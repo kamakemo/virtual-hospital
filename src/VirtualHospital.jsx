@@ -398,6 +398,106 @@ async function compressImage(file, { maxDim = 1600, quality = 0.82, mime = 'imag
   });
 }
 
+// ============== PASTE SANITIZER ==============
+// Strips inline styles, background colors, fonts, and unwanted attributes
+// from pasted HTML — keeps the *structure* (headings, lists, tables, bold)
+// but lets the case viewer's own typography take over.
+function sanitizePastedHTML(html) {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const root = doc.body;
+
+  // Allowed tags. Anything not in this list is unwrapped (children kept, tag removed).
+  const ALLOWED = new Set([
+    'p', 'br', 'div', 'span',
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'ul', 'ol', 'li',
+    'strong', 'b', 'em', 'i', 'u', 's', 'strike', 'del',
+    'sub', 'sup', 'mark',
+    'blockquote', 'pre', 'code',
+    'hr',
+    'a', 'img',
+    'table', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th', 'caption',
+    'figure', 'figcaption',
+  ]);
+
+  // Attributes that are safe to keep
+  const ALLOWED_ATTRS = {
+    a: ['href', 'title', 'target', 'rel'],
+    img: ['src', 'alt', 'title'],
+    td: ['colspan', 'rowspan'],
+    th: ['colspan', 'rowspan'],
+  };
+
+  function clean(node) {
+    // Walk children first (in reverse so removals don't shift indices)
+    const kids = Array.from(node.childNodes);
+    for (const k of kids) {
+      if (k.nodeType === 1) clean(k);
+      else if (k.nodeType === 8) k.remove(); // remove comment nodes
+    }
+
+    if (node.nodeType !== 1) return;
+    const tag = node.tagName.toLowerCase();
+
+    // Drop disallowed tags but keep their content
+    if (!ALLOWED.has(tag)) {
+      const parent = node.parentNode;
+      while (node.firstChild) parent.insertBefore(node.firstChild, node);
+      parent.removeChild(node);
+      return;
+    }
+
+    // Strip ALL attributes except a small whitelist per tag
+    const keep = ALLOWED_ATTRS[tag] || [];
+    [...node.attributes].forEach(attr => {
+      if (!keep.includes(attr.name.toLowerCase())) {
+        node.removeAttribute(attr.name);
+      }
+    });
+
+    // Remove any leftover style/class/id attributes (defensive)
+    node.removeAttribute('style');
+    node.removeAttribute('class');
+    node.removeAttribute('id');
+
+    // Map deprecated/visual tags to semantic equivalents
+    if (tag === 'b') replaceTag(node, 'strong');
+    else if (tag === 'i') replaceTag(node, 'em');
+    else if (tag === 'strike' || tag === 'del') replaceTag(node, 's');
+
+    // Convert MS Word's <p> with non-breaking spaces into clean <p>
+    if (tag === 'p' && node.textContent.replace(/\u00a0/g, '').trim() === '') {
+      node.remove();
+      return;
+    }
+
+    // Block-level <span> wrappers from Word/Google Docs add no value; unwrap
+    if (tag === 'span') {
+      const parent = node.parentNode;
+      while (node.firstChild) parent.insertBefore(node.firstChild, node);
+      parent.removeChild(node);
+    }
+  }
+
+  function replaceTag(node, newTag) {
+    const replacement = doc.createElement(newTag);
+    while (node.firstChild) replacement.appendChild(node.firstChild);
+    node.replaceWith(replacement);
+  }
+
+  // Walk the tree
+  Array.from(root.childNodes).forEach(child => {
+    if (child.nodeType === 1) clean(child);
+  });
+
+  // Normalize empty inline tags
+  root.querySelectorAll('strong, em, u, s, mark').forEach(el => {
+    if (!el.textContent.trim()) el.remove();
+  });
+
+  return root.innerHTML;
+}
+
 // ============== AUTH HOOK ==============
 function useAuth() {
   const [session, setSession] = useState(null);
@@ -519,6 +619,33 @@ function RichTextEditor({ value, onChange, placeholder = 'Write content...', min
     });
     setActive(a);
     saveSelection();
+  };
+
+  // ===== Paste sanitizer — strips source styling while keeping structure =====
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const cd = e.clipboardData;
+    if (!cd) return;
+
+    // Prefer HTML paste (preserves structure); fall back to plain text
+    const html = cd.getData('text/html');
+    const text = cd.getData('text/plain');
+
+    if (!html) {
+      // Plain text paste — convert to escaped HTML with line breaks
+      const safe = (text || '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .split(/\n\s*\n/)
+        .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)
+        .join('');
+      insertHTML(safe);
+      return;
+    }
+
+    // Sanitize the HTML: strip unwanted attributes, classes, inline styles,
+    // and unwanted tags. Keep structure (headings, p, ul/ol, table, etc).
+    const cleaned = sanitizePastedHTML(html);
+    insertHTML(cleaned);
   };
 
   // ===== File upload handlers =====
@@ -815,6 +942,20 @@ function RichTextEditor({ value, onChange, placeholder = 'Write content...', min
         <div className="ml-auto flex items-center gap-1">
           <button
             type="button"
+            onClick={() => {
+              if (!ref.current) return;
+              if (!confirm('Strip all colors, fonts, and inline styles from the content? This keeps your text, headings, lists, tables, and bold/italic — but removes any styling pasted from another source.')) return;
+              const cleaned = sanitizePastedHTML(ref.current.innerHTML);
+              ref.current.innerHTML = cleaned;
+              onChange(cleaned);
+            }}
+            className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600"
+            title="Strip styling from already-pasted content (removes colors, fonts, backgrounds; keeps structure)"
+          >
+            <Eraser size={13} /> Clean styling
+          </button>
+          <button
+            type="button"
             onClick={handleSourceToggle}
             className={cx(
               'flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold',
@@ -844,6 +985,7 @@ function RichTextEditor({ value, onChange, placeholder = 'Write content...', min
           onBlur={handleInput}
           onKeyUp={saveSelection}
           onMouseUp={saveSelection}
+          onPaste={handlePaste}
           suppressContentEditableWarning
           className="rte-content p-4 max-w-none focus:outline-none text-sm text-slate-800 dark:text-slate-200"
           style={{ minHeight: minH }}
