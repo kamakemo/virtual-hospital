@@ -1068,8 +1068,8 @@ export default function VirtualHospital() {
 
         /* Rich text content styles — used in editor preview AND in case view */
         .rte-content { line-height: 1.72; font-size: 0.97rem; }
-        .rte-content > * { max-width: 78ch; }
-        .rte-content > figure, .rte-content > .rte-embed, .rte-content > table, .rte-content > .rte-callout, .rte-content > pre, .rte-content > hr { max-width: none; }
+        .rte-content table { width: 100%; table-layout: auto; }
+        .rte-content table td, .rte-content table th { word-break: break-word; }
         .rte-content h1 { font-family: 'Fraunces', Georgia, serif; font-size: 1.75rem; font-weight: 800; margin: 0.9em 0 0.4em; line-height: 1.2; letter-spacing: -0.01em; }
         .rte-content h2 { font-family: 'Fraunces', Georgia, serif; font-size: 1.4rem; font-weight: 700; margin: 0.85em 0 0.35em; line-height: 1.25; }
         .rte-content h3 { font-size: 1.15rem; font-weight: 700; margin: 0.7em 0 0.3em; }
