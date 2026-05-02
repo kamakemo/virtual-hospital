@@ -1012,12 +1012,23 @@ export default function VirtualHospital() {
     return <ConfigMissingScreen />;
   }
 
-  // ===== Auth gating: students must log in to use the platform =====
+  // ===== Auth gating: landing page is public; sign-in is required for content =====
   if (auth.loading) {
     return <SplashLoader />;
   }
-  if (!auth.user) {
-    return <LoginScreen theme={theme} setTheme={setTheme} />;
+
+  const PUBLIC_ROUTES = ['landing', 'login'];
+  const isPublicRoute = PUBLIC_ROUTES.includes(route.name);
+  const requiresAuth = !auth.user && !isPublicRoute;
+
+  // If trying to access a protected route while signed out, redirect to login
+  if (requiresAuth) {
+    return <LoginScreen theme={theme} setTheme={setTheme} returnTo={route} navigate={navigate} />;
+  }
+
+  // Explicit /login route (when user clicks "Sign in")
+  if (route.name === 'login') {
+    return <LoginScreen theme={theme} setTheme={setTheme} navigate={navigate} />;
   }
 
   return (
@@ -1173,21 +1184,27 @@ function TopBar({ route, navigate, theme, setTheme, progress, userRole, auth }) 
 
         <nav className="ml-auto flex items-center gap-1">
           <NavLink active={route.name === 'landing'} onClick={() => navigate({ name: 'landing' })} icon={Home} label="Home" />
-          <NavLink active={route.name === 'dashboard'} onClick={() => navigate({ name: 'dashboard' })} icon={BarChart3} label="Progress" />
+          {auth?.user && (
+            <NavLink active={route.name === 'dashboard'} onClick={() => navigate({ name: 'dashboard' })} icon={BarChart3} label="Progress" />
+          )}
           {auth?.isAdmin && (
             <NavLink active={route.name === 'admin'} onClick={() => navigate({ name: 'admin' })} icon={Settings} label="Admin" />
           )}
         </nav>
 
         <div className="flex items-center gap-2 pl-3 ml-1 border-l border-slate-200 dark:border-slate-800">
-          <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-500/10 dark:to-yellow-500/10 border border-amber-200 dark:border-amber-500/20">
-            <Star size={13} className="text-amber-600 dark:text-amber-400 fill-amber-500" />
-            <span className="text-xs font-bold text-amber-900 dark:text-amber-200">{progress.xp} XP</span>
-          </div>
-          <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-teal-50 dark:bg-teal-500/10 border border-teal-200 dark:border-teal-500/20">
-            <RoleIcon size={13} className="text-teal-700 dark:text-teal-400" />
-            <span className="text-xs font-semibold text-teal-900 dark:text-teal-300">{userRole.label}</span>
-          </div>
+          {auth?.user && (
+            <>
+              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-500/10 dark:to-yellow-500/10 border border-amber-200 dark:border-amber-500/20">
+                <Star size={13} className="text-amber-600 dark:text-amber-400 fill-amber-500" />
+                <span className="text-xs font-bold text-amber-900 dark:text-amber-200">{progress.xp} XP</span>
+              </div>
+              <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-teal-50 dark:bg-teal-500/10 border border-teal-200 dark:border-teal-500/20">
+                <RoleIcon size={13} className="text-teal-700 dark:text-teal-400" />
+                <span className="text-xs font-semibold text-teal-900 dark:text-teal-300">{userRole.label}</span>
+              </div>
+            </>
+          )}
           <button
             onClick={() => setTheme(t => ({ ...t, dark: !t.dark }))}
             className="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800"
@@ -1195,6 +1212,14 @@ function TopBar({ route, navigate, theme, setTheme, progress, userRole, auth }) 
           >
             {theme.dark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
+          {!auth?.user && (
+            <button
+              onClick={() => navigate({ name: 'login' })}
+              className="px-4 py-1.5 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-sm font-semibold hover:scale-[1.02] transition-transform"
+            >
+              Sign in
+            </button>
+          )}
           {auth?.user && (
             <div className="relative">
               <button
@@ -1258,7 +1283,7 @@ function NavLink({ active, onClick, icon: Icon, label }) {
 }
 
 // ============== LOGIN SCREEN ==============
-function LoginScreen({ theme, setTheme }) {
+function LoginScreen({ theme, setTheme, navigate, returnTo }) {
   const [email, setEmail] = useState('');
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -1294,12 +1319,22 @@ function LoginScreen({ theme, setTheme }) {
       `}</style>
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-teal-400/20 dark:bg-teal-500/10 blur-[120px] rounded-full pointer-events-none" />
 
-      <button
-        onClick={() => setTheme(t => ({ ...t, dark: !t.dark }))}
-        className="absolute top-4 right-4 p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800"
-      >
-        {theme.dark ? <Sun size={16} /> : <Moon size={16} />}
-      </button>
+      <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+        {navigate ? (
+          <button
+            onClick={() => navigate({ name: 'landing' })}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800"
+          >
+            <ChevronLeft size={14} /> Back to home
+          </button>
+        ) : <span />}
+        <button
+          onClick={() => setTheme(t => ({ ...t, dark: !t.dark }))}
+          className="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800"
+        >
+          {theme.dark ? <Sun size={16} /> : <Moon size={16} />}
+        </button>
+      </div>
 
       <div className="relative w-full max-w-md">
         <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-2xl p-8">
@@ -1311,7 +1346,9 @@ function LoginScreen({ theme, setTheme }) {
           </div>
 
           <h1 className="display-font text-3xl font-bold text-center mb-1">Virtual Hospital</h1>
-          <p className="text-center text-sm text-slate-500 mb-6">Sign in to enter the ward</p>
+          <p className="text-center text-sm text-slate-500 mb-6">
+            {returnTo ? 'Sign in to continue' : 'Sign in to enter the ward'}
+          </p>
 
           {sent ? (
             <div className="text-center py-4">
