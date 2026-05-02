@@ -1067,15 +1067,17 @@ export default function VirtualHospital() {
         .fade-up { animation: fadeUp 0.4s ease-out both; }
 
         /* Rich text content styles — used in editor preview AND in case view */
-        .rte-content { line-height: 1.65; }
-        .rte-content h1 { font-family: 'Fraunces', Georgia, serif; font-size: 1.6rem; font-weight: 800; margin: 0.7em 0 0.3em; line-height: 1.2; letter-spacing: -0.01em; }
-        .rte-content h2 { font-family: 'Fraunces', Georgia, serif; font-size: 1.3rem; font-weight: 700; margin: 0.7em 0 0.3em; line-height: 1.25; }
-        .rte-content h3 { font-size: 1.1rem; font-weight: 700; margin: 0.5em 0 0.25em; }
-        .rte-content h4 { font-size: 1rem; font-weight: 700; margin: 0.4em 0 0.2em; }
-        .rte-content p { margin: 0.5em 0; }
-        .rte-content ul { list-style: disc; padding-left: 1.5em; margin: 0.5em 0; }
-        .rte-content ol { list-style: decimal; padding-left: 1.5em; margin: 0.5em 0; }
-        .rte-content li { margin: 0.2em 0; }
+        .rte-content { line-height: 1.72; font-size: 0.97rem; }
+        .rte-content > * { max-width: 78ch; }
+        .rte-content > figure, .rte-content > .rte-embed, .rte-content > table, .rte-content > .rte-callout, .rte-content > pre, .rte-content > hr { max-width: none; }
+        .rte-content h1 { font-family: 'Fraunces', Georgia, serif; font-size: 1.75rem; font-weight: 800; margin: 0.9em 0 0.4em; line-height: 1.2; letter-spacing: -0.01em; }
+        .rte-content h2 { font-family: 'Fraunces', Georgia, serif; font-size: 1.4rem; font-weight: 700; margin: 0.85em 0 0.35em; line-height: 1.25; }
+        .rte-content h3 { font-size: 1.15rem; font-weight: 700; margin: 0.7em 0 0.3em; }
+        .rte-content h4 { font-size: 1.02rem; font-weight: 700; margin: 0.55em 0 0.25em; }
+        .rte-content p { margin: 0.65em 0; }
+        .rte-content ul { list-style: disc; padding-left: 1.6em; margin: 0.6em 0; }
+        .rte-content ol { list-style: decimal; padding-left: 1.6em; margin: 0.6em 0; }
+        .rte-content li { margin: 0.3em 0; }
         .rte-content strong { font-weight: 700; color: inherit; }
         .rte-content blockquote { border-left: 3px solid #14b8a6; padding: 0.5em 0 0.5em 1em; color: #475569; font-style: italic; margin: 0.7em 0; background: rgba(20,184,166,0.06); border-radius: 0 8px 8px 0; }
         .dark .rte-content blockquote { color: #94a3b8; }
@@ -2182,7 +2184,7 @@ function CaseView({ caseData, navigate, progress, setProgress, userRole }) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+    <div className="max-w-[1480px] mx-auto px-4 sm:px-6 py-6">
       <button
         onClick={() => caseData.department
           ? navigate({ name: 'department', hospital: caseData.hospital, departmentId: caseData.department })
@@ -2235,7 +2237,7 @@ function CaseView({ caseData, navigate, progress, setProgress, userRole }) {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-[260px_1fr] gap-5">
+      <div className="grid lg:grid-cols-[220px_1fr] gap-6">
         {/* Stage timeline */}
         <aside className="lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto scrollbar-thin">
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2">
