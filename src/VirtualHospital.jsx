@@ -18,6 +18,18 @@ import {
   CircleDot, Hash
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, BarChart, Bar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import {
+  supabase,
+  isSupabaseConfigured,
+  signInWithMagicLink,
+  signOut,
+  isUserAdmin,
+  fetchAllCases,
+  upsertCase,
+  deleteCaseRow,
+  fetchProgress,
+  saveProgress,
+} from './supabaseClient';
 
 // ============== STORAGE KEYS ==============
 const SK = {
@@ -339,6 +351,91 @@ const useLocal = (key, initial) => {
   return [v, setV];
 };
 
+// ============== IMAGE COMPRESSION ==============
+// Compresses an uploaded image to a sensible size before storing.
+// Returns a Promise<dataURL>.
+async function compressImage(file, { maxDim = 1600, quality = 0.82, mime = 'image/jpeg' } = {}) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const { width, height } = img;
+        let w = width, h = height;
+        if (w > maxDim || h > maxDim) {
+          if (w >= h) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        // Smooth high-quality scaling
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        // White background for transparent PNGs being saved as JPEG
+        if (mime === 'image/jpeg') {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, w, h);
+        }
+        ctx.drawImage(img, 0, 0, w, h);
+        try {
+          const dataUrl = canvas.toDataURL(mime, quality);
+          resolve(dataUrl);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      img.onerror = () => reject(new Error('Failed to decode image'));
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ============== AUTH HOOK ==============
+function useAuth() {
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    if (!isSupabaseConfigured()) {
+      setLoading(false);
+      return;
+    }
+    supabase.auth.getSession().then(({ data }) => {
+      if (!mounted) return;
+      setSession(data.session);
+      setLoading(false);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
+      setSession(sess);
+    });
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  // Check admin status whenever session changes
+  useEffect(() => {
+    if (session?.user?.email) {
+      isUserAdmin(session.user.email).then(setIsAdmin);
+    } else {
+      setIsAdmin(false);
+    }
+  }, [session?.user?.email]);
+
+  return { session, loading, isAdmin, user: session?.user || null };
+}
+
 // ============== RICH TEXT EDITOR ==============
 // ============== STAGE HELPERS ==============
 // Each case can have a custom `stages` array: [{ id, key, label, icon, color, removed? }]
@@ -425,17 +522,21 @@ function RichTextEditor({ value, onChange, placeholder = 'Write content...', min
   };
 
   // ===== File upload handlers =====
-  const handleImageUpload = (e, kind = 'image') => {
+  const handleImageUpload = async (e, kind = 'image') => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 8 * 1024 * 1024) {
-      alert('File too large (max 8MB). Compress the image and try again.');
+    if (file.size > 25 * 1024 * 1024) {
+      alert('File too large (max 25MB before compression).');
       e.target.value = '';
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result;
+    try {
+      // ECG/imaging files are usually photos of strips/films — keep higher quality.
+      // Regular content images are heavily compressed.
+      const opts = kind === 'ecg'
+        ? { maxDim: 2000, quality: 0.88, mime: 'image/jpeg' }
+        : { maxDim: 1600, quality: 0.82, mime: 'image/jpeg' };
+      const dataUrl = await compressImage(file, opts);
       const caption = prompt(kind === 'ecg' ? 'ECG / Imaging caption (e.g. "Lead II — ST elevation")' : 'Optional caption (leave empty for none):') || '';
       const figClass = kind === 'ecg' ? 'rte-figure rte-ecg' : 'rte-figure';
       const html = `
@@ -444,8 +545,9 @@ function RichTextEditor({ value, onChange, placeholder = 'Write content...', min
   ${caption ? `<figcaption>${caption}</figcaption>` : ''}
 </figure><p><br></p>`;
       insertHTML(html);
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      alert('Image processing failed: ' + (err?.message || 'unknown error'));
+    }
     e.target.value = '';
   };
 
@@ -814,30 +916,109 @@ function InsMenuItem({ icon: Icon, label, onClick }) {
 // ============== APP ==============
 export default function VirtualHospital() {
   const [theme, setTheme] = useLocal(SK.SETTINGS, { dark: false });
-  const [cases, setCases] = useLocal(SK.CASES, SEED_CASES);
-  const [progress, setProgress] = useLocal(SK.PROGRESS, {
+  const [cases, setCases] = useState([]);
+  const [casesLoading, setCasesLoading] = useState(true);
+  const [progress, setProgress] = useState({
     xp: 0, completedStages: {}, mcqScores: {}, badges: [], teachingMode: 'advanced'
   });
-  const [route, setRoute] = useState({ name: 'landing' }); // landing | hospital | case | admin | dashboard
-  const [adminAuth, setAdminAuth] = useLocal(SK.ADMIN_AUTH, false);
+  const [route, setRoute] = useState({ name: 'landing' });
+
+  const auth = useAuth();
+  const isConfigured = isSupabaseConfigured();
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme.dark);
   }, [theme.dark]);
 
+  // Load cases from Supabase on mount, and re-load when auth changes
+  useEffect(() => {
+    let cancelled = false;
+    if (!isConfigured) {
+      // Fall back to seed cases if env vars missing (dev convenience)
+      setCases(SEED_CASES);
+      setCasesLoading(false);
+      return;
+    }
+    setCasesLoading(true);
+    fetchAllCases().then(async rows => {
+      if (cancelled) return;
+      // Auto-seed: if there are no cases AND the current user is admin, insert the 5 starters
+      if (rows.length === 0 && auth.isAdmin) {
+        console.log('[seed] No cases yet — inserting 5 starter cases…');
+        for (const c of SEED_CASES) {
+          await upsertCase(c);
+        }
+        const seeded = await fetchAllCases();
+        if (!cancelled) {
+          setCases(seeded);
+          setCasesLoading(false);
+        }
+      } else {
+        setCases(rows);
+        setCasesLoading(false);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [isConfigured, auth.isAdmin]);
+
+  // Load progress for the signed-in user
+  useEffect(() => {
+    if (!auth.user) {
+      setProgress({ xp: 0, completedStages: {}, mcqScores: {}, badges: [], teachingMode: 'advanced' });
+      return;
+    }
+    fetchProgress(auth.user.id).then(p => {
+      if (p) setProgress(p);
+    });
+  }, [auth.user?.id]);
+
+  // Save progress to Supabase when it changes (debounced)
+  const progressSaveTimer = useRef(null);
+  useEffect(() => {
+    if (!auth.user) return;
+    if (progressSaveTimer.current) clearTimeout(progressSaveTimer.current);
+    progressSaveTimer.current = setTimeout(() => {
+      saveProgress(auth.user.id, progress);
+    }, 600);
+    return () => {
+      if (progressSaveTimer.current) clearTimeout(progressSaveTimer.current);
+    };
+  }, [progress, auth.user?.id]);
+
   const navigate = (r) => setRoute(r);
 
-  const updateCase = (updated) => {
+  // Case CRUD — go through Supabase
+  const updateCase = async (updated) => {
     setCases(cs => cs.map(c => c.id === updated.id ? updated : c));
+    if (isConfigured) await upsertCase(updated);
   };
-  const addCase = (newCase) => setCases(cs => [...cs, newCase]);
-  const deleteCase = (id) => setCases(cs => cs.filter(c => c.id !== id));
+  const addCase = async (newCase) => {
+    setCases(cs => [...cs, newCase]);
+    if (isConfigured) await upsertCase(newCase);
+  };
+  const deleteCase = async (id) => {
+    setCases(cs => cs.filter(c => c.id !== id));
+    if (isConfigured) await deleteCaseRow(id);
+  };
 
   const userRole = useMemo(() => {
     let r = ROLES[0];
     for (const role of ROLES) if (progress.xp >= role.xpRequired) r = role;
     return r;
   }, [progress.xp]);
+
+  // ===== If Supabase is not configured, show a setup banner =====
+  if (!isConfigured) {
+    return <ConfigMissingScreen />;
+  }
+
+  // ===== Auth gating: students must log in to use the platform =====
+  if (auth.loading) {
+    return <SplashLoader />;
+  }
+  if (!auth.user) {
+    return <LoginScreen theme={theme} setTheme={setTheme} />;
+  }
 
   return (
     <div className={cx(
@@ -921,11 +1102,16 @@ export default function VirtualHospital() {
 
       <TopBar
         route={route} navigate={navigate} theme={theme} setTheme={setTheme}
-        progress={progress} userRole={userRole}
+        progress={progress} userRole={userRole} auth={auth}
       />
 
       <main>
-        {route.name === 'landing' && (
+        {casesLoading && route.name === 'landing' && (
+          <div className="max-w-7xl mx-auto px-6 py-12 text-center text-slate-500">
+            <div className="inline-flex items-center gap-2"><RefreshCw size={14} className="animate-spin" /> Loading cases…</div>
+          </div>
+        )}
+        {!casesLoading && route.name === 'landing' && (
           <Landing navigate={navigate} cases={cases} progress={progress} userRole={userRole} />
         )}
         {route.name === 'hospital' && (
@@ -954,7 +1140,7 @@ export default function VirtualHospital() {
           <AdminPanel
             cases={cases} updateCase={updateCase} addCase={addCase}
             deleteCase={deleteCase} navigate={navigate}
-            adminAuth={adminAuth} setAdminAuth={setAdminAuth}
+            auth={auth}
           />
         )}
       </main>
@@ -968,8 +1154,9 @@ export default function VirtualHospital() {
 }
 
 // ============== TOP BAR ==============
-function TopBar({ route, navigate, theme, setTheme, progress, userRole }) {
+function TopBar({ route, navigate, theme, setTheme, progress, userRole, auth }) {
   const RoleIcon = userRole.icon;
+  const [menuOpen, setMenuOpen] = useState(false);
   return (
     <header className="sticky top-0 z-40 backdrop-blur-xl bg-white/70 dark:bg-slate-950/70 border-b border-slate-200/70 dark:border-slate-800/70">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
@@ -987,7 +1174,9 @@ function TopBar({ route, navigate, theme, setTheme, progress, userRole }) {
         <nav className="ml-auto flex items-center gap-1">
           <NavLink active={route.name === 'landing'} onClick={() => navigate({ name: 'landing' })} icon={Home} label="Home" />
           <NavLink active={route.name === 'dashboard'} onClick={() => navigate({ name: 'dashboard' })} icon={BarChart3} label="Progress" />
-          <NavLink active={route.name === 'admin'} onClick={() => navigate({ name: 'admin' })} icon={Settings} label="Admin" />
+          {auth?.isAdmin && (
+            <NavLink active={route.name === 'admin'} onClick={() => navigate({ name: 'admin' })} icon={Settings} label="Admin" />
+          )}
         </nav>
 
         <div className="flex items-center gap-2 pl-3 ml-1 border-l border-slate-200 dark:border-slate-800">
@@ -1006,6 +1195,45 @@ function TopBar({ route, navigate, theme, setTheme, progress, userRole }) {
           >
             {theme.dark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
+          {auth?.user && (
+            <div className="relative">
+              <button
+                onClick={() => setMenuOpen(o => !o)}
+                className="flex items-center gap-1.5 p-1.5 pl-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+                title={auth.user.email}
+              >
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-teal-500 to-cyan-500 text-white text-xs font-bold flex items-center justify-center">
+                  {(auth.user.email || '?').slice(0, 1).toUpperCase()}
+                </div>
+                <ChevronDown size={12} className="text-slate-400" />
+              </button>
+              {menuOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
+                  <div className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-2xl z-50 p-1">
+                    <div className="px-3 py-2 border-b border-slate-200 dark:border-slate-700">
+                      <div className="text-xs text-slate-500">Signed in as</div>
+                      <div className="text-sm font-semibold truncate">{auth.user.email}</div>
+                      {auth.isAdmin && (
+                        <div className="mt-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300">
+                          <Shield size={10} /> Admin
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      onClick={async () => {
+                        setMenuOpen(false);
+                        await signOut();
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/15 text-rose-600 dark:text-rose-400 text-sm font-medium"
+                    >
+                      <X size={14} /> Sign out
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </header>
@@ -1026,6 +1254,163 @@ function NavLink({ active, onClick, icon: Icon, label }) {
       <Icon size={14} />
       <span className="hidden sm:inline">{label}</span>
     </button>
+  );
+}
+
+// ============== LOGIN SCREEN ==============
+function LoginScreen({ theme, setTheme }) {
+  const [email, setEmail] = useState('');
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setSending(true);
+    setError('');
+    const { error } = await signInWithMagicLink(email.trim());
+    setSending(false);
+    if (error) {
+      setError(error.message || 'Could not send the magic link.');
+    } else {
+      setSent(true);
+    }
+  };
+
+  return (
+    <div className={cx('min-h-screen flex items-center justify-center p-4 relative overflow-hidden grid-bg',
+      'bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100')}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600;700;900&family=Inter:wght@400;500;600;700&display=swap');
+        body, html { font-family: 'Inter', system-ui, sans-serif; }
+        .display-font { font-family: 'Fraunces', Georgia, serif; letter-spacing: -0.02em; }
+        .grid-bg {
+          background-image:
+            linear-gradient(rgba(20, 184, 166, 0.08) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(20, 184, 166, 0.08) 1px, transparent 1px);
+          background-size: 32px 32px;
+        }
+      `}</style>
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-teal-400/20 dark:bg-teal-500/10 blur-[120px] rounded-full pointer-events-none" />
+
+      <button
+        onClick={() => setTheme(t => ({ ...t, dark: !t.dark }))}
+        className="absolute top-4 right-4 p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800"
+      >
+        {theme.dark ? <Sun size={16} /> : <Moon size={16} />}
+      </button>
+
+      <div className="relative w-full max-w-md">
+        <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-2xl p-8">
+          <div className="flex justify-center mb-5">
+            <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-500 via-cyan-500 to-blue-600 flex items-center justify-center shadow-xl shadow-teal-500/30">
+              <Hospital size={26} className="text-white" />
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-400 ring-2 ring-white dark:ring-slate-900" />
+            </div>
+          </div>
+
+          <h1 className="display-font text-3xl font-bold text-center mb-1">Virtual Hospital</h1>
+          <p className="text-center text-sm text-slate-500 mb-6">Sign in to enter the ward</p>
+
+          {sent ? (
+            <div className="text-center py-4">
+              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center">
+                <CheckCircle2 className="text-emerald-600 dark:text-emerald-400" size={24} />
+              </div>
+              <h2 className="font-bold mb-2">Check your inbox</h2>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                We sent a magic sign-in link to<br />
+                <strong className="text-slate-900 dark:text-white">{email}</strong>
+              </p>
+              <p className="text-xs text-slate-500 mt-3">
+                Click the link in your email to finish signing in. You can close this tab.
+              </p>
+              <button
+                onClick={() => { setSent(false); setEmail(''); }}
+                className="mt-4 text-xs text-teal-600 dark:text-teal-400 hover:underline"
+              >
+                Use a different email
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <div>
+                <label className="text-xs uppercase tracking-wider text-slate-500 font-semibold block mb-1.5">
+                  Email address
+                </label>
+                <input
+                  type="email" required autoFocus
+                  value={email} onChange={e => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-transparent focus:border-teal-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none text-sm"
+                />
+              </div>
+              {error && (
+                <div className="text-xs text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 px-3 py-2 rounded-lg">
+                  {error}
+                </div>
+              )}
+              <button
+                type="submit"
+                disabled={sending || !email.trim()}
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01] transition-transform"
+              >
+                {sending ? 'Sending magic link…' : 'Send magic link'}
+              </button>
+              <p className="text-xs text-slate-500 text-center pt-2">
+                We'll email you a one-tap sign-in link. No password needed.
+              </p>
+            </form>
+          )}
+        </div>
+
+        <p className="text-center text-xs text-slate-500 mt-6">
+          Educational platform · For AlGhad EMS &amp; Internal Medicine students
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ============== SPLASH LOADER ==============
+function SplashLoader() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+      <div className="text-center">
+        <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-teal-500 to-blue-600 flex items-center justify-center animate-pulse">
+          <Hospital size={22} className="text-white" />
+        </div>
+        <p className="text-sm text-slate-500">Loading…</p>
+      </div>
+    </div>
+  );
+}
+
+// ============== CONFIG MISSING SCREEN ==============
+function ConfigMissingScreen() {
+  return (
+    <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+      <div className="max-w-lg w-full rounded-3xl border border-amber-300 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-8">
+        <div className="w-14 h-14 rounded-2xl bg-amber-500 text-white flex items-center justify-center mb-4">
+          <AlertTriangle size={26} />
+        </div>
+        <h1 className="display-font text-2xl font-bold mb-2">Supabase configuration missing</h1>
+        <p className="text-sm mb-4">
+          The app needs two environment variables to connect to your Supabase project.
+          Create a file called <code className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-900 text-xs font-mono">.env.local</code> in your project root with:
+        </p>
+        <pre className="text-xs bg-slate-900 text-emerald-300 p-4 rounded-xl mb-4 overflow-x-auto">{`VITE_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJ...your-anon-public-key...`}</pre>
+        <p className="text-xs text-slate-700 dark:text-slate-300">
+          Find these on your Supabase dashboard under <strong>Project Settings → API</strong>.
+          After creating the file, restart the dev server (<code className="px-1 py-0.5 rounded bg-white dark:bg-slate-900 text-[11px] font-mono">npm run dev</code>).
+        </p>
+        <p className="text-xs text-slate-500 mt-3">
+          For deployment on Vercel, add the same two variables in <strong>Project Settings → Environment Variables</strong>.
+        </p>
+      </div>
+    </div>
   );
 }
 
@@ -2467,33 +2852,54 @@ function RoleProgress({ xp }) {
 }
 
 // ============== ADMIN PANEL ==============
-function AdminPanel({ cases, updateCase, addCase, deleteCase, navigate, adminAuth, setAdminAuth }) {
+function AdminPanel({ cases, updateCase, addCase, deleteCase, navigate, auth }) {
   const [activeId, setActiveId] = useState(cases[0]?.id);
   const [activeStageKey, setActiveStageKey] = useState('profile');
-  const [pwd, setPwd] = useState('');
   const [showNew, setShowNew] = useState(false);
+
+  // Update activeId when cases change
+  useEffect(() => {
+    if (!activeId && cases.length > 0) setActiveId(cases[0].id);
+    if (activeId && !cases.find(c => c.id === activeId)) setActiveId(cases[0]?.id);
+  }, [cases, activeId]);
 
   const active = cases.find(c => c.id === activeId);
 
-  if (!adminAuth) {
+  // ===== Access control: must be signed in AND in the admins table =====
+  if (!auth?.user) {
     return (
       <div className="max-w-md mx-auto px-6 py-20">
         <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 text-center">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center mx-auto mb-4">
             <Lock className="text-white" size={22} />
           </div>
-          <h2 className="display-font text-2xl font-bold mb-1">Admin access</h2>
-          <p className="text-sm text-slate-500 mb-5">Demo passcode: <code className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono text-xs">algahd2026</code></p>
-          <input
-            type="password" value={pwd} onChange={e => setPwd(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && pwd === 'algahd2026' && setAdminAuth(true)}
-            placeholder="Enter passcode"
-            className="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-transparent focus:border-teal-500 focus:outline-none mb-3"
-          />
-          <button
-            onClick={() => pwd === 'algahd2026' ? setAdminAuth(true) : alert('Incorrect passcode')}
-            className="w-full px-4 py-2.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-semibold"
-          >Unlock admin panel</button>
+          <h2 className="display-font text-2xl font-bold mb-2">Sign in required</h2>
+          <p className="text-sm text-slate-500 mb-4">Please sign in to access the admin panel.</p>
+          <button onClick={() => navigate({ name: 'landing' })} className="text-sm text-teal-600 underline">Back to home</button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!auth.isAdmin) {
+    return (
+      <div className="max-w-md mx-auto px-6 py-20">
+        <div className="rounded-3xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 p-8 text-center">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center mx-auto mb-4">
+            <Shield className="text-white" size={22} />
+          </div>
+          <h2 className="display-font text-2xl font-bold mb-2">Admin access only</h2>
+          <p className="text-sm text-slate-700 dark:text-slate-300 mb-2">
+            Your account (<strong>{auth.user.email}</strong>) is not in the admin list.
+          </p>
+          <p className="text-xs text-slate-500 mb-4">
+            To grant admin access, run this SQL in your Supabase SQL editor:
+          </p>
+          <pre className="text-[11px] bg-slate-900 text-emerald-300 p-3 rounded-lg text-left mb-4 overflow-x-auto">
+{`insert into admins (email)
+values ('${auth.user.email}');`}
+          </pre>
+          <button onClick={() => navigate({ name: 'landing' })} className="text-sm text-teal-600 underline">Back to home</button>
         </div>
       </div>
     );
@@ -2505,6 +2911,7 @@ function AdminPanel({ cases, updateCase, addCase, deleteCase, navigate, adminAut
         <div>
           <p className="text-xs uppercase tracking-[0.25em] text-slate-500 font-semibold mb-1">Content authoring</p>
           <h1 className="display-font text-3xl font-bold">Admin Panel</h1>
+          <p className="text-xs text-slate-500 mt-1">Signed in as <strong>{auth.user.email}</strong> · Changes save to Supabase instantly</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={() => setShowNew(true)} className="px-4 py-2 rounded-full bg-teal-500 text-white text-sm font-bold flex items-center gap-1.5 hover:bg-teal-600">
@@ -2520,9 +2927,8 @@ function AdminPanel({ cases, updateCase, addCase, deleteCase, navigate, adminAut
             }}
             className="px-3 py-2 rounded-full border border-slate-300 dark:border-slate-700 text-sm font-semibold flex items-center gap-1.5 hover:bg-slate-100 dark:hover:bg-slate-800"
           >
-            <Download size={14} /> Export
+            <Download size={14} /> Export backup
           </button>
-          <button onClick={() => { setAdminAuth(false); navigate({ name: 'landing' }); }} className="text-sm text-slate-500 hover:text-rose-500">Sign out</button>
         </div>
       </div>
 
