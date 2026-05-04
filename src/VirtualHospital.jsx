@@ -498,6 +498,237 @@ function sanitizePastedHTML(html) {
   return root.innerHTML;
 }
 
+// ============== MCQ BULK PARSER ==============
+// Parses a block of pasted text into structured MCQ objects.
+// Returns { questions: [...], errors: [...] }
+function parseMCQBulk(rawText) {
+  if (!rawText || !rawText.trim()) return { questions: [], errors: [] };
+
+  // Normalize whitespace, smart quotes, em-dashes
+  let text = rawText
+    .replace(/\r\n/g, '\n')
+    .replace(/\u2013|\u2014/g, '—')         // en-dash / em-dash → em-dash
+    .replace(/[\u201C\u201D]/g, '"')        // smart double quotes
+    .replace(/[\u2018\u2019]/g, "'")        // smart single quotes
+    .replace(/\u00A0/g, ' ');               // non-breaking space → space
+
+  // Split into question blocks. A new question starts with "Q" + digits at the start of a line.
+  // We split on either an explicit "---" separator OR the start of the next "Q##" line.
+  const blocks = [];
+  const lines = text.split('\n');
+  let current = [];
+  let inQuestion = false;
+
+  const isNewQuestionLine = (line) => /^\s*Q\s*\d+/i.test(line);
+  const isSeparator = (line) => /^\s*---+\s*$/.test(line);
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (isNewQuestionLine(line)) {
+      if (current.length > 0) blocks.push(current.join('\n'));
+      current = [line];
+      inQuestion = true;
+    } else if (isSeparator(line)) {
+      if (current.length > 0) blocks.push(current.join('\n'));
+      current = [];
+      inQuestion = false;
+    } else if (inQuestion) {
+      current.push(line);
+    }
+  }
+  if (current.length > 0) blocks.push(current.join('\n'));
+
+  const questions = [];
+  const errors = [];
+
+  blocks.forEach((block, idx) => {
+    const result = parseSingleMCQ(block, idx);
+    if (result.error) {
+      errors.push({ index: idx, label: result.label, error: result.error });
+    } else if (result.question) {
+      questions.push(result.question);
+    }
+  });
+
+  return { questions, errors };
+}
+
+function parseSingleMCQ(block, idx) {
+  const lines = block.split('\n');
+  if (lines.length === 0) return { error: 'empty block' };
+
+  // === Parse the Q-line: "Q30 ⭐⭐ [Management]" ===
+  const qLine = lines[0];
+  const qLineMatch = qLine.match(/^\s*Q\s*(\d+)\s*([⭐★*\u2B50]*)\s*(?:\[([^\]]+)\])?\s*$/i);
+  let qNumber = idx + 1;
+  let stars = 0;
+  let qType = null;
+  let stemStartIdx = 1;
+
+  if (qLineMatch) {
+    qNumber = parseInt(qLineMatch[1]);
+    stars = (qLineMatch[2] || '').replace(/[^⭐★*\u2B50]/g, '').length;
+    qType = qLineMatch[3] || null;
+  } else {
+    // Maybe Q + number is mixed with content on same line — try a looser match
+    const loose = qLine.match(/^\s*Q\s*(\d+)[\.\):]?\s*([⭐★*\u2B50]*)\s*(?:\[([^\]]+)\])?\s*(.*)$/i);
+    if (loose) {
+      qNumber = parseInt(loose[1]);
+      stars = (loose[2] || '').replace(/[^⭐★*\u2B50]/g, '').length;
+      qType = loose[3] || null;
+      // If stem text appears on the same line, treat it as part of the stem
+      if (loose[4] && loose[4].trim()) {
+        lines[0] = loose[4];
+        stemStartIdx = 0;
+      }
+    } else {
+      return { error: `Could not find "Q##" header. First line: "${qLine.slice(0, 60)}"` };
+    }
+  }
+
+  const label = `Q${qNumber}`;
+
+  // === Find option block (lines starting with bullet+letter or just letter) ===
+  // Acceptable: "• A) text", "A) text", "A. text", "(A) text", "A: text"
+  const optionRegex = /^\s*(?:[•\-\*]\s*)?\(?([A-E])\)?[\.\:\)]\s*(.+)$/;
+  const optionStartIdx = lines.findIndex((l, i) => i > stemStartIdx - 1 && optionRegex.test(l));
+
+  if (optionStartIdx === -1) {
+    return { label, error: 'No options (A, B, C…) found.' };
+  }
+
+  // Stem = lines between Q-line and first option
+  const stem = lines.slice(stemStartIdx, optionStartIdx).join('\n').trim();
+  if (!stem) {
+    return { label, error: 'Question stem is empty.' };
+  }
+
+  // === Collect options ===
+  const options = [];
+  const optionLetters = [];
+  let i = optionStartIdx;
+  while (i < lines.length) {
+    const m = lines[i].match(optionRegex);
+    if (m) {
+      options.push({ letter: m[1].toUpperCase(), text: m[2].trim() });
+      optionLetters.push(m[1].toUpperCase());
+      // Continue collecting if next line(s) are continuations of this option (not a new option, not "CORRECT ANSWER", not "EXPLANATION")
+      let j = i + 1;
+      while (j < lines.length) {
+        const nextLine = lines[j];
+        if (optionRegex.test(nextLine)) break;
+        if (/CORRECT\s*ANSWER\s*:/i.test(nextLine)) break;
+        if (/EXPLANATION\s*:/i.test(nextLine)) break;
+        if (nextLine.trim() === '') { j++; continue; }
+        // Append to last option
+        options[options.length - 1].text += ' ' + nextLine.trim();
+        j++;
+      }
+      i = j;
+    } else {
+      i++;
+    }
+    // Stop if we've reached "CORRECT ANSWER:" or "EXPLANATION:"
+    if (i < lines.length && (/CORRECT\s*ANSWER\s*:/i.test(lines[i]) || /EXPLANATION\s*:/i.test(lines[i]))) break;
+  }
+
+  if (options.length < 2) {
+    return { label, error: `Only ${options.length} option(s) found — need at least 2.` };
+  }
+
+  // === Find correct answer ===
+  const correctMatch = block.match(/CORRECT\s*ANSWER\s*:\s*([A-E])/i);
+  if (!correctMatch) {
+    return { label, error: 'Could not find "CORRECT ANSWER: X" line.' };
+  }
+  const correctLetter = correctMatch[1].toUpperCase();
+  const correctIdx = optionLetters.indexOf(correctLetter);
+  if (correctIdx === -1) {
+    return { label, error: `Marked correct answer "${correctLetter}" but no option ${correctLetter} exists.` };
+  }
+
+  // === Extract explanation ===
+  let explainBlock = '';
+  const explanationMarker = block.match(/EXPLANATION\s*:\s*\n?/i);
+  if (explanationMarker) {
+    const idxOfExplain = explanationMarker.index + explanationMarker[0].length;
+    explainBlock = block.slice(idxOfExplain).trim();
+  }
+
+  // Detect optional sub-sections "Why X is correct/wrong:" → split into perOption explanations
+  const perOption = {};
+  let mainExplanation = explainBlock;
+  const subSectionRegex = /^\s*Why\s+([A-E])\s+is\s+(correct|wrong|incorrect|right)\s*:\s*/im;
+
+  if (subSectionRegex.test(explainBlock)) {
+    const sections = [];
+    const sectionStartRe = /^\s*Why\s+([A-E])\s+is\s+(correct|wrong|incorrect|right)\s*:\s*/gim;
+    const splits = [];
+    let match;
+    while ((match = sectionStartRe.exec(explainBlock)) !== null) {
+      splits.push({ start: match.index, end: match.index + match[0].length, letter: match[1].toUpperCase(), kind: match[2].toLowerCase() });
+    }
+
+    if (splits.length > 0) {
+      // Anything before the first sub-section is the "main" explanation
+      const firstStart = splits[0].start;
+      mainExplanation = explainBlock.slice(0, firstStart).trim();
+
+      for (let s = 0; s < splits.length; s++) {
+        const segStart = splits[s].end;
+        const segEnd = s + 1 < splits.length ? splits[s + 1].start : explainBlock.length;
+        const text = explainBlock.slice(segStart, segEnd).trim();
+        perOption[splits[s].letter] = {
+          kind: splits[s].kind === 'correct' || splits[s].kind === 'right' ? 'correct' : 'wrong',
+          text,
+        };
+      }
+    }
+  }
+
+  // Convert plain-text explanation lines to simple HTML so it renders nicely
+  const toHTML = (txt) => {
+    if (!txt) return '';
+    // Already HTML?
+    if (/<[a-z]+[\s>]/i.test(txt)) return txt;
+    return txt
+      .split(/\n\s*\n/)
+      .map(p => {
+        // Bullet lines starting with • or - or *
+        if (p.split('\n').every(l => /^\s*[•\-\*]\s+/.test(l) || l.trim() === '')) {
+          const items = p.split('\n').filter(l => l.trim()).map(l => '<li>' + l.replace(/^\s*[•\-\*]\s+/, '').trim() + '</li>').join('');
+          return `<ul>${items}</ul>`;
+        }
+        // Lines starting with "X." or "1." numbered
+        if (p.split('\n').every(l => /^\s*\d+[\.\)]\s+/.test(l) || l.trim() === '')) {
+          const items = p.split('\n').filter(l => l.trim()).map(l => '<li>' + l.replace(/^\s*\d+[\.\)]\s+/, '').trim() + '</li>').join('');
+          return `<ol>${items}</ol>`;
+        }
+        return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+      })
+      .join('');
+  };
+
+  // Map difficulty
+  const difficulty = stars >= 3 ? 'hard' : stars === 2 ? 'moderate' : stars === 1 ? 'easy' : 'standard';
+
+  return {
+    question: {
+      q: stem,
+      options: options.map(o => o.text),
+      correct: correctIdx,
+      explain: mainExplanation || explainBlock,  // preserve original if no sub-sections
+      explainHTML: toHTML(mainExplanation || explainBlock),
+      perOption: Object.keys(perOption).length > 0
+        ? Object.fromEntries(Object.entries(perOption).map(([k, v]) => [k, { ...v, html: toHTML(v.text) }]))
+        : null,
+      difficulty,
+      stars,
+      type: qType,
+    },
+  };
+}
+
 // ============== AUTH HOOK ==============
 function useAuth() {
   const [session, setSession] = useState(null);
@@ -2770,11 +3001,33 @@ function MCQSection({ mcqs, caseId, progress, setProgress, markComplete }) {
 
   return (
     <div className="space-y-4">
-      {mcqs.map((q, i) => (
+      {mcqs.map((q, i) => {
+        const stars = '⭐'.repeat(q.stars || 0);
+        const diffChip = {
+          easy:     'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300',
+          moderate: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300',
+          hard:     'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300',
+        }[q.difficulty];
+        return (
         <div key={i} className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 p-5">
           <div className="flex items-start gap-3 mb-3">
             <div className="w-7 h-7 rounded-lg bg-pink-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">Q{i + 1}</div>
-            <p className="font-semibold text-sm leading-relaxed flex-1">{q.q}</p>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                {stars && <span className="text-xs">{stars}</span>}
+                {q.difficulty && diffChip && (
+                  <span className={cx('text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded', diffChip)}>
+                    {q.difficulty}
+                  </span>
+                )}
+                {q.type && (
+                  <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                    {q.type}
+                  </span>
+                )}
+              </div>
+              <p className="font-semibold text-sm leading-relaxed">{q.q}</p>
+            </div>
           </div>
           <div className="space-y-2">
             {q.options.map((opt, oi) => {
@@ -2813,21 +3066,77 @@ function MCQSection({ mcqs, caseId, progress, setProgress, markComplete }) {
             })}
           </div>
           {submitted && (
-            <div className={cx(
-              'mt-3 rounded-lg p-3 text-sm border',
-              answers[i] === q.correct
-                ? 'border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-900 dark:text-emerald-200'
-                : 'border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 text-rose-900 dark:text-rose-200'
-            )}>
-              <div className="flex items-center gap-2 font-bold mb-1">
+            <div className="mt-3 space-y-2">
+              {/* Pass/fail banner */}
+              <div className={cx(
+                'rounded-lg px-3 py-2 text-sm border flex items-center gap-2 font-bold',
+                answers[i] === q.correct
+                  ? 'border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-900 dark:text-emerald-200'
+                  : 'border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 text-rose-900 dark:text-rose-200'
+              )}>
                 {answers[i] === q.correct ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
-                {answers[i] === q.correct ? 'Correct' : 'Why this is wrong'}
+                {answers[i] === q.correct ? 'Correct!' : `Correct answer: ${String.fromCharCode(65 + q.correct)}`}
               </div>
-              <p className="text-xs leading-relaxed">{q.explain}</p>
+
+              {/* Per-option explanations (if available) */}
+              {q.perOption ? (
+                <>
+                  {/* Why correct */}
+                  {Object.entries(q.perOption).filter(([, v]) => v.kind === 'correct').map(([letter, v]) => (
+                    <div key={letter} className="rounded-lg p-3 border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10">
+                      <div className="font-bold text-xs text-emerald-700 dark:text-emerald-300 mb-1.5 flex items-center gap-1.5">
+                        <CheckCircle2 size={13} /> Why {letter} is correct
+                      </div>
+                      <div className="rte-content text-xs text-emerald-900 dark:text-emerald-100" dangerouslySetInnerHTML={{ __html: v.html || `<p>${v.text}</p>` }} />
+                    </div>
+                  ))}
+                  {/* Why others are wrong */}
+                  {Object.entries(q.perOption).filter(([, v]) => v.kind === 'wrong').length > 0 && (
+                    <div className="rounded-lg p-3 border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10">
+                      <div className="font-bold text-xs text-rose-700 dark:text-rose-300 mb-2 flex items-center gap-1.5">
+                        <XCircle size={13} /> Why others are wrong
+                      </div>
+                      <div className="space-y-2">
+                        {Object.entries(q.perOption).filter(([, v]) => v.kind === 'wrong').map(([letter, v]) => (
+                          <div key={letter} className="text-xs text-rose-900 dark:text-rose-100">
+                            <span className="font-bold mr-1">{letter}:</span>
+                            <span className="rte-content inline" dangerouslySetInnerHTML={{ __html: v.html || `<p>${v.text}</p>` }} />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {/* Main/leading explanation block, if any */}
+                  {q.explain && q.explain.trim() && (
+                    <div className="rounded-lg p-3 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/40">
+                      <div className="font-bold text-xs text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
+                        <BookOpen size={13} /> Explanation
+                      </div>
+                      <div className="rte-content text-xs text-slate-800 dark:text-slate-200" dangerouslySetInnerHTML={{ __html: q.explainHTML || `<p>${q.explain}</p>` }} />
+                    </div>
+                  )}
+                </>
+              ) : (
+                /* Single unified explanation block */
+                q.explain && (
+                  <div className={cx(
+                    'rounded-lg p-3 border',
+                    answers[i] === q.correct
+                      ? 'border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-500/5'
+                      : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/40'
+                  )}>
+                    <div className="font-bold text-xs text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
+                      <BookOpen size={13} /> Explanation
+                    </div>
+                    <div className="rte-content text-xs text-slate-800 dark:text-slate-200" dangerouslySetInnerHTML={{ __html: q.explainHTML || `<p>${q.explain.split('\n').filter(l => l.trim()).map(l => l).join('</p><p>')}</p>` }} />
+                  </div>
+                )
+              )}
             </div>
           )}
         </div>
-      ))}
+        );
+      })}
       <div className="flex items-center gap-3 pt-2">
         {!submitted ? (
           <button
@@ -3687,6 +3996,8 @@ function SectionRow({ stage, index, total, onRename, onToggleRemove, onMoveUp, o
 }
 
 function MCQEditor({ mcqs, onChange }) {
+  const [showBulk, setShowBulk] = useState(false);
+
   const update = (i, k, v) => {
     const next = [...mcqs];
     next[i] = { ...next[i], [k]: v };
@@ -3702,14 +4013,32 @@ function MCQEditor({ mcqs, onChange }) {
   const addQ = () => onChange([...mcqs, { q: '', options: ['', '', '', ''], correct: 0, explain: '' }]);
   const removeQ = (i) => onChange(mcqs.filter((_, idx) => idx !== i));
 
+  const handleBulkImport = (newQuestions) => {
+    onChange([...mcqs, ...newQuestions]);
+    setShowBulk(false);
+  };
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <h3 className="font-bold flex items-center gap-2"><Brain size={16} /> Multiple choice questions</h3>
-        <button onClick={addQ} className="px-3 py-1.5 rounded-full bg-pink-500 text-white text-xs font-bold flex items-center gap-1 hover:bg-pink-600">
-          <Plus size={12} /> Add question
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setShowBulk(true)} className="px-3 py-1.5 rounded-full bg-violet-500 text-white text-xs font-bold flex items-center gap-1 hover:bg-violet-600">
+            <Upload size={12} /> Bulk import
+          </button>
+          <button onClick={addQ} className="px-3 py-1.5 rounded-full bg-pink-500 text-white text-xs font-bold flex items-center gap-1 hover:bg-pink-600">
+            <Plus size={12} /> Add question
+          </button>
+        </div>
       </div>
+
+      {showBulk && (
+        <BulkImportModal
+          existingCount={mcqs.length}
+          onClose={() => setShowBulk(false)}
+          onImport={handleBulkImport}
+        />
+      )}
 
       {mcqs.length === 0 && (
         <div className="rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 p-10 text-center text-slate-500">
@@ -3762,6 +4091,198 @@ function MCQEditor({ mcqs, onChange }) {
           </Field>
         </div>
       ))}
+    </div>
+  );
+}
+
+// ============== BULK IMPORT MODAL ==============
+function BulkImportModal({ existingCount, onClose, onImport }) {
+  const [text, setText] = useState('');
+  const [parsed, setParsed] = useState({ questions: [], errors: [] });
+
+  const samplePlaceholder = `Paste questions in this format:
+
+Q1 ⭐⭐ [Management]
+
+A 58-year-old man presents with crushing chest pain. ECG shows ST elevation
+in V1-V4. Which artery is most likely occluded?
+
+• A) Right coronary artery
+• B) Left circumflex
+• C) Left anterior descending
+• D) Posterior descending
+
+✅ CORRECT ANSWER: C
+
+📖 EXPLANATION:
+V1-V4 represents the anterior wall, supplied by the LAD.
+Proximal LAD occlusion involves a large myocardium territory.
+
+Why C is correct:
+LAD supplies the entire anterior wall...
+
+Why A is wrong:
+RCA supplies the inferior wall (II, III, aVF)...
+
+---
+
+Q2 ⭐⭐⭐ [Diagnosis]
+[next question stem...]
+`;
+
+  // Re-parse on every change
+  useEffect(() => {
+    if (!text.trim()) {
+      setParsed({ questions: [], errors: [] });
+      return;
+    }
+    const result = parseMCQBulk(text);
+    setParsed(result);
+  }, [text]);
+
+  const validCount = parsed.questions.length;
+  const errorCount = parsed.errors.length;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div className="w-full max-w-6xl h-[90vh] rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between flex-shrink-0">
+          <div>
+            <h3 className="display-font text-2xl font-bold flex items-center gap-2">
+              <Upload size={20} className="text-violet-500" /> Bulk Import MCQs
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">Paste multiple questions; the parser will structure them automatically</p>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"><X size={18} /></button>
+        </div>
+
+        {/* Body — two-pane */}
+        <div className="flex-1 grid lg:grid-cols-2 overflow-hidden">
+          {/* Left: text input */}
+          <div className="border-r border-slate-200 dark:border-slate-800 p-4 flex flex-col overflow-hidden">
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-xs uppercase tracking-wider font-semibold text-slate-500">Paste questions here</label>
+              <button
+                onClick={() => setText(samplePlaceholder.replace(/^Paste questions in this format:\n\n/, ''))}
+                className="text-[11px] text-violet-600 dark:text-violet-400 hover:underline"
+              >
+                Show sample format
+              </button>
+            </div>
+            <textarea
+              value={text}
+              onChange={e => setText(e.target.value)}
+              placeholder={samplePlaceholder}
+              spellCheck={false}
+              className="flex-1 w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 font-mono text-xs leading-relaxed focus:outline-none focus:ring-2 ring-violet-500/40 resize-none"
+            />
+            <div className="flex items-center justify-between mt-2 text-[11px] text-slate-500">
+              <span>{text.length.toLocaleString()} characters</span>
+              <span className="flex items-center gap-3">
+                {validCount > 0 && <span className="text-emerald-600 dark:text-emerald-400 font-semibold">✓ {validCount} valid</span>}
+                {errorCount > 0 && <span className="text-rose-600 dark:text-rose-400 font-semibold">✗ {errorCount} error{errorCount !== 1 && 's'}</span>}
+              </span>
+            </div>
+          </div>
+
+          {/* Right: preview */}
+          <div className="overflow-y-auto p-4 bg-slate-50 dark:bg-slate-950/50">
+            <div className="text-xs uppercase tracking-wider font-semibold text-slate-500 mb-3">Parser preview</div>
+
+            {validCount === 0 && errorCount === 0 && (
+              <div className="text-center py-12 text-slate-400">
+                <Brain size={32} className="mx-auto mb-2 opacity-40" />
+                <p className="text-sm">Paste questions on the left to see them parsed here</p>
+              </div>
+            )}
+
+            {parsed.errors.length > 0 && (
+              <div className="mb-4 p-3 rounded-xl bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30">
+                <div className="font-semibold text-sm text-rose-700 dark:text-rose-300 mb-1.5">⚠ Could not parse {parsed.errors.length} question{parsed.errors.length !== 1 ? 's' : ''}</div>
+                <ul className="text-xs space-y-1 text-rose-700 dark:text-rose-300">
+                  {parsed.errors.map((e, i) => (
+                    <li key={i}><strong>{e.label || `Block ${e.index + 1}`}:</strong> {e.error}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {parsed.questions.map((q, i) => (
+              <ParsedQuestionPreview key={i} question={q} index={i} />
+            ))}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between flex-shrink-0">
+          <div className="text-xs text-slate-500">
+            {existingCount > 0 && <>This case currently has <strong>{existingCount}</strong> question{existingCount !== 1 ? 's' : ''}. </>}
+            {validCount > 0 && <>Importing will append <strong>{validCount}</strong> new question{validCount !== 1 ? 's' : ''}.</>}
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={onClose} className="px-4 py-2 rounded-full border border-slate-300 dark:border-slate-700 text-sm font-semibold hover:bg-slate-100 dark:hover:bg-slate-800">Cancel</button>
+            <button
+              onClick={() => onImport(parsed.questions)}
+              disabled={validCount === 0}
+              className="px-5 py-2 rounded-full bg-violet-500 text-white text-sm font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-violet-600 flex items-center gap-1.5"
+            >
+              <Check size={14} /> Import {validCount > 0 ? `${validCount} question${validCount !== 1 ? 's' : ''}` : 'questions'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ParsedQuestionPreview({ question, index }) {
+  const stars = '⭐'.repeat(question.stars || 0);
+  const diffChip = {
+    easy:     'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300',
+    moderate: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300',
+    hard:     'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300',
+    standard: 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300',
+  }[question.difficulty || 'standard'];
+
+  return (
+    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 mb-3">
+      <div className="flex items-start justify-between gap-2 mb-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs font-bold bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300 px-2 py-0.5 rounded">Q{index + 1}</span>
+          {stars && <span className="text-xs">{stars}</span>}
+          {question.difficulty && question.difficulty !== 'standard' && (
+            <span className={cx('text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded', diffChip)}>
+              {question.difficulty}
+            </span>
+          )}
+          {question.type && (
+            <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+              {question.type}
+            </span>
+          )}
+        </div>
+      </div>
+      <p className="text-sm font-medium leading-relaxed mb-3 line-clamp-3">{question.q}</p>
+      <div className="space-y-1 mb-3">
+        {question.options.map((opt, oi) => (
+          <div key={oi} className={cx(
+            'text-xs px-2 py-1 rounded flex items-start gap-2',
+            oi === question.correct ? 'bg-emerald-50 dark:bg-emerald-500/15 border border-emerald-200 dark:border-emerald-500/30' : 'bg-slate-50 dark:bg-slate-800/50'
+          )}>
+            <span className={cx(
+              'flex-shrink-0 w-5 h-5 rounded text-[10px] font-bold flex items-center justify-center',
+              oi === question.correct ? 'bg-emerald-500 text-white' : 'bg-slate-200 dark:bg-slate-700'
+            )}>{oi === question.correct ? '✓' : String.fromCharCode(65 + oi)}</span>
+            <span className="flex-1 line-clamp-2">{opt}</span>
+          </div>
+        ))}
+      </div>
+      <div className="text-[11px] text-slate-500">
+        {question.perOption
+          ? `✓ Per-option explanations detected (${Object.keys(question.perOption).length})`
+          : `✓ Single explanation block (${(question.explain || '').length} chars)`}
+      </div>
     </div>
   );
 }
