@@ -2970,75 +2970,334 @@ function LabTrendChart({ data, caseTitle }) {
 // ============== MCQ SECTION ==============
 function MCQSection({ mcqs, caseId, progress, setProgress, markComplete }) {
   const stored = progress.mcqScores?.[caseId] || {};
-  const [answers, setAnswers] = useState(stored.answers || {});
-  const [submitted, setSubmitted] = useState(stored.submitted || false);
+  // answers[i] = { picked: 0..N, submitted: bool }
+  const initialAnswers = (() => {
+    const out = {};
+    Object.entries(stored.answers || {}).forEach(([k, v]) => {
+      // Backwards-compat: old format stored picked option as a number
+      if (typeof v === 'number') out[k] = { picked: v, submitted: !!stored.submitted };
+      else if (v && typeof v === 'object') out[k] = v;
+    });
+    return out;
+  })();
 
-  const submit = () => {
-    const correct = mcqs.filter((q, i) => answers[i] === q.correct).length;
-    const total = mcqs.length;
-    const xpGain = correct * 25;
-
-    setSubmitted(true);
-    setProgress(p => ({
-      ...p,
-      xp: (p.xp || 0) + xpGain,
-      mcqScores: {
-        ...p.mcqScores,
-        [caseId]: { answers, submitted: true, correct, total }
-      },
-      badges: correct === total && !p.badges?.includes(caseId)
-        ? [...(p.badges || []), caseId]
-        : p.badges
-    }));
-    markComplete();
-  };
-
-  const reset = () => { setAnswers({}); setSubmitted(false); };
+  const [answers, setAnswers] = useState(initialAnswers);
+  const [openIdx, setOpenIdx] = useState(null);   // which question is expanded (Study mode)
+  const [mode, setMode] = useState('study');       // 'study' | 'exam'
+  const [examIdx, setExamIdx] = useState(0);       // current question in exam mode
 
   if (!mcqs.length) {
     return <p className="text-sm text-slate-500 italic">No MCQs authored for this case yet.</p>;
   }
 
-  return (
-    <div className="space-y-4">
-      {mcqs.map((q, i) => {
-        const stars = '⭐'.repeat(q.stars || 0);
-        const diffChip = {
-          easy:     'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300',
-          moderate: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300',
-          hard:     'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300',
-        }[q.difficulty];
-        return (
-        <div key={i} className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 p-5">
-          <div className="flex items-start gap-3 mb-3">
-            <div className="w-7 h-7 rounded-lg bg-pink-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">Q{i + 1}</div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                {stars && <span className="text-xs">{stars}</span>}
-                {q.difficulty && diffChip && (
-                  <span className={cx('text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded', diffChip)}>
-                    {q.difficulty}
-                  </span>
-                )}
-                {q.type && (
-                  <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
-                    {q.type}
-                  </span>
-                )}
-              </div>
-              <p className="font-semibold text-sm leading-relaxed">{q.q}</p>
-            </div>
+  // Persist progress whenever answers change
+  const persistProgress = (nextAnswers, opts = {}) => {
+    const correct = mcqs.filter((q, i) => nextAnswers[i]?.submitted && nextAnswers[i].picked === q.correct).length;
+    const totalSubmitted = mcqs.filter((q, i) => nextAnswers[i]?.submitted).length;
+    const allDone = totalSubmitted === mcqs.length;
+
+    setProgress(p => {
+      const prevCorrect = p.mcqScores?.[caseId]?.correct || 0;
+      const xpDelta = Math.max(0, correct - prevCorrect) * 25;
+      return {
+        ...p,
+        xp: (p.xp || 0) + xpDelta,
+        mcqScores: {
+          ...p.mcqScores,
+          [caseId]: { answers: nextAnswers, submitted: allDone, correct, total: mcqs.length }
+        },
+        badges: allDone && correct === mcqs.length && !p.badges?.includes(caseId)
+          ? [...(p.badges || []), caseId]
+          : p.badges
+      };
+    });
+
+    if (allDone) markComplete();
+  };
+
+  const pick = (qi, oi) => {
+    if (answers[qi]?.submitted) return;
+    const next = { ...answers, [qi]: { ...(answers[qi] || {}), picked: oi } };
+    setAnswers(next);
+  };
+
+  const submitOne = (qi) => {
+    const a = answers[qi];
+    if (!a || a.picked == null || a.submitted) return;
+    const next = { ...answers, [qi]: { ...a, submitted: true } };
+    setAnswers(next);
+    persistProgress(next);
+  };
+
+  const retakeAll = () => {
+    if (!confirm('Reset all your answers and retake the quiz?')) return;
+    setAnswers({});
+    setOpenIdx(null);
+    setExamIdx(0);
+    setProgress(p => ({
+      ...p,
+      mcqScores: {
+        ...p.mcqScores,
+        [caseId]: { answers: {}, submitted: false, correct: 0, total: mcqs.length }
+      }
+    }));
+  };
+
+  // ===== Tally =====
+  const submittedCount = mcqs.filter((q, i) => answers[i]?.submitted).length;
+  const correctCount = mcqs.filter((q, i) => answers[i]?.submitted && answers[i].picked === q.correct).length;
+  const wrongCount = submittedCount - correctCount;
+  const allComplete = submittedCount === mcqs.length;
+  const pct = mcqs.length ? Math.round((submittedCount / mcqs.length) * 100) : 0;
+  const accuracy = submittedCount ? Math.round((correctCount / submittedCount) * 100) : 0;
+
+  // ===== Header (mode toggle, progress, retake) =====
+  const Header = (
+    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-pink-50 to-violet-50 dark:from-pink-500/5 dark:to-violet-500/5 p-4 sticky top-2 z-10 backdrop-blur-sm">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-2 text-sm font-bold">
+            <Brain size={16} className="text-pink-500" />
+            <span>{mcqs.length} question{mcqs.length !== 1 ? 's' : ''}</span>
           </div>
+          {submittedCount > 0 && (
+            <>
+              <div className="text-slate-300 dark:text-slate-700">·</div>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 text-xs font-bold">
+                <CheckCircle2 size={12} /> {correctCount} correct
+              </div>
+              {wrongCount > 0 && (
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-100 dark:bg-rose-500/15 text-rose-700 dark:text-rose-300 text-xs font-bold">
+                  <XCircle size={12} /> {wrongCount} wrong
+                </div>
+              )}
+              <div className="text-xs text-slate-500">· {accuracy}% accuracy</div>
+            </>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-0.5">
+            <button
+              onClick={() => setMode('study')}
+              className={cx('px-3 py-1 rounded-full text-xs font-semibold transition-colors',
+                mode === 'study' ? 'bg-pink-500 text-white' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white')}
+            >
+              Study mode
+            </button>
+            <button
+              onClick={() => { setMode('exam'); setExamIdx(0); }}
+              className={cx('px-3 py-1 rounded-full text-xs font-semibold transition-colors',
+                mode === 'exam' ? 'bg-pink-500 text-white' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white')}
+            >
+              Exam mode
+            </button>
+          </div>
+          {submittedCount > 0 && (
+            <button onClick={retakeAll} className="text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center gap-1 px-2 py-1 rounded-md hover:bg-white dark:hover:bg-slate-800">
+              <RefreshCw size={12} /> Retake quiz
+            </button>
+          )}
+        </div>
+      </div>
+      {/* Progress bar */}
+      <div className="mt-3 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+        <div
+          className="h-full bg-gradient-to-r from-pink-500 to-violet-500 transition-all duration-500"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  );
+
+  // ===== Final summary card (when all questions answered) =====
+  const SummaryCard = allComplete && (
+    <div className="rounded-3xl border border-emerald-200 dark:border-emerald-500/30 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-500/10 dark:to-teal-500/10 p-6 mt-3">
+      <div className="flex items-start gap-4">
+        <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center flex-shrink-0">
+          <Trophy size={24} />
+        </div>
+        <div className="flex-1">
+          <h3 className="display-font text-2xl font-bold mb-1">Quiz complete!</h3>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+            You scored <strong className="text-slate-900 dark:text-white">{correctCount} out of {mcqs.length}</strong> ({accuracy}%)
+          </p>
+          {wrongCount > 0 && (
+            <button
+              onClick={() => {
+                const firstWrong = mcqs.findIndex((q, i) => answers[i]?.submitted && answers[i].picked !== q.correct);
+                if (firstWrong >= 0) {
+                  setMode('study');
+                  setOpenIdx(firstWrong);
+                  setTimeout(() => document.getElementById(`mcq-card-${firstWrong}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+                }
+              }}
+              className="text-xs px-3 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-rose-200 dark:border-rose-500/30 text-rose-600 dark:text-rose-300 font-semibold hover:bg-rose-50 dark:hover:bg-rose-500/10"
+            >
+              Review {wrongCount} wrong answer{wrongCount !== 1 ? 's' : ''}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  // ===== EXAM MODE — single question carousel =====
+  if (mode === 'exam') {
+    const q = mcqs[examIdx];
+    const a = answers[examIdx];
+    const isSubmitted = !!a?.submitted;
+    return (
+      <div className="space-y-4">
+        {Header}
+        <div className="text-xs text-slate-500 flex items-center gap-2">
+          <span>Question {examIdx + 1} of {mcqs.length}</span>
+          <div className="flex-1 flex items-center gap-1 ml-3">
+            {mcqs.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setExamIdx(i)}
+                className={cx('h-2 flex-1 rounded-full transition-colors',
+                  answers[i]?.submitted && answers[i].picked === mcqs[i].correct && 'bg-emerald-500',
+                  answers[i]?.submitted && answers[i].picked !== mcqs[i].correct && 'bg-rose-500',
+                  !answers[i]?.submitted && i === examIdx && 'bg-slate-400 dark:bg-slate-500',
+                  !answers[i]?.submitted && i !== examIdx && 'bg-slate-200 dark:bg-slate-700',
+                )}
+                title={`Q${i + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+        <QuestionCard
+          q={q} qi={examIdx} a={a} isSubmitted={isSubmitted}
+          collapsed={false} onToggle={() => {}} pick={pick} submitOne={submitOne} alwaysOpen
+        />
+        <div className="flex items-center justify-between gap-3 pt-1">
+          <button
+            onClick={() => setExamIdx(i => Math.max(0, i - 1))}
+            disabled={examIdx === 0}
+            className="px-4 py-2 rounded-full border border-slate-300 dark:border-slate-700 text-sm font-semibold disabled:opacity-40 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1"
+          >
+            <ChevronLeft size={14} /> Previous
+          </button>
+          <button
+            onClick={() => setExamIdx(i => Math.min(mcqs.length - 1, i + 1))}
+            disabled={examIdx === mcqs.length - 1}
+            className="px-4 py-2 rounded-full bg-pink-500 text-white text-sm font-bold disabled:opacity-40 hover:bg-pink-600 flex items-center gap-1"
+          >
+            Next <ChevronRight size={14} />
+          </button>
+        </div>
+        {SummaryCard}
+      </div>
+    );
+  }
+
+  // ===== STUDY MODE — accordion list =====
+  return (
+    <div className="space-y-3">
+      {Header}
+      {mcqs.map((q, i) => {
+        const a = answers[i];
+        const isSubmitted = !!a?.submitted;
+        const collapsed = openIdx !== i;
+        return (
+          <QuestionCard
+            key={i}
+            q={q} qi={i} a={a} isSubmitted={isSubmitted}
+            collapsed={collapsed}
+            onToggle={() => setOpenIdx(openIdx === i ? null : i)}
+            pick={pick} submitOne={submitOne}
+          />
+        );
+      })}
+      {SummaryCard}
+    </div>
+  );
+}
+
+// ===== Single question card — used by both study and exam modes =====
+function QuestionCard({ q, qi, a, isSubmitted, collapsed, onToggle, pick, submitOne, alwaysOpen = false }) {
+  const stars = '⭐'.repeat(q.stars || 0);
+  const diffChip = {
+    easy:     'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300',
+    moderate: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300',
+    hard:     'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300',
+  }[q.difficulty];
+
+  const correctOnSubmit = isSubmitted && a.picked === q.correct;
+  const wrongOnSubmit = isSubmitted && a.picked !== q.correct;
+
+  // Status icon for collapsed header
+  const StatusIcon = isSubmitted
+    ? (correctOnSubmit
+      ? <span className="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center"><Check size={14} /></span>
+      : <span className="w-6 h-6 rounded-full bg-rose-500 text-white flex items-center justify-center"><X size={14} /></span>)
+    : (a?.picked != null
+      ? <span className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 flex items-center justify-center text-[11px] font-bold">{String.fromCharCode(65 + a.picked)}</span>
+      : <span className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-500 flex items-center justify-center"><CircleDot size={12} /></span>);
+
+  const containerCls = cx(
+    'rounded-2xl border transition-all',
+    !alwaysOpen && collapsed && 'cursor-pointer hover:shadow-sm',
+    correctOnSubmit && 'border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-500/5',
+    wrongOnSubmit && 'border-rose-200 dark:border-rose-500/30 bg-rose-50/40 dark:bg-rose-500/5',
+    !isSubmitted && 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40',
+  );
+
+  return (
+    <div id={`mcq-card-${qi}`} className={containerCls}>
+      {/* Header row — always visible */}
+      <div
+        onClick={alwaysOpen ? undefined : onToggle}
+        className={cx('p-4 flex items-start gap-3', !alwaysOpen && 'cursor-pointer')}
+      >
+        <div className="w-7 h-7 rounded-lg bg-pink-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">Q{qi + 1}</div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap mb-1">
+            {stars && <span className="text-xs">{stars}</span>}
+            {q.difficulty && diffChip && (
+              <span className={cx('text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded', diffChip)}>
+                {q.difficulty}
+              </span>
+            )}
+            {q.type && (
+              <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                {q.type}
+              </span>
+            )}
+          </div>
+          <p className={cx('text-sm leading-relaxed', collapsed && !alwaysOpen ? 'line-clamp-2 text-slate-700 dark:text-slate-300' : 'font-semibold')}>
+            {q.q}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {StatusIcon}
+          {!alwaysOpen && (
+            <button
+              type="button"
+              className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700"
+              onClick={(e) => { e.stopPropagation(); onToggle(); }}
+            >
+              <ChevronDown size={16} className={cx('transition-transform', !collapsed && 'rotate-180')} />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Body — only when expanded */}
+      {(!collapsed || alwaysOpen) && (
+        <div className="px-4 pb-4 space-y-3">
+          {/* Options */}
           <div className="space-y-2">
             {q.options.map((opt, oi) => {
-              const picked = answers[i] === oi;
+              const picked = a?.picked === oi;
               const isCorrect = oi === q.correct;
-              const showResult = submitted;
+              const showResult = isSubmitted;
               return (
                 <button
                   key={oi}
-                  disabled={submitted}
-                  onClick={() => setAnswers(a => ({ ...a, [i]: oi }))}
+                  disabled={isSubmitted}
+                  onClick={() => pick(qi, oi)}
                   className={cx(
                     'w-full text-left px-3 py-2.5 rounded-lg border text-sm transition-all flex items-center gap-3',
                     !showResult && picked && 'border-teal-500 bg-teal-50 dark:bg-teal-500/15',
@@ -3065,23 +3324,32 @@ function MCQSection({ mcqs, caseId, progress, setProgress, markComplete }) {
               );
             })}
           </div>
-          {submitted && (
-            <div className="mt-3 space-y-2">
+
+          {/* Submit button OR explanation */}
+          {!isSubmitted ? (
+            <button
+              onClick={() => submitOne(qi)}
+              disabled={a?.picked == null}
+              className="px-5 py-2 rounded-full bg-pink-500 text-white text-sm font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-pink-600"
+            >
+              Submit answer
+            </button>
+          ) : (
+            <div className="space-y-2">
               {/* Pass/fail banner */}
               <div className={cx(
                 'rounded-lg px-3 py-2 text-sm border flex items-center gap-2 font-bold',
-                answers[i] === q.correct
+                correctOnSubmit
                   ? 'border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-900 dark:text-emerald-200'
                   : 'border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 text-rose-900 dark:text-rose-200'
               )}>
-                {answers[i] === q.correct ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
-                {answers[i] === q.correct ? 'Correct!' : `Correct answer: ${String.fromCharCode(65 + q.correct)}`}
+                {correctOnSubmit ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
+                {correctOnSubmit ? 'Correct!' : `Correct answer: ${String.fromCharCode(65 + q.correct)}`}
               </div>
 
               {/* Per-option explanations (if available) */}
               {q.perOption ? (
                 <>
-                  {/* Why correct */}
                   {Object.entries(q.perOption).filter(([, v]) => v.kind === 'correct').map(([letter, v]) => (
                     <div key={letter} className="rounded-lg p-3 border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10">
                       <div className="font-bold text-xs text-emerald-700 dark:text-emerald-300 mb-1.5 flex items-center gap-1.5">
@@ -3090,7 +3358,6 @@ function MCQSection({ mcqs, caseId, progress, setProgress, markComplete }) {
                       <div className="rte-content text-xs text-emerald-900 dark:text-emerald-100" dangerouslySetInnerHTML={{ __html: v.html || `<p>${v.text}</p>` }} />
                     </div>
                   ))}
-                  {/* Why others are wrong */}
                   {Object.entries(q.perOption).filter(([, v]) => v.kind === 'wrong').length > 0 && (
                     <div className="rounded-lg p-3 border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10">
                       <div className="font-bold text-xs text-rose-700 dark:text-rose-300 mb-2 flex items-center gap-1.5">
@@ -3106,7 +3373,6 @@ function MCQSection({ mcqs, caseId, progress, setProgress, markComplete }) {
                       </div>
                     </div>
                   )}
-                  {/* Main/leading explanation block, if any */}
                   {q.explain && q.explain.trim() && (
                     <div className="rounded-lg p-3 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/40">
                       <div className="font-bold text-xs text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
@@ -3117,47 +3383,24 @@ function MCQSection({ mcqs, caseId, progress, setProgress, markComplete }) {
                   )}
                 </>
               ) : (
-                /* Single unified explanation block */
                 q.explain && (
                   <div className={cx(
                     'rounded-lg p-3 border',
-                    answers[i] === q.correct
+                    correctOnSubmit
                       ? 'border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-500/5'
                       : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/40'
                   )}>
                     <div className="font-bold text-xs text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
                       <BookOpen size={13} /> Explanation
                     </div>
-                    <div className="rte-content text-xs text-slate-800 dark:text-slate-200" dangerouslySetInnerHTML={{ __html: q.explainHTML || `<p>${q.explain.split('\n').filter(l => l.trim()).map(l => l).join('</p><p>')}</p>` }} />
+                    <div className="rte-content text-xs text-slate-800 dark:text-slate-200" dangerouslySetInnerHTML={{ __html: q.explainHTML || `<p>${q.explain.split('\n').filter(l => l.trim()).join('</p><p>')}</p>` }} />
                   </div>
                 )
               )}
             </div>
           )}
         </div>
-        );
-      })}
-      <div className="flex items-center gap-3 pt-2">
-        {!submitted ? (
-          <button
-            onClick={submit}
-            disabled={Object.keys(answers).length < mcqs.length}
-            className="px-5 py-2.5 rounded-full bg-pink-500 text-white text-sm font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-pink-600"
-          >
-            Submit answers ({Object.keys(answers).length}/{mcqs.length})
-          </button>
-        ) : (
-          <>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 text-sm font-bold">
-              <Trophy size={14} />
-              {mcqs.filter((q, i) => answers[i] === q.correct).length} / {mcqs.length} correct
-            </div>
-            <button onClick={reset} className="text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center gap-1">
-              <RefreshCw size={12} /> Reset
-            </button>
-          </>
-        )}
-      </div>
+      )}
     </div>
   );
 }
