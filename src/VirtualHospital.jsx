@@ -29,6 +29,17 @@ import {
   deleteCaseRow,
   fetchProgress,
   saveProgress,
+  fetchAllExams,
+  upsertExam,
+  deleteExamRow,
+  fetchTopics,
+  upsertTopic,
+  deleteTopicRow,
+  fetchQuestions,
+  fetchQuestionsForExam,
+  upsertQuestion,
+  bulkInsertQuestions,
+  deleteQuestionRow,
 } from './supabaseClient';
 
 // ============== STORAGE KEYS ==============
@@ -1390,7 +1401,7 @@ export default function VirtualHospital() {
     return <SplashLoader />;
   }
 
-  const PUBLIC_ROUTES = ['landing', 'login'];
+  const PUBLIC_ROUTES = ['landing', 'login', 'exams'];
   const isPublicRoute = PUBLIC_ROUTES.includes(route.name);
   const requiresAuth = !auth.user && !isPublicRoute;
 
@@ -1522,6 +1533,26 @@ export default function VirtualHospital() {
         {route.name === 'dashboard' && (
           <Dashboard cases={cases} progress={progress} navigate={navigate} userRole={userRole} />
         )}
+        {route.name === 'exams' && (
+          <ExamsLanding navigate={navigate} progress={progress} />
+        )}
+        {route.name === 'exam' && (
+          <ExamHome
+            examId={route.examId} navigate={navigate}
+            progress={progress} setProgress={setProgress}
+            isAdmin={auth?.isAdmin}
+          />
+        )}
+        {route.name === 'exam-test' && (
+          <ExamTestRunner
+            examId={route.examId}
+            topicId={route.topicId}
+            mode={route.mode || 'tutor'}
+            navigate={navigate}
+            progress={progress}
+            setProgress={setProgress}
+          />
+        )}
         {route.name === 'admin' && (
           <AdminPanel
             cases={cases} updateCase={updateCase} addCase={addCase}
@@ -1559,6 +1590,7 @@ function TopBar({ route, navigate, theme, setTheme, progress, userRole, auth }) 
 
         <nav className="ml-auto flex items-center gap-1">
           <NavLink active={route.name === 'landing'} onClick={() => navigate({ name: 'landing' })} icon={Home} label="Home" />
+          <NavLink active={['exams','exam','exam-test'].includes(route.name)} onClick={() => navigate({ name: 'exams' })} icon={GraduationCap} label="Exams" />
           {auth?.user && (
             <NavLink active={route.name === 'dashboard'} onClick={() => navigate({ name: 'dashboard' })} icon={BarChart3} label="Progress" />
           )}
@@ -1909,6 +1941,29 @@ function Landing({ navigate, cases, progress, userRole }) {
             cases={internalCases}
             onClick={() => navigate({ name: 'hospital', hospital: 'internal' })}
           />
+        </div>
+      </section>
+
+      {/* Exam prep section */}
+      <section id="exam-prep" className="max-w-7xl mx-auto px-6 py-14 border-t border-slate-200/60 dark:border-slate-800/60">
+        <div className="text-center max-w-2xl mx-auto mb-10">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/20 text-violet-700 dark:text-violet-300 text-xs font-bold mb-4">
+            <GraduationCap size={12} /> EXAM PREPARATION
+          </div>
+          <h2 className="display-font text-4xl font-bold mb-3">Prepare for your boards</h2>
+          <p className="text-slate-600 dark:text-slate-400 text-base">
+            High-yield question banks for MRCP, USMLE, Saudi Board, Arab Board and more —
+            organized by subject and topic, with detailed explanations.
+          </p>
+        </div>
+        <div className="flex justify-center">
+          <button
+            onClick={() => navigate({ name: 'exams' })}
+            className="group relative overflow-hidden px-6 py-3 rounded-2xl bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-bold shadow-xl shadow-violet-500/30 hover:scale-[1.02] transition-transform flex items-center gap-2"
+          >
+            <Brain size={18} /> Browse exams
+            <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+          </button>
         </div>
       </section>
 
@@ -3584,8 +3639,676 @@ function RoleProgress({ xp }) {
   );
 }
 
+// ============================================================================
+// EXAM PREP — STUDENT VIEWS
+// ============================================================================
+
+// ============== EXAMS LANDING ==============
+function ExamsLanding({ navigate, progress }) {
+  const [exams, setExams] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('all');
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const data = await fetchAllExams();
+      if (!cancelled) {
+        setExams(data);
+        setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const filtered = filter === 'all' ? exams : exams.filter(e => e.category === filter);
+
+  const examProgress = progress.examProgress || {};
+
+  return (
+    <div className="max-w-7xl mx-auto px-6 py-10">
+      {/* Hero */}
+      <div className="text-center max-w-3xl mx-auto mb-10">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/20 text-violet-700 dark:text-violet-300 text-xs font-bold mb-4">
+          <GraduationCap size={12} /> EXAM PREPARATION
+        </div>
+        <h1 className="display-font text-5xl font-bold mb-4">Prepare for your boards</h1>
+        <p className="text-lg text-slate-600 dark:text-slate-400">
+          Pick your exam below. Each is organized into subjects and topics with high-yield questions and detailed explanations.
+        </p>
+      </div>
+
+      {/* Filter chips */}
+      <div className="flex items-center gap-2 justify-center mb-8 flex-wrap">
+        {[
+          { id: 'all', label: 'All exams' },
+          { id: 'international', label: 'International' },
+          { id: 'regional', label: 'Regional (GCC)' },
+          { id: 'specialty', label: 'Specialty' },
+        ].map(opt => (
+          <button
+            key={opt.id}
+            onClick={() => setFilter(opt.id)}
+            className={cx(
+              'px-4 py-1.5 rounded-full text-sm font-semibold transition-colors',
+              filter === opt.id
+                ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
+                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+            )}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Exams grid */}
+      {loading ? (
+        <div className="text-center py-12 text-slate-500">
+          <RefreshCw className="inline animate-spin mr-2" size={14} /> Loading exams…
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="text-center py-12 text-slate-500">No exams in this category yet.</div>
+      ) : (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filtered.map(exam => (
+            <ExamCard
+              key={exam.id}
+              exam={exam}
+              progress={examProgress[exam.id]}
+              onClick={() => navigate({ name: 'exam', examId: exam.id })}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ExamCard({ exam, progress, onClick }) {
+  const colorMap = {
+    rose: 'from-rose-500 to-pink-500 shadow-rose-500/20',
+    sky: 'from-sky-500 to-blue-500 shadow-sky-500/20',
+    teal: 'from-teal-500 to-emerald-500 shadow-teal-500/20',
+    emerald: 'from-emerald-500 to-green-500 shadow-emerald-500/20',
+    violet: 'from-violet-500 to-fuchsia-500 shadow-violet-500/20',
+    amber: 'from-amber-500 to-orange-500 shadow-amber-500/20',
+    red: 'from-red-500 to-rose-500 shadow-red-500/20',
+  };
+  const grad = colorMap[exam.color] || colorMap.teal;
+
+  const total = progress?.totalAnswered || 0;
+  const correct = progress?.correctAnswered || 0;
+  const accuracy = total ? Math.round((correct / total) * 100) : 0;
+
+  return (
+    <button
+      onClick={onClick}
+      className="group text-left rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 hover:shadow-2xl hover:-translate-y-1 transition-all"
+    >
+      <div className="flex items-start gap-3 mb-3">
+        <div className={cx('w-12 h-12 rounded-2xl bg-gradient-to-br flex items-center justify-center text-2xl shadow-lg', grad)}>
+          {exam.icon || '🎓'}
+        </div>
+        <div className="flex-1">
+          <h3 className="font-bold text-base leading-tight mb-1 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">{exam.title}</h3>
+          {exam.region && <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">{exam.region}</span>}
+        </div>
+      </div>
+      <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-3 line-clamp-3 min-h-[3.5rem]">
+        {exam.description}
+      </p>
+      <div className="flex items-center justify-between text-xs">
+        {total > 0 ? (
+          <>
+            <div className="flex items-center gap-1.5 font-semibold">
+              <Trophy size={12} className="text-amber-500" />
+              <span>{correct}/{total}</span>
+              <span className="text-slate-500">({accuracy}%)</span>
+            </div>
+            <ArrowRight size={14} className="text-slate-400 group-hover:translate-x-1 transition-transform" />
+          </>
+        ) : (
+          <>
+            <span className="text-slate-500">Not started</span>
+            <ArrowRight size={14} className="text-slate-400 group-hover:translate-x-1 transition-transform" />
+          </>
+        )}
+      </div>
+    </button>
+  );
+}
+
+// ============== EXAM HOME ==============
+function ExamHome({ examId, navigate, progress, setProgress, isAdmin }) {
+  const [exam, setExam] = useState(null);
+  const [topics, setTopics] = useState([]);
+  const [questions, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      const exams = await fetchAllExams();
+      const found = exams.find(e => e.id === examId);
+      const { topics: tps, questions: qs } = await fetchQuestionsForExam(examId);
+      if (!cancelled) {
+        setExam(found);
+        setTopics(tps);
+        setQuestions(qs);
+        setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [examId]);
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-6 py-12 text-center text-slate-500">
+        <RefreshCw className="inline animate-spin mr-2" size={14} /> Loading exam…
+      </div>
+    );
+  }
+
+  if (!exam) {
+    return (
+      <div className="max-w-7xl mx-auto px-6 py-12 text-center">
+        <p className="text-slate-500">Exam not found.</p>
+        <button onClick={() => navigate({ name: 'exams' })} className="mt-4 text-sm text-violet-600 hover:underline">← Back to all exams</button>
+      </div>
+    );
+  }
+
+  // Group topics by subject
+  const subjects = {};
+  topics.forEach(t => {
+    if (!subjects[t.subject]) subjects[t.subject] = [];
+    subjects[t.subject].push(t);
+  });
+
+  // Compute progress per topic and per subject from progress.examProgress
+  const examProg = progress.examProgress?.[examId] || { topics: {} };
+
+  const topicStats = (topicId) => {
+    const tQuestions = questions.filter(q => q.topicId === topicId);
+    const tProg = examProg.topics?.[topicId] || { answers: {} };
+    const submitted = Object.values(tProg.answers).filter(a => a?.submitted).length;
+    const correct = Object.entries(tProg.answers).filter(([qid, a]) => {
+      if (!a?.submitted) return false;
+      const q = tQuestions.find(qq => qq.id === qid);
+      return q && a.picked === q.correct;
+    }).length;
+    return { total: tQuestions.length, submitted, correct };
+  };
+
+  const subjectStats = (subjectName) => {
+    const ts = subjects[subjectName] || [];
+    let total = 0, submitted = 0, correct = 0;
+    ts.forEach(t => {
+      const s = topicStats(t.id);
+      total += s.total; submitted += s.submitted; correct += s.correct;
+    });
+    return { total, submitted, correct };
+  };
+
+  // Overall stats
+  const allStats = topics.reduce((acc, t) => {
+    const s = topicStats(t.id);
+    acc.total += s.total; acc.submitted += s.submitted; acc.correct += s.correct;
+    return acc;
+  }, { total: 0, submitted: 0, correct: 0 });
+  const overallAccuracy = allStats.submitted ? Math.round((allStats.correct / allStats.submitted) * 100) : 0;
+  const overallProgress = allStats.total ? Math.round((allStats.submitted / allStats.total) * 100) : 0;
+
+  return (
+    <div className="max-w-7xl mx-auto px-6 py-8">
+      <button
+        onClick={() => navigate({ name: 'exams' })}
+        className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white mb-4"
+      >
+        <ChevronLeft size={14} /> All exams
+      </button>
+
+      {/* Header */}
+      <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-900/50 p-6 mb-6">
+        <div className="flex items-start gap-4 flex-wrap">
+          <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-3xl shadow-xl shadow-violet-500/30 flex-shrink-0">
+            {exam.icon || '🎓'}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h1 className="display-font text-3xl font-bold mb-1">{exam.title}</h1>
+            <p className="text-sm text-slate-600 dark:text-slate-400 max-w-3xl">{exam.description}</p>
+          </div>
+          {allStats.total > 0 && (
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <div className="text-3xl font-black">{overallAccuracy}<span className="text-base text-slate-400">%</span></div>
+                <div className="text-xs text-slate-500">accuracy ({allStats.correct}/{allStats.submitted})</div>
+              </div>
+              <div className="w-px h-12 bg-slate-200 dark:bg-slate-700" />
+              <div className="text-right">
+                <div className="text-3xl font-black">{overallProgress}<span className="text-base text-slate-400">%</span></div>
+                <div className="text-xs text-slate-500">complete ({allStats.submitted}/{allStats.total})</div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Empty state */}
+      {topics.length === 0 ? (
+        <div className="rounded-3xl border-2 border-dashed border-slate-300 dark:border-slate-700 p-12 text-center">
+          <Brain size={40} className="mx-auto mb-3 text-slate-300 dark:text-slate-700" />
+          <h3 className="font-bold mb-1">No questions yet</h3>
+          <p className="text-sm text-slate-500 mb-4">
+            {isAdmin ? 'Add topics and questions in the admin panel to populate this exam.' : 'This exam is being prepared. Check back soon!'}
+          </p>
+          {isAdmin && (
+            <button
+              onClick={() => navigate({ name: 'admin' })}
+              className="px-4 py-2 rounded-full bg-violet-500 text-white text-sm font-bold hover:bg-violet-600"
+            >
+              Open admin panel
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {/* Subject performance bars (analytics) */}
+          {allStats.submitted > 0 && (
+            <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
+              <h3 className="font-bold text-sm mb-3 flex items-center gap-2">
+                <BarChart3 size={14} /> Subject performance
+              </h3>
+              <div className="space-y-2">
+                {Object.keys(subjects).sort().map(subject => {
+                  const s = subjectStats(subject);
+                  const acc = s.submitted ? Math.round((s.correct / s.submitted) * 100) : 0;
+                  const prog = s.total ? Math.round((s.submitted / s.total) * 100) : 0;
+                  return (
+                    <div key={subject}>
+                      <div className="flex items-center justify-between text-xs mb-1">
+                        <span className="font-semibold">{subject}</span>
+                        <span className="text-slate-500">
+                          {s.submitted > 0 ? `${acc}% accurate · ${s.submitted}/${s.total} done` : `0/${s.total} done`}
+                        </span>
+                      </div>
+                      <div className="h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden relative">
+                        <div
+                          className="h-full bg-slate-300 dark:bg-slate-700 absolute left-0 top-0"
+                          style={{ width: `${prog}%` }}
+                        />
+                        <div
+                          className={cx(
+                            'h-full absolute left-0 top-0',
+                            acc >= 75 ? 'bg-emerald-500' : acc >= 50 ? 'bg-amber-500' : 'bg-rose-500'
+                          )}
+                          style={{ width: `${(s.correct / Math.max(s.total, 1)) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Topics by subject */}
+          {Object.keys(subjects).sort().map(subject => (
+            <div key={subject}>
+              <h2 className="display-font text-xl font-bold mb-3 flex items-center gap-2">
+                <span>{subject}</span>
+                <span className="text-xs font-normal text-slate-500">{subjects[subject].length} topic{subjects[subject].length !== 1 ? 's' : ''}</span>
+              </h2>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {subjects[subject].map(topic => {
+                  const stats = topicStats(topic.id);
+                  return (
+                    <TopicCard
+                      key={topic.id}
+                      topic={topic}
+                      stats={stats}
+                      onTutor={() => navigate({ name: 'exam-test', examId, topicId: topic.id, mode: 'tutor' })}
+                      onTest={() => navigate({ name: 'exam-test', examId, topicId: topic.id, mode: 'test' })}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TopicCard({ topic, stats, onTutor, onTest }) {
+  const acc = stats.submitted ? Math.round((stats.correct / stats.submitted) * 100) : 0;
+  const accColor = acc >= 75 ? 'text-emerald-600 dark:text-emerald-400' : acc >= 50 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400';
+  return (
+    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 flex flex-col">
+      <h4 className="font-semibold text-sm leading-tight mb-1">{topic.title}</h4>
+      {topic.description && <p className="text-xs text-slate-500 mb-3 line-clamp-2">{topic.description}</p>}
+      <div className="flex items-center gap-3 text-xs mt-auto mb-3">
+        <span className="text-slate-500">{stats.total} Qs</span>
+        {stats.submitted > 0 && (
+          <>
+            <span className="text-slate-300 dark:text-slate-700">·</span>
+            <span className={cx('font-bold', accColor)}>{acc}%</span>
+            <span className="text-slate-500">({stats.correct}/{stats.submitted})</span>
+          </>
+        )}
+      </div>
+      <div className="flex items-center gap-1.5">
+        <button
+          onClick={onTutor}
+          disabled={stats.total === 0}
+          className="flex-1 px-2.5 py-1.5 rounded-full bg-violet-100 dark:bg-violet-500/15 text-violet-700 dark:text-violet-300 text-xs font-bold hover:bg-violet-200 dark:hover:bg-violet-500/25 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1"
+        >
+          <BookOpen size={11} /> Tutor
+        </button>
+        <button
+          onClick={onTest}
+          disabled={stats.total === 0}
+          className="flex-1 px-2.5 py-1.5 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold hover:scale-[1.02] transition-transform disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1"
+        >
+          <Trophy size={11} /> Test
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ============== EXAM TEST RUNNER ==============
+function ExamTestRunner({ examId, topicId, mode, navigate, progress, setProgress }) {
+  const [exam, setExam] = useState(null);
+  const [topic, setTopic] = useState(null);
+  const [questions, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      const exams = await fetchAllExams();
+      const found = exams.find(e => e.id === examId);
+      const tps = await fetchTopics(examId);
+      const t = tps.find(x => x.id === topicId);
+      const qs = await fetchQuestions(topicId);
+      if (!cancelled) {
+        setExam(found);
+        setTopic(t);
+        setQuestions(qs);
+        setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [examId, topicId]);
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto px-6 py-12 text-center text-slate-500">
+        <RefreshCw className="inline animate-spin mr-2" size={14} /> Loading questions…
+      </div>
+    );
+  }
+
+  if (!exam || !topic) {
+    return (
+      <div className="max-w-4xl mx-auto px-6 py-12 text-center">
+        <p className="text-slate-500">Topic not found.</p>
+        <button onClick={() => navigate({ name: 'exams' })} className="mt-4 text-sm text-violet-600 hover:underline">← Back to exams</button>
+      </div>
+    );
+  }
+
+  if (questions.length === 0) {
+    return (
+      <div className="max-w-4xl mx-auto px-6 py-12 text-center">
+        <Brain size={40} className="mx-auto mb-3 text-slate-300 dark:text-slate-700" />
+        <h3 className="font-bold mb-1">No questions yet</h3>
+        <p className="text-sm text-slate-500 mb-4">This topic doesn't have questions yet.</p>
+        <button onClick={() => navigate({ name: 'exam', examId })} className="text-sm text-violet-600 hover:underline">← Back to exam</button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
+      <button
+        onClick={() => navigate({ name: 'exam', examId })}
+        className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white mb-4"
+      >
+        <ChevronLeft size={14} /> {exam.title} · {topic.subject}
+      </button>
+
+      <div className="mb-4">
+        <h1 className="display-font text-2xl font-bold mb-1">{topic.title}</h1>
+        <div className="flex items-center gap-2 text-xs">
+          <span className={cx(
+            'px-2 py-0.5 rounded-full font-bold uppercase tracking-wider',
+            mode === 'tutor' ? 'bg-violet-100 dark:bg-violet-500/15 text-violet-700 dark:text-violet-300' : 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
+          )}>
+            {mode === 'tutor' ? '📖 Tutor mode' : '🏆 Test mode'}
+          </span>
+          <span className="text-slate-500">{questions.length} question{questions.length !== 1 ? 's' : ''}</span>
+        </div>
+      </div>
+
+      <ExamMCQRunner
+        questions={questions}
+        examId={examId}
+        topicId={topicId}
+        mode={mode}
+        progress={progress}
+        setProgress={setProgress}
+      />
+    </div>
+  );
+}
+
+// MCQ runner specialized for exam-prep — reuses QuestionCard, but tutor mode shows
+// explanations after each submit, test mode batches them at the end.
+function ExamMCQRunner({ questions, examId, topicId, mode, progress, setProgress }) {
+  const examProg = progress.examProgress?.[examId] || { topics: {} };
+  const stored = examProg.topics?.[topicId] || { answers: {} };
+
+  const [answers, setAnswers] = useState(() => {
+    // Convert stored answers to expected shape
+    const out = {};
+    Object.entries(stored.answers || {}).forEach(([qid, a]) => { out[qid] = a; });
+    return out;
+  });
+  const [openIdx, setOpenIdx] = useState(0);
+  const [testSubmitted, setTestSubmitted] = useState(false);
+
+  const persistExamProgress = (nextAnswers) => {
+    setProgress(p => {
+      const prevExamProg = p.examProgress || {};
+      const prevExam = prevExamProg[examId] || { topics: {} };
+      const prevTopic = prevExam.topics?.[topicId] || { answers: {} };
+
+      // Recompute totals across all answers in this topic
+      const submittedCount = Object.values(nextAnswers).filter(a => a?.submitted).length;
+      const correctCount = Object.entries(nextAnswers).filter(([qid, a]) => {
+        if (!a?.submitted) return false;
+        const q = questions.find(qq => qq.id === qid);
+        return q && a.picked === q.correct;
+      }).length;
+
+      // Recompute exam-level totals (sum of all topics)
+      const allTopics = { ...prevExam.topics, [topicId]: { answers: nextAnswers, submitted: submittedCount, correct: correctCount } };
+      let totalAnswered = 0, correctAnswered = 0;
+      Object.values(allTopics).forEach(t => {
+        totalAnswered += t.submitted || 0;
+        correctAnswered += t.correct || 0;
+      });
+
+      const xpDelta = Math.max(0, correctCount - (prevTopic.correct || 0)) * 10;
+
+      return {
+        ...p,
+        xp: (p.xp || 0) + xpDelta,
+        examProgress: {
+          ...prevExamProg,
+          [examId]: {
+            ...prevExam,
+            totalAnswered,
+            correctAnswered,
+            topics: allTopics,
+          },
+        },
+      };
+    });
+  };
+
+  const pick = (qi, oi) => {
+    const q = questions[qi];
+    if (mode === 'tutor' && answers[q.id]?.submitted) return;
+    const next = { ...answers, [q.id]: { ...(answers[q.id] || {}), picked: oi } };
+    setAnswers(next);
+  };
+
+  const submitOne = (qi) => {
+    const q = questions[qi];
+    const a = answers[q.id];
+    if (!a || a.picked == null || a.submitted) return;
+    const next = { ...answers, [q.id]: { ...a, submitted: true } };
+    setAnswers(next);
+    persistExamProgress(next);
+  };
+
+  const submitAllTest = () => {
+    const next = { ...answers };
+    questions.forEach(q => {
+      if (next[q.id]?.picked != null && !next[q.id].submitted) {
+        next[q.id] = { ...next[q.id], submitted: true };
+      }
+    });
+    setAnswers(next);
+    setTestSubmitted(true);
+    persistExamProgress(next);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const resetTopic = () => {
+    if (!confirm('Reset all answers for this topic?')) return;
+    setAnswers({});
+    setOpenIdx(0);
+    setTestSubmitted(false);
+    persistExamProgress({});
+  };
+
+  const total = questions.length;
+  const submittedCount = questions.filter(q => answers[q.id]?.submitted).length;
+  const correctCount = questions.filter(q => answers[q.id]?.submitted && answers[q.id].picked === q.correct).length;
+  const accuracy = submittedCount ? Math.round((correctCount / submittedCount) * 100) : 0;
+  const allDone = submittedCount === total;
+  const allPicked = questions.every(q => answers[q.id]?.picked != null);
+
+  // In test mode, hide explanations until everything is submitted
+  const showExplanations = mode === 'tutor' || testSubmitted;
+
+  return (
+    <div className="space-y-3">
+      {/* Sticky header */}
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-violet-50 to-fuchsia-50 dark:from-violet-500/5 dark:to-fuchsia-500/5 p-4 sticky top-2 z-10 backdrop-blur-sm">
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-3 flex-wrap text-xs">
+            <span className="font-bold">{submittedCount} / {total} answered</span>
+            {showExplanations && submittedCount > 0 && (
+              <>
+                <span className="text-slate-300 dark:text-slate-700">·</span>
+                <span className="px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold">
+                  ✓ {correctCount} correct
+                </span>
+                <span className="text-slate-500">{accuracy}% accuracy</span>
+              </>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {mode === 'test' && !testSubmitted && (
+              <button
+                onClick={submitAllTest}
+                disabled={!allPicked}
+                className="px-4 py-1.5 rounded-full bg-pink-500 text-white text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-pink-600"
+              >
+                Submit test
+              </button>
+            )}
+            {submittedCount > 0 && (
+              <button onClick={resetTopic} className="text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center gap-1 px-2 py-1 rounded-md hover:bg-white dark:hover:bg-slate-800">
+                <RefreshCw size={11} /> Reset
+              </button>
+            )}
+          </div>
+        </div>
+        <div className="mt-3 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-violet-500 to-fuchsia-500 transition-all duration-500" style={{ width: `${total ? (submittedCount / total) * 100 : 0}%` }} />
+        </div>
+      </div>
+
+      {/* Question list */}
+      {questions.map((q, i) => {
+        const a = answers[q.id];
+        const isSubmitted = !!(a?.submitted && showExplanations);
+        const collapsed = openIdx !== i;
+        return (
+          <QuestionCard
+            key={q.id}
+            q={q} qi={i}
+            a={a ? { picked: a.picked, submitted: isSubmitted } : null}
+            isSubmitted={isSubmitted}
+            collapsed={collapsed}
+            onToggle={() => setOpenIdx(openIdx === i ? -1 : i)}
+            pick={pick}
+            submitOne={mode === 'tutor' ? submitOne : () => {}}
+          />
+        );
+      })}
+
+      {/* Test-mode hint */}
+      {mode === 'test' && !testSubmitted && (
+        <div className="rounded-2xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-4 text-sm text-amber-900 dark:text-amber-200 flex items-start gap-3">
+          <Info size={16} className="flex-shrink-0 mt-0.5" />
+          <div>
+            <strong>Test mode:</strong> answer all questions, then click <em>Submit test</em> at the top.
+            Explanations and your score will be revealed only after submission.
+          </div>
+        </div>
+      )}
+
+      {/* Final summary */}
+      {allDone && showExplanations && (
+        <div className="rounded-3xl border border-emerald-200 dark:border-emerald-500/30 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-500/10 dark:to-teal-500/10 p-6">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center flex-shrink-0">
+              <Trophy size={24} />
+            </div>
+            <div className="flex-1">
+              <h3 className="display-font text-2xl font-bold mb-1">Topic complete!</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+                You scored <strong className="text-slate-900 dark:text-white">{correctCount} out of {total}</strong> ({accuracy}%)
+              </p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <button
+                  onClick={resetTopic}
+                  className="text-xs px-3 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-semibold hover:bg-slate-100"
+                >
+                  Retake this topic
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ============== ADMIN PANEL ==============
 function AdminPanel({ cases, updateCase, addCase, deleteCase, navigate, auth }) {
+  const [activeTab, setActiveTab] = useState('cases'); // 'cases' | 'exams'
   const [activeId, setActiveId] = useState(cases[0]?.id);
   const [activeStageKey, setActiveStageKey] = useState('profile');
   const [showNew, setShowNew] = useState(false);
@@ -3647,22 +4370,52 @@ values ('${auth.user.email}');`}
           <p className="text-xs text-slate-500 mt-1">Signed in as <strong>{auth.user.email}</strong> · Changes save to Supabase instantly</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowNew(true)} className="px-4 py-2 rounded-full bg-teal-500 text-white text-sm font-bold flex items-center gap-1.5 hover:bg-teal-600">
-            <Plus size={14} /> New case
-          </button>
-          <button
-            onClick={() => {
-              const blob = new Blob([JSON.stringify(cases, null, 2)], { type: 'application/json' });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement('a');
-              a.href = url; a.download = 'virtual-hospital-cases.json';
-              a.click(); URL.revokeObjectURL(url);
-            }}
-            className="px-3 py-2 rounded-full border border-slate-300 dark:border-slate-700 text-sm font-semibold flex items-center gap-1.5 hover:bg-slate-100 dark:hover:bg-slate-800"
-          >
-            <Download size={14} /> Export backup
-          </button>
+          {activeTab === 'cases' && (
+            <>
+              <button onClick={() => setShowNew(true)} className="px-4 py-2 rounded-full bg-teal-500 text-white text-sm font-bold flex items-center gap-1.5 hover:bg-teal-600">
+                <Plus size={14} /> New case
+              </button>
+              <button
+                onClick={() => {
+                  const blob = new Blob([JSON.stringify(cases, null, 2)], { type: 'application/json' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url; a.download = 'virtual-hospital-cases.json';
+                  a.click(); URL.revokeObjectURL(url);
+                }}
+                className="px-3 py-2 rounded-full border border-slate-300 dark:border-slate-700 text-sm font-semibold flex items-center gap-1.5 hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                <Download size={14} /> Export backup
+              </button>
+            </>
+          )}
         </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex items-center gap-1 mb-5 border-b border-slate-200 dark:border-slate-800">
+        <button
+          onClick={() => setActiveTab('cases')}
+          className={cx(
+            'px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors -mb-px',
+            activeTab === 'cases'
+              ? 'border-teal-500 text-teal-700 dark:text-teal-400'
+              : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white'
+          )}
+        >
+          🏥 Hospital cases
+        </button>
+        <button
+          onClick={() => setActiveTab('exams')}
+          className={cx(
+            'px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors -mb-px',
+            activeTab === 'exams'
+              ? 'border-violet-500 text-violet-700 dark:text-violet-400'
+              : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white'
+          )}
+        >
+          🎓 Exam prep
+        </button>
       </div>
 
       {showNew && (
@@ -3676,6 +4429,9 @@ values ('${auth.user.email}');`}
         />
       )}
 
+      {activeTab === 'exams' ? (
+        <ExamAdmin />
+      ) : (
       <div className="grid lg:grid-cols-[280px_1fr] gap-5">
         {/* Case list */}
         <aside className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 lg:max-h-[calc(100vh-12rem)] lg:overflow-y-auto scrollbar-thin">
@@ -3728,6 +4484,359 @@ values ('${auth.user.email}');`}
           </div>
         )}
       </div>
+      )}
+    </div>
+  );
+}
+
+// ============== EXAM ADMIN ==============
+function ExamAdmin() {
+  const [exams, setExams] = useState([]);
+  const [topics, setTopics] = useState([]);
+  const [questions, setQuestions] = useState([]);
+  const [activeExamId, setActiveExamId] = useState(null);
+  const [activeTopicId, setActiveTopicId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showBulk, setShowBulk] = useState(false);
+  const [showNewTopic, setShowNewTopic] = useState(false);
+
+  // Load all exams initially
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const data = await fetchAllExams();
+      if (!cancelled) {
+        setExams(data);
+        setActiveExamId(data[0]?.id || null);
+        setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Load topics when active exam changes
+  useEffect(() => {
+    if (!activeExamId) return;
+    let cancelled = false;
+    (async () => {
+      const tps = await fetchTopics(activeExamId);
+      if (!cancelled) {
+        setTopics(tps);
+        setActiveTopicId(tps[0]?.id || null);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [activeExamId]);
+
+  // Load questions when active topic changes
+  useEffect(() => {
+    if (!activeTopicId) { setQuestions([]); return; }
+    let cancelled = false;
+    (async () => {
+      const qs = await fetchQuestions(activeTopicId);
+      if (!cancelled) setQuestions(qs);
+    })();
+    return () => { cancelled = true; };
+  }, [activeTopicId]);
+
+  const reloadTopics = async () => {
+    const tps = await fetchTopics(activeExamId);
+    setTopics(tps);
+    if (activeTopicId && !tps.find(t => t.id === activeTopicId)) {
+      setActiveTopicId(tps[0]?.id || null);
+    }
+  };
+
+  const reloadQuestions = async () => {
+    const qs = await fetchQuestions(activeTopicId);
+    setQuestions(qs);
+  };
+
+  const addTopic = async (subject, title, description) => {
+    const id = `topic-${Date.now()}`;
+    const result = await upsertTopic({
+      id, examId: activeExamId, subject, title, description: description || null,
+      displayOrder: topics.length,
+    });
+    if (result.error) {
+      alert('Failed to add topic: ' + result.error.message);
+      return;
+    }
+    await reloadTopics();
+    setActiveTopicId(id);
+    setShowNewTopic(false);
+  };
+
+  const deleteActiveTopic = async () => {
+    if (!confirm(`Delete topic "${activeTopic?.title}" and ALL its questions?`)) return;
+    await deleteTopicRow(activeTopicId);
+    await reloadTopics();
+  };
+
+  const handleBulkImport = async (newQuestions) => {
+    const result = await bulkInsertQuestions(activeTopicId, newQuestions);
+    if (result.error) {
+      alert('Bulk insert failed: ' + result.error.message);
+      return;
+    }
+    await reloadQuestions();
+    setShowBulk(false);
+  };
+
+  const deleteOneQuestion = async (qid) => {
+    if (!confirm('Delete this question?')) return;
+    await deleteQuestionRow(qid);
+    await reloadQuestions();
+  };
+
+  if (loading) {
+    return <div className="text-center py-12 text-slate-500"><RefreshCw size={14} className="inline animate-spin mr-2" /> Loading exams…</div>;
+  }
+
+  if (exams.length === 0) {
+    return (
+      <div className="rounded-3xl border-2 border-dashed border-slate-300 dark:border-slate-700 p-12 text-center">
+        <GraduationCap size={40} className="mx-auto mb-3 text-slate-300 dark:text-slate-700" />
+        <h3 className="font-bold mb-1">No exams found</h3>
+        <p className="text-sm text-slate-500 mb-3">
+          Run the exam-prep migration SQL in your Supabase project to seed exams.
+        </p>
+        <p className="text-xs text-slate-500">
+          See <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">exam-prep-migration.sql</code>
+        </p>
+      </div>
+    );
+  }
+
+  const activeExam = exams.find(e => e.id === activeExamId);
+  const activeTopic = topics.find(t => t.id === activeTopicId);
+
+  return (
+    <div>
+      {/* Exam selector */}
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 mb-4">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs uppercase tracking-wider font-bold text-slate-500 px-1">Exam:</span>
+          <select
+            value={activeExamId || ''}
+            onChange={e => setActiveExamId(e.target.value)}
+            className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold focus:outline-none focus:ring-2 ring-violet-500/40"
+          >
+            {exams.map(e => (
+              <option key={e.id} value={e.id}>{e.icon} {e.title}</option>
+            ))}
+          </select>
+        </div>
+        {activeExam && (
+          <p className="text-xs text-slate-500 mt-2 px-1">{activeExam.description}</p>
+        )}
+      </div>
+
+      <div className="grid lg:grid-cols-[300px_1fr] gap-4">
+        {/* Topics sidebar */}
+        <aside className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 lg:max-h-[calc(100vh-16rem)] lg:overflow-y-auto">
+          <div className="px-3 py-2 text-[10px] uppercase tracking-wider text-slate-500 font-bold flex items-center justify-between">
+            <span>Topics ({topics.length})</span>
+            <button
+              onClick={() => setShowNewTopic(true)}
+              className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-violet-600 dark:text-violet-400"
+              title="Add topic"
+            >
+              <Plus size={12} />
+            </button>
+          </div>
+          {topics.length === 0 ? (
+            <p className="text-xs text-slate-500 italic px-3 py-2">No topics yet. Click + to add one.</p>
+          ) : (
+            // Group by subject
+            (() => {
+              const bySubject = {};
+              topics.forEach(t => {
+                if (!bySubject[t.subject]) bySubject[t.subject] = [];
+                bySubject[t.subject].push(t);
+              });
+              return Object.keys(bySubject).sort().map(subject => (
+                <div key={subject} className="mb-2">
+                  <div className="px-3 py-1 text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-wider">{subject}</div>
+                  {bySubject[subject].map(t => (
+                    <button
+                      key={t.id}
+                      onClick={() => setActiveTopicId(t.id)}
+                      className={cx(
+                        'w-full text-left px-3 py-2 rounded-lg text-sm mb-0.5',
+                        activeTopicId === t.id
+                          ? 'bg-violet-500 text-white'
+                          : 'hover:bg-slate-100 dark:hover:bg-slate-800'
+                      )}
+                    >
+                      <div className="font-semibold truncate">{t.title}</div>
+                    </button>
+                  ))}
+                </div>
+              ));
+            })()
+          )}
+        </aside>
+
+        {/* Topic editor */}
+        {activeTopic ? (
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
+            <div className="flex items-start justify-between mb-4 flex-wrap gap-2">
+              <div>
+                <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">{activeTopic.subject}</p>
+                <h2 className="display-font text-2xl font-bold">{activeTopic.title}</h2>
+                {activeTopic.description && <p className="text-xs text-slate-500 mt-1 max-w-xl">{activeTopic.description}</p>}
+              </div>
+              <button
+                onClick={deleteActiveTopic}
+                className="text-xs text-rose-500 hover:text-rose-600 flex items-center gap-1"
+              >
+                <Trash2 size={12} /> Delete topic
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2 mb-4">
+              <button
+                onClick={() => setShowBulk(true)}
+                className="px-3 py-1.5 rounded-full bg-violet-500 text-white text-xs font-bold flex items-center gap-1 hover:bg-violet-600"
+              >
+                <Upload size={12} /> Bulk import questions
+              </button>
+              <span className="text-xs text-slate-500">
+                {questions.length} question{questions.length !== 1 ? 's' : ''} in this topic
+              </span>
+            </div>
+
+            {questions.length === 0 ? (
+              <div className="rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 p-10 text-center">
+                <Brain size={32} className="mx-auto mb-3 text-slate-300 dark:text-slate-700" />
+                <p className="text-sm text-slate-500">No questions yet. Use Bulk import to add many at once.</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {questions.map((q, i) => (
+                  <div key={q.id} className="rounded-xl border border-slate-200 dark:border-slate-800 p-3 flex items-start gap-3">
+                    <span className="text-xs font-bold bg-violet-100 dark:bg-violet-500/15 text-violet-700 dark:text-violet-300 px-2 py-1 rounded">Q{i + 1}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        {q.stars > 0 && <span className="text-xs">{'⭐'.repeat(q.stars)}</span>}
+                        {q.difficulty && q.difficulty !== 'standard' && (
+                          <span className={cx(
+                            'text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded',
+                            q.difficulty === 'easy' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300' :
+                            q.difficulty === 'moderate' ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300' :
+                            'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300'
+                          )}>
+                            {q.difficulty}
+                          </span>
+                        )}
+                        {q.type && <span className="text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">{q.type}</span>}
+                        <span className="text-[10px] text-slate-500">Answer: {String.fromCharCode(65 + q.correct)}</span>
+                      </div>
+                      <p className="text-xs leading-relaxed line-clamp-2">{q.q}</p>
+                    </div>
+                    <button
+                      onClick={() => deleteOneQuestion(q.id)}
+                      className="p-1 rounded hover:bg-rose-50 dark:hover:bg-rose-500/10 text-rose-500"
+                      title="Delete question"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 p-12 text-center text-slate-500">
+            <p>Select or create a topic to add questions.</p>
+          </div>
+        )}
+      </div>
+
+      {/* New topic modal */}
+      {showNewTopic && (
+        <NewTopicModal onClose={() => setShowNewTopic(false)} onCreate={addTopic} />
+      )}
+
+      {/* Bulk import modal — reuses the existing one with our exam-specific handler */}
+      {showBulk && activeTopic && (
+        <BulkImportModal
+          existingCount={questions.length}
+          onClose={() => setShowBulk(false)}
+          onImport={handleBulkImport}
+        />
+      )}
+    </div>
+  );
+}
+
+function NewTopicModal({ onClose, onCreate }) {
+  const [subject, setSubject] = useState('');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+
+  const COMMON_SUBJECTS = [
+    'Cardiology', 'Endocrinology', 'Respiratory', 'Gastroenterology',
+    'Nephrology', 'Neurology', 'Hematology', 'Rheumatology',
+    'Infectious Diseases', 'Oncology', 'Dermatology', 'Psychiatry',
+    'Geriatrics', 'Emergency Medicine', 'Critical Care', 'General Medicine',
+  ];
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (!subject.trim() || !title.trim()) return;
+    onCreate(subject.trim(), title.trim(), description.trim());
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <form onSubmit={submit} className="w-full max-w-lg rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl p-6">
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="display-font text-2xl font-bold">New topic</h3>
+          <button type="button" onClick={onClose} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"><X size={18} /></button>
+        </div>
+        <div className="space-y-3">
+          <div>
+            <label className="text-xs uppercase tracking-wider font-bold text-slate-500 block mb-1">Subject</label>
+            <input
+              list="subject-suggestions"
+              value={subject}
+              onChange={e => setSubject(e.target.value)}
+              placeholder="e.g., Cardiology"
+              required
+              className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-transparent focus:border-violet-500 focus:outline-none text-sm"
+            />
+            <datalist id="subject-suggestions">
+              {COMMON_SUBJECTS.map(s => <option key={s} value={s} />)}
+            </datalist>
+          </div>
+          <div>
+            <label className="text-xs uppercase tracking-wider font-bold text-slate-500 block mb-1">Topic title</label>
+            <input
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              placeholder="e.g., Acute Coronary Syndrome"
+              required
+              className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-transparent focus:border-violet-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs uppercase tracking-wider font-bold text-slate-500 block mb-1">Description (optional)</label>
+            <textarea
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              rows={2}
+              placeholder="Short description shown to students"
+              className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-transparent focus:border-violet-500 focus:outline-none text-sm resize-none"
+            />
+          </div>
+        </div>
+        <div className="flex items-center justify-end gap-2 mt-5">
+          <button type="button" onClick={onClose} className="px-4 py-2 rounded-full border border-slate-300 dark:border-slate-700 text-sm font-semibold">Cancel</button>
+          <button type="submit" className="px-5 py-2 rounded-full bg-violet-500 text-white text-sm font-bold hover:bg-violet-600">Create topic</button>
+        </div>
+      </form>
     </div>
   );
 }
