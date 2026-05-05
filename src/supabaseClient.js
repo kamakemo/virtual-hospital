@@ -143,6 +143,7 @@ export async function fetchProgress(userId) {
     mcqScores: data.mcq_scores || {},
     badges: data.badges || [],
     teachingMode: data.teaching_mode || 'advanced',
+    examProgress: data.exam_progress || {},
   }
 }
 
@@ -155,9 +156,186 @@ export async function saveProgress(userId, progress) {
     mcq_scores: progress.mcqScores || {},
     badges: progress.badges || [],
     teaching_mode: progress.teachingMode || 'advanced',
+    exam_progress: progress.examProgress || {},
   }
   const { error } = await supabase
     .from('progress')
     .upsert(row, { onConflict: 'user_id' })
   if (error) console.error('[progress] save failed:', error.message)
+}
+
+// ============== EXAM PREP — EXAMS ==============
+export async function fetchAllExams() {
+  const { data, error } = await supabase
+    .from('exams')
+    .select('*')
+    .eq('active', true)
+    .order('display_order', { ascending: true })
+  if (error) {
+    console.error('[exams] fetch failed:', error.message)
+    return []
+  }
+  return data || []
+}
+
+export async function upsertExam(examObj) {
+  const row = {
+    id: examObj.id,
+    title: examObj.title,
+    short_title: examObj.shortTitle || examObj.short_title,
+    description: examObj.description || null,
+    category: examObj.category || 'international',
+    region: examObj.region || null,
+    icon: examObj.icon || '🎓',
+    color: examObj.color || 'teal',
+    display_order: examObj.displayOrder || examObj.display_order || 0,
+    active: examObj.active !== false,
+  }
+  const { data, error } = await supabase
+    .from('exams')
+    .upsert(row, { onConflict: 'id' })
+    .select()
+    .single()
+  if (error) {
+    console.error('[exams] upsert failed:', error.message)
+    return { error }
+  }
+  return { data }
+}
+
+export async function deleteExamRow(id) {
+  const { error } = await supabase.from('exams').delete().eq('id', id)
+  if (error) console.error('[exams] delete failed:', error.message)
+  return { error }
+}
+
+// ============== EXAM PREP — TOPICS ==============
+export async function fetchTopics(examId) {
+  const { data, error } = await supabase
+    .from('exam_topics')
+    .select('*')
+    .eq('exam_id', examId)
+    .order('display_order', { ascending: true })
+  if (error) {
+    console.error('[topics] fetch failed:', error.message)
+    return []
+  }
+  return data || []
+}
+
+export async function upsertTopic(topicObj) {
+  const row = {
+    id: topicObj.id,
+    exam_id: topicObj.examId || topicObj.exam_id,
+    subject: topicObj.subject,
+    title: topicObj.title,
+    description: topicObj.description || null,
+    display_order: topicObj.displayOrder || topicObj.display_order || 0,
+  }
+  const { data, error } = await supabase
+    .from('exam_topics')
+    .upsert(row, { onConflict: 'id' })
+    .select()
+    .single()
+  if (error) {
+    console.error('[topics] upsert failed:', error.message)
+    return { error }
+  }
+  return { data }
+}
+
+export async function deleteTopicRow(id) {
+  const { error } = await supabase.from('exam_topics').delete().eq('id', id)
+  if (error) console.error('[topics] delete failed:', error.message)
+  return { error }
+}
+
+// ============== EXAM PREP — QUESTIONS ==============
+export async function fetchQuestions(topicId) {
+  const { data, error } = await supabase
+    .from('exam_questions')
+    .select('*')
+    .eq('topic_id', topicId)
+    .order('question_number', { ascending: true })
+  if (error) {
+    console.error('[questions] fetch failed:', error.message)
+    return []
+  }
+  return (data || []).map(r => ({
+    id: r.id,
+    topicId: r.topic_id,
+    questionNumber: r.question_number,
+    ...(r.data || {}),
+  }))
+}
+
+export async function fetchQuestionsForExam(examId) {
+  // Get all topics first, then questions for those topics
+  const topics = await fetchTopics(examId)
+  if (!topics.length) return { topics: [], questions: [] }
+  const topicIds = topics.map(t => t.id)
+  const { data, error } = await supabase
+    .from('exam_questions')
+    .select('*')
+    .in('topic_id', topicIds)
+    .order('question_number', { ascending: true })
+  if (error) {
+    console.error('[questions] bulk fetch failed:', error.message)
+    return { topics, questions: [] }
+  }
+  const questions = (data || []).map(r => ({
+    id: r.id,
+    topicId: r.topic_id,
+    questionNumber: r.question_number,
+    ...(r.data || {}),
+  }))
+  return { topics, questions }
+}
+
+export async function upsertQuestion(questionObj) {
+  const { id, topicId, topic_id, questionNumber, question_number, ...mcqData } = questionObj
+  const row = {
+    id: id,
+    topic_id: topicId || topic_id,
+    question_number: questionNumber || question_number || null,
+    data: mcqData,
+  }
+  const { data, error } = await supabase
+    .from('exam_questions')
+    .upsert(row, { onConflict: 'id' })
+    .select()
+    .single()
+  if (error) {
+    console.error('[questions] upsert failed:', error.message)
+    return { error }
+  }
+  return { data }
+}
+
+export async function bulkInsertQuestions(topicId, questions) {
+  // questions = array of MCQ objects
+  const rows = questions.map((q, i) => {
+    const id = `eq-${topicId}-${Date.now()}-${i}`
+    return {
+      id,
+      topic_id: topicId,
+      question_number: i + 1,
+      data: q,
+    }
+  })
+  const { data, error } = await supabase
+    .from('exam_questions')
+    .insert(rows)
+    .select()
+  if (error) {
+    console.error('[questions] bulk insert failed:', error.message)
+    return { error, count: 0 }
+  }
+  return { data, count: data?.length || 0 }
+}
+
+export async function deleteQuestionRow(id) {
+  const { error } = await supabase.from('exam_questions').delete().eq('id', id)
+  if (error) console.error('[questions] delete failed:', error.message)
+  return { error }
 }
