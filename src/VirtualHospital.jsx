@@ -15,7 +15,7 @@ import {
   Undo2, Redo2, Type, Palette, Highlighter, Table as TableIcon, Minus,
   Youtube, Film, Image as ImageIcon2, FileImage, Link2, Code2, Indent, Outdent,
   GripVertical, Pencil, ArrowUp, ArrowDown, Eraser, FileCode, Info, AlertTriangle,
-  CircleDot, Hash
+  CircleDot, Hash, Mic, Calendar, MessageSquare, HelpCircle
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, BarChart, Bar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import {
@@ -40,6 +40,14 @@ import {
   upsertQuestion,
   bulkInsertQuestions,
   deleteQuestionRow,
+  fetchAllConferences,
+  fetchConference,
+  upsertConference,
+  deleteConferenceRow,
+  fetchSessions,
+  fetchSession,
+  upsertSession,
+  deleteSessionRow,
 } from './supabaseClient';
 
 // ============== STORAGE KEYS ==============
@@ -1401,7 +1409,7 @@ export default function VirtualHospital() {
     return <SplashLoader />;
   }
 
-  const PUBLIC_ROUTES = ['landing', 'login', 'exams'];
+  const PUBLIC_ROUTES = ['landing', 'login', 'exams', 'conferences'];
   const isPublicRoute = PUBLIC_ROUTES.includes(route.name);
   const requiresAuth = !auth.user && !isPublicRoute;
 
@@ -1553,6 +1561,25 @@ export default function VirtualHospital() {
             setProgress={setProgress}
           />
         )}
+        {route.name === 'conferences' && (
+          <ConferencesLanding navigate={navigate} progress={progress} />
+        )}
+        {route.name === 'conference' && (
+          <ConferenceHome
+            conferenceId={route.conferenceId} navigate={navigate}
+            progress={progress} setProgress={setProgress}
+            isAdmin={auth?.isAdmin}
+          />
+        )}
+        {route.name === 'session' && (
+          <SessionView
+            conferenceId={route.conferenceId}
+            sessionId={route.sessionId}
+            navigate={navigate}
+            progress={progress}
+            setProgress={setProgress}
+          />
+        )}
         {route.name === 'admin' && (
           <AdminPanel
             cases={cases} updateCase={updateCase} addCase={addCase}
@@ -1590,6 +1617,7 @@ function TopBar({ route, navigate, theme, setTheme, progress, userRole, auth }) 
 
         <nav className="ml-auto flex items-center gap-1">
           <NavLink active={route.name === 'landing'} onClick={() => navigate({ name: 'landing' })} icon={Home} label="Home" />
+          <NavLink active={['conferences','conference','session'].includes(route.name)} onClick={() => navigate({ name: 'conferences' })} icon={Mic} label="Conferences" />
           <NavLink active={['exams','exam','exam-test'].includes(route.name)} onClick={() => navigate({ name: 'exams' })} icon={GraduationCap} label="Exams" />
           {auth?.user && (
             <NavLink active={route.name === 'dashboard'} onClick={() => navigate({ name: 'dashboard' })} icon={BarChart3} label="Progress" />
@@ -1962,6 +1990,29 @@ function Landing({ navigate, cases, progress, userRole }) {
             className="group relative overflow-hidden px-6 py-3 rounded-2xl bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-bold shadow-xl shadow-violet-500/30 hover:scale-[1.02] transition-transform flex items-center gap-2"
           >
             <Brain size={18} /> Browse exams
+            <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+          </button>
+        </div>
+      </section>
+
+      {/* Conferences section */}
+      <section id="conferences" className="max-w-7xl mx-auto px-6 py-14 border-t border-slate-200/60 dark:border-slate-800/60">
+        <div className="text-center max-w-2xl mx-auto mb-10">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-700 dark:text-amber-300 text-xs font-bold mb-4">
+            <Mic size={12} /> CONFERENCES
+          </div>
+          <h2 className="display-font text-4xl font-bold mb-3">Attend virtual conferences</h2>
+          <p className="text-slate-600 dark:text-slate-400 text-base">
+            Conference-style learning with expert speakers, moderator discussion questions,
+            and audience Q&A — organized like real medical conferences.
+          </p>
+        </div>
+        <div className="flex justify-center">
+          <button
+            onClick={() => navigate({ name: 'conferences' })}
+            className="group relative overflow-hidden px-6 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold shadow-xl shadow-amber-500/30 hover:scale-[1.02] transition-transform flex items-center gap-2"
+          >
+            <Mic size={18} /> Browse conferences
             <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>
@@ -4306,6 +4357,600 @@ function ExamMCQRunner({ questions, examId, topicId, mode, progress, setProgress
   );
 }
 
+// ============================================================================
+// CONFERENCES — STUDENT VIEWS
+// ============================================================================
+
+// ============== CONFERENCES LANDING ==============
+function ConferencesLanding({ navigate, progress }) {
+  const [conferences, setConferences] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const data = await fetchAllConferences();
+      if (!cancelled) {
+        setConferences(data);
+        setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const conferenceProgress = progress.conferenceProgress || {};
+
+  return (
+    <div className="max-w-7xl mx-auto px-6 py-10">
+      {/* Hero */}
+      <div className="text-center max-w-3xl mx-auto mb-10">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-700 dark:text-amber-300 text-xs font-bold mb-4">
+          <Mic size={12} /> CONFERENCES
+        </div>
+        <h1 className="display-font text-5xl font-bold mb-4">Virtual conferences</h1>
+        <p className="text-lg text-slate-600 dark:text-slate-400">
+          Attend conference-style learning sessions with expert speakers, moderator discussions, and audience Q&amp;A.
+        </p>
+      </div>
+
+      {/* Conferences grid */}
+      {loading ? (
+        <div className="text-center py-12 text-slate-500">
+          <RefreshCw className="inline animate-spin mr-2" size={14} /> Loading conferences…
+        </div>
+      ) : conferences.length === 0 ? (
+        <div className="rounded-3xl border-2 border-dashed border-slate-300 dark:border-slate-700 p-12 text-center">
+          <Mic size={40} className="mx-auto mb-3 text-slate-300 dark:text-slate-700" />
+          <h3 className="font-bold mb-1">No conferences yet</h3>
+          <p className="text-sm text-slate-500">Conferences will appear here once they're added by an admin.</p>
+        </div>
+      ) : (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {conferences.map(conf => (
+            <ConferenceCard
+              key={conf.id}
+              conference={conf}
+              progress={conferenceProgress[conf.id]}
+              onClick={() => navigate({ name: 'conference', conferenceId: conf.id })}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ConferenceCard({ conference, progress, onClick }) {
+  const colorMap = {
+    rose: 'from-rose-500 to-pink-500',
+    sky: 'from-sky-500 to-blue-500',
+    teal: 'from-teal-500 to-emerald-500',
+    emerald: 'from-emerald-500 to-green-500',
+    violet: 'from-violet-500 to-fuchsia-500',
+    amber: 'from-amber-500 to-orange-500',
+    red: 'from-red-500 to-rose-500',
+  };
+  const grad = colorMap[conference.banner_color] || colorMap.amber;
+
+  const attended = Object.keys(progress?.sessions || {}).length;
+
+  return (
+    <button
+      onClick={onClick}
+      className="group text-left rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all"
+    >
+      <div className={cx('h-32 bg-gradient-to-br relative flex items-center justify-center', grad)}>
+        {conference.hero_image ? (
+          <img src={conference.hero_image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        ) : (
+          <span className="text-6xl">{conference.icon || '🎤'}</span>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+      </div>
+      <div className="p-5">
+        {conference.date_label && (
+          <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
+            {conference.date_label} {conference.organizer && `· ${conference.organizer}`}
+          </p>
+        )}
+        <h3 className="font-bold text-base leading-tight mb-1 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+          {conference.title}
+        </h3>
+        {conference.subtitle && (
+          <p className="text-xs text-slate-600 dark:text-slate-400 mb-2 leading-relaxed">{conference.subtitle}</p>
+        )}
+        {conference.description && (
+          <p className="text-xs text-slate-500 leading-relaxed mb-3 line-clamp-2">{conference.description}</p>
+        )}
+        <div className="flex items-center justify-between text-xs">
+          {attended > 0 ? (
+            <div className="flex items-center gap-1.5 font-semibold text-emerald-600 dark:text-emerald-400">
+              <CheckCircle2 size={12} /> {attended} session{attended !== 1 ? 's' : ''} attended
+            </div>
+          ) : (
+            <span className="text-slate-500">Not started</span>
+          )}
+          <ArrowRight size={14} className="text-slate-400 group-hover:translate-x-1 transition-transform" />
+        </div>
+      </div>
+    </button>
+  );
+}
+
+// ============== CONFERENCE HOME ==============
+function ConferenceHome({ conferenceId, navigate, progress, setProgress, isAdmin }) {
+  const [conference, setConference] = useState(null);
+  const [sessions, setSessions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      const conf = await fetchConference(conferenceId);
+      const sess = await fetchSessions(conferenceId);
+      if (!cancelled) {
+        setConference(conf);
+        setSessions(sess);
+        setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [conferenceId]);
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-6 py-12 text-center text-slate-500">
+        <RefreshCw className="inline animate-spin mr-2" size={14} /> Loading conference…
+      </div>
+    );
+  }
+
+  if (!conference) {
+    return (
+      <div className="max-w-7xl mx-auto px-6 py-12 text-center">
+        <p className="text-slate-500">Conference not found.</p>
+        <button onClick={() => navigate({ name: 'conferences' })} className="mt-4 text-sm text-amber-600 hover:underline">← Back to all conferences</button>
+      </div>
+    );
+  }
+
+  const colorMap = {
+    rose: 'from-rose-500 to-pink-500',
+    sky: 'from-sky-500 to-blue-500',
+    teal: 'from-teal-500 to-emerald-500',
+    emerald: 'from-emerald-500 to-green-500',
+    violet: 'from-violet-500 to-fuchsia-500',
+    amber: 'from-amber-500 to-orange-500',
+    red: 'from-red-500 to-rose-500',
+  };
+  const grad = colorMap[conference.banner_color] || colorMap.amber;
+
+  const confProgress = progress.conferenceProgress?.[conferenceId] || { sessions: {} };
+  const attendedIds = Object.keys(confProgress.sessions || {});
+  const attendedCount = attendedIds.length;
+  const completionPct = sessions.length ? Math.round((attendedCount / sessions.length) * 100) : 0;
+
+  return (
+    <div>
+      {/* Hero banner */}
+      <div className={cx('relative bg-gradient-to-br h-56 sm:h-64 flex items-center justify-center overflow-hidden', grad)}>
+        {conference.hero_image && (
+          <img src={conference.hero_image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+        <div className="relative max-w-7xl mx-auto px-6 py-8 w-full">
+          <button
+            onClick={() => navigate({ name: 'conferences' })}
+            className="flex items-center gap-1 text-xs text-white/80 hover:text-white mb-3"
+          >
+            <ChevronLeft size={12} /> All conferences
+          </button>
+          {conference.date_label && (
+            <p className="text-xs uppercase tracking-[0.25em] text-white/80 font-bold mb-2">
+              {conference.date_label} {conference.organizer && `· ${conference.organizer}`}
+            </p>
+          )}
+          <h1 className="display-font text-4xl sm:text-5xl font-bold text-white leading-tight mb-2">{conference.title}</h1>
+          {conference.subtitle && (
+            <p className="text-base sm:text-lg text-white/90 max-w-3xl">{conference.subtitle}</p>
+          )}
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Description + progress */}
+        <div className="grid lg:grid-cols-[1fr_320px] gap-6 mb-8">
+          <div>
+            {conference.description && (
+              <div className="prose prose-sm dark:prose-invert max-w-none">
+                <p className="text-slate-700 dark:text-slate-300 leading-relaxed">{conference.description}</p>
+              </div>
+            )}
+          </div>
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
+            <h3 className="font-bold text-sm mb-3 flex items-center gap-2">
+              <Trophy size={14} /> Your attendance
+            </h3>
+            <div className="text-center mb-3">
+              <div className="text-4xl font-black">{attendedCount}<span className="text-base text-slate-400"> / {sessions.length}</span></div>
+              <div className="text-xs text-slate-500">sessions attended</div>
+            </div>
+            <div className="h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+              <div className={cx('h-full bg-gradient-to-r transition-all duration-500', grad)} style={{ width: `${completionPct}%` }} />
+            </div>
+            {attendedCount === sessions.length && sessions.length > 0 && (
+              <div className="mt-3 px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 text-xs text-emerald-700 dark:text-emerald-300 flex items-center gap-2 font-semibold">
+                <Award size={12} /> Conference complete!
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Sessions */}
+        <h2 className="display-font text-2xl font-bold mb-4 flex items-center gap-2">
+          <Calendar size={18} /> Programme
+          <span className="text-xs font-normal text-slate-500">{sessions.length} session{sessions.length !== 1 ? 's' : ''}</span>
+        </h2>
+
+        {sessions.length === 0 ? (
+          <div className="rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 p-10 text-center">
+            <Mic size={32} className="mx-auto mb-3 text-slate-300 dark:text-slate-700" />
+            <p className="text-sm text-slate-500">
+              {isAdmin ? 'No sessions yet. Add some in the admin panel.' : 'This conference is being prepared. Check back soon!'}
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {sessions.map((session, i) => {
+              const isAttended = !!confProgress.sessions?.[session.id];
+              return (
+                <SessionListItem
+                  key={session.id}
+                  session={session}
+                  index={i}
+                  isAttended={isAttended}
+                  onClick={() => navigate({ name: 'session', conferenceId, sessionId: session.id })}
+                />
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SessionListItem({ session, index, isAttended, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full text-left rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 hover:shadow-md hover:border-amber-300 dark:hover:border-amber-500/40 transition-all flex items-start gap-4 group"
+    >
+      <div className={cx(
+        'w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 font-bold text-sm',
+        isAttended ? 'bg-emerald-500 text-white' : 'bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400'
+      )}>
+        {isAttended ? <Check size={16} /> : (index + 1)}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-1 flex-wrap">
+          {session.durationMinutes && (
+            <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+              <Clock size={10} className="inline mr-0.5" /> {session.durationMinutes} min
+            </span>
+          )}
+          {isAttended && (
+            <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
+              Attended
+            </span>
+          )}
+        </div>
+        <h3 className="font-semibold text-base leading-tight mb-1 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+          {session.topic}
+        </h3>
+        {session.speakerName && (
+          <p className="text-xs text-slate-600 dark:text-slate-400">
+            <span className="font-semibold">{session.speakerName}</span>
+            {session.speakerTitle && <span> · {session.speakerTitle}</span>}
+            {session.speakerAffiliation && <span className="text-slate-500"> · {session.speakerAffiliation}</span>}
+          </p>
+        )}
+      </div>
+      <ArrowRight size={16} className="text-slate-400 group-hover:translate-x-1 transition-transform flex-shrink-0 mt-1" />
+    </button>
+  );
+}
+
+// ============== SESSION VIEW ==============
+function SessionView({ conferenceId, sessionId, navigate, progress, setProgress }) {
+  const [session, setSession] = useState(null);
+  const [conference, setConference] = useState(null);
+  const [sessions, setSessions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [revealedModerator, setRevealedModerator] = useState({});
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      const sess = await fetchSession(sessionId);
+      const conf = await fetchConference(conferenceId);
+      const allSess = await fetchSessions(conferenceId);
+      if (!cancelled) {
+        setSession(sess);
+        setConference(conf);
+        setSessions(allSess);
+        setLoading(false);
+        setRevealedModerator({}); // Reset on session change
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [sessionId, conferenceId]);
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto px-6 py-12 text-center text-slate-500">
+        <RefreshCw className="inline animate-spin mr-2" size={14} /> Loading session…
+      </div>
+    );
+  }
+
+  if (!session || !conference) {
+    return (
+      <div className="max-w-4xl mx-auto px-6 py-12 text-center">
+        <p className="text-slate-500">Session not found.</p>
+        <button onClick={() => navigate({ name: 'conferences' })} className="mt-4 text-sm text-amber-600 hover:underline">← Back to conferences</button>
+      </div>
+    );
+  }
+
+  const confProg = progress.conferenceProgress?.[conferenceId] || { sessions: {} };
+  const isAttended = !!confProg.sessions?.[sessionId];
+
+  const moderatorQs = session.moderatorQs || [];
+  const audienceQs = session.audienceQs || [];
+
+  const currentIdx = sessions.findIndex(s => s.id === sessionId);
+  const prevSession = currentIdx > 0 ? sessions[currentIdx - 1] : null;
+  const nextSession = currentIdx < sessions.length - 1 ? sessions[currentIdx + 1] : null;
+
+  const markAttended = () => {
+    setProgress(p => {
+      const prev = p.conferenceProgress || {};
+      const prevConf = prev[conferenceId] || { sessions: {} };
+      const wasAttended = !!prevConf.sessions?.[sessionId];
+      const xpDelta = wasAttended ? 0 : 25;
+      return {
+        ...p,
+        xp: (p.xp || 0) + xpDelta,
+        conferenceProgress: {
+          ...prev,
+          [conferenceId]: {
+            ...prevConf,
+            sessions: { ...prevConf.sessions, [sessionId]: { attendedAt: new Date().toISOString() } },
+          },
+        },
+      };
+    });
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-1 text-xs text-slate-500 mb-4 flex-wrap">
+        <button onClick={() => navigate({ name: 'conferences' })} className="hover:text-slate-900 dark:hover:text-white">Conferences</button>
+        <ChevronRight size={11} />
+        <button onClick={() => navigate({ name: 'conference', conferenceId })} className="hover:text-slate-900 dark:hover:text-white truncate">{conference.title}</button>
+        <ChevronRight size={11} />
+        <span className="font-semibold text-slate-700 dark:text-slate-300 truncate">Session {currentIdx + 1}</span>
+      </div>
+
+      {/* Speaker card */}
+      <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-500/5 dark:to-orange-500/5 p-5 mb-5">
+        <div className="flex items-start gap-4 flex-wrap">
+          {session.speakerPhoto ? (
+            <img src={session.speakerPhoto} alt={session.speakerName} className="w-20 h-20 rounded-2xl object-cover flex-shrink-0 ring-2 ring-white dark:ring-slate-800 shadow-md" />
+          ) : (
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white text-3xl font-bold flex-shrink-0 shadow-md">
+              {(session.speakerName || '?').charAt(0)}
+            </div>
+          )}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap mb-1.5">
+              <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded bg-amber-500 text-white">
+                <Mic size={9} className="inline mr-0.5" /> Session {currentIdx + 1}
+              </span>
+              {session.durationMinutes && (
+                <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                  <Clock size={10} className="inline mr-0.5" /> {session.durationMinutes} min
+                </span>
+              )}
+            </div>
+            <h1 className="display-font text-2xl sm:text-3xl font-bold leading-tight mb-2">{session.topic}</h1>
+            {session.speakerName && (
+              <div>
+                <p className="font-bold text-base">{session.speakerName}</p>
+                {session.speakerTitle && (
+                  <p className="text-sm text-slate-700 dark:text-slate-300">{session.speakerTitle}</p>
+                )}
+                {session.speakerAffiliation && (
+                  <p className="text-xs text-slate-500">{session.speakerAffiliation}</p>
+                )}
+                {session.speakerBio && (
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 max-w-2xl leading-relaxed">{session.speakerBio}</p>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Lecture content */}
+      <article className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 mb-5">
+        <div className="flex items-center gap-2 mb-4 text-xs uppercase tracking-wider font-bold text-slate-500">
+          <BookOpen size={12} /> Lecture
+        </div>
+        {session.lectureHTML ? (
+          <div className="rte-content text-slate-800 dark:text-slate-200" dangerouslySetInnerHTML={{ __html: session.lectureHTML }} />
+        ) : (
+          <p className="text-slate-500 italic text-sm">No lecture content yet.</p>
+        )}
+      </article>
+
+      {/* Moderator questions */}
+      {moderatorQs.length > 0 && (
+        <section className="mb-5">
+          <h2 className="display-font text-xl font-bold mb-3 flex items-center gap-2">
+            <HelpCircle size={18} className="text-violet-500" />
+            Moderator's discussion questions
+            <span className="text-xs font-normal text-slate-500">{moderatorQs.length}</span>
+          </h2>
+          <div className="space-y-3">
+            {moderatorQs.map((mq, i) => (
+              <ModeratorQCard
+                key={i}
+                index={i}
+                question={mq}
+                revealed={!!revealedModerator[i]}
+                onReveal={() => setRevealedModerator(r => ({ ...r, [i]: true }))}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Audience Q&A */}
+      {audienceQs.length > 0 && (
+        <section className="mb-5">
+          <h2 className="display-font text-xl font-bold mb-3 flex items-center gap-2">
+            <MessageSquare size={18} className="text-sky-500" />
+            Audience Q&amp;A
+            <span className="text-xs font-normal text-slate-500">{audienceQs.length}</span>
+          </h2>
+          <div className="space-y-3">
+            {audienceQs.map((aq, i) => (
+              <AudienceQCard key={i} qa={aq} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Mark attended + navigation */}
+      <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 mb-5">
+        {!isAttended ? (
+          <button
+            onClick={markAttended}
+            className="w-full px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold hover:scale-[1.01] transition-transform flex items-center justify-center gap-2"
+          >
+            <CheckCircle2 size={18} /> Mark session as attended  (+25 XP)
+          </button>
+        ) : (
+          <div className="flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-semibold text-sm">
+            <CheckCircle2 size={16} /> You've attended this session
+          </div>
+        )}
+      </div>
+
+      {/* Previous / Next */}
+      <div className="flex items-center justify-between gap-3">
+        {prevSession ? (
+          <button
+            onClick={() => navigate({ name: 'session', conferenceId, sessionId: prevSession.id })}
+            className="flex items-center gap-2 px-4 py-2 rounded-full border border-slate-300 dark:border-slate-700 text-sm font-semibold hover:bg-slate-100 dark:hover:bg-slate-800"
+          >
+            <ChevronLeft size={14} />
+            <span className="text-left">
+              <span className="block text-[10px] uppercase tracking-wider text-slate-500">Previous</span>
+              <span className="block text-xs truncate max-w-[200px]">{prevSession.topic}</span>
+            </span>
+          </button>
+        ) : <div />}
+        {nextSession ? (
+          <button
+            onClick={() => navigate({ name: 'session', conferenceId, sessionId: nextSession.id })}
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500 text-white text-sm font-bold hover:bg-amber-600"
+          >
+            <span className="text-right">
+              <span className="block text-[10px] uppercase tracking-wider opacity-80">Next</span>
+              <span className="block text-xs truncate max-w-[200px]">{nextSession.topic}</span>
+            </span>
+            <ChevronRight size={14} />
+          </button>
+        ) : (
+          <button
+            onClick={() => navigate({ name: 'conference', conferenceId })}
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-sm font-bold"
+          >
+            Back to programme <ArrowRight size={14} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ModeratorQCard({ index, question, revealed, onReveal }) {
+  return (
+    <div className="rounded-2xl border border-violet-200 dark:border-violet-500/30 bg-violet-50 dark:bg-violet-500/5 p-4">
+      <div className="flex items-start gap-3">
+        <div className="w-8 h-8 rounded-lg bg-violet-500 text-white flex items-center justify-center flex-shrink-0 text-xs font-bold">
+          M{index + 1}
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-semibold leading-relaxed mb-1">{question.q}</p>
+          {question.moderator && (
+            <p className="text-[11px] text-slate-500 mb-3">— {question.moderator}</p>
+          )}
+          {!revealed ? (
+            <button
+              onClick={onReveal}
+              className="text-xs px-3 py-1.5 rounded-full bg-violet-500 text-white font-bold hover:bg-violet-600 flex items-center gap-1"
+            >
+              <Eye size={12} /> Reveal speaker's answer
+            </button>
+          ) : (
+            <div className="rounded-xl bg-white dark:bg-slate-900 border border-violet-200 dark:border-violet-500/30 p-3">
+              <div className="text-[10px] uppercase tracking-wider font-bold text-violet-600 dark:text-violet-400 mb-1">Speaker's answer</div>
+              {question.answerHTML ? (
+                <div className="rte-content text-sm text-slate-800 dark:text-slate-200" dangerouslySetInnerHTML={{ __html: question.answerHTML }} />
+              ) : (
+                <p className="text-sm text-slate-700 dark:text-slate-300">{question.a}</p>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AudienceQCard({ qa }) {
+  return (
+    <div className="rounded-2xl border border-sky-200 dark:border-sky-500/30 bg-sky-50/50 dark:bg-sky-500/5 p-4">
+      <div className="flex items-start gap-3">
+        <div className="w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-500/15 text-sky-700 dark:text-sky-300 flex items-center justify-center flex-shrink-0">
+          <MessageSquare size={14} />
+        </div>
+        <div className="flex-1">
+          {qa.attendee && (
+            <p className="text-[11px] uppercase tracking-wider font-bold text-sky-600 dark:text-sky-400 mb-0.5">{qa.attendee}</p>
+          )}
+          <p className="text-sm font-semibold leading-relaxed mb-2">{qa.q}</p>
+          <div className="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-3">
+            <div className="text-[10px] uppercase tracking-wider font-bold text-slate-500 mb-1">Reply</div>
+            {qa.answerHTML ? (
+              <div className="rte-content text-sm text-slate-800 dark:text-slate-200" dangerouslySetInnerHTML={{ __html: qa.answerHTML }} />
+            ) : (
+              <p className="text-sm text-slate-700 dark:text-slate-300">{qa.a}</p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ============== ADMIN PANEL ==============
 function AdminPanel({ cases, updateCase, addCase, deleteCase, navigate, auth }) {
   const [activeTab, setActiveTab] = useState('cases'); // 'cases' | 'exams'
@@ -4416,6 +5061,17 @@ values ('${auth.user.email}');`}
         >
           🎓 Exam prep
         </button>
+        <button
+          onClick={() => setActiveTab('conferences')}
+          className={cx(
+            'px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors -mb-px',
+            activeTab === 'conferences'
+              ? 'border-amber-500 text-amber-700 dark:text-amber-400'
+              : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white'
+          )}
+        >
+          🎤 Conferences
+        </button>
       </div>
 
       {showNew && (
@@ -4431,6 +5087,8 @@ values ('${auth.user.email}');`}
 
       {activeTab === 'exams' ? (
         <ExamAdmin />
+      ) : activeTab === 'conferences' ? (
+        <ConferenceAdmin />
       ) : (
       <div className="grid lg:grid-cols-[280px_1fr] gap-5">
         {/* Case list */}
@@ -4837,6 +5495,732 @@ function NewTopicModal({ onClose, onCreate }) {
           <button type="submit" className="px-5 py-2 rounded-full bg-violet-500 text-white text-sm font-bold hover:bg-violet-600">Create topic</button>
         </div>
       </form>
+    </div>
+  );
+}
+
+// ============== CONFERENCE ADMIN ==============
+function ConferenceAdmin() {
+  const [conferences, setConferences] = useState([]);
+  const [sessions, setSessions] = useState([]);
+  const [activeConfId, setActiveConfId] = useState(null);
+  const [activeSessionId, setActiveSessionId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showNewConf, setShowNewConf] = useState(false);
+  const [showNewSession, setShowNewSession] = useState(false);
+  const [editConf, setEditConf] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const data = await fetchAllConferences();
+      if (!cancelled) {
+        setConferences(data);
+        if (data.length > 0) setActiveConfId(data[0].id);
+        setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    if (!activeConfId) { setSessions([]); return; }
+    let cancelled = false;
+    (async () => {
+      const sess = await fetchSessions(activeConfId);
+      if (!cancelled) {
+        setSessions(sess);
+        setActiveSessionId(sess[0]?.id || null);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [activeConfId]);
+
+  const reloadConferences = async () => {
+    const data = await fetchAllConferences();
+    setConferences(data);
+  };
+
+  const reloadSessions = async () => {
+    const sess = await fetchSessions(activeConfId);
+    setSessions(sess);
+  };
+
+  const createConference = async (confDraft) => {
+    const id = `conf-${Date.now()}`;
+    const result = await upsertConference({ ...confDraft, id, displayOrder: conferences.length });
+    if (result.error) {
+      alert('Failed to create conference: ' + result.error.message);
+      return;
+    }
+    await reloadConferences();
+    setActiveConfId(id);
+    setShowNewConf(false);
+  };
+
+  const updateConference = async (confDraft) => {
+    const result = await upsertConference(confDraft);
+    if (result.error) {
+      alert('Failed to update conference: ' + result.error.message);
+      return;
+    }
+    await reloadConferences();
+    setEditConf(false);
+  };
+
+  const deleteActiveConference = async () => {
+    if (!confirm(`Delete conference "${activeConference?.title}" and ALL its sessions? This cannot be undone.`)) return;
+    await deleteConferenceRow(activeConfId);
+    await reloadConferences();
+    setActiveConfId(conferences.find(c => c.id !== activeConfId)?.id || null);
+  };
+
+  const createSession = async (sessDraft) => {
+    const id = `sess-${Date.now()}`;
+    const result = await upsertSession({
+      ...sessDraft,
+      id,
+      conferenceId: activeConfId,
+      displayOrder: sessions.length,
+      sessionNumber: sessions.length + 1,
+    });
+    if (result.error) {
+      alert('Failed to create session: ' + result.error.message);
+      return;
+    }
+    await reloadSessions();
+    setActiveSessionId(id);
+    setShowNewSession(false);
+  };
+
+  const deleteActiveSession = async () => {
+    if (!confirm(`Delete session "${activeSession?.topic}"?`)) return;
+    await deleteSessionRow(activeSessionId);
+    await reloadSessions();
+  };
+
+  const saveActiveSession = async (updates) => {
+    const merged = { ...activeSession, ...updates };
+    const result = await upsertSession(merged);
+    if (result.error) {
+      alert('Failed to save session: ' + result.error.message);
+      return;
+    }
+    await reloadSessions();
+  };
+
+  if (loading) {
+    return <div className="text-center py-12 text-slate-500"><RefreshCw size={14} className="inline animate-spin mr-2" /> Loading conferences…</div>;
+  }
+
+  const activeConference = conferences.find(c => c.id === activeConfId);
+  const activeSession = sessions.find(s => s.id === activeSessionId);
+
+  // Empty state
+  if (conferences.length === 0) {
+    return (
+      <div>
+        <div className="rounded-3xl border-2 border-dashed border-slate-300 dark:border-slate-700 p-12 text-center">
+          <Mic size={40} className="mx-auto mb-3 text-slate-300 dark:text-slate-700" />
+          <h3 className="font-bold mb-1">No conferences yet</h3>
+          <p className="text-sm text-slate-500 mb-4">Create your first conference to get started.</p>
+          <button onClick={() => setShowNewConf(true)} className="px-5 py-2 rounded-full bg-amber-500 text-white text-sm font-bold hover:bg-amber-600">
+            <Plus size={14} className="inline mr-1" /> Create conference
+          </button>
+        </div>
+        {showNewConf && (
+          <ConferenceFormModal onClose={() => setShowNewConf(false)} onSave={createConference} />
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {/* Conference selector */}
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 mb-4">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs uppercase tracking-wider font-bold text-slate-500 px-1">Conference:</span>
+          <select
+            value={activeConfId || ''}
+            onChange={e => setActiveConfId(e.target.value)}
+            className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold focus:outline-none focus:ring-2 ring-amber-500/40"
+          >
+            {conferences.map(c => (
+              <option key={c.id} value={c.id}>{c.icon} {c.title}</option>
+            ))}
+          </select>
+          <button
+            onClick={() => setShowNewConf(true)}
+            className="px-3 py-1.5 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center gap-1 hover:bg-amber-600"
+          >
+            <Plus size={12} /> New conference
+          </button>
+          {activeConference && (
+            <>
+              <button onClick={() => setEditConf(true)} className="px-3 py-1.5 rounded-full border border-slate-300 dark:border-slate-700 text-xs font-semibold flex items-center gap-1 hover:bg-slate-100 dark:hover:bg-slate-800">
+                <Edit3 size={12} /> Edit details
+              </button>
+              <button onClick={deleteActiveConference} className="px-3 py-1.5 rounded-full text-xs text-rose-500 font-semibold flex items-center gap-1 hover:bg-rose-50 dark:hover:bg-rose-500/10">
+                <Trash2 size={12} /> Delete
+              </button>
+            </>
+          )}
+        </div>
+        {activeConference && (
+          <p className="text-xs text-slate-500 mt-2 px-1">
+            {activeConference.subtitle} · {sessions.length} session{sessions.length !== 1 ? 's' : ''}
+          </p>
+        )}
+      </div>
+
+      <div className="grid lg:grid-cols-[300px_1fr] gap-4">
+        {/* Sessions sidebar */}
+        <aside className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 lg:max-h-[calc(100vh-16rem)] lg:overflow-y-auto">
+          <div className="px-3 py-2 text-[10px] uppercase tracking-wider text-slate-500 font-bold flex items-center justify-between">
+            <span>Sessions ({sessions.length})</span>
+            <button
+              onClick={() => setShowNewSession(true)}
+              className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-amber-600 dark:text-amber-400"
+              title="Add session"
+            >
+              <Plus size={12} />
+            </button>
+          </div>
+          {sessions.length === 0 ? (
+            <p className="text-xs text-slate-500 italic px-3 py-2">No sessions yet. Click + to add one.</p>
+          ) : (
+            sessions.map((s, i) => (
+              <button
+                key={s.id}
+                onClick={() => setActiveSessionId(s.id)}
+                className={cx(
+                  'w-full text-left flex items-start gap-2 px-3 py-2 rounded-lg text-sm mb-0.5',
+                  activeSessionId === s.id
+                    ? 'bg-amber-500 text-white'
+                    : 'hover:bg-slate-100 dark:hover:bg-slate-800'
+                )}
+              >
+                <span className="font-bold text-xs opacity-70 mt-0.5">{i + 1}.</span>
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold truncate text-xs">{s.topic}</div>
+                  {s.speakerName && (
+                    <div className={cx('text-[10px] truncate', activeSessionId === s.id ? 'opacity-80' : 'text-slate-500')}>
+                      {s.speakerName}
+                    </div>
+                  )}
+                </div>
+              </button>
+            ))
+          )}
+        </aside>
+
+        {/* Session editor */}
+        {activeSession ? (
+          <SessionEditor
+            key={activeSession.id}
+            session={activeSession}
+            onSave={saveActiveSession}
+            onDelete={deleteActiveSession}
+          />
+        ) : (
+          <div className="rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 p-12 text-center text-slate-500">
+            <p>Select or create a session to edit.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Modals */}
+      {showNewConf && (
+        <ConferenceFormModal onClose={() => setShowNewConf(false)} onSave={createConference} />
+      )}
+      {editConf && activeConference && (
+        <ConferenceFormModal
+          conference={activeConference}
+          onClose={() => setEditConf(false)}
+          onSave={updateConference}
+        />
+      )}
+      {showNewSession && activeConfId && (
+        <NewSessionModal onClose={() => setShowNewSession(false)} onCreate={createSession} />
+      )}
+    </div>
+  );
+}
+
+function ConferenceFormModal({ conference, onClose, onSave }) {
+  const [draft, setDraft] = useState(conference || {
+    title: '', subtitle: '', description: '',
+    organizer: 'AlGhad College', dateLabel: '',
+    icon: '🎤', bannerColor: 'amber',
+  });
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (!draft.title.trim()) return;
+    onSave(draft);
+  };
+
+  const COLORS = ['rose', 'amber', 'emerald', 'teal', 'sky', 'violet', 'red'];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <form onSubmit={submit} className="w-full max-w-2xl rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="display-font text-2xl font-bold">{conference ? 'Edit conference' : 'New conference'}</h3>
+          <button type="button" onClick={onClose} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"><X size={18} /></button>
+        </div>
+        <div className="grid sm:grid-cols-[80px_1fr] gap-3">
+          <Field label="Icon">
+            <input
+              value={draft.icon || ''}
+              onChange={e => setDraft({ ...draft, icon: e.target.value })}
+              maxLength={4}
+              className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-2xl text-center focus:outline-none focus:ring-2 ring-amber-500/40"
+            />
+          </Field>
+          <Field label="Title">
+            <input
+              value={draft.title || ''}
+              onChange={e => setDraft({ ...draft, title: e.target.value })}
+              required
+              placeholder="AlGhad Cardiology Update 2026"
+              className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 focus:outline-none focus:ring-2 ring-amber-500/40 text-sm"
+            />
+          </Field>
+        </div>
+        <div className="mt-3">
+          <Field label="Subtitle">
+            <input
+              value={draft.subtitle || ''}
+              onChange={e => setDraft({ ...draft, subtitle: e.target.value })}
+              placeholder="A modern review of acute coronary syndromes"
+              className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 focus:outline-none focus:ring-2 ring-amber-500/40 text-sm"
+            />
+          </Field>
+        </div>
+        <div className="grid sm:grid-cols-2 gap-3 mt-3">
+          <Field label="Organizer">
+            <input
+              value={draft.organizer || ''}
+              onChange={e => setDraft({ ...draft, organizer: e.target.value })}
+              className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 focus:outline-none focus:ring-2 ring-amber-500/40 text-sm"
+            />
+          </Field>
+          <Field label="Date label">
+            <input
+              value={draft.dateLabel || draft.date_label || ''}
+              onChange={e => setDraft({ ...draft, dateLabel: e.target.value })}
+              placeholder="Spring 2026"
+              className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 focus:outline-none focus:ring-2 ring-amber-500/40 text-sm"
+            />
+          </Field>
+        </div>
+        <div className="mt-3">
+          <Field label="Description">
+            <textarea
+              value={draft.description || ''}
+              onChange={e => setDraft({ ...draft, description: e.target.value })}
+              rows={3}
+              placeholder="Short paragraph describing what this conference covers"
+              className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 focus:outline-none focus:ring-2 ring-amber-500/40 text-sm resize-none"
+            />
+          </Field>
+        </div>
+        <div className="mt-3">
+          <Field label="Banner color">
+            <div className="flex items-center gap-2 flex-wrap">
+              {COLORS.map(c => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setDraft({ ...draft, bannerColor: c, banner_color: c })}
+                  className={cx(
+                    'w-10 h-10 rounded-xl transition-all',
+                    `bg-gradient-to-br from-${c}-500 to-${c === 'amber' ? 'orange' : c}-500`,
+                    (draft.bannerColor === c || draft.banner_color === c) ? 'ring-2 ring-offset-2 ring-amber-500 scale-110' : 'opacity-60 hover:opacity-100'
+                  )}
+                  title={c}
+                />
+              ))}
+            </div>
+          </Field>
+        </div>
+        <div className="flex items-center justify-end gap-2 mt-6">
+          <button type="button" onClick={onClose} className="px-4 py-2 rounded-full border border-slate-300 dark:border-slate-700 text-sm font-semibold">Cancel</button>
+          <button type="submit" className="px-5 py-2 rounded-full bg-amber-500 text-white text-sm font-bold hover:bg-amber-600">
+            {conference ? 'Save changes' : 'Create conference'}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+function NewSessionModal({ onClose, onCreate }) {
+  const [draft, setDraft] = useState({
+    topic: '',
+    speakerName: '',
+    speakerTitle: '',
+    speakerAffiliation: '',
+    durationMinutes: 30,
+  });
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (!draft.topic.trim()) return;
+    onCreate(draft);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <form onSubmit={submit} className="w-full max-w-lg rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl p-6">
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="display-font text-2xl font-bold">New session</h3>
+          <button type="button" onClick={onClose} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"><X size={18} /></button>
+        </div>
+        <div className="space-y-3">
+          <Field label="Session topic *">
+            <input
+              value={draft.topic}
+              onChange={e => setDraft({ ...draft, topic: e.target.value })}
+              required
+              placeholder="e.g., Cardiogenic Shock 2026"
+              className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 focus:outline-none focus:ring-2 ring-amber-500/40 text-sm"
+            />
+          </Field>
+          <Field label="Speaker name">
+            <input
+              value={draft.speakerName}
+              onChange={e => setDraft({ ...draft, speakerName: e.target.value })}
+              placeholder="Dr. Fatima Nasser"
+              className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 focus:outline-none focus:ring-2 ring-amber-500/40 text-sm"
+            />
+          </Field>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <Field label="Speaker title">
+              <input
+                value={draft.speakerTitle}
+                onChange={e => setDraft({ ...draft, speakerTitle: e.target.value })}
+                placeholder="Consultant Cardiologist"
+                className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 focus:outline-none focus:ring-2 ring-amber-500/40 text-sm"
+              />
+            </Field>
+            <Field label="Affiliation">
+              <input
+                value={draft.speakerAffiliation}
+                onChange={e => setDraft({ ...draft, speakerAffiliation: e.target.value })}
+                placeholder="King Faisal Specialist Hospital"
+                className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 focus:outline-none focus:ring-2 ring-amber-500/40 text-sm"
+              />
+            </Field>
+          </div>
+          <Field label="Duration (minutes)">
+            <input
+              type="number"
+              value={draft.durationMinutes}
+              onChange={e => setDraft({ ...draft, durationMinutes: parseInt(e.target.value) || 0 })}
+              className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 focus:outline-none focus:ring-2 ring-amber-500/40 text-sm"
+            />
+          </Field>
+        </div>
+        <p className="text-xs text-slate-500 mt-3">You can fill in lecture content, moderator questions, and audience Q&amp;A after creating the session.</p>
+        <div className="flex items-center justify-end gap-2 mt-5">
+          <button type="button" onClick={onClose} className="px-4 py-2 rounded-full border border-slate-300 dark:border-slate-700 text-sm font-semibold">Cancel</button>
+          <button type="submit" className="px-5 py-2 rounded-full bg-amber-500 text-white text-sm font-bold hover:bg-amber-600">Create session</button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+function SessionEditor({ session, onSave, onDelete }) {
+  const [draft, setDraft] = useState(session);
+  const [activePane, setActivePane] = useState('lecture'); // 'speaker' | 'lecture' | 'moderator' | 'audience'
+  const [dirty, setDirty] = useState(false);
+
+  // When session prop changes (different session selected), reset
+  useEffect(() => {
+    setDraft(session);
+    setDirty(false);
+  }, [session.id]);
+
+  const update = (k, v) => {
+    setDraft(d => ({ ...d, [k]: v }));
+    setDirty(true);
+  };
+
+  const handleSave = async () => {
+    await onSave(draft);
+    setDirty(false);
+  };
+
+  const moderatorQs = draft.moderatorQs || [];
+  const audienceQs = draft.audienceQs || [];
+
+  return (
+    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
+      <div className="flex items-start justify-between mb-4 flex-wrap gap-2">
+        <div className="flex-1 min-w-0">
+          <input
+            value={draft.topic || ''}
+            onChange={e => update('topic', e.target.value)}
+            placeholder="Session topic"
+            className="display-font text-2xl font-bold w-full bg-transparent focus:outline-none focus:bg-slate-100 dark:focus:bg-slate-800 px-2 py-1 rounded-lg -mx-2"
+          />
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {dirty && (
+            <button onClick={handleSave} className="px-4 py-2 rounded-full bg-emerald-500 text-white text-sm font-bold hover:bg-emerald-600 flex items-center gap-1">
+              <Save size={12} /> Save changes
+            </button>
+          )}
+          <button onClick={onDelete} className="text-xs text-rose-500 hover:text-rose-600 flex items-center gap-1 px-3 py-2 rounded-full hover:bg-rose-50 dark:hover:bg-rose-500/10">
+            <Trash2 size={12} /> Delete
+          </button>
+        </div>
+      </div>
+
+      {/* Pane tabs */}
+      <div className="flex items-center gap-1 mb-4 border-b border-slate-200 dark:border-slate-800 flex-wrap">
+        {[
+          { id: 'speaker', label: 'Speaker', icon: UserCircle },
+          { id: 'lecture', label: 'Lecture', icon: BookOpen },
+          { id: 'moderator', label: `Moderator Q&A (${moderatorQs.length})`, icon: HelpCircle },
+          { id: 'audience', label: `Audience Q&A (${audienceQs.length})`, icon: MessageSquare },
+        ].map(t => {
+          const Icon = t.icon;
+          return (
+            <button
+              key={t.id}
+              onClick={() => setActivePane(t.id)}
+              className={cx(
+                'px-3 py-2 text-xs font-semibold border-b-2 transition-colors -mb-px flex items-center gap-1.5',
+                activePane === t.id
+                  ? 'border-amber-500 text-amber-700 dark:text-amber-400'
+                  : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white'
+              )}
+            >
+              <Icon size={12} /> {t.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Speaker pane */}
+      {activePane === 'speaker' && (
+        <div className="space-y-3">
+          <div className="grid sm:grid-cols-2 gap-3">
+            <Field label="Speaker name">
+              <input
+                value={draft.speakerName || ''}
+                onChange={e => update('speakerName', e.target.value)}
+                className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 ring-amber-500/40"
+              />
+            </Field>
+            <Field label="Duration (minutes)">
+              <input
+                type="number"
+                value={draft.durationMinutes || 0}
+                onChange={e => update('durationMinutes', parseInt(e.target.value) || 0)}
+                className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 ring-amber-500/40"
+              />
+            </Field>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <Field label="Speaker title">
+              <input
+                value={draft.speakerTitle || ''}
+                onChange={e => update('speakerTitle', e.target.value)}
+                placeholder="e.g., Consultant Interventional Cardiologist"
+                className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 ring-amber-500/40"
+              />
+            </Field>
+            <Field label="Affiliation">
+              <input
+                value={draft.speakerAffiliation || ''}
+                onChange={e => update('speakerAffiliation', e.target.value)}
+                placeholder="e.g., King Faisal Specialist Hospital"
+                className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 ring-amber-500/40"
+              />
+            </Field>
+          </div>
+          <Field label="Speaker photo URL (optional)">
+            <input
+              value={draft.speakerPhoto || ''}
+              onChange={e => update('speakerPhoto', e.target.value)}
+              placeholder="https://..."
+              className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 ring-amber-500/40 font-mono"
+            />
+          </Field>
+          <Field label="Speaker bio">
+            <textarea
+              value={draft.speakerBio || ''}
+              onChange={e => update('speakerBio', e.target.value)}
+              rows={3}
+              placeholder="Short biography shown above the lecture"
+              className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 ring-amber-500/40 resize-none"
+            />
+          </Field>
+        </div>
+      )}
+
+      {/* Lecture pane */}
+      {activePane === 'lecture' && (
+        <div>
+          <p className="text-xs text-slate-500 mb-2">The main lecture content. Paste your slide content, prose, or HTML — it'll be displayed beautifully on the session page.</p>
+          <RichTextEditor
+            value={draft.lectureHTML || ''}
+            onChange={v => update('lectureHTML', v)}
+            placeholder="Paste lecture content here…"
+            minH="500px"
+          />
+        </div>
+      )}
+
+      {/* Moderator Q&A pane */}
+      {activePane === 'moderator' && (
+        <ModeratorQEditor
+          questions={moderatorQs}
+          onChange={qs => update('moderatorQs', qs)}
+        />
+      )}
+
+      {/* Audience Q&A pane */}
+      {activePane === 'audience' && (
+        <AudienceQEditor
+          qas={audienceQs}
+          onChange={qas => update('audienceQs', qas)}
+        />
+      )}
+    </div>
+  );
+}
+
+function ModeratorQEditor({ questions, onChange }) {
+  const add = () => onChange([...questions, { q: '', a: '', answerHTML: '', moderator: '' }]);
+  const update = (i, k, v) => {
+    const next = [...questions];
+    next[i] = { ...next[i], [k]: v };
+    onChange(next);
+  };
+  const remove = (i) => onChange(questions.filter((_, idx) => idx !== i));
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <p className="text-xs text-slate-500">
+          Discussion questions asked by moderators after the lecture. Students see the question first, then click to reveal the speaker's answer.
+        </p>
+        <button onClick={add} className="px-3 py-1.5 rounded-full bg-violet-500 text-white text-xs font-bold flex items-center gap-1 hover:bg-violet-600">
+          <Plus size={12} /> Add question
+        </button>
+      </div>
+      {questions.length === 0 ? (
+        <div className="rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 p-8 text-center text-sm text-slate-500">
+          No moderator questions yet. Click "Add question" to start.
+        </div>
+      ) : (
+        questions.map((mq, i) => (
+          <div key={i} className="rounded-2xl border border-slate-200 dark:border-slate-800 p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold bg-violet-100 dark:bg-violet-500/15 text-violet-700 dark:text-violet-300 px-2 py-0.5 rounded">M{i + 1}</span>
+              <button onClick={() => remove(i)} className="text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 p-1 rounded">
+                <Trash2 size={12} />
+              </button>
+            </div>
+            <Field label="Moderator name (optional)">
+              <input
+                value={mq.moderator || ''}
+                onChange={e => update(i, 'moderator', e.target.value)}
+                placeholder="Dr. Sarah Williams"
+                className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm focus:outline-none"
+              />
+            </Field>
+            <Field label="Question">
+              <textarea
+                value={mq.q || ''}
+                onChange={e => update(i, 'q', e.target.value)}
+                rows={2}
+                placeholder="What would you say to a clinician facing this scenario in the ED?"
+                className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm focus:outline-none resize-none"
+              />
+            </Field>
+            <Field label="Speaker's answer">
+              <RichTextEditor
+                value={mq.answerHTML || mq.a || ''}
+                onChange={v => update(i, 'answerHTML', v)}
+                placeholder="The speaker's response — paste rich content if needed"
+                minH="160px"
+              />
+            </Field>
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
+
+function AudienceQEditor({ qas, onChange }) {
+  const add = () => onChange([...qas, { q: '', a: '', answerHTML: '', attendee: '' }]);
+  const update = (i, k, v) => {
+    const next = [...qas];
+    next[i] = { ...next[i], [k]: v };
+    onChange(next);
+  };
+  const remove = (i) => onChange(qas.filter((_, idx) => idx !== i));
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <p className="text-xs text-slate-500">
+          Questions asked by audience members during Q&amp;A. Each appears as a card with the question and the speaker's reply.
+        </p>
+        <button onClick={add} className="px-3 py-1.5 rounded-full bg-sky-500 text-white text-xs font-bold flex items-center gap-1 hover:bg-sky-600">
+          <Plus size={12} /> Add Q&amp;A
+        </button>
+      </div>
+      {qas.length === 0 ? (
+        <div className="rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 p-8 text-center text-sm text-slate-500">
+          No audience questions yet. Click "Add Q&amp;A" to start.
+        </div>
+      ) : (
+        qas.map((qa, i) => (
+          <div key={i} className="rounded-2xl border border-slate-200 dark:border-slate-800 p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold bg-sky-100 dark:bg-sky-500/15 text-sky-700 dark:text-sky-300 px-2 py-0.5 rounded">Q{i + 1}</span>
+              <button onClick={() => remove(i)} className="text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 p-1 rounded">
+                <Trash2 size={12} />
+              </button>
+            </div>
+            <Field label="Attendee (optional)">
+              <input
+                value={qa.attendee || ''}
+                onChange={e => update(i, 'attendee', e.target.value)}
+                placeholder="Resident from KAMC"
+                className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm focus:outline-none"
+              />
+            </Field>
+            <Field label="Question">
+              <textarea
+                value={qa.q || ''}
+                onChange={e => update(i, 'q', e.target.value)}
+                rows={2}
+                placeholder="The audience member's question"
+                className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm focus:outline-none resize-none"
+              />
+            </Field>
+            <Field label="Speaker's reply">
+              <RichTextEditor
+                value={qa.answerHTML || qa.a || ''}
+                onChange={v => update(i, 'answerHTML', v)}
+                placeholder="The speaker's reply"
+                minH="140px"
+              />
+            </Field>
+          </div>
+        ))
+      )}
     </div>
   );
 }
