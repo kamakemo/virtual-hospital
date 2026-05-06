@@ -144,6 +144,7 @@ export async function fetchProgress(userId) {
     badges: data.badges || [],
     teachingMode: data.teaching_mode || 'advanced',
     examProgress: data.exam_progress || {},
+    conferenceProgress: data.conference_progress || {},
   }
 }
 
@@ -157,6 +158,7 @@ export async function saveProgress(userId, progress) {
     badges: progress.badges || [],
     teaching_mode: progress.teachingMode || 'advanced',
     exam_progress: progress.examProgress || {},
+    conference_progress: progress.conferenceProgress || {},
   }
   const { error } = await supabase
     .from('progress')
@@ -338,4 +340,145 @@ export async function deleteQuestionRow(id) {
   const { error } = await supabase.from('exam_questions').delete().eq('id', id)
   if (error) console.error('[questions] delete failed:', error.message)
   return { error }
+}
+
+// ============== CONFERENCES ==============
+export async function fetchAllConferences() {
+  const { data, error } = await supabase
+    .from('conferences')
+    .select('*')
+    .eq('active', true)
+    .order('display_order', { ascending: true })
+  if (error) {
+    console.error('[conferences] fetch failed:', error.message)
+    return []
+  }
+  return data || []
+}
+
+export async function fetchConference(id) {
+  const { data, error } = await supabase
+    .from('conferences')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle()
+  if (error) {
+    console.error('[conference] fetch failed:', error.message)
+    return null
+  }
+  return data
+}
+
+export async function upsertConference(confObj) {
+  const row = {
+    id: confObj.id,
+    title: confObj.title,
+    subtitle: confObj.subtitle || null,
+    description: confObj.description || null,
+    banner_color: confObj.bannerColor || confObj.banner_color || 'teal',
+    icon: confObj.icon || '🎤',
+    organizer: confObj.organizer || null,
+    date_label: confObj.dateLabel || confObj.date_label || null,
+    hero_image: confObj.heroImage || confObj.hero_image || null,
+    display_order: confObj.displayOrder || confObj.display_order || 0,
+    active: confObj.active !== false,
+  }
+  const { data, error } = await supabase
+    .from('conferences')
+    .upsert(row, { onConflict: 'id' })
+    .select()
+    .single()
+  if (error) {
+    console.error('[conference] upsert failed:', error.message)
+    return { error }
+  }
+  return { data }
+}
+
+export async function deleteConferenceRow(id) {
+  const { error } = await supabase.from('conferences').delete().eq('id', id)
+  if (error) console.error('[conference] delete failed:', error.message)
+  return { error }
+}
+
+export async function fetchSessions(conferenceId) {
+  const { data, error } = await supabase
+    .from('conference_sessions')
+    .select('*')
+    .eq('conference_id', conferenceId)
+    .order('display_order', { ascending: true })
+  if (error) {
+    console.error('[sessions] fetch failed:', error.message)
+    return []
+  }
+  return (data || []).map(rowToSession)
+}
+
+export async function fetchSession(id) {
+  const { data, error } = await supabase
+    .from('conference_sessions')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle()
+  if (error) {
+    console.error('[session] fetch failed:', error.message)
+    return null
+  }
+  return data ? rowToSession(data) : null
+}
+
+export async function upsertSession(sessionObj) {
+  const { id, conferenceId, conference_id, sessionNumber, session_number,
+          topic, durationMinutes, duration_minutes,
+          speakerName, speaker_name, speakerTitle, speaker_title,
+          speakerAffiliation, speaker_affiliation, speakerPhoto, speaker_photo,
+          speakerBio, speaker_bio, displayOrder, display_order,
+          ...rest } = sessionObj
+  const row = {
+    id,
+    conference_id: conferenceId || conference_id,
+    session_number: sessionNumber || session_number || 1,
+    topic,
+    duration_minutes: durationMinutes || duration_minutes || null,
+    speaker_name: speakerName || speaker_name || null,
+    speaker_title: speakerTitle || speaker_title || null,
+    speaker_affiliation: speakerAffiliation || speaker_affiliation || null,
+    speaker_photo: speakerPhoto || speaker_photo || null,
+    speaker_bio: speakerBio || speaker_bio || null,
+    data: rest, // lectureHTML, moderatorQs, audienceQs all go in here
+    display_order: displayOrder || display_order || 0,
+  }
+  const { data, error } = await supabase
+    .from('conference_sessions')
+    .upsert(row, { onConflict: 'id' })
+    .select()
+    .single()
+  if (error) {
+    console.error('[session] upsert failed:', error.message)
+    return { error }
+  }
+  return { data: rowToSession(data) }
+}
+
+export async function deleteSessionRow(id) {
+  const { error } = await supabase.from('conference_sessions').delete().eq('id', id)
+  if (error) console.error('[session] delete failed:', error.message)
+  return { error }
+}
+
+function rowToSession(row) {
+  return {
+    id: row.id,
+    conferenceId: row.conference_id,
+    sessionNumber: row.session_number,
+    topic: row.topic,
+    durationMinutes: row.duration_minutes,
+    speakerName: row.speaker_name,
+    speakerTitle: row.speaker_title,
+    speakerAffiliation: row.speaker_affiliation,
+    speakerPhoto: row.speaker_photo,
+    speakerBio: row.speaker_bio,
+    displayOrder: row.display_order,
+    ...(row.data || {}),
+  }
 }
