@@ -517,6 +517,195 @@ function sanitizePastedHTML(html) {
   return root.innerHTML;
 }
 
+// ============== HTML CASE FILE PARSER ==============
+// Parses an uploaded HTML file with the section-marker format and returns a
+// case-shaped object ready to be saved. Returns { caseObj, errors }.
+function parseHTMLCase(htmlText) {
+  const errors = [];
+  const warnings = [];
+
+  // Map: stage key (lowercase, no spaces) → STAGES key
+  // Includes synonyms (in case the AI uses slightly different labels)
+  const STAGE_LOOKUP = {
+    's1': 'profile', 'profile': 'profile',
+    's2': 'handover', 'handover': 'handover', 'sbar': 'handover',
+    's3': 'assessment', 'initialassessment': 'assessment', 'assessment': 'assessment',
+    's4': 'resident', 'residentreview': 'resident', 'resident': 'resident',
+    's5': 'consultant', 'consultantround': 'consultant', 'consultant': 'consultant',
+    's6': 'teaching', 'teachingpoints': 'teaching', 'teaching': 'teaching',
+    's7': 'orders', 'orders': 'orders',
+    's8': 'nursing', 'nursingcare': 'nursing', 'nursing': 'nursing',
+    's9': 'investigations', 'investigations': 'investigations', 'labs': 'investigations',
+    's10': 'imaging', 'ecg': 'imaging', 'imaging': 'imaging', 'ecgimaging': 'imaging',
+    's11': 'medications', 'medications': 'medications', 'meds': 'medications',
+    's12': 'monitoring', 'monitoring': 'monitoring',
+    's13': 'complications', 'complications': 'complications',
+    's14': 'differentials', 'differentials': 'differentials', 'differential': 'differentials',
+    's15': 'plan', 'plan': 'plan', 'managementplan': 'plan',
+    's16': 'progress', 'progress': 'progress', 'progressnotes': 'progress',
+    's17': 'discharge', 'discharge': 'discharge', 'outcome': 'discharge',
+    's18': 'pearls', 'pearls': 'pearls', 'clinicalpearls': 'pearls',
+    's19': 'mcqs', 'mcqs': 'mcqs', 'questions': 'mcqs', 'assessment': 'mcqs',
+  };
+
+  // 1. Parse the HTML
+  const doc = new DOMParser().parseFromString(htmlText, 'text/html');
+
+  // 2. Extract metadata from META comment block
+  const meta = {};
+  const walker = doc.createTreeWalker(doc.documentElement, NodeFilter.SHOW_COMMENT);
+  let cnode;
+  while ((cnode = walker.nextNode())) {
+    const txt = cnode.nodeValue;
+    if (/^\s*META\b/i.test(txt)) {
+      const lines = txt.split('\n');
+      lines.forEach(line => {
+        const m = line.match(/^\s*([a-zA-Z_][\w]*)\s*:\s*(.+)\s*$/);
+        if (m) meta[m[1].trim().toLowerCase()] = m[2].trim();
+      });
+    }
+  }
+
+  // 3. Find the body element
+  const body = doc.body || doc.documentElement;
+  if (!body) {
+    return { caseObj: null, errors: ['Could not parse HTML — no <body> found.'] };
+  }
+
+  // 4. Walk top-level elements, splitting at <h1> markers that match S## or stage names
+  const children = Array.from(body.children);
+  const sections = {}; // key → HTML string
+  let currentKey = null;
+  let currentBuffer = [];
+
+  const tryMatchHeading = (text) => {
+    if (!text) return null;
+    // Try "S1", "S1 — Profile", "Profile", "S1 - Handover", etc.
+    // Strip emoji, dashes, underscores, normalize
+    const cleaned = text.replace(/[^\w]/g, '').toLowerCase();
+
+    // Try "s1" prefix first (most reliable)
+    const sMatch = cleaned.match(/^s(\d+)/);
+    if (sMatch) {
+      const sKey = `s${sMatch[1]}`;
+      if (STAGE_LOOKUP[sKey]) return STAGE_LOOKUP[sKey];
+    }
+
+    // Try the full normalized heading
+    if (STAGE_LOOKUP[cleaned]) return STAGE_LOOKUP[cleaned];
+
+    // Try strip leading numbers like "1Profile"
+    const stripped = cleaned.replace(/^\d+/, '');
+    if (STAGE_LOOKUP[stripped]) return STAGE_LOOKUP[stripped];
+
+    return null;
+  };
+
+  const flushBuffer = () => {
+    if (currentKey && currentBuffer.length > 0) {
+      sections[currentKey] = currentBuffer.map(el => el.outerHTML).join('\n');
+    }
+  };
+
+  for (const el of children) {
+    if (el.tagName === 'H1') {
+      const matchedKey = tryMatchHeading(el.textContent || '');
+      if (matchedKey) {
+        flushBuffer();
+        currentKey = matchedKey;
+        currentBuffer = [];
+        continue;
+      }
+    }
+    // Skip standalone elements before the first section
+    if (!currentKey) continue;
+    // Skip script/style elements
+    if (el.tagName === 'SCRIPT' || el.tagName === 'STYLE' || el.tagName === 'NOSCRIPT') continue;
+    currentBuffer.push(el);
+  }
+  flushBuffer();
+
+  // 5. Validate required metadata
+  const requiredFields = ['title', 'hospital', 'department'];
+  const missing = requiredFields.filter(f => !meta[f]);
+  if (missing.length > 0) {
+    errors.push(`Missing required metadata: ${missing.join(', ')}. Add a <!-- META block at the top with title, hospital, department.`);
+  }
+
+  // 6. Validate hospital
+  const hospital = (meta.hospital || '').toLowerCase();
+  if (hospital && !['cardiology', 'internal'].includes(hospital)) {
+    warnings.push(`Hospital "${meta.hospital}" not recognized — must be "cardiology" or "internal". Will default to "cardiology".`);
+  }
+
+  // 7. Sanitize each section's HTML using existing sanitizer
+  const cleanSections = {};
+  for (const [key, html] of Object.entries(sections)) {
+    cleanSections[key] = sanitizePastedHTML(html);
+  }
+
+  // 8. Special handling for the MCQs section — parse with the MCQ parser if present
+  let mcqs = [];
+  if (cleanSections.mcqs) {
+    // Convert HTML back to plain text for the MCQ parser
+    const tempDoc = new DOMParser().parseFromString(`<div>${cleanSections.mcqs}</div>`, 'text/html');
+    const mcqText = tempDoc.body.textContent || '';
+    const result = parseMCQBulk(mcqText);
+    if (result.questions.length > 0) {
+      mcqs = result.questions;
+    }
+    if (result.errors.length > 0) {
+      warnings.push(`MCQs section: ${result.errors.length} question(s) could not be parsed.`);
+    }
+  }
+
+  // 9. Build the case object
+  const caseObj = {
+    id: meta.id || `case-${Date.now()}`,
+    title: meta.title || 'Untitled Case',
+    hospital: ['cardiology', 'internal'].includes(hospital) ? hospital : 'cardiology',
+    department: meta.department || null,
+    bedNumber: meta.bednumber ? parseInt(meta.bednumber) || null : null,
+    chiefComplaint: meta.chiefcomplaint || meta.chief_complaint || '',
+    system: meta.system || 'Cardiology',
+    severity: ['stable', 'urgent', 'critical'].includes((meta.severity || '').toLowerCase())
+      ? meta.severity.toLowerCase() : 'urgent',
+    tags: meta.tags ? meta.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+    // Each stage's HTML content
+    profile: cleanSections.profile || '',
+    handover: cleanSections.handover || '',
+    assessment: cleanSections.assessment || '',
+    resident: cleanSections.resident || '',
+    consultant: cleanSections.consultant || '',
+    teaching: cleanSections.teaching || '',
+    orders: cleanSections.orders || '',
+    nursing: cleanSections.nursing || '',
+    investigations: cleanSections.investigations || '',
+    imaging: cleanSections.imaging || '',
+    medications: cleanSections.medications || '',
+    monitoring: cleanSections.monitoring || '',
+    complications: cleanSections.complications || '',
+    differentials: cleanSections.differentials || '',
+    plan: cleanSections.plan || '',
+    progress: cleanSections.progress || '',
+    discharge: cleanSections.discharge || '',
+    pearls: cleanSections.pearls || '',
+    // MCQs go in their own array
+    mcqs,
+  };
+
+  // 10. Identify which sections were detected (for the UI summary)
+  const detectedSectionKeys = Object.keys(sections);
+
+  return {
+    caseObj,
+    errors,
+    warnings,
+    detectedSectionKeys,
+    metaPresent: Object.keys(meta).length > 0,
+  };
+}
+
 // ============== MCQ BULK PARSER ==============
 // Parses a block of pasted text into structured MCQ objects.
 // Returns { questions: [...], errors: [...] }
@@ -4957,6 +5146,7 @@ function AdminPanel({ cases, updateCase, addCase, deleteCase, navigate, auth }) 
   const [activeId, setActiveId] = useState(cases[0]?.id);
   const [activeStageKey, setActiveStageKey] = useState('profile');
   const [showNew, setShowNew] = useState(false);
+  const [showUpload, setShowUpload] = useState(false);
 
   // Update activeId when cases change
   useEffect(() => {
@@ -5020,6 +5210,9 @@ values ('${auth.user.email}');`}
               <button onClick={() => setShowNew(true)} className="px-4 py-2 rounded-full bg-teal-500 text-white text-sm font-bold flex items-center gap-1.5 hover:bg-teal-600">
                 <Plus size={14} /> New case
               </button>
+              <button onClick={() => setShowUpload(true)} className="px-4 py-2 rounded-full bg-violet-500 text-white text-sm font-bold flex items-center gap-1.5 hover:bg-violet-600">
+                <Upload size={14} /> Upload HTML
+              </button>
               <button
                 onClick={() => {
                   const blob = new Blob([JSON.stringify(cases, null, 2)], { type: 'application/json' });
@@ -5081,6 +5274,18 @@ values ('${auth.user.email}');`}
             addCase(c);
             setActiveId(c.id);
             setShowNew(false);
+          }}
+        />
+      )}
+
+      {showUpload && (
+        <UploadHTMLCaseModal
+          existingIds={cases.map(c => c.id)}
+          onClose={() => setShowUpload(false)}
+          onCreate={(c) => {
+            addCase(c);
+            setActiveId(c.id);
+            setShowUpload(false);
           }}
         />
       )}
@@ -6328,6 +6533,304 @@ function NewCaseModal({ onClose, onCreate }) {
             }}
             className="px-5 py-2 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-sm font-bold"
           >Create case</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============== UPLOAD HTML CASE MODAL ==============
+function UploadHTMLCaseModal({ existingIds, onClose, onCreate }) {
+  const [fileName, setFileName] = useState('');
+  const [parsed, setParsed] = useState(null); // { caseObj, errors, warnings, detectedSectionKeys, metaPresent }
+  const [overrides, setOverrides] = useState({});
+  const [isImporting, setIsImporting] = useState(false);
+
+  const handleFile = async (file) => {
+    if (!file) return;
+    setFileName(file.name);
+    try {
+      const text = await file.text();
+      const result = parseHTMLCase(text);
+      setParsed(result);
+      setOverrides({});
+    } catch (e) {
+      setParsed({ caseObj: null, errors: ['Could not read file: ' + e.message], warnings: [], detectedSectionKeys: [] });
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const file = e.dataTransfer?.files?.[0];
+    if (file && file.name.match(/\.(html?|htm)$/i)) {
+      handleFile(file);
+    } else {
+      alert('Please upload an .html file');
+    }
+  };
+
+  const handleImport = async () => {
+    if (!parsed?.caseObj) return;
+    setIsImporting(true);
+
+    // Apply overrides from the form (hospital, department, severity, title, etc.)
+    const finalCase = { ...parsed.caseObj, ...overrides };
+
+    // Make sure the id is unique
+    let id = finalCase.id;
+    if (existingIds.includes(id)) {
+      id = `case-${Date.now()}`;
+    }
+    finalCase.id = id;
+
+    onCreate(finalCase);
+  };
+
+  // Get departments for the chosen hospital
+  const hospital = overrides.hospital || parsed?.caseObj?.hospital || 'cardiology';
+  const availableDepartments = DEPARTMENTS[hospital] || [];
+
+  // Stage key → label map for showing detected sections
+  const stageKeyToLabel = STAGES.reduce((acc, s) => { acc[s.key] = s.label; return acc; }, {});
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div className="w-full max-w-3xl max-h-[92vh] flex flex-col rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl overflow-hidden">
+        {/* Header */}
+        <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between flex-shrink-0">
+          <div>
+            <h3 className="display-font text-2xl font-bold flex items-center gap-2">
+              <Upload size={20} className="text-violet-500" /> Upload HTML case
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">Upload a complete case as a single HTML file with section markers (S1, S2, …)</p>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"><X size={18} /></button>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto p-5">
+          {!parsed ? (
+            <>
+              {/* File upload area */}
+              <label
+                htmlFor="html-upload"
+                onDragOver={e => { e.preventDefault(); e.stopPropagation(); }}
+                onDrop={handleDrop}
+                className="block border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-10 text-center cursor-pointer hover:border-violet-400 dark:hover:border-violet-500 hover:bg-violet-50/30 dark:hover:bg-violet-500/5 transition-colors"
+              >
+                <FileCode size={40} className="mx-auto mb-3 text-slate-400 dark:text-slate-600" />
+                <p className="font-semibold text-sm mb-1">Drop your case HTML file here</p>
+                <p className="text-xs text-slate-500 mb-3">or click to browse</p>
+                <span className="inline-block px-4 py-2 rounded-full bg-violet-500 text-white text-xs font-bold">Choose file</span>
+                <input
+                  id="html-upload"
+                  type="file"
+                  accept=".html,.htm"
+                  onChange={(e) => handleFile(e.target.files?.[0])}
+                  className="hidden"
+                />
+              </label>
+
+              {/* Format hint */}
+              <div className="mt-5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-4 text-xs text-slate-600 dark:text-slate-400">
+                <div className="font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-1.5">
+                  <Info size={12} /> Expected file format
+                </div>
+                <p className="mb-2">Your HTML file should contain:</p>
+                <ol className="list-decimal pl-5 space-y-1.5">
+                  <li>A <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded text-[11px]">&lt;!-- META --&gt;</code> comment block at the top with title, hospital, department.</li>
+                  <li>Each section starting with <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded text-[11px]">&lt;h1&gt;S1 — Profile&lt;/h1&gt;</code>, <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded text-[11px]">&lt;h1&gt;S2 — Handover&lt;/h1&gt;</code>, etc.</li>
+                  <li>Standard HTML tags inside (p, h2, h3, ul, table, strong, em).</li>
+                </ol>
+                <details className="mt-3">
+                  <summary className="cursor-pointer font-semibold text-violet-600 dark:text-violet-400">Show example META block</summary>
+                  <pre className="mt-2 bg-slate-900 text-emerald-300 p-3 rounded text-[10px] overflow-x-auto">{`<!-- META
+title: Anterior STEMI in 58yo male
+hospital: cardiology
+department: cv-ccu
+bedNumber: 3
+chiefComplaint: Crushing central chest pain
+system: Cardiology
+severity: critical
+tags: STEMI, anterior, primary PCI
+-->`}</pre>
+                </details>
+                <p className="mt-3 text-[11px] text-slate-500">
+                  Hospital values: <strong>cardiology</strong> or <strong>internal</strong>.
+                  Severity: <strong>stable</strong>, <strong>urgent</strong>, or <strong>critical</strong>.
+                </p>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Parse summary */}
+              <div className="mb-4">
+                <div className="text-xs uppercase tracking-wider font-semibold text-slate-500 mb-1.5">File</div>
+                <div className="flex items-center gap-2 text-sm">
+                  <FileCode size={14} className="text-violet-500" />
+                  <span className="font-semibold">{fileName}</span>
+                  <button
+                    onClick={() => { setParsed(null); setFileName(''); setOverrides({}); }}
+                    className="ml-auto text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white"
+                  >
+                    Choose different file
+                  </button>
+                </div>
+              </div>
+
+              {/* Errors */}
+              {parsed.errors?.length > 0 && (
+                <div className="mb-4 rounded-2xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 p-4">
+                  <div className="font-bold text-sm text-rose-700 dark:text-rose-300 mb-1.5 flex items-center gap-1.5">
+                    <AlertTriangle size={14} /> Could not parse file
+                  </div>
+                  <ul className="text-xs space-y-1 text-rose-700 dark:text-rose-300 list-disc pl-5">
+                    {parsed.errors.map((e, i) => <li key={i}>{e}</li>)}
+                  </ul>
+                </div>
+              )}
+
+              {/* Warnings */}
+              {parsed.warnings?.length > 0 && (
+                <div className="mb-4 rounded-2xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-4">
+                  <div className="font-bold text-sm text-amber-700 dark:text-amber-300 mb-1.5 flex items-center gap-1.5">
+                    <Info size={14} /> Notes
+                  </div>
+                  <ul className="text-xs space-y-1 text-amber-700 dark:text-amber-300 list-disc pl-5">
+                    {parsed.warnings.map((w, i) => <li key={i}>{w}</li>)}
+                  </ul>
+                </div>
+              )}
+
+              {parsed.caseObj && (
+                <>
+                  {/* Detected sections */}
+                  <div className="mb-5">
+                    <div className="text-xs uppercase tracking-wider font-semibold text-slate-500 mb-2">
+                      Detected sections ({parsed.detectedSectionKeys?.length || 0} of 19)
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {STAGES.map(s => {
+                        const detected = parsed.detectedSectionKeys?.includes(s.key);
+                        return (
+                          <span
+                            key={s.key}
+                            className={cx(
+                              'text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded',
+                              detected
+                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 line-through'
+                            )}
+                          >
+                            {detected && '✓ '}{s.id} {s.label}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* MCQs detected */}
+                  {parsed.caseObj.mcqs?.length > 0 && (
+                    <div className="mb-4 rounded-xl bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/30 p-3 text-xs">
+                      <div className="font-bold text-violet-700 dark:text-violet-300 flex items-center gap-1.5">
+                        <Brain size={12} /> {parsed.caseObj.mcqs.length} MCQ{parsed.caseObj.mcqs.length !== 1 ? 's' : ''} parsed
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Editable case metadata */}
+                  <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 p-4 space-y-3">
+                    <div className="text-xs uppercase tracking-wider font-semibold text-slate-500 mb-1">Case details (you can adjust before importing)</div>
+
+                    <Field label="Title">
+                      <input
+                        value={overrides.title ?? parsed.caseObj.title}
+                        onChange={e => setOverrides({ ...overrides, title: e.target.value })}
+                        className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 ring-violet-500/40"
+                      />
+                    </Field>
+
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      <Field label="Hospital">
+                        <select
+                          value={overrides.hospital ?? parsed.caseObj.hospital}
+                          onChange={e => setOverrides({ ...overrides, hospital: e.target.value, department: DEPARTMENTS[e.target.value]?.[0]?.id })}
+                          className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
+                        >
+                          <option value="cardiology">🫀 Cardiovascular</option>
+                          <option value="internal">🩺 Internal Medicine</option>
+                        </select>
+                      </Field>
+                      <Field label="Department">
+                        <select
+                          value={overrides.department ?? parsed.caseObj.department ?? availableDepartments[0]?.id ?? ''}
+                          onChange={e => setOverrides({ ...overrides, department: e.target.value })}
+                          className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
+                        >
+                          {availableDepartments.map(d => (
+                            <option key={d.id} value={d.id}>{d.label}</option>
+                          ))}
+                        </select>
+                      </Field>
+                    </div>
+
+                    <div className="grid sm:grid-cols-3 gap-3">
+                      <Field label="Severity">
+                        <select
+                          value={overrides.severity ?? parsed.caseObj.severity}
+                          onChange={e => setOverrides({ ...overrides, severity: e.target.value })}
+                          className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
+                        >
+                          <option value="stable">🟢 Stable</option>
+                          <option value="urgent">🟡 Urgent</option>
+                          <option value="critical">🔴 Critical</option>
+                        </select>
+                      </Field>
+                      <Field label="Bed number">
+                        <input
+                          type="number"
+                          value={overrides.bedNumber ?? parsed.caseObj.bedNumber ?? ''}
+                          onChange={e => setOverrides({ ...overrides, bedNumber: parseInt(e.target.value) || null })}
+                          placeholder="(optional)"
+                          className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
+                        />
+                      </Field>
+                      <Field label="System">
+                        <input
+                          value={overrides.system ?? parsed.caseObj.system}
+                          onChange={e => setOverrides({ ...overrides, system: e.target.value })}
+                          className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
+                        />
+                      </Field>
+                    </div>
+
+                    <Field label="Chief complaint">
+                      <input
+                        value={overrides.chiefComplaint ?? parsed.caseObj.chiefComplaint}
+                        onChange={e => setOverrides({ ...overrides, chiefComplaint: e.target.value })}
+                        className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
+                      />
+                    </Field>
+                  </div>
+                </>
+              )}
+            </>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-2 flex-shrink-0">
+          <button onClick={onClose} className="px-4 py-2 rounded-full border border-slate-300 dark:border-slate-700 text-sm font-semibold">Cancel</button>
+          {parsed?.caseObj && (
+            <button
+              onClick={handleImport}
+              disabled={isImporting || (parsed.errors?.length > 0)}
+              className="px-5 py-2 rounded-full bg-violet-500 text-white text-sm font-bold hover:bg-violet-600 disabled:opacity-40 flex items-center gap-1.5"
+            >
+              <Check size={14} /> Create case
+            </button>
+          )}
         </div>
       </div>
     </div>
