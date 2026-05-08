@@ -920,10 +920,21 @@ function parseSingleMCQ(block, idx) {
   // Map difficulty
   const difficulty = stars >= 3 ? 'hard' : stars === 2 ? 'moderate' : stars === 1 ? 'easy' : 'standard';
 
+  // Detect if any content contains HTML markup (tables, lists, formatting)
+  const containsHTML = (s) => /<(p|h[1-6]|ul|ol|li|table|tr|td|th|thead|tbody|strong|b|em|i|br|hr|div|span|blockquote|pre|code|figure|img)\b/i.test(s || '');
+  const stripHTML = (s) => (s || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+
+  const stemHasHTML = containsHTML(stem);
+  const optionsHaveHTML = options.some(o => containsHTML(o.text));
+
   return {
     question: {
-      q: stem,
-      options: options.map(o => o.text),
+      // Plain text versions (used for previews, line-clamping)
+      q: stemHasHTML ? stripHTML(stem) : stem,
+      options: options.map(o => optionsHaveHTML ? stripHTML(o.text) : o.text),
+      // HTML versions (preserved if source had tables/structure) — rendered when present
+      qHTML: stemHasHTML ? stem : null,
+      optionsHTML: optionsHaveHTML ? options.map(o => o.text) : null,
       correct: correctIdx,
       explain: mainExplanation || explainBlock,  // preserve original if no sub-sections
       explainHTML: toHTML(mainExplanation || explainBlock),
@@ -3561,9 +3572,16 @@ function QuestionCard({ q, qi, a, isSubmitted, collapsed, onToggle, pick, submit
               </span>
             )}
           </div>
-          <p className={cx('text-sm leading-relaxed', collapsed && !alwaysOpen ? 'line-clamp-2 text-slate-700 dark:text-slate-300' : 'font-semibold')}>
-            {q.q}
-          </p>
+          {q.qHTML ? (
+            <div
+              className={cx('rte-content text-sm leading-relaxed', collapsed && !alwaysOpen ? 'line-clamp-2 text-slate-700 dark:text-slate-300' : 'font-semibold')}
+              dangerouslySetInnerHTML={{ __html: q.qHTML }}
+            />
+          ) : (
+            <p className={cx('text-sm leading-relaxed', collapsed && !alwaysOpen ? 'line-clamp-2 text-slate-700 dark:text-slate-300' : 'font-semibold')}>
+              {q.q}
+            </p>
+          )}
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {StatusIcon}
@@ -3614,7 +3632,11 @@ function QuestionCard({ q, qi, a, isSubmitted, collapsed, onToggle, pick, submit
                      showResult && picked && !isCorrect ? <X size={12} /> :
                      String.fromCharCode(65 + oi)}
                   </span>
-                  <span className="flex-1">{opt}</span>
+                  {q.optionsHTML?.[oi] ? (
+                    <span className="flex-1 rte-content" dangerouslySetInnerHTML={{ __html: q.optionsHTML[oi] }} />
+                  ) : (
+                    <span className="flex-1">{opt}</span>
+                  )}
                 </button>
               );
             })}
@@ -4314,7 +4336,7 @@ function ExamTestRunner({ examId, topicId, mode, navigate, progress, setProgress
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
+    <div className="max-w-[1480px] mx-auto px-4 sm:px-6 py-6">
       <button
         onClick={() => navigate({ name: 'exam', examId })}
         className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white mb-4"
@@ -7412,6 +7434,21 @@ Q2 ⭐⭐⭐ [Diagnosis]
             <textarea
               value={text}
               onChange={e => setText(e.target.value)}
+              onPaste={(e) => {
+                // Capture HTML from clipboard if available — preserves tables, lists, formatting
+                const html = e.clipboardData?.getData('text/html');
+                if (html && /<(table|ul|ol|strong|em|b|i)\b/i.test(html)) {
+                  e.preventDefault();
+                  // Sanitize the HTML using existing sanitizer (strips inline styles, classes, scripts)
+                  const cleaned = sanitizePastedHTML(html);
+                  // Insert at caret position
+                  const ta = e.target;
+                  const start = ta.selectionStart || 0;
+                  const end = ta.selectionEnd || 0;
+                  const newText = text.slice(0, start) + cleaned + text.slice(end);
+                  setText(newText);
+                }
+              }}
               placeholder={samplePlaceholder}
               spellCheck={false}
               className="flex-1 w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 font-mono text-xs leading-relaxed focus:outline-none focus:ring-2 ring-violet-500/40 resize-none"
