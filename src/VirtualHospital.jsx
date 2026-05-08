@@ -897,11 +897,14 @@ function parseSingleMCQ(block, idx) {
   // Detect optional sub-sections "Why X is correct/wrong:" → split into perOption explanations
   const perOption = {};
   let mainExplanation = explainBlock;
-  const subSectionRegex = /^\s*Why\s+([A-E])\s+is\s+(correct|wrong|incorrect|right)\s*:\s*/im;
+  // Allow optional leading inline tags (<strong>, <b>, <em>, <i>, <span>, <u>) before "Why X is correct/wrong:"
+  // and optional trailing inline closing tags before the colon.
+  const inlineOpen = '(?:<\\/?(?:strong|b|em|i|span|u)[^>]*>\\s*)*';
+  const subSectionRegex = new RegExp(`^\\s*${inlineOpen}Why\\s+([A-E])\\s+is\\s+(correct|wrong|incorrect|right)\\s*${inlineOpen}:\\s*`, 'im');
 
   if (subSectionRegex.test(explainBlock)) {
     const sections = [];
-    const sectionStartRe = /^\s*Why\s+([A-E])\s+is\s+(correct|wrong|incorrect|right)\s*:\s*/gim;
+    const sectionStartRe = new RegExp(`^\\s*${inlineOpen}Why\\s+([A-E])\\s+is\\s+(correct|wrong|incorrect|right)\\s*${inlineOpen}:\\s*`, 'gim');
     const splits = [];
     let match;
     while ((match = sectionStartRe.exec(explainBlock)) !== null) {
@@ -4367,7 +4370,7 @@ function ExamTestRunner({ examId, topicId, mode, navigate, progress, setProgress
   }
 
   return (
-    <div className="max-w-[1480px] mx-auto px-4 sm:px-6 py-6">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
       <button
         onClick={() => navigate({ name: 'exam', examId })}
         className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white mb-4"
