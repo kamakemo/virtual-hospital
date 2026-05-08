@@ -712,13 +712,44 @@ function parseHTMLCase(htmlText) {
 function parseMCQBulk(rawText) {
   if (!rawText || !rawText.trim()) return { questions: [], errors: [] };
 
+  // ===== Detect & pre-process HTML input =====
+  // If the source contains HTML markup, the content is often "all on one line" because
+  // browsers don't need newlines between block tags. The parser is line-based, so we
+  // normalize HTML into a line-friendly format first by inserting newlines after
+  // closing block tags. We KEEP inline tags (<strong>, <em>, <table>, etc.) so the
+  // renderer can use them; we just split paragraphs/list-items/breaks onto separate lines.
+  const looksLikeHTML = /<\/?(p|li|ul|ol|br|h[1-6]|tr|hr|div)\b/i.test(rawText);
+
+  let text = rawText;
+  if (looksLikeHTML) {
+    text = text
+      // Newlines after block-closing tags (so each <p>, <li>, <h2> ends on its own line)
+      .replace(/<\/(p|li|h[1-6]|tr|div|blockquote|figcaption)>/gi, '\n')
+      // <br> and <hr> become newlines
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<hr\s*\/?>/gi, '\n---\n')
+      // Newlines BEFORE opening block tags (so the next <p> starts fresh)
+      .replace(/<(p|li|h[1-6]|tr|div|blockquote)\b[^>]*>/gi, '\n')
+      // Wrappers <ul>/<ol>/<table>/<thead>/<tbody> become whitespace; their <li>/<tr> handle the structure
+      .replace(/<\/?(ul|ol|table|thead|tbody|tfoot|figure)\b[^>]*>/gi, '\n')
+      // Decode common entities so the parser sees plain characters in headings/content
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/&amp;/gi, '&')
+      .replace(/&lt;/gi, '<')
+      .replace(/&gt;/gi, '>')
+      .replace(/&quot;/gi, '"')
+      .replace(/&#39;/gi, "'");
+  }
+
   // Normalize whitespace, smart quotes, em-dashes
-  let text = rawText
+  text = text
     .replace(/\r\n/g, '\n')
     .replace(/\u2013|\u2014/g, '—')         // en-dash / em-dash → em-dash
     .replace(/[\u201C\u201D]/g, '"')        // smart double quotes
     .replace(/[\u2018\u2019]/g, "'")        // smart single quotes
-    .replace(/\u00A0/g, ' ');               // non-breaking space → space
+    .replace(/\u00A0/g, ' ')                // non-breaking space → space
+    // Collapse runs of 3+ blank lines to just 2
+    .replace(/\n{3,}/g, '\n\n');
 
   // Split into question blocks. A new question starts with "Q" + digits at the start of a line.
   // We split on either an explicit "---" separator OR the start of the next "Q##" line.
