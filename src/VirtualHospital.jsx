@@ -15,7 +15,7 @@ import {
   Undo2, Redo2, Type, Palette, Highlighter, Table as TableIcon, Minus,
   Youtube, Film, Image as ImageIcon2, FileImage, Link2, Code2, Indent, Outdent,
   GripVertical, Pencil, ArrowUp, ArrowDown, Eraser, FileCode, Info, AlertTriangle,
-  CircleDot, Hash, Mic, Calendar, MessageSquare, HelpCircle
+  CircleDot, Hash, Mic, Calendar, MessageSquare, HelpCircle, Maximize2
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, BarChart, Bar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import {
@@ -2962,7 +2962,155 @@ function CaseCard({ caseData: c, onClick, progress, delay = 0 }) {
 }
 
 // ============== CASE VIEW ==============
+// ============== RICH HTML CASE VIEW ==============
+// Renders a Rich HTML case (uploaded HTML file shown as-is) inside an iframe.
+// Preserves the file's original styling, fonts, scripts, and layout completely.
+function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
+  const iframeRef = useRef(null);
+  const [iframeHeight, setIframeHeight] = useState(800);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [completed, setCompleted] = useState(
+    !!progress?.completedStages?.[`rich:${caseData.id}`]
+  );
+
+  // Auto-resize iframe to fit its content (since the HTML may have unknown height)
+  useEffect(() => {
+    const iframe = iframeRef.current;
+    if (!iframe) return;
+
+    const resize = () => {
+      try {
+        const doc = iframe.contentDocument;
+        if (doc) {
+          const h = Math.max(
+            doc.body?.scrollHeight || 0,
+            doc.documentElement?.scrollHeight || 0
+          );
+          if (h > 0) setIframeHeight(Math.min(h + 40, 12000)); // cap at 12,000px
+        }
+      } catch (e) {
+        // Cross-origin or sandbox restrictions — keep default height
+      }
+    };
+
+    iframe.addEventListener('load', resize);
+    // Re-measure periodically in case content changes (collapsibles, etc.)
+    const interval = setInterval(resize, 1000);
+    return () => {
+      iframe.removeEventListener('load', resize);
+      clearInterval(interval);
+    };
+  }, [caseData.htmlContent]);
+
+  const markComplete = () => {
+    if (completed) return;
+    setProgress(p => ({
+      ...p,
+      xp: (p.xp || 0) + 50,
+      completedStages: { ...p.completedStages, [`rich:${caseData.id}`]: true },
+    }));
+    setCompleted(true);
+  };
+
+  const downloadHTML = () => {
+    const blob = new Blob([caseData.htmlContent || ''], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${caseData.title.replace(/[^\w]/g, '-')}.html`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  if (!caseData.htmlContent) {
+    return (
+      <div className="max-w-7xl mx-auto px-6 py-12 text-center">
+        <p className="text-slate-500">This Rich HTML case has no content.</p>
+        <button onClick={() => navigate({ name: 'landing' })} className="mt-3 text-teal-600 underline">Return home</button>
+      </div>
+    );
+  }
+
+  const severityColor = {
+    critical: 'bg-rose-500',
+    urgent: 'bg-amber-500',
+    stable: 'bg-emerald-500',
+  }[caseData.severity] || 'bg-slate-500';
+
+  return (
+    <div className={cx(fullscreen ? 'fixed inset-0 z-50 bg-white dark:bg-slate-900 overflow-y-auto' : '')}>
+      {/* Header bar — outside the iframe, in platform's design */}
+      <div className={cx(
+        'border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900',
+        fullscreen ? 'sticky top-0 z-10' : ''
+      )}>
+        <div className="max-w-[1480px] mx-auto px-4 sm:px-6 py-3 flex items-center gap-3 flex-wrap">
+          <button
+            onClick={() => navigate({ name: 'landing' })}
+            className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white"
+          >
+            <ChevronLeft size={14} /> Back
+          </button>
+          <span className="text-slate-300 dark:text-slate-700">·</span>
+          <span className={cx('inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded text-white', severityColor)}>
+            <FileCode size={9} /> Rich Case
+          </span>
+          <div className="flex-1 min-w-0">
+            <h1 className="font-bold text-sm sm:text-base truncate">{caseData.title}</h1>
+            <p className="text-[11px] text-slate-500 truncate">
+              {caseData.system} · {caseData.severity}
+              {caseData.chiefComplaint && ` · ${caseData.chiefComplaint}`}
+            </p>
+          </div>
+          {!completed ? (
+            <button
+              onClick={markComplete}
+              className="px-3 py-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-bold hover:scale-[1.02] transition-transform flex items-center gap-1"
+            >
+              <CheckCircle2 size={12} /> Mark complete (+50 XP)
+            </button>
+          ) : (
+            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-bold">
+              <CheckCircle2 size={12} /> Completed
+            </span>
+          )}
+          <button
+            onClick={() => setFullscreen(f => !f)}
+            className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+            title={fullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+          >
+            {fullscreen ? <X size={14} /> : <Maximize2 size={14} />}
+          </button>
+          <button
+            onClick={downloadHTML}
+            className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+            title="Download HTML"
+          >
+            <Download size={14} />
+          </button>
+        </div>
+      </div>
+
+      {/* The actual case content — rendered in iframe, isolated from platform styles */}
+      <iframe
+        ref={iframeRef}
+        srcDoc={caseData.htmlContent}
+        title={caseData.title}
+        className="w-full block border-0 bg-white"
+        style={{ height: `${iframeHeight}px`, minHeight: '600px' }}
+        // Allow scripts but sandbox to prevent breaking out of the iframe
+        sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+      />
+    </div>
+  );
+}
+
 function CaseView({ caseData, navigate, progress, setProgress, userRole }) {
+  // === FORK: Rich HTML cases use their own renderer ===
+  if (caseData?.caseType === 'rich-html') {
+    return <RichHTMLCaseView caseData={caseData} navigate={navigate} progress={progress} setProgress={setProgress} />;
+  }
+
   const stages = useMemo(() => getCaseStages(caseData), [caseData]);
   const [activeStage, setActiveStage] = useState(stages[0]?.key || 'profile');
   const [decisionMode, setDecisionMode] = useState(false);
@@ -3986,7 +4134,12 @@ function Dashboard({ cases, progress, navigate, userRole }) {
                   <button key={c.id} onClick={() => navigate({ name: 'case', caseId: c.id })} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-left transition-colors">
                     <span className={cx('w-2 h-2 rounded-full', sev.dot)} />
                     <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-sm truncate">{c.title}</div>
+                      <div className="font-semibold text-sm truncate flex items-center gap-1.5">
+                        {c.title}
+                        {c.caseType === 'rich-html' && (
+                          <span className="text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300 flex-shrink-0">Rich</span>
+                        )}
+                      </div>
                       <div className="text-xs text-slate-500">{c.system}</div>
                     </div>
                     <ArrowRight size={14} className="text-slate-400" />
@@ -6700,21 +6853,71 @@ function NewCaseModal({ onClose, onCreate }) {
 
 // ============== UPLOAD HTML CASE MODAL ==============
 function UploadHTMLCaseModal({ existingIds, onClose, onCreate }) {
+  // ===== NEW BEHAVIOR =====
+  // Saves the entire HTML file as-is for display in an iframe.
+  // The platform extracts only metadata (title, hospital, dept) — no parsing of content.
   const [fileName, setFileName] = useState('');
-  const [parsed, setParsed] = useState(null); // { caseObj, errors, warnings, detectedSectionKeys, metaPresent }
-  const [overrides, setOverrides] = useState({});
+  const [htmlContent, setHtmlContent] = useState('');
+  const [meta, setMeta] = useState({
+    title: '',
+    hospital: 'cardiology',
+    department: '',
+    severity: 'urgent',
+    bedNumber: '',
+    system: '',
+    chiefComplaint: '',
+    tags: '',
+  });
   const [isImporting, setIsImporting] = useState(false);
 
+  // Read the HTML file and try to extract sensible defaults for metadata
   const handleFile = async (file) => {
     if (!file) return;
     setFileName(file.name);
     try {
       const text = await file.text();
-      const result = parseHTMLCase(text);
-      setParsed(result);
-      setOverrides({});
+      setHtmlContent(text);
+      // Extract metadata defaults from the file
+      try {
+        const doc = new DOMParser().parseFromString(text, 'text/html');
+        const titleEl = doc.querySelector('title');
+        const h1El = doc.querySelector('body h1, h1');
+        const defaultTitle = (titleEl?.textContent || h1El?.textContent || file.name.replace(/\.html?$/i, ''))
+          .trim()
+          .replace(/\s*[—–-]\s*Virtual Teaching Hospital.*$/i, '')
+          .slice(0, 200);
+
+        // Try to read META block too
+        const metaFromComment = {};
+        const walker = doc.createTreeWalker(doc.documentElement, NodeFilter.SHOW_COMMENT);
+        let cn;
+        while ((cn = walker.nextNode())) {
+          const txt = cn.nodeValue || '';
+          if (/^\s*META\b/i.test(txt)) {
+            txt.split('\n').forEach(line => {
+              const m = line.match(/^\s*([a-zA-Z_][\w]*)\s*:\s*(.+)\s*$/);
+              if (m) metaFromComment[m[1].trim().toLowerCase()] = m[2].trim();
+            });
+          }
+        }
+
+        setMeta(prev => ({
+          ...prev,
+          title: metaFromComment.title || defaultTitle,
+          hospital: (metaFromComment.hospital === 'internal' || metaFromComment.hospital === 'im') ? 'internal' : 'cardiology',
+          department: metaFromComment.department || '',
+          severity: ['stable', 'urgent', 'critical'].includes((metaFromComment.severity || '').toLowerCase()) ? metaFromComment.severity.toLowerCase() : 'urgent',
+          bedNumber: metaFromComment.bednumber || '',
+          system: metaFromComment.system || '',
+          chiefComplaint: metaFromComment.chiefcomplaint || metaFromComment.chief_complaint || '',
+          tags: metaFromComment.tags || '',
+        }));
+      } catch (e) {
+        // ignore — user fills it manually
+        setMeta(prev => ({ ...prev, title: file.name.replace(/\.html?$/i, '') }));
+      }
     } catch (e) {
-      setParsed({ caseObj: null, errors: ['Could not read file: ' + e.message], warnings: [], detectedSectionKeys: [] });
+      alert('Could not read file: ' + e.message);
     }
   };
 
@@ -6729,29 +6932,32 @@ function UploadHTMLCaseModal({ existingIds, onClose, onCreate }) {
     }
   };
 
-  const handleImport = async () => {
-    if (!parsed?.caseObj) return;
+  const handleImport = () => {
+    if (!htmlContent || !meta.title.trim()) return;
     setIsImporting(true);
 
-    // Apply overrides from the form (hospital, department, severity, title, etc.)
-    const finalCase = { ...parsed.caseObj, ...overrides };
+    let id = `rich-${Date.now()}`;
+    if (existingIds.includes(id)) id = `rich-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
 
-    // Make sure the id is unique
-    let id = finalCase.id;
-    if (existingIds.includes(id)) {
-      id = `case-${Date.now()}`;
-    }
-    finalCase.id = id;
+    const finalCase = {
+      id,
+      caseType: 'rich-html',
+      htmlContent,
+      title: meta.title.trim(),
+      hospital: meta.hospital,
+      department: meta.department || null,
+      bedNumber: meta.bedNumber ? parseInt(meta.bedNumber) || null : null,
+      chiefComplaint: meta.chiefComplaint.trim(),
+      system: meta.system.trim() || (meta.hospital === 'cardiology' ? 'Cardiology' : 'Internal Medicine'),
+      severity: meta.severity,
+      tags: meta.tags.split(',').map(t => t.trim()).filter(Boolean),
+    };
 
     onCreate(finalCase);
   };
 
-  // Get departments for the chosen hospital
-  const hospital = overrides.hospital || parsed?.caseObj?.hospital || 'cardiology';
-  const availableDepartments = DEPARTMENTS[hospital] || [];
-
-  // Stage key → label map for showing detected sections
-  const stageKeyToLabel = STAGES.reduce((acc, s) => { acc[s.key] = s.label; return acc; }, {});
+  const availableDepartments = DEPARTMENTS[meta.hospital] || [];
+  const fileSize = htmlContent ? (htmlContent.length / 1024).toFixed(1) : 0;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -6760,18 +6966,17 @@ function UploadHTMLCaseModal({ existingIds, onClose, onCreate }) {
         <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between flex-shrink-0">
           <div>
             <h3 className="display-font text-2xl font-bold flex items-center gap-2">
-              <Upload size={20} className="text-violet-500" /> Upload HTML case
+              <FileCode size={20} className="text-violet-500" /> Upload HTML case
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">Upload a complete case as a single HTML file with section markers (S1, S2, …)</p>
+            <p className="text-xs text-slate-500 mt-0.5">Upload a complete HTML file — it will be displayed exactly as designed, preserving all styling and interactivity.</p>
           </div>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"><X size={18} /></button>
         </div>
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto p-5">
-          {!parsed ? (
+          {!htmlContent ? (
             <>
-              {/* File upload area */}
               <label
                 htmlFor="html-upload"
                 onDragOver={e => { e.preventDefault(); e.stopPropagation(); }}
@@ -6791,189 +6996,120 @@ function UploadHTMLCaseModal({ existingIds, onClose, onCreate }) {
                 />
               </label>
 
-              {/* Format hint */}
               <div className="mt-5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-4 text-xs text-slate-600 dark:text-slate-400">
                 <div className="font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-1.5">
-                  <Info size={12} /> Expected file format
+                  <Info size={12} /> About Rich HTML cases
                 </div>
-                <p className="mb-2">Your HTML file should contain:</p>
-                <ol className="list-decimal pl-5 space-y-1.5">
-                  <li>A <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded text-[11px]">&lt;!-- META --&gt;</code> comment block at the top with title, hospital, department.</li>
-                  <li>Each section starting with <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded text-[11px]">&lt;h1&gt;S1 — Profile&lt;/h1&gt;</code>, <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded text-[11px]">&lt;h1&gt;S2 — Handover&lt;/h1&gt;</code>, etc.</li>
-                  <li>Standard HTML tags inside (p, h2, h3, ul, table, strong, em).</li>
-                </ol>
-                <details className="mt-3">
-                  <summary className="cursor-pointer font-semibold text-violet-600 dark:text-violet-400">Show example META block</summary>
-                  <pre className="mt-2 bg-slate-900 text-emerald-300 p-3 rounded text-[10px] overflow-x-auto">{`<!-- META
-title: Anterior STEMI in 58yo male
-hospital: cardiology
-department: cv-ccu
-bedNumber: 3
-chiefComplaint: Crushing central chest pain
-system: Cardiology
-severity: critical
-tags: STEMI, anterior, primary PCI
--->`}</pre>
-                </details>
-                <p className="mt-3 text-[11px] text-slate-500">
-                  Hospital values: <strong>cardiology</strong> or <strong>internal</strong>.
-                  Severity: <strong>stable</strong>, <strong>urgent</strong>, or <strong>critical</strong>.
-                </p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>The file is uploaded and displayed <strong>exactly as-is</strong> in an iframe.</li>
+                  <li>All styling, fonts, gradients, scripts, and interactivity are preserved.</li>
+                  <li>The platform's stage system, MCQ engine, and per-stage XP do not apply to these cases.</li>
+                  <li>Students earn <strong>+50 XP</strong> for marking the case as complete.</li>
+                  <li>If your file has a <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded">&lt;!-- META --&gt;</code> block, title/hospital/department will auto-fill.</li>
+                </ul>
               </div>
             </>
           ) : (
             <>
-              {/* Parse summary */}
-              <div className="mb-4">
-                <div className="text-xs uppercase tracking-wider font-semibold text-slate-500 mb-1.5">File</div>
-                <div className="flex items-center gap-2 text-sm">
-                  <FileCode size={14} className="text-violet-500" />
-                  <span className="font-semibold">{fileName}</span>
-                  <button
-                    onClick={() => { setParsed(null); setFileName(''); setOverrides({}); }}
-                    className="ml-auto text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white"
-                  >
-                    Choose different file
-                  </button>
+              <div className="mb-4 rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 p-3 flex items-center gap-2 text-xs">
+                <CheckCircle2 size={14} className="text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <div className="font-bold text-emerald-700 dark:text-emerald-300 truncate">{fileName}</div>
+                  <div className="text-emerald-600 dark:text-emerald-400">{fileSize} KB · Will be displayed exactly as designed</div>
                 </div>
+                <button
+                  onClick={() => { setFileName(''); setHtmlContent(''); }}
+                  className="text-xs text-emerald-700 dark:text-emerald-300 hover:underline font-semibold"
+                >
+                  Change file
+                </button>
               </div>
 
-              {/* Errors */}
-              {parsed.errors?.length > 0 && (
-                <div className="mb-4 rounded-2xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 p-4">
-                  <div className="font-bold text-sm text-rose-700 dark:text-rose-300 mb-1.5 flex items-center gap-1.5">
-                    <AlertTriangle size={14} /> Could not parse file
-                  </div>
-                  <ul className="text-xs space-y-1 text-rose-700 dark:text-rose-300 list-disc pl-5">
-                    {parsed.errors.map((e, i) => <li key={i}>{e}</li>)}
-                  </ul>
+              <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 p-4 space-y-3">
+                <div className="text-xs uppercase tracking-wider font-semibold text-slate-500 mb-1">Case details (shown in the case list)</div>
+
+                <Field label="Title *">
+                  <input
+                    value={meta.title}
+                    onChange={e => setMeta({ ...meta, title: e.target.value })}
+                    required
+                    className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 ring-violet-500/40"
+                  />
+                </Field>
+
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <Field label="Hospital">
+                    <select
+                      value={meta.hospital}
+                      onChange={e => setMeta({ ...meta, hospital: e.target.value, department: DEPARTMENTS[e.target.value]?.[0]?.id || '' })}
+                      className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
+                    >
+                      <option value="cardiology">🫀 Cardiovascular</option>
+                      <option value="internal">🩺 Internal Medicine</option>
+                    </select>
+                  </Field>
+                  <Field label="Department">
+                    <select
+                      value={meta.department || availableDepartments[0]?.id || ''}
+                      onChange={e => setMeta({ ...meta, department: e.target.value })}
+                      className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
+                    >
+                      {availableDepartments.map(d => (
+                        <option key={d.id} value={d.id}>{d.label}</option>
+                      ))}
+                    </select>
+                  </Field>
                 </div>
-              )}
 
-              {/* Warnings */}
-              {parsed.warnings?.length > 0 && (
-                <div className="mb-4 rounded-2xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-4">
-                  <div className="font-bold text-sm text-amber-700 dark:text-amber-300 mb-1.5 flex items-center gap-1.5">
-                    <Info size={14} /> Notes
-                  </div>
-                  <ul className="text-xs space-y-1 text-amber-700 dark:text-amber-300 list-disc pl-5">
-                    {parsed.warnings.map((w, i) => <li key={i}>{w}</li>)}
-                  </ul>
+                <div className="grid sm:grid-cols-3 gap-3">
+                  <Field label="Severity">
+                    <select
+                      value={meta.severity}
+                      onChange={e => setMeta({ ...meta, severity: e.target.value })}
+                      className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
+                    >
+                      <option value="stable">🟢 Stable</option>
+                      <option value="urgent">🟡 Urgent</option>
+                      <option value="critical">🔴 Critical</option>
+                    </select>
+                  </Field>
+                  <Field label="Bed number">
+                    <input
+                      type="number"
+                      value={meta.bedNumber}
+                      onChange={e => setMeta({ ...meta, bedNumber: e.target.value })}
+                      placeholder="(optional)"
+                      className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
+                    />
+                  </Field>
+                  <Field label="System">
+                    <input
+                      value={meta.system}
+                      onChange={e => setMeta({ ...meta, system: e.target.value })}
+                      placeholder="e.g., Cardiology"
+                      className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
+                    />
+                  </Field>
                 </div>
-              )}
 
-              {parsed.caseObj && (
-                <>
-                  {/* Detected sections */}
-                  <div className="mb-5">
-                    <div className="text-xs uppercase tracking-wider font-semibold text-slate-500 mb-2">
-                      Detected sections ({parsed.detectedSectionKeys?.length || 0} of 19)
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {STAGES.map(s => {
-                        const detected = parsed.detectedSectionKeys?.includes(s.key);
-                        return (
-                          <span
-                            key={s.key}
-                            className={cx(
-                              'text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded',
-                              detected
-                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
-                                : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 line-through'
-                            )}
-                          >
-                            {detected && '✓ '}{s.id} {s.label}
-                          </span>
-                        );
-                      })}
-                    </div>
-                  </div>
+                <Field label="Chief complaint">
+                  <input
+                    value={meta.chiefComplaint}
+                    onChange={e => setMeta({ ...meta, chiefComplaint: e.target.value })}
+                    placeholder="(optional)"
+                    className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
+                  />
+                </Field>
 
-                  {/* MCQs detected */}
-                  {parsed.caseObj.mcqs?.length > 0 && (
-                    <div className="mb-4 rounded-xl bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/30 p-3 text-xs">
-                      <div className="font-bold text-violet-700 dark:text-violet-300 flex items-center gap-1.5">
-                        <Brain size={12} /> {parsed.caseObj.mcqs.length} MCQ{parsed.caseObj.mcqs.length !== 1 ? 's' : ''} parsed
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Editable case metadata */}
-                  <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 p-4 space-y-3">
-                    <div className="text-xs uppercase tracking-wider font-semibold text-slate-500 mb-1">Case details (you can adjust before importing)</div>
-
-                    <Field label="Title">
-                      <input
-                        value={overrides.title ?? parsed.caseObj.title}
-                        onChange={e => setOverrides({ ...overrides, title: e.target.value })}
-                        className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 ring-violet-500/40"
-                      />
-                    </Field>
-
-                    <div className="grid sm:grid-cols-2 gap-3">
-                      <Field label="Hospital">
-                        <select
-                          value={overrides.hospital ?? parsed.caseObj.hospital}
-                          onChange={e => setOverrides({ ...overrides, hospital: e.target.value, department: DEPARTMENTS[e.target.value]?.[0]?.id })}
-                          className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
-                        >
-                          <option value="cardiology">🫀 Cardiovascular</option>
-                          <option value="internal">🩺 Internal Medicine</option>
-                        </select>
-                      </Field>
-                      <Field label="Department">
-                        <select
-                          value={overrides.department ?? parsed.caseObj.department ?? availableDepartments[0]?.id ?? ''}
-                          onChange={e => setOverrides({ ...overrides, department: e.target.value })}
-                          className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
-                        >
-                          {availableDepartments.map(d => (
-                            <option key={d.id} value={d.id}>{d.label}</option>
-                          ))}
-                        </select>
-                      </Field>
-                    </div>
-
-                    <div className="grid sm:grid-cols-3 gap-3">
-                      <Field label="Severity">
-                        <select
-                          value={overrides.severity ?? parsed.caseObj.severity}
-                          onChange={e => setOverrides({ ...overrides, severity: e.target.value })}
-                          className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
-                        >
-                          <option value="stable">🟢 Stable</option>
-                          <option value="urgent">🟡 Urgent</option>
-                          <option value="critical">🔴 Critical</option>
-                        </select>
-                      </Field>
-                      <Field label="Bed number">
-                        <input
-                          type="number"
-                          value={overrides.bedNumber ?? parsed.caseObj.bedNumber ?? ''}
-                          onChange={e => setOverrides({ ...overrides, bedNumber: parseInt(e.target.value) || null })}
-                          placeholder="(optional)"
-                          className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
-                        />
-                      </Field>
-                      <Field label="System">
-                        <input
-                          value={overrides.system ?? parsed.caseObj.system}
-                          onChange={e => setOverrides({ ...overrides, system: e.target.value })}
-                          className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
-                        />
-                      </Field>
-                    </div>
-
-                    <Field label="Chief complaint">
-                      <input
-                        value={overrides.chiefComplaint ?? parsed.caseObj.chiefComplaint}
-                        onChange={e => setOverrides({ ...overrides, chiefComplaint: e.target.value })}
-                        className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
-                      />
-                    </Field>
-                  </div>
-                </>
-              )}
+                <Field label="Tags">
+                  <input
+                    value={meta.tags}
+                    onChange={e => setMeta({ ...meta, tags: e.target.value })}
+                    placeholder="comma-separated, e.g., ARVC, genetics, cardiomyopathy"
+                    className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
+                  />
+                </Field>
+              </div>
             </>
           )}
         </div>
@@ -6981,13 +7117,13 @@ tags: STEMI, anterior, primary PCI
         {/* Footer */}
         <div className="p-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-2 flex-shrink-0">
           <button onClick={onClose} className="px-4 py-2 rounded-full border border-slate-300 dark:border-slate-700 text-sm font-semibold">Cancel</button>
-          {parsed?.caseObj && (
+          {htmlContent && (
             <button
               onClick={handleImport}
-              disabled={isImporting || (parsed.errors?.length > 0)}
+              disabled={isImporting || !meta.title.trim()}
               className="px-5 py-2 rounded-full bg-violet-500 text-white text-sm font-bold hover:bg-violet-600 disabled:opacity-40 flex items-center gap-1.5"
             >
-              <Check size={14} /> Create case
+              <Check size={14} /> Create Rich Case
             </button>
           )}
         </div>
