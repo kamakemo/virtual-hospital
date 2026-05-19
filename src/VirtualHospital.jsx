@@ -518,160 +518,265 @@ function sanitizePastedHTML(html) {
 }
 
 // ============== HTML CASE FILE PARSER ==============
-// Parses an uploaded HTML file with the section-marker format and returns a
-// case-shaped object ready to be saved. Returns { caseObj, errors }.
+// Parses an uploaded HTML file with case content. Tolerates many HTML structures:
+//   - <div id="s1"> / <section id="s1">           (id-based)
+//   - <h1>S1 — Profile</h1> / <h2>S1 ...</h2>     (heading-based, any level)
+//   - <!-- S1 — Profile -->                       (comment-based)
+//   - Bare headings like <h2>Profile</h2>         (name-based)
+// Metadata can come from a <!-- META --> block OR is filled in by the user via the modal.
+// Returns { caseObj, errors, warnings, detectedSectionKeys, metaPresent }.
 function parseHTMLCase(htmlText) {
   const errors = [];
   const warnings = [];
 
-  // Map: stage key (lowercase, no spaces) → STAGES key
-  // Includes synonyms (in case the AI uses slightly different labels)
+  // Map: normalized text → stage key
   const STAGE_LOOKUP = {
-    's1': 'profile', 'profile': 'profile',
-    's2': 'handover', 'handover': 'handover', 'sbar': 'handover',
-    's3': 'assessment', 'initialassessment': 'assessment', 'assessment': 'assessment',
-    's4': 'resident', 'residentreview': 'resident', 'resident': 'resident',
-    's5': 'consultant', 'consultantround': 'consultant', 'consultant': 'consultant',
-    's6': 'teaching', 'teachingpoints': 'teaching', 'teaching': 'teaching',
-    's7': 'orders', 'orders': 'orders',
-    's8': 'nursing', 'nursingcare': 'nursing', 'nursing': 'nursing',
-    's9': 'investigations', 'investigations': 'investigations', 'labs': 'investigations',
-    's10': 'imaging', 'ecg': 'imaging', 'imaging': 'imaging', 'ecgimaging': 'imaging',
-    's11': 'medications', 'medications': 'medications', 'meds': 'medications',
-    's12': 'monitoring', 'monitoring': 'monitoring',
-    's13': 'complications', 'complications': 'complications',
-    's14': 'differentials', 'differentials': 'differentials', 'differential': 'differentials',
-    's15': 'plan', 'plan': 'plan', 'managementplan': 'plan',
-    's16': 'progress', 'progress': 'progress', 'progressnotes': 'progress',
-    's17': 'discharge', 'discharge': 'discharge', 'outcome': 'discharge',
-    's18': 'pearls', 'pearls': 'pearls', 'clinicalpearls': 'pearls',
-    's19': 'mcqs', 'mcqs': 'mcqs', 'questions': 'mcqs', 'assessment': 'mcqs',
+    's1': 'profile', 'profile': 'profile', 'patientprofile': 'profile', 's1profile': 'profile', 's1patientprofile': 'profile',
+    's2': 'handover', 'handover': 'handover', 'sbar': 'handover', 's2handover': 'handover',
+    's3': 'assessment', 'initialassessment': 'assessment', 'assessment': 'assessment', 's3initialassessment': 'assessment', 's3assessment': 'assessment',
+    's4': 'resident', 'residentreview': 'resident', 'resident': 'resident', 's4residentreview': 'resident',
+    's5': 'consultant', 'consultantround': 'consultant', 'consultant': 'consultant', 's5consultantround': 'consultant',
+    's6': 'teaching', 'teachingpoints': 'teaching', 'teaching': 'teaching', 's6teachingpoints': 'teaching', 's6teaching': 'teaching',
+    's7': 'orders', 'orders': 'orders', 's7orders': 'orders',
+    's8': 'nursing', 'nursingcare': 'nursing', 'nursing': 'nursing', 's8nursingcare': 'nursing',
+    's9': 'investigations', 'investigations': 'investigations', 'labs': 'investigations', 's9investigations': 'investigations',
+    's10': 'imaging', 'ecg': 'imaging', 'imaging': 'imaging', 'ecgimaging': 'imaging', 's10ecgimaging': 'imaging', 's10imaging': 'imaging',
+    's11': 'medications', 'medications': 'medications', 'meds': 'medications', 's11medications': 'medications',
+    's12': 'monitoring', 'monitoring': 'monitoring', 's12monitoring': 'monitoring',
+    's13': 'complications', 'complications': 'complications', 's13complications': 'complications',
+    's14': 'differentials', 'differentials': 'differentials', 'differential': 'differentials', 's14differentials': 'differentials',
+    's15': 'plan', 'plan': 'plan', 'managementplan': 'plan', 'comprehensiveplan': 'plan', 's15plan': 'plan', 's15comprehensiveplan': 'plan',
+    's16': 'progress', 'progress': 'progress', 'progressnotes': 'progress', 's16progress': 'progress',
+    's17': 'discharge', 'discharge': 'discharge', 'outcome': 'discharge', 'dischargeongoingcare': 'discharge', 's17discharge': 'discharge',
+    's18': 'pearls', 'pearls': 'pearls', 'clinicalpearls': 'pearls', 's18clinicalpearls': 'pearls', 's18pearls': 'pearls',
+    's19': 'mcqs', 'mcqs': 'mcqs', 'questions': 'mcqs', 'mcq': 'mcqs', 's19mcqs': 'mcqs',
   };
 
-  // 1. Parse the HTML
-  const doc = new DOMParser().parseFromString(htmlText, 'text/html');
+  const normalize = (text) => (text || '').replace(/[^\w]/g, '').toLowerCase();
 
-  // 2. Extract metadata from META comment block
-  const meta = {};
-  const walker = doc.createTreeWalker(doc.documentElement, NodeFilter.SHOW_COMMENT);
-  let cnode;
-  while ((cnode = walker.nextNode())) {
-    const txt = cnode.nodeValue;
-    if (/^\s*META\b/i.test(txt)) {
-      const lines = txt.split('\n');
-      lines.forEach(line => {
-        const m = line.match(/^\s*([a-zA-Z_][\w]*)\s*:\s*(.+)\s*$/);
-        if (m) meta[m[1].trim().toLowerCase()] = m[2].trim();
-      });
-    }
-  }
-
-  // 3. Find the body element
-  const body = doc.body || doc.documentElement;
-  if (!body) {
-    return { caseObj: null, errors: ['Could not parse HTML — no <body> found.'] };
-  }
-
-  // 4. Walk top-level elements, splitting at <h1> markers that match S## or stage names
-  const children = Array.from(body.children);
-  const sections = {}; // key → HTML string
-  let currentKey = null;
-  let currentBuffer = [];
-
-  const tryMatchHeading = (text) => {
+  // Try to match a heading/id/comment text to a stage key
+  const tryMatchKey = (text) => {
     if (!text) return null;
-    // Try "S1", "S1 — Profile", "Profile", "S1 - Handover", etc.
-    // Strip emoji, dashes, underscores, normalize
-    const cleaned = text.replace(/[^\w]/g, '').toLowerCase();
+    const cleaned = normalize(text);
+    if (!cleaned) return null;
 
-    // Try "s1" prefix first (most reliable)
+    // 1. Try "s##" prefix (e.g., "s1", "s10anything")
     const sMatch = cleaned.match(/^s(\d+)/);
     if (sMatch) {
       const sKey = `s${sMatch[1]}`;
       if (STAGE_LOOKUP[sKey]) return STAGE_LOOKUP[sKey];
     }
 
-    // Try the full normalized heading
+    // 2. Full normalized text
     if (STAGE_LOOKUP[cleaned]) return STAGE_LOOKUP[cleaned];
 
-    // Try strip leading numbers like "1Profile"
+    // 3. Drop leading digits ("1Profile" → "Profile")
     const stripped = cleaned.replace(/^\d+/, '');
     if (STAGE_LOOKUP[stripped]) return STAGE_LOOKUP[stripped];
 
     return null;
   };
 
-  const flushBuffer = () => {
-    if (currentKey && currentBuffer.length > 0) {
-      sections[currentKey] = currentBuffer.map(el => el.outerHTML).join('\n');
-    }
-  };
+  // 1. Parse HTML
+  let doc;
+  try {
+    doc = new DOMParser().parseFromString(htmlText, 'text/html');
+  } catch (e) {
+    return { caseObj: null, errors: ['Could not parse HTML: ' + e.message], warnings: [], detectedSectionKeys: [], metaPresent: false };
+  }
 
-  for (const el of children) {
-    if (el.tagName === 'H1') {
-      const matchedKey = tryMatchHeading(el.textContent || '');
-      if (matchedKey) {
-        flushBuffer();
-        currentKey = matchedKey;
-        currentBuffer = [];
-        continue;
+  // 2. Extract metadata from any META comment block (anywhere in the doc)
+  const meta = {};
+  const walker = doc.createTreeWalker(doc.documentElement, NodeFilter.SHOW_COMMENT);
+  let cnode;
+  while ((cnode = walker.nextNode())) {
+    const txt = cnode.nodeValue || '';
+    if (/^\s*META\b/i.test(txt)) {
+      txt.split('\n').forEach(line => {
+        const m = line.match(/^\s*([a-zA-Z_][\w]*)\s*:\s*(.+)\s*$/);
+        if (m) meta[m[1].trim().toLowerCase()] = m[2].trim();
+      });
+    }
+  }
+
+  // Also try to pull a default title from <title> if META didn't have one
+  if (!meta.title) {
+    const titleEl = doc.querySelector('title');
+    if (titleEl && titleEl.textContent) {
+      meta.title = titleEl.textContent.trim().replace(/\s*[—–-]\s*Virtual Teaching Hospital.*$/i, '').trim();
+    }
+  }
+  // Also try <h1> of the document
+  if (!meta.title) {
+    const h1 = doc.querySelector('body h1, h1');
+    if (h1 && h1.textContent && h1.textContent.length < 200) {
+      meta.title = h1.textContent.trim();
+    }
+  }
+
+  const body = doc.body || doc.documentElement;
+  if (!body) {
+    return { caseObj: null, errors: ['No <body> found in HTML.'], warnings: [], detectedSectionKeys: [], metaPresent: false };
+  }
+
+  // 3. Detect sections using multiple strategies, in priority order
+  // Strategy A: Elements with id="s1" / "s2" / etc.
+  // Strategy B: Headings (h1-h4) whose text matches a known section
+  // Strategy C: HTML comments like <!-- S1 — PROFILE --> (split top-level by these)
+  const sections = {}; // key → HTML string
+
+  // === Strategy A: id-based detection ===
+  // Look for elements with id matching s1, s2, ..., s19 anywhere in body.
+  // These typically contain a header bar + a content body. We try to extract just
+  // the content portion to avoid importing the navigation/toggle UI.
+  for (let n = 1; n <= 19; n++) {
+    const el = body.querySelector(`#s${n}, [id="S${n}"]`);
+    if (!el) continue;
+    const key = tryMatchKey(`s${n}`);
+    if (!key) continue;
+
+    // Look for a "content" sub-element by common class patterns: section-content, content, body, card-body
+    let contentEl =
+      el.querySelector('.section-content, .content, .section-body, .card-body') ||
+      // Or look for the largest descendant that contains the most text
+      null;
+
+    // If no obvious content sub-element, try to skip the heading and take everything else
+    if (!contentEl) {
+      // Clone the section and remove obvious "header" elements (h1-h6 at start, svg, button)
+      const clone = el.cloneNode(true);
+      // Remove the first heading if it matches the section name (it's redundant)
+      const firstHeading = clone.querySelector('h1, h2, h3, h4');
+      if (firstHeading && tryMatchKey(firstHeading.textContent) === key) {
+        // Remove the heading's parent header bar if it looks like one
+        const headerBar = firstHeading.closest('[class*="header"]') || firstHeading.parentElement;
+        if (headerBar && headerBar !== clone) {
+          headerBar.remove();
+        } else {
+          firstHeading.remove();
+        }
       }
+      // Remove navigation chevrons (svg elements at the top, buttons)
+      clone.querySelectorAll('svg.chevron, .chevron, button[onclick*="toggle"]').forEach(n => n.remove());
+      sections[key] = clone.innerHTML;
+    } else {
+      sections[key] = contentEl.innerHTML;
     }
-    // Skip standalone elements before the first section
-    if (!currentKey) continue;
-    // Skip script/style elements
-    if (el.tagName === 'SCRIPT' || el.tagName === 'STYLE' || el.tagName === 'NOSCRIPT') continue;
-    currentBuffer.push(el);
-  }
-  flushBuffer();
-
-  // 5. Validate required metadata
-  const requiredFields = ['title', 'hospital', 'department'];
-  const missing = requiredFields.filter(f => !meta[f]);
-  if (missing.length > 0) {
-    errors.push(`Missing required metadata: ${missing.join(', ')}. Add a <!-- META block at the top with title, hospital, department.`);
   }
 
-  // 6. Validate hospital
-  const hospital = (meta.hospital || '').toLowerCase();
-  if (hospital && !['cardiology', 'internal'].includes(hospital)) {
-    warnings.push(`Hospital "${meta.hospital}" not recognized — must be "cardiology" or "internal". Will default to "cardiology".`);
+  // === Strategy B: heading-based detection (only if A didn't find sections) ===
+  if (Object.keys(sections).length === 0) {
+    // Walk through ALL elements at any depth, looking for headings that mark sections
+    const allElements = Array.from(body.querySelectorAll('h1, h2, h3, h4'));
+    const headingMatches = []; // { node, key }
+    for (const h of allElements) {
+      const key = tryMatchKey(h.textContent);
+      if (key) headingMatches.push({ node: h, key });
+    }
+
+    // For each matched heading, gather siblings until the next matched heading
+    for (let i = 0; i < headingMatches.length; i++) {
+      const { node, key } = headingMatches[i];
+      const nextNode = i + 1 < headingMatches.length ? headingMatches[i + 1].node : null;
+      const buffer = [];
+
+      // Collect HTML between this heading and the next, walking forward at the SAME depth
+      // Strategy: use a TreeWalker forward from `node`, stopping at `nextNode`
+      let current = node.nextSibling;
+      while (current && current !== nextNode) {
+        if (current.contains && nextNode && current.contains(nextNode)) {
+          // The next heading is inside current — descend into current and stop there
+          break;
+        }
+        if (current.nodeType === 1) buffer.push(current.outerHTML);
+        else if (current.nodeType === 3) buffer.push(current.textContent);
+        current = current.nextSibling;
+      }
+      // If we collected nothing at this level (heading is nested), try the parent's children
+      if (buffer.length === 0 && node.parentElement) {
+        const parent = node.parentElement;
+        let collecting = false;
+        for (const child of parent.children) {
+          if (child === node) { collecting = true; continue; }
+          if (collecting) {
+            if (child === nextNode || (nextNode && child.contains && child.contains(nextNode))) break;
+            buffer.push(child.outerHTML);
+          }
+        }
+      }
+      sections[key] = buffer.join('\n');
+    }
   }
 
-  // 7. Sanitize each section's HTML using existing sanitizer
+  // === Strategy C: comment-based detection (fallback) ===
+  if (Object.keys(sections).length === 0) {
+    // Find comments at body's top-level children level matching "S## — Name"
+    // For simplicity, this strategy splits raw HTML by comment markers
+    const commentRe = /<!--\s*=*\s*(S\d+)\s*[—\-–]\s*([^=\-][^>]*?)\s*=*-->/gi;
+    const rawHtml = body.innerHTML;
+    const matches = [];
+    let cm;
+    while ((cm = commentRe.exec(rawHtml)) !== null) {
+      const key = tryMatchKey(cm[1]);
+      if (key) matches.push({ index: cm.index, end: cm.index + cm[0].length, key });
+    }
+    for (let i = 0; i < matches.length; i++) {
+      const start = matches[i].end;
+      const end = i + 1 < matches.length ? matches[i + 1].index : rawHtml.length;
+      sections[matches[i].key] = rawHtml.slice(start, end);
+    }
+  }
+
+  // 4. Validate that we found ANY sections (this is the only hard requirement now)
+  if (Object.keys(sections).length === 0) {
+    errors.push(
+      'Could not detect any case sections in this HTML file. The parser looks for sections marked by: ' +
+      '(a) <div id="s1">…</div>, (b) <h1>S1 — Profile</h1> headings, or (c) <!-- S1 — Profile --> comments. ' +
+      'Make sure your file uses one of these patterns.'
+    );
+  }
+
+  // 5. Sanitize each section's HTML (strip scripts, classes, inline styles)
   const cleanSections = {};
   for (const [key, html] of Object.entries(sections)) {
     cleanSections[key] = sanitizePastedHTML(html);
   }
 
-  // 8. Special handling for the MCQs section — parse with the MCQ parser if present
+  // 6. Special handling for MCQs section — parse with the MCQ parser if present
   let mcqs = [];
   if (cleanSections.mcqs) {
-    // Convert HTML back to plain text for the MCQ parser
-    const tempDoc = new DOMParser().parseFromString(`<div>${cleanSections.mcqs}</div>`, 'text/html');
-    const mcqText = tempDoc.body.textContent || '';
-    const result = parseMCQBulk(mcqText);
-    if (result.questions.length > 0) {
-      mcqs = result.questions;
-    }
-    if (result.errors.length > 0) {
+    const result = parseMCQBulk(cleanSections.mcqs);
+    if (result.questions.length > 0) mcqs = result.questions;
+    if (result.errors && result.errors.length > 0) {
       warnings.push(`MCQs section: ${result.errors.length} question(s) could not be parsed.`);
     }
   }
 
-  // 9. Build the case object
+  // 7. Validate hospital field (soft — accepts "cardiology" or "internal" or "cv"/"im")
+  const rawHospital = (meta.hospital || '').toLowerCase().trim();
+  let hospital = 'cardiology'; // default
+  if (rawHospital === 'cardiology' || rawHospital === 'cardio' || rawHospital === 'cv' || rawHospital === 'cardiac') {
+    hospital = 'cardiology';
+  } else if (rawHospital === 'internal' || rawHospital === 'internalmedicine' || rawHospital === 'im' || rawHospital === 'medicine') {
+    hospital = 'internal';
+  } else if (rawHospital) {
+    warnings.push(`Hospital "${meta.hospital}" not recognized — set to "cardiology" by default. You can change it below.`);
+  } else {
+    warnings.push('No hospital specified in META block — defaulting to "Cardiovascular". Change it below if needed.');
+  }
+
+  // 8. Build the case object — fields that come from META or have safe defaults
   const caseObj = {
     id: meta.id || `case-${Date.now()}`,
-    title: meta.title || 'Untitled Case',
-    hospital: ['cardiology', 'internal'].includes(hospital) ? hospital : 'cardiology',
+    title: meta.title || 'Imported Case',
+    hospital,
     department: meta.department || null,
     bedNumber: meta.bednumber ? parseInt(meta.bednumber) || null : null,
-    chiefComplaint: meta.chiefcomplaint || meta.chief_complaint || '',
-    system: meta.system || 'Cardiology',
+    chiefComplaint: meta.chiefcomplaint || meta.chief_complaint || meta.chief || '',
+    system: meta.system || (hospital === 'cardiology' ? 'Cardiology' : 'Internal Medicine'),
     severity: ['stable', 'urgent', 'critical'].includes((meta.severity || '').toLowerCase())
       ? meta.severity.toLowerCase() : 'urgent',
     tags: meta.tags ? meta.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
-    // Each stage's HTML content
     profile: cleanSections.profile || '',
     handover: cleanSections.handover || '',
     assessment: cleanSections.assessment || '',
@@ -690,11 +795,9 @@ function parseHTMLCase(htmlText) {
     progress: cleanSections.progress || '',
     discharge: cleanSections.discharge || '',
     pearls: cleanSections.pearls || '',
-    // MCQs go in their own array
     mcqs,
   };
 
-  // 10. Identify which sections were detected (for the UI summary)
   const detectedSectionKeys = Object.keys(sections);
 
   return {
