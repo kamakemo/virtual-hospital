@@ -92,6 +92,7 @@ export async function deleteCaseRow(id) {
 function caseToRow(c) {
   const {
     id, hospital, department, bedNumber, title, chiefComplaint, system, severity, tags,
+    caseType, htmlContent,
     ...rest
   } = c
   return {
@@ -104,6 +105,8 @@ function caseToRow(c) {
     system: system || null,
     severity: severity || 'urgent',
     tags: tags || [],
+    case_type: caseType || 'interactive',
+    html_content: htmlContent || null,
     data: rest, // every other field goes into the JSONB blob
   }
 }
@@ -120,6 +123,8 @@ function rowToCase(row) {
     system: row.system,
     severity: row.severity,
     tags: row.tags || [],
+    caseType: row.case_type || 'interactive',
+    htmlContent: row.html_content || null,
     ...(row.data || {}),
   }
 }
