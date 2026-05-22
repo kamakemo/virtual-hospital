@@ -48,6 +48,8 @@ import {
   fetchSession,
   upsertSession,
   deleteSessionRow,
+  uploadRichCaseFile,
+  deleteRichCaseFile,
 } from './supabaseClient';
 
 // ============== STORAGE KEYS ==============
@@ -1726,6 +1728,11 @@ export default function VirtualHospital() {
     if (isConfigured) await upsertCase(newCase);
   };
   const deleteCase = async (id) => {
+    // If it's a Rich HTML case, delete the file from Storage too
+    const c = cases.find(c => c.id === id);
+    if (c?.caseType === 'rich-html' && c?.htmlUrl && isConfigured) {
+      await deleteRichCaseFile(c.htmlUrl);
+    }
     setCases(cs => cs.filter(c => c.id !== id));
     if (isConfigured) await deleteCaseRow(id);
   };
@@ -3012,17 +3019,24 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
     setCompleted(true);
   };
 
-  const downloadHTML = () => {
-    const blob = new Blob([caseData.htmlContent || ''], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${caseData.title.replace(/[^\w]/g, '-')}.html`;
-    a.click();
-    URL.revokeObjectURL(url);
+  const downloadHTML = async () => {
+    try {
+      const resp = await fetch(caseData.htmlUrl);
+      const text = await resp.text();
+      const blob = new Blob([text], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${caseData.title.replace(/[^\w]/g, '-')}.html`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      // Fallback: open in new tab
+      window.open(caseData.htmlUrl, '_blank');
+    }
   };
 
-  if (!caseData.htmlContent) {
+  if (!caseData.htmlUrl) {
     return (
       <div className="max-w-7xl mx-auto px-6 py-12 text-center">
         <p className="text-slate-500">This Rich HTML case has no content.</p>
@@ -3091,14 +3105,13 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
         </div>
       </div>
 
-      {/* The actual case content — rendered in iframe, isolated from platform styles */}
+      {/* The actual case content — loaded from Supabase Storage via URL */}
       <iframe
         ref={iframeRef}
-        srcDoc={caseData.htmlContent}
+        src={caseData.htmlUrl}
         title={caseData.title}
         className="w-full block border-0 bg-white"
         style={{ height: `${iframeHeight}px`, minHeight: '600px' }}
-        // Allow scripts but sandbox to prevent breaking out of the iframe
         sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
       />
     </div>
@@ -6853,11 +6866,8 @@ function NewCaseModal({ onClose, onCreate }) {
 
 // ============== UPLOAD HTML CASE MODAL ==============
 function UploadHTMLCaseModal({ existingIds, onClose, onCreate }) {
-  // ===== NEW BEHAVIOR =====
-  // Saves the entire HTML file as-is for display in an iframe.
-  // The platform extracts only metadata (title, hospital, dept) — no parsing of content.
   const [fileName, setFileName] = useState('');
-  const [htmlContent, setHtmlContent] = useState('');
+  const [htmlContent, setHtmlContent] = useState(''); // kept in memory for metadata extraction only
   const [meta, setMeta] = useState({
     title: '',
     hospital: 'cardiology',
@@ -6869,15 +6879,16 @@ function UploadHTMLCaseModal({ existingIds, onClose, onCreate }) {
     tags: '',
   });
   const [isImporting, setIsImporting] = useState(false);
+  const [uploadError, setUploadError] = useState('');
 
-  // Read the HTML file and try to extract sensible defaults for metadata
+  // Read the HTML file — extract metadata defaults, keep text in memory for upload
   const handleFile = async (file) => {
     if (!file) return;
     setFileName(file.name);
+    setUploadError('');
     try {
       const text = await file.text();
       setHtmlContent(text);
-      // Extract metadata defaults from the file
       try {
         const doc = new DOMParser().parseFromString(text, 'text/html');
         const titleEl = doc.querySelector('title');
@@ -6887,7 +6898,7 @@ function UploadHTMLCaseModal({ existingIds, onClose, onCreate }) {
           .replace(/\s*[—–-]\s*Virtual Teaching Hospital.*$/i, '')
           .slice(0, 200);
 
-        // Try to read META block too
+        // Try META comment block
         const metaFromComment = {};
         const walker = doc.createTreeWalker(doc.documentElement, NodeFilter.SHOW_COMMENT);
         let cn;
@@ -6906,18 +6917,18 @@ function UploadHTMLCaseModal({ existingIds, onClose, onCreate }) {
           title: metaFromComment.title || defaultTitle,
           hospital: (metaFromComment.hospital === 'internal' || metaFromComment.hospital === 'im') ? 'internal' : 'cardiology',
           department: metaFromComment.department || '',
-          severity: ['stable', 'urgent', 'critical'].includes((metaFromComment.severity || '').toLowerCase()) ? metaFromComment.severity.toLowerCase() : 'urgent',
+          severity: ['stable', 'urgent', 'critical'].includes((metaFromComment.severity || '').toLowerCase())
+            ? metaFromComment.severity.toLowerCase() : 'urgent',
           bedNumber: metaFromComment.bednumber || '',
           system: metaFromComment.system || '',
           chiefComplaint: metaFromComment.chiefcomplaint || metaFromComment.chief_complaint || '',
           tags: metaFromComment.tags || '',
         }));
       } catch (e) {
-        // ignore — user fills it manually
         setMeta(prev => ({ ...prev, title: file.name.replace(/\.html?$/i, '') }));
       }
     } catch (e) {
-      alert('Could not read file: ' + e.message);
+      setUploadError('Could not read file: ' + e.message);
     }
   };
 
@@ -6928,21 +6939,37 @@ function UploadHTMLCaseModal({ existingIds, onClose, onCreate }) {
     if (file && file.name.match(/\.(html?|htm)$/i)) {
       handleFile(file);
     } else {
-      alert('Please upload an .html file');
+      setUploadError('Please upload an .html file');
     }
   };
 
-  const handleImport = () => {
+  const handleImport = async () => {
     if (!htmlContent || !meta.title.trim()) return;
     setIsImporting(true);
+    setUploadError('');
+
+    // Upload to Supabase Storage
+    const { url, error } = await uploadRichCaseFile(htmlContent, fileName || 'case.html');
+
+    if (error) {
+      setUploadError(
+        error.message?.includes('Bucket not found') || error.message?.includes('not found')
+          ? 'Storage bucket "rich-cases" not found. Please create it in Supabase Dashboard → Storage → New bucket → name: "rich-cases" → Public: ON.'
+          : error.message?.includes('already exists')
+          ? 'A file with this name already exists. Rename your file and try again.'
+          : 'Upload failed: ' + error.message
+      );
+      setIsImporting(false);
+      return;
+    }
 
     let id = `rich-${Date.now()}`;
-    if (existingIds.includes(id)) id = `rich-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    while (existingIds.includes(id)) id = `rich-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
 
     const finalCase = {
       id,
       caseType: 'rich-html',
-      htmlContent,
+      htmlUrl: url,                              // ← URL only, not the full HTML text
       title: meta.title.trim(),
       hospital: meta.hospital,
       department: meta.department || null,
@@ -6968,7 +6995,9 @@ function UploadHTMLCaseModal({ existingIds, onClose, onCreate }) {
             <h3 className="display-font text-2xl font-bold flex items-center gap-2">
               <FileCode size={20} className="text-violet-500" /> Upload HTML case
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">Upload a complete HTML file — it will be displayed exactly as designed, preserving all styling and interactivity.</p>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Upload a complete HTML file — it will be stored in Supabase Storage and displayed exactly as designed.
+            </p>
           </div>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"><X size={18} /></button>
         </div>
@@ -6996,37 +7025,58 @@ function UploadHTMLCaseModal({ existingIds, onClose, onCreate }) {
                 />
               </label>
 
+              {uploadError && (
+                <div className="mt-3 rounded-xl bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 p-3 text-xs text-rose-700 dark:text-rose-300 flex items-start gap-2">
+                  <AlertTriangle size={12} className="flex-shrink-0 mt-0.5" />
+                  <span>{uploadError}</span>
+                </div>
+              )}
+
               <div className="mt-5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-4 text-xs text-slate-600 dark:text-slate-400">
                 <div className="font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-1.5">
                   <Info size={12} /> About Rich HTML cases
                 </div>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li>The file is uploaded and displayed <strong>exactly as-is</strong> in an iframe.</li>
-                  <li>All styling, fonts, gradients, scripts, and interactivity are preserved.</li>
-                  <li>The platform's stage system, MCQ engine, and per-stage XP do not apply to these cases.</li>
-                  <li>Students earn <strong>+50 XP</strong> for marking the case as complete.</li>
-                  <li>If your file has a <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded">&lt;!-- META --&gt;</code> block, title/hospital/department will auto-fill.</li>
+                <ul className="list-disc pl-5 space-y-1.5">
+                  <li>The file is uploaded to <strong>Supabase Storage</strong> — not stored in the database.</li>
+                  <li>It is displayed <strong>exactly as-is</strong> — all styling, fonts, scripts preserved.</li>
+                  <li>Works with any HTML file regardless of how it was made (Arena, AI, hand-coded).</li>
+                  <li>Students earn <strong>+50 XP</strong> when they mark the case complete.</li>
+                  <li>Requires the <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded">rich-cases</code> bucket to exist in Supabase Storage.</li>
                 </ul>
               </div>
             </>
           ) : (
             <>
-              <div className="mb-4 rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 p-3 flex items-center gap-2 text-xs">
+              {/* File confirmed */}
+              <div className="mb-4 rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 p-3 flex items-center gap-3 text-xs">
                 <CheckCircle2 size={14} className="text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <div className="font-bold text-emerald-700 dark:text-emerald-300 truncate">{fileName}</div>
-                  <div className="text-emerald-600 dark:text-emerald-400">{fileSize} KB · Will be displayed exactly as designed</div>
+                  <div className="text-emerald-600 dark:text-emerald-400">
+                    {fileSize} KB · Will be saved to Supabase Storage → displayed as-is
+                  </div>
                 </div>
                 <button
-                  onClick={() => { setFileName(''); setHtmlContent(''); }}
+                  onClick={() => { setFileName(''); setHtmlContent(''); setUploadError(''); }}
                   className="text-xs text-emerald-700 dark:text-emerald-300 hover:underline font-semibold"
                 >
-                  Change file
+                  Change
                 </button>
               </div>
 
+              {/* Upload error */}
+              {uploadError && (
+                <div className="mb-4 rounded-xl bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 p-3 text-xs text-rose-700 dark:text-rose-300 flex items-start gap-2">
+                  <AlertTriangle size={12} className="flex-shrink-0 mt-0.5" />
+                  <span>{uploadError}</span>
+                </div>
+              )}
+
+              {/* Metadata form */}
               <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 p-4 space-y-3">
-                <div className="text-xs uppercase tracking-wider font-semibold text-slate-500 mb-1">Case details (shown in the case list)</div>
+                <div className="text-xs uppercase tracking-wider font-semibold text-slate-500">
+                  Case details — shown in the case list
+                </div>
 
                 <Field label="Title *">
                   <input
@@ -7078,7 +7128,7 @@ function UploadHTMLCaseModal({ existingIds, onClose, onCreate }) {
                       type="number"
                       value={meta.bedNumber}
                       onChange={e => setMeta({ ...meta, bedNumber: e.target.value })}
-                      placeholder="(optional)"
+                      placeholder="optional"
                       className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
                     />
                   </Field>
@@ -7086,7 +7136,7 @@ function UploadHTMLCaseModal({ existingIds, onClose, onCreate }) {
                     <input
                       value={meta.system}
                       onChange={e => setMeta({ ...meta, system: e.target.value })}
-                      placeholder="e.g., Cardiology"
+                      placeholder="e.g. Cardiology"
                       className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
                     />
                   </Field>
@@ -7096,7 +7146,7 @@ function UploadHTMLCaseModal({ existingIds, onClose, onCreate }) {
                   <input
                     value={meta.chiefComplaint}
                     onChange={e => setMeta({ ...meta, chiefComplaint: e.target.value })}
-                    placeholder="(optional)"
+                    placeholder="optional"
                     className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
                   />
                 </Field>
@@ -7105,7 +7155,7 @@ function UploadHTMLCaseModal({ existingIds, onClose, onCreate }) {
                   <input
                     value={meta.tags}
                     onChange={e => setMeta({ ...meta, tags: e.target.value })}
-                    placeholder="comma-separated, e.g., ARVC, genetics, cardiomyopathy"
+                    placeholder="comma-separated, e.g. ARVC, genetics, cardiomyopathy"
                     className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
                   />
                 </Field>
@@ -7116,14 +7166,20 @@ function UploadHTMLCaseModal({ existingIds, onClose, onCreate }) {
 
         {/* Footer */}
         <div className="p-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-2 flex-shrink-0">
-          <button onClick={onClose} className="px-4 py-2 rounded-full border border-slate-300 dark:border-slate-700 text-sm font-semibold">Cancel</button>
+          <button onClick={onClose} className="px-4 py-2 rounded-full border border-slate-300 dark:border-slate-700 text-sm font-semibold">
+            Cancel
+          </button>
           {htmlContent && (
             <button
               onClick={handleImport}
               disabled={isImporting || !meta.title.trim()}
-              className="px-5 py-2 rounded-full bg-violet-500 text-white text-sm font-bold hover:bg-violet-600 disabled:opacity-40 flex items-center gap-1.5"
+              className="px-5 py-2 rounded-full bg-violet-500 text-white text-sm font-bold hover:bg-violet-600 disabled:opacity-40 flex items-center gap-2"
             >
-              <Check size={14} /> Create Rich Case
+              {isImporting ? (
+                <><RefreshCw size={13} className="animate-spin" /> Uploading…</>
+              ) : (
+                <><Check size={13} /> Upload &amp; create case</>
+              )}
             </button>
           )}
         </div>
