@@ -2980,11 +2980,15 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
     !!progress?.completedStages?.[`rich:${caseData.id}`]
   );
 
-  // Auto-resize iframe to fit its content (since the HTML may have unknown height)
+  // Support both storage format (htmlUrl) and legacy inline format (htmlContent)
+  const hasUrl = !!caseData.htmlUrl;
+  const hasInline = !!caseData.htmlContent;
+  const hasContent = hasUrl || hasInline;
+
+  // Auto-resize iframe to fit its content
   useEffect(() => {
     const iframe = iframeRef.current;
     if (!iframe) return;
-
     const resize = () => {
       try {
         const doc = iframe.contentDocument;
@@ -2993,21 +2997,19 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
             doc.body?.scrollHeight || 0,
             doc.documentElement?.scrollHeight || 0
           );
-          if (h > 0) setIframeHeight(Math.min(h + 40, 12000)); // cap at 12,000px
+          if (h > 0) setIframeHeight(Math.min(h + 40, 12000));
         }
       } catch (e) {
-        // Cross-origin or sandbox restrictions — keep default height
+        // Cross-origin — keep default height
       }
     };
-
     iframe.addEventListener('load', resize);
-    // Re-measure periodically in case content changes (collapsibles, etc.)
     const interval = setInterval(resize, 1000);
     return () => {
       iframe.removeEventListener('load', resize);
       clearInterval(interval);
     };
-  }, [caseData.htmlContent]);
+  }, [caseData.htmlUrl, caseData.htmlContent]);
 
   const markComplete = () => {
     if (completed) return;
@@ -3021,8 +3023,11 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
 
   const downloadHTML = async () => {
     try {
-      const resp = await fetch(caseData.htmlUrl);
-      const text = await resp.text();
+      let text = caseData.htmlContent || '';
+      if (hasUrl) {
+        const resp = await fetch(caseData.htmlUrl);
+        text = await resp.text();
+      }
       const blob = new Blob([text], { type: 'text/html' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -3031,16 +3036,21 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
       a.click();
       URL.revokeObjectURL(url);
     } catch (e) {
-      // Fallback: open in new tab
-      window.open(caseData.htmlUrl, '_blank');
+      if (hasUrl) window.open(caseData.htmlUrl, '_blank');
     }
   };
 
-  if (!caseData.htmlUrl) {
+  if (!hasContent) {
     return (
       <div className="max-w-7xl mx-auto px-6 py-12 text-center">
-        <p className="text-slate-500">This Rich HTML case has no content.</p>
-        <button onClick={() => navigate({ name: 'landing' })} className="mt-3 text-teal-600 underline">Return home</button>
+        <p className="text-slate-500 mb-2">This Rich HTML case has no content yet.</p>
+        <p className="text-xs text-slate-400">
+          If you just uploaded this case, the HTML file may not have saved correctly.
+          Try deleting and re-uploading.
+        </p>
+        <button onClick={() => navigate({ name: 'landing' })} className="mt-4 text-teal-600 underline text-sm">
+          Return home
+        </button>
       </div>
     );
   }
@@ -3053,7 +3063,7 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
 
   return (
     <div className={cx(fullscreen ? 'fixed inset-0 z-50 bg-white dark:bg-slate-900 overflow-y-auto' : '')}>
-      {/* Header bar — outside the iframe, in platform's design */}
+      {/* Platform header bar */}
       <div className={cx(
         'border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900',
         fullscreen ? 'sticky top-0 z-10' : ''
@@ -3069,6 +3079,11 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
           <span className={cx('inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded text-white', severityColor)}>
             <FileCode size={9} /> Rich Case
           </span>
+          {!hasUrl && hasInline && (
+            <span className="text-[10px] px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-300 font-semibold">
+              Legacy — re-upload to move to Storage
+            </span>
+          )}
           <div className="flex-1 min-w-0">
             <h1 className="font-bold text-sm sm:text-base truncate">{caseData.title}</h1>
             <p className="text-[11px] text-slate-500 truncate">
@@ -3105,15 +3120,26 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
         </div>
       </div>
 
-      {/* The actual case content — loaded from Supabase Storage via URL */}
-      <iframe
-        ref={iframeRef}
-        src={caseData.htmlUrl}
-        title={caseData.title}
-        className="w-full block border-0 bg-white"
-        style={{ height: `${iframeHeight}px`, minHeight: '600px' }}
-        sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-      />
+      {/* Case content — src for Storage URL, srcDoc for legacy inline HTML */}
+      {hasUrl ? (
+        <iframe
+          ref={iframeRef}
+          src={caseData.htmlUrl}
+          title={caseData.title}
+          className="w-full block border-0 bg-white"
+          style={{ height: `${iframeHeight}px`, minHeight: '600px' }}
+          sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+        />
+      ) : (
+        <iframe
+          ref={iframeRef}
+          srcDoc={caseData.htmlContent}
+          title={caseData.title}
+          className="w-full block border-0 bg-white"
+          style={{ height: `${iframeHeight}px`, minHeight: '600px' }}
+          sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+        />
+      )}
     </div>
   );
 }
