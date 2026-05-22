@@ -2994,25 +2994,50 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
   );
   const hasContent = isRealUrl || isInlineHTML;
 
-  // Auto-resize iframe to fit content height
+  // Auto-resize iframe to fit content height.
+  // Strategy: measure once after load, then watch via ResizeObserver (no polling).
+  // This prevents infinite expansion caused by scroll-triggered animations or
+  // sticky elements that change layout while the user scrolls.
   useEffect(() => {
     const iframe = iframeRef.current;
     if (!iframe) return;
-    const resize = () => {
+
+    let observer = null;
+
+    const measure = () => {
       try {
         const doc = iframe.contentDocument;
-        if (doc) {
-          const h = Math.max(
-            doc.body?.scrollHeight || 0,
-            doc.documentElement?.scrollHeight || 0
-          );
-          if (h > 0) setIframeHeight(Math.min(h + 40, 12000));
-        }
-      } catch (e) { /* cross-origin — keep default */ }
+        if (!doc?.body) return;
+        // Use scrollHeight of the body only — documentElement.scrollHeight can
+        // grow unboundedly on pages with sticky/fixed elements.
+        const h = doc.body.scrollHeight;
+        if (h > 100) setIframeHeight(Math.min(h + 24, 16000));
+      } catch (e) { /* cross-origin — keep default 800px */ }
     };
-    iframe.addEventListener('load', resize);
-    const interval = setInterval(resize, 1000);
-    return () => { iframe.removeEventListener('load', resize); clearInterval(interval); };
+
+    const onLoad = () => {
+      // Small delay to allow CSS animations / fonts to finish rendering
+      setTimeout(() => {
+        measure();
+        // After load, watch the body for genuine content size changes
+        try {
+          const doc = iframe.contentDocument;
+          if (doc?.body && typeof ResizeObserver !== 'undefined') {
+            observer = new ResizeObserver(() => {
+              // Only grow, never shrink — avoids jitter from scroll-triggered reflows
+              measure();
+            });
+            observer.observe(doc.body);
+          }
+        } catch (e) { /* cross-origin */ }
+      }, 300);
+    };
+
+    iframe.addEventListener('load', onLoad);
+    return () => {
+      iframe.removeEventListener('load', onLoad);
+      if (observer) observer.disconnect();
+    };
   }, [rawValue]);
 
   const markComplete = () => {
