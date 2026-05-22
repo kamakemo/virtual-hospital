@@ -3178,65 +3178,70 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
     !!progress?.completedStages?.[`rich:${caseData.id}`]
   );
 
-  // Detect what we actually have:
-  // - htmlUrl is a real URL  → load via src=
-  // - htmlUrl contains raw HTML (old upload bug) → load via srcDoc=
-  // - htmlContent exists (very old format) → load via srcDoc=
+  // We ALWAYS use srcDoc (never src=URL) because Supabase Storage serves HTML
+  // files as plain text regardless of content-type headers, causing the browser
+  // to display raw HTML tags instead of rendering the page.
+  // Strategy: if we have a URL, fetch its text first, then use srcDoc.
   const rawValue = caseData.htmlUrl || caseData.htmlContent || '';
-  const isRealUrl = rawValue.startsWith('http://') || rawValue.startsWith('https://');
-  const isInlineHTML = !isRealUrl && (
-    rawValue.trimStart().startsWith('<!DOCTYPE') ||
-    rawValue.trimStart().startsWith('<html') ||
-    rawValue.trimStart().startsWith('<head') ||
-    rawValue.trimStart().startsWith('<body')
-  );
-  const hasContent = isRealUrl || isInlineHTML;
+  const isUrl = rawValue.startsWith('http://') || rawValue.startsWith('https://');
+  const isInline = !isUrl && rawValue.trimStart().startsWith('<');
+  const hasContent = isUrl || isInline;
 
-  // Auto-resize iframe to fit content height.
-  // Strategy: measure once after load, then watch via ResizeObserver (no polling).
-  // This prevents infinite expansion caused by scroll-triggered animations or
-  // sticky elements that change layout while the user scrolls.
+  const [htmlDoc, setHtmlDoc] = useState(isInline ? rawValue : '');
+  const [fetchError, setFetchError] = useState('');
+  const [fetching, setFetching] = useState(false);
+
+  // If we have a URL, fetch the HTML text once
+  useEffect(() => {
+    if (!isUrl) return;
+    setFetching(true);
+    setFetchError('');
+    fetch(rawValue)
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.text();
+      })
+      .then(text => {
+        setHtmlDoc(text);
+        setFetching(false);
+      })
+      .catch(e => {
+        setFetchError('Could not load case: ' + e.message);
+        setFetching(false);
+      });
+  }, [rawValue]);
+
+  // Auto-resize: measure once after load, then watch via ResizeObserver
   useEffect(() => {
     const iframe = iframeRef.current;
-    if (!iframe) return;
-
+    if (!iframe || !htmlDoc) return;
     let observer = null;
-
     const measure = () => {
       try {
         const doc = iframe.contentDocument;
         if (!doc?.body) return;
-        // Use scrollHeight of the body only — documentElement.scrollHeight can
-        // grow unboundedly on pages with sticky/fixed elements.
         const h = doc.body.scrollHeight;
         if (h > 100) setIframeHeight(Math.min(h + 24, 16000));
-      } catch (e) { /* cross-origin — keep default 800px */ }
+      } catch (e) { /* cross-origin */ }
     };
-
     const onLoad = () => {
-      // Small delay to allow CSS animations / fonts to finish rendering
       setTimeout(() => {
         measure();
-        // After load, watch the body for genuine content size changes
         try {
           const doc = iframe.contentDocument;
           if (doc?.body && typeof ResizeObserver !== 'undefined') {
-            observer = new ResizeObserver(() => {
-              // Only grow, never shrink — avoids jitter from scroll-triggered reflows
-              measure();
-            });
+            observer = new ResizeObserver(measure);
             observer.observe(doc.body);
           }
         } catch (e) { /* cross-origin */ }
       }, 300);
     };
-
     iframe.addEventListener('load', onLoad);
     return () => {
       iframe.removeEventListener('load', onLoad);
       if (observer) observer.disconnect();
     };
-  }, [rawValue]);
+  }, [htmlDoc]);
 
   const markComplete = () => {
     if (completed) return;
@@ -3250,7 +3255,7 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
 
   const downloadHTML = async () => {
     try {
-      let text = isRealUrl ? await (await fetch(rawValue)).text() : rawValue;
+      const text = htmlDoc || rawValue;
       const blob = new Blob([text], { type: 'text/html' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -3259,7 +3264,7 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
       a.click();
       URL.revokeObjectURL(url);
     } catch (e) {
-      if (isRealUrl) window.open(rawValue, '_blank');
+      if (isUrl) window.open(rawValue, '_blank');
     }
   };
 
@@ -3271,9 +3276,7 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
         <button onClick={() => navigate({ name: 'landing' })} className="mt-4 text-teal-600 underline text-sm">Return home</button>
       </div>
     );
-  }
-
-  const severityColor = { critical: 'bg-rose-500', urgent: 'bg-amber-500', stable: 'bg-emerald-500' }[caseData.severity] || 'bg-slate-500';
+  }  const severityColor = { critical: 'bg-rose-500', urgent: 'bg-amber-500', stable: 'bg-emerald-500' }[caseData.severity] || 'bg-slate-500';
 
   return (
     <div className={cx(fullscreen ? 'fixed inset-0 z-50 bg-white dark:bg-slate-900 overflow-y-auto' : '')}>
@@ -3311,15 +3314,30 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
         </div>
       </div>
 
-      {/* Render via src (Storage URL) or srcDoc (inline HTML) */}
-      <iframe
-        ref={iframeRef}
-        {...(isRealUrl ? { src: rawValue } : { srcDoc: rawValue })}
-        title={caseData.title}
-        className="w-full block border-0 bg-white"
-        style={{ height: `${iframeHeight}px`, minHeight: '600px' }}
-        sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-      />
+      {/* Always render via srcDoc — Supabase Storage serves HTML as plain text
+          when using src=URL, so we fetch the content first and inject it as srcDoc */}
+      {fetching && (
+        <div className="flex items-center justify-center py-20 text-slate-500">
+          <RefreshCw size={18} className="animate-spin mr-2" /> Loading case…
+        </div>
+      )}
+      {fetchError && (
+        <div className="max-w-2xl mx-auto px-6 py-12 text-center">
+          <p className="text-rose-500 font-semibold mb-2">Failed to load case</p>
+          <p className="text-sm text-slate-500">{fetchError}</p>
+          <button onClick={() => navigate({ name: 'landing' })} className="mt-4 text-teal-600 underline text-sm">Return home</button>
+        </div>
+      )}
+      {htmlDoc && !fetching && (
+        <iframe
+          ref={iframeRef}
+          srcDoc={htmlDoc}
+          title={caseData.title}
+          className="w-full block border-0 bg-white"
+          style={{ height: `${iframeHeight}px`, minHeight: '600px' }}
+          sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+        />
+      )}
     </div>
   );
 }
