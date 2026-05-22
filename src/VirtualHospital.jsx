@@ -2980,12 +2980,21 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
     !!progress?.completedStages?.[`rich:${caseData.id}`]
   );
 
-  // Support both storage format (htmlUrl) and legacy inline format (htmlContent)
-  const hasUrl = !!caseData.htmlUrl;
-  const hasInline = !!caseData.htmlContent;
-  const hasContent = hasUrl || hasInline;
+  // Detect what we actually have:
+  // - htmlUrl is a real URL  → load via src=
+  // - htmlUrl contains raw HTML (old upload bug) → load via srcDoc=
+  // - htmlContent exists (very old format) → load via srcDoc=
+  const rawValue = caseData.htmlUrl || caseData.htmlContent || '';
+  const isRealUrl = rawValue.startsWith('http://') || rawValue.startsWith('https://');
+  const isInlineHTML = !isRealUrl && (
+    rawValue.trimStart().startsWith('<!DOCTYPE') ||
+    rawValue.trimStart().startsWith('<html') ||
+    rawValue.trimStart().startsWith('<head') ||
+    rawValue.trimStart().startsWith('<body')
+  );
+  const hasContent = isRealUrl || isInlineHTML;
 
-  // Auto-resize iframe to fit its content
+  // Auto-resize iframe to fit content height
   useEffect(() => {
     const iframe = iframeRef.current;
     if (!iframe) return;
@@ -2999,17 +3008,12 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
           );
           if (h > 0) setIframeHeight(Math.min(h + 40, 12000));
         }
-      } catch (e) {
-        // Cross-origin — keep default height
-      }
+      } catch (e) { /* cross-origin — keep default */ }
     };
     iframe.addEventListener('load', resize);
     const interval = setInterval(resize, 1000);
-    return () => {
-      iframe.removeEventListener('load', resize);
-      clearInterval(interval);
-    };
-  }, [caseData.htmlUrl, caseData.htmlContent]);
+    return () => { iframe.removeEventListener('load', resize); clearInterval(interval); };
+  }, [rawValue]);
 
   const markComplete = () => {
     if (completed) return;
@@ -3023,11 +3027,7 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
 
   const downloadHTML = async () => {
     try {
-      let text = caseData.htmlContent || '';
-      if (hasUrl) {
-        const resp = await fetch(caseData.htmlUrl);
-        text = await resp.text();
-      }
+      let text = isRealUrl ? await (await fetch(rawValue)).text() : rawValue;
       const blob = new Blob([text], { type: 'text/html' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -3036,7 +3036,7 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
       a.click();
       URL.revokeObjectURL(url);
     } catch (e) {
-      if (hasUrl) window.open(caseData.htmlUrl, '_blank');
+      if (isRealUrl) window.open(rawValue, '_blank');
     }
   };
 
@@ -3044,46 +3044,25 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
     return (
       <div className="max-w-7xl mx-auto px-6 py-12 text-center">
         <p className="text-slate-500 mb-2">This Rich HTML case has no content yet.</p>
-        <p className="text-xs text-slate-400">
-          If you just uploaded this case, the HTML file may not have saved correctly.
-          Try deleting and re-uploading.
-        </p>
-        <button onClick={() => navigate({ name: 'landing' })} className="mt-4 text-teal-600 underline text-sm">
-          Return home
-        </button>
+        <p className="text-xs text-slate-400">Try deleting and re-uploading the HTML file.</p>
+        <button onClick={() => navigate({ name: 'landing' })} className="mt-4 text-teal-600 underline text-sm">Return home</button>
       </div>
     );
   }
 
-  const severityColor = {
-    critical: 'bg-rose-500',
-    urgent: 'bg-amber-500',
-    stable: 'bg-emerald-500',
-  }[caseData.severity] || 'bg-slate-500';
+  const severityColor = { critical: 'bg-rose-500', urgent: 'bg-amber-500', stable: 'bg-emerald-500' }[caseData.severity] || 'bg-slate-500';
 
   return (
     <div className={cx(fullscreen ? 'fixed inset-0 z-50 bg-white dark:bg-slate-900 overflow-y-auto' : '')}>
-      {/* Platform header bar */}
-      <div className={cx(
-        'border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900',
-        fullscreen ? 'sticky top-0 z-10' : ''
-      )}>
+      <div className={cx('border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900', fullscreen ? 'sticky top-0 z-10' : '')}>
         <div className="max-w-[1480px] mx-auto px-4 sm:px-6 py-3 flex items-center gap-3 flex-wrap">
-          <button
-            onClick={() => navigate({ name: 'landing' })}
-            className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white"
-          >
+          <button onClick={() => navigate({ name: 'landing' })} className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white">
             <ChevronLeft size={14} /> Back
           </button>
           <span className="text-slate-300 dark:text-slate-700">·</span>
           <span className={cx('inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded text-white', severityColor)}>
             <FileCode size={9} /> Rich Case
           </span>
-          {!hasUrl && hasInline && (
-            <span className="text-[10px] px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-300 font-semibold">
-              Legacy — re-upload to move to Storage
-            </span>
-          )}
           <div className="flex-1 min-w-0">
             <h1 className="font-bold text-sm sm:text-base truncate">{caseData.title}</h1>
             <p className="text-[11px] text-slate-500 truncate">
@@ -3092,10 +3071,7 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
             </p>
           </div>
           {!completed ? (
-            <button
-              onClick={markComplete}
-              className="px-3 py-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-bold hover:scale-[1.02] transition-transform flex items-center gap-1"
-            >
+            <button onClick={markComplete} className="px-3 py-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-bold hover:scale-[1.02] transition-transform flex items-center gap-1">
               <CheckCircle2 size={12} /> Mark complete (+50 XP)
             </button>
           ) : (
@@ -3103,43 +3079,24 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
               <CheckCircle2 size={12} /> Completed
             </span>
           )}
-          <button
-            onClick={() => setFullscreen(f => !f)}
-            className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
-            title={fullscreen ? 'Exit fullscreen' : 'Fullscreen'}
-          >
+          <button onClick={() => setFullscreen(f => !f)} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" title={fullscreen ? 'Exit fullscreen' : 'Fullscreen'}>
             {fullscreen ? <X size={14} /> : <Maximize2 size={14} />}
           </button>
-          <button
-            onClick={downloadHTML}
-            className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
-            title="Download HTML"
-          >
+          <button onClick={downloadHTML} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" title="Download HTML">
             <Download size={14} />
           </button>
         </div>
       </div>
 
-      {/* Case content — src for Storage URL, srcDoc for legacy inline HTML */}
-      {hasUrl ? (
-        <iframe
-          ref={iframeRef}
-          src={caseData.htmlUrl}
-          title={caseData.title}
-          className="w-full block border-0 bg-white"
-          style={{ height: `${iframeHeight}px`, minHeight: '600px' }}
-          sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-        />
-      ) : (
-        <iframe
-          ref={iframeRef}
-          srcDoc={caseData.htmlContent}
-          title={caseData.title}
-          className="w-full block border-0 bg-white"
-          style={{ height: `${iframeHeight}px`, minHeight: '600px' }}
-          sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-        />
-      )}
+      {/* Render via src (Storage URL) or srcDoc (inline HTML) */}
+      <iframe
+        ref={iframeRef}
+        {...(isRealUrl ? { src: rawValue } : { srcDoc: rawValue })}
+        title={caseData.title}
+        className="w-full block border-0 bg-white"
+        style={{ height: `${iframeHeight}px`, minHeight: '600px' }}
+        sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+      />
     </div>
   );
 }
