@@ -88,11 +88,72 @@ export async function deleteCaseRow(id) {
   return { error }
 }
 
+// ============== RICH HTML CASE STORAGE ==============
+// Uploads a raw HTML file to Supabase Storage bucket "rich-cases".
+// Returns { url, path } on success or { error } on failure.
+export async function uploadRichCaseFile(fileText, fileName) {
+  const BUCKET = 'rich-cases'
+
+  // Convert text → Blob (HTML file)
+  const blob = new Blob([fileText], { type: 'text/html' })
+
+  // Build a unique path: rich-cases/<timestamp>-<sanitized-name>.html
+  const safeName = fileName
+    .replace(/[^a-zA-Z0-9.\-_]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .toLowerCase()
+  const path = `${Date.now()}-${safeName}`
+
+  const { data, error } = await supabase
+    .storage
+    .from(BUCKET)
+    .upload(path, blob, {
+      contentType: 'text/html',
+      upsert: false,
+    })
+
+  if (error) {
+    console.error('[storage] upload failed:', error.message)
+    return { error }
+  }
+
+  // Get the public URL
+  const { data: urlData } = supabase
+    .storage
+    .from(BUCKET)
+    .getPublicUrl(path)
+
+  return {
+    url: urlData.publicUrl,
+    path,
+  }
+}
+
+// Deletes a Rich HTML file from Storage when the case is deleted.
+export async function deleteRichCaseFile(htmlUrl) {
+  if (!htmlUrl) return
+  const BUCKET = 'rich-cases'
+
+  // Extract the path from the public URL
+  // Public URL format: https://<project>.supabase.co/storage/v1/object/public/rich-cases/<path>
+  try {
+    const url = new URL(htmlUrl)
+    const parts = url.pathname.split(`/rich-cases/`)
+    if (parts.length < 2) return
+    const path = parts[1]
+    const { error } = await supabase.storage.from(BUCKET).remove([path])
+    if (error) console.error('[storage] delete failed:', error.message)
+  } catch (e) {
+    console.error('[storage] delete parse error:', e.message)
+  }
+}
+
 // Convert app-side case object → DB row
 function caseToRow(c) {
   const {
     id, hospital, department, bedNumber, title, chiefComplaint, system, severity, tags,
-    caseType, htmlContent,
+    caseType, htmlUrl,
     ...rest
   } = c
   return {
@@ -106,8 +167,8 @@ function caseToRow(c) {
     severity: severity || 'urgent',
     tags: tags || [],
     case_type: caseType || 'interactive',
-    html_content: htmlContent || null,
-    data: rest, // every other field goes into the JSONB blob
+    html_url: htmlUrl || null,
+    data: rest,
   }
 }
 
@@ -124,7 +185,7 @@ function rowToCase(row) {
     severity: row.severity,
     tags: row.tags || [],
     caseType: row.case_type || 'interactive',
-    htmlContent: row.html_content || null,
+    htmlUrl: row.html_url || null,
     ...(row.data || {}),
   }
 }
