@@ -94,10 +94,7 @@ export async function deleteCaseRow(id) {
 export async function uploadRichCaseFile(fileText, fileName) {
   const BUCKET = 'rich-cases'
 
-  // Convert text → Blob (HTML file)
-  const blob = new Blob([fileText], { type: 'text/html' })
-
-  // Build a unique path: rich-cases/<timestamp>-<sanitized-name>.html
+  // Use File object (not just Blob) — gives the SDK the filename and explicit MIME type
   const safeName = fileName
     .replace(/[^a-zA-Z0-9.\-_]/g, '-')
     .replace(/-+/g, '-')
@@ -105,11 +102,14 @@ export async function uploadRichCaseFile(fileText, fileName) {
     .toLowerCase()
   const path = `${Date.now()}-${safeName}`
 
+  const file = new File([fileText], safeName, { type: 'text/html; charset=utf-8' })
+
   const { data, error } = await supabase
     .storage
     .from(BUCKET)
-    .upload(path, blob, {
-      contentType: 'text/html',
+    .upload(path, file, {
+      contentType: 'text/html; charset=utf-8',
+      cacheControl: '3600',
       upsert: false,
     })
 
