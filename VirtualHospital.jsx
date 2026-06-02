@@ -1735,8 +1735,21 @@ export default function VirtualHospital() {
     if (isConfigured) await upsertCase(updated);
   };
   const addCase = async (newCase) => {
+    // Optimistically add to UI immediately
     setCases(cs => [...cs, newCase]);
-    if (isConfigured) await upsertCase(newCase);
+    if (isConfigured) {
+      const result = await upsertCase(newCase);
+      if (result?.error) {
+        console.error('[addCase] upsert failed:', result.error.message);
+        // Remove the optimistic entry if save failed
+        setCases(cs => cs.filter(c => c.id !== newCase.id));
+        alert('Failed to save case: ' + result.error.message);
+      } else {
+        // Re-fetch to make sure local state matches DB (picks up any server-side transforms)
+        const fresh = await fetchAllCases();
+        if (fresh?.length) setCases(fresh);
+      }
+    }
   };
   const deleteCase = async (id) => {
     // If it's a Rich HTML case, delete the file from Storage too
@@ -2929,10 +2942,15 @@ function WardFloor({ beds, dept, accent, hoveredBed, setHoveredBed, navigate, pr
 function Bed3D({ bedNumber, caseData, accent, isHovered, onHover, onClick, progress }) {
   const c = caseData;
   const sev = c ? SEVERITY[c.severity] : null;
-  const completed = c ? Object.values(progress.completedStages?.[c.id] || {}).filter(Boolean).length : 0;
+  // Rich HTML cases use a single boolean completion flag, not per-stage progress
+  const isRichComplete = c?.caseType === 'rich-html'
+    ? !!(progress.completedStages?.[c.id] || progress.completedStages?.[`rich:${c.id}`])
+    : false;
+  const completed = isRichComplete ? STAGES.length
+    : c ? Object.values(progress.completedStages?.[c.id] || {}).filter(Boolean).length : 0;
   const totalStages = STAGES.length;
   const pct = c ? Math.round((completed / totalStages) * 100) : 0;
-  const isComplete = pct === 100;
+  const isComplete = isRichComplete || pct === 100;
 
   // Severity-based colors for the bed
   const sevColor = c?.severity === 'critical' ? 'rose'
