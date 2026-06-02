@@ -13,7 +13,7 @@ import {
   Soup, Droplets, MapPin, Radio,
   AlignLeft, AlignCenter, AlignRight, AlignJustify, Strikethrough, Subscript, Superscript,
   Undo2, Redo2, Type, Palette, Highlighter, Table as TableIcon, Minus,
-  Youtube, Film, Image as ImageIcon2, FileImage, Link2, Code2, Indent, Outdent,
+  Play, Film, Image as ImageIcon2, FileImage, Link2, Code2, Indent, Outdent,
   GripVertical, Pencil, ArrowUp, ArrowDown, Eraser, FileCode, Info, AlertTriangle,
   CircleDot, Hash, Mic, Calendar, MessageSquare, HelpCircle, Maximize2, Ambulance
 } from 'lucide-react';
@@ -92,24 +92,24 @@ const SEVERITY = {
 // ============== DEPARTMENT DEFINITIONS ==============
 const DEPARTMENTS = {
   cardiology: [
-    { id: 'cv-ed',         label: 'Emergency Department',     short: 'ED',         icon: Siren,        accent: 'rose',    beds: 8,  desc: 'Front door — triage and acute presentations' },
-    { id: 'cv-ccu',        label: 'CCU',                      short: 'CCU',        icon: HeartPulse,   accent: 'red',     beds: 6,  desc: 'Coronary Care Unit — STEMI, shock, arrhythmia' },
-    { id: 'cv-hf',         label: 'Heart Failure Ward',       short: 'HF Ward',    icon: Heart,        accent: 'pink',    beds: 10, desc: 'Acute decompensation, chronic HF optimization' },
-    { id: 'cv-cath',       label: 'Cath Lab',                 short: 'Cath',       icon: Activity,     accent: 'fuchsia', beds: 4,  desc: 'PCI, angiography, structural intervention' },
-    { id: 'cv-valve',      label: 'Valvular & Structural',    short: 'Structural', icon: Layers,       accent: 'violet',  beds: 6,  desc: 'TAVR, MitraClip, congenital, septal defects' },
-    { id: 'cv-ep',         label: 'EP Lab',                   short: 'EP',         icon: Zap,          accent: 'amber',   beds: 4,  desc: 'Ablation, device implant, complex arrhythmia' },
-    { id: 'cv-imaging',    label: 'Cardiac Imaging',          short: 'Imaging',    icon: Waves,        accent: 'cyan',    beds: 4,  desc: 'Echo, cardiac MRI, CT angiography' },
-    { id: 'cv-clinic',     label: 'Outpatient Clinic',        short: 'Clinic',     icon: ClipboardList,accent: 'teal',    beds: 6,  desc: 'Follow-up, risk-factor management' },
+    { id: 'cv-ed',         label: 'Emergency Department',     short: 'ED',         icon: Siren,        accent: 'rose',    beds: 999,  desc: 'Front door — triage and acute presentations' },
+    { id: 'cv-ccu',        label: 'CCU',                      short: 'CCU',        icon: HeartPulse,   accent: 'red',     beds: 999,  desc: 'Coronary Care Unit — STEMI, shock, arrhythmia' },
+    { id: 'cv-hf',         label: 'Heart Failure Ward',       short: 'HF Ward',    icon: Heart,        accent: 'pink',    beds: 999, desc: 'Acute decompensation, chronic HF optimization' },
+    { id: 'cv-cath',       label: 'Cath Lab',                 short: 'Cath',       icon: Activity,     accent: 'fuchsia', beds: 999,  desc: 'PCI, angiography, structural intervention' },
+    { id: 'cv-valve',      label: 'Valvular & Structural',    short: 'Structural', icon: Layers,       accent: 'violet',  beds: 999,  desc: 'TAVR, MitraClip, congenital, septal defects' },
+    { id: 'cv-ep',         label: 'EP Lab',                   short: 'EP',         icon: Zap,          accent: 'amber',   beds: 999,  desc: 'Ablation, device implant, complex arrhythmia' },
+    { id: 'cv-imaging',    label: 'Cardiac Imaging',          short: 'Imaging',    icon: Waves,        accent: 'cyan',    beds: 999,  desc: 'Echo, cardiac MRI, CT angiography' },
+    { id: 'cv-clinic',     label: 'Outpatient Clinic',        short: 'Clinic',     icon: ClipboardList,accent: 'teal',    beds: 999,  desc: 'Follow-up, risk-factor management' },
   ],
   internal: [
-    { id: 'im-resp',       label: 'Respiratory',              short: 'Resp',       icon: Wind,         accent: 'sky',     beds: 8,  desc: 'Asthma, COPD, pneumonia, ILD, PE' },
-    { id: 'im-icu',        label: 'Critical Care Unit',       short: 'ICU',        icon: Siren,        accent: 'red',     beds: 6,  desc: 'Sepsis, shock, ARDS, multi-organ failure' },
-    { id: 'im-hemonc',     label: 'Hematology & Oncology',    short: 'Hem/Onc',    icon: Droplets,     accent: 'rose',    beds: 8,  desc: 'Anemia, leukemia, lymphoma, solid tumors' },
-    { id: 'im-endo',       label: 'Endocrinology',            short: 'Endo',       icon: Dna,          accent: 'amber',   beds: 6,  desc: 'Diabetes, thyroid, adrenal, pituitary' },
-    { id: 'im-rheum',      label: 'Rheumatology & Immunology',short: 'Rheum',      icon: Bone,         accent: 'violet',  beds: 6,  desc: 'SLE, RA, vasculitis, immunodeficiency' },
-    { id: 'im-neph',       label: 'Nephrology',               short: 'Neph',       icon: Beaker,       accent: 'cyan',    beds: 6,  desc: 'AKI, CKD, glomerulonephritis, dialysis' },
-    { id: 'im-neuro',      label: 'Neurology',                short: 'Neuro',      icon: Brain,        accent: 'indigo',  beds: 6,  desc: 'Stroke, seizure, MS, neuromuscular' },
-    { id: 'im-git',        label: 'GIT & Hepatology',         short: 'GI/Hep',     icon: Soup,         accent: 'emerald', beds: 8,  desc: 'GI bleed, IBD, cirrhosis, pancreatitis' },
+    { id: 'im-resp',       label: 'Respiratory',              short: 'Resp',       icon: Wind,         accent: 'sky',     beds: 999,  desc: 'Asthma, COPD, pneumonia, ILD, PE' },
+    { id: 'im-icu',        label: 'Critical Care Unit',       short: 'ICU',        icon: Siren,        accent: 'red',     beds: 999,  desc: 'Sepsis, shock, ARDS, multi-organ failure' },
+    { id: 'im-hemonc',     label: 'Hematology & Oncology',    short: 'Hem/Onc',    icon: Droplets,     accent: 'rose',    beds: 999,  desc: 'Anemia, leukemia, lymphoma, solid tumors' },
+    { id: 'im-endo',       label: 'Endocrinology',            short: 'Endo',       icon: Dna,          accent: 'amber',   beds: 999,  desc: 'Diabetes, thyroid, adrenal, pituitary' },
+    { id: 'im-rheum',      label: 'Rheumatology & Immunology',short: 'Rheum',      icon: Bone,         accent: 'violet',  beds: 999,  desc: 'SLE, RA, vasculitis, immunodeficiency' },
+    { id: 'im-neph',       label: 'Nephrology',               short: 'Neph',       icon: Beaker,       accent: 'cyan',    beds: 999,  desc: 'AKI, CKD, glomerulonephritis, dialysis' },
+    { id: 'im-neuro',      label: 'Neurology',                short: 'Neuro',      icon: Brain,        accent: 'indigo',  beds: 999,  desc: 'Stroke, seizure, MS, neuromuscular' },
+    { id: 'im-git',        label: 'GIT & Hepatology',         short: 'GI/Hep',     icon: Soup,         accent: 'emerald', beds: 999,  desc: 'GI bleed, IBD, cirrhosis, pancreatitis' },
   ],
   prehospital: [
     { id: 'ph-foundations', label: 'Foundations',                    short: 'Foundations', icon: BookOpen,      accent: 'amber',   beds: 0, desc: 'EMS history, roles, legal, ethics, communication' },
@@ -1521,7 +1521,7 @@ function RichTextEditor({ value, onChange, placeholder = 'Write content...', min
                 insertHTML(`<figure class="rte-figure" contenteditable="false"><img src="${url}" alt=""/>${cap ? `<figcaption>${cap}</figcaption>` : ''}</figure><p><br></p>`);
               }} />
               <div className="my-1 h-px bg-slate-200 dark:bg-slate-700" />
-              <InsMenuItem icon={Youtube} label="YouTube video" onClick={() => { setShowInsert(false); insertYouTube(); }} />
+              <InsMenuItem icon={Play} label="YouTube video" onClick={() => { setShowInsert(false); insertYouTube(); }} />
               <InsMenuItem icon={Film} label="Video from URL" onClick={() => { setShowInsert(false); insertVideoURL(); }} />
               <div className="my-1 h-px bg-slate-200 dark:bg-slate-700" />
               <InsMenuItem icon={Link2} label="Hyperlink" onClick={() => {
@@ -1735,8 +1735,21 @@ export default function VirtualHospital() {
     if (isConfigured) await upsertCase(updated);
   };
   const addCase = async (newCase) => {
+    // Optimistically add to UI immediately
     setCases(cs => [...cs, newCase]);
-    if (isConfigured) await upsertCase(newCase);
+    if (isConfigured) {
+      const result = await upsertCase(newCase);
+      if (result?.error) {
+        console.error('[addCase] upsert failed:', result.error.message);
+        // Remove the optimistic entry if save failed
+        setCases(cs => cs.filter(c => c.id !== newCase.id));
+        alert('Failed to save case: ' + result.error.message);
+      } else {
+        // Re-fetch to make sure local state matches DB (picks up any server-side transforms)
+        const fresh = await fetchAllCases();
+        if (fresh?.length) setCases(fresh);
+      }
+    }
   };
   const deleteCase = async (id) => {
     // If it's a Rich HTML case, delete the file from Storage too
@@ -2523,8 +2536,8 @@ function HospitalView({ hospital, cases, navigate, progress }) {
           const deptCases = cases.filter(c => c.department === d.id);
           const occupied = deptCases.length;
           const occupancyPct = hospital === 'prehospital'
-            ? Math.min(occupied * 20, 100)   // each case fills 20% — just a visual indicator
-            : Math.round((occupied / d.beds) * 100);
+            ? Math.min(occupied * 20, 100)
+            : Math.min(occupied * 8, 100);   // visual indicator only — 12+ cases = full bar
           const accent = ACCENT_CLASSES[d.accent];
           const DIcon = d.icon;
           const critical = deptCases.filter(c => c.severity === 'critical').length;
@@ -2555,15 +2568,13 @@ function HospitalView({ hospital, cases, navigate, progress }) {
 
                 <h3 className="display-font text-lg font-bold leading-tight mb-1">{d.label}</h3>
                 <p className={cx('text-[11px] font-semibold mb-3 uppercase tracking-wider', accent.text)}>
-                  {d.short} · {hospital === 'prehospital' ? `${deptCases.length} case${deptCases.length !== 1 ? 's' : ''}` : `${d.beds} beds`}
+                  {d.short} · {occupied > 0 ? `${occupied} case${occupied !== 1 ? 's' : ''}` : 'No cases yet'}
                 </p>
                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 line-clamp-2">{d.desc}</p>
 
                 <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-slate-500">{hospital === 'prehospital' ? 'Cases' : 'Occupancy'}</span>
-                  <span className={cx('font-bold', accent.text)}>
-                    {hospital === 'prehospital' ? occupied : `${occupied}/${d.beds}`}
-                  </span>
+                  <span className="text-slate-500">Cases</span>
+                  <span className={cx('font-bold', accent.text)}>{occupied}</span>
                 </div>
                 <div className="mt-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
                   <div className={cx('h-full bg-gradient-to-r transition-all', accent.grad)} style={{ width: `${occupancyPct}%` }} />
@@ -2606,27 +2617,25 @@ function DepartmentView({ hospital, departmentId, cases, navigate, progress }) {
       );
   }, [cases, departmentId, search, filter]);
 
-  // Build bed slots — fill by bedNumber, leaving empty slots between
+  // Build bed slots dynamically:
+  // - One bed per existing case (always shown)
+  // - Plus a few empty decorative beds at the end (min 2, so ward doesn't look bare)
   const beds = useMemo(() => {
-    const arr = [];
-    for (let i = 1; i <= dept.beds; i++) {
-      const c = deptCases.find(x => x.bedNumber === i) || deptCases[arr.filter(b => b.case).length];
-      // Simpler: assign cases to beds in order, filling sequential bed numbers
-      arr.push({ bedNumber: i, case: null });
-    }
-    // Fill cases into beds sequentially
-    deptCases.forEach((c, idx) => {
-      const target = c.bedNumber && c.bedNumber <= dept.beds ? c.bedNumber - 1 : idx;
-      if (target < arr.length && !arr[target].case) {
-        arr[target].case = c;
+    const EXTRA_EMPTY = 2; // decorative empty beds always visible at the end
+    const totalSlots = Math.max(deptCases.length + EXTRA_EMPTY, 6);
+    const arr = Array.from({ length: totalSlots }, (_, i) => ({ bedNumber: i + 1, case: null }));
+    // Assign cases to beds — respect bedNumber if set, otherwise fill sequentially
+    deptCases.forEach((c) => {
+      const preferredIdx = c.bedNumber && c.bedNumber >= 1 ? c.bedNumber - 1 : -1;
+      if (preferredIdx >= 0 && preferredIdx < arr.length && !arr[preferredIdx].case) {
+        arr[preferredIdx].case = c;
       } else {
-        // find first empty
         const empty = arr.findIndex(b => !b.case);
         if (empty >= 0) arr[empty].case = c;
       }
     });
     return arr;
-  }, [deptCases, dept.beds]);
+  }, [deptCases]);
 
   const occupied = beds.filter(b => b.case).length;
   const critical = beds.filter(b => b.case?.severity === 'critical').length;
@@ -2657,8 +2666,8 @@ function DepartmentView({ hospital, departmentId, cases, navigate, progress }) {
           </div>
           <div className="flex items-center gap-3">
             <div className="text-center px-3 py-2 rounded-xl bg-white/5 border border-white/10">
-              <div className="display-font text-xl font-bold">{occupied}/{dept.beds}</div>
-              <div className="text-[10px] uppercase tracking-wider opacity-70">Occupancy</div>
+              <div className="display-font text-xl font-bold">{occupied}</div>
+              <div className="text-[10px] uppercase tracking-wider opacity-70">Cases</div>
             </div>
             {critical > 0 && (
               <div className="text-center px-3 py-2 rounded-xl bg-red-500/20 border border-red-500/40">
@@ -2933,10 +2942,15 @@ function WardFloor({ beds, dept, accent, hoveredBed, setHoveredBed, navigate, pr
 function Bed3D({ bedNumber, caseData, accent, isHovered, onHover, onClick, progress }) {
   const c = caseData;
   const sev = c ? SEVERITY[c.severity] : null;
-  const completed = c ? Object.values(progress.completedStages?.[c.id] || {}).filter(Boolean).length : 0;
+  // Rich HTML cases use a single boolean completion flag, not per-stage progress
+  const isRichComplete = c?.caseType === 'rich-html'
+    ? !!(progress.completedStages?.[c.id] || progress.completedStages?.[`rich:${c.id}`])
+    : false;
+  const completed = isRichComplete ? STAGES.length
+    : c ? Object.values(progress.completedStages?.[c.id] || {}).filter(Boolean).length : 0;
   const totalStages = STAGES.length;
   const pct = c ? Math.round((completed / totalStages) * 100) : 0;
-  const isComplete = pct === 100;
+  const isComplete = isRichComplete || pct === 100;
 
   // Severity-based colors for the bed
   const sevColor = c?.severity === 'critical' ? 'rose'
@@ -7034,7 +7048,7 @@ function NewCaseModal({ onClose, onCreate }) {
               className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm"
             >
               {availableDepartments.map(d => (
-                <option key={d.id} value={d.id}>{d.label} ({d.beds} beds)</option>
+                <option key={d.id} value={d.id}>{d.label}</option>
               ))}
             </select>
             {DEPARTMENT_BY_ID[draft.department]?.desc && (
