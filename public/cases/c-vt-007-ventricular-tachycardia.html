@@ -67,8 +67,8 @@ tags: VT, Wide-complex tachycardia, Synchronized cardioversion, VT storm, Antiar
   .vital.warn .v-num{color:var(--amber)}
   @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
 
-  /* ===== HORIZONTAL SECTION SIDEBAR (sticky top) ===== */
-  .topnav{position:sticky; top:0; z-index:50; background:rgba(255,255,255,.92); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.06)}
+  /* ===== HORIZONTAL SECTION SIDEBAR (fixed — always visible) ===== */
+  .topnav{position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.10)}
   .topnav .rail{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; max-width:1180px; margin:0 auto; scrollbar-width:thin}
   .navchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink2); font-size:11px; font-weight:700; text-decoration:none; min-width:78px; text-align:center; transition:all .18s; cursor:pointer}
   .navchip .s-id{font-size:10px; letter-spacing:1px; color:#94a3b8}
@@ -994,6 +994,14 @@ tags: VT, Wide-complex tachycardia, Synchronized cardioversion, VT storm, Antiar
      this box from the parent window's height minus whatever app chrome sits
      above the iframe, and scroll internally instead. Standalone → 100vh. */
   var caseScroll = document.getElementById('caseScroll');
+  var topnav = document.getElementById('topnav');
+  /* The tab bar is position:fixed, so it's out of flow — reserve space at the
+     top of the scroll content (and offset anchor jumps) by its real height. */
+  function setNavOffset(){
+    var navH = topnav ? topnav.offsetHeight : 70;
+    caseScroll.style.paddingTop = navH + 'px';
+    caseScroll.style.scrollPaddingTop = (navH + 14) + 'px';
+  }
   function sizeScroller(){
     try {
       var p = window.parent;
@@ -1004,13 +1012,15 @@ tags: VT, Wide-complex tachycardia, Synchronized cardioversion, VT storm, Antiar
         var h = ph - rectTop - 6;             // leave the bottom edge breathing room
         if(h < 460) h = 460;                  // sane minimum on short windows
         caseScroll.style.height = h + 'px';
-        return;
+      } else {
+        caseScroll.style.height = '100vh';
       }
-    } catch(e){ /* cross-origin: fall through to viewport height */ }
-    caseScroll.style.height = '100vh';
+    } catch(e){ caseScroll.style.height = '100vh'; }
+    setNavOffset();
   }
   sizeScroller();
   window.addEventListener('resize', sizeScroller);
+  window.addEventListener('load', sizeScroller);
   try { if(window.parent && window.parent !== window) window.parent.addEventListener('resize', sizeScroller); } catch(e){}
 
   /* ============ NAV: scroll-spy active + visited ============ */
