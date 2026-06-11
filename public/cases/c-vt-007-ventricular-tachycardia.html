@@ -29,8 +29,14 @@ tags: VT, Wide-complex tachycardia, Synchronized cardioversion, VT storm, Antiar
     --shadow:0 4px 16px rgba(15,23,42,.07);
   }
   *{box-sizing:border-box}
-  html{scroll-behavior:smooth; scroll-padding-top:130px}
+  html{scroll-behavior:smooth}
   body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  /* Internal scroll viewport. When this case is embedded the host app stretches
+     the iframe to full content height and the OUTER page scrolls, which would
+     let a sticky bar scroll away. We instead scroll inside this box (sized to
+     the visible window by JS) so the section tab bar stays pinned at the top.
+     Standalone, it falls back to the full viewport height. */
+  #caseScroll{height:100vh; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; scroll-padding-top:92px}
 
   /* ===== HERO ===== */
   .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:36px 24px 80px; position:relative; overflow:hidden}
@@ -235,6 +241,7 @@ tags: VT, Wide-complex tachycardia, Synchronized cardioversion, VT storm, Antiar
 </style>
 </head>
 <body>
+<div id="caseScroll">
 
 <!-- ===================== HERO ===================== -->
 <header class="hero">
@@ -940,6 +947,8 @@ tags: VT, Wide-complex tachycardia, Synchronized cardioversion, VT storm, Antiar
   ⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."
 </div>
 
+</div><!-- /#caseScroll -->
+
 <script>
 (function(){
   "use strict";
@@ -977,6 +986,32 @@ tags: VT, Wide-complex tachycardia, Synchronized cardioversion, VT storm, Antiar
     dash.classList.toggle('collapsed');
     this.textContent = dash.classList.contains('collapsed') ? '+' : '–';
   });
+
+  /* ============ INTERNAL SCROLL SIZING ============ */
+  /* Size the scroll box to the visible window so the sticky tab bar stays in
+     view. When embedded (srcDoc iframe, same-origin), the host page stretches
+     the iframe to full content height and scrolls the OUTER page — so we size
+     this box from the parent window's height minus whatever app chrome sits
+     above the iframe, and scroll internally instead. Standalone → 100vh. */
+  var caseScroll = document.getElementById('caseScroll');
+  function sizeScroller(){
+    try {
+      var p = window.parent;
+      if(p && p !== window && window.frameElement){
+        var rectTop = window.frameElement.getBoundingClientRect().top;
+        if(rectTop < 0) rectTop = 0;          // parent scrolled past the chrome
+        var ph = p.innerHeight || 800;
+        var h = ph - rectTop - 6;             // leave the bottom edge breathing room
+        if(h < 460) h = 460;                  // sane minimum on short windows
+        caseScroll.style.height = h + 'px';
+        return;
+      }
+    } catch(e){ /* cross-origin: fall through to viewport height */ }
+    caseScroll.style.height = '100vh';
+  }
+  sizeScroller();
+  window.addEventListener('resize', sizeScroller);
+  try { if(window.parent && window.parent !== window) window.parent.addEventListener('resize', sizeScroller); } catch(e){}
 
   /* ============ NAV: scroll-spy active + visited ============ */
   var navchips = Array.prototype.slice.call(document.querySelectorAll('.navchip'));
@@ -1017,10 +1052,8 @@ tags: VT, Wide-complex tachycardia, Synchronized cardioversion, VT storm, Antiar
     });
   });
 
-  /* Scroll-spy. When embedded, the iframe is sized to its full content and the
-     PARENT page scrolls, so window.scrollY here never changes — use
-     IntersectionObserver (which accounts for the parent viewport in same-origin
-     iframes). Keep the scroll listener as a fallback for standalone viewing. */
+  /* Scroll-spy. Scrolling happens inside #caseScroll, so the observer root and
+     the scroll listener both target that container (not the window). */
   if('IntersectionObserver' in window){
     var io = new IntersectionObserver(function(entries){
       entries.forEach(function(entry){
@@ -1028,12 +1061,11 @@ tags: VT, Wide-complex tachycardia, Synchronized cardioversion, VT storm, Antiar
         var idx = sections.indexOf(entry.target);
         if(idx > -1){ setActive(idx); markVisited(idx); }
       });
-    }, { rootMargin: '-15% 0px -65% 0px' });
+    }, { root: caseScroll, rootMargin: '-12% 0px -70% 0px' });
     sections.forEach(function(s){ if(s) io.observe(s); });
   }
   function onScroll(){
-    if(window.scrollY === 0 && document.body.scrollHeight <= window.innerHeight + 50) return;
-    var y = window.scrollY + 150;
+    var y = caseScroll.scrollTop + 150;
     var current = 0;
     for(var i=0;i<sections.length;i++){
       if(sections[i] && sections[i].offsetTop <= y) current = i;
@@ -1041,7 +1073,7 @@ tags: VT, Wide-complex tachycardia, Synchronized cardioversion, VT storm, Antiar
     setActive(current);
     markVisited(current);
   }
-  window.addEventListener('scroll', onScroll, {passive:true});
+  caseScroll.addEventListener('scroll', onScroll, {passive:true});
   markVisited(0);
   setActive(0);
 
