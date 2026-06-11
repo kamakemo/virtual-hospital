@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unstable Monomorphic Ventricular Tachycardia — Virtual Teaching Hospital</title>
+<!-- META
+id: c-vt-007
+title: Unstable Monomorphic Ventricular Tachycardia (VT Storm)
+hospital: cardiology
+department: cv-ccu
+bednumber: 2
+chiefcomplaint: Palpitations, presyncope and a wide-complex tachycardia at 188/min
+system: Cardiology
+severity: critical
+tags: VT, Wide-complex tachycardia, Synchronized cardioversion, VT storm, Antiarrhythmics, ICD
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --radius:16px;
+    --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth; scroll-padding-top:130px}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:36px 24px 80px; position:relative; overflow:hidden}
+  .hero::after{content:"📈"; position:absolute; right:-20px; top:-30px; font-size:220px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{max-width:1100px; margin:0 auto; position:relative; z-index:1}
+  .hero .crumbs{font-size:13px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:10px 0 6px; font-size:clamp(26px,4vw,40px); line-height:1.15}
+  .hero .sub{font-size:16px; opacity:.95}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; backdrop-filter:blur(4px)}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== LIVE ECG STRIP IN HERO ===== */
+  .ecg-banner{max-width:1100px; margin:14px auto 0; position:relative; z-index:1}
+  .ecg-banner svg{width:100%; height:64px; display:block; background:rgba(0,0,0,.18); border-radius:12px; border:1px solid rgba(255,255,255,.25)}
+  .ecg-trace{stroke:#86efac; stroke-width:2.4; fill:none; stroke-dasharray:1600; stroke-dashoffset:1600; animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{stroke-dashoffset:0}}
+
+  /* ===== VITALS STRIP ===== */
+  .vitals-strip{max-width:1100px; margin:-52px auto 0; padding:0 24px; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:11px; font-weight:700; letter-spacing:.6px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:21px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== HORIZONTAL SECTION SIDEBAR (sticky top) ===== */
+  .topnav{position:sticky; top:0; z-index:50; background:rgba(255,255,255,.92); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.06)}
+  .topnav .rail{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; max-width:1180px; margin:0 auto; scrollbar-width:thin}
+  .navchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink2); font-size:11px; font-weight:700; text-decoration:none; min-width:78px; text-align:center; transition:all .18s; cursor:pointer}
+  .navchip .s-id{font-size:10px; letter-spacing:1px; color:#94a3b8}
+  .navchip .s-emoji{font-size:16px}
+  .navchip:hover{border-color:var(--rose); color:var(--rose); transform:translateY(-2px)}
+  .navchip.active{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; border-color:#b91c1c}
+  .navchip.active .s-id{color:#fecaca}
+  .navchip.visited:not(.active){border-color:var(--emerald-line); background:var(--emerald-soft)}
+
+  /* ===== DASHBOARD WIDGET ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:215px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10.5px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:760px){.dash{display:none}}
+
+  /* ===== MAIN / SECTIONS ===== */
+  main{max-width:1100px; margin:26px auto 80px; padding:0 24px}
+  section.case-sec{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:26px; overflow:hidden}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16.5px; margin:26px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14.5px; margin:18px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:24px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15.5px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:14px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px; letter-spacing:.4px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14.5px}
+
+  /* ===== INTERACTIVE BITS ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:10px 18px; font-weight:700; font-size:14px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:22px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:15px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 15px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 15px; margin-top:12px; font-size:14px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim sliders */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:14px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:14px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Heart/circuit diagram */
+  .heart-fig{display:flex; gap:18px; flex-wrap:wrap; align-items:center; background:var(--slate-soft); border-radius:16px; padding:18px; margin:14px 0}
+  .heart-fig svg{flex:0 0 auto}
+  .heart-legend{flex:1; min-width:230px; font-size:13.5px}
+  .lg{display:flex; align-items:center; gap:8px; margin:5px 0}
+  .lg .sw{width:14px; height:14px; border-radius:4px; flex:0 0 auto}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Journey cards */
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:14px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:15px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:14px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13.5px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:22px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14.5px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:13px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .footer{max-width:1100px; margin:0 auto 36px; padding:0 24px; text-align:center; color:#94a3b8; font-size:12.5px}
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · 💗 Coronary Care Unit · 🛏️ Bed 2</div>
+    <h1>📈 Unstable Monomorphic Ventricular Tachycardia — "The Wide One That Kills"</h1>
+    <div class="sub">⚡ A 67-year-old man with an old infarct is running a broad, regular tachycardia at 188. His pressure is sliding. Someone is reaching for verapamil. Stop them.</div>
+    <div class="chips">
+      <span class="chip crit">🔴 CRITICAL</span>
+      <span class="chip">⚡ Wide-Complex Tachycardia</span>
+      <span class="chip">🔌 Synchronized Cardioversion</span>
+      <span class="chip">🌀 VT Storm</span>
+      <span class="chip">🎮 Interactive Case</span>
+      <span class="chip">⏱️ Decide in 60 seconds</span>
+    </div>
+    <div class="ecg-banner" title="Monomorphic VT rhythm strip">
+      <svg viewBox="0 0 800 64" preserveAspectRatio="none" aria-label="Wide-complex tachycardia rhythm strip">
+        <polyline class="ecg-trace" points="0,40 40,40 55,12 70,58 85,40 130,40 145,12 160,58 175,40 220,40 235,12 250,58 265,40 310,40 325,12 340,58 355,40 400,40 415,12 430,58 445,40 490,40 505,12 520,58 535,40 580,40 595,12 610,58 625,40 670,40 685,12 700,58 715,40 760,40 775,12 790,58 800,40"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== LIVE VITALS ===================== -->
+<div class="vitals-strip">
+  <div class="vitals-grid">
+    <div class="vital alert"><div class="v-label">💓 HR</div><div class="v-num">188</div></div>
+    <div class="vital alert"><div class="v-label">🩸 BP</div><div class="v-num">78/46</div></div>
+    <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">26</div></div>
+    <div class="vital warn"><div class="v-label">🫁 SpO₂</div><div class="v-num">91%</div></div>
+    <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.4°</div></div>
+    <div class="vital warn"><div class="v-label">🧠 GCS</div><div class="v-num">14</div></div>
+    <div class="vital alert"><div class="v-label">📐 QRS</div><div class="v-num">168 ms</div></div>
+    <div class="vital alert"><div class="v-label">😖 Distress</div><div class="v-num">High</div></div>
+  </div>
+</div>
+
+<!-- ===================== HORIZONTAL SECTION SIDEBAR ===================== -->
+<nav class="topnav" id="topnav">
+  <div class="rail">
+    <a class="navchip" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navchip" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navchip" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navchip" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navchip" href="#s5"><span class="s-emoji">🎓</span><span>Consultant Round</span><span class="s-id">S5</span></a>
+    <a class="navchip" href="#s6"><span class="s-emoji">📖</span><span>Teaching Points</span><span class="s-id">S6</span></a>
+    <a class="navchip" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navchip" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navchip" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navchip" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navchip" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navchip" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navchip" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navchip" href="#s14"><span class="s-emoji">🔀</span><span>Differentials</span><span class="s-id">S14</span></a>
+    <a class="navchip" href="#s15"><span class="s-emoji">🗺️</span><span>Plan</span><span class="s-id">S15</span></a>
+    <a class="navchip" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navchip" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navchip" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navchip" href="#s19"><span class="s-emoji">🧠</span><span>MCQs</span><span class="s-id">S19</span></a>
+  </div>
+</nav>
+
+<!-- ===================== SCORE DASHBOARD ===================== -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections visited</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-vt">⚡ VT-Spotter</span>
+      <span class="badge" id="bdg-shock">🔌 Shock On Time</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champion</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Ward Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running sims, taking the right path and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- S1 — PROFILE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s1">
+  <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+  <div class="section-content">
+    <div class="callout danger">
+      <b class="ct">🚨 YOU ARE HERE — 23:14, CCU Bed 2</b>
+      The monitor screams a regular, broad, marching complex at 188. The patient is gray, sweaty, talking in three-word bursts: <em>"My heart… is going… to explode."</em> A junior nurse is drawing up <strong>verapamil</strong> because "it's a fast heart." Your hand reaches the trolley first. This is not a case to read about — it is a rhythm you must name and break <strong>right now</strong>.
+    </div>
+
+    <h3>👤 Patient Identity</h3>
+    <table class="tbl">
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>🧔 Name</td><td><strong>Mr. D.R.</strong></td></tr>
+      <tr><td>🎂 Age / Sex</td><td>67-year-old male</td></tr>
+      <tr><td>🆔 MRN</td><td>CV-10402</td></tr>
+      <tr><td>⚖️ Weight</td><td>84 kg</td></tr>
+      <tr><td>💼 Occupation</td><td>Retired electrician</td></tr>
+      <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+    </table>
+
+    <h3>📜 Past Medical History — every line is the substrate</h3>
+    <ul>
+      <li>🫀 <strong>Anterior STEMI 4 years ago</strong>, late presentation, no primary PCI — left a large akinetic anteroapical <strong>scar</strong>. This scar is the whole story: dead muscle interwoven with surviving fibres is a maze that re-entry circuits love.</li>
+      <li>💔 <strong>Ischemic cardiomyopathy, EF 28%</strong> (HFrEF). A weak, dilated, scarred ventricle is an arrhythmic ventricle.</li>
+      <li>💧 On <strong>furosemide</strong> for congestion — and his last clinic K⁺ was 3.2, Mg²⁺ never checked. Diuretic-driven <strong>hypokalemia and hypomagnesemia</strong> are tonight's gasoline.</li>
+      <li>💊 Was started on <strong>amiodarone</strong> 6 months ago for "ectopy" but <strong>stopped it himself 3 weeks ago</strong> ("the tablets made me feel slow").</li>
+      <li>🔌 <strong>Declined a primary-prevention ICD</strong> last year — "I didn't want a machine shocking me." Tonight that decision is being tested.</li>
+      <li>🚬 Ex-smoker, 40 pack-years. Hypertension, dyslipidemia.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A wide, regular, fast rhythm in a patient with a previous MI is ventricular tachycardia until a cardiologist proves otherwise — and even then, treat it as VT."</div>
+
+    <h3>🧬 Why THIS patient? — scar + trigger + low potassium</h3>
+    <p>Sustained monomorphic VT is almost always <strong>scar-related re-entry</strong>. The infarct left islands of dead, non-conducting tissue surrounded by channels of slowly-conducting surviving myocytes. A premature beat enters one channel, finds the exit still refractory, loops back through a now-recovered path, and a self-sustaining circuit is born — a wavefront chasing its own tail at 188 times a minute. The substrate (scar) was laid down four years ago. Tonight, <strong>low potassium and low magnesium</strong> shortened refractoriness and made the surrounding myocardium twitchy enough for a single ectopic to light the fuse. Stopping amiodarone removed the only thing damping it. Three ingredients, one storm.</p>
+
+    <div class="callout warn"><b class="ct">🔥 Risk factors for sustained monomorphic VT</b>
+    🫀 Prior MI / scar (the #1 cause) · 💔 Low EF (&lt; 35%) · ⚡ Electrolyte derangement (low K⁺, low Mg²⁺) · 🧬 Cardiomyopathy (dilated, hypertrophic, ARVC, sarcoid) · 💊 Antiarrhythmic non-adherence or pro-arrhythmia · 🍷 Ischemia/acute MI · 🧪 Digoxin toxicity</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S2 — HANDOVER -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s2">
+  <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+  <div class="section-content">
+    <h3>📻 Ward Nurse Handover — listen for the trap</h3>
+    <div class="callout info">
+      <b class="ct">🎙️ SBAR from the CCU nurse (verbatim)</b>
+      <p><strong>S:</strong> "Bed 2 — Mr. D.R., old anterior MI, EF 28%. Was comfortable, then 10 minutes ago suddenly felt his heart racing, went clammy and nearly passed out. Monitor shows a fast, wide, regular rhythm at 188."</p>
+      <p><strong>B:</strong> "Ischemic cardiomyopathy, stopped his amiodarone three weeks ago, on furosemide. Last potassium 3.2."</p>
+      <p><strong>A:</strong> "He's still talking but only just — gray, sweaty, BP was 78 over 46 a minute ago. The covering doctor on the phone said it's probably SVT and to try <strong>adenosine, then verapamil</strong>."</p>
+      <p><strong>R:</strong> "I've got pads on, defibrillator at the bedside, IV running. I held the verapamil because… something didn't feel right. He looks awful."</p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The phone diagnosis of 'probably SVT' is how patients in VT get killed. Never let a voice down a wire override a wide complex in a scarred heart."</div>
+
+    <h3>🚩 Spot-the-Red-Flag — tap each feature that screams VT</h3>
+    <p>🎮 <em>Interactive: click every feature that points to ventricular tachycardia (not SVT). Each correct flag = +10 XP. Wrong picks cost you.</em></p>
+    <div id="flagGame">
+      <button class="btn ghost flag-btn" data-good="1">🫀 Prior myocardial infarction / scar</button>
+      <button class="btn ghost flag-btn" data-good="1">📐 Wide QRS (168 ms), regular</button>
+      <button class="btn ghost flag-btn" data-good="1">💔 EF 28% structural heart disease</button>
+      <button class="btn ghost flag-btn" data-good="1">😵 Sudden onset with presyncope</button>
+      <button class="btn ghost flag-btn" data-good="1">⚡ Low K⁺ / low Mg²⁺ trigger</button>
+      <button class="btn ghost flag-btn" data-good="0">🌡️ Temperature 36.4°C</button>
+      <button class="btn ghost flag-btn" data-good="0">🫁 SpO₂ 91% on air</button>
+      <button class="btn ghost flag-btn" data-good="0">💊 He likes his tea</button>
+    </div>
+    <p id="flagResult" style="font-weight:700"></p>
+
+    <h3>⏱️ Timeline so far</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">23:04</div>Sudden palpitations and presyncope while sitting up in bed.</div>
+      <div class="t-item"><div class="t-time">23:06</div>Monitor: wide regular tachycardia 188/min. BP 78/46. Patient clammy, GCS 14.</div>
+      <div class="t-item"><div class="t-time">23:09</div>Covering doctor (by phone) says "probably SVT — try adenosine then verapamil." Nurse <strong>withholds verapamil</strong> — 🏅 instinct worth its weight in gold.</div>
+      <div class="t-item"><div class="t-time">23:14</div>You arrive. Pads are on. The clock is the enemy: every minute of VT at this rate erodes coronary filling and cerebral perfusion.</div>
+    </div>
+
+    <div class="callout ok"><b class="ct">🏅 Praise where due</b>The nurse who held the verapamil prevented a catastrophe. IV verapamil/diltiazem in VT causes profound vasodilation and negative inotropy on an already failing, scarred ventricle — it drops the pressure off a cliff and degenerates VT into VF. Withholding it may have bought this man his life.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S3 — INITIAL ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s3">
+  <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+  <div class="section-content">
+    <h3>🅰️🅱️🅲️ Primary Survey — what your hands, eyes and ears find</h3>
+    <table class="tbl">
+      <tr><th>Step</th><th>Finding</th><th>What it means mechanistically</th></tr>
+      <tr><td>🅰️ Airway</td><td>Patent, speaking in 3-word bursts.</td><td>Short sentences = low cardiac output and rising effort; he is on the edge of decompensation.</td></tr>
+      <tr><td>🅱️ Breathing</td><td>RR 26, SpO₂ 91% on air, bibasal crackles.</td><td>The 188/min rate gives the ventricle almost no diastolic filling time → output falls → pulmonary congestion → hypoxia. Rate itself is the poison.</td></tr>
+      <tr><td>🅲️ Circulation</td><td><strong>BP 78/46</strong>, cool clammy peripheries, thready pulse, CRT 4 s. JVP shows <strong>intermittent cannon A waves</strong>. S1 varies in intensity beat to beat.</td><td>Cannon A waves = the right atrium contracting against a closed tricuspid valve because the atria and ventricles are firing independently — i.e. <strong>AV dissociation</strong>, a hallmark of VT. Variable S1 = the same dissociation changing valve position each beat.</td></tr>
+      <tr><td>🅳 Disability</td><td>GCS 14, anxious, intermittently vague.</td><td>Cerebral hypoperfusion from low output. Worsening GCS = imminent arrest — do not wait for unconsciousness to act.</td></tr>
+      <tr><td>🅴 Exposure</td><td>No rash, no focal deficit. Old sternotomy-free chest. Pads already on.</td><td>Confirms structural setup; pads on means you are seconds, not minutes, from definitive therapy.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Cannon A waves + variable S1 + a wide regular tachycardia = AV dissociation = ventricular tachycardia. Your fingers on the neck can diagnose this before the 12-lead prints."</div>
+
+    <h3>🧭 The single most important question: STABLE or UNSTABLE?</h3>
+    <p>Tachyarrhythmia management forks on one decision. Look for the <strong>adverse features</strong> (the "4 S's"): <strong>Shock</strong> (SBP &lt; 90, poor perfusion), <strong>Syncope</strong>/presyncope, <strong>Severe ischemia</strong> (chest pain, ST changes), <strong>Severe heart failure</strong> (pulmonary edema). Mr. D.R. has shock, presyncope and pulmonary edema — <strong>UNSTABLE</strong>.</p>
+
+    <div class="callout danger"><b class="ct">⚡ The decision is made: UNSTABLE → SYNCHRONIZED DC CARDIOVERSION</b>An unstable wide-complex tachycardia gets <strong>electricity, not chemistry</strong>. Drugs are too slow and too negatively inotropic for a patient sliding into shock. Sedate if time and consciousness allow, then deliver a <strong>synchronized</strong> shock. Do not chase a perfect diagnosis while the pressure falls.</div>
+
+    <!-- 🎬 BRANCHING SCENARIO ENGINE -->
+    <div class="scenario" id="scenarioBox">
+      <h3>🎬 Choose Your Path — "The First 60 Seconds"</h3>
+      <div class="hud"><span>❤️ Stability: <b id="scStab">●●○○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 s</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+      <div class="scene-text" id="scText">The nurse looks at you, syringe of verapamil in one hand, defibrillator paddles in the other. BP 78/46 and falling. Monitor: regular wide-complex tachycardia at 188. The patient is awake but gray. What do you do FIRST?</div>
+      <div class="choices" id="scChoices"></div>
+      <div class="feedback" id="scFeedback"></div>
+      <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+    </div>
+
+    <div class="callout info"><b class="ct">🧮 If he were STABLE instead</b>
+    A <em>stable</em> wide-complex tachycardia buys you time to think: get a 12-lead, apply VT criteria (Brugada, Vereckei — see S10), and treat with <strong>IV antiarrhythmic</strong> (amiodarone, or procainamide which performed better in PROCAMIO). But <strong>adenosine</strong> is only safe if you are confident it is SVT with aberrancy — and never in irregular wide tachycardia (think pre-excited AF, where AV-nodal blockers can precipitate VF). When unsure: treat as VT.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S4 — RESIDENT REVIEW -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s4">
+  <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+  <div class="section-content">
+    <p><em>The cardiology resident arrives at 23:16. Her reasoning, out loud:</em></p>
+
+    <h3>🧠 Pattern recognition first, then physiology</h3>
+    <p>"Wide. Regular. Fast. Old anterior MI, EF 28%. That is <strong>VT</strong> — I don't need a single Brugada criterion to bet my license on it. The base-rate alone settles it: in a patient with structural heart disease, a regular wide-complex tachycardia is VT in ~95% of cases. The dangerous instinct is to <em>talk yourself out of VT</em> because the patient is still conscious. People can be awake in VT for minutes — right up until they aren't."</p>
+
+    <h3>🎯 Immediate priorities (her actual order of operations)</h3>
+    <ol>
+      <li>🚫 <strong>Kill the SVT pathway:</strong> no verapamil, no diltiazem, no beta-blocker bolus. Say it out loud and remove the syringe from the bedside.</li>
+      <li>⚡ <strong>He is unstable → synchronized cardioversion.</strong> Call for senior help and the arrest trolley in parallel, but do not wait for them to shock.</li>
+      <li>💤 <strong>Procedural sedation if he can tolerate the seconds:</strong> small dose of ketamine or midazolam + fentanyl. A conscious shock is agony — but a falling GCS means do not delay the shock for sedation.</li>
+      <li>🔌 <strong>Synchronized shock, biphasic, full energy</strong> for a deteriorating adult (e.g. 150–200 J biphasic). Confirm the machine is in SYNC and marking each R wave.</li>
+      <li>🧪 <strong>Treat the reversible trigger in parallel:</strong> IV magnesium and potassium are drawn up <em>now</em>; a twitchy, hypokalemic ventricle will just re-enter VT after the shock if you don't correct it.</li>
+      <li>🩻 <strong>Hunt for ischemia:</strong> 12-lead after conversion, troponin, and ask whether this VT is the <em>symptom</em> of an acute coronary occlusion that needs the cath lab.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Shock the unstable patient first; correct the potassium second; find the cause third — but draw up the magnesium before you charge, because the ventricle you cardiovert is the one you must keep."</div>
+
+    <h3>🤔 "But what if it's SVT with aberrancy and I'm wrong to shock?"</h3>
+    <p>"Then I have synchronized-cardioverted an SVT — which is <em>also</em> the correct treatment for an unstable SVT. The decision to cardiovert an unstable wide tachycardia is <strong>right whether it's VT or SVT</strong>. That's the beauty of the algorithm: instability collapses the differential. The only way to be wrong here is to treat VT as SVT with an AV-nodal blocker."</p>
+
+    <div class="callout purple"><b class="ct">🧪 Resident's self-test (answer before reading on)</b>
+    Someone suggests adenosine "to see if it breaks — and if it doesn't, at least it's diagnostic." Good idea in this patient?
+    <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+    <div class="reveal-hidden" id="rev1"><p><strong>No.</strong> He is <em>unstable</em> — the answer is electricity, not a diagnostic drug. Adenosine has a role only in a <em>stable, regular, monomorphic</em> wide tachycardia where SVT with aberrancy is genuinely possible, as a diagnostic-therapeutic trial under continuous ECG. It will not terminate true VT, wastes precious seconds, and in an unstable patient that delay can be fatal. It is also dangerous in irregular wide tachycardia (pre-excited AF).</p></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S5 — CONSULTANT ROUND -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s5">
+  <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round</h2></div>
+  <div class="section-content">
+    <p><em>The on-call consultant electrophysiologist, by phone at 23:20, then at the bedside:</em></p>
+
+    <h3>🗂️ Name the rhythm precisely — it changes the drug</h3>
+    <div class="vs">
+      <div class="side a"><h4>🔴 Monomorphic VT (this patient)</h4>
+        <ul><li>Uniform QRS shape beat-to-beat → one stable re-entry circuit, usually around <strong>scar</strong></li><li>Cause: prior MI, cardiomyopathy, ARVC, sarcoid</li><li>Unstable → <strong>synchronized cardioversion</strong>; stable → amiodarone/procainamide</li><li>Long-term: ICD ± catheter ablation</li></ul></div>
+      <div class="side b"><h4>🔵 Polymorphic VT</h4>
+        <ul><li>Continuously changing QRS morphology/axis</li><li><strong>With long QT = Torsades de Pointes</strong> → IV <strong>magnesium</strong>, correct K⁺, stop QT drugs, overdrive pace</li><li><strong>With normal QT</strong> → think acute ischemia → revascularize</li><li>Often unstable/degenerates to VF → <strong>defibrillation</strong></li></ul></div>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Monomorphic VT is a circuit you shock and ablate. Polymorphic VT is a sick myocardium you must fix — magnesium and the long QT, or the cath lab and the ischemia. Same letters, opposite causes."</div>
+
+    <h3>🌀 What is "VT storm" — and is he in it?</h3>
+    <p>VT storm (electrical storm) = <strong>≥ 3 sustained episodes of VT/VF in 24 hours</strong>, each requiring intervention (cardioversion, defibrillation, or anti-tachycardia pacing). It is a sympathetically-driven emergency with its own playbook: <strong>beta-blockade is therapeutic, not contraindicated</strong> here — and non-selective blockade (propranolol) or even stellate ganglion block / deep sedation can quiet the storm. After his first shock tonight, watch closely: if he re-enters VT twice more, the management pivots from "treat the episode" to "calm the storm."</p>
+
+    <h3>🧭 Consultant's three commandments for the next hour</h3>
+    <ol>
+      <li>⚡ "Unstable wide-complex tachycardia = a <strong>synchronized</strong> shock. The only tachycardias I defibrillate (unsynchronized) are <strong>pulseless VT and VF</strong> — and polymorphic VT too disorganized for the machine to sync. Get the mode right or you can shock him into VF."</li>
+      <li>🧪 "Replace magnesium to &gt; 1.0 mmol/L and potassium to 4.5–5.0. An electrically irritable, hypokalemic ventricle is a re-entry machine. The shock buys you a rhythm; the electrolytes keep it."</li>
+      <li>🫀 "Then ask <strong>why now</strong>: ischemia, electrolytes, drug non-adherence, decompensated heart failure, QT-prolonging drugs. VT is a <em>symptom</em>. Treat the symptom tonight; treat the substrate (ICD ± ablation, GDMT) this admission."</li>
+    </ol>
+
+    <div class="callout danger"><b class="ct">☠️ The consultant's war memory (more in S13 M&amp;M)</b>"The last wide tachycardia I saw mistreated was a 70-year-old with an old infarct, called 'SVT' by a tired night team. They gave IV verapamil. His pressure vanished, the VT degenerated to VF, and we ran a 40-minute code we lost. The 12-lead from before the arrest, reviewed at the M&amp;M, had textbook AV dissociation and a capture beat. The ECG told the truth; nobody read it as VT because the patient 'looked too well.' He doesn't look too well anymore."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S6 — TEACHING POINTS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s6">
+  <div class="sec-header"><span class="s-badge">S6</span><h2>📖 Teaching Points</h2></div>
+  <div class="section-content">
+    <h3>🔬 The mechanism — WHY scar makes VT (the WHY behind the WHY)</h3>
+    <ol>
+      <li>🧱 <strong>The substrate:</strong> after an MI, dead myocardium is replaced by patchy fibrosis. Surviving myocyte bundles thread through the scar like alleys through rubble — they conduct, but <strong>slowly and unevenly</strong>.</li>
+      <li>🚦 <strong>Unidirectional block:</strong> a premature beat hits one channel where tissue is still refractory in one direction but not the other. The wavefront can only go one way.</li>
+      <li>🔁 <strong>Re-entry:</strong> by the time the wavefront crawls through the slow channel and comes out the far side, the tissue it first blocked at has recovered. It re-enters, loops, and a circuit is established — a wavefront perpetually chasing recovered tissue. Each lap = one wide QRS. 188 laps a minute = VT.</li>
+      <li>⚡ <strong>Why low K⁺/Mg²⁺ ignites it:</strong> hypokalemia <em>hyperpolarizes</em> at rest but paradoxically prolongs repolarization and increases automaticity and excitability; hypomagnesemia destabilizes membranes and worsens the effect. Shorter, more heterogeneous refractoriness = the perfect window for that triggering premature beat to find unidirectional block. Fix the electrolytes and you widen the refractory window — re-entry can no longer fit.</li>
+      <li>💥 <strong>Why it kills:</strong> 188/min gives the ventricle almost no diastole. Stroke volume collapses, coronary perfusion (which happens in diastole) falls, ischemia worsens the substrate, and the rhythm degenerates to VF — disorganized, pulseless, fatal in minutes.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"VT is a wavefront trapped in a maze of scar. Electricity resets every cell at once and collapses the maze; the electrolytes you give afterward make sure a new maze can't form."</div>
+
+    <h3>⚖️ Contrast pair #1 — VT vs SVT with aberrancy (the lethal mimic)</h3>
+    <div class="vs">
+      <div class="side a"><h4>⚡ VT IS… (assume this)</h4><ul><li>Structural heart disease / prior MI present</li><li><strong>AV dissociation</strong> (cannon A waves, capture &amp; fusion beats)</li><li>Very wide QRS (&gt; 140 ms RBBB-like, &gt; 160 ms LBBB-like)</li><li><strong>Concordance</strong> (all precordial QRS same direction)</li><li>Extreme/"northwest" axis</li><li>QRS unlike any prior bundle-branch pattern</li></ul></div>
+      <div class="side b"><h4>🫀 SVT-aberrancy is NOT that…</h4><ul><li>Younger, structurally normal heart</li><li>QRS matches a typical RBBB or LBBB template</li><li>Often a prior ECG shows the <em>same</em> bundle branch block</li><li>May terminate with vagal maneuvers / adenosine</li><li>No AV dissociation, no capture/fusion beats</li></ul></div>
+    </div>
+    <p>😈 <strong>The trap:</strong> when uncertain, the brain reaches for the "less scary" diagnosis (SVT) — and reaches for AV-nodal blockers that are lethal in VT. The cost of treating VT as SVT (verapamil → VF) vastly exceeds the cost of treating SVT as VT (cardioversion, which works for both). <strong>The asymmetry of harm is why the rule is "treat as VT."</strong></p>
+
+    <h3>⚖️ Contrast pair #2 — Monomorphic VT vs Torsades (polymorphic, long QT)</h3>
+    <div class="vs">
+      <div class="side a"><h4>📏 Monomorphic VT (tonight)</h4><ul><li>One fixed QRS shape; usually scar re-entry</li><li>Trigger: ischemia/scar</li><li>Therapy: synchronized cardioversion, amiodarone/procainamide, ICD ± ablation</li><li>Magnesium helps but isn't the headline drug</li></ul></div>
+      <div class="side b"><h4>🌀 Torsades de Pointes</h4><ul><li>QRS twists around the baseline; needs a <strong>long QT</strong></li><li>Trigger: ↓K⁺, ↓Mg²⁺, QT drugs, bradycardia, congenital LQTS</li><li>Therapy: <strong>IV magnesium</strong>, correct K⁺, stop offending drugs, <strong>overdrive pacing / isoprenaline</strong> if pause-dependent</li><li>Beta-blockers help congenital LQTS; <strong>avoid amiodarone</strong> (further prolongs QT)</li></ul></div>
+    </div>
+    <p>💡 <em>Why it matters:</em> give amiodarone reflexively to a twisting, long-QT polymorphic VT and you can <strong>lengthen the QT and worsen the Torsades</strong>. Read the QT before you reach for the brown bottle.</p>
+
+    <!-- 🎮 INTERACTIVE SIM: electrolyte / membrane stability -->
+    <div class="sim" id="kSim">
+      <h3 style="margin-top:0">🎮 Simulation — The Potassium Dial: how serum K⁺ tunes arrhythmia risk</h3>
+      <p style="font-size:13.5px">Drag the dial. Watch what low and high potassium do to the myocyte and to the rhythm. This is the single most important "invisible vital sign" in this case.</p>
+      <label for="kRange">🧪 Serum potassium: <b id="kVal">3.1</b> mmol/L</label>
+      <input type="range" id="kRange" min="20" max="75" value="31">
+      <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+      <div class="readout bad" id="kReadout">Set the dial to explore.</div>
+      <p style="font-size:12.5px; margin-top:10px; color:var(--ink2)">🎯 Target band for an irritable post-VT ventricle: <strong>K⁺ 4.5–5.0 mmol/L</strong>. Too low → re-entry &amp; ectopy. Too high → conduction block &amp; asystole. The therapeutic window is narrow on purpose.</p>
+    </div>
+
+    <!-- 📚 EBM MODULE -->
+    <div class="ebm">
+      <h3>📚 Evidence-Based Medicine Corner</h3>
+      <table class="tbl">
+        <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+        <tr><td><span class="lvl">RCT</span> PROCAMIO (2017)</td><td>IV procainamide vs amiodarone for stable monomorphic VT: procainamide terminated more VT with fewer major cardiac adverse events.</td><td>For the <em>stable</em> patient, procainamide is a strong (often preferred) first choice; amiodarone remains widely used and useful, especially in poor LV function.</td></tr>
+        <tr><td><span class="lvl">RCT</span> ALIVE (2002)</td><td>Amiodarone improved survival to hospital admission vs lidocaine in shock-refractory VF/pulseless VT.</td><td>In the <em>arrest</em> setting, amiodarone is the default antiarrhythmic; lidocaine is the alternative.</td></tr>
+        <tr><td><span class="lvl">RCT</span> MADIT-II / SCD-HeFT</td><td>Primary-prevention ICD reduces mortality in EF ≤ 35% post-MI / HFrEF.</td><td>His declined ICD is exactly the intervention proven to save lives in his phenotype — revisit it.</td></tr>
+        <tr><td><span class="lvl">RCT</span> VANISH / SMS / PARTITA</td><td>Catheter ablation reduces recurrent VT and ICD shocks; early ablation after first ICD shock improves outcomes.</td><td>Ablation is not a last resort — it is increasingly an early, mortality- and shock-reducing therapy.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2020 ACLS / 2022 ESC VA Guideline</td><td>Unstable wide-complex tachycardia → synchronized cardioversion; pulseless VT/VF → defibrillation; treat reversible causes.</td><td>Exactly the algorithm driving S3, S7 and S11.</td></tr>
+      </table>
+    </div>
+
+    <!-- 🔬 ADVANCED TOPICS -->
+    <div class="callout purple">
+      <h3 style="margin-top:0">🔬 Fellowship Corner — Advanced Topics</h3>
+      <ul>
+        <li>🗺️ <strong>VT substrate mapping &amp; ablation:</strong> electroanatomic mapping identifies the scar border zone and "channels"; targets include the diastolic isthmus, late potentials, and local abnormal ventricular activities (LAVA). Substrate-based homogenization vs activation/entrainment mapping of mappable VT.</li>
+        <li>🧬 <strong>Idiopathic VT in normal hearts:</strong> RVOT VT (LBBB + inferior axis, adenosine-sensitive, cAMP-mediated) and fascicular VT (RBBB + left-axis, <strong>verapamil-sensitive</strong>) — the rare exceptions where verapamil is correct, but only after structural disease is excluded.</li>
+        <li>🫀 <strong>Channelopathies &amp; non-ischemic substrates:</strong> ARVC (epsilon waves, fibrofatty RV), Brugada (type 1 coved ST in V1–V2), CPVT (exercise-induced bidirectional VT), cardiac sarcoidosis (patchy scar, AV block — image with PET/MRI), HCM.</li>
+        <li>💉 <strong>Refractory VT storm escalation ladder:</strong> deep sedation/intubation → IV beta-blockade (esmolol/propranolol) → amiodarone ± lidocaine → <strong>stellate ganglion block</strong> → mechanical support (IABP/Impella/VA-ECMO) → emergent ablation → in extremis, cardiac sympathetic denervation.</li>
+        <li>🔌 <strong>The ICD as both therapy and trigger:</strong> repeated shocks are themselves pro-arrhythmic and traumatic; anti-tachycardia pacing (ATP) painlessly terminates much monomorphic VT — device programming (longer detection, ATP-before-shock, e.g. MADIT-RIT) reduces inappropriate and total shocks.</li>
+        <li>🧪 <strong>Bidirectional VT</strong> (alternating QRS axis): think <strong>digoxin toxicity</strong> and CPVT — a high-yield exam pattern.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S7 — ORDERS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s7">
+  <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+  <div class="section-content">
+    <h3>🖊️ The order set, written as you'd actually write it (23:18)</h3>
+    <ul>
+      <li>🚨 <strong>NO verapamil, NO diltiazem, NO IV beta-blocker bolus</strong> while hypotensive — flag on chart and whiteboard.</li>
+      <li>⚡ <strong>Synchronized DC cardioversion</strong> — biphasic, 150–200 J, escalate if unsuccessful. Confirm SYNC mode (machine marks each R wave).</li>
+      <li>💤 <strong>Procedural sedation</strong> if consciousness/time allows: e.g. ketamine 0.5 mg/kg IV or midazolam 1–2 mg + fentanyl 25–50 mcg. Do NOT delay the shock for sedation in a crashing patient.</li>
+      <li>🧪 <strong>Magnesium sulfate 2 g IV</strong> over 10 min, then recheck; <strong>potassium</strong> replacement to target 4.5–5.0 mmol/L (IV via monitored line, max peripheral rate respected).</li>
+      <li>💉 <strong>Amiodarone 300 mg IV</strong> over 20–60 min then 900 mg/24 h — to stabilize after conversion / for recurrence (or for the stable patient as first-line).</li>
+      <li>🫀 12-lead ECG immediately after conversion; serial troponin; bloods: U&amp;E, Mg²⁺, Ca²⁺, CBC, TSH, digoxin level if relevant.</li>
+      <li>📞 Refer cardiology/EP; consider activating cath lab if post-conversion ECG suggests acute ischemia as the driver.</li>
+      <li>🫁 High-flow O₂ to SpO₂ ≥ 94%, continuous monitoring, second large-bore IV, NPO.</li>
+      <li>🔌 Keep <strong>defibrillator and pacing pads</strong> attached — anticipate recurrence (VT storm) and post-shock bradycardia.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In unstable VT there are only two priorities: deliver a synchronized shock, and refill the potassium and magnesium. Every other order exists to make those two safer and to stop the rhythm coming back."</div>
+
+    <!-- 🩺 PROCEDURE GUIDE 1 -->
+    <div class="checklist" id="ckCV">
+      <h3 style="margin-top:0">🩺 Procedure Guide — Synchronized Cardioversion — tick as you go</h3>
+      <label class="ck"><input type="checkbox"><span>🧑‍⚕️ Confirm UNSTABLE wide-complex tachycardia with a pulse (not pulseless VT/VF — that needs unsynchronized defibrillation)</span></label>
+      <label class="ck"><input type="checkbox"><span>🔋 Apply pads, attach ECG leads to the defibrillator, and press <strong>SYNC</strong> — verify a marker sits on each R wave</span></label>
+      <label class="ck"><input type="checkbox"><span>💤 Sedate/analgese if conscious and time permits (ketamine or midazolam + fentanyl); pre-oxygenate; airway kit ready</span></label>
+      <label class="ck"><input type="checkbox"><span>⚡ Select energy (≈150–200 J biphasic for VT), charge, announce "STAND CLEAR," ensure no one (and no oxygen flow) touches the patient</span></label>
+      <label class="ck"><input type="checkbox"><span>🖲️ Deliver shock — HOLD the discharge until the machine fires on the next R wave (there is a deliberate delay; do not release early)</span></label>
+      <label class="ck"><input type="checkbox"><span>📈 Reassess rhythm and pulse; if still VT, re-confirm SYNC (it often defaults OFF after a shock) and escalate energy</span></label>
+      <label class="ck"><input type="checkbox"><span>🧪 Post-conversion: 12-lead, correct K⁺/Mg²⁺, start/continue antiarrhythmic, find the trigger</span></label>
+      <div class="ck-progress" data-progress>0 / 7 complete</div>
+    </div>
+
+    <!-- 🩺 PROCEDURE GUIDE 2 -->
+    <div class="checklist" id="ckDefib">
+      <h3 style="margin-top:0">🩺 Procedure Guide — If he loses his pulse: ACLS Defibrillation (UNSYNCHRONIZED)</h3>
+      <p style="font-size:13px">⚠️ Pulseless VT / VF or shock-induced VF → switch immediately to <strong>UNSYNCHRONIZED</strong> defibrillation. SYNC cannot find an R wave in VF and will never fire — so turn it OFF.</p>
+      <label class="ck"><input type="checkbox"><span>🚫 Confirm no pulse → call arrest, start high-quality CPR (100–120/min, depth 5–6 cm, full recoil)</span></label>
+      <label class="ck"><input type="checkbox"><span>🔌 Defibrillator to <strong>UNSYNCHRONIZED</strong>, charge to max (200 J biphasic), clear, shock at minimal interruption to compressions</span></label>
+      <label class="ck"><input type="checkbox"><span>💉 Adrenaline 1 mg IV every 3–5 min; amiodarone 300 mg after the 3rd shock (then 150 mg)</span></label>
+      <label class="ck"><input type="checkbox"><span>🧠 Treat reversible causes — the 4 H's &amp; 4 T's; here especially <strong>hypokalemia/hypomagnesemia</strong> and ischemia (Thrombosis–coronary)</span></label>
+      <label class="ck"><input type="checkbox"><span>🔁 Rhythm/pulse check every 2 min; minimize hands-off time; rotate compressors</span></label>
+      <label class="ck"><input type="checkbox"><span>🫀 ROSC → post-arrest care, urgent coronary angiography if ischemic cause suspected, ICU</span></label>
+      <div class="ck-progress" data-progress>0 / 6 complete</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S8 — NURSING CARE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s8">
+  <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+  <div class="section-content">
+    <h3>🛏️ CCU nursing priorities — minute by minute</h3>
+    <ul>
+      <li>📟 <strong>Continuous telemetry with the defibrillator at the bedside, pads attached.</strong> Keep the machine charged-ready and in the correct mode for the current rhythm.</li>
+      <li>🔌 <strong>Know your modes cold:</strong> SYNC for cardioversion of a patient WITH a pulse; UNSYNC (defib) for pulseless VT/VF. Re-check SYNC after every shock — it commonly resets to OFF.</li>
+      <li>🩸 <strong>BP every 2–5 min</strong> (cycle the NIBP, or read the arterial line once placed). A falling pressure means escalate now, not at the next set of obs.</li>
+      <li>🧪 <strong>Run the magnesium and potassium as prescribed</strong> on a monitored line; double-check concentrations and rates — potassium errors are themselves arrhythmogenic and lethal.</li>
+      <li>💤 Prepare sedation drugs and airway adjuncts before the shock; assign a team member to the airway.</li>
+      <li>🧠 <strong>Neuro/consciousness checks</strong> — a patient who stops talking is losing output; a patient who slumps may have lost the pulse → check it, don't assume.</li>
+      <li>📋 <strong>Document the rhythm strip before and after each intervention</strong>, the energy delivered, and the time — the post-event 12-lead and pre-conversion strip are gold for the EP team.</li>
+      <li>🔇 <strong>Calm the room:</strong> fear and pain drive catecholamines that feed VT storm. A composed bedside is antiarrhythmic.</li>
+      <li>👨‍👩‍👦 Keep the family updated and supported (see S16) — assign a liaison if staffing allows; this is terrifying to watch.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who re-checks SYNC after every shock and keeps potassium in the safe band is doing half the antiarrhythmic work in the room."</div>
+    <div class="callout warn"><b class="ct">📢 Escalate IMMEDIATELY for</b>Loss of pulse (→ switch to UNSYNC defib + CPR) · recurrent VT (→ VT storm pathway) · BP falling despite conversion · new chest pain / ST changes · post-shock bradycardia or pauses (have pacing ready) · falling consciousness · any prescription for an AV-nodal blocker in this patient.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S9 — INVESTIGATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s9">
+  <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+  <div class="section-content">
+    <h3>🧾 Results board (23:30, drawn during resuscitation)</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>Result</th><th>Reference</th><th>Interpretation</th></tr>
+      <tr><td>Potassium</td><td class="lo">3.1 mmol/L ↓</td><td>3.5–5.0</td><td>The fuse. Hypokalemia shortens and heterogenizes refractoriness → re-entry. Replace aggressively to 4.5–5.0; he will keep re-entering VT until you do.</td></tr>
+      <tr><td>Magnesium</td><td class="lo">0.52 mmol/L ↓</td><td>0.7–1.0</td><td>Low Mg²⁺ destabilizes membranes and worsens hypokalemia (you cannot correct K⁺ properly without Mg²⁺). Give 2 g IV.</td></tr>
+      <tr><td>Troponin I</td><td class="hi">0.21 ng/mL ↑</td><td>&lt; 0.04</td><td>Mildly raised — demand ischemia from the tachycardia itself, OR an acute coronary trigger. Serial values + post-conversion ECG decide which.</td></tr>
+      <tr><td>Creatinine</td><td class="hi">1.6 mg/dL ↑</td><td>0.7–1.2</td><td>Cardiorenal / hypoperfusion. Affects drug dosing and potassium handling.</td></tr>
+      <tr><td>Lactate</td><td class="hi">3.4 mmol/L ↑</td><td>&lt; 2.0</td><td>Tissue hypoperfusion from low-output VT — another marker that he is unstable, not "stable enough to wait."</td></tr>
+      <tr><td>Digoxin</td><td class="ok-v">Not on digoxin</td><td>—</td><td>Excludes digoxin-toxic VT/bidirectional VT here.</td></tr>
+      <tr><td>TSH</td><td class="ok-v">Pending</td><td>—</td><td>Relevant given prior amiodarone (thyroid effects) and arrhythmia workup.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"You cannot fix the potassium without fixing the magnesium first — low Mg²⁺ makes the kidney waste the K⁺ you're pouring in. Give magnesium, then potassium, then expect both to behave."</div>
+
+    <div class="callout info"><b class="ct">🧠 Why a mildly positive troponin does NOT relabel this as 'just an MI to lyse'</b>Almost any sustained VT raises troponin through supply–demand mismatch. The question is whether ischemia is the <em>cause</em> or the <em>consequence</em>. Convert the rhythm, get a clean 12-lead, trend the troponin: a culprit-pattern STEMI after conversion → cath lab; a settling troponin with no ST elevation → the VT was primary (scar) and ischemia was secondary.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S10 — ECG / IMAGING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s10">
+  <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging</h2></div>
+  <div class="section-content">
+    <h3>🫀 The presenting rhythm — read it like a detective</h3>
+    <div class="ecg-fig">
+      <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Monomorphic VT with AV dissociation, a capture beat and a fusion beat">
+        <rect width="820" height="150" fill="#0b1220"/>
+        <g stroke="#1e3a5f" stroke-width="1">
+          <line x1="0" y1="30" x2="820" y2="30"/><line x1="0" y1="60" x2="820" y2="60"/>
+          <line x1="0" y1="90" x2="820" y2="90"/><line x1="0" y1="120" x2="820" y2="120"/>
+        </g>
+        <polyline fill="none" stroke="#86efac" stroke-width="2.4" points="0,75 30,75 45,40 60,110 75,75 120,75 135,40 150,110 165,75 210,75 225,40 240,110 255,75 300,75 312,55 322,30 332,118 342,70 352,75 400,75 415,40 430,110 445,75 490,75 505,40 520,110 535,75 580,75 588,58 598,42 612,100 624,66 634,75 680,75 695,40 710,110 725,75 770,75 785,40 800,110 815,75"/>
+        <text x="305" y="22" fill="#fca5a5" font-size="12" font-weight="700">↑ capture beat</text>
+        <text x="585" y="22" fill="#fcd34d" font-size="12" font-weight="700">↑ fusion beat</text>
+      </svg>
+      <div class="ecg-cap">Wide, regular, monomorphic tachycardia. A narrow <span style="color:#fca5a5">capture beat</span> and an intermediate <span style="color:#fcd34d">fusion beat</span> interrupt the run — both are produced by an independently firing atrium sneaking through the AV node, i.e. <strong>AV dissociation</strong>. These are near-diagnostic of VT.</div>
+    </div>
+
+    <h3>🔎 The VT-vs-SVT toolkit (memorize the high-yield ones)</h3>
+    <table class="tbl">
+      <tr><th>Feature</th><th>Why it means VT</th></tr>
+      <tr><td>🔀 <strong>AV dissociation</strong></td><td>Atria and ventricles firing independently — the ventricle has its own pacemaker (the VT circuit). Look for P waves marching through at a different rate.</td></tr>
+      <tr><td>🎯 <strong>Capture beats</strong></td><td>An occasional supraventricular impulse "captures" the ventricle for one normal-width beat — proof the AV node is dissociated and the wide beats are ventricular.</td></tr>
+      <tr><td>🔗 <strong>Fusion beats</strong></td><td>A supraventricular and a ventricular impulse collide → a hybrid QRS. Same logic as capture: dissociation = VT.</td></tr>
+      <tr><td>📏 <strong>Very broad QRS</strong></td><td>&gt; 140 ms (RBBB-like) or &gt; 160 ms (LBBB-like) favors VT — the impulse spreads cell-to-cell, not down the fast His-Purkinje highway.</td></tr>
+      <tr><td>🧭 <strong>Extreme axis</strong></td><td>"Northwest"/superior axis (negative I, II, III) strongly favors VT.</td></tr>
+      <tr><td>↕️ <strong>Precordial concordance</strong></td><td>All V1–V6 QRS pointing the same way (all up or all down) favors VT.</td></tr>
+      <tr><td>⏱️ <strong>Brugada / Vereckei criteria</strong></td><td>Stepwise algorithms (e.g. no RS in precordials, R-to-S &gt; 100 ms, initial R in aVR — Vereckei) formalize the above. Useful, but never delay treating an unstable patient to run them.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Find a capture or fusion beat and the argument is over — it's VT. But you do not need them: in a scarred heart, wide-and-regular IS VT until proven otherwise."</div>
+
+    <h3>🫀 Post-conversion 12-lead &amp; echo</h3>
+    <ul>
+      <li>📈 <strong>Post-shock 12-lead:</strong> sinus rhythm ~70/min, old <strong>anterior Q waves V1–V4</strong> with poor R-wave progression (the scar), QTc 470 ms (borderline — relevant to drug choice), no new ST elevation → favors VT as primary, not an acute occlusion.</li>
+      <li>🩻 <strong>Echo:</strong> EF 25%, large akinetic anteroapical scar with thinning, no LV thrombus seen tonight (re-image — apical aneurysms harbor clot), moderate functional MR.</li>
+      <li>🧲 <strong>Cardiac MRI (later):</strong> delayed-enhancement mapping of the scar and border zone — informs ICD/ablation and excludes infiltrative causes (sarcoid).</li>
+    </ul>
+
+    <div class="callout warn"><b class="ct">⚠️ The ECG's favorite lie in wide-complex tachycardia</b>"It looks like a bundle branch block, so it's SVT with aberrancy." A scar-related VT can mimic any bundle pattern. The only reassuring "aberrancy" is a QRS that <strong>matches the patient's own documented baseline bundle branch block</strong>. Absent that prior ECG, assume VT.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S11 — MEDICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s11">
+  <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+  <div class="section-content">
+    <h3>💉 Acute drugs — what, why, and the traps</h3>
+    <table class="tbl">
+      <tr><th>Drug</th><th>Role tonight</th><th>Mechanism / caution</th></tr>
+      <tr><td><strong>Magnesium sulfate 2 g IV</strong></td><td>Membrane stabilizer; essential in low-Mg²⁺ and the drug of choice in Torsades</td><td>Stabilizes myocyte membranes and enables potassium repletion. Safe, fast, give early. Watch for hypotension if pushed quickly.</td></tr>
+      <tr><td><strong>Potassium (IV, monitored)</strong></td><td>Refill to 4.5–5.0 to close the re-entry window</td><td>Restores normal refractoriness. Respect maximum peripheral infusion rates; central line for faster repletion. Recheck frequently.</td></tr>
+      <tr><td><strong>Amiodarone 300 mg IV</strong></td><td>Antiarrhythmic to suppress recurrence (and first-line drug for the <em>stable</em> patient)</td><td>Class III (multichannel). Negative inotrope/vasodilator if pushed fast → give over 20–60 min. <strong>Prolongs QT</strong> — avoid if the rhythm is Torsades.</td></tr>
+      <tr><td><strong>Procainamide</strong></td><td>Preferred IV agent for stable monomorphic VT (PROCAMIO)</td><td>Class Ia. Stop for hypotension, QRS widening &gt; 50%, or QT prolongation. Avoid in severe LV dysfunction/heart failure.</td></tr>
+      <tr><td><strong>Lidocaine</strong></td><td>Alternative, especially ischemia-driven VT and in the arrest</td><td>Class Ib, works best on ischemic/abnormal tissue. Less effective generally; watch for neuro toxicity.</td></tr>
+      <tr><td><strong>Beta-blocker (esmolol/propranolol)</strong></td><td>Cornerstone of <strong>VT storm</strong>; sympatholysis calms recurrent VT</td><td>Therapeutic in storm — but avoid an IV bolus into acute hypotension/decompensated failure; titrate.</td></tr>
+      <tr><td><strong>Sedation (ketamine / midazolam + fentanyl)</strong></td><td>For conscious synchronized cardioversion</td><td>Ketamine preserves BP better in shock. Don't delay a shock for sedation if peri-arrest.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Verapamil and diltiazem are for the supraventricular world. Give them to a wide-complex tachycardia in a sick heart and you trade a perfusing rhythm for VF. In doubt, treat as VT — and VT never wants a calcium-channel blocker."</div>
+
+    <div class="callout danger"><b class="ct">🚫 The 'never' list in undifferentiated wide-complex tachycardia</b>❌ IV verapamil / diltiazem · ❌ reflexive AV-nodal blockers · ❌ adenosine in <em>irregular</em> wide tachycardia (pre-excited AF → can precipitate VF) · ❌ amiodarone if the rhythm is Torsades (long QT). When the diagnosis is uncertain and the patient is unstable, the safest "drug" is <strong>synchronized electricity</strong>.</div>
+
+    <h3>🏠 Substrate-modifying therapy (this admission, not just tonight)</h3>
+    <ul>
+      <li>💙 <strong>Optimize HFrEF GDMT:</strong> the four pillars (ARNI/ACEi, beta-blocker, MRA, SGLT2i) reduce arrhythmic death by remodeling the substrate.</li>
+      <li>🔌 <strong>ICD</strong> for secondary prevention (he just had sustained VT) — now a Class I indication, far stronger than the primary-prevention offer he declined.</li>
+      <li>🗺️ <strong>Catheter ablation</strong> of the VT circuit, especially if recurrent or storm.</li>
+      <li>💊 <strong>Restart/continue amiodarone</strong> (or sotalol) as adjunct to reduce ICD shocks while definitive therapy is arranged.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S12 — MONITORING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s12">
+  <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+  <div class="section-content">
+    <h3>📡 What to watch and why</h3>
+    <ul>
+      <li>📈 <strong>Continuous telemetry</strong> with the defibrillator at the bedside until ≥ 24–48 h arrhythmia-free; print strips of any ectopy or runs.</li>
+      <li>🩸 <strong>Invasive arterial line</strong> for beat-to-beat BP through repeated cardioversions and antiarrhythmic infusions.</li>
+      <li>🧪 <strong>Serial K⁺ and Mg²⁺</strong> (e.g. q2–4h initially) — the most modifiable arrhythmia drivers; keep K⁺ 4.5–5.0, Mg²⁺ &gt; 1.0.</li>
+      <li>📐 <strong>QTc on every 12-lead</strong> — amiodarone, sotalol, low K⁺/Mg²⁺ all prolong it; a lengthening QT changes the rhythm risk from monomorphic VT to Torsades.</li>
+      <li>🫀 <strong>Serial troponin</strong> — rising = ongoing ischemia (consider angiography); plateauing/falling = demand ischemia from the tachycardia.</li>
+      <li>💤 <strong>Sedation/airway readiness</strong> kept at bedside in case of recurrence or storm.</li>
+      <li>🔋 If/when an <strong>ICD</strong> is placed: monitor for appropriate vs inappropriate detections and shocks; ATP-before-shock programming.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After you convert VT, the monitor's job changes from 'is he in VT?' to 'is he about to be again?' — and the two numbers that answer it are potassium and QTc."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S13 — COMPLICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s13">
+  <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+  <div class="section-content">
+    <h3>💀 What can go wrong — and the mechanism</h3>
+    <ul>
+      <li>⚡ <strong>Degeneration to VF / cardiac arrest</strong> — the great fear; rate and ischemia disorganize the circuit. Treatment pivots to UNSYNC defibrillation + CPR.</li>
+      <li>🌀 <strong>VT storm</strong> (≥ 3 episodes/24 h) — sympathetically driven; needs beta-blockade, sedation, ablation, sometimes mechanical support.</li>
+      <li>🧠 <strong>Cardiogenic shock / multi-organ hypoperfusion</strong> — prolonged low output from the tachycardia and a failing ventricle.</li>
+      <li>🩸 <strong>Post-cardioversion complications</strong> — skin burns, transient bradyarrhythmia/asystole (have pacing ready), thromboembolism (LV apical thrombus in an aneurysmal scar).</li>
+      <li>💊 <strong>Pro-arrhythmia from therapy</strong> — antiarrhythmics prolong QT (Torsades); the very ICD shocks meant to save him are pro-arrhythmic and traumatic.</li>
+      <li>🫀 <strong>Recurrence</strong> — if the trigger (low K⁺/Mg²⁺, ischemia) and substrate (scar, low EF) aren't addressed, VT returns.</li>
+    </ul>
+
+    <!-- 🎭 M&M CONFERENCE MODULE -->
+    <div class="mm">
+      <h3>🎭 Morbidity &amp; Mortality Conference — "The Patient Who Looked Too Well"</h3>
+      <div class="mm-case">
+        <strong>The case:</strong> A 70-year-old man, anterior MI two years prior, arrived to a busy ED at 02:00 with palpitations and a regular wide-complex tachycardia at 170, BP 96/60, fully alert and chatting. The tired night team called it "SVT with aberrancy — he's far too stable for VT." They gave <strong>IV verapamil 5 mg</strong>. Within ninety seconds his pressure collapsed, the VT accelerated and degenerated into <strong>VF</strong>. A 38-minute resuscitation followed. He did not survive. The pre-treatment 12-lead, projected at the M&amp;M, showed unmistakable <strong>AV dissociation and a capture beat</strong>.
+      </div>
+      <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+      <div class="swiss">
+        <div class="hole"><b>🧠 ANCHORING</b>"He looks too well to be VT" — being conscious does not rule out VT.</div>
+        <div class="hole"><b>📈 ECG NOT READ</b>AV dissociation and a capture beat were on the strip and unread.</div>
+        <div class="hole"><b>📞 BASE RATE IGNORED</b>Prior MI + wide + regular = ~95% VT, regardless of how well he looks.</div>
+        <div class="hole"><b>💊 LETHAL DRUG</b>Verapamil into VT → vasodilatation, negative inotropy → VF.</div>
+        <div class="hole"><b>🌙 SYSTEM</b>Night fatigue, no senior review, no "treat-as-VT" default.</div>
+      </div>
+      <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> apply the universal rule — <em>wide + regular + structural heart disease = VT</em>; never give AV-nodal blockers to undifferentiated wide-complex tachycardia; if unstable, synchronized cardioversion (correct for VT <em>and</em> SVT); read the strip for AV dissociation, capture and fusion beats; get senior eyes early. <strong>This is exactly why your nurse held the verapamil tonight.</strong></p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Too stable to be VT' is the sentence written on the chart of patients who then die of VT. Stability is not a diagnosis."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S14 — DIFFERENTIALS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s14">
+  <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials</h2></div>
+  <div class="section-content">
+    <h3>🧩 The wide-complex tachycardia differential</h3>
+    <table class="tbl">
+      <tr><th>Diagnosis</th><th>Clues</th><th>Why it matters</th></tr>
+      <tr><td>⚡ <strong>Ventricular tachycardia</strong> (this patient)</td><td>Structural heart disease, AV dissociation, capture/fusion beats, very broad QRS, concordance</td><td>Default assumption; unstable → cardiovert. ~80% of all wide tachy, ~95% if prior MI.</td></tr>
+      <tr><td>🔁 <strong>SVT with aberrancy / pre-existing BBB</strong></td><td>Younger, normal heart, QRS matches a known bundle pattern, may break with vagal/adenosine</td><td>Only "safe" if you can prove it; never assume it to justify AV-nodal blockers.</td></tr>
+      <tr><td>🌀 <strong>Pre-excited tachycardia (WPW + AF)</strong></td><td><strong>Irregular</strong>, very fast, varying QRS width, delta-wave history</td><td>AV-nodal blockers (adenosine, verapamil, digoxin) can precipitate VF → use procainamide or cardiovert.</td></tr>
+      <tr><td>🌪️ <strong>Polymorphic VT / Torsades</strong></td><td>Changing QRS morphology; long QT (Torsades) or ischemia (normal QT)</td><td>Different therapy — magnesium &amp; fix QT, or revascularize. Don't give amiodarone to Torsades.</td></tr>
+      <tr><td>🧪 <strong>Toxic / metabolic wide tachy</strong></td><td>Hyperkalemia (sine wave), TCA/sodium-channel toxicity (wide QRS, R in aVR), digoxin (bidirectional VT)</td><td>Specific antidotes — calcium &amp; insulin/dextrose, sodium bicarbonate, digoxin-specific antibody.</td></tr>
+      <tr><td>📟 <strong>Paced rhythm / artefact</strong></td><td>Pacing spikes; tremor or lead artefact mimicking VT</td><td>Always confirm a true tachycardia and a real pulse before treating.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"REGULAR wide tachycardia → think VT. IRREGULAR wide tachycardia → think pre-excited AF (and keep your hands off the AV node)."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S15 — PLAN -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s15">
+  <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan</h2></div>
+  <div class="section-content">
+    <h3>🧭 Tonight → this week → for life</h3>
+    <ol>
+      <li>⚡ <strong>Tonight (done):</strong> synchronized cardioversion → sinus rhythm; magnesium 2 g IV; potassium repleted toward 4.5–5.0; amiodarone load for recurrence; defibrillator kept ready; CCU admission.</li>
+      <li>🫀 <strong>Identify &amp; treat the trigger:</strong> serial troponin/ECG (ischemia?), full electrolyte correction, review of diuretic dosing, reinforce amiodarone adherence, TSH given prior amiodarone.</li>
+      <li>🔌 <strong>Secondary-prevention ICD</strong> — now a Class I indication after sustained VT with structural disease; revisit the conversation that ended in "no" last year, with the lived experience of tonight.</li>
+      <li>🗺️ <strong>Electrophysiology referral for catheter ablation</strong> of the scar-related circuit — particularly if VT recurs or storms; early ablation reduces shocks and recurrence.</li>
+      <li>💙 <strong>Optimize HFrEF GDMT</strong> (ARNI/ACEi, beta-blocker, MRA, SGLT2i) and assess for revascularization of viable myocardium.</li>
+      <li>👨‍👩‍👦 <strong>Shared decision-making &amp; education</strong> — what an ICD does, anti-tachycardia pacing vs shocks, driving rules after VT/ICD, and a clear "call 911 for palpitations + presyncope" safety net.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Cardioversion treats the episode; the ICD, ablation and GDMT treat the disease. Send him home with all three planned, or he comes back in VT."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S16 — PROGRESS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s16">
+  <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+  <div class="section-content">
+    <h3>📅 Course in CCU</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Night 1, 23:22</div>Single synchronized shock at 150 J → sinus rhythm. BP recovers to 104/64 over 10 min. Magnesium and potassium running.</div>
+      <div class="t-item"><div class="t-time">Night 1, 01:30</div>One 12-beat run of non-sustained VT during ongoing K⁺ repletion (K⁺ then 3.6). No further sustained VT once K⁺ 4.6 / Mg²⁺ 1.0.</div>
+      <div class="t-item"><div class="t-time">Day 1</div>Troponin plateaus then falls; no new ST elevation — VT deemed primary (scar) with electrolyte trigger. GDMT uptitrated. Amiodarone continued.</div>
+      <div class="t-item"><div class="t-time">Day 2</div>Echo confirms EF 25% + anteroapical scar; coronary angiography shows old occluded LAD, no new culprit — medical therapy + EP pathway.</div>
+      <div class="t-item"><div class="t-time">Day 4</div>Secondary-prevention ICD implanted after a long, honest conversation with the patient and his wife. EP plans elective VT ablation.</div>
+      <div class="t-item"><div class="t-time">Day 6</div>Arrhythmia-free 48 h, mobilizing, electrolytes stable, ICD checked. Ready for discharge.</div>
+    </div>
+
+    <!-- 👨‍👩‍👦 FAMILY & PATIENT JOURNEY MODULE -->
+    <h3>👨‍👩‍👦 Family &amp; Patient Journey</h3>
+    <div class="journey">
+      <div class="j-card"><div class="j-who">🧔 The patient — Mr. D.R.</div><p>"I was awake the whole time and I thought I was dying. They said one shock fixed it. I refused the box last year because I didn't want to be shocked — now I understand the box is what catches it when there's no doctor in the room."</p></div>
+      <div class="j-card"><div class="j-who">👩 His wife</div><p>"They let me stand in the doorway and a nurse kept telling me what was happening. The hardest part was the silence when they put him to sleep for the shock. Then the monitor beeped slow and steady again and I could breathe."</p></div>
+      <div class="j-card"><div class="j-who">👩‍⚕️ The bedside nurse</div><p>"My job was the defibrillator, the magnesium and the truth — telling the family what each beep meant. And holding that verapamil. Sometimes good care is the drug you <em>don't</em> give."</p></div>
+      <div class="j-card"><div class="j-who">🎓 The team's reflection</div><p>"This wasn't a clever diagnosis — it was a disciplined one. We treated a wide regular tachycardia in a scarred heart as VT, and the algorithm did the rest."</p></div>
+    </div>
+
+    <div class="callout pink"><b class="ct">💗 The human thread</b>An ICD is not just hardware — it is a daily companion that will, one day, deliver a shock that feels like a kick from a horse and saves his life in his own living room. Preparing the patient and family for that — what it feels like, what to do after, when to call — is as much treatment as the device itself.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S17 — DISCHARGE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s17">
+  <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+  <div class="section-content">
+    <h3>📋 Discharge plan &amp; safety net</h3>
+    <ul>
+      <li>💊 <strong>Medications:</strong> resumed amiodarone (with thyroid/LFT monitoring plan), optimized HFrEF GDMT (ARNI/beta-blocker/MRA/SGLT2i), statin, and a clear written schedule. Review diuretic dose that drove the hypokalemia.</li>
+      <li>🔌 <strong>ICD in situ:</strong> wound care, no driving per local rules after VT/ICD (counsel specifically), avoid strong magnetic fields, carry the device ID card, device clinic follow-up.</li>
+      <li>🧪 <strong>Electrolyte plan:</strong> recheck K⁺/Mg²⁺ with the GP/clinic; consider potassium-sparing strategy; teach why "skipping the water tablet decision" and dehydration matter.</li>
+      <li>🗺️ <strong>EP follow-up</strong> for planned VT ablation; cardiology and heart-failure clinic appointments booked before he leaves.</li>
+      <li>🚩 <strong>Red flags → call emergency services:</strong> palpitations with dizziness/presyncope, an ICD shock (one shock + feeling well = urgent review; multiple shocks = emergency), chest pain, breathlessness, fainting.</li>
+      <li>📚 <strong>Education:</strong> what VT is in plain language, why the ICD and ablation matter, medication adherence (the stopped amiodarone was part of tonight's story), and CPR/AED training offered to his wife.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Discharge after VT is not 'rhythm fixed, go home' — it is a device, an ablation plan, optimized heart-failure drugs, corrected electrolytes and a family who knows what a shock means."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S18 — CLINICAL PEARLS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s18">
+  <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+  <div class="section-content">
+    <div class="pearl-grid">
+      <div class="pearl"><b>⚡ Treat as VT</b>Wide + regular + structural heart disease = VT until proven otherwise. The asymmetry of harm makes this the only safe default.</div>
+      <div class="pearl"><b>🔌 Unstable = electricity</b>An unstable wide-complex tachycardia gets a SYNCHRONIZED shock — correct for VT <em>and</em> SVT. Instability collapses the differential.</div>
+      <div class="pearl"><b>🚫 No CCBs</b>Verapamil/diltiazem in VT → vasodilatation + negative inotropy → VF. Never give AV-nodal blockers to undifferentiated wide tachycardia.</div>
+      <div class="pearl"><b>🎯 Capture &amp; fusion = VT</b>A capture or fusion beat proves AV dissociation. Find one and the argument is over.</div>
+      <div class="pearl"><b>🧪 Mg before K</b>You cannot correct potassium without magnesium — low Mg²⁺ makes the kidney waste the K⁺ you give.</div>
+      <div class="pearl"><b>🌀 Mono vs poly</b>Monomorphic = circuit you shock/ablate. Polymorphic + long QT = Torsades → magnesium, fix QT, NOT amiodarone.</div>
+      <div class="pearl"><b>↕️ Regular vs irregular</b>Regular wide → VT. Irregular wide → pre-excited AF; keep your hands off the AV node.</div>
+      <div class="pearl"><b>🔄 SYNC resets</b>Defibrillators often default OUT of SYNC after a shock — re-check before every cardioversion.</div>
+      <div class="pearl"><b>🩺 "Too well" is a trap</b>Patients can be conscious in VT for minutes. Stability is not a diagnosis.</div>
+      <div class="pearl"><b>🔋 ICD after sustained VT</b>Secondary prevention is Class I — far stronger than the primary-prevention offer commonly declined.</div>
+      <div class="pearl"><b>🧬 Verapamil-sensitive VT</b>The rare exception: fascicular VT in a structurally normal heart. Prove a normal heart first.</div>
+      <div class="pearl"><b>🩻 VT is a symptom</b>Always ask "why now?" — ischemia, electrolytes, drugs, decompensation. Treat the rhythm and the cause.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S19 — MCQs / ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s19">
+  <div class="sec-header"><span class="s-badge">S19</span><h2>🧠 MCQs / Assessment</h2></div>
+  <div class="section-content">
+    <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP and feed your dashboard. Each shows a full explanation.</em></p>
+    <div id="mcqHost"></div>
+    <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · Case c-vt-007 — Unstable Monomorphic Ventricular Tachycardia<br>
+  ⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ XP / DASHBOARD CORE ============ */
+  var XP = 0, XP_MAX = 1200;
+  var awarded = {}; // dedupe one-time awards by key
+  var xpVal = document.getElementById('xpVal');
+  var xpFill = document.getElementById('xpFill');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+  }
+  function addXP(amount, key, label){
+    if(key){ if(awarded[key]) return; awarded[key] = true; }
+    XP += amount;
+    if(XP > XP_MAX) XP = XP_MAX;
+    xpVal.textContent = XP;
+    xpFill.style.width = Math.min(100, Math.round(XP / XP_MAX * 100)) + '%';
+    showToast('+' + amount + ' XP' + (label ? ' · ' + label : ''));
+  }
+  function earnBadge(id){
+    var b = document.getElementById(id);
+    if(b && !b.classList.contains('earned')){ b.classList.add('earned'); }
+  }
+
+  /* Dashboard minimize */
+  var dash = document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){
+    dash.classList.toggle('collapsed');
+    this.textContent = dash.classList.contains('collapsed') ? '+' : '–';
+  });
+
+  /* ============ NAV: scroll-spy active + visited ============ */
+  var navchips = Array.prototype.slice.call(document.querySelectorAll('.navchip'));
+  var sections = navchips.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited = {};
+  var visitVal = document.getElementById('visitVal');
+
+  function markVisited(idx){
+    var sec = sections[idx];
+    if(!sec) return;
+    if(!visited[sec.id]){
+      visited[sec.id] = true;
+      navchips[idx].classList.add('visited');
+      var count = Object.keys(visited).length;
+      visitVal.textContent = count + ' / 19';
+      addXP(8, 'visit-' + sec.id, 'Section read');
+      if(count >= 19){ earnBadge('bdg-explorer'); addXP(60, 'allvisited', 'Ward Explorer!'); }
+    }
+  }
+  function onScroll(){
+    var y = window.scrollY + 150;
+    var current = 0;
+    for(var i=0;i<sections.length;i++){
+      if(sections[i] && sections[i].offsetTop <= y) current = i;
+    }
+    navchips.forEach(function(c){ c.classList.remove('active'); });
+    if(navchips[current]) navchips[current].classList.add('active');
+    markVisited(current);
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  window.addEventListener('load', onScroll);
+  onScroll();
+
+  /* ============ FLAG GAME (S2) ============ */
+  var flagBtns = document.querySelectorAll('#flagGame .flag-btn');
+  var flagResult = document.getElementById('flagResult');
+  var flagsFound = 0, flagsTotal = 0, flagWrong = 0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good') === '1') flagsTotal++; });
+  flagBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.dataset.locked) return;
+      btn.dataset.locked = '1';
+      var good = btn.getAttribute('data-good') === '1';
+      if(good){
+        btn.classList.add('flag-good');
+        flagsFound++;
+        addXP(10, 'flag-' + flagsFound + '-' + Math.random(), 'VT flag spotted');
+      } else {
+        btn.classList.add('flag-bad');
+        flagWrong++;
+        showToast('❌ Not a VT-specific flag');
+      }
+      if(flagsFound === flagsTotal){
+        flagResult.textContent = '✅ All ' + flagsTotal + ' VT red flags found' + (flagWrong ? ' (with ' + flagWrong + ' wrong pick' + (flagWrong>1?'s':'') + ')' : ' — flawless!');
+        earnBadge('bdg-vt');
+        addXP(30, 'flags-complete', 'VT-Spotter badge');
+      } else {
+        flagResult.textContent = flagsFound + ' / ' + flagsTotal + ' VT red flags found…';
+      }
+    });
+  });
+
+  /* ============ BRANCHING SCENARIO (S3) ============ */
+  var scText = document.getElementById('scText');
+  var scChoices = document.getElementById('scChoices');
+  var scFeedback = document.getElementById('scFeedback');
+  var scRestart = document.getElementById('scRestart');
+  var scStab = document.getElementById('scStab');
+  var scTime = document.getElementById('scTime');
+  var scXP = document.getElementById('scXP');
+  var pathXP = 0, scStability = 2, scElapsed = 0;
+
+  var STEPS = {
+    start: {
+      text: "The nurse looks at you, syringe of verapamil in one hand, defibrillator paddles in the other. BP 78/46 and falling. Monitor: regular wide-complex tachycardia at 188. The patient is awake but gray. What do you do FIRST?",
+      choices: [
+        { t: "🚫 Take the verapamil away and prepare synchronized cardioversion", good:true, ds:1, dt:10, xp:40, fb:"✅ Exactly. He is UNSTABLE (shock, presyncope, pulmonary edema). Remove the lethal drug and go to electricity. You've bought him a future." , next:"sedate" },
+        { t: "💉 Give the verapamil — 'it's a fast heart, worth a try'", good:false, ds:-2, dt:20, xp:0, fb:"☠️ Catastrophe. Verapamil in VT → vasodilatation + negative inotropy → his pressure collapses and the VT degenerates toward VF. This is the M&M case in S13. Restart and choose again.", end:true },
+        { t: "💊 Push adenosine 6 mg 'to break it or diagnose it'", good:false, ds:-1, dt:15, xp:5, fb:"⚠️ Wrong for an UNSTABLE patient. Adenosine won't terminate true VT and wastes seconds he doesn't have. Electricity, not a diagnostic drug.", next:"start2" }
+      ]
+    },
+    start2: {
+      text: "Adenosine did nothing (as expected). BP now 70/40, he's drowsier. The nurse has the defibrillator ready. Now what?",
+      choices: [
+        { t: "⚡ Synchronized cardioversion now", good:true, ds:1, dt:8, xp:30, fb:"✅ Finally — the right call. Lesson banked: in unstable wide-complex tachycardia, go to synchronized shock first.", next:"sedate" },
+        { t: "💉 Try IV amiodarone over 20 minutes", good:false, ds:-1, dt:20, xp:0, fb:"⚠️ Too slow for a crashing patient. Drugs are for the stable; this man needs a shock now.", next:"sedate" }
+      ]
+    },
+    sedate: {
+      text: "He's still (barely) conscious, BP 74/44. The defibrillator is charged and in SYNC. Before you press the button?",
+      choices: [
+        { t: "💤 Give a quick dose of ketamine, then shock — and check SYNC is on", good:true, ds:1, dt:6, xp:30, fb:"✅ Ideal: brief sedation for a conscious shock (ketamine preserves BP), and confirm SYNC so the machine fires on the R wave. Now deliver it.", next:"shock" },
+        { t: "🔌 Shock immediately with no sedation, no SYNC check", good:false, ds:0, dt:3, xp:10, fb:"⚠️ Defensible if peri-arrest, but a conscious unsedated shock is agony, and an unchecked SYNC mode risks shocking on the T wave → VF. Confirm SYNC at minimum.", next:"shock" }
+      ]
+    },
+    shock: {
+      text: "Synchronized shock at 150 J delivered. Rhythm converts to sinus at 72, BP climbs to 102/64. He groans. The potassium is 3.1 and magnesium 0.52. Final move of the first few minutes?",
+      choices: [
+        { t: "🧪 Give magnesium 2 g IV and replace potassium toward 4.5–5.0", good:true, ds:1, dt:5, xp:40, fb:"🏆 Perfect close. The shock bought the rhythm; the electrolytes keep it. Without this he re-enters VT within the hour. Case stabilized.", end:true },
+        { t: "🎉 Done — sit back, he's in sinus", good:false, ds:-1, dt:10, xp:0, fb:"⚠️ Premature. An untreated hypokalemic, hypomagnesemic ventricle is a re-entry machine — he'll be back in VT. Always refill K⁺/Mg²⁺ after converting.", end:true }
+      ]
+    }
+  };
+
+  function renderStab(){
+    var s = Math.max(0, Math.min(5, scStability + 2)); // map -2..3 → 0..5
+    var dots = '';
+    for(var i=0;i<5;i++) dots += (i < s ? '●' : '○');
+    scStab.textContent = dots;
+  }
+  function renderStep(key){
+    var step = STEPS[key];
+    scText.textContent = step.text;
+    scFeedback.className = 'feedback';
+    scFeedback.style.display = 'none';
+    scChoices.innerHTML = '';
+    step.choices.forEach(function(ch){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = ch.t;
+      b.addEventListener('click', function(){
+        pathXP += ch.xp; scXP.textContent = pathXP;
+        scElapsed += ch.dt; scTime.textContent = scElapsed + ' s';
+        scStability += ch.ds; renderStab();
+        if(ch.xp) addXP(ch.xp, null, 'Scenario choice');
+        scFeedback.textContent = ch.fb;
+        scFeedback.className = 'feedback ' + (ch.good ? 'good' : 'bad');
+        scFeedback.style.display = 'block';
+        Array.prototype.forEach.call(scChoices.children, function(c){ c.disabled = true; c.style.opacity = .6; });
+        if(ch.end){
+          scRestart.style.display = 'inline-block';
+          if(ch.good && key === 'shock'){ earnBadge('bdg-shock'); addXP(20, 'scenario-win', 'Shock On Time!'); }
+        } else if(ch.next){
+          setTimeout(function(){ renderStep(ch.next); }, 1400);
+        }
+      });
+      scChoices.appendChild(b);
+    });
+  }
+  scRestart.addEventListener('click', function(){
+    pathXP = 0; scStability = 2; scElapsed = 0;
+    scXP.textContent = 0; scTime.textContent = '0 s'; renderStab();
+    scRestart.style.display = 'none';
+    renderStep('start');
+  });
+  renderStab();
+  renderStep('start');
+
+  /* ============ REVEAL BUTTONS ============ */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.getAttribute('data-target'));
+      if(!t) return;
+      if(t.classList.contains('reveal-shown')){
+        t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden');
+      } else {
+        t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown');
+        addXP(8, 'reveal-' + btn.getAttribute('data-target'), 'Self-test');
+      }
+    });
+  });
+
+  /* ============ POTASSIUM SIM (S6) ============ */
+  var kRange = document.getElementById('kRange');
+  var kVal = document.getElementById('kVal');
+  var kNeedle = document.getElementById('kNeedle');
+  var kReadout = document.getElementById('kReadout');
+  if(kRange){
+    var simUsed = false;
+    function updateK(){
+      var k = (parseInt(kRange.value,10) / 10); // 2.0 .. 7.5
+      kVal.textContent = k.toFixed(1);
+      var pct = (parseInt(kRange.value,10) - 20) / (75 - 20) * 100;
+      kNeedle.style.left = pct + '%';
+      var msg, cls;
+      if(k < 3.0){ msg = '🔴 Severe hypokalemia — short, heterogeneous refractoriness → ectopy, re-entry, VT/Torsades risk. This is tonight’s fuse.'; cls='bad'; }
+      else if(k < 3.5){ msg = '🟠 Hypokalemia — irritable myocardium, prone to re-entry. Replace toward 4.5–5.0 to keep the rhythm you cardioverted.'; cls='warn-r'; }
+      else if(k <= 5.0){ msg = '🟢 Target band — stable refractoriness, lowest arrhythmia risk. This is where you want him after converting.'; cls='good'; }
+      else if(k <= 6.0){ msg = '🟠 Hyperkalemia — peaked T waves, slowing conduction, widening QRS. Different danger, same monitor.'; cls='warn-r'; }
+      else { msg = '🔴 Severe hyperkalemia — sine-wave QRS, conduction block heading to asystole/VF. Calcium first, then shift &amp; remove.'; cls='bad'; }
+      kReadout.innerHTML = msg;
+      kReadout.className = 'readout ' + cls;
+      if(!simUsed){ simUsed = true; addXP(15, 'ksim', 'Titration Master'); }
+    }
+    kRange.addEventListener('input', updateK);
+    updateK();
+  }
+
+  /* ============ CHECKLISTS (S7) ============ */
+  var allChecklistsDone = 0, totalChecklists = document.querySelectorAll('.checklist').length;
+  document.querySelectorAll('.checklist').forEach(function(list){
+    var boxes = list.querySelectorAll('input[type=checkbox]');
+    var prog = list.querySelector('[data-progress]');
+    var total = boxes.length;
+    var doneAwarded = false;
+    function refresh(){
+      var done = 0;
+      boxes.forEach(function(b){
+        if(b.checked){ done++; b.closest('.ck').classList.add('done'); }
+        else { b.closest('.ck').classList.remove('done'); }
+      });
+      prog.textContent = done + ' / ' + total + ' complete';
+      if(done === total && !doneAwarded){
+        doneAwarded = true;
+        allChecklistsDone++;
+        addXP(25, 'ck-' + list.id, 'Checklist done');
+        if(allChecklistsDone >= totalChecklists){ earnBadge('bdg-ck'); addXP(20, 'allck', 'Checklist Champion'); }
+      }
+    }
+    boxes.forEach(function(b){
+      b.addEventListener('change', function(){
+        if(b.checked) addXP(4, null, 'Step checked');
+        refresh();
+      });
+    });
+  });
+
+  /* ============ MCQs (S19) ============ */
+  var MCQS = [
+    {
+      q: "A 67-year-old with a prior anterior MI presents with a regular wide-complex tachycardia at 188/min, BP 78/46, clammy and presyncopal. The best immediate management is:",
+      opts: ["IV verapamil to slow the rate","IV adenosine as a diagnostic-therapeutic trial","Synchronized DC cardioversion","Observe on telemetry and recheck in 15 minutes"],
+      correct: 2,
+      exp: "He is UNSTABLE (shock, presyncope, pulmonary edema). Unstable wide-complex tachycardia → synchronized cardioversion, which is correct whether the rhythm is VT or SVT. Verapamil in VT can precipitate VF; adenosine wastes time and won't terminate VT; observation is unsafe."
+    },
+    {
+      q: "Which ECG finding is most specific for ventricular tachycardia rather than SVT with aberrancy?",
+      opts: ["QRS duration of 120 ms","A capture or fusion beat (AV dissociation)","Regular rhythm","Rate above 150/min"],
+      correct: 1,
+      exp: "Capture and fusion beats demonstrate AV dissociation — the atria and ventricles firing independently — which is essentially diagnostic of VT. The other features are non-specific and occur in both VT and SVT."
+    },
+    {
+      q: "Why is IV verapamil dangerous in undifferentiated wide-complex tachycardia?",
+      opts: ["It prolongs the QT and causes Torsades","It causes vasodilatation and negative inotropy that can collapse the BP and degenerate VT to VF","It blocks the SA node causing asystole","It has no antiarrhythmic effect at all"],
+      correct: 1,
+      exp: "In VT, verapamil's vasodilatation and negative inotropy drop the blood pressure precipitously and can degenerate the rhythm into VF — the classic lethal error in misdiagnosed VT."
+    },
+    {
+      q: "After successful cardioversion, the patient's K⁺ is 3.1 and Mg²⁺ 0.52. The priority to prevent VT recurrence is:",
+      opts: ["Give magnesium and replace potassium toward 4.5–5.0","Start a dopamine infusion","Restrict all IV fluids","Give a calcium-channel blocker prophylactically"],
+      correct: 0,
+      exp: "Hypokalemia and hypomagnesemia shorten and heterogenize refractoriness, creating the substrate for re-entry. You cannot correct potassium effectively without magnesium. Replacing both closes the re-entry window and is essential to maintaining the converted rhythm."
+    },
+    {
+      q: "An IRREGULAR wide-complex tachycardia with varying QRS width in a patient with a delta-wave history most likely represents:",
+      opts: ["Monomorphic VT","Pre-excited atrial fibrillation (WPW + AF)","Sinus tachycardia","Third-degree AV block"],
+      correct: 1,
+      exp: "Irregular wide-complex tachycardia with varying QRS morphology suggests pre-excited AF. AV-nodal blockers (adenosine, verapamil, digoxin) can accelerate conduction down the accessory pathway and precipitate VF — use procainamide or cardiovert."
+    },
+    {
+      q: "Polymorphic VT with a prolonged QT interval (Torsades de Pointes) is best treated with:",
+      opts: ["IV amiodarone","IV magnesium, correct K⁺, stop QT-prolonging drugs ± overdrive pacing","IV verapamil","Immediate ICD interrogation only"],
+      correct: 1,
+      exp: "Torsades requires IV magnesium, correction of potassium, withdrawal of QT-prolonging drugs, and overdrive pacing/isoprenaline if pause-dependent. Amiodarone further prolongs the QT and can worsen Torsades, so it is avoided."
+    },
+    {
+      q: "In an unstable patient, when do you use UNSYNCHRONIZED defibrillation rather than synchronized cardioversion?",
+      opts: ["Always, for any tachycardia","For pulseless VT, VF, or polymorphic VT too disorganized to synchronize","Only for narrow-complex SVT","Never — synchronization is always required"],
+      correct: 1,
+      exp: "Synchronized cardioversion is for an organized rhythm WITH a pulse. Pulseless VT, VF, and chaotic polymorphic VT cannot be synchronized (no reliable R wave) and require unsynchronized defibrillation. SYNC also often defaults OFF after a shock — re-check it."
+    },
+    {
+      q: "This patient declined a primary-prevention ICD last year. After tonight's sustained VT, the ICD indication is now:",
+      opts: ["Still only primary prevention","A Class I secondary-prevention indication","No longer indicated because he was cardioverted","Contraindicated due to his low EF"],
+      correct: 1,
+      exp: "Sustained VT with structural heart disease is a Class I indication for a secondary-prevention ICD — a much stronger indication than the primary-prevention offer he declined. It should be revisited this admission, alongside catheter ablation and optimized heart-failure therapy."
+    }
+  ];
+
+  var host = document.getElementById('mcqHost');
+  var mcqVal = document.getElementById('mcqVal');
+  var mcqScore = 0, mcqAnswered = 0;
+  var letters = ['A','B','C','D','E'];
+
+  MCQS.forEach(function(item, qi){
+    var box = document.createElement('div');
+    box.className = 'mcq';
+    var html = '<div class="mcq-q">QUESTION ' + (qi+1) + ' / ' + MCQS.length + '</div>';
+    html += '<div class="mcq-stem">' + item.q + '</div>';
+    item.opts.forEach(function(opt, oi){
+      html += '<label class="mcq-opt" data-oi="' + oi + '"><strong>' + letters[oi] + '.</strong> ' + opt + '</label>';
+    });
+    html += '<div class="mcq-exp"></div>';
+    box.innerHTML = html;
+    host.appendChild(box);
+
+    var opts = box.querySelectorAll('.mcq-opt');
+    var exp = box.querySelector('.mcq-exp');
+    var locked = false;
+    opts.forEach(function(label){
+      label.addEventListener('click', function(){
+        if(locked) return;
+        locked = true;
+        var oi = parseInt(label.getAttribute('data-oi'),10);
+        box.classList.add('answered');
+        var correct = item.correct;
+        if(oi === correct){
+          label.classList.add('picked-right');
+          mcqScore++;
+          addXP(25, null, 'Correct answer');
+        } else {
+          label.classList.add('picked-wrong');
+          opts[correct].classList.add('show-right');
+          showToast('❌ Correct: ' + letters[correct]);
+        }
+        exp.innerHTML = '<strong>' + (oi === correct ? '✅ Correct. ' : '📘 Explanation. ') + '</strong>' + item.exp;
+        mcqAnswered++;
+        mcqVal.textContent = mcqScore + ' / ' + MCQS.length;
+        if(mcqAnswered === MCQS.length){
+          var done = document.getElementById('mcqDone');
+          var summary = document.getElementById('mcqSummary');
+          done.style.display = 'block';
+          summary.textContent = 'You scored ' + mcqScore + ' / ' + MCQS.length + '. ' +
+            (mcqScore === MCQS.length ? 'Flawless — you treat wide-and-regular as VT every time. 🏆' :
+             mcqScore >= 6 ? 'Strong — review the misses and the contrast pairs in S6.' :
+             'Revisit S3, S5, S6 and S11 — the VT-vs-SVT logic is the whole case.');
+          if(mcqScore >= 7){ earnBadge('bdg-quiz'); addXP(50, 'quizace', 'Quiz Ace!'); }
+        }
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
