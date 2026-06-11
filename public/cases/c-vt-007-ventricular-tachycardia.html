@@ -996,19 +996,54 @@ tags: VT, Wide-complex tachycardia, Synchronized cardioversion, VT storm, Antiar
       if(count >= 19){ earnBadge('bdg-explorer'); addXP(60, 'allvisited', 'Ward Explorer!'); }
     }
   }
+  function setActive(idx){
+    navchips.forEach(function(c){ c.classList.remove('active'); });
+    if(navchips[idx]) navchips[idx].classList.add('active');
+  }
+
+  /* Tab clicks: scroll in-page, never navigate.
+     Inside the app this file runs in a srcDoc iframe whose base URL is the
+     parent page, so a raw href="#s3" would load the app's home page into the
+     iframe. preventDefault + scrollIntoView avoids that entirely and also
+     works when the file is opened standalone. */
+  navchips.forEach(function(chip, idx){
+    chip.addEventListener('click', function(ev){
+      ev.preventDefault();
+      var target = sections[idx];
+      if(!target) return;
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setActive(idx);
+      markVisited(idx);
+    });
+  });
+
+  /* Scroll-spy. When embedded, the iframe is sized to its full content and the
+     PARENT page scrolls, so window.scrollY here never changes — use
+     IntersectionObserver (which accounts for the parent viewport in same-origin
+     iframes). Keep the scroll listener as a fallback for standalone viewing. */
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(!entry.isIntersecting) return;
+        var idx = sections.indexOf(entry.target);
+        if(idx > -1){ setActive(idx); markVisited(idx); }
+      });
+    }, { rootMargin: '-15% 0px -65% 0px' });
+    sections.forEach(function(s){ if(s) io.observe(s); });
+  }
   function onScroll(){
+    if(window.scrollY === 0 && document.body.scrollHeight <= window.innerHeight + 50) return;
     var y = window.scrollY + 150;
     var current = 0;
     for(var i=0;i<sections.length;i++){
       if(sections[i] && sections[i].offsetTop <= y) current = i;
     }
-    navchips.forEach(function(c){ c.classList.remove('active'); });
-    if(navchips[current]) navchips[current].classList.add('active');
+    setActive(current);
     markVisited(current);
   }
   window.addEventListener('scroll', onScroll, {passive:true});
-  window.addEventListener('load', onScroll);
-  onScroll();
+  markVisited(0);
+  setActive(0);
 
   /* ============ FLAG GAME (S2) ============ */
   var flagBtns = document.querySelectorAll('#flagGame .flag-btn');
