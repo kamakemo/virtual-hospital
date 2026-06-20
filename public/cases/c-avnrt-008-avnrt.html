@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AVNRT — Paroxysmal Supraventricular Tachycardia — Virtual Teaching Hospital</title>
+<!-- META
+id: c-avnrt-008
+title: AVNRT — Paroxysmal Supraventricular Tachycardia
+hospital: cardiology
+department: cv-ep
+bednumber: 1
+chiefcomplaint: Sudden palpitations with a regular narrow-complex tachycardia at 188/min
+system: Cardiology
+severity: urgent
+tags: AVNRT, SVT, Adenosine, Vagal maneuvers, Slow-pathway ablation
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --radius:16px;
+    --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  /* Internal scroll viewport. When this case is embedded the host app stretches
+     the iframe to full content height and the OUTER page scrolls, which would
+     let a sticky bar scroll away. We instead scroll inside this box (sized to
+     the visible window by JS) so the section tab bar stays pinned at the top.
+     Standalone, it falls back to the full viewport height. */
+  #caseScroll{height:100vh; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; scroll-padding-top:92px}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:36px 24px 80px; position:relative; overflow:hidden}
+  .hero::after{content:"📈"; position:absolute; right:-20px; top:-30px; font-size:220px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{max-width:1100px; margin:0 auto; position:relative; z-index:1}
+  .hero .crumbs{font-size:13px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:10px 0 6px; font-size:clamp(26px,4vw,40px); line-height:1.15}
+  .hero .sub{font-size:16px; opacity:.95}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; backdrop-filter:blur(4px)}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== LIVE ECG STRIP IN HERO ===== */
+  .ecg-banner{max-width:1100px; margin:14px auto 0; position:relative; z-index:1}
+  .ecg-banner svg{width:100%; height:64px; display:block; background:rgba(0,0,0,.18); border-radius:12px; border:1px solid rgba(255,255,255,.25)}
+  .ecg-trace{stroke:#86efac; stroke-width:2.4; fill:none; stroke-dasharray:1600; stroke-dashoffset:1600; animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{stroke-dashoffset:0}}
+
+  /* ===== VITALS STRIP ===== */
+  .vitals-strip{max-width:1100px; margin:-52px auto 0; padding:0 24px; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:11px; font-weight:700; letter-spacing:.6px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:21px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== HORIZONTAL SECTION SIDEBAR (fixed — always visible) ===== */
+  .topnav{position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.10)}
+  .topnav .rail{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; max-width:1180px; margin:0 auto; scrollbar-width:thin}
+  .navchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink2); font-size:11px; font-weight:700; text-decoration:none; min-width:78px; text-align:center; transition:all .18s; cursor:pointer}
+  .navchip .s-id{font-size:10px; letter-spacing:1px; color:#94a3b8}
+  .navchip .s-emoji{font-size:16px}
+  .navchip:hover{border-color:var(--rose); color:var(--rose); transform:translateY(-2px)}
+  .navchip.active{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; border-color:#b91c1c}
+  .navchip.active .s-id{color:#fecaca}
+  .navchip.visited:not(.active){border-color:var(--emerald-line); background:var(--emerald-soft)}
+
+  /* ===== DASHBOARD WIDGET ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:215px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10.5px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:760px){.dash{display:none}}
+
+  /* ===== MAIN / SECTIONS (tabbed: one section visible at a time) ===== */
+  main{max-width:1100px; margin:26px auto 80px; padding:0 24px}
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:26px; overflow:hidden}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16.5px; margin:26px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14.5px; margin:18px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:24px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15.5px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:14px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px; letter-spacing:.4px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14.5px}
+
+  /* ===== INTERACTIVE BITS ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:10px 18px; font-weight:700; font-size:14px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:22px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:15px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 15px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 15px; margin-top:12px; font-size:14px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim sliders */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:14px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:14px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Heart/circuit diagram */
+  .heart-fig{display:flex; gap:18px; flex-wrap:wrap; align-items:center; background:var(--slate-soft); border-radius:16px; padding:18px; margin:14px 0}
+  .heart-fig svg{flex:0 0 auto}
+  .heart-legend{flex:1; min-width:230px; font-size:13.5px}
+  .lg{display:flex; align-items:center; gap:8px; margin:5px 0}
+  .lg .sw{width:14px; height:14px; border-radius:4px; flex:0 0 auto}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Journey cards */
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:14px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:15px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:14px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13.5px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:22px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14.5px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:13px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .footer{max-width:1100px; margin:0 auto 36px; padding:0 24px; text-align:center; color:#94a3b8; font-size:12.5px}
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="caseScroll">
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · ⚡ EP Lab · 🛏️ Bed 1</div>
+    <h1>🌀 AVNRT — "The Heart That Suddenly Sprints"</h1>
+    <div class="sub">⚡ A 24-year-old woman, structurally normal heart, is running a flawless, regular, narrow-complex tachycardia at 188. It started in a heartbeat and won't stop. Vagal first — then a deliberate six-second cardiac arrest in a syringe.</div>
+    <div class="chips">
+      <span class="chip crit">🟠 URGENT</span>
+      <span class="chip">🌀 Narrow-Complex Tachycardia</span>
+      <span class="chip">💨 Vagal Maneuvers</span>
+      <span class="chip">💉 Adenosine</span>
+      <span class="chip">🎮 Interactive Case</span>
+      <span class="chip">⏱️ Break the loop</span>
+    </div>
+    <div class="ecg-banner" title="Regular narrow-complex SVT rhythm strip">
+      <svg viewBox="0 0 800 64" preserveAspectRatio="none" aria-label="Regular narrow-complex tachycardia rhythm strip">
+        <polyline class="ecg-trace" points="0,40 40,40 55,12 70,58 85,40 130,40 145,12 160,58 175,40 220,40 235,12 250,58 265,40 310,40 325,12 340,58 355,40 400,40 415,12 430,58 445,40 490,40 505,12 520,58 535,40 580,40 595,12 610,58 625,40 670,40 685,12 700,58 715,40 760,40 775,12 790,58 800,40"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== LIVE VITALS ===================== -->
+<div class="vitals-strip">
+  <div class="vitals-grid">
+    <div class="vital alert"><div class="v-label">💓 HR</div><div class="v-num">188</div></div>
+    <div class="vital warn"><div class="v-label">🩸 BP</div><div class="v-num">96/60</div></div>
+    <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">22</div></div>
+    <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">98%</div></div>
+    <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.7°</div></div>
+    <div class="vital"><div class="v-label">🧠 GCS</div><div class="v-num">15</div></div>
+    <div class="vital ok-v"><div class="v-label">📐 QRS</div><div class="v-num">88 ms</div></div>
+    <div class="vital warn"><div class="v-label">😖 Distress</div><div class="v-num">Anxious</div></div>
+  </div>
+</div>
+
+<!-- ===================== HORIZONTAL SECTION SIDEBAR ===================== -->
+<nav class="topnav" id="topnav">
+  <div class="rail">
+    <a class="navchip" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navchip" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navchip" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navchip" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navchip" href="#s5"><span class="s-emoji">🎓</span><span>Consultant Round</span><span class="s-id">S5</span></a>
+    <a class="navchip" href="#s6"><span class="s-emoji">📖</span><span>Teaching Points</span><span class="s-id">S6</span></a>
+    <a class="navchip" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navchip" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navchip" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navchip" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navchip" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navchip" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navchip" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navchip" href="#s14"><span class="s-emoji">🔀</span><span>Differentials</span><span class="s-id">S14</span></a>
+    <a class="navchip" href="#s15"><span class="s-emoji">🗺️</span><span>Plan</span><span class="s-id">S15</span></a>
+    <a class="navchip" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navchip" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navchip" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navchip" href="#s19"><span class="s-emoji">🧠</span><span>MCQs</span><span class="s-id">S19</span></a>
+  </div>
+</nav>
+
+<!-- ===================== SCORE DASHBOARD ===================== -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections visited</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-vt">🌀 SVT-Spotter</span>
+      <span class="badge" id="bdg-shock">💨 Broke The Loop</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champion</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Ward Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running sims, taking the right path and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- S1 — PROFILE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s1">
+  <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+  <div class="section-content">
+    <div class="callout danger">
+      <b class="ct">🚨 YOU ARE HERE — 14:32, EP Lab / ED resus bay 1</b>
+      A 24-year-old woman sits bolt upright, hand on her chest, eyes wide: <em>"It just… switched on. Like a flick. My heart is at a hundred miles an hour."</em> The monitor shows a metronome-perfect, narrow, regular tachycardia at 188. She's pale and lightheaded, but talking in full sentences. This is the most common regular SVT you will ever treat — and the management ladder is beautiful if you climb it in order. <strong>Vagal first.</strong>
+    </div>
+
+    <h3>👤 Patient Identity</h3>
+    <table class="tbl">
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>👩 Name</td><td><strong>Ms. A.K.</strong></td></tr>
+      <tr><td>🎂 Age / Sex</td><td>24-year-old female</td></tr>
+      <tr><td>🆔 MRN</td><td>CV-20815</td></tr>
+      <tr><td>⚖️ Weight</td><td>62 kg</td></tr>
+      <tr><td>💼 Occupation</td><td>Graduate student</td></tr>
+      <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+    </table>
+
+    <h3>📜 Past Medical History — a structurally normal heart with a hidden wiring quirk</h3>
+    <ul>
+      <li>💓 <strong>Recurrent "racing heart" episodes since her late teens</strong> — sudden onset, lasting minutes to an hour, often stopping just as abruptly. She's learned to "bear down" and sometimes it breaks. That's the diagnosis hiding in plain sight: <strong>paroxysmal SVT, almost certainly AVNRT</strong>.</li>
+      <li>🫀 <strong>Structurally normal heart</strong> — normal prior echo, no MI, no cardiomyopathy. The problem is electrical, not muscular. This is the polar opposite of a scarred-ventricle VT.</li>
+      <li>☕ Triggers she's noticed: <strong>caffeine, stress, alcohol, and the tail end of exercise</strong> — all states that fire off premature atrial beats, the spark that lights AVNRT.</li>
+      <li>💊 Otherwise well: no regular medications, occasional over-the-counter caffeine tablets during exam season.</li>
+      <li>🚭 Non-smoker, no recreational drugs, no family history of sudden death (relevant — we always screen for the dangerous mimics).</li>
+      <li>🤰 Not pregnant (asked and confirmed — it changes drug choices and is a classic AVNRT trigger).</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A young patient with a structurally normal heart and a sudden, regular, narrow-complex tachycardia at 150–250 is AVNRT until proven otherwise — the commonest paroxysmal SVT, and one you can usually break at the bedside."</div>
+
+    <h3>🧬 Why THIS patient? — dual AV-nodal physiology</h3>
+    <p>AVNRT exists because of a quirk almost everyone is born with but few notice: the AV node has <strong>two functional inputs — a fast pathway</strong> (conducts quickly, but with a long refractory period) <strong>and a slow pathway</strong> (conducts slowly, but recovers quickly). In normal rhythm, an impulse races down the fast pathway and you never know the slow one exists. The setup for re-entry: a well-timed <strong>premature atrial beat</strong> arrives while the fast pathway is still refractory, so it is forced down the slow pathway. By the time it reaches the bottom, the fast pathway has recovered — and the impulse turns around and conducts <strong>retrogradely up the fast pathway</strong>, back to the top, then down the slow pathway again. A self-sustaining loop is born, spinning entirely within and around the AV node at ~188 laps a minute. The substrate (dual pathways) has been there her whole life. Tonight a single ectopic beat — caffeine, stress — found the perfect timing and lit it.</p>
+
+    <div class="callout warn"><b class="ct">🔥 Triggers / risk factors for AVNRT</b>
+    ☕ Caffeine · 🍷 Alcohol · 😰 Emotional stress &amp; catecholamine surges · 🏃 Exercise (especially the recovery phase) · 🤰 Pregnancy · 💊 Stimulants/sympathomimetics · 🚺 Young, female predominance (≈ 2:1) · 🧬 A well-timed premature atrial beat — the universal spark.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S2 — HANDOVER -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s2">
+  <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+  <div class="section-content">
+    <h3>📻 Triage Nurse Handover — listen for the rhythm of the story</h3>
+    <div class="callout info">
+      <b class="ct">🎙️ SBAR from the ED triage nurse (verbatim)</b>
+      <p><strong>S:</strong> "Bay 1 — Ms. A.K., 24, sudden palpitations 25 minutes ago while studying with a coffee. Monitor shows a fast, narrow, perfectly regular rhythm at 188."</p>
+      <p><strong>B:</strong> "She's had these since her teens; usually breaks them by bearing down. Fit and well, normal heart, not pregnant, no meds."</p>
+      <p><strong>A:</strong> "Talking in full sentences but pale and lightheaded — BP 96 over 60. She tried holding her breath in the waiting room and it didn't work this time. A med student suggested we 'just give a beta-blocker tablet and wait.'"</p>
+      <p><strong>R:</strong> "I've got her on the monitor, IV in, and I printed a 12-lead. I held off on any tablet — I thought you'd want to try the proper vagal maneuver and have adenosine ready."</p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A regular narrow-complex tachycardia in a well young person has a free, instant, side-effect-light first treatment: a properly done vagal maneuver. Reach for it before you reach for a needle."</div>
+
+    <h3>🚩 Spot-the-Red-Flag — tap each feature that points to AVNRT</h3>
+    <p>🎮 <em>Interactive: click every feature that points to AVNRT (not a dangerous mimic or a red herring). Each correct flag = +10 XP. Wrong picks cost you.</em></p>
+    <div id="flagGame">
+      <button class="btn ghost flag-btn" data-good="1">⚡ Sudden on/off (paroxysmal) onset</button>
+      <button class="btn ghost flag-btn" data-good="1">📐 Narrow QRS (88 ms), regular</button>
+      <button class="btn ghost flag-btn" data-good="1">💓 Rate 188 (in the 150–250 SVT band)</button>
+      <button class="btn ghost flag-btn" data-good="1">🫀 Structurally normal heart, young patient</button>
+      <button class="btn ghost flag-btn" data-good="1">☕ Caffeine / stress trigger</button>
+      <button class="btn ghost flag-btn" data-good="0">🩻 Old anterior Q waves / prior MI</button>
+      <button class="btn ghost flag-btn" data-good="0">🌡️ Temperature 36.7°C</button>
+      <button class="btn ghost flag-btn" data-good="0">😴 She slept poorly last night</button>
+    </div>
+    <p id="flagResult" style="font-weight:700"></p>
+
+    <h3>⏱️ Timeline so far</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">14:07</div>Sudden palpitations while studying over a coffee — "switched on like a flick."</div>
+      <div class="t-item"><div class="t-time">14:18</div>Monitor: regular narrow-complex tachycardia 188/min. BP 96/60. Pale, lightheaded, fully alert.</div>
+      <div class="t-item"><div class="t-time">14:25</div>Self-administered Valsalva (holding breath) in the waiting room — no conversion. A med student suggests an oral beta-blocker; nurse <strong>holds it</strong> — 🏅 sensible: oral drugs are far too slow and the modified Valsalva hasn't been tried properly yet.</div>
+      <div class="t-item"><div class="t-time">14:32</div>You arrive. 12-lead printed, IV in, monitor on, pads available. Time to climb the ladder: vagal → adenosine → rate-control drug → (only if unstable) cardioversion.</div>
+    </div>
+
+    <div class="callout ok"><b class="ct">🏅 Praise where due</b>Holding the oral beta-blocker was the right instinct. A swallowed tablet takes 30–60 minutes to work — useless for an acute re-entry circuit spinning right now. The correct acute tools are a <strong>properly performed (modified) Valsalva</strong> and, if that fails, <strong>IV adenosine</strong>. Save chronic oral drugs for prevention, not for breaking the episode in front of you.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S3 — INITIAL ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s3">
+  <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+  <div class="section-content">
+    <h3>🅰️🅱️🅲️ Primary Survey — what your hands, eyes and ears find</h3>
+    <table class="tbl">
+      <tr><th>Step</th><th>Finding</th><th>What it means mechanistically</th></tr>
+      <tr><td>🅰️ Airway</td><td>Patent, speaking in full sentences.</td><td>Full sentences = adequate output for now; she is symptomatic but not crashing. This is a "conscious, anxious, perfusing" SVT — the common presentation.</td></tr>
+      <tr><td>🅱️ Breathing</td><td>RR 22, SpO₂ 98% on air, chest clear.</td><td>No pulmonary congestion — her heart is structurally normal, so even at 188 she compensates far better than a scarred ventricle would. Tachypnea is largely anxiety and mild low output.</td></tr>
+      <tr><td>🅲️ Circulation</td><td><strong>BP 96/60</strong> (borderline, her baseline 118/74), cool fingertips, <strong>regular</strong> rapid pulse. JVP shows rapid, <strong>regular "frog sign" / cannon A waves</strong> with every beat. S1 constant.</td><td>The hallmark of <strong>typical AVNRT</strong>: atria and ventricles depolarize almost <em>simultaneously</em>, so the right atrium contracts against a closed tricuspid valve every single beat → regular cannon A waves ("frog sign," neck pounding). Constant S1 (vs VT's variable S1) reflects fixed AV relationship — the opposite of VT's AV dissociation.</td></tr>
+      <tr><td>🅳 Disability</td><td>GCS 15, anxious, mild lightheadedness when she stands.</td><td>Mild cerebral hypoperfusion from the fast rate and short diastole — uncomfortable but not collapsing. Watch for any drop: presyncope is one of the "adverse features."</td></tr>
+      <tr><td>🅴 Exposure</td><td>No rash, no focal deficit, no leg swelling. Pads available, not yet applied.</td><td>Confirms a well young patient. Always have pads to hand for SVT — escalation is rare but you prepare for it.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Regular neck pounding (cannon A waves every beat) + a regular narrow tachycardia = the atrium and ventricle firing together = typical AVNRT. The 'frog sign' is the bedside fingerprint."</div>
+
+    <h3>🧭 The single most important question: STABLE or UNSTABLE?</h3>
+    <p>Every tachyarrhythmia forks on one decision. Look for the <strong>adverse features</strong> (the "4 S's"): <strong>Shock</strong> (SBP &lt; 90, poor perfusion), <strong>Syncope</strong>/presyncope, <strong>Severe ischemia</strong> (chest pain, ST changes), <strong>Severe heart failure</strong> (pulmonary edema). Ms. A.K. has mild presyncope and a borderline pressure but is <strong>conscious, perfusing and STABLE-leaning</strong>. That means we climb the chemistry/vagal ladder — but we keep cardioversion in reserve and re-check her constantly, because borderline patients can tip.</p>
+
+    <div class="callout warn"><b class="ct">⚡ The decision: STABLE-leaning → VAGAL FIRST, then ADENOSINE</b>A stable regular narrow-complex SVT gets the gentle ladder: <strong>(1) a properly performed modified Valsalva, (2) IV adenosine, (3) a rate-controlling drug if needed.</strong> Electricity (synchronized cardioversion) is held in reserve for the patient who becomes <strong>unstable</strong>. Don't reach for the defibrillator on a chatting 24-year-old — but never be more than one deterioration away from it.</div>
+
+    <!-- 🎬 BRANCHING SCENARIO ENGINE -->
+    <div class="scenario" id="scenarioBox">
+      <h3>🎬 Choose Your Path — "The First 60 Seconds"</h3>
+      <div class="hud"><span>❤️ Stability: <b id="scStab">●●○○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 s</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+      <div class="scene-text" id="scText">She's pale, hand on her chest, monitor showing a regular narrow-complex tachycardia at 188. BP 96/60, fully alert, full sentences. Her own breath-hold in the waiting room failed. The IV is in and adenosine and pads are at the bedside. What do you do FIRST?</div>
+      <div class="choices" id="scChoices"></div>
+      <div class="feedback" id="scFeedback"></div>
+      <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+    </div>
+
+    <div class="callout info"><b class="ct">🧮 If she were UNSTABLE instead</b>
+    If she became truly <em>unstable</em> — SBP &lt; 90 with shock, ongoing chest pain with ischemia, syncope, or pulmonary edema — the answer shifts from chemistry to electricity: <strong>synchronized DC cardioversion</strong> (after brief sedation if time allows). For an organized regular SVT this typically converts at low energy. But for the well, perfusing patient in front of you, electricity is overkill — vagal and adenosine break the great majority of AVNRT.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S4 — RESIDENT REVIEW -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s4">
+  <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+  <div class="section-content">
+    <p><em>The cardiology resident arrives at 14:34. Her reasoning, out loud:</em></p>
+
+    <h3>🧠 Pattern recognition first, then physiology</h3>
+    <p>"Narrow. Regular. Fast — 188. Young, structurally normal heart, recurrent paroxysmal episodes she breaks by bearing down. That is <strong>AVNRT</strong> — the commonest regular paroxysmal SVT. The narrow QRS tells me the ventricles are still being activated through the normal His-Purkinje system, so the circuit is <em>above</em> or <em>within</em> the AV node. This is the mirror image of our VT patient down the hall: there, scar + wide + regular = a ventricular circuit you shock. Here, normal heart + narrow + regular = a nodal circuit you can interrupt with a vagal maneuver or a drug that briefly blocks the AV node."</p>
+
+    <h3>🎯 Immediate priorities (her actual order of operations)</h3>
+    <ol>
+      <li>💨 <strong>Modified Valsalva, done properly:</strong> 15 seconds of forced exhalation against resistance (blow into a 10 mL syringe) while semi-recumbent, then <strong>immediately lie flat and have the legs raised to 45°</strong> for 15 s (the REVERT maneuver). This boosts venous return and the reflex vagal surge — roughly tripling conversion vs a standard Valsalva.</li>
+      <li>💉 <strong>If vagal fails → adenosine 6 mg rapid IV push + immediate saline flush</strong>, via a large proximal (antecubital) cannula, with continuous ECG running and the print button ready. Then 12 mg, then 12 mg if needed.</li>
+      <li>🗣️ <strong>Warn the patient before the push:</strong> "You'll feel a few seconds of chest tightness, flushing, breathlessness, maybe a sense of impending doom — it passes in seconds. That's the medicine working." Forewarned is half-treated.</li>
+      <li>🛡️ <strong>Have defib pads on and the resuscitation trolley ready</strong> — not because adenosine usually causes trouble, but because the whole point of the drug is a transient complete AV block, and you respect that.</li>
+      <li>🧯 <strong>Check the contraindications out loud:</strong> asthma/COPD (bronchospasm), recent heart transplant and dipyridamole (potentiate — reduce dose), and confirm the rhythm is <em>regular</em> and <em>not</em> pre-excited AF before any AV-nodal blocker.</li>
+      <li>📋 <strong>Capture the conversion on ECG</strong> — the moment adenosine blocks the node is diagnostic gold (reveals flutter waves, an atrial tachycardia, or the abrupt break of re-entry).</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Vagal first, adenosine second, cardioversion if unstable — and a rate-controlling drug only once you're certain it's a regular SVT and not pre-excited AF."</div>
+
+    <h3>🤔 "Why not just give verapamil first — it works for SVT?"</h3>
+    <p>"Verapamil <em>does</em> terminate AVNRT, but it's second-line behind vagal and adenosine for a reason: it's longer-acting, it drops the blood pressure, and — crucially — if I'm even slightly wrong and this is actually <strong>pre-excited AF</strong> (an irregular rhythm masquerading), an AV-nodal blocker can shunt conduction down the accessory pathway and precipitate VF. Adenosine's half-life is ~10 seconds, so its block is over almost before it begins; verapamil's effect lingers. Start with the reversible, then the short-acting, then the long-acting — and confirm regularity before any of the AV-nodal blockers."</p>
+
+    <div class="callout purple"><b class="ct">🧪 Resident's self-test (answer before reading on)</b>
+    A junior wants to give adenosine through a small cannula in the back of the hand, slowly, "to be gentle." Good idea?
+    <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+    <div class="reveal-hidden" id="rev1"><p><strong>No — that's how adenosine fails.</strong> Its half-life is ~10 seconds; pushed slowly or through a distal vein, it's metabolized before it ever reaches the AV node and does nothing — leading teams to wrongly conclude "adenosine didn't work" and escalate. Give it <strong>fast</strong>, through a <strong>large proximal (antecubital) line</strong>, with an <strong>immediate saline flush</strong> chasing it (the two-syringe or three-way-tap technique). Speed and a flush are the whole trick.</p></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S5 — CONSULTANT ROUND -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s5">
+  <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round</h2></div>
+  <div class="section-content">
+    <p><em>The on-call consultant electrophysiologist, by phone at 14:40, then at the bedside:</em></p>
+
+    <h3>🗂️ Name the rhythm precisely — it changes the long-term plan</h3>
+    <div class="vs">
+      <div class="side a"><h4>🔴 AVNRT (this patient)</h4>
+        <ul><li>Re-entry <strong>within/around the AV node</strong> using dual (slow &amp; fast) pathways</li><li>P wave usually <strong>buried in the QRS</strong> or just after it (pseudo-r' in V1, pseudo-S in inferior leads)</li><li>Commonest regular paroxysmal SVT; young, often female, normal heart</li><li>Acute: vagal → adenosine. Definitive: <strong>slow-pathway ablation</strong></li></ul></div>
+      <div class="side b"><h4>🔵 AVRT (orthodromic)</h4>
+        <ul><li>Re-entry through the AV node <em>down</em> and an <strong>accessory pathway</strong> back <em>up</em> — the circuit needs the whole atrium &amp; ventricle</li><li>P wave clearly <strong>after the QRS</strong> (longer RP); look for delta waves/WPW in sinus rhythm</li><li>Risk of pre-excited AF → never block the node blindly</li><li>Definitive: ablate the <strong>accessory pathway</strong></li></ul></div>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"AVNRT hides its P wave inside the QRS; AVRT shows its P wave after the QRS. Both stop when you block the AV node — but only AVRT carries an accessory pathway you must respect."</div>
+
+    <h3>🔎 The RP-interval trick — how the consultant tells the three apart</h3>
+    <p>"Look at where the retrograde P sits relative to the QRS — the <strong>RP interval</strong>. In <strong>typical (slow-fast) AVNRT</strong> the P is buried in or immediately after the QRS (very short RP — pseudo-r'/pseudo-S). In <strong>AVRT</strong> the P comes a little later (short RP, but distinct, after the QRS). In <strong>atrial tachycardia</strong> the P is far from the QRS (long RP) and the rhythm may persist with AV block when you give adenosine — the atria keep firing even though the node is blocked. That last point is the elegant diagnostic value of adenosine: it doesn't just treat, it <em>unmasks</em>."</p>
+
+    <h3>🧭 Consultant's three commandments for the next ten minutes</h3>
+    <ol>
+      <li>💨 "Do the vagal maneuver <strong>properly</strong> — the REVERT (modified Valsalva with leg-raise) before anyone touches a syringe. It's free, it's safe, and it works in nearly half of cases when done right. A lazy breath-hold is not a treatment."</li>
+      <li>💉 "If you give adenosine, give it like you mean it: <strong>6 mg fast through a big line with a flush, run the ECG strip</strong>, warn her first, pads on. If 6 fails, 12, then 12. Reduce the dose with dipyridamole or a transplanted heart; avoid it in real asthma."</li>
+      <li>🗺️ "Then think beyond tonight: this is her umpteenth episode. A <strong>slow-pathway catheter ablation</strong> is &gt;95% curative with ~1% risk of needing a pacemaker. Offer it — it can take a recurrent, life-disrupting arrhythmia and make it disappear for good."</li>
+    </ol>
+
+    <div class="callout danger"><b class="ct">☠️ The consultant's war memory (more in S13 M&amp;M)</b>"The dangerous error with these isn't usually AVNRT itself — it's the lookalike. I watched a team push adenosine into an <em>irregular</em> wide tachycardia they'd called 'SVT.' It was pre-excited AF. The transient nodal block shunted everything down the accessory pathway, the ventricular rate exploded, and it degenerated into VF. Adenosine is a deliberate six-second cardiac arrest — only aim it at a <em>regular</em> rhythm you're sure of, with the defibrillator at your elbow."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S6 — TEACHING POINTS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s6">
+  <div class="sec-header"><span class="s-badge">S6</span><h2>📖 Teaching Points</h2></div>
+  <div class="section-content">
+    <h3>🔬 The mechanism — WHY dual pathways make AVNRT (the WHY behind the WHY)</h3>
+    <ol>
+      <li>🛤️ <strong>The substrate:</strong> the AV node has two functional pathways. The <strong>fast pathway</strong> conducts quickly but has a <em>long</em> refractory period. The <strong>slow pathway</strong> conducts slowly but has a <em>short</em> refractory period. Most people have this and never know.</li>
+      <li>⏱️ <strong>The trigger:</strong> a premature atrial beat arrives at a critical moment — early enough that the fast pathway is still refractory (it blocks there), but the slow pathway has recovered and accepts it.</li>
+      <li>🔁 <strong>Re-entry is born:</strong> the impulse crawls <em>down the slow pathway</em>; by the time it reaches the bottom, the fast pathway has recovered, so it conducts <strong>retrogradely up the fast pathway</strong> to the top, then back down the slow pathway. A wavefront chasing its own tail in a tiny loop around the AV node. Each lap drives the atria and ventricles almost simultaneously → ~150–250/min.</li>
+      <li>👻 <strong>Why the P wave vanishes:</strong> because atria and ventricles are activated at nearly the same instant, the retrograde P wave is buried inside the QRS — or peeks out as a <strong>pseudo-r' in V1</strong> and a <strong>pseudo-S in the inferior leads</strong> (II, III, aVF). Those tiny deflections are retrograde atrial activation, not part of the QRS.</li>
+      <li>💥 <strong>Why it's usually well-tolerated (but not always):</strong> a normal heart copes with 188 for a while, but short diastole means reduced filling, lower output, lightheadedness, and — if prolonged or in a borderline patient — hypotension and presyncope. Block the AV node for one beat and the loop has nowhere to go: it terminates instantly.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"AVNRT is a wavefront trapped in a loop through the AV node. Anything that blocks the node for a single beat — a vagal surge or a slug of adenosine — collapses the loop and the tachycardia stops dead."</div>
+
+    <h3>⚖️ Contrast pair #1 — AVNRT vs AVRT vs Atrial Tachycardia (the RP-interval family)</h3>
+    <div class="vs">
+      <div class="side a"><h4>🌀 AVNRT (assume this first)</h4><ul><li>Re-entry <strong>within/around the AV node</strong> (dual pathways)</li><li>Very short RP — P <strong>buried in QRS</strong> / pseudo-r' (V1), pseudo-S (inferior)</li><li>Young, normal heart, sudden on/off</li><li>Terminates with vagal/adenosine; cured by <strong>slow-pathway ablation</strong></li></ul></div>
+      <div class="side b"><h4>🔵 AVRT &amp; Atrial Tachycardia</h4><ul><li><strong>AVRT:</strong> uses an accessory pathway — P clearly <em>after</em> QRS; hunt for WPW/delta waves; ablate the pathway</li><li><strong>Atrial tachycardia:</strong> long RP, P far from QRS; <strong>continues despite AV block</strong> with adenosine (atria keep firing)</li><li>Adenosine is diagnostic <em>and</em> therapeutic — watch what happens at the moment of block</li></ul></div>
+    </div>
+    <p>😈 <strong>The trap:</strong> all three are regular narrow tachycardias that can look alike at a glance. The discriminators are the <strong>RP interval</strong>, the presence of <strong>WPW</strong> on a resting ECG, and the <strong>response to adenosine</strong> — re-entry (AVNRT/AVRT) breaks abruptly; atrial tachycardia and flutter persist with transient block, unmasking their atrial activity.</p>
+
+    <h3>⚖️ Contrast pair #2 — Narrow-complex vs Wide-complex tachycardia</h3>
+    <div class="vs">
+      <div class="side a"><h4>🌀 Narrow-complex (this patient)</h4><ul><li>QRS &lt; 120 ms — ventricles via normal His-Purkinje</li><li>Supraventricular origin: AVNRT, AVRT, atrial tach, flutter, AF</li><li>Regular + narrow → treat as SVT: vagal/adenosine</li><li>Generally well-tolerated; reversible block ends re-entry</li></ul></div>
+      <div class="side b"><h4>⚡ Wide-complex</h4><ul><li>QRS ≥ 120 ms — abnormal ventricular activation</li><li><strong>Treat a wide-AND-regular tachycardia as VT</strong> until proven otherwise, especially with structural heart disease</li><li><strong>Never</strong> give AV-nodal blockers blindly to wide tachycardia</li><li>Unstable → synchronized cardioversion (see the VT case)</li></ul></div>
+    </div>
+    <p>💡 <em>Why it matters:</em> the narrow QRS here is what makes the gentle SVT ladder safe. The instant a tachycardia is wide and regular, the default flips to "treat as VT," and AV-nodal blockers become dangerous. Width changes the whole algorithm.</p>
+
+    <!-- 🎮 INTERACTIVE SIM: vagal tone / AV-node refractoriness -->
+    <div class="sim" id="kSim">
+      <h3 style="margin-top:0">🎮 Simulation — The Vagal Dial: how AV-node refractoriness breaks the loop</h3>
+      <p style="font-size:13.5px">Drag the dial from low vagal tone (sympathetic, the node conducts freely and the re-entry loop keeps spinning) up through a strong vagal surge / adenosine (transient complete AV block). Watch the moment the loop has nowhere to go and the tachycardia terminates.</p>
+      <label for="kRange">💨 Vagal tone / AV-node block: <b id="kVal">3.1</b> / 10</label>
+      <input type="range" id="kRange" min="20" max="75" value="31">
+      <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+      <div class="readout bad" id="kReadout">Set the dial to explore.</div>
+      <p style="font-size:12.5px; margin-top:10px; color:var(--ink2)">🎯 The therapeutic target: enough transient AV-nodal block to interrupt one beat of the circuit — a strong modified Valsalva, or adenosine's ~10-second complete block. Too little vagal tone → re-entry persists. The block need only last a heartbeat to win.</p>
+    </div>
+
+    <!-- 📚 EBM MODULE -->
+    <div class="ebm">
+      <h3>📚 Evidence-Based Medicine Corner</h3>
+      <table class="tbl">
+        <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+        <tr><td><span class="lvl">RCT</span> REVERT (2015, Lancet)</td><td>Modified Valsalva (forced exhalation then immediate supine leg-raise) converted ~43% of SVT vs ~17% with the standard Valsalva.</td><td>Do the <em>modified</em> maneuver, not a lazy breath-hold — it roughly triples your first-line success and saves many patients a needle.</td></tr>
+        <tr><td><span class="lvl">RCT</span> Adenosine vs Verapamil (meta-analyses)</td><td>Both terminate ~90%+ of AVNRT/AVRT; adenosine acts in seconds with a ~10 s half-life and fewer hypotensive episodes, verapamil lasts longer and lowers BP more.</td><td>Adenosine is first-line drug therapy (fast, short-lived). Non-DHP CCB/beta-blocker are alternatives once a regular SVT is confirmed.</td></tr>
+        <tr><td><span class="lvl">REGISTRY</span> Slow-pathway ablation</td><td>Catheter ablation of the slow pathway cures AVNRT in &gt;95% of patients, with a small (~1%) risk of AV block requiring a pacemaker.</td><td>For recurrent/symptomatic AVNRT, ablation is definitive and highly effective — offer it rather than a lifetime of pills.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2015 ACC/AHA SVT</td><td>Vagal maneuvers and adenosine are Class I for acute termination of regular SVT; ablation is recommended for recurrent symptomatic AVNRT.</td><td>The ladder driving S3, S7 and S11 is exactly guideline-concordant.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2019 ESC SVT</td><td>Confirms vagal → adenosine → (verapamil/diltiazem or beta-blocker) → cardioversion if unstable; ablation as first-line definitive therapy.</td><td>Same ladder, same definitive cure — international consensus.</td></tr>
+      </table>
+    </div>
+
+    <!-- 🔬 ADVANCED TOPICS -->
+    <div class="callout purple">
+      <h3 style="margin-top:0">🔬 Fellowship Corner — Advanced Topics</h3>
+      <ul>
+        <li>🔁 <strong>Typical vs atypical AVNRT:</strong> "slow-fast" (typical, ~90%, very short RP, P buried) vs "fast-slow" or "slow-slow" (atypical, long RP, P well after QRS) — the atypical forms mimic atrial tachycardia and can be tricky to map.</li>
+        <li>🗺️ <strong>Slow-pathway modification:</strong> ablation targets the slow-pathway region in the inferoseptal right atrium near the coronary sinus os; endpoint is loss of sustained AVNRT with at most a single AV-nodal echo. The risk to avoid is the compact node → <strong>complete heart block</strong>.</li>
+        <li>🧬 <strong>The AVNRT–AVRT mechanistic divide:</strong> AVNRT is a small intranodal loop; AVRT requires a macro-reentrant circuit through an accessory pathway — which is why a resting ECG in sinus rhythm (looking for pre-excitation/delta waves) is mandatory before ablation.</li>
+        <li>💊 <strong>The 'pill-in-the-pocket' strategy:</strong> for infrequent, well-tolerated episodes, a single oral dose of diltiazem + propranolol (or flecainide in selected patients with normal hearts) taken at onset can abort attacks without daily medication.</li>
+        <li>🤰 <strong>AVNRT in pregnancy:</strong> vagal maneuvers first; adenosine is considered safe and is the drug of choice; metoprolol/verapamil as alternatives; cardioversion is safe if unstable. Flecainide/sotalol for prophylaxis if needed.</li>
+        <li>🧪 <strong>The pseudo-r'/pseudo-S sign:</strong> compare the tachycardia ECG to the patient's sinus-rhythm ECG — a new small terminal deflection (r' in V1, S in inferior leads) that disappears after conversion is retrograde atrial activation and is fairly specific for typical AVNRT.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S7 — ORDERS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s7">
+  <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+  <div class="section-content">
+    <h3>🖊️ The order set, written as you'd actually write it (14:35)</h3>
+    <ul>
+      <li>💨 <strong>Modified Valsalva (REVERT) FIRST</strong> — forced exhalation 15 s against resistance, then immediate supine position with passive leg-raise; repeat once if needed.</li>
+      <li>💉 <strong>Adenosine 6 mg rapid IV push + immediate 20 mL saline flush</strong> via a large antecubital cannula, continuous ECG recording; if no conversion → <strong>12 mg</strong>, then <strong>12 mg</strong>. Reduce dose if on dipyridamole or heart transplant; avoid in active asthma.</li>
+      <li>🛡️ <strong>Defibrillator pads applied, resuscitation trolley at bedside</strong> before adenosine — anticipate the transient pause and counsel the patient.</li>
+      <li>🚫 <strong>Confirm the rhythm is REGULAR and not pre-excited AF before any AV-nodal blocker</strong> — flag on chart.</li>
+      <li>💊 <strong>If adenosine fails or AVNRT recurs:</strong> non-DHP calcium-channel blocker (<strong>verapamil 5–10 mg IV slowly</strong> or diltiazem) <em>or</em> a beta-blocker — only once a regular SVT is confirmed and BP tolerates it.</li>
+      <li>⚡ <strong>If she becomes UNSTABLE:</strong> synchronized DC cardioversion (sedate if time allows) — low energy usually suffices for organized SVT.</li>
+      <li>🫀 12-lead ECG before, during (capture the moment of conversion) and after; basic bloods: U&amp;E, Mg²⁺, TSH (screen for thyrotoxicosis as a driver), pregnancy test.</li>
+      <li>📞 Refer cardiology/EP for slow-pathway ablation discussion; advise on triggers (caffeine, alcohol) and the self-administered modified Valsalva for future episodes.</li>
+      <li>🫁 Continuous monitoring, second IV, reassure — anxiety feeds the sympathetic drive that sustains the rhythm.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In stable AVNRT there are only two acute jobs: do the modified Valsalva properly, and if it fails, push adenosine FAST through a big line with a flush. Everything else is reassurance and follow-up."</div>
+
+    <!-- 🩺 PROCEDURE GUIDE 1 -->
+    <div class="checklist" id="ckCV">
+      <h3 style="margin-top:0">🩺 Procedure Guide — Modified Valsalva (REVERT) — tick as you go</h3>
+      <label class="ck"><input type="checkbox"><span>🧑‍⚕️ Confirm a STABLE regular narrow-complex tachycardia with a pulse (no adverse features needing cardioversion)</span></label>
+      <label class="ck"><input type="checkbox"><span>🪑 Sit the patient semi-recumbent (≈45°); attach continuous ECG and have a 10 mL syringe ready as the resistance device</span></label>
+      <label class="ck"><input type="checkbox"><span>💨 Ask her to blow into the syringe (or against a closed glottis) hard enough to just move the plunger, for <strong>15 seconds</strong></span></label>
+      <label class="ck"><input type="checkbox"><span>🛏️ <strong>Immediately</strong> lie her flat and have an assistant passively raise her legs to 45° for 15 seconds (the modification that triples success)</span></label>
+      <label class="ck"><input type="checkbox"><span>📈 Return her to semi-recumbent, watch the monitor for conversion to sinus rhythm; print a strip across the transition</span></label>
+      <label class="ck"><input type="checkbox"><span>🔁 If unsuccessful, repeat once — then escalate to adenosine</span></label>
+      <label class="ck"><input type="checkbox"><span>📋 Document rhythm before/after, time, and patient tolerance</span></label>
+      <div class="ck-progress" data-progress>0 / 7 complete</div>
+    </div>
+
+    <!-- 🩺 PROCEDURE GUIDE 2 -->
+    <div class="checklist" id="ckDefib">
+      <h3 style="margin-top:0">🩺 Procedure Guide — Giving Adenosine Safely (the FAST-and-FLUSH technique)</h3>
+      <p style="font-size:13px">⚠️ Adenosine is a deliberate ~6-second cardiac arrest. Its half-life is ~10 s, so it MUST be pushed fast and flushed, or it never reaches the node. Warn the patient and ready the defibrillator.</p>
+      <label class="ck"><input type="checkbox"><span>🗣️ Warn the patient: brief chest tightness, flushing, breathlessness, a sense of doom, then a short pause — all pass in seconds</span></label>
+      <label class="ck"><input type="checkbox"><span>🛡️ Defib pads on, continuous ECG running with the recorder armed, large proximal (antecubital) IV confirmed patent</span></label>
+      <label class="ck"><input type="checkbox"><span>💉 Draw 6 mg adenosine and a 20 mL saline flush; use a three-way tap or the two-syringe technique so the flush chases instantly</span></label>
+      <label class="ck"><input type="checkbox"><span>⚡ Push the adenosine <strong>as fast as possible</strong>, then immediately push the flush and raise the arm</span></label>
+      <label class="ck"><input type="checkbox"><span>📈 Watch for the transient AV block / pause and the abrupt termination of re-entry; capture it on the strip (diagnostic gold)</span></label>
+      <label class="ck"><input type="checkbox"><span>🔁 If no conversion, escalate to 12 mg, then 12 mg; reduce dose with dipyridamole/transplant; avoid in active asthma</span></label>
+      <div class="ck-progress" data-progress>0 / 6 complete</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S8 — NURSING CARE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s8">
+  <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+  <div class="section-content">
+    <h3>🛏️ ED / EP nursing priorities — minute by minute</h3>
+    <ul>
+      <li>📟 <strong>Continuous telemetry with a printed rhythm strip running across every intervention.</strong> The strip capturing the moment of conversion is diagnostic gold for the EP team.</li>
+      <li>💉 <strong>Set up adenosine to be given FAST:</strong> draw the 6 mg, draw a 20 mL flush, connect a three-way tap to a large proximal cannula. The drug fails if it is given slowly or through a tiny distal vein — your set-up makes or breaks the treatment.</li>
+      <li>🗣️ <strong>Coach the patient through the modified Valsalva</strong> and warn her about the adenosine sensation beforehand — a calm, prepared patient tolerates both far better.</li>
+      <li>🩸 <strong>BP every few minutes</strong> — borderline pressures can drop; watch for presyncope or any adverse feature that would tip her toward cardioversion.</li>
+      <li>🛡️ <strong>Defib pads on and trolley ready before adenosine.</strong> Trouble is rare, but the drug deliberately blocks the AV node, so you respect it.</li>
+      <li>🔇 <strong>Calm the room:</strong> anxiety pours out catecholamines that feed the re-entry circuit and make termination harder. A composed bedside is genuinely therapeutic.</li>
+      <li>📋 <strong>Document the rhythm before/after each maneuver and drug</strong>, the dose, the time, and tolerance — and keep a copy of the sinus-rhythm ECG to compare P-wave morphology.</li>
+      <li>🧠 <strong>Re-check consciousness and pulse character</strong> — a patient who stops talking or whose pulse changes needs immediate medical review.</li>
+      <li>👨‍👩‍👦 Keep the family/companion informed (see S16) — a fit young person with a racing heart is frightening to watch.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who sets adenosine up to be pushed FAST with a flush, and coaches the modified Valsalva properly, does most of the antiarrhythmic work in the room."</div>
+    <div class="callout warn"><b class="ct">📢 Escalate IMMEDIATELY for</b>New hypotension with shock · syncope or worsening presyncope · chest pain or ischemic ST changes · pulmonary edema · an <em>irregular</em> rhythm appearing (think pre-excited AF — stop AV-nodal blockers) · any deterioration suggesting the patient is now UNSTABLE and needs cardioversion.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S9 — INVESTIGATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s9">
+  <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+  <div class="section-content">
+    <h3>🧾 Results board (14:50)</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>Result</th><th>Reference</th><th>Interpretation</th></tr>
+      <tr><td>Potassium</td><td class="ok-v">4.2 mmol/L</td><td>3.5–5.0</td><td>Normal — unlike the VT case, electrolytes are not the driver here. The substrate is structural-electrical (dual AV-nodal pathways), not metabolic.</td></tr>
+      <tr><td>Magnesium</td><td class="ok-v">0.84 mmol/L</td><td>0.7–1.0</td><td>Normal. Reassuring, and supports a primary re-entry mechanism rather than a triggered/metabolic arrhythmia.</td></tr>
+      <tr><td>Troponin I</td><td class="ok-v">&lt; 0.04 ng/mL</td><td>&lt; 0.04</td><td>Negative — no significant demand ischemia in a young normal heart even at 188. A negative troponin reassures but does not change acute management.</td></tr>
+      <tr><td>TSH</td><td class="hi">Pending</td><td>0.4–4.0</td><td>Always screen: thyrotoxicosis precipitates and sustains SVT and changes long-term management if abnormal.</td></tr>
+      <tr><td>β-hCG</td><td class="ok-v">Negative</td><td>—</td><td>Confirms not pregnant — relevant to drug choice (adenosine is safe in pregnancy, but verapamil/amiodarone choices shift).</td></tr>
+      <tr><td>Caffeine / stimulant history</td><td class="hi">High coffee + OTC caffeine tablets</td><td>—</td><td>The likely trigger that fired the premature atrial beat. Trigger counseling is part of the cure.</td></tr>
+      <tr><td>Resting (sinus) 12-lead</td><td class="ok-v">No delta wave / pre-excitation</td><td>—</td><td>Crucial: no WPW pattern argues against AVRT and supports AVNRT; it also reassures before any AV-nodal blocker.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In AVNRT the bloods are usually boring — and that's the point. A normal-heart, normal-electrolyte, regular narrow tachycardia is a wiring problem, not a chemistry problem. The ECG, not the lab, makes this diagnosis."</div>
+
+    <div class="callout info"><b class="ct">🧠 Why the SINUS-rhythm ECG matters as much as the tachycardia ECG</b>Always obtain a 12-lead once she's back in sinus rhythm. Two reasons: (1) compare it to the tachycardia ECG — a terminal pseudo-r' (V1) or pseudo-S (inferior leads) that <em>vanishes</em> after conversion confirms it was retrograde atrial activation, i.e. typical AVNRT; (2) look for a <strong>delta wave / short PR</strong> of WPW — if present, the rhythm may have been AVRT and the accessory pathway changes the long-term ablation target and the danger of pre-excited AF.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S10 — ECG / IMAGING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s10">
+  <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging</h2></div>
+  <div class="section-content">
+    <h3>🫀 The presenting rhythm — read it like a detective</h3>
+    <div class="ecg-fig">
+      <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Regular narrow-complex tachycardia with a pseudo-r prime, terminating abruptly to sinus after adenosine">
+        <rect width="820" height="150" fill="#0b1220"/>
+        <g stroke="#1e3a5f" stroke-width="1">
+          <line x1="0" y1="30" x2="820" y2="30"/><line x1="0" y1="60" x2="820" y2="60"/>
+          <line x1="0" y1="90" x2="820" y2="90"/><line x1="0" y1="120" x2="820" y2="120"/>
+        </g>
+        <polyline fill="none" stroke="#86efac" stroke-width="2.4" points="0,75 30,75 40,40 50,95 58,62 70,75 110,75 120,40 130,95 138,62 150,75 190,75 200,40 210,95 218,62 230,75 270,75 280,40 290,95 298,62 310,75 350,75 360,40 370,95 378,62 390,75 430,75 440,40 450,95 458,62 470,75 510,75 540,75 560,72 575,55 590,75 640,75 660,68 678,55 695,75 740,75 760,68 778,55 795,75 820,75"/>
+        <text x="180" y="22" fill="#fca5a5" font-size="12" font-weight="700">↑ pseudo-r' (buried P)</text>
+        <text x="520" y="22" fill="#fcd34d" font-size="12" font-weight="700">↑ adenosine → abrupt break to sinus</text>
+      </svg>
+      <div class="ecg-cap">Regular, narrow, monomorphic tachycardia at ~188 with a small terminal <span style="color:#fca5a5">pseudo-r'</span> (the retrograde P buried in the QRS). At the arrow, <span style="color:#fcd34d">adenosine</span> blocks the AV node and the re-entry loop <strong>terminates abruptly</strong> into sinus rhythm — the signature of nodal-dependent SVT.</div>
+    </div>
+
+    <h3>🔎 The AVNRT recognition toolkit (memorize the high-yield ones)</h3>
+    <table class="tbl">
+      <tr><th>Feature</th><th>Why it means AVNRT</th></tr>
+      <tr><td>📏 <strong>Narrow QRS, regular</strong></td><td>&lt; 120 ms and metronome-regular — ventricles via the normal His-Purkinje system, so the circuit is supraventricular/nodal.</td></tr>
+      <tr><td>👻 <strong>No visible P waves</strong></td><td>The retrograde P is buried in the QRS because atria and ventricles fire almost simultaneously — the hallmark of typical (slow-fast) AVNRT.</td></tr>
+      <tr><td>🔼 <strong>Pseudo-r' in V1</strong></td><td>A small terminal positive deflection in V1 that wasn't there in sinus rhythm — retrograde atrial activation peeking out of the QRS.</td></tr>
+      <tr><td>🔽 <strong>Pseudo-S in II, III, aVF</strong></td><td>A small terminal negative deflection in the inferior leads — the same retrograde P, seen from below.</td></tr>
+      <tr><td>⚡ <strong>Sudden onset &amp; offset</strong></td><td>Re-entry starts and stops in a single beat — paroxysmal "on/off like a switch." Contrast with sinus tach, which warms up and cools down.</td></tr>
+      <tr><td>💨 <strong>Terminates with vagal/adenosine</strong></td><td>Blocking the AV node for one beat collapses the loop — abrupt termination confirms a nodal-dependent re-entry (AVNRT or AVRT).</td></tr>
+      <tr><td>🚫 <strong>No delta wave in sinus rhythm</strong></td><td>Absence of pre-excitation argues against AVRT/WPW and for AVNRT — always check the post-conversion ECG.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A new pseudo-r' in V1 or pseudo-S inferiorly that vanishes the moment the tachycardia breaks is a retrograde P wave — and near-proof of typical AVNRT."</div>
+
+    <h3>🫀 Post-conversion 12-lead &amp; echo</h3>
+    <ul>
+      <li>📈 <strong>Post-conversion 12-lead:</strong> sinus rhythm ~72/min, normal axis, normal PR, <strong>no delta wave</strong>, and — compared to the tachycardia strip — the V1 pseudo-r' and inferior pseudo-S have <strong>disappeared</strong>, confirming they were retrograde atrial activation (typical AVNRT).</li>
+      <li>🩻 <strong>Echo:</strong> structurally normal heart, normal chambers, normal valves, EF 62%. This is expected and reassuring — AVNRT is a wiring problem on a healthy heart.</li>
+      <li>🧪 <strong>Ambulatory monitoring (later):</strong> if the diagnosis is ever in doubt, a Holter/event recorder can capture onset (a premature atrial beat initiating the run) — useful before ablation.</li>
+    </ul>
+
+    <div class="callout warn"><b class="ct">⚠️ The ECG's favorite trap in narrow-complex tachycardia</b>"It's regular and narrow, so it must be AVNRT." Not always — <strong>atrial flutter with 2:1 block</strong> sits at almost exactly 150/min and looks deceptively regular. Adenosine (or a careful look for flutter waves at 300/min) unmasks it: the ventricular rate slows with AV block while sawtooth flutter waves march on. Always interrogate the response to nodal block.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S11 — MEDICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s11">
+  <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+  <div class="section-content">
+    <h3>💉 Acute drugs — what, why, and the traps</h3>
+    <table class="tbl">
+      <tr><th>Drug</th><th>Role tonight</th><th>Mechanism / caution</th></tr>
+      <tr><td><strong>Adenosine 6 → 12 → 12 mg IV</strong></td><td>First-line drug: transient complete AV block breaks the re-entry circuit</td><td>Half-life ~10 s — push <strong>FAST</strong> through a large proximal line + immediate flush. Warn: chest tightness, flushing, dyspnea, sense of doom, brief pause. <strong>Caution: asthma/COPD</strong> (bronchospasm); <strong>reduce dose</strong> with dipyridamole or heart transplant; give a larger dose if via a central line.</td></tr>
+      <tr><td><strong>Verapamil 5–10 mg IV slowly</strong></td><td>Second-line if adenosine fails or AVNRT recurs (regular SVT confirmed)</td><td>Non-DHP CCB; blocks the AV node for longer than adenosine. <strong>Negative inotrope/vasodilator</strong> → can drop BP. <strong>NEVER in undifferentiated wide-complex or pre-excited AF.</strong></td></tr>
+      <tr><td><strong>Diltiazem IV</strong></td><td>Alternative non-DHP CCB, second-line</td><td>Similar to verapamil; slightly less negative inotropy. Same contraindications — confirm a regular SVT first.</td></tr>
+      <tr><td><strong>Beta-blocker (metoprolol/esmolol)</strong></td><td>Alternative AV-nodal blocker; useful in catecholamine-driven recurrence</td><td>Slows AV-nodal conduction. Avoid an aggressive bolus into hypotension; titrate. Esmolol's short half-life is handy.</td></tr>
+      <tr><td><strong>Magnesium / IV fluids</strong></td><td>Supportive; treat dehydration or borderline pressure</td><td>A fluid bolus can lift a borderline BP and improve tolerance while you work the ladder.</td></tr>
+      <tr><td><strong>Synchronized cardioversion (not a drug)</strong></td><td>For the patient who becomes UNSTABLE</td><td>Organized SVT converts at low energy. Sedate if time allows. The fall-back when chemistry is inappropriate or fails in an unstable patient.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Adenosine is a deliberate six-second cardiac arrest — warn the patient, ready the defibrillator, and push it FAST with a flush. Verapamil only when you're certain it's a regular SVT and not pre-excited AF."</div>
+
+    <div class="callout danger"><b class="ct">🚫 The 'never' list when the rhythm might NOT be simple AVNRT</b>❌ AV-nodal blockers (adenosine, verapamil, diltiazem, beta-blockers, digoxin) into an <em>irregular</em> wide tachycardia — <strong>pre-excited AF</strong>, where blocking the node shunts conduction down the accessory pathway and can precipitate VF · ❌ verapamil into any wide-complex tachycardia you haven't proven is SVT · ❌ slow / distal-vein adenosine (it simply won't work). When unsure and unstable, the safest "drug" is <strong>synchronized electricity</strong>.</div>
+
+    <h3>🏠 Definitive &amp; preventive therapy (beyond breaking tonight's episode)</h3>
+    <ul>
+      <li>🗺️ <strong>Slow-pathway catheter ablation</strong> — the definitive cure: &gt;95% success, ~1% risk of AV block/pacemaker. For recurrent, symptomatic AVNRT this beats lifelong tablets.</li>
+      <li>💊 <strong>Chronic oral AV-nodal blockers</strong> (beta-blocker or non-DHP CCB) — for patients who decline or defer ablation, to reduce episode frequency.</li>
+      <li>💼 <strong>'Pill-in-the-pocket'</strong> — a single oral dose at onset for infrequent, well-tolerated attacks.</li>
+      <li>☕ <strong>Trigger modification &amp; self-Valsalva training</strong> — reduce caffeine/alcohol, manage stress, and teach the modified Valsalva so she can often abort attacks herself.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S12 — MONITORING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s12">
+  <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+  <div class="section-content">
+    <h3>📡 What to watch and why</h3>
+    <ul>
+      <li>📈 <strong>Continuous telemetry</strong> through the maneuvers and drug pushes; <strong>print a strip across every intervention</strong> — the conversion strip is diagnostic gold for the EP team.</li>
+      <li>🩸 <strong>Frequent BP</strong> — borderline pressures can drop; a falling BP or new presyncope means re-evaluate stability and consider cardioversion.</li>
+      <li>📐 <strong>Watch the post-adenosine rhythm</strong> — expect a brief pause/AV block; rarely a few seconds of bradycardia, ectopy or even transient AF before sinus resumes. Be ready, but don't over-react to the expected pause.</li>
+      <li>🫀 <strong>Compare the tachycardia and sinus 12-leads</strong> — disappearance of the pseudo-r'/pseudo-S confirms AVNRT; a delta wave changes the plan.</li>
+      <li>😰 <strong>Symptom + anxiety monitoring</strong> — recurrence is often heralded by the patient feeling it "switch on" again; her own report is a sensitive monitor.</li>
+      <li>🔁 <strong>Watch for recurrence</strong> — AVNRT can restart, especially if the catecholamine state (anxiety, pain, caffeine) persists. Reassurance and trigger removal are part of monitoring.</li>
+      <li>🔋 <strong>If referred for ablation:</strong> the EP study itself is the definitive "monitor" — inducing and mapping the circuit to confirm the slow-pathway target.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After you break AVNRT, the monitor's job changes from 'can I terminate it?' to 'is it coming back?' — and the two things that answer that are the rhythm strip and whether the trigger is still present."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S13 — COMPLICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s13">
+  <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+  <div class="section-content">
+    <h3>💀 What can go wrong — and the mechanism</h3>
+    <ul>
+      <li>🌀 <strong>Misdiagnosing pre-excited AF as 'SVT'</strong> — the most dangerous error. Giving an AV-nodal blocker to an irregular wide tachycardia shunts conduction down the accessory pathway → very rapid ventricular rates → VF. Always confirm <em>regularity</em> first.</li>
+      <li>📉 <strong>Hemodynamic deterioration</strong> — a borderline patient can tip into shock or presyncope if the rate is sustained, mandating a switch to cardioversion.</li>
+      <li>⏸️ <strong>Adenosine effects</strong> — transient flushing, chest tightness, dyspnea, sense of doom, and a brief pause; rarely transient AF, bradycardia or bronchospasm (asthmatics). Almost always self-limiting because of the ~10 s half-life.</li>
+      <li>🩺 <strong>Verapamil hypotension</strong> — second-line CCB can drop the pressure (vasodilation + negative inotropy), especially if the rhythm was actually VT — hence "confirm SVT first."</li>
+      <li>🗺️ <strong>Ablation complications</strong> — slow-pathway ablation carries a small (~1%) risk of <strong>complete AV block requiring a pacemaker</strong> (the compact node is nearby), plus the usual access-site/effusion risks.</li>
+      <li>🔁 <strong>Recurrence</strong> — without trigger control or definitive ablation, AVNRT comes back; it's benign but can be life-disrupting.</li>
+    </ul>
+
+    <!-- 🎭 M&M CONFERENCE MODULE -->
+    <div class="mm">
+      <h3>🎭 Morbidity &amp; Mortality Conference — "The Adenosine That Became a Defibrillation"</h3>
+      <div class="mm-case">
+        <strong>The case:</strong> A 29-year-old man arrived with palpitations and a fast tachycardia the night team labeled "SVT." They reached for adenosine — but the rhythm was actually <strong>pre-excited atrial fibrillation</strong> (irregular, varying QRS width, a delta wave on an old ECG nobody pulled). The transient AV-nodal block from adenosine pushed conduction entirely down the accessory pathway; the ventricular rate accelerated to over 280 and <strong>degenerated into VF</strong>. He arrested and needed prolonged defibrillation. In a parallel near-miss the same week, a different team gave adenosine through a hand vein <em>slowly</em>, watched it "fail," and escalated to IV verapamil for what was in fact a regular AVNRT — the verapamil dropped the BP dangerously before the rhythm finally broke. Two errors, one lesson.
+      </div>
+      <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+      <div class="swiss">
+        <div class="hole"><b>🌀 REGULARITY NOT CHECKED</b>Irregular wide tachycardia = pre-excited AF, not simple SVT — AV-nodal block is lethal there.</div>
+        <div class="hole"><b>📈 OLD ECG NOT PULLED</b>A documented delta wave (WPW) would have changed everything.</div>
+        <div class="hole"><b>💉 GIVEN WRONG</b>Slow push through a distal vein → adenosine metabolized before it works → false 'failure.'</div>
+        <div class="hole"><b>💊 PREMATURE ESCALATION</b>Jumping to verapamil for a 'failed' adenosine that was never given properly.</div>
+        <div class="hole"><b>🌙 SYSTEM</b>Night fatigue, no senior review, no "confirm regular + check for pre-excitation" default.</div>
+      </div>
+      <p style="margin-bottom:0"><strong>🛡️ What would have saved them:</strong> before any AV-nodal blocker, confirm the rhythm is <em>regular</em> and look for pre-excitation (irregular + varying QRS width = pre-excited AF → procainamide or cardiovert, never block the node); give adenosine <strong>FAST through a large proximal line with a flush, defibrillator ready</strong>; don't call adenosine a 'failure' until it's been given correctly; climb the ladder in order. <strong>This is exactly why your team confirmed a regular narrow rhythm and a clean sinus ECG before pushing tonight.</strong></p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'It's just SVT' is the sentence written before an AV-nodal blocker turns pre-excited AF into VF. Confirm REGULAR and rule out pre-excitation before you ever block the node."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S14 — DIFFERENTIALS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s14">
+  <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials</h2></div>
+  <div class="section-content">
+    <h3>🧩 The regular narrow-complex (and one wide) tachycardia differential</h3>
+    <table class="tbl">
+      <tr><th>Diagnosis</th><th>Clues</th><th>Why it matters</th></tr>
+      <tr><td>🌀 <strong>AVNRT</strong> (this patient)</td><td>Young, normal heart, sudden on/off, P buried in QRS / pseudo-r' / pseudo-S, regular 150–250</td><td>Commonest regular paroxysmal SVT. Vagal → adenosine; cured by slow-pathway ablation.</td></tr>
+      <tr><td>🔵 <strong>AVRT (orthodromic)</strong></td><td>P clearly after the QRS (short RP, but visible); delta wave/WPW on sinus ECG</td><td>Uses an accessory pathway; ablate the pathway. Pre-excited AF risk — never block the node blindly.</td></tr>
+      <tr><td>📡 <strong>Atrial tachycardia</strong></td><td>Long RP, P far from QRS; <strong>continues with AV block</strong> after adenosine (atria keep firing)</td><td>Adenosine is diagnostic, not always curative; different mapping target at ablation.</td></tr>
+      <tr><td>🪚 <strong>Atrial flutter (2:1)</strong></td><td>Ventricular rate ~150, sawtooth flutter waves at ~300; regularity mimics AVNRT</td><td>Adenosine slows AV conduction and unmasks flutter waves. Rate control / cardioversion / ablation differ.</td></tr>
+      <tr><td>🏃 <strong>Sinus tachycardia</strong></td><td>Gradual warm-up/cool-down, identifiable P before each QRS, a clear cause (pain, fever, anxiety, hypovolemia)</td><td>Treat the cause, not the rhythm. Won't terminate with adenosine.</td></tr>
+      <tr><td>⚡ <strong>Pre-excited AF / wide-complex tachycardia</strong></td><td><strong>Irregular</strong>, varying QRS width; or wide + regular in a structural heart (VT)</td><td>AV-nodal blockers are dangerous/contraindicated → procainamide or cardiovert. The lethal mimic — see S13.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"REGULAR + narrow + young normal heart → think AVNRT. IRREGULAR (or wide) → stop and think pre-excited AF or VT, and keep your hands off the AV node."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S15 — PLAN -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s15">
+  <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan</h2></div>
+  <div class="section-content">
+    <h3>🧭 Now → this week → for life</h3>
+    <ol>
+      <li>💨 <strong>Now (done):</strong> modified Valsalva attempted; adenosine 6 mg then 12 mg given FAST with flush → abrupt conversion to sinus rhythm; post-conversion 12-lead confirms no pre-excitation; BP normalizes; observe and reassure.</li>
+      <li>🔎 <strong>Confirm the diagnosis &amp; screen drivers:</strong> compare tachycardia vs sinus ECG (pseudo-r'/pseudo-S resolution), check TSH, review caffeine/alcohol/stimulant intake, confirm a structurally normal echo.</li>
+      <li>🗺️ <strong>Electrophysiology referral for slow-pathway ablation</strong> — definitive cure (&gt;95% success, ~1% pacemaker risk) for recurrent symptomatic AVNRT; offer it given her years of disruptive episodes.</li>
+      <li>💊 <strong>Bridge / alternative:</strong> chronic oral beta-blocker or non-DHP CCB, or a 'pill-in-the-pocket' strategy, for patients deferring ablation or with infrequent episodes.</li>
+      <li>☕ <strong>Trigger modification &amp; self-management training:</strong> reduce caffeine/alcohol, manage stress, and teach her the modified Valsalva so she can abort future attacks herself.</li>
+      <li>👨‍👩‍👦 <strong>Shared decision-making &amp; education:</strong> explain AVNRT in plain language, the benign-but-disruptive nature, when to come to hospital (presyncope/chest pain/breathlessness or an episode that won't break), and the realistic cure that ablation offers.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Adenosine treats the episode; slow-pathway ablation treats the disease. Send her home knowing how to break the next attack — and with a referral that can end them for good."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S16 — PROGRESS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s16">
+  <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+  <div class="section-content">
+    <h3>📅 Course in the ED / EP day unit</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">14:36</div>Modified Valsalva (REVERT) performed properly — rate dips briefly but the tachycardia persists. Escalate to adenosine.</div>
+      <div class="t-item"><div class="t-time">14:42</div>Adenosine 6 mg fast IV + flush → transient AV block, a few-second pause, but reverts straight back to AVNRT. Patient warned and tolerated it.</div>
+      <div class="t-item"><div class="t-time">14:44</div>Adenosine 12 mg fast IV + flush → <strong>abrupt termination to sinus rhythm at 74</strong>. BP rises to 116/72. She exhales: "That's it — it's gone."</div>
+      <div class="t-item"><div class="t-time">14:55</div>Post-conversion 12-lead: sinus, normal PR, no delta wave; the V1 pseudo-r' from the tachycardia strip has disappeared → typical AVNRT confirmed.</div>
+      <div class="t-item"><div class="t-time">15:30</div>Observed, asymptomatic, ambulating. TSH normal, echo structurally normal. Counseled on triggers and taught the modified Valsalva.</div>
+      <div class="t-item"><div class="t-time">Day 0 → clinic</div>EP referral made for elective slow-pathway ablation after a discussion she leaves keen to pursue. Discharged the same day.</div>
+    </div>
+
+    <!-- 👨‍👩‍👦 FAMILY & PATIENT JOURNEY MODULE -->
+    <h3>👨‍👩‍👦 Family &amp; Patient Journey</h3>
+    <div class="journey">
+      <div class="j-card"><div class="j-who">👩 The patient — Ms. A.K.</div><p>"For years these came and went and I just lived with them. The adenosine was the strangest few seconds of my life — like a wall, then a deep breath, then it was over. When they said an ablation could actually <em>cure</em> it, I cried with relief. I didn't know it could just stop."</p></div>
+      <div class="j-card"><div class="j-who">🧑 Her partner</div><p>"They told me beforehand the medicine would make her feel awful for a few seconds and that it was normal. Knowing that turned a terrifying pause into something I could sit through. The monitor going steady again was the best sound."</p></div>
+      <div class="j-card"><div class="j-who">👩‍⚕️ The ED nurse</div><p>"My job was setting the adenosine up to be pushed FAST with the flush, coaching her breathing for the Valsalva, and warning her before the push. Half the success is preparation and a calm voice."</p></div>
+      <div class="j-card"><div class="j-who">🎓 The team's reflection</div><p>"This wasn't a heroic save — it was a disciplined ladder. Vagal first, adenosine done properly, regularity and pre-excitation confirmed, and a referral that can make the whole thing disappear."</p></div>
+    </div>
+
+    <div class="callout pink"><b class="ct">💗 The human thread</b>AVNRT is rarely dangerous, but it is genuinely disruptive — episodes at exams, on dates, mid-presentation, with no warning. The kindest treatment is often the most definitive one: teaching her to break attacks herself, and offering an ablation that can give a young person back the certainty that her heart will simply behave.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S17 — DISCHARGE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s17">
+  <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+  <div class="section-content">
+    <h3>📋 Discharge plan &amp; safety net</h3>
+    <ul>
+      <li>💊 <strong>Medications:</strong> usually none needed acutely after conversion; consider a low-dose beta-blocker or non-DHP CCB if episodes are frequent and she's deferring ablation. Provide a clear written plan.</li>
+      <li>💨 <strong>Self-management:</strong> taught and given a written guide to the <strong>modified Valsalva</strong> (blow into a syringe, then lie flat with legs raised) so she can often abort future attacks at home.</li>
+      <li>🗺️ <strong>EP follow-up</strong> for elective slow-pathway ablation booked before she leaves; cardiology clinic appointment confirmed.</li>
+      <li>☕ <strong>Trigger plan:</strong> reduce caffeine and alcohol (especially during exams), manage stress and sleep, stay hydrated; explain that these fire the premature beats that start AVNRT.</li>
+      <li>🚩 <strong>Red flags → call emergency services / return:</strong> palpitations with <strong>chest pain, breathlessness, fainting or severe lightheadedness</strong>, or an episode that <strong>won't break</strong> with her Valsalva within a reasonable time.</li>
+      <li>📚 <strong>Education:</strong> AVNRT explained in plain language (a tiny short-circuit in the heart's wiring, not a sign of a damaged heart), reassurance about its generally benign nature, and what to expect from an ablation.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Discharge after AVNRT isn't 'rhythm fixed, go home' — it's a patient who can break her own attacks, knows her triggers, knows when to return, and has a referral that could cure her for good."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S18 — CLINICAL PEARLS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s18">
+  <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+  <div class="section-content">
+    <div class="pearl-grid">
+      <div class="pearl"><b>🌀 Think AVNRT first</b>Young, normal heart, sudden regular narrow tachycardia at 150–250 = AVNRT until proven otherwise — the commonest paroxysmal SVT.</div>
+      <div class="pearl"><b>💨 Vagal before needles</b>Do the MODIFIED Valsalva (REVERT: blow, then lie flat + legs up) — it roughly triples conversion vs a lazy breath-hold and is free.</div>
+      <div class="pearl"><b>💉 Adenosine = 6-sec arrest</b>Warn the patient, ready the defibrillator, push it FAST through a big line with a flush. Slow or distal = it fails.</div>
+      <div class="pearl"><b>🧯 Adenosine cautions</b>Asthma/COPD (bronchospasm); reduce dose with dipyridamole or heart transplant; larger dose via a central line.</div>
+      <div class="pearl"><b>👻 The vanishing P</b>P buried in the QRS, pseudo-r' (V1), pseudo-S (inferior) — retrograde atrial activation that disappears after conversion.</div>
+      <div class="pearl"><b>📏 RP interval sorts them</b>Very short RP = AVNRT; P after QRS = AVRT; long RP / persists with AV block = atrial tachycardia.</div>
+      <div class="pearl"><b>↕️ Regular vs irregular</b>Regular narrow → SVT, block the node. IRREGULAR → think pre-excited AF; keep your hands off the AV node.</div>
+      <div class="pearl"><b>📐 Narrow vs wide</b>Narrow + regular → SVT ladder. Wide + regular → treat as VT; never give AV-nodal blockers blindly.</div>
+      <div class="pearl"><b>🗺️ Ablation cures it</b>Slow-pathway ablation: &gt;95% success, ~1% pacemaker risk — definitive for recurrent symptomatic AVNRT.</div>
+      <div class="pearl"><b>🚫 No pre-excitation? Check it</b>Always get a sinus-rhythm ECG to exclude a delta wave before relying on AV-nodal blockers.</div>
+      <div class="pearl"><b>🔌 Unstable = electricity</b>If she becomes unstable (shock, syncope, ischemia, pulmonary edema), synchronized cardioversion — chemistry is too slow.</div>
+      <div class="pearl"><b>☕ Treat the trigger too</b>Caffeine, alcohol, stress, thyrotoxicosis — counsel on triggers and screen the TSH; it's part of the cure.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S19 — MCQs / ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s19">
+  <div class="sec-header"><span class="s-badge">S19</span><h2>🧠 MCQs / Assessment</h2></div>
+  <div class="section-content">
+    <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP and feed your dashboard. Each shows a full explanation.</em></p>
+    <div id="mcqHost"></div>
+    <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · Case c-avnrt-008 — AVNRT (Paroxysmal Supraventricular Tachycardia)<br>
+  ⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."
+</div>
+
+</div><!-- /#caseScroll -->
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ XP / DASHBOARD CORE ============ */
+  var XP = 0, XP_MAX = 1200;
+  var awarded = {}; // dedupe one-time awards by key
+  var xpVal = document.getElementById('xpVal');
+  var xpFill = document.getElementById('xpFill');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+  }
+  function addXP(amount, key, label){
+    if(key){ if(awarded[key]) return; awarded[key] = true; }
+    XP += amount;
+    if(XP > XP_MAX) XP = XP_MAX;
+    xpVal.textContent = XP;
+    xpFill.style.width = Math.min(100, Math.round(XP / XP_MAX * 100)) + '%';
+    showToast('+' + amount + ' XP' + (label ? ' · ' + label : ''));
+  }
+  function earnBadge(id){
+    var b = document.getElementById(id);
+    if(b && !b.classList.contains('earned')){ b.classList.add('earned'); }
+  }
+
+  /* Dashboard minimize */
+  var dash = document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){
+    dash.classList.toggle('collapsed');
+    this.textContent = dash.classList.contains('collapsed') ? '+' : '–';
+  });
+
+  /* ============ INTERNAL SCROLL SIZING ============ */
+  /* Size the scroll box to the visible window so the sticky tab bar stays in
+     view. When embedded (srcDoc iframe, same-origin), the host page stretches
+     the iframe to full content height and scrolls the OUTER page — so we size
+     this box from the parent window's height minus whatever app chrome sits
+     above the iframe, and scroll internally instead. Standalone → 100vh. */
+  var caseScroll = document.getElementById('caseScroll');
+  var topnav = document.getElementById('topnav');
+  /* The tab bar is position:fixed, so it's out of flow — reserve space at the
+     top of the scroll content (and offset anchor jumps) by its real height. */
+  function setNavOffset(){
+    var navH = topnav ? topnav.offsetHeight : 70;
+    caseScroll.style.paddingTop = navH + 'px';
+    caseScroll.style.scrollPaddingTop = (navH + 14) + 'px';
+  }
+  function sizeScroller(){
+    try {
+      var p = window.parent;
+      if(p && p !== window && window.frameElement){
+        var rectTop = window.frameElement.getBoundingClientRect().top;
+        if(rectTop < 0) rectTop = 0;          // parent scrolled past the chrome
+        var ph = p.innerHeight || 800;
+        var h = ph - rectTop - 6;             // leave the bottom edge breathing room
+        if(h < 460) h = 460;                  // sane minimum on short windows
+        caseScroll.style.height = h + 'px';
+      } else {
+        caseScroll.style.height = '100vh';
+      }
+    } catch(e){ caseScroll.style.height = '100vh'; }
+    setNavOffset();
+  }
+  sizeScroller();
+  window.addEventListener('resize', sizeScroller);
+  window.addEventListener('load', sizeScroller);
+  try { if(window.parent && window.parent !== window) window.parent.addEventListener('resize', sizeScroller); } catch(e){}
+
+  /* ============ NAV: scroll-spy active + visited ============ */
+  var navchips = Array.prototype.slice.call(document.querySelectorAll('.navchip'));
+  var sections = navchips.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited = {};
+  var visitVal = document.getElementById('visitVal');
+
+  function markVisited(idx){
+    var sec = sections[idx];
+    if(!sec) return;
+    if(!visited[sec.id]){
+      visited[sec.id] = true;
+      navchips[idx].classList.add('visited');
+      var count = Object.keys(visited).length;
+      visitVal.textContent = count + ' / 19';
+      addXP(8, 'visit-' + sec.id, 'Section read');
+      if(count >= 19){ earnBadge('bdg-explorer'); addXP(60, 'allvisited', 'Ward Explorer!'); }
+    }
+  }
+  function setActive(idx){
+    navchips.forEach(function(c){ c.classList.remove('active'); });
+    if(navchips[idx]) navchips[idx].classList.add('active');
+  }
+
+  /* True tabs: each chip shows ONLY its section, hidden via CSS otherwise.
+     No scrollIntoView and no scroll-spy — nothing can scroll the tab bar away,
+     which also sidesteps every srcDoc-iframe scrolling quirk. The hero banner
+     and vitals strip belong to the case intro, so they show on S1 only. */
+  var heroBits = [document.querySelector('.hero'), document.querySelector('.vitals-strip')]
+    .filter(function(el){ return !!el; });
+
+  function showSection(idx){
+    sections.forEach(function(s, i){ if(s) s.classList.toggle('sec-active', i === idx); });
+    heroBits.forEach(function(el){ el.style.display = (idx === 0) ? '' : 'none'; });
+    caseScroll.scrollTop = 0;
+    setActive(idx);
+    markVisited(idx);
+  }
+
+  navchips.forEach(function(chip, idx){
+    chip.addEventListener('click', function(ev){
+      ev.preventDefault();
+      showSection(idx);
+    });
+  });
+  showSection(0);
+
+  /* ============ FLAG GAME (S2) ============ */
+  var flagBtns = document.querySelectorAll('#flagGame .flag-btn');
+  var flagResult = document.getElementById('flagResult');
+  var flagsFound = 0, flagsTotal = 0, flagWrong = 0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good') === '1') flagsTotal++; });
+  flagBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.dataset.locked) return;
+      btn.dataset.locked = '1';
+      var good = btn.getAttribute('data-good') === '1';
+      if(good){
+        btn.classList.add('flag-good');
+        flagsFound++;
+        addXP(10, 'flag-' + flagsFound + '-' + Math.random(), 'AVNRT flag spotted');
+      } else {
+        btn.classList.add('flag-bad');
+        flagWrong++;
+        showToast('❌ Not an AVNRT-specific flag');
+      }
+      if(flagsFound === flagsTotal){
+        flagResult.textContent = '✅ All ' + flagsTotal + ' AVNRT red flags found' + (flagWrong ? ' (with ' + flagWrong + ' wrong pick' + (flagWrong>1?'s':'') + ')' : ' — flawless!');
+        earnBadge('bdg-vt');
+        addXP(30, 'flags-complete', 'SVT-Spotter badge');
+      } else {
+        flagResult.textContent = flagsFound + ' / ' + flagsTotal + ' AVNRT red flags found…';
+      }
+    });
+  });
+
+  /* ============ BRANCHING SCENARIO (S3) ============ */
+  var scText = document.getElementById('scText');
+  var scChoices = document.getElementById('scChoices');
+  var scFeedback = document.getElementById('scFeedback');
+  var scRestart = document.getElementById('scRestart');
+  var scStab = document.getElementById('scStab');
+  var scTime = document.getElementById('scTime');
+  var scXP = document.getElementById('scXP');
+  var pathXP = 0, scStability = 2, scElapsed = 0;
+
+  var STEPS = {
+    start: {
+      text: "She's pale, hand on her chest, monitor showing a regular narrow-complex tachycardia at 188. BP 96/60, fully alert, full sentences. Her own breath-hold in the waiting room failed. The IV is in and adenosine and pads are at the bedside. What do you do FIRST?",
+      choices: [
+        { t: "💨 Perform a properly done modified Valsalva (blow, then lie flat + legs up)", good:true, ds:1, dt:20, xp:40, fb:"✅ Exactly. Vagal first — and the MODIFIED maneuver (REVERT), not a lazy breath-hold. It's free, safe, and converts ~43% of SVT. If it fails, you escalate to adenosine.", next:"adenosine" },
+        { t: "💉 Give IV verapamil straight away — 'it works for SVT'", good:false, ds:-1, dt:15, xp:5, fb:"⚠️ Skips the ladder. Verapamil is longer-acting, drops the BP, and is dangerous if this were actually pre-excited AF. Vagal first, then short-acting adenosine, then a CCB only once a regular SVT is confirmed.", next:"adenosine" },
+        { t: "🔌 Reach for synchronized cardioversion now", good:false, ds:-1, dt:10, xp:0, fb:"⚠️ Overkill for a conscious, perfusing, talking patient. Electricity is for the UNSTABLE patient. Climb the gentle ladder first: vagal, then adenosine.", next:"adenosine" }
+      ]
+    },
+    adenosine: {
+      text: "The modified Valsalva briefly slowed it but the tachycardia persists. She's still stable. You decide on adenosine. How do you give it?",
+      choices: [
+        { t: "💉 6 mg FAST through the antecubital line + immediate flush, ECG running, pads on, patient warned", good:true, ds:1, dt:10, xp:40, fb:"✅ Textbook. Half-life ~10 s, so fast + proximal + flush is the whole trick. Warn her about the chest tightness/flushing/doom and brief pause, then push. If 6 fails → 12, then 12.", next:"convert" },
+        { t: "💉 6 mg slowly through a small hand vein 'to be gentle'", good:false, ds:-1, dt:20, xp:0, fb:"⚠️ That's how adenosine 'fails' — it's metabolized before it reaches the node. Give it FAST through a large proximal line with a flush, or you'll wrongly conclude it didn't work and escalate dangerously.", next:"convert" }
+      ]
+    },
+    convert: {
+      text: "Adenosine 12 mg given fast with a flush → a brief pause, then the rhythm breaks abruptly into sinus at 74. BP rises to 116/72. She exhales with relief. What's your final move of these first minutes?",
+      choices: [
+        { t: "🫀 Get a post-conversion 12-lead — check for a delta wave and the vanishing pseudo-r'", good:true, ds:1, dt:6, xp:40, fb:"🏆 Perfect close. The sinus ECG confirms typical AVNRT (pseudo-r' gone) and excludes WPW/pre-excitation before you rely on any AV-nodal blocker — and it informs the ablation referral.", end:true },
+        { t: "🎉 Done — discharge her immediately, episode over", good:false, ds:-1, dt:10, xp:0, fb:"⚠️ Premature. Always get a post-conversion 12-lead (exclude pre-excitation, confirm AVNRT), screen the trigger/TSH, counsel on the modified Valsalva, and refer for ablation. The episode is over; the care isn't.", end:true }
+      ]
+    }
+  };
+
+  function renderStab(){
+    var s = Math.max(0, Math.min(5, scStability + 2)); // map -2..3 → 0..5
+    var dots = '';
+    for(var i=0;i<5;i++) dots += (i < s ? '●' : '○');
+    scStab.textContent = dots;
+  }
+  function renderStep(key){
+    var step = STEPS[key];
+    scText.textContent = step.text;
+    scFeedback.className = 'feedback';
+    scFeedback.style.display = 'none';
+    scChoices.innerHTML = '';
+    step.choices.forEach(function(ch){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = ch.t;
+      b.addEventListener('click', function(){
+        pathXP += ch.xp; scXP.textContent = pathXP;
+        scElapsed += ch.dt; scTime.textContent = scElapsed + ' s';
+        scStability += ch.ds; renderStab();
+        if(ch.xp) addXP(ch.xp, null, 'Scenario choice');
+        scFeedback.textContent = ch.fb;
+        scFeedback.className = 'feedback ' + (ch.good ? 'good' : 'bad');
+        scFeedback.style.display = 'block';
+        Array.prototype.forEach.call(scChoices.children, function(c){ c.disabled = true; c.style.opacity = .6; });
+        if(ch.end){
+          scRestart.style.display = 'inline-block';
+          if(ch.good && key === 'convert'){ earnBadge('bdg-shock'); addXP(20, 'scenario-win', 'Broke The Loop!'); }
+        } else if(ch.next){
+          setTimeout(function(){ renderStep(ch.next); }, 1400);
+        }
+      });
+      scChoices.appendChild(b);
+    });
+  }
+  scRestart.addEventListener('click', function(){
+    pathXP = 0; scStability = 2; scElapsed = 0;
+    scXP.textContent = 0; scTime.textContent = '0 s'; renderStab();
+    scRestart.style.display = 'none';
+    renderStep('start');
+  });
+  renderStab();
+  renderStep('start');
+
+  /* ============ REVEAL BUTTONS ============ */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.getAttribute('data-target'));
+      if(!t) return;
+      if(t.classList.contains('reveal-shown')){
+        t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden');
+      } else {
+        t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown');
+        addXP(8, 'reveal-' + btn.getAttribute('data-target'), 'Self-test');
+      }
+    });
+  });
+
+  /* ============ VAGAL TONE / AV-NODE SIM (S6) ============ */
+  var kRange = document.getElementById('kRange');
+  var kVal = document.getElementById('kVal');
+  var kNeedle = document.getElementById('kNeedle');
+  var kReadout = document.getElementById('kReadout');
+  if(kRange){
+    var simUsed = false;
+    function updateK(){
+      var k = (parseInt(kRange.value,10) / 10); // 2.0 .. 7.5 (vagal tone, arbitrary 0–10ish)
+      kVal.textContent = k.toFixed(1);
+      var pct = (parseInt(kRange.value,10) - 20) / (75 - 20) * 100;
+      kNeedle.style.left = pct + '%';
+      var msg, cls;
+      if(k < 3.0){ msg = '🔴 Low vagal tone (sympathetic dominance) — the AV node conducts freely, the re-entry loop keeps spinning. Tachycardia persists at ~188. This is the untreated state.'; cls='bad'; }
+      else if(k < 3.5){ msg = '🟠 Mild vagal effect — the node slows a little but the circuit still finds its way around. A lazy breath-hold lands here: rate dips, then re-entry continues.'; cls='warn-r'; }
+      else if(k <= 5.0){ msg = '🟢 Strong modified Valsalva / good vagal surge — AV-nodal refractoriness is long enough to block one beat of the circuit → re-entry collapses and the rhythm breaks. This is the target.'; cls='good'; }
+      else if(k <= 6.0){ msg = '🟢 Adenosine-level transient AV block — a brief complete block reliably interrupts the loop. The tachycardia terminates abruptly into sinus. Just warn the patient about the pause.'; cls='good'; }
+      else { msg = '🔴 Excessive/prolonged AV block — beyond breaking the loop you risk a longer pause, transient bradycardia or ectopy. With adenosine this is fleeting (~10 s half-life); with longer-acting drugs, respect it.'; cls='bad'; }
+      kReadout.innerHTML = msg;
+      kReadout.className = 'readout ' + cls;
+      if(!simUsed){ simUsed = true; addXP(15, 'ksim', 'Vagal Master'); }
+    }
+    kRange.addEventListener('input', updateK);
+    updateK();
+  }
+
+  /* ============ CHECKLISTS (S7) ============ */
+  var allChecklistsDone = 0, totalChecklists = document.querySelectorAll('.checklist').length;
+  document.querySelectorAll('.checklist').forEach(function(list){
+    var boxes = list.querySelectorAll('input[type=checkbox]');
+    var prog = list.querySelector('[data-progress]');
+    var total = boxes.length;
+    var doneAwarded = false;
+    function refresh(){
+      var done = 0;
+      boxes.forEach(function(b){
+        if(b.checked){ done++; b.closest('.ck').classList.add('done'); }
+        else { b.closest('.ck').classList.remove('done'); }
+      });
+      prog.textContent = done + ' / ' + total + ' complete';
+      if(done === total && !doneAwarded){
+        doneAwarded = true;
+        allChecklistsDone++;
+        addXP(25, 'ck-' + list.id, 'Checklist done');
+        if(allChecklistsDone >= totalChecklists){ earnBadge('bdg-ck'); addXP(20, 'allck', 'Checklist Champion'); }
+      }
+    }
+    boxes.forEach(function(b){
+      b.addEventListener('change', function(){
+        if(b.checked) addXP(4, null, 'Step checked');
+        refresh();
+      });
+    });
+  });
+
+  /* ============ MCQs (S19) ============ */
+  var MCQS = [
+    {
+      q: "A 24-year-old woman with a structurally normal heart has a sudden, regular, narrow-complex tachycardia at 188/min. What is the underlying mechanism of typical AVNRT?",
+      opts: ["Re-entry through an accessory pathway connecting atrium and ventricle","Re-entry within/around the AV node using dual (slow and fast) pathways","An automatic focus firing in the right atrium","Scar-related re-entry in the ventricle"],
+      correct: 1,
+      exp: "Typical (slow-fast) AVNRT is a re-entry circuit within and around the AV node using two functional pathways — a slow pathway (down) and a fast pathway (up). A premature atrial beat blocks in the fast pathway, conducts down the slow pathway, and returns up the recovered fast pathway, establishing a self-sustaining loop. It is the commonest regular paroxysmal SVT."
+    },
+    {
+      q: "She is stable. What is the recommended FIRST-line acute treatment for her regular narrow-complex SVT?",
+      opts: ["Immediate synchronized cardioversion","IV amiodarone","A properly performed (modified) vagal maneuver","An oral beta-blocker tablet"],
+      correct: 2,
+      exp: "Vagal maneuvers are first-line for a stable regular SVT. The modified Valsalva (REVERT: forced exhalation then immediate supine leg-raise) converts ~43% vs ~17% for the standard Valsalva. It is free, safe and fast — try it before adenosine. Oral drugs are far too slow; cardioversion is reserved for instability."
+    },
+    {
+      q: "Vagal maneuvers fail and you give adenosine. Which statement about its mechanism and administration is correct?",
+      opts: ["It works by slowing the SA node and should be infused slowly over 10 minutes","It causes transient complete AV-nodal block (half-life ~10 s) and must be pushed FAST with a flush; caution in asthma","It is a long-acting AV-nodal blocker safe to give through any small vein","It is contraindicated in all regular SVT"],
+      correct: 1,
+      exp: "Adenosine causes a transient, near-complete AV-nodal block that interrupts the re-entry circuit. Its half-life is ~10 seconds, so it must be given as a rapid IV push through a large proximal line with an immediate flush — given slowly or distally it is metabolized before it works. Caution in asthma/COPD (bronchospasm); reduce the dose with dipyridamole or a transplanted heart."
+    },
+    {
+      q: "On the tachycardia ECG you see a small pseudo-r' in V1 and a pseudo-S in the inferior leads that disappear after conversion. What do these represent?",
+      opts: ["Pre-excitation (delta waves)","Retrograde atrial activation (the buried P wave) of typical AVNRT","Ventricular ectopy","Acute ischemic ST changes"],
+      correct: 1,
+      exp: "Because the atria and ventricles depolarize almost simultaneously in typical AVNRT, the retrograde P wave is buried in the QRS and peeks out as a pseudo-r' in V1 and a pseudo-S in II/III/aVF. These deflections vanish after conversion (comparing to the sinus ECG) — a fairly specific sign of typical AVNRT."
+    },
+    {
+      q: "How does AVNRT differ from orthodromic AVRT on the surface ECG?",
+      opts: ["AVRT is always wide-complex; AVNRT is narrow","In AVNRT the P is buried in/just after the QRS (very short RP); in AVRT the P is clearly after the QRS, and a delta wave may appear in sinus rhythm","AVNRT continues despite AV block with adenosine; AVRT does not","There is no way to distinguish them"],
+      correct: 1,
+      exp: "In typical AVNRT the retrograde P is buried in or immediately after the QRS (very short RP). In AVRT the circuit uses an accessory pathway, so the retrograde P falls a little later (distinct, after the QRS), and the resting ECG may show pre-excitation (a delta wave/WPW). Both terminate with AV-nodal block; only AVRT involves an accessory pathway."
+    },
+    {
+      q: "Mid-treatment the patient becomes hypotensive with chest pain and presyncope (truly unstable). What is the correct next step?",
+      opts: ["Synchronized DC cardioversion","Repeat the oral beta-blocker","Observe for another 15 minutes","Give IV fluids only and wait"],
+      correct: 0,
+      exp: "An unstable SVT — shock, syncope/presyncope, severe ischemia or pulmonary edema — gets synchronized DC cardioversion (with brief sedation if time allows). Organized SVT usually converts at low energy. Drugs are too slow for a patient who is decompensating; electricity is the answer."
+    },
+    {
+      q: "What is the target of definitive catheter ablation for AVNRT, and its approximate success/risk?",
+      opts: ["The accessory pathway; ~50% success","The slow pathway; >95% success with ~1% risk of AV block needing a pacemaker","The sinus node; ~80% success","The His bundle; negligible risk"],
+      correct: 1,
+      exp: "Definitive cure of AVNRT is slow-pathway catheter ablation in the inferoseptal right atrium near the coronary sinus os. It is >95% successful with a small (~1%) risk of inadvertent AV block requiring a pacemaker, because the compact AV node is nearby. The accessory pathway is the AVRT target, not AVNRT."
+    },
+    {
+      q: "You are about to give an AV-nodal blocker, but the rhythm is actually IRREGULAR with varying QRS width and an old ECG shows a delta wave. What must you AVOID?",
+      opts: ["Giving oxygen","AV-nodal blockers (adenosine, verapamil, diltiazem, beta-blockers, digoxin) — this is pre-excited AF and they can precipitate VF","Obtaining a 12-lead ECG","Calling for senior help"],
+      correct: 1,
+      exp: "An irregular wide tachycardia with varying QRS width and a delta-wave history is pre-excited atrial fibrillation (WPW + AF). AV-nodal blockers shunt conduction down the accessory pathway, accelerate the ventricular rate, and can precipitate VF. Use procainamide or synchronized cardioversion instead — and always confirm a REGULAR rhythm before blocking the node."
+    }
+  ];
+
+  var host = document.getElementById('mcqHost');
+  var mcqVal = document.getElementById('mcqVal');
+  var mcqScore = 0, mcqAnswered = 0;
+  var letters = ['A','B','C','D','E'];
+
+  MCQS.forEach(function(item, qi){
+    var box = document.createElement('div');
+    box.className = 'mcq';
+    var html = '<div class="mcq-q">QUESTION ' + (qi+1) + ' / ' + MCQS.length + '</div>';
+    html += '<div class="mcq-stem">' + item.q + '</div>';
+    item.opts.forEach(function(opt, oi){
+      html += '<label class="mcq-opt" data-oi="' + oi + '"><strong>' + letters[oi] + '.</strong> ' + opt + '</label>';
+    });
+    html += '<div class="mcq-exp"></div>';
+    box.innerHTML = html;
+    host.appendChild(box);
+
+    var opts = box.querySelectorAll('.mcq-opt');
+    var exp = box.querySelector('.mcq-exp');
+    var locked = false;
+    opts.forEach(function(label){
+      label.addEventListener('click', function(){
+        if(locked) return;
+        locked = true;
+        var oi = parseInt(label.getAttribute('data-oi'),10);
+        box.classList.add('answered');
+        var correct = item.correct;
+        if(oi === correct){
+          label.classList.add('picked-right');
+          mcqScore++;
+          addXP(25, null, 'Correct answer');
+        } else {
+          label.classList.add('picked-wrong');
+          opts[correct].classList.add('show-right');
+          showToast('❌ Correct: ' + letters[correct]);
+        }
+        exp.innerHTML = '<strong>' + (oi === correct ? '✅ Correct. ' : '📘 Explanation. ') + '</strong>' + item.exp;
+        mcqAnswered++;
+        mcqVal.textContent = mcqScore + ' / ' + MCQS.length;
+        if(mcqAnswered === MCQS.length){
+          var done = document.getElementById('mcqDone');
+          var summary = document.getElementById('mcqSummary');
+          done.style.display = 'block';
+          summary.textContent = 'You scored ' + mcqScore + ' / ' + MCQS.length + '. ' +
+            (mcqScore === MCQS.length ? 'Flawless — vagal first, adenosine done right, and you respect pre-excited AF every time. 🏆' :
+             mcqScore >= 6 ? 'Strong — review the misses and the RP-interval contrast pairs in S6.' :
+             'Revisit S3, S5, S6 and S11 — the management ladder and the AVNRT-vs-AVRT logic are the whole case.');
+          if(mcqScore >= 7){ earnBadge('bdg-quiz'); addXP(50, 'quizace', 'Quiz Ace!'); }
+        }
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
