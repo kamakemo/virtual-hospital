@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Torsades de Pointes — Acquired Long QT — Virtual Teaching Hospital</title>
+<!-- META
+id: c-torsades-012
+title: Torsades de Pointes — Acquired Long QT
+hospital: cardiology
+department: cv-ep
+bednumber: 5
+chiefcomplaint: Recurrent syncope with self-terminating polymorphic VT that twists around the baseline
+system: Cardiology
+severity: critical
+tags: Torsades de Pointes, Long QT, Magnesium, Overdrive pacing, QT-prolonging drugs
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --radius:16px;
+    --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  /* Internal scroll viewport. When this case is embedded the host app stretches
+     the iframe to full content height and the OUTER page scrolls, which would
+     let a sticky bar scroll away. We instead scroll inside this box (sized to
+     the visible window by JS) so the section tab bar stays pinned at the top.
+     Standalone, it falls back to the full viewport height. */
+  #caseScroll{height:100vh; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; scroll-padding-top:92px}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:36px 24px 80px; position:relative; overflow:hidden}
+  .hero::after{content:"📈"; position:absolute; right:-20px; top:-30px; font-size:220px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{max-width:1100px; margin:0 auto; position:relative; z-index:1}
+  .hero .crumbs{font-size:13px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:10px 0 6px; font-size:clamp(26px,4vw,40px); line-height:1.15}
+  .hero .sub{font-size:16px; opacity:.95}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; backdrop-filter:blur(4px)}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== LIVE ECG STRIP IN HERO ===== */
+  .ecg-banner{max-width:1100px; margin:14px auto 0; position:relative; z-index:1}
+  .ecg-banner svg{width:100%; height:64px; display:block; background:rgba(0,0,0,.18); border-radius:12px; border:1px solid rgba(255,255,255,.25)}
+  .ecg-trace{stroke:#86efac; stroke-width:2.4; fill:none; stroke-dasharray:1600; stroke-dashoffset:1600; animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{stroke-dashoffset:0}}
+
+  /* ===== VITALS STRIP ===== */
+  .vitals-strip{max-width:1100px; margin:-52px auto 0; padding:0 24px; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:11px; font-weight:700; letter-spacing:.6px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:21px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== HORIZONTAL SECTION SIDEBAR (fixed — always visible) ===== */
+  .topnav{position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.10)}
+  .topnav .rail{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; max-width:1180px; margin:0 auto; scrollbar-width:thin}
+  .navchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink2); font-size:11px; font-weight:700; text-decoration:none; min-width:78px; text-align:center; transition:all .18s; cursor:pointer}
+  .navchip .s-id{font-size:10px; letter-spacing:1px; color:#94a3b8}
+  .navchip .s-emoji{font-size:16px}
+  .navchip:hover{border-color:var(--rose); color:var(--rose); transform:translateY(-2px)}
+  .navchip.active{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; border-color:#b91c1c}
+  .navchip.active .s-id{color:#fecaca}
+  .navchip.visited:not(.active){border-color:var(--emerald-line); background:var(--emerald-soft)}
+
+  /* ===== DASHBOARD WIDGET ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:215px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10.5px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:760px){.dash{display:none}}
+
+  /* ===== MAIN / SECTIONS (tabbed: one section visible at a time) ===== */
+  main{max-width:1100px; margin:26px auto 80px; padding:0 24px}
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:26px; overflow:hidden}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16.5px; margin:26px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14.5px; margin:18px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:24px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15.5px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:14px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px; letter-spacing:.4px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14.5px}
+
+  /* ===== INTERACTIVE BITS ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:10px 18px; font-weight:700; font-size:14px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:22px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:15px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 15px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 15px; margin-top:12px; font-size:14px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim sliders */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:14px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:14px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Heart/circuit diagram */
+  .heart-fig{display:flex; gap:18px; flex-wrap:wrap; align-items:center; background:var(--slate-soft); border-radius:16px; padding:18px; margin:14px 0}
+  .heart-fig svg{flex:0 0 auto}
+  .heart-legend{flex:1; min-width:230px; font-size:13.5px}
+  .lg{display:flex; align-items:center; gap:8px; margin:5px 0}
+  .lg .sw{width:14px; height:14px; border-radius:4px; flex:0 0 auto}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Journey cards */
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:14px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:15px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:14px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13.5px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:22px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14.5px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:13px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .footer{max-width:1100px; margin:0 auto 36px; padding:0 24px; text-align:center; color:#94a3b8; font-size:12.5px}
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="caseScroll">
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · ⚡ EP Lab · 🛏️ Bed 5</div>
+    <h1>🌀 Torsades de Pointes — "The Twist Around the Baseline"</h1>
+    <div class="sub">⚡ A 70-year-old woman keeps collapsing. Each time, the monitor shows a polymorphic VT whose axis twists, then self-terminates — over a markedly long QT. Someone is reaching for amiodarone. Stop them.</div>
+    <div class="chips">
+      <span class="chip crit">🔴 CRITICAL</span>
+      <span class="chip">🌀 Polymorphic VT</span>
+      <span class="chip">📏 Long QT</span>
+      <span class="chip">🧪 Magnesium First</span>
+      <span class="chip">🎮 Interactive Case</span>
+      <span class="chip">⏱️ Outrun the next pause</span>
+    </div>
+    <div class="ecg-banner" title="Torsades de Pointes rhythm strip">
+      <svg viewBox="0 0 800 64" preserveAspectRatio="none" aria-label="Polymorphic VT twisting around the baseline">
+        <polyline class="ecg-trace" points="0,40 30,40 45,20 60,40 90,40 110,52 130,28 150,56 170,24 190,58 210,22 230,56 250,30 270,50 290,36 320,40 360,40 375,20 390,40 420,40 440,54 460,26 480,58 500,22 520,58 540,24 560,54 580,30 600,48 620,38 650,40 690,40 705,20 720,40 760,40 790,40 800,40"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== LIVE VITALS ===================== -->
+<div class="vitals-strip">
+  <div class="vitals-grid">
+    <div class="vital warn"><div class="v-label">💓 HR</div><div class="v-num">48</div></div>
+    <div class="vital alert"><div class="v-label">🩸 BP</div><div class="v-num">86/52</div></div>
+    <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">20</div></div>
+    <div class="vital warn"><div class="v-label">🫁 SpO₂</div><div class="v-num">93%</div></div>
+    <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.6°</div></div>
+    <div class="vital warn"><div class="v-label">🧠 GCS</div><div class="v-num">13</div></div>
+    <div class="vital alert"><div class="v-label">📏 QTc</div><div class="v-num">560 ms</div></div>
+    <div class="vital alert"><div class="v-label">🌀 Runs</div><div class="v-num">×4</div></div>
+  </div>
+</div>
+
+<!-- ===================== HORIZONTAL SECTION SIDEBAR ===================== -->
+<nav class="topnav" id="topnav">
+  <div class="rail">
+    <a class="navchip" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navchip" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navchip" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navchip" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navchip" href="#s5"><span class="s-emoji">🎓</span><span>Consultant Round</span><span class="s-id">S5</span></a>
+    <a class="navchip" href="#s6"><span class="s-emoji">📖</span><span>Teaching Points</span><span class="s-id">S6</span></a>
+    <a class="navchip" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navchip" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navchip" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navchip" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navchip" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navchip" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navchip" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navchip" href="#s14"><span class="s-emoji">🔀</span><span>Differentials</span><span class="s-id">S14</span></a>
+    <a class="navchip" href="#s15"><span class="s-emoji">🗺️</span><span>Plan</span><span class="s-id">S15</span></a>
+    <a class="navchip" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navchip" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navchip" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navchip" href="#s19"><span class="s-emoji">🧠</span><span>MCQs</span><span class="s-id">S19</span></a>
+  </div>
+</nav>
+
+<!-- ===================== SCORE DASHBOARD ===================== -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections visited</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-vt">🌀 Torsades-Spotter</span>
+      <span class="badge" id="bdg-shock">🧪 Magnesium On Time</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champion</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Ward Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running sims, taking the right path and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- S1 — PROFILE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s1">
+  <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+  <div class="section-content">
+    <div class="callout danger">
+      <b class="ct">🚨 YOU ARE HERE — 04:10, EP Lab / Telemetry Bed 5</b>
+      For the fourth time tonight the monitor erupts into a chaotic, twisting VT, the patient's eyes roll, and then — after a few seconds — it stops on its own and she comes round, confused. Between runs her rate is slow with pauses. The QT is enormous. A covering doctor is drawing up <strong>amiodarone</strong> because "it's VT." Your hand reaches the trolley first. This is not a case to read about — it is a rhythm you must name and break <strong>the right way, right now</strong>.
+    </div>
+
+    <h3>👤 Patient Identity</h3>
+    <table class="tbl">
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>👵 Name</td><td><strong>Mrs. E.K.</strong></td></tr>
+      <tr><td>🎂 Age / Sex</td><td>70-year-old female</td></tr>
+      <tr><td>🆔 MRN</td><td>EP-20512</td></tr>
+      <tr><td>⚖️ Weight</td><td>58 kg</td></tr>
+      <tr><td>💼 Occupation</td><td>Retired schoolteacher</td></tr>
+      <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+    </table>
+
+    <h3>📜 Past Medical History — every line is lengthening her QT</h3>
+    <ul>
+      <li>🤢 Admitted two days ago with gastroenteritis and vomiting → started on <strong>ondansetron</strong> (a QT-prolonging antiemetic) and getting <strong>volume-deplete and potassium-deplete</strong> from the losses.</li>
+      <li>💊 Treated for a chest infection with a <strong>macrolide/fluoroquinolone</strong> (e.g. azithromycin or levofloxacin) — another QT-prolonger <strong>stacked</strong> on top.</li>
+      <li>💧 On long-term <strong>furosemide + a thiazide</strong> for hypertension → chronic <strong>hypokalemia and hypomagnesemia</strong>. Tonight's K⁺ is 2.8 and Mg²⁺ 0.48.</li>
+      <li>🫀 <strong>No prior MI, structurally near-normal heart, preserved EF</strong> — this is NOT scar-related VT; the problem is repolarization, not a circuit around dead muscle.</li>
+      <li>🩺 Mild <strong>hypothyroidism</strong>, slightly under-replaced — itself a contributor to QT prolongation and bradycardia.</li>
+      <li>😴 Bradycardic at baseline (sinus ~50) with frequent ventricular ectopy — the perfect soil for <strong>pause-dependent</strong> Torsades.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Polymorphic VT + a long QT = Torsades → magnesium, potassium and pace it FAST. Polymorphic VT + a normal QT = ischemia → cath lab. Measure the QT before you name the rhythm."</div>
+
+    <h3>🧬 Why THIS patient? — stacked QT drugs + low K⁺/Mg²⁺ + bradycardia</h3>
+    <p>Torsades needs a <strong>long QT</strong>, and she has every reason to have one: two or more QT-prolonging drugs layered together, profound hypokalemia and hypomagnesemia, under-treated hypothyroidism, and a slow baseline rate. Prolonged repolarization lengthens phase 2/3 of the action potential, allowing the L-type calcium current to <strong>reactivate</strong> and fire an <strong>early afterdepolarization (EAD)</strong>. Across a ventricle with heterogeneous repolarization, that triggered beat finds windows of recovery and re-entry to wander through — producing the twisting polymorphic VT. Her bradycardia and pauses make it <strong>pause-dependent</strong>: a PVC, then a compensatory pause, then a beat with an even longer QT that fires the next EAD. Several insults, one twisting storm.</p>
+
+    <div class="callout warn"><b class="ct">🔥 Risk factors for acquired (drug-induced) long QT / Torsades</b>
+    💊 QT-prolonging drugs — and especially <strong>several together</strong> · ⚡ ↓K⁺, ↓Mg²⁺, ↓Ca²⁺ · 😴 Bradycardia / AV block / pauses · 👵 Older age, female sex · 🩺 Hypothyroidism · 🫀 Heart failure / LVH · 🧠 Acute intracranial events · 🍽️ Starvation / anorexia · 🧬 Subclinical congenital LQTS unmasked by any of the above</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S2 — HANDOVER -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s2">
+  <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+  <div class="section-content">
+    <h3>📻 Ward Nurse Handover — listen for the trap</h3>
+    <div class="callout info">
+      <b class="ct">🎙️ SBAR from the telemetry nurse (verbatim)</b>
+      <p><strong>S:</strong> "Bed 5 — Mrs. E.K., in with vomiting and a chest infection. Over the last hour she's had four episodes of a fast, <strong>twisting</strong> wide rhythm — each one she goes out, then it stops by itself and she wakes up. Between runs she's slow with pauses."</p>
+      <p><strong>B:</strong> "On ondansetron and an antibiotic for the chest, long-term furosemide and a thiazide, mild hypothyroid. Last potassium 2.8, magnesium 0.48. QT on the strip looks huge."</p>
+      <p><strong>A:</strong> "She's pale, BP 86/52, GCS drops during each run then recovers. The covering doctor on the phone said it's VT and to load <strong>amiodarone 300 mg</strong>."</p>
+      <p><strong>R:</strong> "Pads are on, defibrillator at the bedside. I held the amiodarone because… the QT is so long and the rhythm twists — something felt wrong about giving a QT drug."</p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Never feed a long-QT rhythm a QT-prolonging antiarrhythmic. The phone diagnosis of 'just VT — load amiodarone' is how Torsades becomes incessant."</div>
+
+    <h3>🚩 Spot-the-Red-Flag — tap each feature that screams TORSADES</h3>
+    <p>🎮 <em>Interactive: click every feature that points to Torsades de Pointes (long-QT polymorphic VT). Each correct flag = +10 XP. Wrong picks cost you.</em></p>
+    <div id="flagGame">
+      <button class="btn ghost flag-btn" data-good="1">📏 Markedly long QT on the ECG</button>
+      <button class="btn ghost flag-btn" data-good="1">💊 Recent QT-prolonging drug(s) started</button>
+      <button class="btn ghost flag-btn" data-good="1">⚡ Low K⁺ (2.8) / low Mg²⁺ (0.48)</button>
+      <button class="btn ghost flag-btn" data-good="1">🌀 QRS twisting / changing morphology</button>
+      <button class="btn ghost flag-btn" data-good="1">😴 Pause-dependent long–short initiation</button>
+      <button class="btn ghost flag-btn" data-good="1">😵 Recurrent self-terminating syncope</button>
+      <button class="btn ghost flag-btn" data-good="0">🌡️ Temperature 36.6°C</button>
+      <button class="btn ghost flag-btn" data-good="0">🫁 SpO₂ normal between runs</button>
+    </div>
+    <p id="flagResult" style="font-weight:700"></p>
+
+    <h3>⏱️ Timeline so far</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">03:05</div>First syncopal episode; monitor caught a brief twisting polymorphic VT that self-terminated.</div>
+      <div class="t-item"><div class="t-time">03:40</div>Second and third runs over the next half hour. Between them: sinus brady ~48 with pauses and bigeminy. QT measured at ~560 ms.</div>
+      <div class="t-item"><div class="t-time">04:02</div>Covering doctor (by phone) says "it's VT — load amiodarone." Nurse <strong>withholds amiodarone</strong> — 🏅 instinct worth its weight in gold.</div>
+      <div class="t-item"><div class="t-time">04:10</div>You arrive. Pads are on. The clock is the enemy: each pause sets up the next early afterdepolarization and the next run could degenerate to VF.</div>
+    </div>
+
+    <div class="callout ok"><b class="ct">🏅 Praise where due</b>The nurse who held the amiodarone prevented a catastrophe. Amiodarone prolongs the QT further; in a rhythm that exists <em>because</em> the QT is long, that can convert intermittent self-terminating Torsades into incessant Torsades and arrest. Withholding it — and recognizing the twist over a long QT — may have bought this woman her life.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S3 — INITIAL ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s3">
+  <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+  <div class="section-content">
+    <h3>🅰️🅱️🅲️ Primary Survey — what your hands, eyes and ears find</h3>
+    <table class="tbl">
+      <tr><th>Step</th><th>Finding</th><th>What it means mechanistically</th></tr>
+      <tr><td>🅰️ Airway</td><td>Patent between runs; transiently unresponsive during each episode.</td><td>The self-terminating runs drop output to near-zero for seconds → syncope, then recover. Each is a near-miss for sustained Torsades/VF.</td></tr>
+      <tr><td>🅱️ Breathing</td><td>RR 20, SpO₂ 93% on air, chest crepitations from the infection.</td><td>Mostly stable between runs; the threat is the rhythm, not the lungs. SpO₂ normalizes when she is in sinus.</td></tr>
+      <tr><td>🅲️ Circulation</td><td><strong>BP 86/52</strong>, cool, sinus <strong>bradycardia ~48 with pauses</strong> and ventricular bigeminy between runs; labile pressure that collapses during each twist.</td><td>Bradycardia and pauses lengthen the QT of the next beat and set up the <strong>long–short sequence</strong> that triggers pause-dependent Torsades. The slow rate is part of the disease here, not incidental.</td></tr>
+      <tr><td>🅳 Disability</td><td>GCS 13 between runs (drowsy, post-ictal-like), 3 during runs.</td><td>Recurrent cerebral hypoperfusion. Repeated syncope without a warning is a malignant-arrhythmia pattern until proven otherwise.</td></tr>
+      <tr><td>🅴 Exposure</td><td>No rash, no focal deficit. Drug chart reveals the stacked QT-prolongers. Pads already on.</td><td>The exposure step here is the <strong>medication chart</strong> — the cause is usually written on it.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In Torsades, pauses are poison. The slow rate and the long–short beats are not bystanders — they are the trigger. Outrun the next early afterdepolarization."</div>
+
+    <h3>🧭 The single most important question: STABLE/PULSE or PULSELESS?</h3>
+    <p>Torsades management forks on perfusion. <strong>WITH a pulse</strong> (self-terminating or sustained but perfusing): give IV <strong>magnesium</strong>, correct K⁺, stop offending drugs, and <strong>raise the rate</strong> (pacing/isoproterenol) to abolish the pauses. <strong>PULSELESS or degenerating to VF</strong>: it is too disorganized to synchronize → <strong>UNSYNCHRONIZED defibrillation</strong> + ACLS. Right now Mrs. E.K. keeps regaining a pulse — so the magnesium-and-pace pathway leads.</p>
+
+    <div class="callout danger"><b class="ct">🧪 The decision is made: MAGNESIUM NOW + SHORTEN THE QT</b>Give <strong>IV magnesium sulfate 2 g</strong> immediately (first-line even if Mg were normal — it suppresses EADs), replace potassium to high-normal, <strong>stop every QT-prolonging drug</strong>, and prepare to <strong>raise the heart rate</strong> (transvenous overdrive pacing ~90–110, or isoproterenol since this is acquired). Keep the defibrillator ready and UNSYNCHRONIZED for any pulseless run. Do <strong>not</strong> reach for amiodarone.</div>
+
+    <!-- 🎬 BRANCHING SCENARIO ENGINE -->
+    <div class="scenario" id="scenarioBox">
+      <h3>🎬 Choose Your Path — "The First 60 Seconds"</h3>
+      <div class="hud"><span>❤️ Stability: <b id="scStab">●●○○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 s</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+      <div class="scene-text" id="scText">The covering doctor holds a syringe of amiodarone; the nurse has the defibrillator paddles. QTc 560 ms, K⁺ 2.8, Mg²⁺ 0.48. The monitor is in sinus brady with pauses, but it twisted into polymorphic VT four times already and she has a pulse now. What do you do FIRST?</div>
+      <div class="choices" id="scChoices"></div>
+      <div class="feedback" id="scFeedback"></div>
+      <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+    </div>
+
+    <div class="callout info"><b class="ct">🧮 If a run does NOT self-terminate</b>
+    A <em>sustained, perfusing</em> Torsades still gets <strong>magnesium first</strong> and the QT-shortening measures. If it becomes <strong>pulseless or chaotic VF</strong>, do <strong>not</strong> waste time trying to synchronize — there is no reliable R wave to track — deliver an <strong>unsynchronized</strong> defibrillation and run ACLS, correcting K⁺/Mg²⁺ throughout. The same offending drugs must be stopped or it recurs.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S4 — RESIDENT REVIEW -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s4">
+  <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+  <div class="section-content">
+    <p><em>The cardiology resident arrives at 04:12. Her reasoning, out loud:</em></p>
+
+    <h3>🧠 Pattern recognition first, then physiology</h3>
+    <p>"Polymorphic, twisting, self-terminating — and look at that QT: about 560 milliseconds. Low potassium, low magnesium, and a drug chart full of QT-prolongers. This is <strong>acquired long-QT Torsades de Pointes</strong>, not scar VT and not garden-variety monomorphic VT. The dangerous instinct is to see 'VT' and reflexively load amiodarone — which is exactly the wrong drug, because it lengthens the very QT that is driving the rhythm."</p>
+
+    <h3>🎯 Immediate priorities (her actual order of operations)</h3>
+    <ol>
+      <li>🧪 <strong>IV magnesium sulfate 2 g now</strong> — first-line, given even if the magnesium level were normal; it suppresses the early afterdepolarizations that trigger Torsades.</li>
+      <li>⚡ <strong>Correct potassium to high-normal (4.5–5.0)</strong> and replace magnesium — a low-K⁺/low-Mg²⁺ ventricle keeps re-triggering.</li>
+      <li>🚫 <strong>Stop EVERY offending drug:</strong> ondansetron, the macrolide/fluoroquinolone, and any other QT-prolonger. Say it out loud and cross them off the chart.</li>
+      <li>😴 <strong>Shorten the QT by raising the rate:</strong> she is brady and pause-dependent → set up <strong>transvenous overdrive pacing to ~90–110</strong>, or start <strong>isoproterenol</strong> as a bridge (acquired long QT only).</li>
+      <li>🚫 <strong>No amiodarone, no sotalol, no class Ia</strong> — do not give a QT-prolonging antiarrhythmic to a long-QT rhythm.</li>
+      <li>🔌 <strong>Defibrillator ready and UNSYNCHRONIZED</strong> for any pulseless/degenerating run; pads on, charged-ready.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Give magnesium first — even when the level is normal — then refill the potassium, stop the drugs, and outrun the pauses with pacing or isoprenaline. The antiarrhythmic you reach for must never be one that prolongs the QT."</div>
+
+    <h3>🤔 "But it's VT — shouldn't I just load amiodarone like any VT?"</h3>
+    <p>"No. Naming the rhythm precisely changes the drug. <strong>Monomorphic</strong> VT (one fixed shape, usually scar) tolerates amiodarone. <strong>Polymorphic VT with a long QT</strong> is Torsades — and amiodarone prolongs the QT, which can convert intermittent runs into incessant Torsades and arrest. Measure the QT; if it's long and the QRS twists, the answer is magnesium + potassium + faster rate, not the brown bottle."</p>
+
+    <div class="callout purple"><b class="ct">🧪 Resident's self-test (answer before reading on)</b>
+    Magnesium level comes back at 0.85 mmol/L — within the lab's normal range. Do you still give IV magnesium for the Torsades?
+    <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+    <div class="reveal-hidden" id="rev1"><p><strong>Yes.</strong> IV magnesium is first-line for Torsades <em>regardless of the serum level</em> — it suppresses early afterdepolarizations and stabilizes the rhythm even when the measured magnesium is normal. The "normal" level does not change the recommendation. Give 2 g IV, then continue correcting potassium and removing the offending drugs.</p></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S5 — CONSULTANT ROUND -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s5">
+  <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round</h2></div>
+  <div class="section-content">
+    <p><em>The on-call consultant electrophysiologist, by phone at 04:18, then at the bedside:</em></p>
+
+    <h3>🗂️ Name the rhythm precisely — it changes the drug</h3>
+    <div class="vs">
+      <div class="side a"><h4>🌀 Polymorphic VT with LONG QT (this patient = Torsades)</h4>
+        <ul><li>QRS twists around the baseline; the QT is markedly prolonged</li><li>Cause: QT drugs, ↓K⁺/↓Mg²⁺, bradycardia, congenital LQTS</li><li><strong>IV magnesium</strong>, correct K⁺, stop QT drugs, <strong>raise the rate</strong> (pace/isoproterenol)</li><li><strong>Avoid amiodarone</strong> and other QT-prolonging antiarrhythmics</li></ul></div>
+      <div class="side b"><h4>🔵 Polymorphic VT with NORMAL QT</h4>
+        <ul><li>QRS varies but the QT is <strong>not</strong> long</li><li>Cause is usually <strong>acute ischemia</strong></li><li>Treat the ischemia → <strong>revascularize</strong> (cath lab); standard antiarrhythmics OK</li><li>Magnesium less central; the problem is supply, not repolarization</li></ul></div>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Polymorphic VT splits on the QT: long QT = Torsades → magnesium, potassium and pace it fast; normal QT = ischemia → cath lab. Same twist on the monitor, opposite treatment."</div>
+
+    <h3>🌀 Acquired vs congenital long QT — why the caveat matters tonight</h3>
+    <p>This is <strong>acquired</strong> (drug- and electrolyte-induced) long QT, and it is <strong>pause-dependent</strong> — so <strong>isoproterenol</strong> (to raise the rate and abolish the pauses) is a legitimate bridge until transvenous pacing is in. In <strong>congenital</strong> long-QT syndrome, the mainstay is <strong>beta-blockade</strong> and you <em>avoid</em> isoproterenol/catecholamines, which can provoke the rhythm. Read the cause before you choose: catecholamines help the acquired pause-dependent form and harm the congenital adrenergic form.</p>
+
+    <h3>🧭 Consultant's three commandments for the next hour</h3>
+    <ol>
+      <li>🧪 "Magnesium first, even at a normal level. Then potassium to 4.5–5.0. The electrolytes and the magnesium do more than any antiarrhythmic in this rhythm."</li>
+      <li>😴 "Outrun the pauses. She is brady and pause-dependent — get the rate to ~90–110 with overdrive pacing, or isoproterenol while we float the wire. Faster rate = shorter QT = no window for the next EAD."</li>
+      <li>🚫 "Touch nothing that prolongs the QT. No amiodarone, no sotalol, no class Ia, no more of the offending drugs. And if she goes pulseless, defibrillate UNSYNCHRONIZED — it's too disorganized to sync."</li>
+    </ol>
+
+    <div class="callout danger"><b class="ct">☠️ The consultant's war memory (more in S13 M&amp;M)</b>"The last twisting rhythm I saw mistreated was a woman on stacked QT drugs with a potassium of 2.7, called 'VT' by a tired team who never measured the QT. They gave IV amiodarone. The QT lengthened further, the Torsades became incessant, and we lost her. The strip, reviewed at the M&amp;M, had a textbook long QT and a long–short pause-dependent onset. The ECG told the truth; nobody measured the QT — and nobody stopped the drugs."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S6 — TEACHING POINTS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s6">
+  <div class="sec-header"><span class="s-badge">S6</span><h2>📖 Teaching Points</h2></div>
+  <div class="section-content">
+    <h3>🔬 The mechanism — WHY a long QT twists (the WHY behind the WHY)</h3>
+    <ol>
+      <li>📏 <strong>Prolonged repolarization:</strong> QT-prolonging drugs (mostly hERG/I_Kr potassium-channel blockers) plus low K⁺/Mg²⁺ lengthen phase 2/3 of the action potential. The cell takes too long to repolarize → a long QT.</li>
+      <li>⚡ <strong>Early afterdepolarizations (EADs):</strong> during that prolonged plateau, the <strong>L-type calcium current reactivates</strong>, producing a secondary upstroke — an EAD. If it reaches threshold, it fires a triggered beat. This is the spark.</li>
+      <li>🌀 <strong>Heterogeneous repolarization → twisting re-entry:</strong> repolarization is uneven across the ventricular wall (transmural dispersion). The triggered beat from an EAD lands in tissue that has recovered unevenly, so functional re-entry wanders and the QRS axis <strong>twists around the baseline</strong> — polymorphic VT.</li>
+      <li>😴 <strong>Pause-dependence (the long–short sequence):</strong> a PVC → a compensatory <strong>pause</strong> → the next sinus beat has an even <strong>longer QT</strong> → the EAD on that beat fires Torsades. Bradycardia and pauses are therefore the trigger, which is why <strong>raising the rate</strong> (pacing/isoproterenol) abolishes them.</li>
+      <li>💥 <strong>Why it kills:</strong> most runs self-terminate, but each is a near-miss; a run can sustain or degenerate into <strong>VF</strong> — disorganized, pulseless, fatal in minutes. Magnesium suppresses the EADs; a faster rate shortens the QT and removes the pauses; stopping the drugs and refilling K⁺ removes the substrate.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Torsades is a long action potential that reignites itself: a long QT lets calcium current reactivate (the EAD), and a ventricle that recovers unevenly lets the spark twist. Magnesium quiets the spark; speed shortens the fuse."</div>
+
+    <h3>⚖️ Contrast pair #1 — Torsades vs polymorphic VT with NORMAL QT (the triage that changes everything)</h3>
+    <div class="vs">
+      <div class="side a"><h4>🌀 Torsades — long QT (tonight)</h4><ul><li>QT markedly prolonged; QRS twists around the baseline</li><li>Trigger: QT drugs, ↓K⁺/↓Mg²⁺, bradycardia/pauses, congenital LQTS</li><li>Therapy: <strong>IV magnesium</strong>, K⁺ to high-normal, stop QT drugs, <strong>pace/isoproterenol</strong></li><li><strong>Avoid amiodarone</strong> (worsens the QT)</li></ul></div>
+      <div class="side b"><h4>❤️‍🔥 Polymorphic VT — normal QT</h4><ul><li>QRS varies but the QT is normal</li><li>Trigger: <strong>acute ischemia</strong> / infarction</li><li>Therapy: <strong>revascularize</strong> (cath lab); standard antiarrhythmics/beta-blocker acceptable</li><li>Magnesium is not the headline; fix the coronary</li></ul></div>
+    </div>
+    <p>😈 <strong>The trap:</strong> both look like a chaotic, twisting VT on the monitor. If you do not measure the QT you cannot tell them apart — and the treatments diverge completely (magnesium-and-pace vs cath lab). <strong>The QT interval is the fork in the road.</strong></p>
+
+    <h3>⚖️ Contrast pair #2 — Acquired vs Congenital long QT (the isoproterenol caveat)</h3>
+    <div class="vs">
+      <div class="side a"><h4>💊 Acquired long QT (tonight)</h4><ul><li>Cause: drugs + ↓K⁺/↓Mg²⁺ + bradycardia; often pause-dependent</li><li><strong>Isoproterenol and overdrive pacing are OK</strong> — they raise the rate and abolish the pauses</li><li>Remove the offending drugs and correct electrolytes</li></ul></div>
+      <div class="side b"><h4>🧬 Congenital long QT (LQTS)</h4><ul><li>Cause: inherited channelopathy (LQT1/2/3); adrenergically driven</li><li>Mainstay: <strong>beta-blockers</strong>; <strong>AVOID isoproterenol</strong>/catecholamines</li><li>Consider ICD, left cardiac sympathetic denervation</li></ul></div>
+    </div>
+    <p>💡 <em>Why it matters:</em> the same drug (isoproterenol) that rescues acquired pause-dependent Torsades can <strong>provoke</strong> the congenital adrenergic form. Establish whether the long QT is acquired before you give a catecholamine.</p>
+
+    <!-- 🎮 INTERACTIVE SIM: QTc → Torsades / EAD risk -->
+    <div class="sim" id="kSim">
+      <h3 style="margin-top:0">🎮 Simulation — The QT Dial: how the corrected QT tunes Torsades / EAD risk</h3>
+      <p style="font-size:13.5px">Drag the dial. Watch what a lengthening QTc does to repolarization, early afterdepolarizations and the risk of Torsades. This is the single most important "invisible vital sign" in this case.</p>
+      <label for="kRange">📏 Corrected QT (QTc): <b id="kVal">560</b> ms</label>
+      <input type="range" id="kRange" min="380" max="600" value="560">
+      <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+      <div class="readout bad" id="kReadout">Set the dial to explore.</div>
+      <p style="font-size:12.5px; margin-top:10px; color:var(--ink2)">🎯 Normal QTc <strong>&lt; 440 ms</strong>; borderline 440–500; <strong>&gt; 500 ms = high Torsades risk</strong>. Every QT-prolonging drug, low K⁺/Mg²⁺ and each pause push this dial to the right.</p>
+    </div>
+
+    <!-- 📚 EBM MODULE -->
+    <div class="ebm">
+      <h3>📚 Evidence-Based Medicine Corner</h3>
+      <table class="tbl">
+        <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+        <tr><td><span class="lvl">SERIES</span> Tzivoni et al. (1988)</td><td>IV magnesium sulfate rapidly terminated and suppressed Torsades de Pointes, including cases with a normal serum magnesium.</td><td>Magnesium is first-line for Torsades — give it even when the level is normal.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2020 ACLS</td><td>Polymorphic VT with long QT → IV magnesium and correct electrolytes; pulseless/degenerating → UNSYNCHRONIZED defibrillation; treat reversible causes.</td><td>Exactly the algorithm driving S3, S7 and S11 — magnesium and defibrillation, not synchronized shock for the chaotic rhythm.</td></tr>
+        <tr><td><span class="lvl">EVIDENCE</span> Overdrive pacing / isoproterenol</td><td>Raising the heart rate shortens the QT and abolishes the pauses that trigger pause-dependent Torsades, suppressing recurrence.</td><td>In bradycardia/pause-dependent acquired Torsades, pace to ~90–110 or bridge with isoproterenol (acquired only).</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2022 ESC VA / AHA-ACC-HRS</td><td>Withdraw all QT-prolonging drugs, correct K⁺/Mg²⁺/Ca²⁺, and treat bradyarrhythmia; avoid further QT-prolonging agents.</td><td>Stop the offending drugs and fix the electrolytes — the antiarrhythmic is the rate, not the brown bottle.</td></tr>
+        <tr><td><span class="lvl">RESOURCE</span> CredibleMeds / QT-drug lists</td><td>Maintained, evidence-graded lists of drugs with known/possible Torsades risk and high-risk combinations.</td><td>Check every drug against a credible list before and after starting it — especially when stacking several.</td></tr>
+      </table>
+    </div>
+
+    <!-- 🔬 ADVANCED TOPICS -->
+    <div class="callout purple">
+      <h3 style="margin-top:0">🔬 Fellowship Corner — Advanced Topics</h3>
+      <ul>
+        <li>🧬 <strong>Congenital LQTS subtypes:</strong> LQT1 (I_Ks, exertion/swimming-triggered, beta-blocker-responsive), LQT2 (I_Kr/hERG, auditory/startle and postpartum triggers), LQT3 (SCN5A late sodium current, rest/sleep events, mexiletine may help). Genotype guides triggers and therapy.</li>
+        <li>📏 <strong>QT measurement pitfalls:</strong> use Bazett vs Fridericia at extremes of rate, measure in lead II/V5, "tangent method" for the T-wave end, beware U waves merging into the T, and beware QT measured immediately after a pause (it looks longest there — which is the point).</li>
+        <li>💊 <strong>Mechanism of drug-induced LQT:</strong> most culprits block the rapid delayed-rectifier K⁺ current (I_Kr / hERG); risk multiplies with hypokalemia (which itself reduces I_Kr), hypomagnesemia, bradycardia, hepatic/renal impairment and CYP interactions that raise drug levels.</li>
+        <li>😴 <strong>Pause-dependent vs adrenergic-dependent Torsades:</strong> acquired/bradycardia-related is pause-dependent (pacing/isoproterenol help); congenital adrenergic LQTS is catecholamine-dependent (beta-blockade, avoid isoproterenol). The cause dictates whether you raise or block sympathetic tone.</li>
+        <li>🔌 <strong>Temporary pacing options:</strong> transvenous overdrive pacing to ~90–110 is definitive for pause-dependence; transcutaneous pacing bridges; atrial pacing preserves AV synchrony. Isoproterenol is a pharmacologic bridge in acquired LQT only.</li>
+        <li>🧪 <strong>Short-QT and other repolarization syndromes:</strong> contrast with short-QT syndrome and Brugada — high-yield channelopathy patterns that also cause polymorphic VT but with the <em>opposite</em> or normal QT.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S7 — ORDERS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s7">
+  <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+  <div class="section-content">
+    <h3>🖊️ The order set, written as you'd actually write it (04:14)</h3>
+    <ul>
+      <li>🚨 <strong>STOP every QT-prolonging drug NOW</strong> — ondansetron, the macrolide/fluoroquinolone, any others — flag on chart and whiteboard. List them so no one re-orders them.</li>
+      <li>🧪 <strong>Magnesium sulfate 2 g IV</strong> over 1–2 min (then a further 2 g / infusion if recurrent) — first-line, give even if the level is normal.</li>
+      <li>⚡ <strong>Potassium replacement to target 4.5–5.0 mmol/L</strong> (IV via a monitored line; correct magnesium first/alongside or the K⁺ won't hold).</li>
+      <li>😴 <strong>Raise the rate to abolish the pauses:</strong> transvenous <strong>overdrive pacing to ~90–110</strong>; while floating the wire, <strong>isoproterenol</strong> infusion as a bridge (acquired long QT only).</li>
+      <li>🚫 <strong>NO amiodarone, NO sotalol, NO class Ia</strong> — do not give a QT-prolonging antiarrhythmic to a long-QT rhythm.</li>
+      <li>🔌 <strong>Defibrillator at the bedside, pads on, set to UNSYNCHRONIZED</strong> — if she goes pulseless or into VF, defibrillate (the rhythm is too disorganized to synchronize).</li>
+      <li>🫀 12-lead ECG now and after each intervention with <strong>QTc measured each time</strong>; bloods: U&amp;E, Mg²⁺, Ca²⁺, CBC, TSH, drug levels as relevant.</li>
+      <li>📞 Refer cardiology/EP urgently for temporary pacing wire and ongoing care; document the offending drug list for pharmacy and discharge.</li>
+      <li>🫁 O₂ to SpO₂ ≥ 94%, continuous telemetry, second large-bore IV, NPO; treat the underlying infection/dehydration.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In Torsades there are only three priorities: magnesium, potassium, and rate. Stop the drugs that caused it, suppress the EADs with magnesium, and outrun the pauses by pacing fast."</div>
+
+    <!-- 🩺 PROCEDURE GUIDE 1 -->
+    <div class="checklist" id="ckCV">
+      <h3 style="margin-top:0">🩺 Procedure Guide — Acute Torsades (perfusing) — tick as you go</h3>
+      <label class="ck"><input type="checkbox"><span>🌀 Confirm polymorphic VT with a <strong>long QT</strong> (Torsades) — measure the QTc; if QT is normal, think ischemia instead</span></label>
+      <label class="ck"><input type="checkbox"><span>🧪 Give <strong>magnesium sulfate 2 g IV</strong> immediately — first-line even if the serum magnesium is normal</span></label>
+      <label class="ck"><input type="checkbox"><span>⚡ Replace <strong>potassium toward 4.5–5.0</strong> and correct magnesium; recheck frequently</span></label>
+      <label class="ck"><input type="checkbox"><span>🚫 <strong>Stop every QT-prolonging drug</strong> and document them so they are not re-ordered</span></label>
+      <label class="ck"><input type="checkbox"><span>😴 <strong>Raise the rate to ~90–110</strong> — overdrive transvenous pacing, or isoproterenol bridge (acquired LQT only) — to abolish the pauses</span></label>
+      <label class="ck"><input type="checkbox"><span>🚫 Do <strong>NOT</strong> give amiodarone/sotalol/class Ia (they prolong the QT and worsen Torsades)</span></label>
+      <label class="ck"><input type="checkbox"><span>🔌 Keep defibrillator UNSYNCHRONIZED and ready for any pulseless/degenerating run</span></label>
+      <div class="ck-progress" data-progress>0 / 7 complete</div>
+    </div>
+
+    <!-- 🩺 PROCEDURE GUIDE 2 -->
+    <div class="checklist" id="ckDefib">
+      <h3 style="margin-top:0">🩺 Procedure Guide — If she loses her pulse: ACLS Defibrillation (UNSYNCHRONIZED)</h3>
+      <p style="font-size:13px">⚠️ Pulseless Torsades / VF → <strong>UNSYNCHRONIZED</strong> defibrillation. The twisting, chaotic rhythm has no reliable R wave, so SYNC will never fire — turn it OFF.</p>
+      <label class="ck"><input type="checkbox"><span>🚫 Confirm no pulse → call arrest, start high-quality CPR (100–120/min, depth 5–6 cm, full recoil)</span></label>
+      <label class="ck"><input type="checkbox"><span>🔌 Defibrillator to <strong>UNSYNCHRONIZED</strong>, charge to max (200 J biphasic), clear, shock at minimal interruption to compressions</span></label>
+      <label class="ck"><input type="checkbox"><span>🧪 Give <strong>magnesium 2 g IV</strong>; adrenaline 1 mg every 3–5 min; correct K⁺/Mg²⁺ aggressively (avoid amiodarone in long-QT Torsades)</span></label>
+      <label class="ck"><input type="checkbox"><span>🧠 Treat reversible causes — here especially <strong>hypokalemia/hypomagnesemia</strong> and the QT-prolonging drugs (stop them)</span></label>
+      <label class="ck"><input type="checkbox"><span>🔁 Rhythm/pulse check every 2 min; minimize hands-off time; rotate compressors</span></label>
+      <label class="ck"><input type="checkbox"><span>🫀 ROSC → overdrive pace/isoproterenol to shorten the QT, EP for temporary wire, ICU</span></label>
+      <div class="ck-progress" data-progress>0 / 6 complete</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S8 — NURSING CARE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s8">
+  <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+  <div class="section-content">
+    <h3>🛏️ Telemetry nursing priorities — minute by minute</h3>
+    <ul>
+      <li>📟 <strong>Continuous telemetry with the defibrillator at the bedside, pads attached and set to UNSYNCHRONIZED.</strong> Capture every run on a printed strip — the QT and the onset pattern are gold for the EP team.</li>
+      <li>🧪 <strong>Have magnesium drawn up and ready;</strong> give the 2 g as prescribed and prepare repeat doses — magnesium is the first drug to reach for, not the defibrillator (unless pulseless).</li>
+      <li>⚡ <strong>Run potassium repletion as prescribed</strong> on a monitored line; double-check concentrations and rates — potassium errors are themselves arrhythmogenic and lethal.</li>
+      <li>🚫 <strong>Guard the drug chart:</strong> ensure the QT-prolonging drugs stay stopped; question any new order for ondansetron, macrolides, fluoroquinolones, antipsychotics or other QT-prolongers.</li>
+      <li>😴 <strong>Watch the rate and the pauses:</strong> bradycardia and pauses precede the next run. Set up for transvenous/transcutaneous pacing and have isoproterenol ready as ordered.</li>
+      <li>🧠 <strong>Neuro/consciousness checks</strong> — she drops out during each run; a patient who slumps may have lost the pulse → check it, don't assume, and be ready to defibrillate.</li>
+      <li>📋 <strong>Document the QTc, the rhythm strip and the time</strong> before and after each intervention, plus the energy delivered for any shock.</li>
+      <li>👨‍👩‍👦 Keep the family updated and supported (see S16) — repeated collapses are terrifying to witness.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who gives the magnesium fast, keeps the potassium in band, guards the chart from QT drugs and watches for the pause is doing most of the antiarrhythmic work in the room."</div>
+    <div class="callout warn"><b class="ct">📢 Escalate IMMEDIATELY for</b>Loss of pulse (→ UNSYNC defib + CPR + magnesium) · a run that does not self-terminate · lengthening QTc on the monitor · increasing pauses/bradycardia · any new prescription for a QT-prolonging drug · falling consciousness between runs.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S9 — INVESTIGATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s9">
+  <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+  <div class="section-content">
+    <h3>🧾 Results board (04:20, drawn during resuscitation)</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>Result</th><th>Reference</th><th>Interpretation</th></tr>
+      <tr><td>Potassium</td><td class="lo">2.8 mmol/L ↓</td><td>3.5–5.0</td><td>The fuse. Hypokalemia reduces I_Kr and prolongs repolarization → longer QT → EADs. Replace aggressively to 4.5–5.0; she keeps re-triggering until you do.</td></tr>
+      <tr><td>Magnesium</td><td class="lo">0.48 mmol/L ↓</td><td>0.7–1.0</td><td>Low Mg²⁺ destabilizes membranes, worsens hypokalemia and promotes EADs. Give 2 g IV — and give magnesium even if this were normal.</td></tr>
+      <tr><td>Calcium (corrected)</td><td class="lo">1.95 mmol/L ↓</td><td>2.2–2.6</td><td>Hypocalcemia also prolongs the QT — another contributor to correct.</td></tr>
+      <tr><td>QTc (12-lead)</td><td class="hi">560 ms ↑</td><td>&lt; 440</td><td>Markedly prolonged — well into high Torsades-risk territory. The single most important number in this case.</td></tr>
+      <tr><td>TSH</td><td class="hi">11.2 mIU/L ↑</td><td>0.4–4.0</td><td>Under-treated hypothyroidism — contributes to QT prolongation and bradycardia.</td></tr>
+      <tr><td>Troponin I</td><td class="ok-v">0.03 ng/mL</td><td>&lt; 0.04</td><td>Not elevated — argues against acute ischemia as the cause, supporting acquired long-QT Torsades over normal-QT ischemic polymorphic VT.</td></tr>
+      <tr><td>Drug screen / chart</td><td class="hi">≥ 2 QT drugs ↑</td><td>—</td><td>Ondansetron + macrolide/fluoroquinolone stacked on diuretics — the acquired-LQT recipe written on the chart.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"You cannot fix the potassium without fixing the magnesium first — low Mg²⁺ makes the kidney waste the K⁺ you pour in. Give magnesium, then potassium, and recheck the QT after every change."</div>
+
+    <div class="callout info"><b class="ct">🧠 Why the normal troponin matters here</b>The big triage in polymorphic VT is long QT (Torsades) vs normal QT with ischemia. A markedly prolonged QTc plus a flat troponin and a drug chart full of QT-prolongers points firmly to <strong>acquired long-QT Torsades</strong> — treat with magnesium, potassium and rate, not the cath lab. A normal QT with a rising troponin would have sent you to revascularize instead.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S10 — ECG / IMAGING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s10">
+  <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging</h2></div>
+  <div class="section-content">
+    <h3>🫀 The presenting rhythm — read it like a detective</h3>
+    <div class="ecg-fig">
+      <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Torsades de Pointes: a long QT, a long-short pause-dependent onset, then polymorphic VT twisting around the baseline">
+        <rect width="820" height="150" fill="#0b1220"/>
+        <g stroke="#1e3a5f" stroke-width="1">
+          <line x1="0" y1="30" x2="820" y2="30"/><line x1="0" y1="60" x2="820" y2="60"/>
+          <line x1="0" y1="90" x2="820" y2="90"/><line x1="0" y1="120" x2="820" y2="120"/>
+        </g>
+        <polyline fill="none" stroke="#86efac" stroke-width="2.4" points="0,75 25,75 35,45 45,75 70,75 95,68 120,72 150,75 175,75 185,45 195,75 215,75 240,68 270,72 300,75 312,55 322,75 360,75 380,90 400,60 420,96 440,55 460,100 480,52 500,104 520,50 540,100 560,56 580,92 600,64 620,84 640,72 660,76 690,75 705,55 720,75 760,75 800,75 815,75"/>
+        <text x="60" y="22" fill="#fcd34d" font-size="12" font-weight="700">↑ long QT + long–short onset</text>
+        <text x="470" y="22" fill="#fca5a5" font-size="12" font-weight="700">↑ twisting around the baseline</text>
+      </svg>
+      <div class="ecg-cap">A <span style="color:#fcd34d">markedly long QT</span> with a <span style="color:#fcd34d">long–short (pause-dependent) onset</span>, then polymorphic VT whose amplitude and axis <span style="color:#fca5a5">twist around the baseline</span> before self-terminating — the signature of <strong>Torsades de Pointes</strong>.</div>
+    </div>
+
+    <h3>🔎 The Torsades toolkit (memorize the high-yield ones)</h3>
+    <table class="tbl">
+      <tr><th>Feature</th><th>Why it means Torsades</th></tr>
+      <tr><td>📏 <strong>Long QT (QTc &gt; 500 ms)</strong></td><td>The substrate. A prolonged repolarization is what allows the EADs and the twisting re-entry — measure it on the conducted beats before the run.</td></tr>
+      <tr><td>🌀 <strong>Twisting / changing QRS axis</strong></td><td>The amplitude and polarity of the QRS rotate around the baseline ("turning of the points") — defines polymorphic VT and, with a long QT, Torsades.</td></tr>
+      <tr><td>😴 <strong>Long–short initiation</strong></td><td>A PVC → pause → next beat with a longer QT → the run starts on that beat. Pause-dependence points to acquired/bradycardic Torsades.</td></tr>
+      <tr><td>🔁 <strong>Self-terminating runs</strong></td><td>Non-sustained twisting runs that stop on their own, often recurrent — each a near-miss for sustained VF.</td></tr>
+      <tr><td>💊 <strong>Reversible cause on the chart</strong></td><td>QT-prolonging drugs and low K⁺/Mg²⁺ — the diagnosis is half-made by reviewing the medications and the electrolytes.</td></tr>
+      <tr><td>👀 <strong>Prominent U waves / TU fusion</strong></td><td>Hypokalemia and long-QT states produce big U waves that fuse with the T — beware over/under-measuring the QT.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Find a long QT and a twisting QRS and the argument is over — it's Torsades. Look at the conducted beats and the onset: a long–short sequence tells you it's pause-dependent and that pacing will fix it."</div>
+
+    <h3>🫀 Post-stabilization 12-lead &amp; echo</h3>
+    <ul>
+      <li>📈 <strong>Post-treatment 12-lead:</strong> after magnesium, potassium repletion and pacing to ~95/min, the QTc shortens toward 440 ms and the runs stop — the rate-dependence confirmed in front of you.</li>
+      <li>🩻 <strong>Echo:</strong> structurally near-normal heart, preserved EF, no regional wall-motion abnormality — consistent with a repolarization problem, not scar VT or ischemia.</li>
+      <li>🧲 <strong>Genetic / family review (later):</strong> if the QT stays long after every drug and electrolyte is corrected, evaluate for an unmasked <strong>congenital long-QT syndrome</strong> (genotype, family ECGs).</li>
+    </ul>
+
+    <div class="callout warn"><b class="ct">⚠️ The ECG's favorite lie in twisting wide-complex tachycardia</b>"It's polymorphic VT, so just treat it like any VT with amiodarone." Without measuring the QT you cannot separate Torsades (long QT → magnesium, pace, NO amiodarone) from ischemic polymorphic VT (normal QT → cath lab). <strong>The QT interval is the whole diagnosis.</strong></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S11 — MEDICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s11">
+  <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+  <div class="section-content">
+    <h3>💉 Acute drugs — what, why, and the traps</h3>
+    <table class="tbl">
+      <tr><th>Drug</th><th>Role tonight</th><th>Mechanism / caution</th></tr>
+      <tr><td><strong>Magnesium sulfate 2 g IV</strong></td><td><strong>First-line</strong> for Torsades — suppresses EADs and terminates/prevents runs</td><td>Give even if serum Mg²⁺ is normal. Repeat or infuse if recurrent. Watch for hypotension/flushing if pushed very fast; monitor reflexes/respiration with high cumulative doses.</td></tr>
+      <tr><td><strong>Potassium (IV, monitored)</strong></td><td>Refill to high-normal 4.5–5.0 to shorten the QT and close the EAD window</td><td>Correct magnesium first/alongside or the K⁺ won't hold. Respect maximum peripheral infusion rates; central line for faster repletion; recheck often.</td></tr>
+      <tr><td><strong>Isoproterenol (isoprenaline) infusion</strong></td><td>Bridge to raise the rate and abolish the pauses in <strong>acquired</strong> pause-dependent Torsades</td><td>Beta-agonist; titrate to ~90–110/min. <strong>AVOID in congenital LQTS</strong> (catecholamines provoke it). Caution in ischemia.</td></tr>
+      <tr><td><strong>Overdrive transvenous pacing</strong></td><td>Definitive rate support — paces to ~90–110 to shorten the QT and remove pauses</td><td>Preferred over isoproterenol where available; atrial pacing preserves AV synchrony. EP/cardiology to place the wire.</td></tr>
+      <tr><td><strong>Defibrillation (UNSYNCHRONIZED)</strong></td><td>For pulseless Torsades or degeneration to VF</td><td>The chaotic, twisting rhythm has no reliable R wave to sync to → turn SYNC OFF. Resume magnesium/electrolyte correction after.</td></tr>
+      <tr><td><strong>❌ Amiodarone / sotalol / class Ia</strong></td><td><strong>Avoided</strong> — these prolong the QT and worsen Torsades</td><td>The reflexive "it's VT, load amiodarone" is the classic killer here. Never give a QT-prolonging antiarrhythmic to a long-QT rhythm.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Give magnesium first, even when the level is normal; then potassium, then rate. And never feed a long-QT rhythm a QT-prolonging antiarrhythmic — amiodarone is the trap, not the treatment."</div>
+
+    <div class="callout danger"><b class="ct">🚫 The 'never' list in long-QT Torsades</b>❌ Amiodarone / sotalol / dofetilide / class Ia · ❌ continuing ANY QT-prolonging drug (ondansetron, macrolides, fluoroquinolones, azoles, haloperidol, methadone) · ❌ isoproterenol in <em>congenital</em> LQTS · ❌ synchronized cardioversion attempts on chaotic pulseless Torsades (it won't sync — defibrillate). The safe moves are <strong>magnesium, potassium, and a faster rate</strong>.</div>
+
+    <h3>🏠 Substrate-modifying therapy (this admission, not just tonight)</h3>
+    <ul>
+      <li>📋 <strong>Permanent medication review:</strong> document a hard allergy/avoid list of QT-prolongers; cross-check every future drug against a credible QT-drug list (e.g. CredibleMeds).</li>
+      <li>💧 <strong>Revisit the diuretics</strong> that drove chronic hypokalemia/hypomagnesemia; add replacement or a potassium-sparing strategy and a monitoring plan.</li>
+      <li>🩺 <strong>Optimize thyroid replacement</strong> — correcting hypothyroidism helps normalize the QT and rate.</li>
+      <li>🧬 <strong>If the QT stays long</strong> after everything is corrected → evaluate for congenital LQTS (beta-blocker, possible ICD, family screening).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S12 — MONITORING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s12">
+  <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+  <div class="section-content">
+    <h3>📡 What to watch and why</h3>
+    <ul>
+      <li>📏 <strong>QTc on every 12-lead</strong> — the single most important number; track it down toward &lt; 440 ms as you correct electrolytes, stop drugs and pace. A QTc that won't shorten suggests a congenital component.</li>
+      <li>📈 <strong>Continuous telemetry</strong> with the defibrillator at the bedside (UNSYNCHRONIZED-ready) until well controlled; print every run and note its onset (long–short?).</li>
+      <li>⚡ <strong>Serial K⁺, Mg²⁺ and Ca²⁺</strong> (e.g. q2–4h initially) — the most modifiable drivers; keep K⁺ 4.5–5.0, Mg²⁺ &gt; 1.0.</li>
+      <li>😴 <strong>Heart rate and pauses</strong> — watch for the bradycardia/pauses that precede a run; confirm the pacing rate is holding ~90–110 if pacing.</li>
+      <li>💊 <strong>Medication reconciliation</strong> — actively monitor that no QT-prolonging drug is restarted anywhere on the chart.</li>
+      <li>🩺 <strong>Cause monitoring</strong> — TSH, renal function (drug clearance), treatment of the infection/dehydration that started the cascade.</li>
+      <li>🔌 If a temporary pacing wire is in: monitor for capture, sensing and the rate set to suppress pauses.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After you break Torsades, the monitor's job is to answer two questions: is the QT shortening, and are the pauses gone? Those two — QTc and rate — tell you whether the rhythm is coming back."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S13 — COMPLICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s13">
+  <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+  <div class="section-content">
+    <h3>💀 What can go wrong — and the mechanism</h3>
+    <ul>
+      <li>⚡ <strong>Degeneration to VF / cardiac arrest</strong> — the great fear; a run that doesn't self-terminate organizes into sustained Torsades then VF. Treatment pivots to UNSYNC defibrillation + CPR + magnesium.</li>
+      <li>🌀 <strong>Incessant Torsades</strong> — back-to-back runs, often <strong>provoked by giving a QT-prolonging antiarrhythmic</strong> (amiodarone) or by failing to remove the offending drug.</li>
+      <li>🧠 <strong>Anoxic injury / trauma from recurrent syncope</strong> — repeated collapses cause falls, aspiration and cerebral hypoperfusion.</li>
+      <li>😴 <strong>Bradycardia/pause complications</strong> — the slow rate that drives the rhythm; over-aggressive AV-nodal slowing or further bradycardia worsens it.</li>
+      <li>💊 <strong>Iatrogenic QT prolongation</strong> — the very drug reached for ("it's VT") lengthens the QT and worsens the Torsades; electrolyte errors during repletion are also arrhythmogenic.</li>
+      <li>🫀 <strong>Recurrence</strong> — if the offending drugs aren't stopped and K⁺/Mg²⁺ aren't corrected (and the pauses not paced out), Torsades returns.</li>
+    </ul>
+
+    <!-- 🎭 M&M CONFERENCE MODULE -->
+    <div class="mm">
+      <h3>🎭 Morbidity &amp; Mortality Conference — "The QT Nobody Measured"</h3>
+      <div class="mm-case">
+        <strong>The case:</strong> A 72-year-old woman, admitted with vomiting and a chest infection, was on <strong>ondansetron and a macrolide</strong> with a potassium of 2.7 and an un-checked magnesium. She had recurrent self-terminating polymorphic VT and recurrent syncope. A tired night team called it "VT" and gave <strong>IV amiodarone 300 mg</strong> — without measuring the QT or stopping the offending drugs. The QT lengthened further, the Torsades became <strong>incessant</strong>, and she arrested. A prolonged resuscitation followed. She did not survive. The pre-treatment strip, projected at the M&amp;M, showed a textbook <strong>long QT with a long–short, pause-dependent onset</strong>.
+      </div>
+      <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+      <div class="swiss">
+        <div class="hole"><b>📏 QT NEVER MEASURED</b>The long QT — the whole diagnosis — was on the strip and unread.</div>
+        <div class="hole"><b>💊 DRUGS NOT STOPPED</b>Ondansetron + macrolide + diuretics kept the QT long throughout.</div>
+        <div class="hole"><b>🧪 LETHAL DRUG</b>IV amiodarone prolonged the QT → incessant Torsades → arrest.</div>
+        <div class="hole"><b>⚡ ELECTROLYTES IGNORED</b>K⁺ 2.7 and unchecked Mg²⁺ — the fuse left burning.</div>
+        <div class="hole"><b>🌙 SYSTEM</b>Night fatigue, no senior review, no "measure the QT first" default.</div>
+      </div>
+      <p style="margin-bottom:0"><strong>🛡️ What would have saved her:</strong> measure the QT on every polymorphic VT; give <em>magnesium first</em> (even at a normal level); stop every QT-prolonging drug; correct K⁺/Mg²⁺; raise the rate to abolish pauses; and never give a QT-prolonging antiarrhythmic to a long-QT rhythm. <strong>This is exactly why your nurse held the amiodarone tonight.</strong></p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'It's just VT, load amiodarone' is the sentence written on the chart of patients who then die of Torsades. Measure the QT before you name the rhythm."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S14 — DIFFERENTIALS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s14">
+  <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials</h2></div>
+  <div class="section-content">
+    <h3>🧩 The polymorphic / twisting wide-complex tachycardia differential</h3>
+    <table class="tbl">
+      <tr><th>Diagnosis</th><th>Clues</th><th>Why it matters</th></tr>
+      <tr><td>🌀 <strong>Torsades de Pointes — acquired long QT</strong> (this patient)</td><td>Long QT, twisting QRS, long–short onset, QT drugs + low K⁺/Mg²⁺, brady/pauses</td><td>Default for long-QT polymorphic VT; magnesium, potassium, stop drugs, pace fast. NOT amiodarone.</td></tr>
+      <tr><td>🧬 <strong>Congenital long-QT syndrome</strong></td><td>Long QT persisting after drugs/electrolytes corrected; young, family history, adrenergic triggers</td><td>Beta-blockers, <strong>avoid isoproterenol</strong>; consider ICD and family screening.</td></tr>
+      <tr><td>❤️‍🔥 <strong>Polymorphic VT with NORMAL QT (ischemic)</strong></td><td>Twisting QRS but <strong>normal QT</strong>, chest pain, ST changes, rising troponin</td><td>This is ischemia → <strong>revascularize</strong> (cath lab); not a magnesium-and-pace problem.</td></tr>
+      <tr><td>⚡ <strong>Monomorphic VT</strong></td><td>One fixed QRS shape, usually scar/prior MI</td><td>Different therapy — synchronized cardioversion if unstable, amiodarone/procainamide tolerated.</td></tr>
+      <tr><td>🧪 <strong>Other electrolyte / toxic causes</strong></td><td>Hypocalcemia (long QT), digoxin (bidirectional VT), CPVT (exercise-induced bidirectional VT)</td><td>Specific fixes — replace calcium, digoxin antibody, beta-blockade for CPVT.</td></tr>
+      <tr><td>😵 <strong>Non-arrhythmic syncope mimics</strong></td><td>Vasovagal, seizure, hypoglycemia — no twisting rhythm captured, normal QT</td><td>Confirm a true captured arrhythmia and the QT before committing to Torsades therapy.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Twisting polymorphic VT → MEASURE THE QT. Long QT → Torsades (magnesium, pace). Normal QT → ischemia (cath lab). The QT is the fork in the road."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S15 — PLAN -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s15">
+  <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan</h2></div>
+  <div class="section-content">
+    <h3>🧭 Tonight → this week → for life</h3>
+    <ol>
+      <li>🧪 <strong>Tonight (done):</strong> magnesium 2 g IV; potassium repleted toward 4.5–5.0; all QT-prolonging drugs stopped; overdrive pacing to ~95/min (isoproterenol bridge first) → runs abolished and QTc shortening; defibrillator kept UNSYNC-ready; CCU/EP admission.</li>
+      <li>📏 <strong>Watch the QT come down:</strong> serial 12-leads/QTc as electrolytes normalize and pacing continues; wean pacing only once the QT is safe and pauses are gone.</li>
+      <li>🩺 <strong>Treat every cause:</strong> correct calcium, optimize thyroid replacement, treat the infection/dehydration, and review the diuretics that drove the hypokalemia/hypomagnesemia.</li>
+      <li>📋 <strong>Hard-stop the offending drugs:</strong> document a clear "avoid QT-prolongers" alert; reconcile against a credible QT-drug list before any new prescription.</li>
+      <li>🧬 <strong>If the QT stays long</strong> once everything is corrected → EP evaluation for congenital LQTS (genotype, beta-blocker, possible ICD, family screening).</li>
+      <li>👨‍👩‍👦 <strong>Shared decision-making &amp; education</strong> — why this happened, the drug-avoidance list, the importance of electrolytes, and a clear "call 911 for syncope/palpitations" safety net.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Magnesium and rate treat the episode; stopping the drugs, correcting the electrolytes and a permanent avoid-list treat the disease. Send her home with all of those, or she comes back twisting."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S16 — PROGRESS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s16">
+  <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+  <div class="section-content">
+    <h3>📅 Course in CCU / EP</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Night 1, 04:16</div>Magnesium 2 g IV given, second 2 g for a recurrent run; potassium infusion started; all QT drugs stopped. Isoproterenol started as a bridge.</div>
+      <div class="t-item"><div class="t-time">Night 1, 05:10</div>Transvenous wire placed; overdrive pacing to ~95/min abolishes the pauses and the runs stop. QTc begins to fall.</div>
+      <div class="t-item"><div class="t-time">Day 1</div>K⁺ 4.6, Mg²⁺ 1.0, Ca²⁺ corrected; QTc down to ~470 ms; troponin remains flat — confirmed acquired long-QT Torsades, not ischemia.</div>
+      <div class="t-item"><div class="t-time">Day 2</div>Thyroid replacement optimized; infection treated; QTc ~450 ms; no further runs off isoproterenol with pacing backup.</div>
+      <div class="t-item"><div class="t-time">Day 3</div>Pacing weaned; QTc ~440 ms on telemetry with the offending drugs removed. Echo near-normal, preserved EF.</div>
+      <div class="t-item"><div class="t-time">Day 5</div>Arrhythmia-free 48 h, electrolytes stable, QT safe, drug-avoidance list documented. Ready for discharge with EP follow-up.</div>
+    </div>
+
+    <!-- 👨‍👩‍👦 FAMILY & PATIENT JOURNEY MODULE -->
+    <h3>👨‍👩‍👦 Family &amp; Patient Journey</h3>
+    <div class="journey">
+      <div class="j-card"><div class="j-who">👵 The patient — Mrs. E.K.</div><p>"I kept blacking out and waking up confused — I thought I was just exhausted from the sickness. They told me it was my heart twisting, set off by the very tablets meant to help. Now I carry a card listing the drugs I must never take again."</p></div>
+      <div class="j-card"><div class="j-who">👨 Her son</div><p>"Watching her collapse again and again was the worst night of my life. A nurse kept explaining each step. When the monitor finally beeped steady and fast — on purpose, they said, to keep it from twisting — I could finally breathe."</p></div>
+      <div class="j-card"><div class="j-who">👩‍⚕️ The bedside nurse</div><p>"My job was the magnesium, the potassium, guarding the chart, and the truth. And holding that amiodarone. Sometimes the best care is the drug you <em>don't</em> give and the QT you <em>do</em> measure."</p></div>
+      <div class="j-card"><div class="j-who">🎓 The team's reflection</div><p>"This wasn't a clever diagnosis — it was a disciplined one. We measured the QT, named it Torsades, gave magnesium, stopped the drugs and paced the pauses away."</p></div>
+    </div>
+
+    <div class="callout pink"><b class="ct">💗 The human thread</b>For this patient, safety is now a piece of paper and a habit: a drug-avoidance list, and a household that knows why "just an antiemetic" or "just an antibiotic" can be dangerous for her. Teaching the family which drugs to refuse, and to ask "could this prolong her QT?", is as much treatment as the magnesium was.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S17 — DISCHARGE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s17">
+  <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+  <div class="section-content">
+    <h3>📋 Discharge plan &amp; safety net</h3>
+    <ul>
+      <li>💊 <strong>Medications:</strong> a clear written list of QT-prolonging drugs to <strong>avoid for life</strong> (antiemetics like ondansetron, macrolides/fluoroquinolones, azoles, many antipsychotics, methadone, sotalol/class Ia), optimized thyroid replacement, and a reviewed diuretic/electrolyte plan.</li>
+      <li>📏 <strong>QT documentation:</strong> the discharge QTc and a note that the QT normalized once drugs/electrolytes were corrected — vital for any future prescriber.</li>
+      <li>🧪 <strong>Electrolyte plan:</strong> recheck K⁺/Mg²⁺/Ca²⁺ with the GP/clinic; consider potassium-sparing strategy and replacement; teach why dehydration and diuretics matter.</li>
+      <li>🗺️ <strong>EP follow-up:</strong> to confirm a normal QT off the offending drugs and to evaluate for congenital LQTS if the QT had not fully normalized; cardiology clinic booked before discharge.</li>
+      <li>🚩 <strong>Red flags → call emergency services:</strong> fainting or near-fainting, palpitations with dizziness, or being prescribed any new drug without it being checked against her QT-avoid list.</li>
+      <li>📚 <strong>Education:</strong> what Torsades is in plain language, the lifelong drug-avoidance list (carry the card, tell every clinician and pharmacist), the importance of electrolytes, and CPR/AED awareness for the family.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Discharge after Torsades is not 'rhythm fixed, go home' — it is a lifelong drug-avoidance list, corrected electrolytes, an optimized thyroid, a documented QT and a family who knows what 'could this prolong her QT?' means."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S18 — CLINICAL PEARLS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s18">
+  <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+  <div class="section-content">
+    <div class="pearl-grid">
+      <div class="pearl"><b>📏 Measure the QT first</b>Polymorphic VT + long QT = Torsades → magnesium, potassium, pace it fast. Polymorphic VT + normal QT = ischemia → cath lab.</div>
+      <div class="pearl"><b>🧪 Magnesium first, always</b>IV magnesium 2 g is first-line for Torsades — give it even when the serum magnesium is normal. It suppresses the EADs.</div>
+      <div class="pearl"><b>😴 Pauses are poison</b>Torsades is pause-dependent — outrun the next early afterdepolarization with overdrive pacing (~90–110) or isoprenaline.</div>
+      <div class="pearl"><b>🚫 Never amiodarone here</b>Never feed a long-QT rhythm a QT-prolonging antiarrhythmic — amiodarone/sotalol/class Ia worsen Torsades.</div>
+      <div class="pearl"><b>⚡ K⁺ to high-normal</b>Replace potassium toward 4.5–5.0, and correct magnesium first or the K⁺ won't hold. Both shorten the QT.</div>
+      <div class="pearl"><b>🧬 Acquired vs congenital</b>Acquired pause-dependent LQT → isoproterenol/pacing OK. Congenital LQTS → beta-blocker, AVOID isoproterenol.</div>
+      <div class="pearl"><b>🔌 Pulseless = UNSYNC defib</b>Chaotic/pulseless Torsades is too disorganized to synchronize — defibrillate UNSYNCHRONIZED, don't try to sync.</div>
+      <div class="pearl"><b>💊 Read the drug chart</b>The cause is usually written on it — QT-prolongers stacked on low K⁺/Mg²⁺. Stop every one of them.</div>
+      <div class="pearl"><b>👀 Mind the U wave</b>Hypokalemia/long-QT states give big U waves and TU fusion — don't mis-measure the QT.</div>
+      <div class="pearl"><b>🌀 Long–short onset</b>A PVC → pause → longer-QT beat → run. Recognizing pause-dependence tells you pacing will fix it.</div>
+      <div class="pearl"><b>📋 Avoid-list for life</b>Document a permanent QT-drug avoidance list; check every future drug against a credible list (e.g. CredibleMeds).</div>
+      <div class="pearl"><b>🩺 Torsades is a symptom</b>Always ask "why long QT?" — drugs, electrolytes, bradycardia, hypothyroidism, congenital. Treat the rhythm and the cause.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S19 — MCQs / ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s19">
+  <div class="sec-header"><span class="s-badge">S19</span><h2>🧠 MCQs / Assessment</h2></div>
+  <div class="section-content">
+    <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP and feed your dashboard. Each shows a full explanation.</em></p>
+    <div id="mcqHost"></div>
+    <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · Case c-torsades-012 — Torsades de Pointes — Acquired Long QT<br>
+  ⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."
+</div>
+
+</div><!-- /#caseScroll -->
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ XP / DASHBOARD CORE ============ */
+  var XP = 0, XP_MAX = 1200;
+  var awarded = {}; // dedupe one-time awards by key
+  var xpVal = document.getElementById('xpVal');
+  var xpFill = document.getElementById('xpFill');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+  }
+  function addXP(amount, key, label){
+    if(key){ if(awarded[key]) return; awarded[key] = true; }
+    XP += amount;
+    if(XP > XP_MAX) XP = XP_MAX;
+    xpVal.textContent = XP;
+    xpFill.style.width = Math.min(100, Math.round(XP / XP_MAX * 100)) + '%';
+    showToast('+' + amount + ' XP' + (label ? ' · ' + label : ''));
+  }
+  function earnBadge(id){
+    var b = document.getElementById(id);
+    if(b && !b.classList.contains('earned')){ b.classList.add('earned'); }
+  }
+
+  /* Dashboard minimize */
+  var dash = document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){
+    dash.classList.toggle('collapsed');
+    this.textContent = dash.classList.contains('collapsed') ? '+' : '–';
+  });
+
+  /* ============ INTERNAL SCROLL SIZING ============ */
+  /* Size the scroll box to the visible window so the sticky tab bar stays in
+     view. When embedded (srcDoc iframe, same-origin), the host page stretches
+     the iframe to full content height and scrolls the OUTER page — so we size
+     this box from the parent window's height minus whatever app chrome sits
+     above the iframe, and scroll internally instead. Standalone → 100vh. */
+  var caseScroll = document.getElementById('caseScroll');
+  var topnav = document.getElementById('topnav');
+  /* The tab bar is position:fixed, so it's out of flow — reserve space at the
+     top of the scroll content (and offset anchor jumps) by its real height. */
+  function setNavOffset(){
+    var navH = topnav ? topnav.offsetHeight : 70;
+    caseScroll.style.paddingTop = navH + 'px';
+    caseScroll.style.scrollPaddingTop = (navH + 14) + 'px';
+  }
+  function sizeScroller(){
+    try {
+      var p = window.parent;
+      if(p && p !== window && window.frameElement){
+        var rectTop = window.frameElement.getBoundingClientRect().top;
+        if(rectTop < 0) rectTop = 0;          // parent scrolled past the chrome
+        var ph = p.innerHeight || 800;
+        var h = ph - rectTop - 6;             // leave the bottom edge breathing room
+        if(h < 460) h = 460;                  // sane minimum on short windows
+        caseScroll.style.height = h + 'px';
+      } else {
+        caseScroll.style.height = '100vh';
+      }
+    } catch(e){ caseScroll.style.height = '100vh'; }
+    setNavOffset();
+  }
+  sizeScroller();
+  window.addEventListener('resize', sizeScroller);
+  window.addEventListener('load', sizeScroller);
+  try { if(window.parent && window.parent !== window) window.parent.addEventListener('resize', sizeScroller); } catch(e){}
+
+  /* ============ NAV: scroll-spy active + visited ============ */
+  var navchips = Array.prototype.slice.call(document.querySelectorAll('.navchip'));
+  var sections = navchips.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited = {};
+  var visitVal = document.getElementById('visitVal');
+
+  function markVisited(idx){
+    var sec = sections[idx];
+    if(!sec) return;
+    if(!visited[sec.id]){
+      visited[sec.id] = true;
+      navchips[idx].classList.add('visited');
+      var count = Object.keys(visited).length;
+      visitVal.textContent = count + ' / 19';
+      addXP(8, 'visit-' + sec.id, 'Section read');
+      if(count >= 19){ earnBadge('bdg-explorer'); addXP(60, 'allvisited', 'Ward Explorer!'); }
+    }
+  }
+  function setActive(idx){
+    navchips.forEach(function(c){ c.classList.remove('active'); });
+    if(navchips[idx]) navchips[idx].classList.add('active');
+  }
+
+  /* True tabs: each chip shows ONLY its section, hidden via CSS otherwise.
+     No scrollIntoView and no scroll-spy — nothing can scroll the tab bar away,
+     which also sidesteps every srcDoc-iframe scrolling quirk. The hero banner
+     and vitals strip belong to the case intro, so they show on S1 only. */
+  var heroBits = [document.querySelector('.hero'), document.querySelector('.vitals-strip')]
+    .filter(function(el){ return !!el; });
+
+  function showSection(idx){
+    sections.forEach(function(s, i){ if(s) s.classList.toggle('sec-active', i === idx); });
+    heroBits.forEach(function(el){ el.style.display = (idx === 0) ? '' : 'none'; });
+    caseScroll.scrollTop = 0;
+    setActive(idx);
+    markVisited(idx);
+  }
+
+  navchips.forEach(function(chip, idx){
+    chip.addEventListener('click', function(ev){
+      ev.preventDefault();
+      showSection(idx);
+    });
+  });
+  showSection(0);
+
+  /* ============ FLAG GAME (S2) ============ */
+  var flagBtns = document.querySelectorAll('#flagGame .flag-btn');
+  var flagResult = document.getElementById('flagResult');
+  var flagsFound = 0, flagsTotal = 0, flagWrong = 0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good') === '1') flagsTotal++; });
+  flagBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.dataset.locked) return;
+      btn.dataset.locked = '1';
+      var good = btn.getAttribute('data-good') === '1';
+      if(good){
+        btn.classList.add('flag-good');
+        flagsFound++;
+        addXP(10, 'flag-' + flagsFound + '-' + Math.random(), 'Torsades flag spotted');
+      } else {
+        btn.classList.add('flag-bad');
+        flagWrong++;
+        showToast('❌ Not a Torsades-specific flag');
+      }
+      if(flagsFound === flagsTotal){
+        flagResult.textContent = '✅ All ' + flagsTotal + ' Torsades red flags found' + (flagWrong ? ' (with ' + flagWrong + ' wrong pick' + (flagWrong>1?'s':'') + ')' : ' — flawless!');
+        earnBadge('bdg-vt');
+        addXP(30, 'flags-complete', 'Torsades-Spotter badge');
+      } else {
+        flagResult.textContent = flagsFound + ' / ' + flagsTotal + ' Torsades red flags found…';
+      }
+    });
+  });
+
+  /* ============ BRANCHING SCENARIO (S3) ============ */
+  var scText = document.getElementById('scText');
+  var scChoices = document.getElementById('scChoices');
+  var scFeedback = document.getElementById('scFeedback');
+  var scRestart = document.getElementById('scRestart');
+  var scStab = document.getElementById('scStab');
+  var scTime = document.getElementById('scTime');
+  var scXP = document.getElementById('scXP');
+  var pathXP = 0, scStability = 2, scElapsed = 0;
+
+  var STEPS = {
+    start: {
+      text: "The covering doctor holds a syringe of amiodarone; the nurse has the defibrillator paddles. QTc 560 ms, K⁺ 2.8, Mg²⁺ 0.48. The monitor is in sinus brady with pauses, but it twisted into polymorphic VT four times already and she has a pulse now. What do you do FIRST?",
+      choices: [
+        { t: "🧪 Stop the QT drugs and give magnesium sulfate 2 g IV now", good:true, ds:1, dt:8, xp:40, fb:"✅ Exactly. This is acquired long-QT Torsades. Magnesium is first-line (even at a normal level) and stopping the offending drugs removes the cause. You've started breaking the rhythm the right way." , next:"electrolytes" },
+        { t: "💉 Load IV amiodarone 300 mg — 'it's VT'", good:false, ds:-2, dt:20, xp:0, fb:"☠️ Catastrophe. Amiodarone prolongs the QT — the very thing driving Torsades — and can turn intermittent runs into incessant Torsades and arrest. This is the M&M case in S13. Restart and choose again.", end:true },
+        { t: "🔌 Synchronized cardioversion of the twisting rhythm", good:false, ds:-1, dt:15, xp:5, fb:"⚠️ She has a pulse and the runs self-terminate; the chaotic twisting rhythm can't be reliably synchronized anyway. Give magnesium and fix the QT first; reserve UNSYNCHRONIZED defibrillation for a pulseless run.", next:"electrolytes" }
+      ]
+    },
+    electrolytes: {
+      text: "Magnesium 2 g is in and the QT drugs are stopped, but she twists again briefly then self-terminates. K⁺ is 2.8, Mg²⁺ 0.48. Next move?",
+      choices: [
+        { t: "⚡ Replace potassium toward 4.5–5.0 and give more magnesium", good:true, ds:1, dt:8, xp:30, fb:"✅ Right. A low-K⁺/low-Mg²⁺ ventricle keeps re-triggering. Correcting both shortens the QT and closes the EAD window. Now deal with the pauses.", next:"pace" },
+        { t: "💉 Now add IV amiodarone to 'cover the VT'", good:false, ds:-1, dt:20, xp:0, fb:"⚠️ Still wrong — it prolongs the QT. Refill potassium and magnesium and raise the rate; do not give a QT-prolonging antiarrhythmic.", next:"pace" }
+      ]
+    },
+    pace: {
+      text: "K⁺ climbing, magnesium repeated, drugs stopped — but she's still brady ~48 with pauses, and each pause sets up another run. How do you abolish the pauses?",
+      choices: [
+        { t: "😴 Overdrive pace to ~95/min (isoproterenol bridge while floating the wire)", good:true, ds:1, dt:6, xp:30, fb:"✅ Ideal: this is acquired pause-dependent Torsades, so raising the rate shortens the QT and removes the pauses. Isoproterenol is OK here because it is acquired, not congenital.", next:"stabilize" },
+        { t: "💊 Give a beta-blocker to settle things down", good:false, ds:0, dt:10, xp:5, fb:"⚠️ Beta-blockade is for CONGENITAL LQTS — here it would slow her further and worsen the pause-dependent Torsades. Raise the rate, don't lower it.", next:"stabilize" }
+      ]
+    },
+    stabilize: {
+      text: "Paced at ~95/min, K⁺ 4.6, Mg²⁺ 1.0, all QT drugs stopped. The runs have stopped and the QTc is falling toward 470 ms. Final move of the first few minutes?",
+      choices: [
+        { t: "📏 Keep pacing, keep correcting electrolytes, and track the QTc down", good:true, ds:1, dt:5, xp:40, fb:"🏆 Perfect close. Magnesium quieted the EADs, potassium and rate shortened the QT, and removing the drugs fixed the cause. Wean pacing only once the QT is safe. Case stabilized.", end:true },
+        { t: "🎉 Done — stop pacing now, she's in rhythm", good:false, ds:-1, dt:10, xp:0, fb:"⚠️ Premature. Stop pacing while the QT is still long and the pauses return → Torsades recurs. Keep the rate up until the QT has normalized and electrolytes are corrected.", end:true }
+      ]
+    }
+  };
+
+  function renderStab(){
+    var s = Math.max(0, Math.min(5, scStability + 2)); // map -2..3 → 0..5
+    var dots = '';
+    for(var i=0;i<5;i++) dots += (i < s ? '●' : '○');
+    scStab.textContent = dots;
+  }
+  function renderStep(key){
+    var step = STEPS[key];
+    scText.textContent = step.text;
+    scFeedback.className = 'feedback';
+    scFeedback.style.display = 'none';
+    scChoices.innerHTML = '';
+    step.choices.forEach(function(ch){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = ch.t;
+      b.addEventListener('click', function(){
+        pathXP += ch.xp; scXP.textContent = pathXP;
+        scElapsed += ch.dt; scTime.textContent = scElapsed + ' s';
+        scStability += ch.ds; renderStab();
+        if(ch.xp) addXP(ch.xp, null, 'Scenario choice');
+        scFeedback.textContent = ch.fb;
+        scFeedback.className = 'feedback ' + (ch.good ? 'good' : 'bad');
+        scFeedback.style.display = 'block';
+        Array.prototype.forEach.call(scChoices.children, function(c){ c.disabled = true; c.style.opacity = .6; });
+        if(ch.end){
+          scRestart.style.display = 'inline-block';
+          if(ch.good && key === 'stabilize'){ earnBadge('bdg-shock'); addXP(20, 'scenario-win', 'Magnesium On Time!'); }
+        } else if(ch.next){
+          setTimeout(function(){ renderStep(ch.next); }, 1400);
+        }
+      });
+      scChoices.appendChild(b);
+    });
+  }
+  scRestart.addEventListener('click', function(){
+    pathXP = 0; scStability = 2; scElapsed = 0;
+    scXP.textContent = 0; scTime.textContent = '0 s'; renderStab();
+    scRestart.style.display = 'none';
+    renderStep('start');
+  });
+  renderStab();
+  renderStep('start');
+
+  /* ============ REVEAL BUTTONS ============ */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.getAttribute('data-target'));
+      if(!t) return;
+      if(t.classList.contains('reveal-shown')){
+        t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden');
+      } else {
+        t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown');
+        addXP(8, 'reveal-' + btn.getAttribute('data-target'), 'Self-test');
+      }
+    });
+  });
+
+  /* ============ QTc SIM (S6) ============ */
+  var kRange = document.getElementById('kRange');
+  var kVal = document.getElementById('kVal');
+  var kNeedle = document.getElementById('kNeedle');
+  var kReadout = document.getElementById('kReadout');
+  if(kRange){
+    var simUsed = false;
+    function updateK(){
+      var k = parseInt(kRange.value,10); // 380 .. 600 ms QTc
+      kVal.textContent = k;
+      var pct = (parseInt(kRange.value,10) - 380) / (600 - 380) * 100;
+      kNeedle.style.left = pct + '%';
+      var msg, cls;
+      if(k < 440){ msg = '🟢 Normal QTc — repolarization is brisk, no window for early afterdepolarizations. This is where you want her after treatment.'; cls='good'; }
+      else if(k <= 500){ msg = '🟠 Borderline / prolonged QTc — repolarization is dragging; EAD risk is rising. Stop QT drugs and correct K⁺/Mg²⁺ before it climbs further.'; cls='warn-r'; }
+      else if(k < 550){ msg = '🔴 High Torsades risk (QTc &gt; 500 ms) — long plateau lets the L-type calcium current reactivate → EADs → twisting polymorphic VT. Magnesium now, raise the rate.'; cls='bad'; }
+      else { msg = '🔴 Extreme QTc — incessant/pause-dependent Torsades territory. Magnesium, potassium to high-normal, stop every QT drug, and overdrive pace to shorten this interval.'; cls='bad'; }
+      kReadout.innerHTML = msg;
+      kReadout.className = 'readout ' + cls;
+      if(!simUsed){ simUsed = true; addXP(15, 'ksim', 'QT Titration Master'); }
+    }
+    kRange.addEventListener('input', updateK);
+    updateK();
+  }
+
+  /* ============ CHECKLISTS (S7) ============ */
+  var allChecklistsDone = 0, totalChecklists = document.querySelectorAll('.checklist').length;
+  document.querySelectorAll('.checklist').forEach(function(list){
+    var boxes = list.querySelectorAll('input[type=checkbox]');
+    var prog = list.querySelector('[data-progress]');
+    var total = boxes.length;
+    var doneAwarded = false;
+    function refresh(){
+      var done = 0;
+      boxes.forEach(function(b){
+        if(b.checked){ done++; b.closest('.ck').classList.add('done'); }
+        else { b.closest('.ck').classList.remove('done'); }
+      });
+      prog.textContent = done + ' / ' + total + ' complete';
+      if(done === total && !doneAwarded){
+        doneAwarded = true;
+        allChecklistsDone++;
+        addXP(25, 'ck-' + list.id, 'Checklist done');
+        if(allChecklistsDone >= totalChecklists){ earnBadge('bdg-ck'); addXP(20, 'allck', 'Checklist Champion'); }
+      }
+    }
+    boxes.forEach(function(b){
+      b.addEventListener('change', function(){
+        if(b.checked) addXP(4, null, 'Step checked');
+        refresh();
+      });
+    });
+  });
+
+  /* ============ MCQs (S19) ============ */
+  var MCQS = [
+    {
+      q: "A 70-year-old woman on ondansetron and a macrolide with K⁺ 2.8 and Mg²⁺ 0.48 has recurrent self-terminating polymorphic VT and a QTc of 560 ms. The best FIRST drug is:",
+      opts: ["IV amiodarone 300 mg","IV magnesium sulfate 2 g","IV verapamil","IV procainamide"],
+      correct: 1,
+      exp: "This is acquired long-QT Torsades de Pointes. IV magnesium sulfate is first-line — given even when the serum magnesium is normal — because it suppresses the early afterdepolarizations that trigger the rhythm. Amiodarone, procainamide and other QT-prolonging agents would worsen it."
+    },
+    {
+      q: "Why are overdrive pacing or isoproterenol used in pause-dependent Torsades?",
+      opts: ["They sedate the patient for cardioversion","Raising the heart rate shortens the QT and abolishes the pauses that trigger the rhythm","They directly block the accessory pathway","They prolong the QT to stabilize repolarization"],
+      correct: 1,
+      exp: "Pause-dependent Torsades is triggered by the long QT that follows a pause (the long–short sequence). Raising the rate shortens the QT and removes the pauses, eliminating the window for early afterdepolarizations. Pacing is definitive; isoproterenol is a pharmacologic bridge in acquired long QT."
+    },
+    {
+      q: "Isoproterenol is a reasonable bridge in acquired pause-dependent Torsades. In which situation should it be AVOIDED?",
+      opts: ["When the magnesium level is normal","In congenital long-QT syndrome (adrenergically driven)","Whenever the potassium is low","In any bradycardic patient"],
+      correct: 1,
+      exp: "Congenital LQTS is catecholamine-driven; isoproterenol can provoke the arrhythmia. There the mainstay is beta-blockade. Isoproterenol/overdrive pacing help the ACQUIRED, pause-dependent form. Establish whether the long QT is acquired before giving a catecholamine."
+    },
+    {
+      q: "You see a twisting polymorphic VT. Which single measurement most changes your management?",
+      opts: ["The heart rate","The QT interval (long vs normal)","The blood pressure","The QRS axis"],
+      correct: 1,
+      exp: "Polymorphic VT splits on the QT: long QT = Torsades → magnesium, correct K⁺, stop QT drugs, raise the rate (and AVOID amiodarone); normal QT usually means acute ischemia → revascularize. Measuring the QT is the fork in the road."
+    },
+    {
+      q: "Which group of drugs is a common cause of acquired long-QT Torsades?",
+      opts: ["Beta-blockers and calcium-channel blockers","Macrolides, fluoroquinolones, azoles, antipsychotics/antiemetics, methadone, sotalol","ACE inhibitors and statins","Loop diuretics only (with no electrolyte effect)"],
+      correct: 1,
+      exp: "Classic culprits include macrolide and fluoroquinolone antibiotics, azole antifungals, antipsychotics and antiemetics (e.g. haloperidol, ondansetron), methadone, and antiarrhythmics like sotalol/class Ia/dofetilide — especially when stacked together or combined with hypokalemia/hypomagnesemia."
+    },
+    {
+      q: "A run of Torsades becomes sustained and pulseless. The correct electrical therapy is:",
+      opts: ["Synchronized cardioversion at low energy","UNSYNCHRONIZED defibrillation","No shock — magnesium only","Synchronized cardioversion at high energy"],
+      correct: 1,
+      exp: "Pulseless or chaotic Torsades has no reliable R wave to synchronize to, so the defibrillator cannot sync. Treat as a shockable arrest with UNSYNCHRONIZED defibrillation plus CPR, while giving magnesium and correcting K⁺/Mg²⁺."
+    },
+    {
+      q: "Which mechanism best explains pause-dependent Torsades de Pointes?",
+      opts: ["A fixed re-entry circuit around an old myocardial scar","A prolonged action potential allowing reactivation of L-type calcium current → early afterdepolarizations, worsened after a pause","AV-nodal re-entry","Increased automaticity of the SA node"],
+      correct: 1,
+      exp: "A long QT prolongs repolarization, allowing the L-type calcium current to reactivate and produce early afterdepolarizations (EADs) — triggered beats. A PVC and its compensatory pause lengthen the next beat's QT further, so the EAD fires (the long–short, pause-dependent sequence). Heterogeneous repolarization sustains the twisting polymorphic re-entry."
+    },
+    {
+      q: "After giving magnesium, what are the target electrolyte goals to prevent recurrence?",
+      opts: ["Keep potassium low to avoid hyperkalemia","Replace potassium toward high-normal (4.5–5.0) and correct magnesium (and calcium)","Only correct calcium","No replacement is needed once magnesium is given"],
+      correct: 1,
+      exp: "Replace potassium toward high-normal 4.5–5.0 and correct magnesium (you cannot hold the potassium without it) and any hypocalcemia. These shorten the QT and close the EAD window. Combined with stopping the offending drugs and raising the rate, they prevent recurrence."
+    }
+  ];
+
+  var host = document.getElementById('mcqHost');
+  var mcqVal = document.getElementById('mcqVal');
+  var mcqScore = 0, mcqAnswered = 0;
+  var letters = ['A','B','C','D','E'];
+
+  MCQS.forEach(function(item, qi){
+    var box = document.createElement('div');
+    box.className = 'mcq';
+    var html = '<div class="mcq-q">QUESTION ' + (qi+1) + ' / ' + MCQS.length + '</div>';
+    html += '<div class="mcq-stem">' + item.q + '</div>';
+    item.opts.forEach(function(opt, oi){
+      html += '<label class="mcq-opt" data-oi="' + oi + '"><strong>' + letters[oi] + '.</strong> ' + opt + '</label>';
+    });
+    html += '<div class="mcq-exp"></div>';
+    box.innerHTML = html;
+    host.appendChild(box);
+
+    var opts = box.querySelectorAll('.mcq-opt');
+    var exp = box.querySelector('.mcq-exp');
+    var locked = false;
+    opts.forEach(function(label){
+      label.addEventListener('click', function(){
+        if(locked) return;
+        locked = true;
+        var oi = parseInt(label.getAttribute('data-oi'),10);
+        box.classList.add('answered');
+        var correct = item.correct;
+        if(oi === correct){
+          label.classList.add('picked-right');
+          mcqScore++;
+          addXP(25, null, 'Correct answer');
+        } else {
+          label.classList.add('picked-wrong');
+          opts[correct].classList.add('show-right');
+          showToast('❌ Correct: ' + letters[correct]);
+        }
+        exp.innerHTML = '<strong>' + (oi === correct ? '✅ Correct. ' : '📘 Explanation. ') + '</strong>' + item.exp;
+        mcqAnswered++;
+        mcqVal.textContent = mcqScore + ' / ' + MCQS.length;
+        if(mcqAnswered === MCQS.length){
+          var done = document.getElementById('mcqDone');
+          var summary = document.getElementById('mcqSummary');
+          done.style.display = 'block';
+          summary.textContent = 'You scored ' + mcqScore + ' / ' + MCQS.length + '. ' +
+            (mcqScore === MCQS.length ? 'Flawless — you measure the QT and reach for magnesium every time. 🏆' :
+             mcqScore >= 6 ? 'Strong — review the misses and the contrast pairs in S6.' :
+             'Revisit S3, S5, S6 and S11 — the long-QT-vs-normal-QT logic is the whole case.');
+          if(mcqScore >= 7){ earnBadge('bdg-quiz'); addXP(50, 'quizace', 'Quiz Ace!'); }
+        }
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
