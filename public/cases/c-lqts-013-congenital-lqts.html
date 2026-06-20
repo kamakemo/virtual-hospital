@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Congenital Long QT Syndrome — Virtual Teaching Hospital</title>
+<!-- META
+id: c-lqts-013
+title: Congenital Long QT Syndrome
+hospital: cardiology
+department: cv-ep
+bednumber: 6
+chiefcomplaint: Exertional/emotional syncope with an aborted cardiac arrest in a young patient
+system: Cardiology
+severity: critical
+tags: Long QT syndrome, Channelopathy, Beta-blockers, ICD, Sudden cardiac death
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --radius:16px;
+    --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  /* Internal scroll viewport. When this case is embedded the host app stretches
+     the iframe to full content height and the OUTER page scrolls, which would
+     let a sticky bar scroll away. We instead scroll inside this box (sized to
+     the visible window by JS) so the section tab bar stays pinned at the top.
+     Standalone, it falls back to the full viewport height. */
+  #caseScroll{height:100vh; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; scroll-padding-top:92px}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:36px 24px 80px; position:relative; overflow:hidden}
+  .hero::after{content:"📈"; position:absolute; right:-20px; top:-30px; font-size:220px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{max-width:1100px; margin:0 auto; position:relative; z-index:1}
+  .hero .crumbs{font-size:13px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:10px 0 6px; font-size:clamp(26px,4vw,40px); line-height:1.15}
+  .hero .sub{font-size:16px; opacity:.95}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; backdrop-filter:blur(4px)}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== LIVE ECG STRIP IN HERO ===== */
+  .ecg-banner{max-width:1100px; margin:14px auto 0; position:relative; z-index:1}
+  .ecg-banner svg{width:100%; height:64px; display:block; background:rgba(0,0,0,.18); border-radius:12px; border:1px solid rgba(255,255,255,.25)}
+  .ecg-trace{stroke:#86efac; stroke-width:2.4; fill:none; stroke-dasharray:1600; stroke-dashoffset:1600; animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{stroke-dashoffset:0}}
+
+  /* ===== VITALS STRIP ===== */
+  .vitals-strip{max-width:1100px; margin:-52px auto 0; padding:0 24px; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:11px; font-weight:700; letter-spacing:.6px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:21px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== HORIZONTAL SECTION SIDEBAR (fixed — always visible) ===== */
+  .topnav{position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.10)}
+  .topnav .rail{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; max-width:1180px; margin:0 auto; scrollbar-width:thin}
+  .navchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink2); font-size:11px; font-weight:700; text-decoration:none; min-width:78px; text-align:center; transition:all .18s; cursor:pointer}
+  .navchip .s-id{font-size:10px; letter-spacing:1px; color:#94a3b8}
+  .navchip .s-emoji{font-size:16px}
+  .navchip:hover{border-color:var(--rose); color:var(--rose); transform:translateY(-2px)}
+  .navchip.active{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; border-color:#b91c1c}
+  .navchip.active .s-id{color:#fecaca}
+  .navchip.visited:not(.active){border-color:var(--emerald-line); background:var(--emerald-soft)}
+
+  /* ===== DASHBOARD WIDGET ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:215px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10.5px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:760px){.dash{display:none}}
+
+  /* ===== MAIN / SECTIONS (tabbed: one section visible at a time) ===== */
+  main{max-width:1100px; margin:26px auto 80px; padding:0 24px}
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:26px; overflow:hidden}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16.5px; margin:26px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14.5px; margin:18px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:24px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15.5px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:14px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px; letter-spacing:.4px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14.5px}
+
+  /* ===== INTERACTIVE BITS ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:10px 18px; font-weight:700; font-size:14px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:22px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:15px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 15px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 15px; margin-top:12px; font-size:14px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim sliders */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:14px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:14px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Heart/circuit diagram */
+  .heart-fig{display:flex; gap:18px; flex-wrap:wrap; align-items:center; background:var(--slate-soft); border-radius:16px; padding:18px; margin:14px 0}
+  .heart-fig svg{flex:0 0 auto}
+  .heart-legend{flex:1; min-width:230px; font-size:13.5px}
+  .lg{display:flex; align-items:center; gap:8px; margin:5px 0}
+  .lg .sw{width:14px; height:14px; border-radius:4px; flex:0 0 auto}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Journey cards */
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:14px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:15px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:14px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13.5px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:22px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14.5px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:13px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .footer{max-width:1100px; margin:0 auto 36px; padding:0 24px; text-align:center; color:#94a3b8; font-size:12.5px}
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="caseScroll">
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · ⚡ EP Lab · 🛏️ Bed 6</div>
+    <h1>📈 Congenital Long QT Syndrome — "The Inherited Spark That Twists"</h1>
+    <div class="sub">⚡ A 17-year-old collapsed at swim practice and was found in VF. ROSC after one shock. Her resting QTc is 0.49 s, and an uncle died young "in his sleep." This is not a faint — it is a channelopathy hiding in plain sight.</div>
+    <div class="chips">
+      <span class="chip crit">🔴 CRITICAL</span>
+      <span class="chip">🧬 Channelopathy</span>
+      <span class="chip">📐 Prolonged QTc</span>
+      <span class="chip">🌀 Torsades de Pointes</span>
+      <span class="chip">🎮 Interactive Case</span>
+      <span class="chip">💊 Beta-blocker, not the cliff</span>
+    </div>
+    <div class="ecg-banner" title="Long QT with a twisting run">
+      <svg viewBox="0 0 800 64" preserveAspectRatio="none" aria-label="Long QT interval rhythm strip">
+        <polyline class="ecg-trace" points="0,40 30,40 38,24 46,40 70,40 86,40 92,18 100,52 108,40 150,40 158,24 166,40 190,40 206,40 212,18 220,52 228,40 270,40 278,24 286,40 310,40 326,40 332,18 340,52 348,40 390,40 398,24 406,40 430,40 446,40 452,18 460,52 468,40 510,40 518,24 526,40 550,40 566,40 572,18 580,52 588,40 630,40 638,24 646,40 670,40 686,40 692,18 700,52 708,40 750,40 758,24 766,40 790,40 800,40"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== LIVE VITALS ===================== -->
+<div class="vitals-strip">
+  <div class="vitals-grid">
+    <div class="vital warn"><div class="v-label">💓 HR</div><div class="v-num">58</div></div>
+    <div class="vital"><div class="v-label">🩸 BP</div><div class="v-num">108/66</div></div>
+    <div class="vital"><div class="v-label">🌬️ RR</div><div class="v-num">16</div></div>
+    <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">98%</div></div>
+    <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.7°</div></div>
+    <div class="vital warn"><div class="v-label">🧠 GCS</div><div class="v-num">15</div></div>
+    <div class="vital alert"><div class="v-label">📐 QTc</div><div class="v-num">490 ms</div></div>
+    <div class="vital alert"><div class="v-label">⚡ Aborted SCA</div><div class="v-num">Yes</div></div>
+  </div>
+</div>
+
+<!-- ===================== HORIZONTAL SECTION SIDEBAR ===================== -->
+<nav class="topnav" id="topnav">
+  <div class="rail">
+    <a class="navchip" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navchip" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navchip" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navchip" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navchip" href="#s5"><span class="s-emoji">🎓</span><span>Consultant Round</span><span class="s-id">S5</span></a>
+    <a class="navchip" href="#s6"><span class="s-emoji">📖</span><span>Teaching Points</span><span class="s-id">S6</span></a>
+    <a class="navchip" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navchip" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navchip" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navchip" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navchip" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navchip" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navchip" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navchip" href="#s14"><span class="s-emoji">🔀</span><span>Differentials</span><span class="s-id">S14</span></a>
+    <a class="navchip" href="#s15"><span class="s-emoji">🗺️</span><span>Plan</span><span class="s-id">S15</span></a>
+    <a class="navchip" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navchip" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navchip" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navchip" href="#s19"><span class="s-emoji">🧠</span><span>MCQs</span><span class="s-id">S19</span></a>
+  </div>
+</nav>
+
+<!-- ===================== SCORE DASHBOARD ===================== -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections visited</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-vt">⚡ QT-Spotter</span>
+      <span class="badge" id="bdg-shock">🛡️ Seatbelt On Time</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champion</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Ward Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running sims, taking the right path and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- S1 — PROFILE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s1">
+  <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+  <div class="section-content">
+    <div class="callout danger">
+      <b class="ct">🚨 YOU ARE HERE — 16:40, EP Lab Admitting Bay, Bed 6</b>
+      Ninety minutes ago a 17-year-old swimmer pushed off the wall, swam two strokes, and went limp underwater. Lifeguards pulled her out pulseless; the poolside AED read <strong>VF</strong> and shocked once → ROSC. She is now awake, scared, neurologically intact — and her resting 12-lead shows a <strong>QTc of 490 ms with notched T waves</strong>. A junior is reaching for an isoprenaline infusion "because her heart rate is only 58." Stop them. In <em>congenital</em> long QT, catecholamines are the cliff, not the cure.
+    </div>
+
+    <h3>👤 Patient Identity</h3>
+    <table class="tbl">
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>🧑 Name</td><td><strong>Miss A.K.</strong></td></tr>
+      <tr><td>🎂 Age / Sex</td><td>17-year-old female</td></tr>
+      <tr><td>🆔 MRN</td><td>EP-20613</td></tr>
+      <tr><td>⚖️ Weight</td><td>58 kg</td></tr>
+      <tr><td>💼 Occupation</td><td>High-school student · competitive swimmer</td></tr>
+      <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+    </table>
+
+    <h3>📜 Past Medical History — the clues that were there all along</h3>
+    <ul>
+      <li>😵 <strong>Two prior "faints":</strong> one at age 14 sprinting at sports day, one at 15 startled awake by a fire-alarm drill. Both labelled <strong>"vasovagal"</strong> and discharged without an ECG. In retrospect, exertional and auditory-startle syncope are textbook long QT.</li>
+      <li>🏊 <strong>Today's event during swimming</strong> — a near-pathognomonic trigger for <strong>LQT1</strong> (the exercise/immersion genotype).</li>
+      <li>🧬 <strong>Family history:</strong> a maternal uncle died suddenly at 23 "in his sleep"; a cousin has "a heart rhythm problem." Premature sudden death in the family is the line that reframes everything.</li>
+      <li>👂 <strong>Hearing normal</strong> — so this is autosomal-dominant <strong>Romano-Ward</strong>, not the recessive, deaf <strong>Jervell–Lange-Nielsen</strong> phenotype (but always ask about congenital deafness).</li>
+      <li>💊 Two months ago a walk-in clinic gave her <strong>azithromycin</strong> for a sore throat — a QT-prolonging macrolide. No one knew her QT was long.</li>
+      <li>🩺 No structural heart disease: normal echo today, normal coronaries expected. This is a <strong>primary electrical disease</strong> of a structurally normal heart.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Exertional or emotional syncope in a young person with a family history of sudden death is long QT until the ECG says otherwise — measure the QTc before you say 'vasovagal.'"</div>
+
+    <h3>🧬 Why THIS patient? — an inherited channel that won't let the cell reset</h3>
+    <p>The QT interval is the time the ventricle spends depolarized and then repolarizing. Repolarization is driven mostly by potassium leaving the cell through <strong>I<sub>Ks</sub></strong> and <strong>I<sub>Kr</sub></strong>, while a small <strong>late sodium current (I<sub>Na</sub>)</strong> tries to keep it depolarized. Congenital LQTS is a set of inherited mutations that tip this balance toward <em>prolonged</em> repolarization — either too little outward K⁺ current (LQT1 = ↓I<sub>Ks</sub>; LQT2 = ↓I<sub>Kr</sub>) or too much inward late Na⁺ current (LQT3 = ↑late I<sub>Na</sub>). A longer action potential lets a stray inward calcium current re-fire the membrane before it has fully recovered — an <strong>early afterdepolarization (EAD)</strong>. An EAD that captures, in a ventricle whose repolarization is wildly heterogeneous, launches <strong>Torsades de Pointes</strong> → syncope, or if sustained, VF and sudden death. The substrate was written in her DNA at conception; today an <strong>adrenergic surge</strong> (exercise + the cold-water dive reflex) pulled the trigger.</p>
+
+    <div class="callout warn"><b class="ct">🔥 What raises event risk in congenital LQTS</b>
+    📐 Longer QTc (risk climbs steeply &gt; 500 ms) · 😵 Prior syncope or aborted arrest (the strongest predictor) · 👦 Genotype (LQT1/2/3, and certain mutations) · 🏃 Adrenergic triggers (exercise, emotion, startle — or rest in LQT3) · 🧪 Hypokalemia/hypomagnesemia · 💊 QT-prolonging drugs · 👶 Younger age &amp; male in childhood, female after puberty · 👂 Jervell–Lange-Nielsen (deaf, very high risk).</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S2 — HANDOVER -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s2">
+  <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+  <div class="section-content">
+    <h3>📻 Paramedic + Resus Handover — listen for the trap</h3>
+    <div class="callout info">
+      <b class="ct">🎙️ SBAR from the EMS / resus team (verbatim)</b>
+      <p><strong>S:</strong> "17-year-old, collapsed underwater at swim practice. Pulled out pulseless, poolside AED showed VF, one shock → ROSC within two minutes. Now GCS 15, talking, frightened."</p>
+      <p><strong>B:</strong> "Fit young swimmer, no known cardiac disease. Mum says two previous 'faints' — one running, one when a fire alarm went off. An uncle died young in his sleep."</p>
+      <p><strong>A:</strong> "Obs stable, HR 58, BP 108/66, sats 98%. First in-department 12-lead: <strong>QTc looks long, around 490, with odd notched T waves</strong>. The covering doctor on the phone said 'sinus brady — start an isoprenaline infusion to speed her up.'"</p>
+      <p><strong>R:</strong> "Pads still on, monitored bed, bloods sent. I held the isoprenaline — in a young arrest with a long QT, pouring in adrenaline-like drugs felt exactly wrong."</p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In congenital long QT, beta-blockers are the seatbelt and isoproterenol is the cliff — the exact reverse of acquired Torsades. The phone order for isoprenaline is how you'd kill her."</div>
+
+    <h3>🚩 Spot-the-Red-Flag — tap each feature that screams congenital long QT</h3>
+    <p>🎮 <em>Interactive: click every feature that points to congenital long QT syndrome (not a benign faint). Each correct flag = +10 XP. Wrong picks cost you.</em></p>
+    <div id="flagGame">
+      <button class="btn ghost flag-btn" data-good="1">📐 QTc &gt; 480 ms (here ~490)</button>
+      <button class="btn ghost flag-btn" data-good="1">🏊 Exertional / emotional / startle syncope</button>
+      <button class="btn ghost flag-btn" data-good="1">🧬 Family history of young sudden death</button>
+      <button class="btn ghost flag-btn" data-good="1">👂 Congenital deafness (Jervell–Lange-Nielsen)</button>
+      <button class="btn ghost flag-btn" data-good="1">📈 Notched / bifid T waves</button>
+      <button class="btn ghost flag-btn" data-good="1">🧒 Young age, structurally normal heart</button>
+      <button class="btn ghost flag-btn" data-good="0">🌡️ Temperature 36.7°C</button>
+      <button class="btn ghost flag-btn" data-good="0">🫁 SpO₂ 98% on air</button>
+    </div>
+    <p id="flagResult" style="font-weight:700"></p>
+
+    <h3>⏱️ Timeline so far</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">15:08</div>Pushed off the wall, two strokes, then went limp underwater during a hard interval set.</div>
+      <div class="t-item"><div class="t-time">15:10</div>Pulled out pulseless. Bystander CPR started. Poolside AED: VF → single shock → ROSC.</div>
+      <div class="t-item"><div class="t-time">15:14</div>EMS arrive; conscious, agitated. Transported monitored.</div>
+      <div class="t-item"><div class="t-time">15:40</div>First in-department 12-lead: <strong>QTc ~490 ms, notched T waves</strong>. Covering doctor (by phone) says "sinus brady — start isoprenaline." Resus nurse <strong>withholds isoprenaline</strong> — 🏅 instinct worth its weight in gold.</div>
+      <div class="t-item"><div class="t-time">16:40</div>You arrive at the EP Lab admitting bay. Pads are on. The task now is to name the disease, protect her with the right drug, and screen the family.</div>
+    </div>
+
+    <div class="callout ok"><b class="ct">🏅 Praise where due</b>The nurse who held the isoprenaline avoided a catastrophe. In <strong>congenital</strong> LQTS the events are <em>adrenergically triggered</em>; a sympathomimetic infusion would feed exactly the catecholamine surge that drives Torsades — the opposite of the pace/isoprenaline strategy that is correct in <em>acquired</em>, pause-dependent Torsades. Knowing which Torsades you are facing is the whole game.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S3 — INITIAL ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s3">
+  <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+  <div class="section-content">
+    <h3>🅰️🅱️🅲️ Primary Survey — a well-looking patient with a lethal ECG</h3>
+    <table class="tbl">
+      <tr><th>Step</th><th>Finding</th><th>What it means mechanistically</th></tr>
+      <tr><td>🅰️ Airway</td><td>Patent, talking in full sentences, mildly tearful.</td><td>Good neurological recovery after a short, witnessed, shockable arrest — exactly what you'd expect after early defibrillation of LQTS-driven VF.</td></tr>
+      <tr><td>🅱️ Breathing</td><td>RR 16, SpO₂ 98% on air, chest clear.</td><td>No aspiration or pulmonary issue; the event was primarily electrical, not respiratory.</td></tr>
+      <tr><td>🅲️ Circulation</td><td>HR 58 sinus, BP 108/66, warm peripheries, normal heart sounds, no murmur.</td><td>Resting sinus <strong>bradycardia</strong> is common in LQTS (especially LQT1/3) and is NOT an indication to push catecholamines. Structurally normal heart — the danger is invisible on examination.</td></tr>
+      <tr><td>🅳 Disability</td><td>GCS 15, oriented, anxious. No focal deficit.</td><td>Cerebral function intact post-ROSC — reassuring, but she remains at high risk of recurrence until protected.</td></tr>
+      <tr><td>🅴 Exposure</td><td>No rash, no injuries beyond minor poolside grazes. Pads on, monitored.</td><td>The 12-lead — not the body — holds the diagnosis: a long QT with abnormal T-wave morphology.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A normal examination is the trap of channelopathy. The heart looks perfect and feels perfect — the only abnormal organ is the ECG. Measure the QT."</div>
+
+    <h3>🧭 The single most important question: is this a faint, or an aborted sudden death?</h3>
+    <p>She has now declared herself with a <strong>resuscitated VF arrest</strong> — this is not ambiguous. But the teaching point is the two events <em>before</em> today: exertional and startle syncope in a young person with a family history of premature sudden death. Each was a <strong>missed warning</strong>, mislabelled "vasovagal." The discriminators that should have triggered an ECG: syncope <strong>during</strong> (not after) exertion, syncope triggered by emotion/noise, absence of a prodrome, and a family history of young sudden death or unexplained drowning.</p>
+
+    <div class="callout danger"><b class="ct">⚡ The decision is made: aborted SCA in congenital LQTS → PROTECT, don't provoke</b>Her acute task is not a shock (she's in sinus now) but <strong>protection</strong>: start a <strong>beta-blocker</strong> (nadolol or propranolol), <strong>correct electrolytes</strong> to high-normal, <strong>strip every QT-prolonging drug</strong>, keep the defibrillator at the bedside, and arrange a <strong>secondary-prevention ICD</strong>. Above all: <strong>no isoprenaline, no sympathomimetics</strong> — catecholamines are the trigger here.</p></div>
+
+    <!-- 🎬 BRANCHING SCENARIO ENGINE -->
+    <div class="scenario" id="scenarioBox">
+      <h3>🎬 Choose Your Path — "After the Shock"</h3>
+      <div class="hud"><span>❤️ Stability: <b id="scStab">●●○○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 s</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+      <div class="scene-text" id="scText">She is back in sinus at 58, awake and tearful. The 12-lead shows QTc ~490 ms with notched T waves and the story is exertional/startle syncope plus an uncle who died young. A junior is hanging an isoprenaline infusion "to lift the heart rate off 58." What do you do FIRST?</div>
+      <div class="choices" id="scChoices"></div>
+      <div class="feedback" id="scFeedback"></div>
+      <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+    </div>
+
+    <div class="callout info"><b class="ct">🧮 If instead she were actively in Torsades right now</b>
+    A patient <em>twisting</em> on the monitor needs immediate care by stability: if pulseless/unstable → <strong>defibrillate</strong>; then <strong>IV magnesium 2 g</strong> regardless of the level, correct K⁺, and remove any QT drug. In <em>congenital</em> LQTS you do NOT reach for isoprenaline/pacing as first-line (that's the acquired, pause-dependent pathway) — you load magnesium, suppress with beta-blockade, and escalate to ICD. Magnesium quiets the twisting; the beta-blocker stops it coming back.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S4 — RESIDENT REVIEW -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s4">
+  <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+  <div class="section-content">
+    <p><em>The cardiology resident arrives at 16:46. Her reasoning, out loud:</em></p>
+
+    <h3>🧠 Pattern recognition first, then physiology</h3>
+    <p>"Young. Structurally normal heart. Arrest during swimming. Two prior syncopes — one exertional, one with a startle. A young uncle dead in his sleep. And a QTc of 490 with notched T waves. That is <strong>congenital long QT syndrome</strong> until proven otherwise, and the swimming trigger points me straight at <strong>LQT1</strong>. The dangerous instinct is to call her first two faints 'vasovagal' again — but a vasovagal faint doesn't happen <em>during</em> a sprint, and it doesn't run in a family that buries its young."</p>
+
+    <h3>🎯 Immediate priorities (her actual order of operations)</h3>
+    <ol>
+      <li>🚫 <strong>Kill the catecholamine pathway:</strong> NO isoprenaline, NO sympathomimetics, NO unnecessary adrenaline. Sinus brady at 58 in LQTS is expected, not a problem to treat. Say it out loud and take the infusion down.</li>
+      <li>💊 <strong>Start a beta-blocker now:</strong> nadolol (preferred) or propranolol — the first-line, mortality-reducing therapy that blunts the adrenergic surges that trigger her events.</li>
+      <li>🧪 <strong>Correct electrolytes to high-normal:</strong> K⁺ toward 4.5–5.0, Mg²⁺ &gt; 1.0; a low K⁺/Mg²⁺ further prolongs repolarization and invites Torsades.</li>
+      <li>🧹 <strong>Strip QT-prolonging drugs:</strong> review every chart and med — no macrolides, no fluoroquinolones, no ondansetron, no haloperidol, no QT-prolonging antiemetics or antifungals.</li>
+      <li>🔌 <strong>Plan the secondary-prevention ICD:</strong> she has had an aborted cardiac arrest — this is a Class I indication, alongside the beta-blocker (not instead of it).</li>
+      <li>🧬 <strong>Confirm and cascade:</strong> formal QTc measurement (repeat, Bazett), Schwartz score, genetic testing, and <strong>screen all first-degree relatives</strong> with an ECG.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Protect first, provoke never: start the beta-blocker, refill the potassium, bin the QT drugs — and remember that in congenital long QT a slow heart is the disease, not an emergency to override with catecholamines."</div>
+
+    <h3>🤔 "Her heart rate is only 58 — shouldn't I speed it up?"</h3>
+    <p>"No. Resting sinus bradycardia is a <em>feature</em> of LQTS, and beta-blockade will slow it further — that's fine, even reassuring, as long as she's perfusing. The myth that you must 'fix' the rate with isoprenaline comes from <strong>acquired, pause-dependent</strong> Torsades, where bradycardia and pauses precipitate the arrhythmia. <strong>Congenital</strong> LQTS is adrenergically triggered — the opposite physiology. If beta-blockade ever causes genuinely symptomatic bradycardia, the answer is <strong>pacing</strong> (often as part of the ICD), never an adrenaline drip."</p>
+
+    <div class="callout purple"><b class="ct">🧪 Resident's self-test (answer before reading on)</b>
+    A colleague suggests amiodarone "to settle her rhythm." Good idea in this patient?
+    <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+    <div class="reveal-hidden" id="rev1"><p><strong>No.</strong> Amiodarone is a class III antiarrhythmic that <em>prolongs</em> the QT — exactly the interval that is already dangerously long. Giving it can lengthen the QT further and provoke Torsades. The antiarrhythmic strategy in congenital LQTS is sympatholysis (<strong>beta-blockers</strong>), plus <strong>mexiletine</strong> (a late-Na blocker that <em>shortens</em> the QT) specifically in LQT3 — not QT-prolonging agents.</p></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S5 — CONSULTANT ROUND -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s5">
+  <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round</h2></div>
+  <div class="section-content">
+    <p><em>The on-call consultant electrophysiologist, by phone at 16:55, then at the bedside:</em></p>
+
+    <h3>🗂️ Name the genotype precisely — it changes the trigger, the T wave and the therapy</h3>
+    <div class="vs">
+      <div class="side a"><h4>🔴 Congenital LQTS (this patient)</h4>
+        <ul><li>Inherited channelopathy; structurally normal heart</li><li>Events are <strong>adrenergically triggered</strong> (exercise/emotion/startle; LQT3 at rest)</li><li>Therapy: <strong>beta-blockers</strong> (nadolol/propranolol), AVOID catecholamines</li><li>ICD for aborted SCA; mexiletine in LQT3; LCSD if refractory</li></ul></div>
+      <div class="side b"><h4>🔵 Acquired Torsades (the mirror image)</h4>
+        <ul><li>Drugs, ↓K⁺/↓Mg²⁺, bradycardia/pauses — no inherited channel needed</li><li>Often <strong>pause-dependent</strong> (a long-short sequence triggers it)</li><li>Therapy: remove the cause, IV <strong>magnesium</strong>, correct K⁺, and <strong>pacing / isoprenaline</strong> are OK</li><li>Beta-blockers are NOT the headline; the drug list is</li></ul></div>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Two Torsades, opposite reflexes: congenital is calmed by beta-blockade and killed by catecholamines; acquired is fixed by removing the drug and is safe with pacing or isoprenaline. Always ask which one you're looking at."</div>
+
+    <h3>🧬 LQT1 vs LQT2 vs LQT3 — "LQT1 swims, LQT2 startles, LQT3 sleeps"</h3>
+    <table class="tbl">
+      <tr><th>Subtype</th><th>Gene / current</th><th>Trigger</th><th>T-wave clue</th><th>Therapy nuance</th></tr>
+      <tr><td>🏊 <strong>LQT1</strong></td><td>KCNQ1 → ↓I<sub>Ks</sub></td><td><strong>Exercise / swimming</strong></td><td>Broad-based T waves</td><td>Beta-blockers work best; avoid competitive sport/unsupervised swimming</td></tr>
+      <tr><td>🔔 <strong>LQT2</strong></td><td>KCNH2 (hERG) → ↓I<sub>Kr</sub></td><td><strong>Emotion / auditory (alarm clock)</strong></td><td>Low-amplitude, <strong>notched/bifid</strong> T waves</td><td>Beta-blockers; remove sudden auditory triggers; keep K⁺ high-normal</td></tr>
+      <tr><td>🌙 <strong>LQT3</strong></td><td>SCN5A → ↑late I<sub>Na</sub></td><td><strong>Rest / sleep</strong></td><td>Long isoelectric ST then late T</td><td><strong>Mexiletine</strong> shortens QT; beta-blockers less protective; ICD threshold lower</td></tr>
+    </table>
+
+    <h3>🧪 Romano-Ward vs Jervell–Lange-Nielsen — always ask about hearing</h3>
+    <p>Most congenital LQTS is <strong>Romano-Ward</strong> (autosomal dominant, normal hearing) — this patient. <strong>Jervell–Lange-Nielsen</strong> is autosomal recessive, combines profound congenital <strong>sensorineural deafness</strong> with very long QT and a high event rate, and warrants aggressive therapy. A single question — "can your child hear normally?" — can flag the most dangerous variant in a paediatric LQTS clinic.</p>
+
+    <h3>🧭 Consultant's three commandments for this admission</h3>
+    <ol>
+      <li>💊 "<strong>Beta-block her tonight</strong> — nadolol is my first choice; it has the best evidence in LQT1/2. The beta-blocker is the seatbelt she'll wear for life."</li>
+      <li>🚫 "<strong>Never a catecholamine, never a QT-prolonging drug.</strong> Put both on the allergy/alert band of her chart. The azithromycin she got two months ago should never happen again."</li>
+      <li>🔌 "<strong>She earned a secondary-prevention ICD with that VF arrest</strong> — but the device is in <em>addition</em> to the beta-blocker, never instead of it, and we'll screen the whole family this week."</li>
+    </ol>
+
+    <div class="callout danger"><b class="ct">☠️ The consultant's war memory (more in S13 M&amp;M)</b>"The last young 'vasovagal faint' I saw mismanaged was a 16-year-old midfielder who collapsed during a match and was cleared to return to sport with no ECG. Three weeks later he died on the pitch in front of his parents. His resting QTc, found later on a sibling's screening ECG, was 500 ms. The diagnosis was one 12-lead away the whole time. I have never since let a young exertional syncope leave without an ECG."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S6 — TEACHING POINTS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s6">
+  <div class="sec-header"><span class="s-badge">S6</span><h2>📖 Teaching Points</h2></div>
+  <div class="section-content">
+    <h3>🔬 The mechanism — WHY a long QT twists into Torsades (the WHY behind the WHY)</h3>
+    <ol>
+      <li>🧬 <strong>The inherited defect:</strong> a mutation cripples a repolarizing potassium current (LQT1 ↓I<sub>Ks</sub>, LQT2 ↓I<sub>Kr</sub>) or strengthens a depolarizing late sodium current (LQT3 ↑late I<sub>Na</sub>). Either way the action potential gets <strong>longer</strong>.</li>
+      <li>📐 <strong>The longer plateau:</strong> while the cell is still depolarized, L-type calcium channels can recover and re-open. A second little hump of inward current — an <strong>early afterdepolarization (EAD)</strong> — rides on the plateau.</li>
+      <li>⚡ <strong>The trigger beat:</strong> if an EAD reaches threshold, it fires a premature ventricular beat — the spark that lands on the vulnerable, heterogeneously-repolarizing ventricle.</li>
+      <li>🌀 <strong>Re-entry that wanders:</strong> because different regions repolarize at different times (transmural dispersion of repolarization), the wavefront spirals and its axis rotates — the QRS appears to <strong>twist around the baseline</strong> = <strong>Torsades de Pointes</strong>.</li>
+      <li>💥 <strong>Why it kills:</strong> Torsades usually self-terminates (→ syncope), but it can sustain and degenerate into <strong>VF</strong> — disorganized, pulseless, fatal in minutes. That is what happened in the pool today.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Long QT is a cell that won't reset; an adrenergic surge lights an early afterdepolarization, and a heart that repolarizes unevenly lets that spark twist into Torsades. Beta-blockade lowers the spark; the ICD catches the fire."</div>
+
+    <h3>⚖️ Contrast pair #1 — Congenital LQTS vs Acquired Torsades (opposite reflexes)</h3>
+    <div class="vs">
+      <div class="side a"><h4>🧬 CONGENITAL LQTS (this patient)</h4><ul><li>Inherited channel mutation; young, family history</li><li><strong>Adrenergically triggered</strong> (exercise/emotion/startle)</li><li>Treat with <strong>beta-blockers</strong>; ICD for aborted SCA</li><li><strong>AVOID isoprenaline / sympathomimetics</strong> — they are the trigger</li></ul></div>
+      <div class="side b"><h4>💊 ACQUIRED TORSADES</h4><ul><li>Caused by drugs, ↓K⁺/↓Mg²⁺, bradycardia, pauses</li><li>Often <strong>pause-dependent</strong> (long-short initiating sequence)</li><li>Treat by <strong>removing the cause</strong> + IV magnesium + correct K⁺</li><li><strong>Pacing / isoprenaline are OK</strong> to suppress pauses</li></ul></div>
+    </div>
+    <p>😈 <strong>The trap:</strong> reflexively reaching for isoprenaline/pacing in a young arrest because "that's how you treat Torsades." It is — for the <em>acquired</em>, pause-dependent kind. In <strong>congenital</strong> LQTS the same drug feeds the catecholamine surge that triggers events. <strong>The asymmetry of harm is why you must name which Torsades you're treating before you reach for any drip.</strong></p>
+
+    <h3>⚖️ Contrast pair #2 — LQT1 vs LQT2 vs LQT3 (trigger / T wave / therapy)</h3>
+    <div class="vs">
+      <div class="side a"><h4>🏊 LQT1 (this patient's likely type)</h4><ul><li>KCNQ1, ↓I<sub>Ks</sub>; <strong>exercise/swimming</strong> triggers</li><li>Broad-based T waves</li><li>Beta-blockers most protective; restrict competitive sport &amp; unsupervised swimming</li></ul></div>
+      <div class="side b"><h4>🔔🌙 LQT2 &amp; LQT3</h4><ul><li><strong>LQT2:</strong> KCNH2/hERG, ↓I<sub>Kr</sub>; <strong>emotion/auditory</strong> (alarm clock) triggers; low-amplitude <strong>notched/bifid</strong> T</li><li><strong>LQT3:</strong> SCN5A, ↑late I<sub>Na</sub>; events at <strong>rest/sleep</strong>; long isoelectric ST then late T; <strong>mexiletine</strong> shortens QT</li></ul></div>
+    </div>
+    <p>💡 <em>Why it matters:</em> the genotype predicts when she's at risk and what protects her — beta-blockers shine in LQT1/2, while LQT3 needs a late-Na blocker (mexiletine) and a lower ICD threshold. Her swimming trigger and broad T waves point to LQT1.</p>
+
+    <!-- 🎮 INTERACTIVE SIM: adrenergic surge / event risk -->
+    <div class="sim" id="kSim">
+      <h3 style="margin-top:0">🎮 Simulation — The Adrenergic Dial: how sympathetic drive tunes triggered-event risk</h3>
+      <p style="font-size:13.5px">Drag the dial from rest toward a maximal exercise/emotion surge. Watch how rising catecholamines load the long-QT ventricle toward Torsades — and how <strong>beta-blockade shifts the safe zone</strong> so the same surge is survivable. This is why the seatbelt is sympatholysis.</p>
+      <label for="kRange">🏃 Sympathetic (adrenergic) drive: <b id="kVal">3.1</b> / 10</label>
+      <input type="range" id="kRange" min="20" max="75" value="31">
+      <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+      <div class="readout bad" id="kReadout">Set the dial to explore.</div>
+      <p style="font-size:12.5px; margin-top:10px; color:var(--ink2)">🎯 The aim of therapy is not to abolish all sympathetic drive but to <strong>blunt the surges</strong> (beta-blockade) so that exercise, emotion and startle no longer reach the triggered-event threshold — and to back it with an ICD when the stakes are an aborted arrest.</p>
+    </div>
+
+    <!-- 📚 EBM MODULE -->
+    <div class="ebm">
+      <h3>📚 Evidence-Based Medicine Corner</h3>
+      <table class="tbl">
+        <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+        <tr><td><span class="lvl">COHORT</span> Beta-blockers in LQTS</td><td>Beta-blockade markedly reduces cardiac events; <strong>nadolol</strong> outperforms other beta-blockers and is least associated with breakthrough events (especially LQT1/2).</td><td>First-line for almost every LQTS patient; prefer nadolol (or propranolol). It is the seatbelt worn for life.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2013 HRS/EHRA/APHRS Channelopathy</td><td>Expert consensus on diagnosis (QTc/Schwartz/genetics), beta-blocker first-line, lifestyle modification, ICD for aborted SCA/breakthrough, and family screening.</td><td>The scaffolding for this whole case — drives S3, S7, S11 and S15.</td></tr>
+        <tr><td><span class="lvl">MECHANISM</span> Mexiletine in LQT3</td><td>The late-Na-current blocker <strong>shortens the QT</strong> and reduces events specifically in SCN5A/LQT3.</td><td>Genotype-guided therapy: mexiletine is the targeted add-on for LQT3, not a generic LQTS drug.</td></tr>
+        <tr><td><span class="lvl">COHORT</span> Left cardiac sympathetic denervation (LCSD)</td><td>Surgical removal of the left stellate ganglion &amp; upper thoracic chain reduces syncope and ICD shocks in high-risk/refractory LQTS.</td><td>For breakthrough events on beta-blockade, or when beta-blockers/ICD aren't enough — an effective antiadrenergic option.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2022 ESC Ventricular Arrhythmia / SCD</td><td>Aborted cardiac arrest in LQTS → ICD (Class I) PLUS beta-blocker; avoid QT-prolonging drugs; screen relatives.</td><td>Exactly the algorithm driving her ICD-plus-beta-blocker plan and the family cascade.</td></tr>
+      </table>
+    </div>
+
+    <!-- 🔬 ADVANCED TOPICS -->
+    <div class="callout purple">
+      <h3 style="margin-top:0">🔬 Fellowship Corner — Advanced Topics</h3>
+      <ul>
+        <li>📐 <strong>Concealed &amp; borderline long QT:</strong> ~25–35% of gene-positive patients have a near-normal resting QTc. Use <strong>exercise/recovery QT</strong> (failure of QT to shorten, or paradoxical lengthening at 4 min recovery — esp. LQT1), epinephrine challenge, and Holter to unmask it.</li>
+        <li>🧮 <strong>Schwartz score &amp; QTc pitfalls:</strong> Bazett overcorrects at high rates and undercorrects at low rates; measure in lead II/V5, longest QT, tangent method, and beware sinus arrhythmia and U waves. Schwartz score integrates ECG, history and family data.</li>
+        <li>🧬 <strong>Genotype–phenotype &amp; risk stratification:</strong> KCNQ1-A341V, certain hERG pore mutations, and JLN carry higher risk; QTc &gt; 500 ms, prior arrest/syncope, and very young/very specific genotypes raise the stakes and lower the ICD threshold.</li>
+        <li>💉 <strong>LCSD technique &amp; role:</strong> video-assisted thoracoscopic left stellate-sparing sympathectomy; powerful in refractory LQTS and CPVT, and a bridge or adjunct to ICD in those with frequent appropriate shocks.</li>
+        <li>👶 <strong>Special situations:</strong> the <strong>postpartum</strong> window (LQT2 events cluster here), drug-gene interactions, and Andersen-Tawil (LQT7, periodic paralysis, dysmorphism) and Timothy syndrome (LQT8, CACNA1C, syndactyly) as multisystem variants.</li>
+        <li>🧪 <strong>CPVT — the catecholaminergic mimic:</strong> RyR2/CASQ2 mutations cause <strong>exercise/emotion-induced bidirectional/polymorphic VT</strong> with a <em>normal resting QT</em> — same beta-blocker (often nadolol) ± flecainide ± LCSD logic, but the ECG at rest is clean.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S7 — ORDERS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s7">
+  <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+  <div class="section-content">
+    <h3>🖊️ The order set, written as you'd actually write it (16:50)</h3>
+    <ul>
+      <li>🚨 <strong>NO isoprenaline, NO sympathomimetics, NO QT-prolonging drugs</strong> — flag on chart, drug-alert band and whiteboard. Sinus brady at 58 is the disease, not a target to treat.</li>
+      <li>💊 <strong>Start a beta-blocker:</strong> nadolol (preferred, long-acting, best LQTS evidence) — e.g. begin and uptitrate to maximally tolerated dose; propranolol is the alternative. First-line, mortality-reducing therapy.</li>
+      <li>🧪 <strong>Correct electrolytes to high-normal:</strong> potassium toward 4.5–5.0 mmol/L, magnesium &gt; 1.0 (IV magnesium 2 g if any Torsades). Recheck.</li>
+      <li>🧹 <strong>Medication reconciliation against a QT-drug list:</strong> stop/avoid macrolides, fluoroquinolones, ondansetron, haloperidol/antipsychotics, methadone, many antifungals/antiemetics (crediblemeds.org is the reference).</li>
+      <li>🫀 12-lead ECG now and repeated; serial QTc (Bazett, lead II/V5); continuous telemetry with defibrillator at the bedside.</li>
+      <li>🧬 <strong>Refer cardiology/EP:</strong> Schwartz score, genetic testing, echo (confirm structurally normal heart), and plan a <strong>secondary-prevention ICD</strong> for the aborted arrest.</li>
+      <li>👨‍👩‍👧 <strong>Family cascade screening:</strong> resting ECG for all first-degree relatives; targeted genetic testing once a pathogenic variant is identified.</li>
+      <li>🛟 <strong>Lifestyle counselling started:</strong> no unsupervised swimming, restrict competitive sport (LQT1), avoid sudden auditory triggers/alarm clocks (LQT2), carry a QT-drug alert card.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In congenital long QT there are only two acute priorities: start the beta-blocker, and strip away every catecholamine and QT-prolonging drug. Everything else exists to make those two safe and permanent."</div>
+
+    <!-- 🩺 PROCEDURE GUIDE 1 -->
+    <div class="checklist" id="ckCV">
+      <h3 style="margin-top:0">🩺 Protocol — Starting &amp; Protecting the LQTS Patient — tick as you go</h3>
+      <label class="ck"><input type="checkbox"><span>🧑‍⚕️ Confirm the diagnosis: repeat 12-lead, measure QTc (Bazett, lead II/V5), document T-wave morphology and the trigger history</span></label>
+      <label class="ck"><input type="checkbox"><span>🚫 Remove ALL catecholamine/QT-prolonging agents; place a drug-alert band; sinus brady is expected, do not treat it with isoprenaline</span></label>
+      <label class="ck"><input type="checkbox"><span>💊 Start a beta-blocker (nadolol preferred / propranolol) and plan uptitration to maximally tolerated dose</span></label>
+      <label class="ck"><input type="checkbox"><span>🧪 Correct K⁺ toward 4.5–5.0 and Mg²⁺ &gt; 1.0; IV magnesium 2 g if any Torsades</span></label>
+      <label class="ck"><input type="checkbox"><span>📟 Continuous telemetry with the defibrillator at the bedside; pads on; serial QTc</span></label>
+      <label class="ck"><input type="checkbox"><span>🔌 Refer EP for secondary-prevention ICD (aborted SCA) and consider mexiletine/LCSD per genotype</span></label>
+      <label class="ck"><input type="checkbox"><span>👨‍👩‍👧 Initiate family cascade screening and genetic counselling; start lifestyle/trigger education</span></label>
+      <div class="ck-progress" data-progress>0 / 7 complete</div>
+    </div>
+
+    <!-- 🩺 PROCEDURE GUIDE 2 -->
+    <div class="checklist" id="ckDefib">
+      <h3 style="margin-top:0">🩺 Procedure Guide — If she goes back into Torsades / VF</h3>
+      <p style="font-size:13px">⚠️ Torsades that is sustained or degenerates to VF is a shockable arrest. Defibrillate, then quiet the substrate — and in <strong>congenital</strong> LQTS reach for magnesium and beta-blockade, NOT isoprenaline.</p>
+      <label class="ck"><input type="checkbox"><span>🚫 Pulseless / sustained Torsades → call arrest, start high-quality CPR (100–120/min, depth 5–6 cm, full recoil)</span></label>
+      <label class="ck"><input type="checkbox"><span>🔌 Defibrillate (UNSYNCHRONIZED — Torsades is too disorganized to sync), 200 J biphasic, minimal interruption to compressions</span></label>
+      <label class="ck"><input type="checkbox"><span>🧪 IV magnesium sulfate 2 g over 1–2 min regardless of the magnesium level; correct K⁺ toward high-normal</span></label>
+      <label class="ck"><input type="checkbox"><span>💊 Suppress recurrence with IV beta-blockade; in congenital LQTS AVOID isoprenaline (it is OK only in acquired pause-dependent Torsades)</span></label>
+      <label class="ck"><input type="checkbox"><span>🧠 Treat reversible factors — remove every QT-prolonging drug, fix electrolytes; only pace for genuine pause/brady-dependence</span></label>
+      <label class="ck"><input type="checkbox"><span>🫀 ROSC → ICU/EP, expedite the ICD, and intensify antiadrenergic therapy (beta-blocker ± LCSD)</span></label>
+      <div class="ck-progress" data-progress>0 / 6 complete</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S8 — NURSING CARE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s8">
+  <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+  <div class="section-content">
+    <h3>🛏️ Ward / EP nursing priorities — protecting a structurally normal but electrically fragile heart</h3>
+    <ul>
+      <li>📟 <strong>Continuous telemetry with the defibrillator at the bedside, pads attached.</strong> Know that the rhythm to fear is a polymorphic, twisting VT (Torsades) that can degenerate to VF.</li>
+      <li>🚫 <strong>Guard the catecholamine line:</strong> question any prescription for isoprenaline, adrenaline infusions or unnecessary sympathomimetics — in congenital LQTS these feed the trigger. Resting bradycardia at 58 is expected and not treated with stimulants.</li>
+      <li>🧪 <strong>Keep K⁺ and Mg²⁺ high-normal:</strong> run replacement as prescribed, double-check rates, and recheck — a low K⁺/Mg²⁺ lengthens the QT she is already fighting.</li>
+      <li>💊 <strong>Screen every drug against the QT list before giving it</strong> (antiemetics, antibiotics, antipsychotics): flag macrolides, fluoroquinolones, ondansetron, haloperidol. One wrong dose can precipitate Torsades.</li>
+      <li>🔔 <strong>Quiet the environment (especially LQT2):</strong> minimize sudden loud noises and alarms; warn before startling her; this is genuinely antiarrhythmic in the auditory-trigger genotype.</li>
+      <li>🧠 <strong>Watch for syncope/seizure-like activity</strong> — a brief Torsades run can look like a faint or a fit; if she slumps, check the pulse and the monitor immediately.</li>
+      <li>📋 <strong>Document any rhythm strip, the QTc trend, and every drug given</strong> — the morphology of a captured Torsades run is gold for the EP team.</li>
+      <li>👨‍👩‍👧 <strong>Support a frightened teenager and her parents</strong> (see S16): an aborted arrest in a healthy-looking child is traumatic; assign a liaison if staffing allows.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who keeps the potassium high, the QT-drugs off the chart and the catecholamines out of the room is doing the antiarrhythmic work the beta-blocker can't do alone."</div>
+    <div class="callout warn"><b class="ct">📢 Escalate IMMEDIATELY for</b>A run of polymorphic/twisting VT (→ magnesium, prepare to defibrillate) · loss of pulse (→ CPR + defibrillate) · any prescription for a catecholamine or QT-prolonging drug · falling K⁺/Mg²⁺ · recurrent syncope · new symptoms after starting/uptitrating the beta-blocker.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S9 — INVESTIGATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s9">
+  <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+  <div class="section-content">
+    <h3>🧾 Results board (17:10, post-ROSC)</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>Result</th><th>Reference</th><th>Interpretation</th></tr>
+      <tr><td>QTc (Bazett, lead II)</td><td class="hi">490 ms ↑</td><td>&lt; 460 (♀)</td><td>Repeatedly &gt; 480 ms is diagnostic of LQTS even without symptoms; with her syncope/arrest, &gt; 460 already qualifies. The single most important number in this case.</td></tr>
+      <tr><td>Potassium</td><td class="lo">3.6 mmol/L</td><td>3.5–5.0</td><td>Low-normal — push to 4.5–5.0. Every 0.1 mmol/L of K⁺ helps repolarization in a long-QT ventricle.</td></tr>
+      <tr><td>Magnesium</td><td class="lo">0.68 mmol/L ↓</td><td>0.7–1.0</td><td>Mildly low — replace to &gt; 1.0. Low Mg²⁺ both prolongs QT and is the treatment for active Torsades.</td></tr>
+      <tr><td>Troponin I</td><td class="hi">0.08 ng/mL ↑</td><td>&lt; 0.04</td><td>Mildly raised from the arrest/CPR and brief ischemia — NOT evidence of a primary coronary event in a 17-year-old. Trends down.</td></tr>
+      <tr><td>TSH / free T4</td><td class="ok-v">Normal</td><td>—</td><td>Excludes hypothyroidism as a reversible QT-prolonging contributor.</td></tr>
+      <tr><td>Calcium (corrected)</td><td class="ok-v">2.32 mmol/L</td><td>2.2–2.6</td><td>Normal — excludes hypocalcaemia as an acquired cause of QT prolongation.</td></tr>
+      <tr><td>Echocardiogram</td><td class="ok-v">Structurally normal</td><td>—</td><td>Normal chambers, function and valves — confirms a <strong>primary electrical disease</strong>, not cardiomyopathy or ischemia.</td></tr>
+      <tr><td>Genetic panel</td><td class="ok-v">Sent (pending)</td><td>—</td><td>Targets KCNQ1/KCNH2/SCN5A etc.; a positive result guides therapy (mexiletine in LQT3) and the family cascade.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"First exclude the acquired causes you can fix in an hour — low K⁺, low Mg²⁺, low Ca²⁺, QT drugs, hypothyroidism — then, in a young patient with the right story, call the residual long QT congenital and treat it as such."</div>
+
+    <div class="callout info"><b class="ct">🧠 How to actually measure and read the QT</b>Measure in lead II or V5, from QRS onset to the end of the T wave (tangent method), take the longest interval, and correct for rate (Bazett: QTc = QT/√RR). Beware U waves, sinus arrhythmia, and rate extremes that fool Bazett. Then read the <em>shape</em>: broad-based T (LQT1), low-amplitude notched/bifid T (LQT2), or a long isoelectric ST with a late T (LQT3). The morphology hints at the genotype before the gene panel returns.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S10 — ECG / IMAGING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s10">
+  <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging</h2></div>
+  <div class="section-content">
+    <h3>🫀 The resting 12-lead — read the interval AND the T-wave shape</h3>
+    <div class="ecg-fig">
+      <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Sinus rhythm with a long QT and notched T waves, then a short run of Torsades">
+        <rect width="820" height="150" fill="#0b1220"/>
+        <g stroke="#1e3a5f" stroke-width="1">
+          <line x1="0" y1="30" x2="820" y2="30"/><line x1="0" y1="60" x2="820" y2="60"/>
+          <line x1="0" y1="90" x2="820" y2="90"/><line x1="0" y1="120" x2="820" y2="120"/>
+        </g>
+        <polyline fill="none" stroke="#86efac" stroke-width="2.4" points="0,75 30,75 40,55 50,30 60,98 70,72 90,75 150,75 175,62 200,52 220,62 235,52 250,75 320,75 330,55 340,30 350,98 360,72 380,75 440,75 465,62 490,52 510,62 525,52 540,75 600,75 612,60 624,90 636,52 648,98 660,58 672,92 684,55 696,96 708,62 720,88 732,56 744,94 756,66 768,84 780,70 800,75"/>
+        <text x="150" y="22" fill="#fcd34d" font-size="12" font-weight="700">↑ long QT + notched T</text>
+        <text x="600" y="22" fill="#fca5a5" font-size="12" font-weight="700">↑ Torsades run (twisting)</text>
+      </svg>
+      <div class="ecg-cap">Sinus rhythm with a <span style="color:#fcd34d">prolonged QT and low-amplitude, notched T waves</span>, then a short <span style="color:#fca5a5">polymorphic run whose axis twists around the baseline</span> — Torsades de Pointes. The long QT is the substrate; an early afterdepolarization is the spark.</div>
+    </div>
+
+    <h3>🔎 The long-QT toolkit (memorize the high-yield ones)</h3>
+    <table class="tbl">
+      <tr><th>Feature</th><th>Why it matters</th></tr>
+      <tr><td>📐 <strong>Prolonged QTc</strong></td><td>&gt; 480 ms repeatedly (or &gt; 460 ms with symptoms) is diagnostic. The interval reflects abnormally long repolarization — the core defect.</td></tr>
+      <tr><td>🏊 <strong>Broad-based T waves</strong></td><td>Suggest <strong>LQT1</strong> (↓I<sub>Ks</sub>) — the exercise/swimming genotype.</td></tr>
+      <tr><td>🔔 <strong>Low-amplitude / notched / bifid T waves</strong></td><td>Suggest <strong>LQT2</strong> (↓I<sub>Kr</sub>) — the emotion/auditory-startle genotype (this patient's T-wave clue).</td></tr>
+      <tr><td>🌙 <strong>Long isoelectric ST then a late T</strong></td><td>Suggests <strong>LQT3</strong> (↑late I<sub>Na</sub>) — the rest/sleep genotype; mexiletine shortens the QT.</td></tr>
+      <tr><td>🌀 <strong>Torsades de Pointes</strong></td><td>Polymorphic VT whose QRS axis twists around the baseline — the malignant arrhythmia of a long QT; may self-terminate (syncope) or sustain (VF).</td></tr>
+      <tr><td>🏃 <strong>Exercise/recovery QT &amp; epinephrine challenge</strong></td><td>Unmask concealed LQTS: failure of the QT to shorten with rate, or paradoxical lengthening in recovery (esp. LQT1). Useful when the resting QTc is borderline.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Read the QT for the diagnosis and the T-wave shape for the genotype: broad T swims (LQT1), notched T startles (LQT2), late T sleeps (LQT3)."</div>
+
+    <h3>🩻 Other imaging &amp; tests</h3>
+    <ul>
+      <li>📈 <strong>Repeat 12-leads &amp; Holter:</strong> serial QTc, T-wave alternans (a marker of high electrical instability), and capture of any spontaneous Torsades runs.</li>
+      <li>🩻 <strong>Echocardiogram:</strong> structurally normal — confirms primary electrical disease and excludes cardiomyopathy/ischemia as the cause of the arrest.</li>
+      <li>🏃 <strong>Exercise testing (later, supervised):</strong> assesses QT behaviour with rate and the response to beta-blockade — done carefully given her risk.</li>
+    </ul>
+
+    <div class="callout warn"><b class="ct">⚠️ The ECG's favorite lie in long QT</b>"A single normal-looking QTc rules it out." It does not: up to a third of gene-positive patients have a near-normal resting QTc (<em>concealed</em> LQTS). Repeat the ECG, use the exercise/recovery QT and epinephrine challenge, weigh the family history, and never let one reassuring strip override a textbook story.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S11 — MEDICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s11">
+  <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+  <div class="section-content">
+    <h3>💉 Therapy — what, why, and the traps</h3>
+    <table class="tbl">
+      <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+      <tr><td><strong>Nadolol</strong> (preferred)</td><td><strong>First-line</strong> long-term protection; best LQTS evidence</td><td>Non-selective, long-acting beta-blocker; blunts the adrenergic surges that trigger events (best in LQT1/2). Uptitrate to maximally tolerated dose; expect/accept bradycardia.</td></tr>
+      <tr><td><strong>Propranolol</strong></td><td>Alternative first-line beta-blocker</td><td>Non-selective; also reduces events. Multiple daily doses; same antiadrenergic principle.</td></tr>
+      <tr><td><strong>Magnesium sulfate 2 g IV</strong></td><td>Drug of choice for active Torsades</td><td>Stabilizes the membrane and suppresses early afterdepolarizations — give regardless of the magnesium level if she twists. Also replete to &gt; 1.0 prophylactically.</td></tr>
+      <tr><td><strong>Potassium (to 4.5–5.0)</strong></td><td>Optimizes repolarization reserve</td><td>Higher K⁺ enhances I<sub>Kr</sub> and shortens the QT — keep it high-normal, especially in LQT2.</td></tr>
+      <tr><td><strong>Mexiletine</strong></td><td>Genotype-specific add-on in <strong>LQT3</strong></td><td>Late-Na (I<sub>Na</sub>) blocker that <strong>shortens the QT</strong> in SCN5A disease. Not a generic LQTS drug — reserved for the late-sodium genotype.</td></tr>
+      <tr><td><strong>Isoprenaline / sympathomimetics</strong></td><td>❌ Contraindicated in congenital LQTS</td><td>Catecholamines are the <em>trigger</em> here; useful only in <em>acquired</em>, pause-dependent Torsades. Giving one to this patient invites the arrhythmia.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Beta-blockers are the seatbelt; isoproterenol is the cliff. In congenital long QT you sympatholyse — you never sympathomimetic. The exact reverse of acquired Torsades."</div>
+
+    <div class="callout danger"><b class="ct">🚫 The 'never' list in congenital long QT — QT-prolonging drugs to avoid</b>❌ Macrolides (azithromycin, erythromycin, clarithromycin) · ❌ Fluoroquinolones (ciprofloxacin, levofloxacin) · ❌ Ondansetron &amp; other QT-prolonging antiemetics · ❌ Haloperidol / many antipsychotics &amp; antidepressants · ❌ Methadone · ❌ Some antifungals (fluconazole) &amp; antimalarials · ❌ Class IA/III antiarrhythmics (incl. <strong>amiodarone, sotalol</strong>) · ❌ Drugs causing ↓K⁺/↓Mg²⁺. <em>Check crediblemeds.org before every new prescription.</em></div>
+
+    <h3>🏠 Definitive &amp; long-term therapy (this admission and for life)</h3>
+    <ul>
+      <li>🔌 <strong>Secondary-prevention ICD</strong> — Class I after her aborted cardiac arrest, in <em>addition</em> to the beta-blocker (never instead of it).</li>
+      <li>💊 <strong>Lifelong beta-blocker</strong> at maximally tolerated dose, with adherence support — stopping it is a classic cause of breakthrough events.</li>
+      <li>🧬 <strong>Genotype-guided add-ons:</strong> mexiletine for LQT3; high-normal K⁺ strategy for LQT2.</li>
+      <li>💉 <strong>Left cardiac sympathetic denervation (LCSD)</strong> for breakthrough events on beta-blockade or frequent ICD shocks.</li>
+      <li>🛟 <strong>Lifestyle prescription:</strong> avoid QT drugs, no unsupervised swimming, restrict competitive sport (LQT1), remove sudden auditory triggers/alarm clocks (LQT2), correct electrolytes during illness.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S12 — MONITORING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s12">
+  <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+  <div class="section-content">
+    <h3>📡 What to watch and why</h3>
+    <ul>
+      <li>📈 <strong>Continuous telemetry</strong> with the defibrillator at the bedside until established on beta-blockade and arrhythmia-free; print any ectopy or polymorphic runs.</li>
+      <li>📐 <strong>Serial QTc on every 12-lead</strong> — the headline number; watch that nothing on the chart (a sneaky antiemetic, a low K⁺) is lengthening it further.</li>
+      <li>🧪 <strong>Serial K⁺ and Mg²⁺</strong> kept high-normal (K⁺ 4.5–5.0, Mg²⁺ &gt; 1.0) — the most modifiable QT drivers.</li>
+      <li>💓 <strong>Heart rate on beta-blockade</strong> — expect and tolerate sinus bradycardia; only act if genuinely symptomatic, and then with <strong>pacing</strong>, not catecholamines.</li>
+      <li>🌀 <strong>Watch for T-wave alternans and runs of polymorphic VT</strong> — early markers of electrical instability that should prompt escalation.</li>
+      <li>🔋 Once an <strong>ICD</strong> is placed: monitor for appropriate vs inappropriate detections/shocks and ensure the bradycardia-pacing function supports beta-blockade.</li>
+      <li>🧬 Track the genetic result and the family-screening ECGs as they return — they change long-term therapy and counselling.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After the arrest, the monitor's two jobs are: 'is the QT creeping longer?' and 'is she throwing polymorphic beats?' — and the two numbers that answer the first are potassium and the medication list."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S13 — COMPLICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s13">
+  <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+  <div class="section-content">
+    <h3>💀 What can go wrong — and the mechanism</h3>
+    <ul>
+      <li>🌀 <strong>Recurrent Torsades / VF arrest</strong> — the central danger; an adrenergic surge or a QT-prolonging drug relights early afterdepolarizations. Treatment: defibrillate, magnesium, beta-blockade (NOT isoprenaline).</li>
+      <li>💊 <strong>Iatrogenic QT prolongation</strong> — a single wrong drug (macrolide, ondansetron) or a dropped K⁺/Mg²⁺ can precipitate Torsades. Entirely preventable.</li>
+      <li>🧠 <strong>Anoxic brain injury / drowning sequelae</strong> — from a prolonged or unwitnessed arrest (here mitigated by fast bystander CPR and early AED).</li>
+      <li>🔌 <strong>ICD-related problems</strong> — inappropriate shocks (very distressing in a teenager), lead issues, infection, and the psychological burden of living with a device.</li>
+      <li>💔 <strong>Breakthrough events on beta-blockade</strong> — especially with non-adherence or in LQT3; may need mexiletine, LCSD or ICD therapy.</li>
+      <li>🧬 <strong>Undiagnosed affected relatives</strong> — the family is at risk until screened; a missed cascade can mean the next sudden death is preventable but unprevented.</li>
+    </ul>
+
+    <!-- 🎭 M&M CONFERENCE MODULE -->
+    <div class="mm">
+      <h3>🎭 Morbidity &amp; Mortality Conference — "The Faint That Was a Warning"</h3>
+      <div class="mm-case">
+        <strong>The case:</strong> A 16-year-old midfielder collapsed mid-match, recovered spontaneously within a minute, and was seen in a busy clinic. He was labelled <strong>"vasovagal — dehydrated, hot day"</strong> and cleared to return to sport with <strong>no ECG</strong>. His mother mentioned that her brother had "died young in his sleep," but it wasn't recorded. Three weeks later he collapsed during a match and could not be resuscitated. A sibling's screening ECG, done after the funeral, showed a <strong>QTc of 500 ms</strong> — congenital long QT syndrome. The diagnosis had been one 12-lead away.
+      </div>
+      <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+      <div class="swiss">
+        <div class="hole"><b>🧠 ANCHORING</b>"Young, fit, hot day = vasovagal" — but syncope DURING exertion is red-flag, not benign.</div>
+        <div class="hole"><b>📈 NO ECG</b>A single resting 12-lead would likely have shown the long QT.</div>
+        <div class="hole"><b>🧬 FAMILY HISTORY IGNORED</b>"Uncle died young in his sleep" is a channelopathy clue, unrecorded.</div>
+        <div class="hole"><b>🏃 CLEARED FOR SPORT</b>Returned to the exact adrenergic trigger that kills LQT1.</div>
+        <div class="hole"><b>🩺 SYSTEM</b>No 'ECG for young exertional syncope' rule; no family-screening pathway.</div>
+      </div>
+      <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> a 12-lead ECG for every young person with exertional or emotional syncope; taking the family history of premature/sleep sudden death seriously; not clearing for sport until cardiac causes are excluded; and a cascade-screening pathway for relatives. <strong>This is exactly why your patient's nurse held the isoprenaline and why we are screening her whole family tonight.</strong></p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Just a vasovagal faint' is the sentence written on the chart of young people who later die of long QT. Exertional or familial syncope earns an ECG — always."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S14 — DIFFERENTIALS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s14">
+  <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials</h2></div>
+  <div class="section-content">
+    <h3>🧩 The young-person syncope / aborted-SCA differential</h3>
+    <table class="tbl">
+      <tr><th>Diagnosis</th><th>Clues</th><th>Why it matters</th></tr>
+      <tr><td>🧬 <strong>Congenital long QT syndrome</strong> (this patient)</td><td>Long QTc, exertional/emotional/startle syncope, family sudden death, notched/broad T waves, structurally normal heart</td><td>Default in young exertional syncope with a long QT; beta-blocker + ICD; AVOID catecholamines &amp; QT drugs.</td></tr>
+      <tr><td>💊 <strong>Acquired (drug/electrolyte) Torsades</strong></td><td>QT-prolonging drug, ↓K⁺/↓Mg²⁺/↓Ca²⁺, bradycardia/pauses; often older or sicker</td><td>Mirror image therapy — remove the cause, magnesium, and pacing/isoprenaline are OK. Must exclude before calling it congenital.</td></tr>
+      <tr><td>🏃 <strong>CPVT</strong> (catecholaminergic polymorphic VT)</td><td>Exercise/emotion-induced bidirectional/polymorphic VT with a <strong>NORMAL resting QT</strong>; RyR2/CASQ2</td><td>Same beta-blocker (nadolol) ± flecainide ± LCSD logic, but a clean resting ECG — the great LQTS mimic.</td></tr>
+      <tr><td>💔 <strong>Hypertrophic cardiomyopathy</strong></td><td>Exertional syncope, murmur, LVH on ECG, asymmetric septal hypertrophy on echo</td><td>Structural cause of young SCD — distinguished by the echo (here normal).</td></tr>
+      <tr><td>🫀 <strong>Anomalous coronary / ARVC / Brugada / WPW</strong></td><td>Exertional chest pain or arrest (anomalous coronary), epsilon waves (ARVC), coved ST V1–2 (Brugada), delta wave (WPW)</td><td>Other young-SCD causes; each has its own ECG/imaging signature and treatment.</td></tr>
+      <tr><td>🧠 <strong>Vasovagal / neurocardiogenic syncope</strong></td><td>Clear prodrome, upright trigger, rapid full recovery, normal ECG, NO exertional/familial features</td><td>Common and benign — but it is the label that hides the lethal channelopathies. Only after the ECG is clean.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Long QT + syncope → congenital LQTS; NORMAL QT + exercise-triggered polymorphic VT → think CPVT; never settle on 'vasovagal' in a young person until the ECG and family history are clean."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S15 — PLAN -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s15">
+  <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan</h2></div>
+  <div class="section-content">
+    <h3>🧭 Tonight → this week → for life</h3>
+    <ol>
+      <li>💊 <strong>Tonight (done):</strong> beta-blocker started (nadolol); isoprenaline/sympathomimetics banned and flagged; K⁺/Mg²⁺ corrected to high-normal; all QT-prolonging drugs stripped; telemetry with defibrillator at the bedside.</li>
+      <li>🧬 <strong>Confirm &amp; subtype:</strong> repeat QTc, Schwartz score, T-wave morphology, genetic testing (KCNQ1/KCNH2/SCN5A), echo confirming a structurally normal heart.</li>
+      <li>🔌 <strong>Secondary-prevention ICD</strong> — Class I after the aborted arrest; implant this admission, in addition to (not instead of) the beta-blocker.</li>
+      <li>💉 <strong>Genotype-guided escalation:</strong> mexiletine if LQT3; consider <strong>LCSD</strong> for breakthrough events or frequent shocks; high-normal K⁺ strategy for LQT2.</li>
+      <li>👨‍👩‍👧 <strong>Family cascade screening:</strong> resting ECG for all first-degree relatives now; targeted genetic testing once her variant is found; counsel about congenital deafness (JLN) if relevant.</li>
+      <li>🛟 <strong>Lifestyle &amp; education:</strong> no unsupervised swimming, restrict competitive sport (LQT1), avoid sudden auditory triggers (LQT2), lifelong beta-blocker adherence, a QT-drug alert card, and a clear 'call 911 for syncope or an ICD shock' safety net.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The beta-blocker treats the trigger, the ICD catches the failure, and the family screen prevents the next death. Send her home with all three — or the disease keeps its secrets and its victims."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S16 — PROGRESS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s16">
+  <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+  <div class="section-content">
+    <h3>📅 Course on the EP unit</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Day 1, 17:00</div>Beta-blocker (nadolol) started and uptitrated; isoprenaline order cancelled and flagged. K⁺ to 4.7, Mg²⁺ to 1.0. No further arrhythmia overnight.</div>
+      <div class="t-item"><div class="t-time">Day 1, 22:00</div>Telemetry shows expected sinus bradycardia on beta-blockade (HR 52), well perfused, asymptomatic — tolerated, not treated.</div>
+      <div class="t-item"><div class="t-time">Day 2</div>Echo normal; troponin trends down; QTc remains ~485 ms. T-wave morphology and swimming trigger favour LQT1; genetics sent.</div>
+      <div class="t-item"><div class="t-time">Day 3</div>Secondary-prevention ICD implanted (subcutaneous/transvenous per EP) — device interrogated, bradycardia support set to allow full beta-blockade.</div>
+      <div class="t-item"><div class="t-time">Day 4</div>Family screening: mother's ECG shows QTc 470 ms (previously undiagnosed) → started on a beta-blocker; younger brother's ECG normal but genetic testing planned.</div>
+      <div class="t-item"><div class="t-time">Day 5</div>Arrhythmia-free, beta-blocker established, education complete, ICD checked. Ready for discharge with EP and psychology follow-up.</div>
+    </div>
+
+    <!-- 👨‍👩‍👦 FAMILY & PATIENT JOURNEY MODULE -->
+    <h3>👨‍👩‍👦 Family &amp; Patient Journey</h3>
+    <div class="journey">
+      <div class="j-card"><div class="j-who">🧑 The patient — Miss A.K.</div><p>"They told me my heart looks perfect on the scan — and that's the scary part, because something in it tried to stop. I'm sad I can't compete anymore, but I'd rather swim for fun and grow up. The little tablet and the device are how I get to do that."</p></div>
+      <div class="j-card"><div class="j-who">👩 Her mother</div><p>"The hardest sentence was 'we'd like to check your ECG too' — and then mine was abnormal as well. My brother died in his sleep at 23 and we never knew why. Now we do, and my other children can be tested. We finally have a name for the thing that's been taking people from us."</p></div>
+      <div class="j-card"><div class="j-who">👩‍⚕️ The resus nurse</div><p>"My job was the defibrillator, the potassium, and saying 'no' to the isoprenaline. In this disease, the drug you refuse to give can matter as much as the one you start."</p></div>
+      <div class="j-card"><div class="j-who">🎓 The team's reflection</div><p>"This wasn't a heroic save — it was a disciplined one. We measured the QT, we read the T waves, we started the seatbelt, and we screened the family. The first two faints should have done the same."</p></div>
+    </div>
+
+    <div class="callout pink"><b class="ct">💗 The human thread</b>For a 17-year-old, the diagnosis reshapes identity: the competitive swimmer becomes the patient who can't race, and an ICD becomes a daily companion that may one day deliver a shock that feels like a kick — and saves her life. Preparing her and her family for the lifestyle changes, the device, and the family screening is as much treatment as the beta-blocker itself.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S17 — DISCHARGE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s17">
+  <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+  <div class="section-content">
+    <h3>📋 Discharge plan &amp; safety net</h3>
+    <ul>
+      <li>💊 <strong>Medications:</strong> lifelong beta-blocker (nadolol) at the maximally tolerated dose with a written schedule and strong adherence counselling; genotype-guided add-ons (mexiletine if LQT3) per EP. Stopping the beta-blocker is a classic cause of breakthrough events.</li>
+      <li>🔌 <strong>ICD in situ:</strong> wound care, device ID card, device-clinic follow-up, and clear instructions on what a shock feels like and what to do after one.</li>
+      <li>📇 <strong>QT-drug alert card</strong> and a documented allergy/alert band: no macrolides, fluoroquinolones, ondansetron, QT-prolonging antiemetics/antipsychotics; check crediblemeds.org before any new prescription.</li>
+      <li>🛟 <strong>Lifestyle:</strong> no unsupervised swimming, restrict competitive sport (LQT1), avoid sudden auditory triggers/alarm clocks (LQT2), keep electrolytes up during vomiting/diarrhoea illness.</li>
+      <li>👨‍👩‍👧 <strong>Family cascade screening &amp; genetic counselling</strong> booked for all first-degree relatives; her mother (newly diagnosed) referred for treatment.</li>
+      <li>🚩 <strong>Red flags → call emergency services:</strong> syncope or near-syncope, palpitations, an ICD shock (one shock + feeling well = urgent review; multiple shocks = emergency), and any new QT-prolonging drug prescribed elsewhere.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Discharge after an LQTS arrest is not 'rhythm normal, go home' — it is a lifelong beta-blocker, an ICD, a QT-drug card, a lifestyle plan, and a family screened for the same hidden spark."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S18 — CLINICAL PEARLS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s18">
+  <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+  <div class="section-content">
+    <div class="pearl-grid">
+      <div class="pearl"><b>📐 Measure the QTc</b>Exertional or emotional syncope in a young person with a family history of sudden death is long QT until the ECG says otherwise.</div>
+      <div class="pearl"><b>🛡️ Beta-blocker = seatbelt</b>Nadolol (or propranolol) is first-line, mortality-reducing therapy that blunts the adrenergic surges that trigger events.</div>
+      <div class="pearl"><b>🪂 Isoproterenol = cliff</b>In congenital LQTS, catecholamines are the trigger — the exact reverse of acquired, pause-dependent Torsades where pacing/isoprenaline are OK.</div>
+      <div class="pearl"><b>🏊🔔🌙 LQT1/2/3</b>LQT1 swims (broad T), LQT2 startles (notched T), LQT3 sleeps (late T). The trigger and the T wave name the gene.</div>
+      <div class="pearl"><b>🔌 ICD after aborted SCA</b>An aborted cardiac arrest is a Class I secondary-prevention indication — in addition to the beta-blocker, never instead of it.</div>
+      <div class="pearl"><b>🧪 K⁺ &amp; Mg²⁺ high-normal</b>Keep potassium 4.5–5.0 and magnesium &gt; 1.0; magnesium 2 g IV is the drug of choice for active Torsades.</div>
+      <div class="pearl"><b>💊 Strip QT drugs</b>No macrolides, fluoroquinolones, ondansetron, haloperidol, amiodarone/sotalol — check crediblemeds.org before every prescription.</div>
+      <div class="pearl"><b>🧬 Mexiletine in LQT3</b>The late-Na blocker shortens the QT specifically in SCN5A disease — genotype-guided, not generic.</div>
+      <div class="pearl"><b>👂 Ask about hearing</b>Congenital deafness + very long QT = Jervell–Lange-Nielsen (recessive, very high risk); normal hearing = Romano-Ward (dominant).</div>
+      <div class="pearl"><b>💉 LCSD for refractory</b>Left cardiac sympathetic denervation reduces syncope/shocks when beta-blockers (± ICD) aren't enough.</div>
+      <div class="pearl"><b>👨‍👩‍👧 Screen the family</b>Cascade ECG ± genetic testing of first-degree relatives can find — and protect — the next silent carrier.</div>
+      <div class="pearl"><b>🩺 "Vasovagal" is a trap</b>Never settle on a benign faint in a young person until the QT and the family history are clean.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S19 — MCQs / ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s19">
+  <div class="sec-header"><span class="s-badge">S19</span><h2>🧠 MCQs / Assessment</h2></div>
+  <div class="section-content">
+    <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP and feed your dashboard. Each shows a full explanation.</em></p>
+    <div id="mcqHost"></div>
+    <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · Case c-lqts-013 — Congenital Long QT Syndrome<br>
+  ⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."
+</div>
+
+</div><!-- /#caseScroll -->
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ XP / DASHBOARD CORE ============ */
+  var XP = 0, XP_MAX = 1200;
+  var awarded = {}; // dedupe one-time awards by key
+  var xpVal = document.getElementById('xpVal');
+  var xpFill = document.getElementById('xpFill');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+  }
+  function addXP(amount, key, label){
+    if(key){ if(awarded[key]) return; awarded[key] = true; }
+    XP += amount;
+    if(XP > XP_MAX) XP = XP_MAX;
+    xpVal.textContent = XP;
+    xpFill.style.width = Math.min(100, Math.round(XP / XP_MAX * 100)) + '%';
+    showToast('+' + amount + ' XP' + (label ? ' · ' + label : ''));
+  }
+  function earnBadge(id){
+    var b = document.getElementById(id);
+    if(b && !b.classList.contains('earned')){ b.classList.add('earned'); }
+  }
+
+  /* Dashboard minimize */
+  var dash = document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){
+    dash.classList.toggle('collapsed');
+    this.textContent = dash.classList.contains('collapsed') ? '+' : '–';
+  });
+
+  /* ============ INTERNAL SCROLL SIZING ============ */
+  /* Size the scroll box to the visible window so the sticky tab bar stays in
+     view. When embedded (srcDoc iframe, same-origin), the host page stretches
+     the iframe to full content height and scrolls the OUTER page — so we size
+     this box from the parent window's height minus whatever app chrome sits
+     above the iframe, and scroll internally instead. Standalone → 100vh. */
+  var caseScroll = document.getElementById('caseScroll');
+  var topnav = document.getElementById('topnav');
+  /* The tab bar is position:fixed, so it's out of flow — reserve space at the
+     top of the scroll content (and offset anchor jumps) by its real height. */
+  function setNavOffset(){
+    var navH = topnav ? topnav.offsetHeight : 70;
+    caseScroll.style.paddingTop = navH + 'px';
+    caseScroll.style.scrollPaddingTop = (navH + 14) + 'px';
+  }
+  function sizeScroller(){
+    try {
+      var p = window.parent;
+      if(p && p !== window && window.frameElement){
+        var rectTop = window.frameElement.getBoundingClientRect().top;
+        if(rectTop < 0) rectTop = 0;          // parent scrolled past the chrome
+        var ph = p.innerHeight || 800;
+        var h = ph - rectTop - 6;             // leave the bottom edge breathing room
+        if(h < 460) h = 460;                  // sane minimum on short windows
+        caseScroll.style.height = h + 'px';
+      } else {
+        caseScroll.style.height = '100vh';
+      }
+    } catch(e){ caseScroll.style.height = '100vh'; }
+    setNavOffset();
+  }
+  sizeScroller();
+  window.addEventListener('resize', sizeScroller);
+  window.addEventListener('load', sizeScroller);
+  try { if(window.parent && window.parent !== window) window.parent.addEventListener('resize', sizeScroller); } catch(e){}
+
+  /* ============ NAV: scroll-spy active + visited ============ */
+  var navchips = Array.prototype.slice.call(document.querySelectorAll('.navchip'));
+  var sections = navchips.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited = {};
+  var visitVal = document.getElementById('visitVal');
+
+  function markVisited(idx){
+    var sec = sections[idx];
+    if(!sec) return;
+    if(!visited[sec.id]){
+      visited[sec.id] = true;
+      navchips[idx].classList.add('visited');
+      var count = Object.keys(visited).length;
+      visitVal.textContent = count + ' / 19';
+      addXP(8, 'visit-' + sec.id, 'Section read');
+      if(count >= 19){ earnBadge('bdg-explorer'); addXP(60, 'allvisited', 'Ward Explorer!'); }
+    }
+  }
+  function setActive(idx){
+    navchips.forEach(function(c){ c.classList.remove('active'); });
+    if(navchips[idx]) navchips[idx].classList.add('active');
+  }
+
+  /* True tabs: each chip shows ONLY its section, hidden via CSS otherwise.
+     No scrollIntoView and no scroll-spy — nothing can scroll the tab bar away,
+     which also sidesteps every srcDoc-iframe scrolling quirk. The hero banner
+     and vitals strip belong to the case intro, so they show on S1 only. */
+  var heroBits = [document.querySelector('.hero'), document.querySelector('.vitals-strip')]
+    .filter(function(el){ return !!el; });
+
+  function showSection(idx){
+    sections.forEach(function(s, i){ if(s) s.classList.toggle('sec-active', i === idx); });
+    heroBits.forEach(function(el){ el.style.display = (idx === 0) ? '' : 'none'; });
+    caseScroll.scrollTop = 0;
+    setActive(idx);
+    markVisited(idx);
+  }
+
+  navchips.forEach(function(chip, idx){
+    chip.addEventListener('click', function(ev){
+      ev.preventDefault();
+      showSection(idx);
+    });
+  });
+  showSection(0);
+
+  /* ============ FLAG GAME (S2) ============ */
+  var flagBtns = document.querySelectorAll('#flagGame .flag-btn');
+  var flagResult = document.getElementById('flagResult');
+  var flagsFound = 0, flagsTotal = 0, flagWrong = 0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good') === '1') flagsTotal++; });
+  flagBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.dataset.locked) return;
+      btn.dataset.locked = '1';
+      var good = btn.getAttribute('data-good') === '1';
+      if(good){
+        btn.classList.add('flag-good');
+        flagsFound++;
+        addXP(10, 'flag-' + flagsFound + '-' + Math.random(), 'QT flag spotted');
+      } else {
+        btn.classList.add('flag-bad');
+        flagWrong++;
+        showToast('❌ Not an LQTS-specific flag');
+      }
+      if(flagsFound === flagsTotal){
+        flagResult.textContent = '✅ All ' + flagsTotal + ' long-QT red flags found' + (flagWrong ? ' (with ' + flagWrong + ' wrong pick' + (flagWrong>1?'s':'') + ')' : ' — flawless!');
+        earnBadge('bdg-vt');
+        addXP(30, 'flags-complete', 'QT-Spotter badge');
+      } else {
+        flagResult.textContent = flagsFound + ' / ' + flagsTotal + ' long-QT red flags found…';
+      }
+    });
+  });
+
+  /* ============ BRANCHING SCENARIO (S3) ============ */
+  var scText = document.getElementById('scText');
+  var scChoices = document.getElementById('scChoices');
+  var scFeedback = document.getElementById('scFeedback');
+  var scRestart = document.getElementById('scRestart');
+  var scStab = document.getElementById('scStab');
+  var scTime = document.getElementById('scTime');
+  var scXP = document.getElementById('scXP');
+  var pathXP = 0, scStability = 2, scElapsed = 0;
+
+  var STEPS = {
+    start: {
+      text: "She is back in sinus at 58, awake and tearful. The 12-lead shows QTc ~490 ms with notched T waves and the story is exertional/startle syncope plus an uncle who died young. A junior is hanging an isoprenaline infusion 'to lift the heart rate off 58.' What do you do FIRST?",
+      choices: [
+        { t: "🚫 Take the isoprenaline down and recognize this as congenital LQTS — start protecting her", good:true, ds:1, dt:10, xp:40, fb:"✅ Exactly. Sinus brady at 58 is the disease, not a target. Catecholamines are the trigger in congenital LQTS — removing the infusion is the single most important first move." , next:"betablock" },
+        { t: "💉 Run the isoprenaline — 'speed the rate up like you would in Torsades'", good:false, ds:-2, dt:20, xp:0, fb:"☠️ Catastrophe. That's the rule for ACQUIRED, pause-dependent Torsades. In CONGENITAL LQTS isoprenaline feeds the adrenergic surge that triggers events. This is the M&M lesson in S13. Restart and choose again.", end:true },
+        { t: "💊 Give IV amiodarone 'to settle her rhythm'", good:false, ds:-1, dt:15, xp:5, fb:"⚠️ Wrong drug. Amiodarone PROLONGS the QT — the very interval that is already dangerously long — and can provoke Torsades. Protect with sympatholysis, not QT-prolonging antiarrhythmics.", next:"betablock" }
+      ]
+    },
+    betablock: {
+      text: "The isoprenaline is gone. Her K⁺ is 3.6 and Mg²⁺ 0.68, QTc still ~490 ms. She is at high risk of recurrence. What is the key protective therapy to start now?",
+      choices: [
+        { t: "💊 Start a beta-blocker (nadolol/propranolol) and correct K⁺/Mg²⁺ to high-normal", good:true, ds:1, dt:8, xp:30, fb:"✅ Right. Beta-blockade is first-line, mortality-reducing therapy that blunts the adrenergic triggers; high-normal electrolytes optimize repolarization. The seatbelt is on.", next:"icd" },
+        { t: "💉 Start a calcium-channel blocker to slow conduction", good:false, ds:-1, dt:20, xp:0, fb:"⚠️ Not the answer. CCBs don't address the channelopathy or the adrenergic trigger. The evidence-based protective drug is a beta-blocker.", next:"icd" }
+      ]
+    },
+    icd: {
+      text: "Beta-blocker started, electrolytes corrected, QT-prolonging drugs stripped from the chart. She had a documented VF arrest today. What definitive step do you arrange this admission?",
+      choices: [
+        { t: "🔌 Refer EP for a secondary-prevention ICD — in addition to the beta-blocker", good:true, ds:1, dt:6, xp:30, fb:"✅ Ideal. An aborted cardiac arrest is a Class I indication for an ICD, alongside (never instead of) the beta-blocker. Now lock in the long-term plan.", next:"family" },
+        { t: "🏠 Beta-blocker alone is enough after an aborted arrest — plan discharge", good:false, ds:0, dt:3, xp:10, fb:"⚠️ Under-treating. The beta-blocker is essential but she has had a VF arrest — that earns a secondary-prevention ICD on top of it. Add the device.", next:"family" }
+      ]
+    },
+    family: {
+      text: "ICD planned, beta-blocker running, lifestyle counselling begun. The genetics are pending. What is the last essential move that protects more than just this patient?",
+      choices: [
+        { t: "👨‍👩‍👧 Cascade-screen all first-degree relatives with an ECG (± genetic testing)", good:true, ds:1, dt:5, xp:40, fb:"🏆 Perfect close. Congenital LQTS is inherited — screening the family can find the next silent carrier before their first arrest. Her mother's ECG turns out abnormal too. Case complete.", end:true },
+        { t: "🎉 Done — she's protected, no need to involve the family", good:false, ds:-1, dt:10, xp:0, fb:"⚠️ Premature. This is a heritable channelopathy; untested relatives may carry the same lethal spark. Always cascade-screen first-degree relatives.", end:true }
+      ]
+    }
+  };
+
+  function renderStab(){
+    var s = Math.max(0, Math.min(5, scStability + 2)); // map -2..3 → 0..5
+    var dots = '';
+    for(var i=0;i<5;i++) dots += (i < s ? '●' : '○');
+    scStab.textContent = dots;
+  }
+  function renderStep(key){
+    var step = STEPS[key];
+    scText.textContent = step.text;
+    scFeedback.className = 'feedback';
+    scFeedback.style.display = 'none';
+    scChoices.innerHTML = '';
+    step.choices.forEach(function(ch){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = ch.t;
+      b.addEventListener('click', function(){
+        pathXP += ch.xp; scXP.textContent = pathXP;
+        scElapsed += ch.dt; scTime.textContent = scElapsed + ' s';
+        scStability += ch.ds; renderStab();
+        if(ch.xp) addXP(ch.xp, null, 'Scenario choice');
+        scFeedback.textContent = ch.fb;
+        scFeedback.className = 'feedback ' + (ch.good ? 'good' : 'bad');
+        scFeedback.style.display = 'block';
+        Array.prototype.forEach.call(scChoices.children, function(c){ c.disabled = true; c.style.opacity = .6; });
+        if(ch.end){
+          scRestart.style.display = 'inline-block';
+          if(ch.good && key === 'family'){ earnBadge('bdg-shock'); addXP(20, 'scenario-win', 'Seatbelt On Time!'); }
+        } else if(ch.next){
+          setTimeout(function(){ renderStep(ch.next); }, 1400);
+        }
+      });
+      scChoices.appendChild(b);
+    });
+  }
+  scRestart.addEventListener('click', function(){
+    pathXP = 0; scStability = 2; scElapsed = 0;
+    scXP.textContent = 0; scTime.textContent = '0 s'; renderStab();
+    scRestart.style.display = 'none';
+    renderStep('start');
+  });
+  renderStab();
+  renderStep('start');
+
+  /* ============ REVEAL BUTTONS ============ */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.getAttribute('data-target'));
+      if(!t) return;
+      if(t.classList.contains('reveal-shown')){
+        t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden');
+      } else {
+        t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown');
+        addXP(8, 'reveal-' + btn.getAttribute('data-target'), 'Self-test');
+      }
+    });
+  });
+
+  /* ============ ADRENERGIC SIM (S6) ============ */
+  var kRange = document.getElementById('kRange');
+  var kVal = document.getElementById('kVal');
+  var kNeedle = document.getElementById('kNeedle');
+  var kReadout = document.getElementById('kReadout');
+  if(kRange){
+    var simUsed = false;
+    function updateK(){
+      var k = (parseInt(kRange.value,10) / 10); // 2.0 .. 7.5
+      kVal.textContent = k.toFixed(1);
+      var pct = (parseInt(kRange.value,10) - 20) / (75 - 20) * 100;
+      kNeedle.style.left = pct + '%';
+      var msg, cls;
+      if(k < 3.0){ msg = '🟢 At rest, low adrenergic drive — with beta-blockade on board the long-QT ventricle is quiet. This is the safe zone the seatbelt creates.'; cls='good'; }
+      else if(k < 4.5){ msg = '🟢 Mild exertion/emotion — beta-blockade blunts the surge so it stays below the triggered-event threshold. Protected.'; cls='good'; }
+      else if(k <= 5.5){ msg = '🟠 Strong surge (hard exercise / emotion / startle) — rising catecholamines load early afterdepolarizations. Beta-blockade keeps this survivable; without it, danger climbs.'; cls='warn-r'; }
+      else if(k <= 6.5){ msg = '🟠 Intense unblocked adrenergic drive — EADs multiply on a long-QT plateau; a triggered beat could launch Torsades. This is why catecholamines are the cliff.'; cls='warn-r'; }
+      else { msg = '🔴 Maximal catecholamine surge in an unprotected LQTS ventricle — exactly the LQT1 swimming trigger → Torsades → VF. Sympatholysis (beta-blocker), never sympathomimetics.'; cls='bad'; }
+      kReadout.innerHTML = msg;
+      kReadout.className = 'readout ' + cls;
+      if(!simUsed){ simUsed = true; addXP(15, 'ksim', 'Surge Master'); }
+    }
+    kRange.addEventListener('input', updateK);
+    updateK();
+  }
+
+  /* ============ CHECKLISTS (S7) ============ */
+  var allChecklistsDone = 0, totalChecklists = document.querySelectorAll('.checklist').length;
+  document.querySelectorAll('.checklist').forEach(function(list){
+    var boxes = list.querySelectorAll('input[type=checkbox]');
+    var prog = list.querySelector('[data-progress]');
+    var total = boxes.length;
+    var doneAwarded = false;
+    function refresh(){
+      var done = 0;
+      boxes.forEach(function(b){
+        if(b.checked){ done++; b.closest('.ck').classList.add('done'); }
+        else { b.closest('.ck').classList.remove('done'); }
+      });
+      prog.textContent = done + ' / ' + total + ' complete';
+      if(done === total && !doneAwarded){
+        doneAwarded = true;
+        allChecklistsDone++;
+        addXP(25, 'ck-' + list.id, 'Checklist done');
+        if(allChecklistsDone >= totalChecklists){ earnBadge('bdg-ck'); addXP(20, 'allck', 'Checklist Champion'); }
+      }
+    }
+    boxes.forEach(function(b){
+      b.addEventListener('change', function(){
+        if(b.checked) addXP(4, null, 'Step checked');
+        refresh();
+      });
+    });
+  });
+
+  /* ============ MCQs (S19) ============ */
+  var MCQS = [
+    {
+      q: "A 17-year-old swimmer is resuscitated from a VF arrest. Resting QTc is 490 ms, structurally normal heart, with exertional/startle syncope and a family history of young sudden death. The first-line long-term protective therapy is:",
+      opts: ["IV amiodarone","A beta-blocker (nadolol or propranolol)","Isoprenaline infusion to raise the heart rate","A calcium-channel blocker"],
+      correct: 1,
+      exp: "Beta-blockers (nadolol preferred, or propranolol) are the first-line, mortality-reducing therapy in congenital LQTS — they blunt the adrenergic surges that trigger events. Amiodarone prolongs the QT; isoprenaline feeds the catecholamine trigger; CCBs don't address the channelopathy."
+    },
+    {
+      q: "Matching genotype to trigger in congenital long QT syndrome, which pairing is correct?",
+      opts: ["LQT1 — events at rest/sleep","LQT2 — events with emotion/auditory startle (e.g. alarm clock)","LQT3 — events with exercise/swimming","LQT1 — events with sudden loud noise"],
+      correct: 1,
+      exp: "'LQT1 swims, LQT2 startles, LQT3 sleeps.' LQT1 (KCNQ1, ↓IKs) is triggered by exercise/swimming; LQT2 (KCNH2/hERG, ↓IKr) by emotion and auditory startle; LQT3 (SCN5A, ↑late INa) at rest/sleep."
+    },
+    {
+      q: "Why is isoproterenol (and other sympathomimetics) avoided in CONGENITAL long QT but acceptable in ACQUIRED Torsades?",
+      opts: ["It prolongs the QT in both situations","Congenital LQTS is adrenergically triggered, so catecholamines provoke events; acquired Torsades is often pause-dependent, where increasing the rate suppresses it","It has no effect on either","It is only avoided because of its cost"],
+      correct: 1,
+      exp: "Congenital LQTS events are driven by adrenergic surges, so a sympathomimetic feeds the trigger. Acquired Torsades is frequently pause/bradycardia-dependent, so pacing or isoprenaline (raising the rate) suppresses it. Same arrhythmia name, opposite reflex."
+    },
+    {
+      q: "Which finding makes a secondary-prevention ICD a Class I indication in this patient?",
+      opts: ["A QTc of 460 ms with no symptoms","Resting sinus bradycardia at 58","An aborted cardiac arrest (resuscitated VF)","A positive family history alone"],
+      correct: 2,
+      exp: "An aborted cardiac arrest (here, resuscitated VF) is a Class I indication for a secondary-prevention ICD — placed in addition to, not instead of, the beta-blocker. Asymptomatic borderline QTc, bradycardia, and family history alone are not, by themselves, ICD indications."
+    },
+    {
+      q: "On the resting ECG, low-amplitude, notched (bifid) T waves most strongly suggest which genotype?",
+      opts: ["LQT1 (KCNQ1)","LQT2 (KCNH2/hERG)","LQT3 (SCN5A)","Acquired hypokalaemic QT prolongation"],
+      correct: 1,
+      exp: "Low-amplitude, notched/bifid T waves are characteristic of LQT2 (↓IKr). Broad-based T waves suggest LQT1; a long isoelectric ST segment with a late-appearing T suggests LQT3."
+    },
+    {
+      q: "Which diagnostic statement about congenital long QT syndrome is correct?",
+      opts: ["A single normal resting QTc reliably excludes it","A QTc repeatedly >480 ms (or >460 ms with symptoms) supports the diagnosis; the Schwartz score and genetics aid it","Genetic testing must be positive to make the diagnosis","Only the QRS duration matters"],
+      correct: 1,
+      exp: "Diagnosis rests on a repeatedly prolonged QTc (>480 ms, or >460 ms with symptoms), supported by the Schwartz score, exercise/recovery QT and genetic testing. Up to a third of gene-positive patients have a near-normal resting QTc (concealed LQTS), so one normal strip does not exclude it."
+    },
+    {
+      q: "Which therapy specifically shortens the QT interval and is targeted at LQT3?",
+      opts: ["Amiodarone","Sotalol","Mexiletine (a late sodium-current blocker)","Verapamil"],
+      correct: 2,
+      exp: "Mexiletine blocks the late sodium current (the overactive INa of SCN5A/LQT3) and shortens the QT — a genotype-specific add-on for LQT3. Amiodarone and sotalol prolong the QT and are avoided in LQTS."
+    },
+    {
+      q: "After diagnosing congenital LQTS, an essential step beyond treating the patient is:",
+      opts: ["Discharge with no follow-up once she is asymptomatic","Cascade ECG ± genetic screening of first-degree relatives; and remember that profound congenital deafness with very long QT suggests Jervell–Lange-Nielsen","Avoiding any ECG in the family to prevent anxiety","Starting all relatives on an ICD"],
+      correct: 1,
+      exp: "LQTS is heritable, so first-degree relatives should be cascade-screened with an ECG (and targeted genetics once a variant is known) — this can find silent carriers before their first event. Congenital sensorineural deafness with a very long QT points to the recessive, high-risk Jervell–Lange-Nielsen syndrome."
+    }
+  ];
+
+  var host = document.getElementById('mcqHost');
+  var mcqVal = document.getElementById('mcqVal');
+  var mcqScore = 0, mcqAnswered = 0;
+  var letters = ['A','B','C','D','E'];
+
+  MCQS.forEach(function(item, qi){
+    var box = document.createElement('div');
+    box.className = 'mcq';
+    var html = '<div class="mcq-q">QUESTION ' + (qi+1) + ' / ' + MCQS.length + '</div>';
+    html += '<div class="mcq-stem">' + item.q + '</div>';
+    item.opts.forEach(function(opt, oi){
+      html += '<label class="mcq-opt" data-oi="' + oi + '"><strong>' + letters[oi] + '.</strong> ' + opt + '</label>';
+    });
+    html += '<div class="mcq-exp"></div>';
+    box.innerHTML = html;
+    host.appendChild(box);
+
+    var opts = box.querySelectorAll('.mcq-opt');
+    var exp = box.querySelector('.mcq-exp');
+    var locked = false;
+    opts.forEach(function(label){
+      label.addEventListener('click', function(){
+        if(locked) return;
+        locked = true;
+        var oi = parseInt(label.getAttribute('data-oi'),10);
+        box.classList.add('answered');
+        var correct = item.correct;
+        if(oi === correct){
+          label.classList.add('picked-right');
+          mcqScore++;
+          addXP(25, null, 'Correct answer');
+        } else {
+          label.classList.add('picked-wrong');
+          opts[correct].classList.add('show-right');
+          showToast('❌ Correct: ' + letters[correct]);
+        }
+        exp.innerHTML = '<strong>' + (oi === correct ? '✅ Correct. ' : '📘 Explanation. ') + '</strong>' + item.exp;
+        mcqAnswered++;
+        mcqVal.textContent = mcqScore + ' / ' + MCQS.length;
+        if(mcqAnswered === MCQS.length){
+          var done = document.getElementById('mcqDone');
+          var summary = document.getElementById('mcqSummary');
+          done.style.display = 'block';
+          summary.textContent = 'You scored ' + mcqScore + ' / ' + MCQS.length + '. ' +
+            (mcqScore === MCQS.length ? 'Flawless — you measure the QT and reach for the beta-blocker, never the catecholamine. 🏆' :
+             mcqScore >= 6 ? 'Strong — review the misses and the contrast pairs in S6.' :
+             'Revisit S3, S5, S6 and S11 — the congenital-vs-acquired and LQT1/2/3 logic is the whole case.');
+          if(mcqScore >= 7){ earnBadge('bdg-quiz'); addXP(50, 'quizace', 'Quiz Ace!'); }
+        }
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
