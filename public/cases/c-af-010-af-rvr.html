@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New-Onset Atrial Fibrillation with Rapid Ventricular Response — Virtual Teaching Hospital</title>
+<!-- META
+id: c-af-010
+title: New-Onset Atrial Fibrillation with Rapid Ventricular Response
+hospital: cardiology
+department: cv-ep
+bednumber: 3
+chiefcomplaint: Palpitations and breathlessness with an irregular tachycardia at 148/min
+system: Cardiology
+severity: urgent
+tags: Atrial fibrillation, Rate control, Rhythm control, Anticoagulation, CHA2DS2-VASc
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --radius:16px;
+    --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  /* Internal scroll viewport. When this case is embedded the host app stretches
+     the iframe to full content height and the OUTER page scrolls, which would
+     let a sticky bar scroll away. We instead scroll inside this box (sized to
+     the visible window by JS) so the section tab bar stays pinned at the top.
+     Standalone, it falls back to the full viewport height. */
+  #caseScroll{height:100vh; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; scroll-padding-top:92px}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:36px 24px 80px; position:relative; overflow:hidden}
+  .hero::after{content:"📈"; position:absolute; right:-20px; top:-30px; font-size:220px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{max-width:1100px; margin:0 auto; position:relative; z-index:1}
+  .hero .crumbs{font-size:13px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:10px 0 6px; font-size:clamp(26px,4vw,40px); line-height:1.15}
+  .hero .sub{font-size:16px; opacity:.95}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; backdrop-filter:blur(4px)}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== LIVE ECG STRIP IN HERO ===== */
+  .ecg-banner{max-width:1100px; margin:14px auto 0; position:relative; z-index:1}
+  .ecg-banner svg{width:100%; height:64px; display:block; background:rgba(0,0,0,.18); border-radius:12px; border:1px solid rgba(255,255,255,.25)}
+  .ecg-trace{stroke:#86efac; stroke-width:2.4; fill:none; stroke-dasharray:1600; stroke-dashoffset:1600; animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{stroke-dashoffset:0}}
+
+  /* ===== VITALS STRIP ===== */
+  .vitals-strip{max-width:1100px; margin:-52px auto 0; padding:0 24px; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:11px; font-weight:700; letter-spacing:.6px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:21px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== HORIZONTAL SECTION SIDEBAR (fixed — always visible) ===== */
+  .topnav{position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.10)}
+  .topnav .rail{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; max-width:1180px; margin:0 auto; scrollbar-width:thin}
+  .navchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink2); font-size:11px; font-weight:700; text-decoration:none; min-width:78px; text-align:center; transition:all .18s; cursor:pointer}
+  .navchip .s-id{font-size:10px; letter-spacing:1px; color:#94a3b8}
+  .navchip .s-emoji{font-size:16px}
+  .navchip:hover{border-color:var(--rose); color:var(--rose); transform:translateY(-2px)}
+  .navchip.active{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; border-color:#b91c1c}
+  .navchip.active .s-id{color:#fecaca}
+  .navchip.visited:not(.active){border-color:var(--emerald-line); background:var(--emerald-soft)}
+
+  /* ===== DASHBOARD WIDGET ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:215px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10.5px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:760px){.dash{display:none}}
+
+  /* ===== MAIN / SECTIONS (tabbed: one section visible at a time) ===== */
+  main{max-width:1100px; margin:26px auto 80px; padding:0 24px}
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:26px; overflow:hidden}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16.5px; margin:26px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14.5px; margin:18px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:24px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15.5px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:14px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px; letter-spacing:.4px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14.5px}
+
+  /* ===== INTERACTIVE BITS ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:10px 18px; font-weight:700; font-size:14px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:22px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:15px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 15px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 15px; margin-top:12px; font-size:14px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim sliders */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:14px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:14px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Heart/circuit diagram */
+  .heart-fig{display:flex; gap:18px; flex-wrap:wrap; align-items:center; background:var(--slate-soft); border-radius:16px; padding:18px; margin:14px 0}
+  .heart-fig svg{flex:0 0 auto}
+  .heart-legend{flex:1; min-width:230px; font-size:13.5px}
+  .lg{display:flex; align-items:center; gap:8px; margin:5px 0}
+  .lg .sw{width:14px; height:14px; border-radius:4px; flex:0 0 auto}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Journey cards */
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:14px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:15px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:14px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13.5px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:22px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14.5px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:13px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .footer{max-width:1100px; margin:0 auto 36px; padding:0 24px; text-align:center; color:#94a3b8; font-size:12.5px}
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="caseScroll">
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · ⚡ EP Lab · 🛏️ Bed 3</div>
+    <h1>📈 New-Onset Atrial Fibrillation with Rapid Ventricular Response — "The Irregular One That Floods the Lungs"</h1>
+    <div class="sub">💓 A 68-year-old woman with palpitations and breathlessness is running an irregularly irregular tachycardia at 148. Her pressure is borderline, her lungs are wetting up — and three decisions are racing each other: rate, rhythm, and the clot.</div>
+    <div class="chips">
+      <span class="chip crit">🟠 URGENT</span>
+      <span class="chip">💓 Irregularly Irregular</span>
+      <span class="chip">🐌 Rate vs Rhythm</span>
+      <span class="chip">🩸 Anticoagulation</span>
+      <span class="chip">🎮 Interactive Case</span>
+      <span class="chip">⏱️ The 48-hour clock</span>
+    </div>
+    <div class="ecg-banner" title="Atrial fibrillation rhythm strip">
+      <svg viewBox="0 0 800 64" preserveAspectRatio="none" aria-label="Irregularly irregular narrow-complex tachycardia rhythm strip">
+        <polyline class="ecg-trace" points="0,40 30,40 36,22 44,58 50,40 110,40 116,22 124,58 130,40 165,40 171,22 179,58 185,40 270,40 276,22 284,58 290,40 330,40 336,22 344,58 350,40 410,40 416,22 424,58 430,40 460,40 466,22 474,58 480,40 560,40 566,22 574,58 580,40 615,40 621,22 629,58 635,40 700,40 706,22 714,58 720,40 760,40 766,22 774,58 780,40 800,40"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== LIVE VITALS ===================== -->
+<div class="vitals-strip">
+  <div class="vitals-grid">
+    <div class="vital alert"><div class="v-label">💓 HR</div><div class="v-num">148</div></div>
+    <div class="vital warn"><div class="v-label">🩸 BP</div><div class="v-num">108/70</div></div>
+    <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">22</div></div>
+    <div class="vital warn"><div class="v-label">🫁 SpO₂</div><div class="v-num">93%</div></div>
+    <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.8°</div></div>
+    <div class="vital"><div class="v-label">🧠 GCS</div><div class="v-num">15</div></div>
+    <div class="vital alert"><div class="v-label">📐 Rhythm</div><div class="v-num">Irreg</div></div>
+    <div class="vital warn"><div class="v-label">😖 Distress</div><div class="v-num">Mod</div></div>
+  </div>
+</div>
+
+<!-- ===================== HORIZONTAL SECTION SIDEBAR ===================== -->
+<nav class="topnav" id="topnav">
+  <div class="rail">
+    <a class="navchip" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navchip" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navchip" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navchip" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navchip" href="#s5"><span class="s-emoji">🎓</span><span>Consultant Round</span><span class="s-id">S5</span></a>
+    <a class="navchip" href="#s6"><span class="s-emoji">📖</span><span>Teaching Points</span><span class="s-id">S6</span></a>
+    <a class="navchip" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navchip" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navchip" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navchip" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navchip" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navchip" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navchip" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navchip" href="#s14"><span class="s-emoji">🔀</span><span>Differentials</span><span class="s-id">S14</span></a>
+    <a class="navchip" href="#s15"><span class="s-emoji">🗺️</span><span>Plan</span><span class="s-id">S15</span></a>
+    <a class="navchip" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navchip" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navchip" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navchip" href="#s19"><span class="s-emoji">🧠</span><span>MCQs</span><span class="s-id">S19</span></a>
+  </div>
+</nav>
+
+<!-- ===================== SCORE DASHBOARD ===================== -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections visited</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-vt">💓 AF-Spotter</span>
+      <span class="badge" id="bdg-shock">🩸 Clot-Aware</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champion</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Ward Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running sims, taking the right path and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- S1 — PROFILE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s1">
+  <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+  <div class="section-content">
+    <div class="callout danger">
+      <b class="ct">🚨 YOU ARE HERE — 14:40, EP Lab Assessment Bay, Bed 3</b>
+      The monitor shows a fast, narrow, <strong>irregularly irregular</strong> tachycardia at 148. The patient is flushed and breathing hard, gripping the rail: <em>"My heart is… all over the place… I can't catch my breath."</em> A junior doctor is reaching for the defibrillator to "shock it back" — without knowing how long she has been in this rhythm. Your hand reaches the chart first. This is a case about three decisions racing each other: <strong>rate, rhythm, and the clot</strong> — and getting the order right.
+    </div>
+
+    <h3>👤 Patient Identity</h3>
+    <table class="tbl">
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>👩 Name</td><td><strong>Mrs. A.F.</strong></td></tr>
+      <tr><td>🎂 Age / Sex</td><td>68-year-old female</td></tr>
+      <tr><td>🆔 MRN</td><td>CV-10810</td></tr>
+      <tr><td>⚖️ Weight</td><td>78 kg</td></tr>
+      <tr><td>💼 Occupation</td><td>Retired schoolteacher</td></tr>
+      <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+    </table>
+
+    <h3>📜 Past Medical History — every line shifts the score</h3>
+    <ul>
+      <li>🩺 <strong>Hypertension</strong> on amlodipine — the most common driver of left-atrial stretch and AF, and 1 point on CHA₂DS₂-VASc.</li>
+      <li>🍬 <strong>Type 2 diabetes</strong> — another atrial-remodeling risk factor and 1 CHA₂DS₂-VASc point.</li>
+      <li>💙 Mild <strong>HFpEF</strong> (preserved EF ~55%, LVH on prior echo) — a stiff ventricle that depends heavily on the "atrial kick," so loss of it tonight hits her output hard.</li>
+      <li>🦋 No known thyroid disease, but a chest infection this week — <strong>infection is a classic AF precipitant</strong> (the "PIRATES" list, S6).</li>
+      <li>🍷 Drinks more than usual at a family wedding three days ago — <strong>"holiday heart"</strong> is on the table.</li>
+      <li>👵 Female, 68: age 65–74 = 1 point, female sex modifies the score. Her CHA₂DS₂-VASc is climbing before you even examine her.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"An irregularly irregular pulse with no discrete P waves is atrial fibrillation until proven otherwise — confirm it on a 12-lead, then count the score and ask why now."</div>
+
+    <h3>🧬 Why THIS patient? — stretch + trigger + a stiff ventricle</h3>
+    <p>AF is a disease of the <strong>left atrium</strong>: years of hypertension, diabetes and a touch of heart failure stretch and fibrose the atrial wall, and the muscular sleeves of the <strong>pulmonary veins</strong> become a nest of rapid-firing ectopic triggers. Once those triggers fire into a remodeled, fibrosed atrium, <strong>multiple re-entrant wavelets</strong> set up and the atrium quivers at 400–600/min instead of contracting. The AV node, bombarded chaotically, lets through whatever it can — giving an <strong>irregularly irregular ventricular response</strong>, often rapid. This week's chest infection, the alcohol binge and the adrenergic surge were the spark; the remodeled atrium was the kindling. Her stiff, hypertrophied ventricle made the loss of atrial contraction especially costly tonight.</p>
+
+    <div class="callout warn"><b class="ct">🔥 Risk factors / drivers for AF</b>
+    🩺 Hypertension (the commonest) · 💙 Heart failure (HFpEF &amp; HFrEF) · 🫁 Pulmonary disease / PE / pneumonia · 🦋 Hyperthyroidism · 🍷 Alcohol ("holiday heart") · 😴 Obstructive sleep apnea · 🫀 Valvular disease (esp. mitral) · 🍬 Diabetes &amp; obesity · 👵 Increasing age · 🔪 Recent surgery / sepsis</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S2 — HANDOVER -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s2">
+  <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+  <div class="section-content">
+    <h3>📻 Triage Nurse Handover — listen for the trap</h3>
+    <div class="callout info">
+      <b class="ct">🎙️ SBAR from the assessment-bay nurse (verbatim)</b>
+      <p><strong>S:</strong> "Bed 3 — Mrs. A.F., 68, came in with two hours of palpitations and breathlessness. Monitor shows a fast, narrow, <strong>irregularly irregular</strong> rhythm around 148. She's never had this before."</p>
+      <p><strong>B:</strong> "Hypertension, diabetes, a bit of heart failure with preserved function. Had a chest infection this week and a big family wedding at the weekend. No blood thinners — she's never needed them."</p>
+      <p><strong>A:</strong> "She's talking in full sentences but tiring, BP 108 over 70, sats 93% on air, a few crackles at the bases. The covering junior says 'it's AF with a fast rate, let's just <strong>shock her back into rhythm</strong> now.'"</p>
+      <p><strong>R:</strong> "I've put the pads on and an IV in. But I asked — nobody actually knows how long she's been in AF, and she's not on any anticoagulation. Something about shocking her right now didn't sit right with me."</p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A clot ejected is a stroke delivered — don't cardiovert AF of unknown duration without anticoagulation or a clear TEE, however tempting the fast rate looks."</div>
+
+    <h3>🚩 Spot-the-Red-Flag — tap each feature that confirms ATRIAL FIBRILLATION</h3>
+    <p>🎮 <em>Interactive: click every feature that points to atrial fibrillation (not another rhythm). Each correct flag = +10 XP. Wrong picks cost you.</em></p>
+    <div id="flagGame">
+      <button class="btn ghost flag-btn" data-good="1">💓 Irregularly irregular pulse / R-R intervals</button>
+      <button class="btn ghost flag-btn" data-good="1">〰️ No discrete P waves / fibrillatory baseline</button>
+      <button class="btn ghost flag-btn" data-good="1">📏 Variable R-R intervals on the strip</button>
+      <button class="btn ghost flag-btn" data-good="1">🫳 Variable / "irregular" peripheral pulse volume</button>
+      <button class="btn ghost flag-btn" data-good="0">🪥 Regular sawtooth flutter waves at exactly 150</button>
+      <button class="btn ghost flag-btn" data-good="0">📐 Three distinct P-wave morphologies (MAT)</button>
+      <button class="btn ghost flag-btn" data-good="0">☕ She prefers decaf coffee</button>
+    </div>
+    <p id="flagResult" style="font-weight:700"></p>
+
+    <h3>⏱️ Timeline so far</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">12:30</div>Sudden palpitations and breathlessness while resting at home — "like a bag of frogs in my chest."</div>
+      <div class="t-item"><div class="t-time">14:10</div>Arrives in clinic. Monitor: narrow, irregularly irregular tachycardia ~148/min. BP 108/70, sats 93%, basal crackles.</div>
+      <div class="t-item"><div class="t-time">14:30</div>Covering junior (briefly) suggests "just shock her now." Nurse <strong>queries the AF duration and lack of anticoagulation</strong> — 🏅 instinct worth its weight in gold.</div>
+      <div class="t-item"><div class="t-time">14:40</div>You arrive. Pads are on but she has a pulse and is conscious. The clock that matters is not seconds — it is the <strong>48-hour clot clock</strong>.</div>
+    </div>
+
+    <div class="callout ok"><b class="ct">🏅 Praise where due</b>The nurse who paused before the cardioversion prevented a potential disaster. Restoring sinus rhythm in an atrium that has been fibrillating for an unknown time can eject a left-atrial-appendage clot the moment organized contraction returns — an embolic stroke hours later. Asking "how long, and is she anticoagulated?" before the shock is the entire safety net.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S3 — INITIAL ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s3">
+  <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+  <div class="section-content">
+    <h3>🅰️🅱️🅲️ Primary Survey — what your hands, eyes and ears find</h3>
+    <table class="tbl">
+      <tr><th>Step</th><th>Finding</th><th>What it means mechanistically</th></tr>
+      <tr><td>🅰️ Airway</td><td>Patent, speaking in full but shortening sentences.</td><td>She is working harder but protecting her airway; watch for fatigue as the rapid rate erodes output.</td></tr>
+      <tr><td>🅱️ Breathing</td><td>RR 22, SpO₂ 93% on air, bibasal crackles.</td><td>A rate of 148 with loss of the atrial kick drops filling and output → pulmonary congestion → mild hypoxia. The rate and the lost atrial contraction are doing the damage together.</td></tr>
+      <tr><td>🅲️ Circulation</td><td><strong>BP 108/70 (borderline)</strong>, warm peripheries, <strong>irregularly irregular</strong> pulse with <strong>variable volume</strong>. Apical-radial <strong>pulse deficit</strong> (apex 148, radial ~128). No cannon waves; S1 varies beat to beat.</td><td>The pulse deficit and beat-to-beat variable S1 reflect that some short-diastole beats fill the ventricle too little to open the aortic valve well — a fingerprint of AF, not AV dissociation.</td></tr>
+      <tr><td>🅳 Disability</td><td>GCS 15, anxious but oriented.</td><td>Cerebral perfusion preserved for now — she is symptomatic but not yet decompensating.</td></tr>
+      <tr><td>🅴 Exposure</td><td>No rash, mild ankle edema, no focal neuro deficit. Pads already on.</td><td>Confirms a congestive picture; the absence of a focal deficit is reassuring but does not exclude a future embolic stroke if mismanaged.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"An irregularly irregular pulse with a radial-apical deficit and a fibrillatory ECG baseline is AF — your fingers on the wrist and the stethoscope at the apex can name it before the 12-lead prints."</div>
+
+    <h3>🧭 The single most important question: STABLE or UNSTABLE?</h3>
+    <p>AF-with-RVR management forks on one decision. Look for the <strong>adverse features</strong> (the "4 S's"): <strong>Shock</strong> (SBP &lt; 90, hypoperfusion), <strong>Syncope</strong>, <strong>Severe ischemia</strong> (chest pain, ST changes), <strong>Severe heart failure</strong> (pulmonary edema). Mrs. A.F. is tachycardic and congested but conscious, perfusing and normotensive-borderline — she is <strong>haemodynamically unstable-leaning but currently STABLE</strong>. That buys time to rate-control, anticoagulate appropriately and decide on rhythm — <em>not</em> to shock blindly.</p>
+
+    <div class="callout danger"><b class="ct">⚡ The fork: STABLE → rate control + anticoagulation + planned rhythm decision; UNSTABLE → immediate synchronized cardioversion</b>If she were in shock, ischemia or frank pulmonary edema from the AF, the answer would be <strong>electricity now</strong> — synchronized cardioversion regardless of the 48-hour rule, with anticoagulation started as soon as possible. While she remains stable, the priorities are <strong>control the rate, start anticoagulation, and make the rhythm decision deliberately</strong> — never cardiovert AF of unknown duration without protecting the brain.</p></div>
+
+    <!-- 🎬 BRANCHING SCENARIO ENGINE -->
+    <div class="scenario" id="scenarioBox">
+      <h3>🎬 Choose Your Path — "Rate, Rhythm, or the Clot?"</h3>
+      <div class="hud"><span>❤️ Stability: <b id="scStab">●●○○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 s</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+      <div class="scene-text" id="scText">The junior hovers over the defibrillator: "She's fast — let's just cardiovert her now." BP 108/70, sats 93%, narrow irregularly irregular tachycardia at 148. She is conscious and perfusing, but nobody knows how long she has been in AF, and she is on no anticoagulation. What do you do FIRST?</div>
+      <div class="choices" id="scChoices"></div>
+      <div class="feedback" id="scFeedback"></div>
+      <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+    </div>
+
+    <div class="callout info"><b class="ct">🧮 If she were UNSTABLE instead</b>
+    A <em>haemodynamically unstable</em> AF-with-RVR (shock, ischemia, pulmonary edema, syncope) needs <strong>immediate synchronized cardioversion</strong> — you do not wait for the 48-hour rule, but you start anticoagulation as soon as feasible and continue it for at least 4 weeks afterward. In the unstable patient electricity wins; the trade-off of a small embolic risk is accepted because the alternative is haemodynamic collapse.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S4 — RESIDENT REVIEW -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s4">
+  <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+  <div class="section-content">
+    <p><em>The cardiology resident arrives at 14:44. Her reasoning, out loud:</em></p>
+
+    <h3>🧠 Name the rhythm, then make three decisions</h3>
+    <p>"Narrow. Irregularly irregular. No P waves, a fibrillatory baseline. That is <strong>atrial fibrillation</strong> with a rapid ventricular response — I don't need anything fancy to call it. The mistake here would be to skip straight to the defibrillator. She is stable. AF management is <strong>three parallel decisions</strong>: control the <em>rate</em>, decide on the <em>rhythm</em>, and prevent the <em>stroke</em>. Get the order and the timing right and she does well; rush the rhythm and you can hand her a stroke."</p>
+
+    <h3>🎯 Immediate priorities (her actual order of operations)</h3>
+    <ol>
+      <li>🩺 <strong>Confirm she is stable:</strong> no shock, no ischemia, no pulmonary edema crashing her — she has time to think.</li>
+      <li>🐌 <strong>Rate control first:</strong> IV/oral beta-blocker (metoprolol) or non-DHP calcium-channel blocker (diltiazem) to bring resting rate &lt; 110 — but check the EF, because in HFrEF those CCBs are dangerous (negative inotropy).</li>
+      <li>🩸 <strong>Score the stroke risk now:</strong> calculate CHA₂DS₂-VASc and start anticoagulation — a DOAC unless there is a mechanical valve or moderate-severe mitral stenosis.</li>
+      <li>⏱️ <strong>Date the AF:</strong> ask precisely "when did the palpitations start?" The &lt; 48 h vs ≥ 48 h / unknown answer determines whether early cardioversion is safe or needs 3 weeks of anticoagulation or a TEE first.</li>
+      <li>🔍 <strong>Hunt the precipitant (PIRATES):</strong> chest infection, alcohol, thyroid, electrolytes, ischemia, sleep apnea — treating the trigger is treating the AF.</li>
+      <li>⚡ <strong>Keep the defibrillator ready:</strong> not to shock now, but in case she decompensates and the decision flips to unstable.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Control the rate, score the clot, date the AF — then, and only then, decide whether to chase the rhythm. Cardioversion is the last decision, not the first."</div>
+
+    <h3>🤔 "But she's fast and breathless — shouldn't we just shock her now?"</h3>
+    <p>"Only if she is <em>unstable</em>. She is breathless from the rate and the lost atrial kick, but she is perfusing and conscious. Slow the rate and most of that breathlessness eases. Shocking AF of unknown duration in an unanticoagulated patient swaps a treatable fast rhythm for a potential embolic stroke. The fast rate is urgent; it is not an excuse to skip the clot question."</p>
+
+    <div class="callout purple"><b class="ct">🧪 Resident's self-test (answer before reading on)</b>
+    Her last echo showed preserved EF (~55%) with LVH. The team suggests IV diltiazem for rate control. Safe choice here?
+    <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+    <div class="reveal-hidden" id="rev1"><p><strong>Yes — with a caveat.</strong> In <em>preserved</em>-EF AF, a non-DHP calcium-channel blocker (diltiazem/verapamil) or a beta-blocker are both reasonable first-line rate agents. The thing to be sure of is that this is NOT HFrEF — in reduced-EF heart failure, verapamil/diltiazem's negative inotropy can precipitate cardiogenic shock, and you reach instead for a beta-blocker or digoxin. Confirm the EF before you commit to a CCB.</p></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S5 — CONSULTANT ROUND -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s5">
+  <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round</h2></div>
+  <div class="section-content">
+    <p><em>The on-call consultant cardiac electrophysiologist, by phone at 14:55, then at the bedside:</em></p>
+
+    <h3>🗂️ Rate control or rhythm control — choose the philosophy</h3>
+    <div class="vs">
+      <div class="side a"><h4>🐌 Rate control (the default for many)</h4>
+        <ul><li>Accept the AF, control the ventricular rate to &lt; 110 (lenient, RACE II) or &lt; 80 if symptomatic</li><li>Beta-blocker or non-DHP CCB; digoxin as add-on or in hypotension/HF</li><li>Simpler, fewer pro-arrhythmic risks; AFFIRM showed no mortality penalty historically</li><li>Always paired with stroke-risk-based anticoagulation</li></ul></div>
+      <div class="side b"><h4>🎵 Rhythm control (restore &amp; keep sinus)</h4>
+        <ul><li>Electrical or chemical cardioversion ± antiarrhythmic ± ablation</li><li>Favored when symptomatic despite rate control, younger, first episode, HFrEF (CASTLE-AF), or early after onset (EAST-AFNET 4)</li><li>Needs the same anticoagulation rules — and the 48-hour clot rule before any cardioversion</li><li>Pulmonary-vein-isolation ablation is increasingly an early option</li></ul></div>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Rate control accepts the rhythm and protects the brain; rhythm control chases sinus and still protects the brain. Anticoagulation is decided by the CHA₂DS₂-VASc score — never by which philosophy you pick."</div>
+
+    <h3>⏱️ The cardioversion / clot rule — say it out loud every time</h3>
+    <p>Restoring sinus rhythm makes a <strong>stunned atrium</strong> resume contraction; if a thrombus has formed in the left atrial appendage during fibrillation, that first organized squeeze can eject it → stroke. So: if AF is reliably <strong>&lt; 48 hours</strong> (and the patient is low-risk), you may cardiovert. If AF is <strong>≥ 48 hours or of unknown duration</strong>, either give <strong>3 weeks of therapeutic anticoagulation first</strong> OR perform a <strong>transoesophageal echo (TEE)</strong> to exclude an appendage thrombus before cardioverting. <strong>Anticoagulate for ≥ 4 weeks after cardioversion regardless</strong>, because atrial mechanical function — and thrombus risk — persists after the rhythm looks normal.</p>
+
+    <h3>🧭 Consultant's three commandments for the next hour</h3>
+    <ol>
+      <li>🐌 "Control the rate to settle the breathlessness — beta-blocker or diltiazem if EF is preserved, beta-blocker or digoxin if it isn't. Target resting &lt; 110, &lt; 80 if she stays symptomatic."</li>
+      <li>🩸 "Score her CHA₂DS₂-VASc and start a DOAC today — she has hypertension, diabetes, age 65–74 and female sex; she is well past the threshold to anticoagulate."</li>
+      <li>⏱️ "Pin down the AF duration. If it's truly &lt; 48 h and she wants sinus, we can cardiovert on anticoagulation. If it's unknown, it's three weeks of a DOAC or a TEE before any shock — and four weeks of anticoagulation after, no matter what."</li>
+    </ol>
+
+    <div class="callout danger"><b class="ct">☠️ The consultant's war memory (more in S13 M&amp;M)</b>"The last AF I saw mishandled was a 72-year-old cardioverted electively for an 'uncertain duration' rhythm — no three weeks of anticoagulation, no TEE, because 'she only felt it this morning.' Sinus came back beautifully. Six hours later she had a dense hemiplegia. The appendage clot we never looked for went straight to her middle cerebral artery. The rhythm strip was perfect; the brain was not. Date the AF and protect the brain — every single time."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S6 — TEACHING POINTS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s6">
+  <div class="sec-header"><span class="s-badge">S6</span><h2>📖 Teaching Points</h2></div>
+  <div class="section-content">
+    <h3>🔬 The mechanism — WHY AF reduces output (the WHY behind the WHY)</h3>
+    <ol>
+      <li>🌱 <strong>The triggers:</strong> muscular sleeves around the <strong>pulmonary veins</strong> fire rapid ectopic bursts into the left atrium.</li>
+      <li>🕸️ <strong>The substrate:</strong> a stretched, fibrosed atrium (from hypertension, diabetes, heart failure, age) supports <strong>multiple simultaneous re-entrant wavelets</strong> — the atrium quivers at 400–600/min and never organizes a contraction.</li>
+      <li>🚦 <strong>The filter:</strong> the AV node is bombarded chaotically and conducts whatever isn't refractory → an <strong>irregularly irregular</strong>, often rapid, ventricular response. The AV node's refractoriness — and the drugs that lengthen it — set the rate.</li>
+      <li>💔 <strong>Consequence 1 — loss of the "atrial kick":</strong> the coordinated atrial contraction normally tops up ventricular filling by ~20–30% of stroke volume. Lose it and output falls — worst in a <strong>stiff, hypertrophied or HFpEF ventricle</strong> that depends on that late filling.</li>
+      <li>⏱️ <strong>Consequence 2 — poor diastolic filling:</strong> a fast, irregular rate shortens diastole; the ventricle has too little time to fill between beats. Together with the lost atrial kick → reduced cardiac output, congestion and demand ischemia.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"AF steals the atrial kick and shortens diastole at the same time — that is why slowing the rate often fixes the breathlessness even before you ever restore sinus rhythm."</div>
+
+    <h3>⚖️ Contrast pair #1 — AF vs Atrial Flutter / MAT / Sinus Tachycardia</h3>
+    <div class="vs">
+      <div class="side a"><h4>💓 AF IS… (this patient)</h4><ul><li><strong>Irregularly irregular</strong>, no two R-R intervals the same</li><li><strong>No discrete P waves</strong> — chaotic fibrillatory baseline</li><li>Atrial rate 400–600/min; variable ventricular response</li><li>Variable pulse volume, apical-radial deficit</li></ul></div>
+      <div class="side b"><h4>🔁 The mimics it is NOT…</h4><ul><li><strong>Atrial flutter:</strong> regular <em>sawtooth</em> flutter waves, often 2:1 → a regular ~150/min</li><li><strong>MAT:</strong> ≥ 3 distinct P-wave morphologies, irregular, classically severe lung disease</li><li><strong>Sinus tachycardia:</strong> regular, normal upright P before every QRS, rate tracks a stressor</li><li>Each is "irregular or fast" but the P waves and regularity give them away</li></ul></div>
+    </div>
+    <p>😈 <strong>The trap:</strong> a fast, slightly irregular rhythm gets called "AF" reflexively — but flutter with variable block can mimic it, and MAT in a COPD patient is treated differently (fix the lungs, avoid cardioversion). <strong>Read the P waves and the regularity before you commit.</strong></p>
+
+    <h3>⚖️ Contrast pair #2 — Rate control vs Rhythm control</h3>
+    <div class="vs">
+      <div class="side a"><h4>🐌 Rate control</h4><ul><li>Accept AF, slow the AV node (beta-blocker, diltiazem, digoxin)</li><li>No mortality penalty in the classic AFFIRM population</li><li>Lenient target &lt; 110 (RACE II) acceptable for many</li><li>Simpler, fewer pro-arrhythmic and procedural risks</li></ul></div>
+      <div class="side b"><h4>🎵 Rhythm control</h4><ul><li>Cardioversion ± antiarrhythmic ± ablation to keep sinus</li><li>Early rhythm control improved outcomes in EAST-AFNET 4</li><li>Ablation improves outcomes in AF + HFrEF (CASTLE-AF)</li><li>Best for symptomatic, younger, first-episode or HFrEF patients</li></ul></div>
+    </div>
+    <p>💡 <em>Why it matters:</em> both strategies <strong>require the same stroke prevention</strong> — restoring sinus rhythm does NOT remove the need for CHA₂DS₂-VASc-based anticoagulation, because AF recurs silently. Choosing rhythm control is never a reason to stop the anticoagulant.</p>
+
+    <!-- 🎮 INTERACTIVE SIM: ventricular rate → filling & output -->
+    <div class="sim" id="kSim">
+      <h3 style="margin-top:0">🎮 Simulation — The Rate Dial: how ventricular rate tunes diastolic filling &amp; cardiac output</h3>
+      <p style="font-size:13.5px">Drag the dial. Watch what very fast and very slow ventricular rates do to diastolic filling and output in this fibrillating, atrial-kick-less heart. Rate is the lever you pull first.</p>
+      <label for="kRange">💓 Ventricular rate: <b id="kVal">148</b> bpm</label>
+      <input type="range" id="kRange" min="40" max="180" value="148">
+      <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+      <div class="readout bad" id="kReadout">Set the dial to explore.</div>
+      <p style="font-size:12.5px; margin-top:10px; color:var(--ink2)">🎯 Target resting band for rate control: <strong>~60–110 bpm</strong> (lenient, RACE II; &lt; 80 if still symptomatic). Too fast → diastole vanishes and the lost atrial kick bites → output falls. Too slow → bradycardia, pauses, poor output too. The window is on purpose.</p>
+    </div>
+
+    <!-- 📚 EBM MODULE -->
+    <div class="ebm">
+      <h3>📚 Evidence-Based Medicine Corner</h3>
+      <table class="tbl">
+        <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+        <tr><td><span class="lvl">RCT</span> AFFIRM (2002)</td><td>Rate control vs rhythm control: no difference in mortality; rhythm control had more hospitalizations and drug adverse effects.</td><td>Rate control is a perfectly respectable default; do not pursue sinus rhythm for its own sake, especially in older, minimally symptomatic patients.</td></tr>
+        <tr><td><span class="lvl">RCT</span> RACE II (2010)</td><td>Lenient rate control (resting &lt; 110) was non-inferior to strict control (&lt; 80) for cardiovascular outcomes.</td><td>You do not need to chase a resting rate below 80 in everyone — &lt; 110 is acceptable if she is not symptomatic at that rate.</td></tr>
+        <tr><td><span class="lvl">RCT</span> EAST-AFNET 4 (2020)</td><td>Early rhythm control (within ~1 year of diagnosis) reduced cardiovascular death, stroke and HF hospitalization vs usual care.</td><td>In recently diagnosed AF, an early rhythm-control strategy is increasingly favored — relevant to this new-onset case.</td></tr>
+        <tr><td><span class="lvl">RCT</span> CASTLE-AF (2018)</td><td>Catheter ablation in AF + HFrEF reduced mortality and HF hospitalization vs medical therapy.</td><td>In AF with reduced-EF heart failure, ablation is a strong, outcome-improving option — escalate to EP early.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2023 ACC/AHA &amp; 2020 ESC AF</td><td>CHA₂DS₂-VASc-guided anticoagulation (DOAC preferred), rate vs rhythm individualized, integrated "ABC" pathway.</td><td>Exactly the framework driving S3, S5, S7 and S11 — score the stroke risk, control the rate, decide the rhythm.</td></tr>
+      </table>
+    </div>
+
+    <!-- 🔬 ADVANCED TOPICS -->
+    <div class="callout purple">
+      <h3 style="margin-top:0">🔬 Fellowship Corner — Advanced Topics</h3>
+      <ul>
+        <li>🗺️ <strong>Pulmonary-vein isolation (PVI) &amp; substrate ablation:</strong> point-by-point RF or cryoballoon isolation of the PV triggers; persistent AF may need additional substrate modification. Early ablation (EARLY-AF, STOP-AF First) beats antiarrhythmic drugs for rhythm control.</li>
+        <li>🧬 <strong>Left-atrial-appendage occlusion (Watchman):</strong> for patients with high stroke risk but contraindications to long-term anticoagulation — the appendage is where ~90% of AF-related clots form.</li>
+        <li>💊 <strong>Antiarrhythmic selection:</strong> flecainide/propafenone (only in structurally normal hearts — "pill-in-the-pocket"), sotalol, dronedarone, amiodarone (most effective but most toxic). Avoid class Ic in structural heart disease/CAD (CAST lesson).</li>
+        <li>🩸 <strong>DOAC nuances:</strong> dose-reduce for renal function/age/weight per agent; avoid DOACs in mechanical valves and moderate-severe mitral stenosis (warfarin only). Reversal: idarucizumab (dabigatran), andexanet alfa (factor-Xa inhibitors).</li>
+        <li>🧮 <strong>Risk-score refinements:</strong> CHA₂DS₂-VASc for stroke, HAS-BLED to identify and modify bleeding risk (NOT to withhold anticoagulation), and the move toward CHA₂DS₂-VA (dropping the sex point) in newer guidance.</li>
+        <li>🔁 <strong>AV-node ablation + pacing ("ablate and pace"):</strong> for refractory rapid AF when rate control fails and rhythm control is not feasible — creates pacemaker dependence but guarantees rate control.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S7 — ORDERS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s7">
+  <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+  <div class="section-content">
+    <h3>🖊️ The order set, written as you'd actually write it (14:50)</h3>
+    <ul>
+      <li>🐌 <strong>Rate control:</strong> IV/oral <strong>metoprolol</strong> (e.g. 2.5–5 mg IV slow, repeat) OR <strong>diltiazem</strong> if EF preserved; target resting rate &lt; 110 (&lt; 80 if symptomatic). <strong>Avoid non-DHP CCB if HFrEF</strong> — use beta-blocker or digoxin.</li>
+      <li>🩸 <strong>Anticoagulation:</strong> calculate <strong>CHA₂DS₂-VASc</strong> and start a <strong>DOAC</strong> today (apixaban/rivaroxaban/dabigatran/edoxaban) unless mechanical valve or moderate-severe mitral stenosis → warfarin.</li>
+      <li>⏱️ <strong>Document AF onset time precisely</strong> — the &lt; 48 h vs ≥ 48 h/unknown answer drives the cardioversion-safety decision.</li>
+      <li>🔍 <strong>Find the precipitant (PIRATES):</strong> CXR + sputum (this week's chest infection), TSH, U&amp;E/Mg²⁺/Ca²⁺, troponin if ischemic features, ask about alcohol and sleep apnea.</li>
+      <li>💙 <strong>Treat congestion gently:</strong> small-dose IV diuretic if frankly congested, oxygen to SpO₂ ≥ 94%; do not over-diurese a rate problem.</li>
+      <li>🫀 <strong>12-lead ECG</strong> (confirm AF, exclude pre-excitation/ischemia), continuous telemetry, transthoracic echo to confirm EF, valves and LA size.</li>
+      <li>📞 Refer cardiology/EP; if she becomes <strong>unstable</strong> → immediate synchronized cardioversion (and anticoagulate as soon as possible).</li>
+      <li>🔌 Keep <strong>defibrillator and pads</strong> attached in case the rhythm decision flips to unstable.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In stable AF-with-RVR there are three orders that matter: slow the rate, score-and-start the anticoagulant, and date the AF. Everything else exists to make rhythm control safe."</div>
+
+    <!-- 🩺 PROCEDURE GUIDE 1 -->
+    <div class="checklist" id="ckCV">
+      <h3 style="margin-top:0">🩺 Procedure Guide — Elective / Urgent Synchronized Cardioversion of AF — tick as you go</h3>
+      <label class="ck"><input type="checkbox"><span>⏱️ Confirm AF is &lt; 48 h OR ≥ 3 weeks of therapeutic anticoagulation OR a TEE has excluded LA appendage thrombus (or the patient is UNSTABLE → proceed regardless)</span></label>
+      <label class="ck"><input type="checkbox"><span>🩸 Confirm anticoagulation is in place / started; plan ≥ 4 weeks of anticoagulation AFTER cardioversion regardless of duration</span></label>
+      <label class="ck"><input type="checkbox"><span>🔋 Apply pads, attach ECG leads to the defibrillator, and press <strong>SYNC</strong> — verify a marker sits on each R wave (never on the T wave)</span></label>
+      <label class="ck"><input type="checkbox"><span>💤 Procedural sedation by a trained provider (e.g. propofol/midazolam), pre-oxygenate, airway kit and monitoring ready</span></label>
+      <label class="ck"><input type="checkbox"><span>⚡ Select energy (≈120–200 J biphasic for AF), charge, announce "STAND CLEAR," ensure no one (and no oxygen flow) touches the patient</span></label>
+      <label class="ck"><input type="checkbox"><span>📈 Reassess rhythm; if still AF, re-confirm SYNC (it can default OFF after a shock) and escalate energy / optimize pad position</span></label>
+      <label class="ck"><input type="checkbox"><span>🧪 Post-conversion: 12-lead, continue anticoagulation ≥ 4 weeks, treat the precipitant, arrange rhythm follow-up</span></label>
+      <div class="ck-progress" data-progress>0 / 7 complete</div>
+    </div>
+
+    <!-- 🩺 PROCEDURE GUIDE 2 -->
+    <div class="checklist" id="ckDefib">
+      <h3 style="margin-top:0">🩺 Procedure Guide — If she becomes UNSTABLE: emergency synchronized cardioversion</h3>
+      <p style="font-size:13px">⚠️ Shock, ischemia, syncope or pulmonary edema from the AF → <strong>do not wait</strong> for the 48-hour rule. Synchronized cardioversion now; start anticoagulation as soon as feasible.</p>
+      <label class="ck"><input type="checkbox"><span>🚨 Recognize instability (SBP &lt; 90 / hypoperfusion, ischemic chest pain, acute pulmonary edema, syncope) — call for senior help</span></label>
+      <label class="ck"><input type="checkbox"><span>🔌 Defibrillator in <strong>SYNCHRONIZED</strong> mode (organized rhythm with a pulse) — confirm the marker is on each R wave</span></label>
+      <label class="ck"><input type="checkbox"><span>💤 Rapid sedation if time allows; do NOT delay a shock in a crashing patient</span></label>
+      <label class="ck"><input type="checkbox"><span>⚡ Deliver synchronized shock (≈120–200 J biphasic), reassess, escalate energy if AF persists</span></label>
+      <label class="ck"><input type="checkbox"><span>🩸 Start anticoagulation as soon as feasible; plan ≥ 4 weeks afterward</span></label>
+      <label class="ck"><input type="checkbox"><span>🔍 Treat the driver (infection, ischemia, electrolytes, alcohol) so AF doesn't simply recur</span></label>
+      <div class="ck-progress" data-progress>0 / 6 complete</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S8 — NURSING CARE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s8">
+  <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+  <div class="section-content">
+    <h3>🛏️ Cardiology nursing priorities — minute by minute</h3>
+    <ul>
+      <li>📟 <strong>Continuous telemetry with the defibrillator at the bedside, pads attached.</strong> Document the rhythm strip and note the irregular, variable R-R pattern.</li>
+      <li>🫳 <strong>Take an apical-radial (apex–wrist) pulse</strong> to detect the pulse deficit — automated NIBP/sats can read falsely in irregular rhythms; correlate by hand.</li>
+      <li>🩸 <strong>BP and rate every 5–15 min</strong> while rate-controlling; a falling pressure or rising rate means escalate now, not at the next set of obs.</li>
+      <li>💊 <strong>Give rate-control and anticoagulant drugs as prescribed</strong> and double-check the EF question before any non-DHP CCB; watch for hypotension/bradycardia after IV beta-blocker or diltiazem.</li>
+      <li>⏱️ <strong>Help pin down the AF onset time</strong> — ask the patient and family exactly when symptoms began; this single fact governs cardioversion safety.</li>
+      <li>🩸 <strong>Watch for bleeding</strong> once anticoagulation starts (bruising, melena, neuro changes) and check the HAS-BLED-modifiable factors.</li>
+      <li>📋 <strong>Document strips before and after every intervention</strong>, the drug, dose and time — invaluable for the EP team and any planned cardioversion.</li>
+      <li>🔇 <strong>Calm the room:</strong> anxiety and pain raise catecholamines that speed AV conduction. A composed bedside helps the rate.</li>
+      <li>👨‍👩‍👦 Keep the family informed and supported (see S16); new-onset AF with breathlessness is frightening.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who takes an apical-radial pulse and nails down exactly when the AF started is doing half the diagnostic and safety work in the room."</div>
+    <div class="callout warn"><b class="ct">📢 Escalate IMMEDIATELY for</b>New hypotension / hypoperfusion · ischemic chest pain or ST changes · worsening pulmonary edema or hypoxia · syncope (→ unstable → synchronized cardioversion) · symptomatic bradycardia/pauses after rate-control drugs · any plan to cardiovert AF of unknown duration without anticoagulation or a TEE · bleeding after anticoagulation.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S9 — INVESTIGATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s9">
+  <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+  <div class="section-content">
+    <h3>🧾 Results board (15:05)</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>Result</th><th>Reference</th><th>Interpretation</th></tr>
+      <tr><td>TSH</td><td class="lo">0.05 mIU/L ↓</td><td>0.4–4.0</td><td>Suppressed — possible <strong>hyperthyroidism</strong>, a classic AF precipitant. Free T4 to follow; treating the thyroid is part of treating the AF and the rate.</td></tr>
+      <tr><td>Potassium</td><td class="ok-v">4.2 mmol/L</td><td>3.5–5.0</td><td>Normal. Worth knowing before any cardioversion or antiarrhythmic; electrolyte derangement promotes arrhythmia.</td></tr>
+      <tr><td>Magnesium</td><td class="lo">0.62 mmol/L ↓</td><td>0.7–1.0</td><td>Mildly low — IV magnesium can assist rate control in AF-with-RVR and is worth replacing.</td></tr>
+      <tr><td>Troponin I</td><td class="hi">0.06 ng/mL ↑</td><td>&lt; 0.04</td><td>Mildly raised — demand ischemia from the rapid rate, OR an ischemic trigger. Trend it and read the ECG; a settling troponin favors rate-driven.</td></tr>
+      <tr><td>CRP / WCC</td><td class="hi">Elevated ↑</td><td>—</td><td>Supports the <strong>chest infection</strong> as the precipitant (the "I" of PIRATES). Treat the infection and the AF often settles.</td></tr>
+      <tr><td>NT-proBNP</td><td class="hi">Raised ↑</td><td>—</td><td>Reflects atrial stretch and the congestive picture; non-specific in AF but consistent with her HFpEF.</td></tr>
+      <tr><td>Creatinine / eGFR</td><td class="ok-v">Normal</td><td>—</td><td>Important for DOAC dosing and contrast/TEE planning.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"New AF is rarely 'just AF' — check the thyroid, the chest film and the electrolytes, because the precipitant you find is often the treatment you give."</div>
+
+    <div class="callout info"><b class="ct">🧠 Why a mildly positive troponin does NOT automatically mean 'treat this as an MI'</b>Any sustained tachycardia at 148 raises troponin through supply–demand mismatch. The question is whether ischemia is the <em>cause</em> or the <em>consequence</em>. Control the rate, get a clean 12-lead, trend the troponin: an ischemic ECG with rising troponin → consider the cath lab; a settling troponin with no dynamic ST changes → the AF and rate were primary, with secondary demand ischemia.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S10 — ECG / IMAGING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s10">
+  <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging</h2></div>
+  <div class="section-content">
+    <h3>🫀 The presenting rhythm — read it like a detective</h3>
+    <div class="ecg-fig">
+      <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Atrial fibrillation: irregularly irregular narrow QRS, no P waves, fibrillatory baseline">
+        <rect width="820" height="150" fill="#0b1220"/>
+        <g stroke="#1e3a5f" stroke-width="1">
+          <line x1="0" y1="30" x2="820" y2="30"/><line x1="0" y1="60" x2="820" y2="60"/>
+          <line x1="0" y1="90" x2="820" y2="90"/><line x1="0" y1="120" x2="820" y2="120"/>
+        </g>
+        <polyline fill="none" stroke="#86efac" stroke-width="2.4" points="0,75 25,74 35,77 50,73 70,76 95,75 105,40 113,110 121,75 200,75 210,40 218,110 226,75 250,73 270,77 290,74 300,40 308,110 316,75 430,75 440,40 448,110 456,75 480,76 500,73 515,40 523,110 531,75 620,75 630,40 638,110 646,75 680,74 700,77 715,40 723,110 731,75 800,75"/>
+        <text x="95" y="22" fill="#fca5a5" font-size="12" font-weight="700">↕ irregular R-R</text>
+        <text x="430" y="22" fill="#fcd34d" font-size="12" font-weight="700">〰️ no P waves / fibrillatory baseline</text>
+      </svg>
+      <div class="ecg-cap">Narrow QRS, <span style="color:#fca5a5">irregularly irregular R-R intervals</span>, and <span style="color:#fcd34d">no discrete P waves</span> — just a chaotic fibrillatory baseline. This triad is diagnostic of <strong>atrial fibrillation</strong>.</div>
+    </div>
+
+    <h3>🔎 The AF-recognition toolkit (memorize the high-yield ones)</h3>
+    <table class="tbl">
+      <tr><th>Feature</th><th>Why it means AF</th></tr>
+      <tr><td>💓 <strong>Irregularly irregular R-R</strong></td><td>No two intervals the same — the AV node conducts chaotic atrial impulses unpredictably. The single most useful bedside-and-ECG sign.</td></tr>
+      <tr><td>〰️ <strong>Absent P waves</strong></td><td>No organized atrial contraction → no discrete P waves; a fibrillatory baseline replaces them.</td></tr>
+      <tr><td>📈 <strong>Fibrillatory (f) waves</strong></td><td>Fine or coarse undulations of the baseline at 400–600/min — the quivering atrium itself.</td></tr>
+      <tr><td>📐 <strong>Narrow QRS (usually)</strong></td><td>Conduction is via the normal His-Purkinje system, so the QRS is narrow unless there is pre-existing/rate-related bundle branch block or pre-excitation.</td></tr>
+      <tr><td>🫳 <strong>Pulse deficit</strong></td><td>Apical rate &gt; radial rate — short-diastole beats fill too little to generate a palpable pulse, a clinical fingerprint of AF.</td></tr>
+      <tr><td>⚠️ <strong>Beware pre-excitation</strong></td><td>AF in WPW gives a fast, irregular, <em>broad</em> tachycardia with varying QRS width — do NOT give AV-nodal blockers; cardiovert or use procainamide.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Irregularly irregular + no P waves = AF. But if that irregular rhythm is also broad and very fast, think pre-excited AF and keep your hands off the AV node."</div>
+
+    <h3>🫀 Echo &amp; further imaging</h3>
+    <ul>
+      <li>🩻 <strong>Transthoracic echo (TTE):</strong> EF ~55% (preserved) with <strong>LVH</strong> and a <strong>dilated left atrium</strong> — confirms HFpEF physiology and the atrial substrate; helps choose rate agents and assess valves.</li>
+      <li>🫧 <strong>Transoesophageal echo (TEE):</strong> the test to <strong>exclude a left-atrial-appendage thrombus</strong> before cardioverting AF of ≥ 48 h / unknown duration — the alternative to 3 weeks of pre-cardioversion anticoagulation.</li>
+      <li>🫁 <strong>CXR:</strong> mild pulmonary congestion and a possible consolidation matching the chest infection precipitant.</li>
+    </ul>
+
+    <div class="callout warn"><b class="ct">⚠️ The ECG's favorite lie in irregular tachycardia</b>"It's fast and a bit irregular, so it's AF." Atrial flutter with variable AV block, and MAT in lung disease, both mimic AF. Look hard for <strong>regular sawtooth flutter waves</strong> (flutter) or <strong>≥ 3 P-wave morphologies</strong> (MAT) before you commit — they change the treatment.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S11 — MEDICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s11">
+  <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+  <div class="section-content">
+    <h3>💉 The drugs — what, why, and the traps</h3>
+    <table class="tbl">
+      <tr><th>Drug</th><th>Role here</th><th>Mechanism / caution</th></tr>
+      <tr><td><strong>Metoprolol (beta-blocker)</strong></td><td>First-line rate control; slows AV conduction</td><td>Works in preserved AND reduced EF (cautious dosing in decompensated HF). Watch for hypotension/bradycardia; avoid IV bolus into severe hypotension.</td></tr>
+      <tr><td><strong>Diltiazem / verapamil (non-DHP CCB)</strong></td><td>First-line rate control if EF preserved</td><td>Negative inotropy → <strong>AVOID in HFrEF</strong> (can precipitate cardiogenic shock). Good when EF is preserved, as in this patient.</td></tr>
+      <tr><td><strong>Digoxin</strong></td><td>Add-on rate control, or first-line in hypotension / HFrEF</td><td>Vagotonic; works poorly against high sympathetic drive (slow onset, less effective in exertion/sepsis). Narrow therapeutic index — watch levels and renal function.</td></tr>
+      <tr><td><strong>DOAC (apixaban, rivaroxaban, dabigatran, edoxaban)</strong></td><td>Stroke prevention — <strong>preferred</strong> over warfarin</td><td>Decided by CHA₂DS₂-VASc, not by rate-vs-rhythm choice. Dose-adjust for renal function/age/weight. NOT for mechanical valves or moderate-severe mitral stenosis.</td></tr>
+      <tr><td><strong>Warfarin</strong></td><td>Anticoagulant for the DOAC exceptions</td><td>Required for <strong>mechanical valves</strong> and <strong>moderate-severe mitral stenosis</strong>. INR monitoring; many interactions.</td></tr>
+      <tr><td><strong>Antiarrhythmics (flecainide, amiodarone, sotalol)</strong></td><td>Chemical cardioversion / maintenance of sinus</td><td>Flecainide ONLY in structurally normal hearts; amiodarone most effective but most toxic; all need attention to QT and structure. Part of a rhythm-control strategy.</td></tr>
+      <tr><td><strong>IV magnesium</strong></td><td>Adjunct to rate control; replace if low</td><td>Can modestly slow the ventricular rate and is reasonable when Mg²⁺ is low, as here.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In HFrEF, reach for a beta-blocker or digoxin, not verapamil/diltiazem — and anticoagulate by the CHA₂DS₂-VASc score, with a DOAC unless it's a mechanical valve or tight mitral stenosis."</div>
+
+    <div class="callout danger"><b class="ct">🚫 The 'never' list in AF</b>❌ Non-DHP CCB (verapamil/diltiazem) in HFrEF (negative inotropy → shock) · ❌ AV-nodal blockers (adenosine, verapamil, diltiazem, digoxin, IV beta-blocker) in <em>pre-excited</em> AF (WPW) → can precipitate VF · ❌ Cardioverting AF of unknown duration without anticoagulation or a TEE · ❌ Class Ic antiarrhythmics (flecainide) in structural heart disease / CAD · ❌ Withholding anticoagulation purely because HAS-BLED is high — modify the bleeding risk instead.</div>
+
+    <h3>🩸 CHA₂DS₂-VASc &amp; the anticoagulation decision</h3>
+    <ul>
+      <li>🧮 <strong>CHA₂DS₂-VASc components:</strong> Congestive HF (1) · Hypertension (1) · Age ≥ 75 (2) · Diabetes (1) · Stroke/TIA/thromboembolism (2) · Vascular disease (1) · Age 65–74 (1) · Sex category female (1).</li>
+      <li>👵 <strong>This patient:</strong> HTN (1) + diabetes (1) + HFpEF (1) + age 65–74 (1) + female (1) = <strong>score 5</strong> → clearly anticoagulate.</li>
+      <li>🩹 <strong>HAS-BLED</strong> estimates bleeding risk to identify and fix modifiable factors (BP, alcohol, interacting drugs) — it is <strong>not</strong> a reason to withhold anticoagulation.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S12 — MONITORING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s12">
+  <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+  <div class="section-content">
+    <h3>📡 What to watch and why</h3>
+    <ul>
+      <li>📈 <strong>Continuous telemetry</strong> until rate-controlled and stable; document conversion to sinus or persistence of AF, and any pauses on rate-control drugs.</li>
+      <li>💓 <strong>Ventricular rate trend</strong> — aim resting &lt; 110 (lenient) or &lt; 80 if symptomatic; correlate the monitor with an apical-radial pulse because automated counts misread irregular rhythms.</li>
+      <li>🩸 <strong>BP and perfusion</strong> — a falling pressure or new ischemia/edema flips her to "unstable" and changes the plan to synchronized cardioversion.</li>
+      <li>🩹 <strong>Bleeding surveillance</strong> once anticoagulated — bruising, GI bleeding, neuro changes; recheck renal function for DOAC dosing.</li>
+      <li>🫁 <strong>Oxygenation and congestion</strong> — sats, work of breathing, crackles; gentle diuresis if congested, avoid over-diuresing a rate problem.</li>
+      <li>🦋 <strong>Precipitant follow-through</strong> — repeat thyroid function, response of the chest infection, electrolytes; the AF often settles when the trigger does.</li>
+      <li>⏱️ <strong>The 48-hour clock</strong> — keep the documented onset time visible so the cardioversion-safety decision is never made on a guess.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Once the rate is controlled, the monitor's job changes from 'how fast is she?' to 'is she stable, is she bleeding, and is the trigger treated?' — and the onset time decides if and when she can be cardioverted."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S13 — COMPLICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s13">
+  <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+  <div class="section-content">
+    <h3>💀 What can go wrong — and the mechanism</h3>
+    <ul>
+      <li>🧠 <strong>Embolic stroke</strong> — the great fear; a left-atrial-appendage clot embolizes, especially around cardioversion of unanticoagulated AF of unknown duration. This is why we score, anticoagulate and respect the 48-hour rule.</li>
+      <li>💙 <strong>Tachycardia-induced cardiomyopathy</strong> — weeks-to-months of poorly controlled rapid AF can reversibly weaken the ventricle; rate or rhythm control reverses it.</li>
+      <li>🌊 <strong>Decompensated heart failure / pulmonary edema</strong> — loss of atrial kick + short diastole in a stiff ventricle floods the lungs; can tip a stable patient into "unstable."</li>
+      <li>🐌 <strong>Drug complications</strong> — hypotension/bradycardia/pauses from beta-blocker or diltiazem; cardiogenic shock if a non-DHP CCB is given in unrecognized HFrEF; digoxin toxicity.</li>
+      <li>🩸 <strong>Bleeding from anticoagulation</strong> — the trade-off for stroke protection; modify the modifiable HAS-BLED factors, don't withhold.</li>
+      <li>⚡ <strong>VF from AV-nodal blockade in pre-excited AF</strong> — giving adenosine/verapamil/digoxin to WPW + AF can accelerate accessory-pathway conduction into VF.</li>
+    </ul>
+
+    <!-- 🎭 M&M CONFERENCE MODULE -->
+    <div class="mm">
+      <h3>🎭 Morbidity &amp; Mortality Conference — "The Rhythm Was Perfect; The Brain Was Not"</h3>
+      <div class="mm-case">
+        <strong>The case:</strong> A 72-year-old woman, hypertensive and diabetic, came to a busy clinic with palpitations and AF at 150. She "only felt it this morning," so the team booked an <strong>elective synchronized cardioversion</strong> the same afternoon — <strong>no three weeks of anticoagulation, no TEE</strong>, because the duration was assumed to be &lt; 48 h. Sinus rhythm was restored on the first shock. <strong>Six hours later she developed a dense right hemiplegia and aphasia</strong> — a left middle-cerebral-artery embolic stroke. The "this morning" onset had been wrong; she had been in silent AF for days. <em>(A second classic version of this story: IV diltiazem given to a patient with undiagnosed HFrEF → profound negative inotropy → cardiogenic shock.)</em>
+      </div>
+      <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+      <div class="swiss">
+        <div class="hole"><b>⏱️ DURATION ASSUMED</b>"Only since this morning" taken at face value — AF is often silent; the real onset was days earlier.</div>
+        <div class="hole"><b>🫧 NO TEE</b>No transoesophageal echo to exclude an appendage thrombus before the shock.</div>
+        <div class="hole"><b>🩸 NOT ANTICOAGULATED</b>No 3 weeks of pre-cardioversion anticoagulation — the brain was unprotected.</div>
+        <div class="hole"><b>🏃 RUSHED RHYTHM</b>Cardioversion chased for a stable patient who could have been rate-controlled and anticoagulated first.</div>
+        <div class="hole"><b>💔 EF UNCHECKED (variant)</b>Diltiazem into unrecognized HFrEF → cardiogenic shock.</div>
+      </div>
+      <p style="margin-bottom:0"><strong>🛡️ What would have saved her:</strong> treat AF duration as <em>unknown</em> unless it is unambiguously &lt; 48 h; before cardioverting unknown-duration AF, give 3 weeks of therapeutic anticoagulation OR a TEE; anticoagulate ≥ 4 weeks afterward regardless; rate-control and anticoagulate the stable patient before chasing sinus; and confirm the EF before any non-DHP CCB. <strong>This is exactly why your nurse paused before cardioverting tonight.</strong></p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'She only felt it this morning' is the sentence written on the chart of patients who then have an embolic stroke. Assume unknown duration unless you can prove &lt; 48 hours."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S14 — DIFFERENTIALS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s14">
+  <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials</h2></div>
+  <div class="section-content">
+    <h3>🧩 The irregular / fast narrow-complex tachycardia differential</h3>
+    <table class="tbl">
+      <tr><th>Diagnosis</th><th>Clues</th><th>Why it matters</th></tr>
+      <tr><td>💓 <strong>Atrial fibrillation</strong> (this patient)</td><td>Irregularly irregular, no P waves, fibrillatory baseline, pulse deficit</td><td>Default for an irregularly irregular narrow tachycardia. Rate control + anticoagulation + rhythm decision.</td></tr>
+      <tr><td>🪥 <strong>Atrial flutter</strong></td><td>Regular <strong>sawtooth</strong> flutter waves; often 2:1 → regular ~150/min (variable block can look irregular)</td><td>Similar anticoagulation rules; very amenable to cardioversion and cavotricuspid-isthmus ablation.</td></tr>
+      <tr><td>📐 <strong>Multifocal atrial tachycardia (MAT)</strong></td><td>≥ 3 distinct P-wave morphologies, irregular, classically severe COPD/lung disease</td><td>Treat the lungs and electrolytes; cardioversion is ineffective; avoid blanket AF management.</td></tr>
+      <tr><td>📈 <strong>Sinus tachycardia</strong></td><td>Regular, normal upright P before every QRS, rate tracks pain/fever/hypovolemia/anemia</td><td>Treat the cause, not the rate — rate control here can be harmful.</td></tr>
+      <tr><td>🌀 <strong>Pre-excited AF (WPW + AF)</strong></td><td><strong>Irregular, broad, very fast</strong>, varying QRS width; delta-wave history</td><td>AV-nodal blockers can precipitate VF → use procainamide or cardiovert. The dangerous mimic.</td></tr>
+      <tr><td>🔁 <strong>AVNRT / AVRT (SVT)</strong></td><td><strong>Regular</strong>, narrow, sudden onset/offset; may break with vagal/adenosine</td><td>Different mechanism and treatment; regularity separates it from AF at the bedside.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"IRREGULAR narrow tachycardia → think AF (then flutter and MAT). IRREGULAR <em>broad</em> tachycardia → think pre-excited AF and keep your hands off the AV node."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S15 — PLAN -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s15">
+  <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan</h2></div>
+  <div class="section-content">
+    <h3>🧭 Today → this week → for life</h3>
+    <ol>
+      <li>🐌 <strong>Today (done):</strong> rate-controlled with metoprolol (EF preserved, so diltiazem was also an option) → rate settled toward &lt; 110; magnesium replaced; oxygen and gentle diuresis for congestion; DOAC started after CHA₂DS₂-VASc of 5.</li>
+      <li>🔍 <strong>Identify &amp; treat the precipitant:</strong> treat the chest infection, confirm and manage the suppressed TSH (hyperthyroidism), counsel on alcohol, screen for sleep apnea — the AF often follows the trigger.</li>
+      <li>⏱️ <strong>Make the rhythm decision deliberately:</strong> document AF onset; if truly &lt; 48 h and symptomatic, cardiovert on anticoagulation; if unknown, 3 weeks of DOAC or a TEE first, then cardiovert; ≥ 4 weeks anticoagulation afterward regardless.</li>
+      <li>🩸 <strong>Lifelong stroke prevention</strong> on the CHA₂DS₂-VASc score (5) with a DOAC; review and modify HAS-BLED factors.</li>
+      <li>🎵 <strong>Consider early rhythm control / EP referral</strong> (EAST-AFNET 4; CASTLE-AF if reduced EF) — new-onset, symptomatic AF is a good candidate for an early rhythm-control discussion, including ablation.</li>
+      <li>👨‍👩‍👦 <strong>Shared decision-making &amp; education</strong> — what AF is, why the anticoagulant matters more than how the heart "feels," rate vs rhythm options, and a clear safety net for palpitations with chest pain, breathlessness or faintness.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Rate control eases the symptoms, the anticoagulant prevents the stroke, and the precipitant is the cure — send her home with all three addressed, or she comes back in AF."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S16 — PROGRESS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s16">
+  <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+  <div class="section-content">
+    <h3>📅 Course on the cardiology ward</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Day 0, 15:10</div>IV then oral metoprolol → ventricular rate settles from 148 to ~98. Breathlessness eases markedly as diastole lengthens and filling improves. DOAC started.</div>
+      <div class="t-item"><div class="t-time">Day 0, 18:00</div>Sats back to 96% on air after gentle diuresis; troponin plateaus then falls — rate-driven demand ischemia, not an acute coronary event.</div>
+      <div class="t-item"><div class="t-time">Day 1</div>Chest infection treated; free T4 confirms hyperthyroidism — endocrine referral. AF persists but rate-controlled and asymptomatic at rest.</div>
+      <div class="t-item"><div class="t-time">Day 2</div>TTE: EF 55% with LVH and a dilated LA — preserved-EF substrate confirmed. Decision: anticoagulate now, defer elective cardioversion pending 3 weeks of DOAC (duration uncertain).</div>
+      <div class="t-item"><div class="t-time">Day 3</div>Stable on oral metoprolol + DOAC; counseled on the rhythm-control options and the 48-hour rule. Ready for discharge with EP follow-up.</div>
+      <div class="t-item"><div class="t-time">Week 3</div>Returns for elective synchronized cardioversion after 3 weeks of documented therapeutic anticoagulation → restores sinus; anticoagulation continued ≥ 4 weeks.</div>
+    </div>
+
+    <!-- 👨‍👩‍👦 FAMILY & PATIENT JOURNEY MODULE -->
+    <h3>👨‍👩‍👦 Family &amp; Patient Journey</h3>
+    <div class="journey">
+      <div class="j-card"><div class="j-who">👩 The patient — Mrs. A.F.</div><p>"It felt like my heart was flapping and I couldn't get a breath. They slowed it down with tablets and the breathlessness lifted. I didn't realize the most important thing wasn't fixing the rhythm — it was the blood thinner that stops a stroke."</p></div>
+      <div class="j-card"><div class="j-who">👨 Her husband</div><p>"I wanted them to 'just shock it' and be done. The doctor explained why rushing the shock could throw a clot to her brain. Waiting the three weeks on the thinner was the safest thing — even though it didn't feel like 'doing something.'"</p></div>
+      <div class="j-card"><div class="j-who">👩‍⚕️ The bedside nurse</div><p>"My job was the rate, the apical-radial pulse, the bleeding watch — and pinning down when this actually started. And pausing before that first cardioversion. Sometimes good care is the shock you <em>don't</em> rush."</p></div>
+      <div class="j-card"><div class="j-who">🎓 The team's reflection</div><p>"This wasn't a clever diagnosis — it was a disciplined one. We controlled the rate, scored the clot, dated the AF, and only then talked about the rhythm. The order is the whole case."</p></div>
+    </div>
+
+    <div class="callout pink"><b class="ct">💗 The human thread</b>A DOAC is not just a tablet — it is a daily commitment that, taken faithfully, quietly prevents the catastrophic stroke that AF would otherwise deliver in her own living room one ordinary afternoon. Helping the patient and family understand why the "invisible" anticoagulant matters more than how the heart feels is as much treatment as the rate control itself.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S17 — DISCHARGE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s17">
+  <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+  <div class="section-content">
+    <h3>📋 Discharge plan &amp; safety net</h3>
+    <ul>
+      <li>💊 <strong>Medications:</strong> oral rate-control (metoprolol; or diltiazem given preserved EF), a <strong>DOAC</strong> with a clear written schedule, treatment for the precipitants (antibiotics finished, anti-thyroid plan), and review of her antihypertensives. Plain instructions never to skip the anticoagulant.</li>
+      <li>⏱️ <strong>Cardioversion plan:</strong> elective synchronized cardioversion after ≥ 3 weeks of documented therapeutic anticoagulation (duration uncertain), with ≥ 4 weeks of anticoagulation afterward — booked before she leaves.</li>
+      <li>🩸 <strong>Anticoagulation safety:</strong> what bleeding to watch for, when to seek help, the importance of adherence, and recheck renal function for ongoing DOAC dosing.</li>
+      <li>🗺️ <strong>EP / cardiology follow-up</strong> for the rhythm-control discussion (including ablation) and management of the AF long-term; endocrine follow-up for the thyroid.</li>
+      <li>🚩 <strong>Red flags → seek urgent care:</strong> palpitations with chest pain, severe breathlessness, fainting or presyncope, or any focal weakness/speech disturbance (possible stroke — call emergency services immediately).</li>
+      <li>📚 <strong>Education:</strong> what AF is in plain language, why the anticoagulant matters more than the heart's "feel," lifestyle levers (alcohol, weight, sleep apnea, BP control), and how to check her own pulse for irregularity.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Discharge in AF is not 'rate fixed, go home' — it is an anticoagulant she understands, a precipitant treated, a rhythm plan booked, and a family who knows the stroke red flags."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S18 — CLINICAL PEARLS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s18">
+  <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+  <div class="section-content">
+    <div class="pearl-grid">
+      <div class="pearl"><b>💓 Name it by the pulse</b>Irregularly irregular with no P waves is AF until proven otherwise — confirm on a 12-lead, then score it.</div>
+      <div class="pearl"><b>🩸 Anticoagulate by the score</b>CHA₂DS₂-VASc decides anticoagulation — never the rate-vs-rhythm choice. Restoring sinus does NOT remove the need.</div>
+      <div class="pearl"><b>⏱️ The 48-hour clot rule</b>Cardiovert &lt; 48 h (low risk); ≥ 48 h or unknown → 3 weeks anticoagulation OR a TEE first; ≥ 4 weeks after, regardless.</div>
+      <div class="pearl"><b>🧠 A clot ejected is a stroke delivered</b>Don't cardiovert AF of unknown duration without anticoagulation or a clear TEE — the first organized squeeze can launch the clot.</div>
+      <div class="pearl"><b>💔 HFrEF? No verapamil/diltiazem</b>Reach for a beta-blocker or digoxin — non-DHP CCBs' negative inotropy can cause cardiogenic shock.</div>
+      <div class="pearl"><b>🐌 Slow the rate first</b>Most of the breathlessness comes from short diastole + lost atrial kick — rate control often fixes it before any rhythm decision.</div>
+      <div class="pearl"><b>🎯 Lenient is fine</b>RACE II: resting &lt; 110 is acceptable; chase &lt; 80 only if she stays symptomatic.</div>
+      <div class="pearl"><b>💊 DOAC over warfarin</b>DOAC preferred — EXCEPT mechanical valve or moderate-severe mitral stenosis, where warfarin is required.</div>
+      <div class="pearl"><b>🔍 Always hunt the precipitant</b>PIRATES: Pulmonary, Ischemia/Infection, Rheumatic valve, Anemia/Alcohol, Thyroid, Electrolytes/Elevated BP, Sepsis/Sleep apnea/Surgery.</div>
+      <div class="pearl"><b>🌀 Irregular + broad = pre-excited AF</b>WPW + AF: keep your hands off the AV node — cardiovert or use procainamide, never adenosine/verapamil/digoxin.</div>
+      <div class="pearl"><b>🪥 Don't miss flutter / MAT</b>Sawtooth at regular ~150 = flutter; ≥ 3 P-wave morphologies in lung disease = MAT. Read the P waves.</div>
+      <div class="pearl"><b>🩹 HAS-BLED informs, never forbids</b>Use it to fix modifiable bleeding risks — not to withhold the anticoagulation she needs.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S19 — MCQs / ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s19">
+  <div class="sec-header"><span class="s-badge">S19</span><h2>🧠 MCQs / Assessment</h2></div>
+  <div class="section-content">
+    <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP and feed your dashboard. Each shows a full explanation.</em></p>
+    <div id="mcqHost"></div>
+    <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · Case c-af-010 — New-Onset Atrial Fibrillation with Rapid Ventricular Response<br>
+  ⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."
+</div>
+
+</div><!-- /#caseScroll -->
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ XP / DASHBOARD CORE ============ */
+  var XP = 0, XP_MAX = 1200;
+  var awarded = {}; // dedupe one-time awards by key
+  var xpVal = document.getElementById('xpVal');
+  var xpFill = document.getElementById('xpFill');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+  }
+  function addXP(amount, key, label){
+    if(key){ if(awarded[key]) return; awarded[key] = true; }
+    XP += amount;
+    if(XP > XP_MAX) XP = XP_MAX;
+    xpVal.textContent = XP;
+    xpFill.style.width = Math.min(100, Math.round(XP / XP_MAX * 100)) + '%';
+    showToast('+' + amount + ' XP' + (label ? ' · ' + label : ''));
+  }
+  function earnBadge(id){
+    var b = document.getElementById(id);
+    if(b && !b.classList.contains('earned')){ b.classList.add('earned'); }
+  }
+
+  /* Dashboard minimize */
+  var dash = document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){
+    dash.classList.toggle('collapsed');
+    this.textContent = dash.classList.contains('collapsed') ? '+' : '–';
+  });
+
+  /* ============ INTERNAL SCROLL SIZING ============ */
+  /* Size the scroll box to the visible window so the sticky tab bar stays in
+     view. When embedded (srcDoc iframe, same-origin), the host page stretches
+     the iframe to full content height and scrolls the OUTER page — so we size
+     this box from the parent window's height minus whatever app chrome sits
+     above the iframe, and scroll internally instead. Standalone → 100vh. */
+  var caseScroll = document.getElementById('caseScroll');
+  var topnav = document.getElementById('topnav');
+  /* The tab bar is position:fixed, so it's out of flow — reserve space at the
+     top of the scroll content (and offset anchor jumps) by its real height. */
+  function setNavOffset(){
+    var navH = topnav ? topnav.offsetHeight : 70;
+    caseScroll.style.paddingTop = navH + 'px';
+    caseScroll.style.scrollPaddingTop = (navH + 14) + 'px';
+  }
+  function sizeScroller(){
+    try {
+      var p = window.parent;
+      if(p && p !== window && window.frameElement){
+        var rectTop = window.frameElement.getBoundingClientRect().top;
+        if(rectTop < 0) rectTop = 0;          // parent scrolled past the chrome
+        var ph = p.innerHeight || 800;
+        var h = ph - rectTop - 6;             // leave the bottom edge breathing room
+        if(h < 460) h = 460;                  // sane minimum on short windows
+        caseScroll.style.height = h + 'px';
+      } else {
+        caseScroll.style.height = '100vh';
+      }
+    } catch(e){ caseScroll.style.height = '100vh'; }
+    setNavOffset();
+  }
+  sizeScroller();
+  window.addEventListener('resize', sizeScroller);
+  window.addEventListener('load', sizeScroller);
+  try { if(window.parent && window.parent !== window) window.parent.addEventListener('resize', sizeScroller); } catch(e){}
+
+  /* ============ NAV: scroll-spy active + visited ============ */
+  var navchips = Array.prototype.slice.call(document.querySelectorAll('.navchip'));
+  var sections = navchips.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited = {};
+  var visitVal = document.getElementById('visitVal');
+
+  function markVisited(idx){
+    var sec = sections[idx];
+    if(!sec) return;
+    if(!visited[sec.id]){
+      visited[sec.id] = true;
+      navchips[idx].classList.add('visited');
+      var count = Object.keys(visited).length;
+      visitVal.textContent = count + ' / 19';
+      addXP(8, 'visit-' + sec.id, 'Section read');
+      if(count >= 19){ earnBadge('bdg-explorer'); addXP(60, 'allvisited', 'Ward Explorer!'); }
+    }
+  }
+  function setActive(idx){
+    navchips.forEach(function(c){ c.classList.remove('active'); });
+    if(navchips[idx]) navchips[idx].classList.add('active');
+  }
+
+  /* True tabs: each chip shows ONLY its section, hidden via CSS otherwise.
+     No scrollIntoView and no scroll-spy — nothing can scroll the tab bar away,
+     which also sidesteps every srcDoc-iframe scrolling quirk. The hero banner
+     and vitals strip belong to the case intro, so they show on S1 only. */
+  var heroBits = [document.querySelector('.hero'), document.querySelector('.vitals-strip')]
+    .filter(function(el){ return !!el; });
+
+  function showSection(idx){
+    sections.forEach(function(s, i){ if(s) s.classList.toggle('sec-active', i === idx); });
+    heroBits.forEach(function(el){ el.style.display = (idx === 0) ? '' : 'none'; });
+    caseScroll.scrollTop = 0;
+    setActive(idx);
+    markVisited(idx);
+  }
+
+  navchips.forEach(function(chip, idx){
+    chip.addEventListener('click', function(ev){
+      ev.preventDefault();
+      showSection(idx);
+    });
+  });
+  showSection(0);
+
+  /* ============ FLAG GAME (S2) ============ */
+  var flagBtns = document.querySelectorAll('#flagGame .flag-btn');
+  var flagResult = document.getElementById('flagResult');
+  var flagsFound = 0, flagsTotal = 0, flagWrong = 0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good') === '1') flagsTotal++; });
+  flagBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.dataset.locked) return;
+      btn.dataset.locked = '1';
+      var good = btn.getAttribute('data-good') === '1';
+      if(good){
+        btn.classList.add('flag-good');
+        flagsFound++;
+        addXP(10, 'flag-' + flagsFound + '-' + Math.random(), 'AF flag spotted');
+      } else {
+        btn.classList.add('flag-bad');
+        flagWrong++;
+        showToast('❌ Not an AF-specific flag');
+      }
+      if(flagsFound === flagsTotal){
+        flagResult.textContent = '✅ All ' + flagsTotal + ' AF features found' + (flagWrong ? ' (with ' + flagWrong + ' wrong pick' + (flagWrong>1?'s':'') + ')' : ' — flawless!');
+        earnBadge('bdg-vt');
+        addXP(30, 'flags-complete', 'AF-Spotter badge');
+      } else {
+        flagResult.textContent = flagsFound + ' / ' + flagsTotal + ' AF features found…';
+      }
+    });
+  });
+
+  /* ============ BRANCHING SCENARIO (S3) ============ */
+  var scText = document.getElementById('scText');
+  var scChoices = document.getElementById('scChoices');
+  var scFeedback = document.getElementById('scFeedback');
+  var scRestart = document.getElementById('scRestart');
+  var scStab = document.getElementById('scStab');
+  var scTime = document.getElementById('scTime');
+  var scXP = document.getElementById('scXP');
+  var pathXP = 0, scStability = 2, scElapsed = 0;
+
+  var STEPS = {
+    start: {
+      text: "The junior hovers over the defibrillator: \"She's fast — let's just cardiovert her now.\" BP 108/70, sats 93%, narrow irregularly irregular tachycardia at 148. She is conscious and perfusing, but nobody knows how long she has been in AF, and she is on no anticoagulation. What do you do FIRST?",
+      choices: [
+        { t: "🐌 Stop the rushed cardioversion; rate-control with metoprolol/diltiazem and start anticoagulation", good:true, ds:1, dt:10, xp:40, fb:"✅ Exactly. She is STABLE, so there is no need to shock blindly. Slow the rate to ease the breathlessness, start a DOAC by her CHA₂DS₂-VASc, and make the rhythm decision deliberately. You just avoided ejecting a possible clot." , next:"date" },
+        { t: "⚡ Cardiovert her immediately — 'she's fast, just reset the rhythm'", good:false, ds:-2, dt:20, xp:0, fb:"☠️ Dangerous. She is stable, so there's no emergency, and her AF duration is unknown with no anticoagulation. Restoring sinus can eject a left-atrial-appendage clot → stroke. This is the M&M case in S13. Restart and choose again.", end:true },
+        { t: "💉 Give IV verapamil for the rate without checking the EF", good:false, ds:-1, dt:15, xp:5, fb:"⚠️ Risky. Rate control is right, but verapamil/diltiazem in unrecognized HFrEF can cause cardiogenic shock. Confirm preserved EF first, or choose a beta-blocker.", next:"start2" }
+      ]
+    },
+    start2: {
+      text: "You check: her last echo showed preserved EF (~55%) with LVH — so a non-DHP CCB or a beta-blocker is reasonable. Rate is still 148 and she is breathless. Now what?",
+      choices: [
+        { t: "🐌 Give metoprolol (or diltiazem) to control the rate, and start anticoagulation", good:true, ds:1, dt:8, xp:30, fb:"✅ Good recovery. With preserved EF, rate control with a beta-blocker or diltiazem is appropriate; the breathlessness eases as diastole lengthens. Start the DOAC by her score.", next:"date" },
+        { t: "⚡ Skip the rate control and cardiovert now anyway", good:false, ds:-1, dt:20, xp:0, fb:"⚠️ Still the wrong move in a stable patient with unknown-duration, unanticoagulated AF. Rate-control and protect the brain first.", next:"date" }
+      ]
+    },
+    date: {
+      text: "Rate is settling toward 100 and she is more comfortable. CHA₂DS₂-VASc is 5 and a DOAC is started. She asks, 'Can't you just shock it and send me home?' How do you handle the rhythm decision?",
+      choices: [
+        { t: "⏱️ Pin down the AF onset; if unknown/≥48 h, plan 3 weeks of anticoagulation OR a TEE before any cardioversion", good:true, ds:1, dt:6, xp:30, fb:"✅ Ideal: the 48-hour clot rule. Unknown duration means no immediate cardioversion without 3 weeks of anticoagulation or a TEE to exclude an appendage clot — and ≥4 weeks of anticoagulation afterward regardless.", next:"close" },
+        { t: "⚡ Agree and cardiovert now since she 'only felt it this morning'", good:false, ds:0, dt:3, xp:10, fb:"⚠️ 'Only this morning' is often wrong — AF is frequently silent. Treat duration as unknown unless you can prove <48 h. Anticoagulate/TEE before cardioverting.", next:"close" }
+      ]
+    },
+    close: {
+      text: "She is rate-controlled, anticoagulated, comfortable, and the rhythm plan is set. Her CRP is up, the CXR shows a consolidation, and her TSH is suppressed. Final move?",
+      choices: [
+        { t: "🔍 Treat the precipitant — the chest infection and the hyperthyroidism (PIRATES)", good:true, ds:1, dt:5, xp:40, fb:"🏆 Perfect close. The trigger is often the cure — treat the infection and the thyroid and the AF frequently settles, and is less likely to recur after cardioversion. Case stabilized and the brain protected.", end:true },
+        { t: "🎉 Done — rate's controlled, send her home today", good:false, ds:-1, dt:10, xp:0, fb:"⚠️ Premature. Always hunt and treat the precipitant (PIRATES) and finalize the anticoagulation/rhythm plan — untreated triggers mean recurrent AF.", end:true }
+      ]
+    }
+  };
+
+  function renderStab(){
+    var s = Math.max(0, Math.min(5, scStability + 2)); // map -2..3 → 0..5
+    var dots = '';
+    for(var i=0;i<5;i++) dots += (i < s ? '●' : '○');
+    scStab.textContent = dots;
+  }
+  function renderStep(key){
+    var step = STEPS[key];
+    scText.textContent = step.text;
+    scFeedback.className = 'feedback';
+    scFeedback.style.display = 'none';
+    scChoices.innerHTML = '';
+    step.choices.forEach(function(ch){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = ch.t;
+      b.addEventListener('click', function(){
+        pathXP += ch.xp; scXP.textContent = pathXP;
+        scElapsed += ch.dt; scTime.textContent = scElapsed + ' s';
+        scStability += ch.ds; renderStab();
+        if(ch.xp) addXP(ch.xp, null, 'Scenario choice');
+        scFeedback.textContent = ch.fb;
+        scFeedback.className = 'feedback ' + (ch.good ? 'good' : 'bad');
+        scFeedback.style.display = 'block';
+        Array.prototype.forEach.call(scChoices.children, function(c){ c.disabled = true; c.style.opacity = .6; });
+        if(ch.end){
+          scRestart.style.display = 'inline-block';
+          if(ch.good && key === 'close'){ earnBadge('bdg-shock'); addXP(20, 'scenario-win', 'Clot-Aware!'); }
+        } else if(ch.next){
+          setTimeout(function(){ renderStep(ch.next); }, 1400);
+        }
+      });
+      scChoices.appendChild(b);
+    });
+  }
+  scRestart.addEventListener('click', function(){
+    pathXP = 0; scStability = 2; scElapsed = 0;
+    scXP.textContent = 0; scTime.textContent = '0 s'; renderStab();
+    scRestart.style.display = 'none';
+    renderStep('start');
+  });
+  renderStab();
+  renderStep('start');
+
+  /* ============ REVEAL BUTTONS ============ */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.getAttribute('data-target'));
+      if(!t) return;
+      if(t.classList.contains('reveal-shown')){
+        t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden');
+      } else {
+        t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown');
+        addXP(8, 'reveal-' + btn.getAttribute('data-target'), 'Self-test');
+      }
+    });
+  });
+
+  /* ============ VENTRICULAR-RATE SIM (S6) ============ */
+  var kRange = document.getElementById('kRange');
+  var kVal = document.getElementById('kVal');
+  var kNeedle = document.getElementById('kNeedle');
+  var kReadout = document.getElementById('kReadout');
+  if(kRange){
+    var simUsed = false;
+    function updateK(){
+      var k = parseInt(kRange.value,10); // 40 .. 180 bpm
+      kVal.textContent = k;
+      var pct = (parseInt(kRange.value,10) - 40) / (180 - 40) * 100;
+      kNeedle.style.left = pct + '%';
+      var msg, cls;
+      if(k < 50){ msg = '🔴 Bradycardia — too slow; long pauses and poor output. Over-aggressive AV-nodal blockade can cause symptomatic bradycardia and syncope.'; cls='bad'; }
+      else if(k < 60){ msg = '🟠 Low rate — borderline slow; watch for pauses and fatigue, especially on rate-control drugs.'; cls='warn-r'; }
+      else if(k <= 110){ msg = '🟢 Target band — adequate diastolic filling, the atrial-kick loss is best tolerated here. Lenient control (<110, RACE II) is fine; aim <80 if still symptomatic.'; cls='good'; }
+      else if(k <= 140){ msg = '🟠 Rapid ventricular response — diastole is shortening and filling falls; breathlessness and demand ischemia begin. Rate-control her down.'; cls='warn-r'; }
+      else { msg = '🔴 Very rapid — diastole vanishes; with the atrial kick already lost, output collapses → congestion, hypotension and demand ischemia. This is her presenting rate of 148.'; cls='bad'; }
+      kReadout.innerHTML = msg;
+      kReadout.className = 'readout ' + cls;
+      if(!simUsed){ simUsed = true; addXP(15, 'ksim', 'Rate-Control Master'); }
+    }
+    kRange.addEventListener('input', updateK);
+    updateK();
+  }
+
+  /* ============ CHECKLISTS (S7) ============ */
+  var allChecklistsDone = 0, totalChecklists = document.querySelectorAll('.checklist').length;
+  document.querySelectorAll('.checklist').forEach(function(list){
+    var boxes = list.querySelectorAll('input[type=checkbox]');
+    var prog = list.querySelector('[data-progress]');
+    var total = boxes.length;
+    var doneAwarded = false;
+    function refresh(){
+      var done = 0;
+      boxes.forEach(function(b){
+        if(b.checked){ done++; b.closest('.ck').classList.add('done'); }
+        else { b.closest('.ck').classList.remove('done'); }
+      });
+      prog.textContent = done + ' / ' + total + ' complete';
+      if(done === total && !doneAwarded){
+        doneAwarded = true;
+        allChecklistsDone++;
+        addXP(25, 'ck-' + list.id, 'Checklist done');
+        if(allChecklistsDone >= totalChecklists){ earnBadge('bdg-ck'); addXP(20, 'allck', 'Checklist Champion'); }
+      }
+    }
+    boxes.forEach(function(b){
+      b.addEventListener('change', function(){
+        if(b.checked) addXP(4, null, 'Step checked');
+        refresh();
+      });
+    });
+  });
+
+  /* ============ MCQs (S19) ============ */
+  var MCQS = [
+    {
+      q: "A 68-year-old presents with palpitations and breathlessness. The pulse is irregularly irregular at 148/min, and the ECG shows a narrow-complex tachycardia with no discrete P waves and a fibrillatory baseline. The most likely rhythm is:",
+      opts: ["Atrial flutter with 2:1 block","Atrial fibrillation","Sinus tachycardia","Multifocal atrial tachycardia"],
+      correct: 1,
+      exp: "An irregularly irregular narrow-complex tachycardia with absent P waves and a fibrillatory baseline is atrial fibrillation. Flutter is usually regular (sawtooth, often 2:1 ~150), sinus tachycardia has upright P waves before every QRS, and MAT shows ≥3 distinct P-wave morphologies in lung disease."
+    },
+    {
+      q: "Your stable AF-with-RVR patient has a preserved EF. Which is an appropriate FIRST-LINE rate-control agent, and what is the key caveat?",
+      opts: ["IV verapamil — safe in everyone with AF","A beta-blocker or non-DHP CCB (diltiazem) — but AVOID non-DHP CCBs in HFrEF","Digoxin only — it is always first-line","Adenosine — to slow the rate"],
+      correct: 1,
+      exp: "Beta-blockers and non-dihydropyridine CCBs (diltiazem/verapamil) are first-line for rate control. The crucial caveat: non-DHP CCBs are negatively inotropic and should be AVOIDED in HFrEF, where you use a beta-blocker or digoxin instead. Adenosine is for terminating AV-nodal-dependent SVT, not for rate-controlling AF."
+    },
+    {
+      q: "AF of UNKNOWN duration in a patient not on anticoagulation. Before elective cardioversion you should:",
+      opts: ["Cardiovert immediately — duration doesn't matter","Give 3 weeks of therapeutic anticoagulation OR perform a TEE to exclude LA appendage thrombus first","Give a single dose of aspirin and cardiovert","Cardiovert only if the rate is above 150"],
+      correct: 1,
+      exp: "If AF is ≥48 h or of unknown duration, either provide 3 weeks of therapeutic anticoagulation OR perform a transoesophageal echo to exclude a left-atrial-appendage thrombus before cardioverting — because restoring sinus rhythm can eject a clot and cause a stroke. Anticoagulate ≥4 weeks afterward regardless."
+    },
+    {
+      q: "This patient has hypertension, diabetes, HFpEF, is 68 and female. Her CHA₂DS₂-VASc indicates that she should:",
+      opts: ["Not be anticoagulated — her score is low","Be anticoagulated, preferably with a DOAC","Take aspirin instead of anticoagulation","Be anticoagulated only after cardioversion"],
+      correct: 1,
+      exp: "Her CHA₂DS₂-VASc is 5 (HTN 1, diabetes 1, HF 1, age 65–74 1, female 1) — well above the threshold to anticoagulate. A DOAC is preferred over warfarin. HAS-BLED is used to modify bleeding risk, not to withhold anticoagulation."
+    },
+    {
+      q: "For stroke prevention in most patients with non-valvular AF, the preferred anticoagulant is a DOAC. In which situation is WARFARIN required instead?",
+      opts: ["Mechanical heart valve or moderate-severe mitral stenosis","Any patient over 65","Diabetes mellitus","Preserved ejection fraction"],
+      correct: 0,
+      exp: "DOACs are preferred for most non-valvular AF, but warfarin is required for a mechanical heart valve or moderate-to-severe mitral stenosis, where DOACs are contraindicated. Age, diabetes and EF do not by themselves mandate warfarin."
+    },
+    {
+      q: "Your AF patient suddenly becomes hypotensive with ischemic chest pain and acute pulmonary edema. The correct management is:",
+      opts: ["Continue oral rate control and reassess in an hour","Immediate synchronized cardioversion","IV verapamil bolus","Observe on telemetry only"],
+      correct: 1,
+      exp: "Haemodynamic instability from AF (shock, ischemia, severe heart failure, syncope) requires immediate synchronized cardioversion — you do not wait for the 48-hour rule. Start anticoagulation as soon as feasible and continue it for at least 4 weeks afterward."
+    },
+    {
+      q: "Why does new-onset AF often cause a noticeable drop in cardiac output, especially in a stiff/HFpEF or hypertrophied ventricle?",
+      opts: ["The coronary arteries occlude","Loss of the coordinated atrial contraction ('atrial kick', ~20–30% of filling) plus poor diastolic filling at fast rates","The QRS becomes very wide","The aortic valve becomes incompetent"],
+      correct: 1,
+      exp: "AF abolishes organized atrial contraction, removing the 'atrial kick' that contributes ~20–30% of ventricular filling — worst in a stiff/HFpEF or hypertrophied ventricle that depends on late diastolic filling. A fast, irregular rate also shortens diastole, further reducing filling and output."
+    },
+    {
+      q: "Which mnemonic captures the precipitants to hunt for in new-onset AF, and which is a classic example?",
+      opts: ["PIRATES — e.g. Pulmonary embolism/pneumonia, Thyroid, Alcohol ('holiday heart')","CURB-65 — pneumonia severity","SAMPLE — allergy history","DUMBELS — cholinergic toxidrome"],
+      correct: 0,
+      exp: "PIRATES summarizes AF precipitants: Pulmonary (PE, pneumonia, COPD), Ischemia/Infection, Rheumatic/mitral valve disease, Anemia/Alcohol ('holiday heart'), Thyroid (hyperthyroidism), Electrolytes/Elevated BP, Sepsis/Sleep apnea/Surgery. Finding and treating the precipitant is often the cure."
+    }
+  ];
+
+  var host = document.getElementById('mcqHost');
+  var mcqVal = document.getElementById('mcqVal');
+  var mcqScore = 0, mcqAnswered = 0;
+  var letters = ['A','B','C','D','E'];
+
+  MCQS.forEach(function(item, qi){
+    var box = document.createElement('div');
+    box.className = 'mcq';
+    var html = '<div class="mcq-q">QUESTION ' + (qi+1) + ' / ' + MCQS.length + '</div>';
+    html += '<div class="mcq-stem">' + item.q + '</div>';
+    item.opts.forEach(function(opt, oi){
+      html += '<label class="mcq-opt" data-oi="' + oi + '"><strong>' + letters[oi] + '.</strong> ' + opt + '</label>';
+    });
+    html += '<div class="mcq-exp"></div>';
+    box.innerHTML = html;
+    host.appendChild(box);
+
+    var opts = box.querySelectorAll('.mcq-opt');
+    var exp = box.querySelector('.mcq-exp');
+    var locked = false;
+    opts.forEach(function(label){
+      label.addEventListener('click', function(){
+        if(locked) return;
+        locked = true;
+        var oi = parseInt(label.getAttribute('data-oi'),10);
+        box.classList.add('answered');
+        var correct = item.correct;
+        if(oi === correct){
+          label.classList.add('picked-right');
+          mcqScore++;
+          addXP(25, null, 'Correct answer');
+        } else {
+          label.classList.add('picked-wrong');
+          opts[correct].classList.add('show-right');
+          showToast('❌ Correct: ' + letters[correct]);
+        }
+        exp.innerHTML = '<strong>' + (oi === correct ? '✅ Correct. ' : '📘 Explanation. ') + '</strong>' + item.exp;
+        mcqAnswered++;
+        mcqVal.textContent = mcqScore + ' / ' + MCQS.length;
+        if(mcqAnswered === MCQS.length){
+          var done = document.getElementById('mcqDone');
+          var summary = document.getElementById('mcqSummary');
+          done.style.display = 'block';
+          summary.textContent = 'You scored ' + mcqScore + ' / ' + MCQS.length + '. ' +
+            (mcqScore === MCQS.length ? 'Flawless — you control the rate, score the clot and respect the 48-hour rule every time. 🏆' :
+             mcqScore >= 6 ? 'Strong — review the misses and the contrast pairs in S6.' :
+             'Revisit S3, S5, S6 and S11 — rate vs rhythm and the anticoagulation rules are the whole case.');
+          if(mcqScore >= 7){ earnBadge('bdg-quiz'); addXP(50, 'quizace', 'Quiz Ace!'); }
+        }
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
