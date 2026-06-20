@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pre-excited Atrial Fibrillation in WPW (FBI) — Virtual Teaching Hospital</title>
+<!-- META
+id: c-wpw-009
+title: Pre-excited Atrial Fibrillation in WPW (FBI — Fast, Broad, Irregular)
+hospital: cardiology
+department: cv-ep
+bednumber: 2
+chiefcomplaint: Syncope then a fast, broad, irregular tachycardia >250/min
+system: Cardiology
+severity: critical
+tags: WPW, Pre-excited AF, Accessory pathway, Procainamide, Cardioversion, Ablation
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --radius:16px;
+    --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  /* Internal scroll viewport. When this case is embedded the host app stretches
+     the iframe to full content height and the OUTER page scrolls, which would
+     let a sticky bar scroll away. We instead scroll inside this box (sized to
+     the visible window by JS) so the section tab bar stays pinned at the top.
+     Standalone, it falls back to the full viewport height. */
+  #caseScroll{height:100vh; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; scroll-padding-top:92px}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:36px 24px 80px; position:relative; overflow:hidden}
+  .hero::after{content:"📈"; position:absolute; right:-20px; top:-30px; font-size:220px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{max-width:1100px; margin:0 auto; position:relative; z-index:1}
+  .hero .crumbs{font-size:13px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:10px 0 6px; font-size:clamp(26px,4vw,40px); line-height:1.15}
+  .hero .sub{font-size:16px; opacity:.95}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; backdrop-filter:blur(4px)}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== LIVE ECG STRIP IN HERO ===== */
+  .ecg-banner{max-width:1100px; margin:14px auto 0; position:relative; z-index:1}
+  .ecg-banner svg{width:100%; height:64px; display:block; background:rgba(0,0,0,.18); border-radius:12px; border:1px solid rgba(255,255,255,.25)}
+  .ecg-trace{stroke:#86efac; stroke-width:2.4; fill:none; stroke-dasharray:1600; stroke-dashoffset:1600; animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{stroke-dashoffset:0}}
+
+  /* ===== VITALS STRIP ===== */
+  .vitals-strip{max-width:1100px; margin:-52px auto 0; padding:0 24px; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:11px; font-weight:700; letter-spacing:.6px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:21px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== HORIZONTAL SECTION SIDEBAR (fixed — always visible) ===== */
+  .topnav{position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.10)}
+  .topnav .rail{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; max-width:1180px; margin:0 auto; scrollbar-width:thin}
+  .navchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink2); font-size:11px; font-weight:700; text-decoration:none; min-width:78px; text-align:center; transition:all .18s; cursor:pointer}
+  .navchip .s-id{font-size:10px; letter-spacing:1px; color:#94a3b8}
+  .navchip .s-emoji{font-size:16px}
+  .navchip:hover{border-color:var(--rose); color:var(--rose); transform:translateY(-2px)}
+  .navchip.active{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; border-color:#b91c1c}
+  .navchip.active .s-id{color:#fecaca}
+  .navchip.visited:not(.active){border-color:var(--emerald-line); background:var(--emerald-soft)}
+
+  /* ===== DASHBOARD WIDGET ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:215px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10.5px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:760px){.dash{display:none}}
+
+  /* ===== MAIN / SECTIONS (tabbed: one section visible at a time) ===== */
+  main{max-width:1100px; margin:26px auto 80px; padding:0 24px}
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:26px; overflow:hidden}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16.5px; margin:26px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14.5px; margin:18px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:24px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15.5px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:14px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px; letter-spacing:.4px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14.5px}
+
+  /* ===== INTERACTIVE BITS ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:10px 18px; font-weight:700; font-size:14px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:22px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:15px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 15px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 15px; margin-top:12px; font-size:14px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim sliders */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:14px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:14px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Heart/circuit diagram */
+  .heart-fig{display:flex; gap:18px; flex-wrap:wrap; align-items:center; background:var(--slate-soft); border-radius:16px; padding:18px; margin:14px 0}
+  .heart-fig svg{flex:0 0 auto}
+  .heart-legend{flex:1; min-width:230px; font-size:13.5px}
+  .lg{display:flex; align-items:center; gap:8px; margin:5px 0}
+  .lg .sw{width:14px; height:14px; border-radius:4px; flex:0 0 auto}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Journey cards */
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:14px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:15px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:14px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13.5px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:22px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14.5px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:13px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .footer{max-width:1100px; margin:0 auto 36px; padding:0 24px; text-align:center; color:#94a3b8; font-size:12.5px}
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="caseScroll">
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · ⚡ EP Lab · 🛏️ Bed 2</div>
+    <h1>📈 Pre-excited Atrial Fibrillation in WPW — "The FBI Rhythm: Fast, Broad, Irregular"</h1>
+    <div class="sub">⚡ A 28-year-old man collapsed and is now running a chaotic, broad, irregular tachycardia faster than the monitor can count — over 250. Someone is reaching for adenosine. Stop them.</div>
+    <div class="chips">
+      <span class="chip crit">🔴 CRITICAL</span>
+      <span class="chip">⚡ Pre-excited AF</span>
+      <span class="chip">🛣️ Accessory Pathway (Kent)</span>
+      <span class="chip">💉 Procainamide or Shock</span>
+      <span class="chip">🎮 Interactive Case</span>
+      <span class="chip">⏱️ Decide in 60 seconds</span>
+    </div>
+    <div class="ecg-banner" title="Pre-excited AF rhythm strip">
+      <svg viewBox="0 0 800 64" preserveAspectRatio="none" aria-label="Fast broad irregular pre-excited AF rhythm strip">
+        <polyline class="ecg-trace" points="0,40 30,40 42,14 56,58 70,40 98,40 112,10 126,56 138,40 172,40 184,16 200,60 214,40 236,40 248,12 262,54 276,40 318,40 330,18 344,58 356,40 374,40 386,12 400,56 414,40 452,40 464,16 478,60 492,40 510,40 522,10 536,54 550,40 590,40 602,18 616,58 630,40 650,40 662,12 676,56 690,40 728,40 740,16 754,60 768,40 800,40"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== LIVE VITALS ===================== -->
+<div class="vitals-strip">
+  <div class="vitals-grid">
+    <div class="vital alert"><div class="v-label">💓 HR</div><div class="v-num">&gt;250 irreg</div></div>
+    <div class="vital alert"><div class="v-label">🩸 BP</div><div class="v-num">80/50</div></div>
+    <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">28</div></div>
+    <div class="vital warn"><div class="v-label">🫁 SpO₂</div><div class="v-num">90%</div></div>
+    <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.6°</div></div>
+    <div class="vital warn"><div class="v-label">🧠 GCS</div><div class="v-num">13</div></div>
+    <div class="vital alert"><div class="v-label">📐 QRS</div><div class="v-num">Varies</div></div>
+    <div class="vital alert"><div class="v-label">😖 Distress</div><div class="v-num">High</div></div>
+  </div>
+</div>
+
+<!-- ===================== HORIZONTAL SECTION SIDEBAR ===================== -->
+<nav class="topnav" id="topnav">
+  <div class="rail">
+    <a class="navchip" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navchip" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navchip" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navchip" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navchip" href="#s5"><span class="s-emoji">🎓</span><span>Consultant Round</span><span class="s-id">S5</span></a>
+    <a class="navchip" href="#s6"><span class="s-emoji">📖</span><span>Teaching Points</span><span class="s-id">S6</span></a>
+    <a class="navchip" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navchip" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navchip" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navchip" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navchip" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navchip" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navchip" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navchip" href="#s14"><span class="s-emoji">🔀</span><span>Differentials</span><span class="s-id">S14</span></a>
+    <a class="navchip" href="#s15"><span class="s-emoji">🗺️</span><span>Plan</span><span class="s-id">S15</span></a>
+    <a class="navchip" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navchip" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navchip" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navchip" href="#s19"><span class="s-emoji">🧠</span><span>MCQs</span><span class="s-id">S19</span></a>
+  </div>
+</nav>
+
+<!-- ===================== SCORE DASHBOARD ===================== -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections visited</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-vt">⚡ FBI-Spotter</span>
+      <span class="badge" id="bdg-shock">🔌 Right Therapy</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champion</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Ward Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running sims, taking the right path and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- S1 — PROFILE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s1">
+  <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+  <div class="section-content">
+    <div class="callout danger">
+      <b class="ct">🚨 YOU ARE HERE — 21:48, EP Lab admissions bay, Bed 2</b>
+      The monitor cannot keep up: a broad, chaotic, beat-to-beat changing complex flickering past at well over 250. The young man is gray and barely rousable after a syncope. A junior doctor is drawing up <strong>adenosine</strong> because "it's a fast SVT." Your hand reaches the trolley first. This is not a case to read about — it is a rhythm you must name and break <strong>right now</strong>, and the wrong drug here is lethal.
+    </div>
+
+    <h3>👤 Patient Identity</h3>
+    <table class="tbl">
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>🧔 Name</td><td><strong>Mr. J.K.</strong></td></tr>
+      <tr><td>🎂 Age / Sex</td><td>28-year-old male</td></tr>
+      <tr><td>🆔 MRN</td><td>CV-20918</td></tr>
+      <tr><td>⚖️ Weight</td><td>76 kg</td></tr>
+      <tr><td>💼 Occupation</td><td>Semi-professional footballer</td></tr>
+      <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+    </table>
+
+    <h3>📜 Past Medical History — the clue was on an old ECG</h3>
+    <ul>
+      <li>💓 <strong>Recurrent palpitations since his teens</strong> — sudden-onset "racing heart," often self-terminating, occasionally needing the ED. Labelled "SVT" and "anxiety" over the years.</li>
+      <li>📈 <strong>An ECG two years ago showed a short PR interval and a delta wave</strong> (a slurred QRS upstroke) — the fingerprint of <strong>Wolff-Parkinson-White</strong>. It was filed and never acted on. This single finding is the whole story tonight.</li>
+      <li>🫀 <strong>Structurally normal heart</strong> — no prior MI, normal echo, normal LV function. His danger is electrical, not muscular.</li>
+      <li>🏃 Fit, competitive athlete; this episode began suddenly at rest after a heavy training day.</li>
+      <li>🍺 Modest alcohol the night before (a recognised AF trigger in young hearts).</li>
+      <li>🚭 Non-smoker. No regular medications. No family screening despite a cousin with "a heart electrical problem."</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Fast + Broad + Irregular (FBI) in a young patient = pre-excited atrial fibrillation until proven otherwise — and that means hands OFF the AV node."</div>
+
+    <h3>🧬 Why THIS patient? — an extra wire and a chaotic atrium</h3>
+    <p>In Wolff-Parkinson-White there is an extra muscular connection — the <strong>bundle of Kent</strong> — that bridges atrium directly to ventricle, <em>bypassing the AV node</em>. The AV node is normally the heart's only gatekeeper between atria and ventricles, and it conducts with <strong>decremental (rate-limiting) physiology</strong> — the faster the atria fire, the more it blocks, protecting the ventricle. The accessory pathway has <strong>no such brake</strong>: it conducts fast and 1-to-1. For years this only caused re-entry tachycardias. Tonight he developed <strong>atrial fibrillation</strong>, where the atria fire 400–600 times a minute. Most of those impulses pour straight down the unguarded accessory pathway to the ventricle, producing rates over 250–300, a chaotic broad-complex rhythm, and a real risk of degeneration into <strong>ventricular fibrillation</strong> and sudden death.</p>
+
+    <div class="callout warn"><b class="ct">🔥 Risk factors / amplifiers for dangerous pre-excited AF</b>
+    🛣️ A high-conduction accessory pathway (short refractory period) · ⚡ Onset of atrial fibrillation in a WPW heart · 🍺 Alcohol / catecholamine surge triggering AF · 💊 Any drug that blocks the AV node (shifts conduction to the pathway) · 🏃 Young, athletic, structurally normal heart that "looks too well" · 🧬 Multiple accessory pathways</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S2 — HANDOVER -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s2">
+  <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+  <div class="section-content">
+    <h3>📻 Paramedic Handover — listen for the trap</h3>
+    <div class="callout info">
+      <b class="ct">🎙️ SBAR from the paramedic crew (verbatim)</b>
+      <p><strong>S:</strong> "28-year-old man, collapsed at home — brief loss of consciousness witnessed by his partner. On our monitor he's in a fast, wide, very irregular rhythm that the machine can't even count — it flickers between 250 and 300."</p>
+      <p><strong>B:</strong> "Healthy footballer, has had 'SVT' for years, no regular meds, drank a bit last night. Partner mentioned a doctor once told him he had something called 'WPW.'"</p>
+      <p><strong>A:</strong> "He's pale and clammy, only just rousable, BP 80 over 50 and soft. The receiving doctor by radio said 'sounds like a fast SVT — give <strong>adenosine</strong>, and maybe a calcium-blocker if that fails.'"</p>
+      <p><strong>R:</strong> "We've got pads on and a line in. I held the adenosine — the rhythm just looked too wide and too irregular to be a simple SVT, and the WPW word made me nervous."</p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The radio diagnosis of 'fast SVT, give adenosine' is how a WPW patient in pre-excited AF gets killed. Never let a voice down a wire override a fast, broad, IRREGULAR rhythm."</div>
+
+    <h3>🚩 Spot-the-Red-Flag — tap each feature of pre-excited AF</h3>
+    <p>🎮 <em>Interactive: click every feature that points to pre-excited atrial fibrillation (not a simple SVT). Each correct flag = +10 XP. Wrong picks cost you.</em></p>
+    <div id="flagGame">
+      <button class="btn ghost flag-btn" data-good="1">🌀 Irregularly irregular rhythm</button>
+      <button class="btn ghost flag-btn" data-good="1">📐 Varying QRS width / morphology beat-to-beat</button>
+      <button class="btn ghost flag-btn" data-good="1">⚡ Very fast rate &gt;250/min</button>
+      <button class="btn ghost flag-btn" data-good="1">📈 Delta wave / short PR on a prior ECG</button>
+      <button class="btn ghost flag-btn" data-good="1">😵 Young patient with syncope &amp; structurally normal heart</button>
+      <button class="btn ghost flag-btn" data-good="0">🌡️ Temperature 36.6°C</button>
+      <button class="btn ghost flag-btn" data-good="0">🫁 SpO₂ 90% on air</button>
+      <button class="btn ghost flag-btn" data-good="0">⚽ He plays football</button>
+    </div>
+    <p id="flagResult" style="font-weight:700"></p>
+
+    <h3>⏱️ Timeline so far</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">21:30</div>Sudden palpitations at home, then a brief witnessed syncope. Partner calls for help.</div>
+      <div class="t-item"><div class="t-time">21:38</div>Paramedics: fast, broad, irregular tachycardia &gt;250/min. BP 80/50. Pale, clammy, drowsy.</div>
+      <div class="t-item"><div class="t-time">21:42</div>Receiving doctor (by radio) says "fast SVT — give adenosine, then a calcium-blocker." Crew <strong>withholds adenosine</strong> — 🏅 instinct worth its weight in gold.</div>
+      <div class="t-item"><div class="t-time">21:48</div>You meet him in the bay. Pads are on. The clock is the enemy: at &gt;250 with no AV-node brake, this rhythm is one step from VF.</div>
+    </div>
+
+    <div class="callout ok"><b class="ct">🏅 Praise where due</b>The crew who held the adenosine prevented a catastrophe. In pre-excited AF, AV-nodal blockers (adenosine, verapamil, beta-blockers, digoxin) remove the AV node's competition and shunt <em>even more</em> impulses down the accessory pathway — accelerating the ventricular rate toward VF. Withholding it may have bought this young man his life.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S3 — INITIAL ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s3">
+  <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+  <div class="section-content">
+    <h3>🅰️🅱️🅲️ Primary Survey — what your hands, eyes and ears find</h3>
+    <table class="tbl">
+      <tr><th>Step</th><th>Finding</th><th>What it means mechanistically</th></tr>
+      <tr><td>🅰️ Airway</td><td>Patent, rousable to voice, slurred short answers.</td><td>Reduced consciousness reflects cerebral hypoperfusion at this extreme rate; he is decompensating.</td></tr>
+      <tr><td>🅱️ Breathing</td><td>RR 28, SpO₂ 90% on air, mild crackles.</td><td>A rate &gt;250 gives the ventricle almost no filling time → output falls → congestion and hypoxia. The rate itself is the poison.</td></tr>
+      <tr><td>🅲️ Circulation</td><td><strong>BP 80/50</strong>, cool clammy peripheries, a <strong>grossly irregular, very fast</strong> thready pulse, CRT 4 s.</td><td>Irregularly irregular = atrial fibrillation. Fast + broad + irregular = the impulses are reaching the ventricle down an unguarded accessory pathway. This is pre-excited AF, not simple SVT.</td></tr>
+      <tr><td>🅳 Disability</td><td>GCS 13, drowsy, anxious.</td><td>Cerebral hypoperfusion from collapsing output. Falling GCS = imminent arrest — do not wait for unconsciousness to act.</td></tr>
+      <tr><td>🅴 Exposure</td><td>No rash, no focal deficit, young athletic build. Pads already on.</td><td>Structurally normal heart confirms an electrical emergency; pads on means you are seconds, not minutes, from definitive therapy.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"An irregular pulse that is also fast AND broad is pre-excited AF until proven otherwise. Your fingers on the wrist can flag the danger before the 12-lead prints."</div>
+
+    <h3>🧭 The single most important question: STABLE or UNSTABLE?</h3>
+    <p>Tachyarrhythmia management forks on one decision. Look for the <strong>adverse features</strong> (the "4 S's"): <strong>Shock</strong> (SBP &lt; 90, poor perfusion), <strong>Syncope</strong>/presyncope, <strong>Severe ischemia</strong> (chest pain, ST changes), <strong>Severe heart failure</strong> (pulmonary edema). Mr. J.K. has shock, has already syncopised and is now drowsy — <strong>UNSTABLE</strong>.</p>
+
+    <div class="callout danger"><b class="ct">⚡ The decision is made: UNSTABLE → SYNCHRONIZED DC CARDIOVERSION</b>An unstable pre-excited AF gets <strong>electricity, not chemistry</strong>. Drugs are too slow for a patient who has already collapsed, and every AV-nodal blocker is frankly dangerous here. Sedate if time and consciousness allow, then deliver a <strong>synchronized</strong> shock. Do not chase a perfect diagnosis while the pressure falls.</div>
+
+    <!-- 🎬 BRANCHING SCENARIO ENGINE -->
+    <div class="scenario" id="scenarioBox">
+      <h3>🎬 Choose Your Path — "The Lethal Fork"</h3>
+      <div class="hud"><span>❤️ Stability: <b id="scStab">●●○○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 s</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+      <div class="scene-text" id="scText">The junior doctor looks at you, syringe of adenosine in one hand, defibrillator paddles in the other. BP 80/50 and falling. Monitor: fast, broad, IRREGULAR tachycardia over 250. The partner says he was told he has "WPW." The patient is drowsy and gray. What do you do FIRST?</div>
+      <div class="choices" id="scChoices"></div>
+      <div class="feedback" id="scFeedback"></div>
+      <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+    </div>
+
+    <div class="callout info"><b class="ct">🧮 If he were STABLE instead</b>
+    A <em>stable</em> pre-excited AF buys you time, but the chemistry is narrow: give <strong>IV procainamide</strong> (or ibutilide) — agents that slow/block the accessory pathway and can restore sinus rhythm. <strong>Never</strong> give adenosine, verapamil, diltiazem, beta-blockers, digoxin or IV amiodarone here. And whenever in doubt, or if he deteriorates, the safe answer is the same: <strong>synchronized cardioversion</strong>.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S4 — RESIDENT REVIEW -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s4">
+  <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+  <div class="section-content">
+    <p><em>The cardiology resident arrives at 21:50. Her reasoning, out loud:</em></p>
+
+    <h3>🧠 Pattern recognition first, then physiology</h3>
+    <p>"Fast. Broad. Irregular — the FBI. In a young man with a delta-wave history, that triad is <strong>pre-excited atrial fibrillation</strong> until proven otherwise, and I don't need anything else to make me terrified of the AV node. The varying QRS width is the giveaway: each beat is a different blend of conduction down the accessory pathway versus the AV node, so no two QRS complexes look alike. The dangerous instinct is to call it 'SVT' because he's young — and reach for adenosine that can kill him."</p>
+
+    <h3>🎯 Immediate priorities (her actual order of operations)</h3>
+    <ol>
+      <li>🚫 <strong>Hands off the AV node:</strong> no adenosine, no verapamil/diltiazem, no beta-blocker, no digoxin, no IV amiodarone. Say it out loud and remove the syringe from the bedside.</li>
+      <li>⚡ <strong>He is unstable → synchronized cardioversion.</strong> Call for senior/EP help and the arrest trolley in parallel, but do not wait for them to shock.</li>
+      <li>💤 <strong>Procedural sedation if he can tolerate the seconds:</strong> small dose of ketamine or midazolam + fentanyl. A conscious shock is agony — but a falling GCS means do not delay the shock for sedation.</li>
+      <li>🔌 <strong>Synchronized shock, biphasic, full energy</strong> for a deteriorating adult (e.g. 150–200 J biphasic). Confirm the machine is in SYNC and marking complexes.</li>
+      <li>💉 <strong>Have procainamide ready</strong> as the chemical option if he stabilises or recurs — it slows the accessory pathway. Never an AV-nodal blocker.</li>
+      <li>📞 <strong>Refer EP urgently:</strong> this man needs accessory-pathway risk stratification and almost certainly curative <strong>catheter ablation</strong> this admission.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In WPW, the AV node is the patient's seatbelt; blocking it during AF cuts the seatbelt at 250 km/h. Procainamide or shock — never adenosine, verapamil, beta-blocker or digoxin."</div>
+
+    <h3>🤔 "But what if it's just a fast SVT and I'm wrong to shock?"</h3>
+    <p>"Then I have synchronized-cardioverted an SVT — which is <em>also</em> the correct treatment for an unstable SVT. The decision to cardiovert an unstable, fast, broad, irregular tachycardia is <strong>right whether it's pre-excited AF or anything else</strong>. Instability collapses the differential. The only way to be truly wrong here is to treat it as a simple SVT and push an AV-nodal blocker."</p>
+
+    <div class="callout purple"><b class="ct">🧪 Resident's self-test (answer before reading on)</b>
+    Someone suggests adenosine "to see if it breaks — and if it doesn't, at least it's diagnostic." Good idea in this patient?
+    <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+    <div class="reveal-hidden" id="rev1"><p><strong>No — it could be lethal.</strong> Adenosine blocks the AV node, removing competition for the atrial impulses, which then conduct even faster down the accessory pathway. In pre-excited AF that can <strong>accelerate the ventricular rate and precipitate VF</strong>. It also won't reliably terminate AF. He is <em>unstable</em> anyway, so the answer is electricity. Adenosine has a role only in a regular, narrow SVT where AV-node-dependent re-entry is the mechanism — not here.</p></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S5 — CONSULTANT ROUND -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s5">
+  <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round</h2></div>
+  <div class="section-content">
+    <p><em>The on-call consultant electrophysiologist, by phone at 21:55, then at the bedside:</em></p>
+
+    <h3>🗂️ Name the rhythm precisely — it changes the drug</h3>
+    <div class="vs">
+      <div class="side a"><h4>🔴 Pre-excited AF (this patient)</h4>
+        <ul><li><strong>Irregular</strong>, very fast (&gt;250), <strong>varying QRS width</strong> — AF conducting via the accessory pathway</li><li>Mechanism: no AV-node brake on a chaotic atrium</li><li>Unstable → <strong>synchronized cardioversion</strong>; stable → <strong>procainamide / ibutilide</strong></li><li>Definitive: accessory-pathway <strong>catheter ablation</strong> (curative)</li></ul></div>
+      <div class="side b"><h4>🔵 Monomorphic VT (the mimic)</h4>
+        <ul><li><strong>Regular</strong>, <strong>uniform</strong> QRS beat-to-beat — one stable circuit</li><li>Usually scar / structural heart disease</li><li>Unstable → synchronized cardioversion; stable → amiodarone/procainamide</li><li>Long-term: ICD ± ablation</li></ul></div>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Regular and uniform = think VT. Fast, broad and IRREGULAR with varying width = think pre-excited AF. The irregularity is the diagnosis — and it changes which drug saves him."</div>
+
+    <h3>🌀 The three faces of WPW arrhythmia — get them straight</h3>
+    <div class="vs">
+      <div class="side a"><h4>🔁 Orthodromic vs antidromic AVRT</h4>
+        <ul><li><strong>Orthodromic AVRT:</strong> down the AV node, up the pathway → <strong>narrow</strong> regular tachycardia (most common)</li><li><strong>Antidromic AVRT:</strong> down the pathway, up the AV node → <strong>wide</strong> regular tachycardia</li></ul></div>
+      <div class="side b"><h4>⚡ Pre-excited AF (tonight)</h4>
+        <ul><li>Atrial fibrillation conducting antegrade down the pathway</li><li><strong>Irregular</strong>, varying width, very fast — the dangerous one</li><li>Risk of VF; needs procainamide or shock, then ablation</li></ul></div>
+    </div>
+
+    <h3>🧭 Consultant's three commandments for the next hour</h3>
+    <ol>
+      <li>⚡ "Unstable pre-excited AF = a <strong>synchronized</strong> shock. The only rhythms I defibrillate (unsynchronized) are pulseless VT and VF — if he degenerates, switch to defib. Get the mode right or you can shock him into VF."</li>
+      <li>💉 "If I have a window and he's stable, the chemistry is <strong>procainamide or ibutilide</strong> — never an AV-nodal blocker. WPW pattern vs WPW syndrome: he now has the <em>syndrome</em> (delta wave PLUS a dangerous arrhythmia), and that mandates definitive treatment."</li>
+      <li>🛣️ "Then we <strong>ablate the accessory pathway</strong>. It is curative. And we risk-stratify the pathway: the shortest pre-excited R–R interval in AF (SPERRI) tells me how dangerous his Kent bundle is."</li>
+    </ol>
+
+    <div class="callout danger"><b class="ct">☠️ The consultant's war memory (more in S13 M&amp;M)</b>"The last young patient I saw mistreated had exactly this — fast, broad, irregular at 270, called 'SVT' by a tired team. They gave IV verapamil. The ventricular rate accelerated, the rhythm degenerated to VF and we ran a long code we lost. The baseline ECG, reviewed at the M&amp;M, had a textbook delta wave nobody checked. The ECG told the truth; nobody read it as WPW because the patient was 'young and fit.' He isn't anything anymore."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S6 — TEACHING POINTS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s6">
+  <div class="sec-header"><span class="s-badge">S6</span><h2>📖 Teaching Points</h2></div>
+  <div class="section-content">
+    <h3>🔬 The mechanism — WHY the accessory pathway makes AF lethal (the WHY behind the WHY)</h3>
+    <ol>
+      <li>🛣️ <strong>The extra wire:</strong> the bundle of Kent is a strand of working myocardium that crosses the AV groove, directly connecting atrium to ventricle and <strong>bypassing the AV node</strong>. On the resting ECG it produces a <strong>short PR</strong> (no nodal delay) and a <strong>delta wave</strong> (the ventricle starts depolarising early and slowly from muscle, not the fast His-Purkinje system).</li>
+      <li>🚦 <strong>The missing brake:</strong> the AV node conducts <em>decrementally</em> — the faster the atria fire, the more it blocks. This is a protective rate-limiter. The accessory pathway has <strong>no decremental property</strong>: it conducts fast and one-to-one, however fast the atrium drives it.</li>
+      <li>🌀 <strong>Add atrial fibrillation:</strong> in AF the atria fire <strong>400–600 times a minute</strong>. The AV node would filter most of these out. The accessory pathway does not — it can conduct a large fraction straight through, giving ventricular rates of <strong>250–300/min</strong>.</li>
+      <li>📐 <strong>Why the QRS varies beat-to-beat:</strong> each ventricular beat is a fusion in changing proportions of conduction down the pathway (wide, delta) and down the AV node (narrow). The result is the diagnostic <strong>irregular rhythm with constantly changing QRS width and morphology</strong>.</li>
+      <li>💥 <strong>Why it kills:</strong> at &gt;250 there is almost no diastole, output collapses, and — critically — the very short coupling intervals can fall on the ventricle's vulnerable period and trigger <strong>ventricular fibrillation</strong>. Pre-excited AF is one of the few mechanisms by which a structurally normal young heart suffers sudden cardiac death.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Procainamide or shock — never adenosine, verapamil, beta-blocker or digoxin. The AV node is the seatbelt; do not unbuckle it at 250 km/h."</div>
+
+    <h3>⚖️ Contrast pair #1 — Pre-excited AF vs monomorphic VT (the lethal mimic)</h3>
+    <div class="vs">
+      <div class="side a"><h4>⚡ Pre-excited AF IS… (tonight)</h4><ul><li><strong>Irregularly irregular</strong></li><li><strong>Varying QRS width &amp; morphology</strong> beat-to-beat</li><li>Often the fastest rhythm you'll see (&gt;250–300)</li><li>Young patient, delta-wave history, structurally normal heart</li><li>Treat: procainamide/ibutilide or cardiovert; ablate</li></ul></div>
+      <div class="side b"><h4>🫀 Monomorphic VT is NOT that…</h4><ul><li><strong>Regular</strong></li><li><strong>Uniform</strong> QRS — every complex identical</li><li>Usually slower (130–200)</li><li>Older patient, prior MI / scar / low EF</li><li>Treat: amiodarone/procainamide or cardiovert; ICD</li></ul></div>
+    </div>
+    <p>😈 <strong>The trap:</strong> both are broad-complex tachycardias, and both unstable patients get the same first move (synchronized cardioversion). But for the <em>stable</em> patient, mislabelling pre-excited AF as 'SVT' invites a lethal AV-nodal blocker. <strong>The irregularity and varying QRS width are what separate them — and what keep your hands off the AV node.</strong></p>
+
+    <h3>⚖️ Contrast pair #2 — WPW pattern vs WPW syndrome</h3>
+    <div class="vs">
+      <div class="side a"><h4>📏 WPW pattern (asymptomatic)</h4><ul><li>Delta wave + short PR on ECG, <strong>no arrhythmia</strong></li><li>Often an incidental finding</li><li>Most never have an event; risk-stratify (especially athletes / high-risk jobs)</li><li>Management debated — consider EP study for SPERRI</li></ul></div>
+      <div class="side b"><h4>🌀 WPW syndrome (this patient)</h4><ul><li>Delta wave <strong>PLUS a documented arrhythmia</strong> (AVRT or pre-excited AF)</li><li>Symptomatic — palpitations, syncope, or arrest</li><li>Mandates definitive therapy: <strong>catheter ablation</strong></li><li>Pre-excited AF is the high-risk presentation</li></ul></div>
+    </div>
+    <p>💡 <em>Why it matters:</em> a delta wave alone is a <em>pattern</em>; the same delta wave plus the arrhythmia he had tonight is the <em>syndrome</em> — and the syndrome with pre-excited AF is curable, dangerous, and a Class I reason to ablate.</p>
+
+    <!-- 🎮 INTERACTIVE SIM: SPERRI / VF risk -->
+    <div class="sim" id="kSim">
+      <h3 style="margin-top:0">🎮 Simulation — The SPERRI Dial: how the shortest pre-excited R–R interval predicts VF risk</h3>
+      <p style="font-size:13.5px">Drag the dial to set the <strong>shortest pre-excited R–R interval (SPERRI)</strong> measured during his AF, in milliseconds. The shorter the interval, the faster the accessory pathway can fire the ventricle — and the higher the risk of degeneration to VF.</p>
+      <label for="kRange">🧪 Shortest pre-excited R–R (SPERRI): <b id="kVal">220</b> ms</label>
+      <input type="range" id="kRange" min="150" max="400" value="220" step="5">
+      <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+      <div class="readout bad" id="kReadout">Set the dial to explore.</div>
+      <p style="font-size:12.5px; margin-top:10px; color:var(--ink2)">🎯 The classic threshold: <strong>SPERRI &lt; 250 ms</strong> (equivalently a pre-excited rate &gt; ~240/min) marks a <strong>high-risk</strong> accessory pathway. Shorter = more impulses reach the ventricle = higher VF risk. Inducible rapid pre-excited AF at EP study carries the same warning.</p>
+    </div>
+
+    <!-- 📚 EBM MODULE -->
+    <div class="ebm">
+      <h3>📚 Evidence-Based Medicine Corner</h3>
+      <table class="tbl">
+        <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2015 ACC/AHA SVT Guideline</td><td>In pre-excited AF, use IV procainamide or ibutilide; <strong>avoid AV-nodal blocking agents</strong> (adenosine, non-dihydropyridine CCBs, beta-blockers, digoxin) and use IV amiodarone with caution.</td><td>For the stable patient, procainamide/ibutilide are the antiarrhythmics; every AV-nodal blocker is off the table.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2019 ESC SVT Guideline</td><td>Hemodynamically unstable pre-excited AF → immediate synchronized cardioversion (Class I); ibutilide/procainamide considered if stable; AV-nodal blockers and IV amiodarone discouraged in pre-excitation.</td><td>Unstable = electricity. Stable = pathway-acting drug. Same algorithm driving S3, S7 and S11.</td></tr>
+        <tr><td><span class="lvl">RISK</span> SPERRI / pathway refractoriness</td><td>A shortest pre-excited R–R interval &lt; 250 ms in AF (or anterograde pathway ERP &lt; 250 ms) identifies a high-risk pathway prone to VF/SCD.</td><td>SPERRI is the number that risk-stratifies the pathway — drives urgency of ablation (the S6 sim).</td></tr>
+        <tr><td><span class="lvl">RCT</span> Pappone et al. (asymptomatic WPW)</td><td>In asymptomatic pre-excitation, EP-guided ablation of high-risk pathways reduced arrhythmic events vs observation.</td><td>Even asymptomatic high-risk patterns may warrant ablation after risk stratification.</td></tr>
+        <tr><td><span class="lvl">REGISTRY</span> Catheter ablation of accessory pathways</td><td>Radiofrequency ablation cures WPW in ~95% with low complication rates and abolishes the sudden-death risk.</td><td>Ablation is definitive and curative — the destination for this admission.</td></tr>
+      </table>
+    </div>
+
+    <!-- 🔬 ADVANCED TOPICS -->
+    <div class="callout purple">
+      <h3 style="margin-top:0">🔬 Fellowship Corner — Advanced Topics</h3>
+      <ul>
+        <li>🗺️ <strong>Accessory-pathway localisation:</strong> delta-wave polarity algorithms (Arruda, etc.) predict pathway location (left-lateral, posteroseptal, right free wall); manifest vs concealed pathways; multiple pathways increase pre-excited AF risk.</li>
+        <li>🧪 <strong>Risk stratification of asymptomatic pre-excitation:</strong> EP study measuring <strong>SPERRI</strong> and anterograde pathway effective refractory period; inducible AVRT or pre-excited AF; loss of pre-excitation at higher rates / on exercise / with procainamide suggests a lower-risk pathway.</li>
+        <li>💉 <strong>Why IV amiodarone is risky here:</strong> it can paradoxically accelerate accessory-pathway conduction and cause hypotension — it is <em>not</em> a safe default in pre-excited AF despite being a class III "antiarrhythmic for everything."</li>
+        <li>🛣️ <strong>Catheter ablation technique:</strong> map the earliest ventricular/atrial activation along the AV groove during pre-excitation or pacing; radiofrequency at the pathway insertion; ~95% acute success, with retrograde/transseptal access for left-sided pathways.</li>
+        <li>🫀 <strong>Special pathways:</strong> Mahaim (atriofascicular) fibres produce LBBB-pattern antidromic tachycardia with decremental conduction; PJRT (permanent junctional reciprocating tachycardia) from a slow concealed posteroseptal pathway.</li>
+        <li>⚽ <strong>WPW in athletes:</strong> competitive sport amplifies catecholamine-driven AF risk; guidelines favour risk stratification ± ablation before clearance in symptomatic or high-risk pre-excitation.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S7 — ORDERS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s7">
+  <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+  <div class="section-content">
+    <h3>🖊️ The order set, written as you'd actually write it (21:52)</h3>
+    <ul>
+      <li>🚨 <strong>NO adenosine, NO verapamil/diltiazem, NO IV beta-blocker, NO digoxin, NO IV amiodarone</strong> — flag "PRE-EXCITED AF — AV-nodal blockers contraindicated" on chart and whiteboard.</li>
+      <li>⚡ <strong>Synchronized DC cardioversion</strong> — biphasic, 150–200 J, escalate if unsuccessful. Confirm SYNC mode (machine marks each complex).</li>
+      <li>💤 <strong>Procedural sedation</strong> if consciousness/time allows: e.g. ketamine 0.5 mg/kg IV or midazolam 1–2 mg + fentanyl 25–50 mcg. Do NOT delay the shock for sedation in a crashing patient.</li>
+      <li>💉 <strong>IV procainamide</strong> (e.g. 10–15 mg/kg, max ~50 mg/min, watch BP and QRS) <em>or</em> ibutilide — the chemical option if he stabilises or recurs; slows/blocks the accessory pathway. Never an AV-nodal blocker.</li>
+      <li>🫀 12-lead ECG immediately after conversion to <strong>look for the delta wave</strong> (confirms WPW); serial troponin; bloods: U&amp;E, Mg²⁺, Ca²⁺, CBC, TSH, coagulation.</li>
+      <li>📞 Refer cardiology/EP urgently for <strong>accessory-pathway ablation</strong> and risk stratification (SPERRI) this admission.</li>
+      <li>🫁 High-flow O₂ to SpO₂ ≥ 94%, continuous monitoring, second large-bore IV, NPO for likely procedure.</li>
+      <li>🔌 Keep <strong>defibrillator and pacing pads</strong> attached — anticipate recurrence of AF and possible degeneration to VF.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In unstable pre-excited AF there are only two right moves: deliver a synchronized shock, and keep every AV-nodal blocker out of the room. Every other order exists to make those two safer and to get him to ablation."</div>
+
+    <!-- 🩺 PROCEDURE GUIDE 1 -->
+    <div class="checklist" id="ckCV">
+      <h3 style="margin-top:0">🩺 Procedure Guide — Synchronized Cardioversion — tick as you go</h3>
+      <label class="ck"><input type="checkbox"><span>🧑‍⚕️ Confirm UNSTABLE pre-excited AF with a pulse (not pulseless VT/VF — that needs unsynchronized defibrillation)</span></label>
+      <label class="ck"><input type="checkbox"><span>🔋 Apply pads, attach ECG leads to the defibrillator, and press <strong>SYNC</strong> — verify a marker sits on each QRS</span></label>
+      <label class="ck"><input type="checkbox"><span>💤 Sedate/analgese if conscious and time permits (ketamine or midazolam + fentanyl); pre-oxygenate; airway kit ready</span></label>
+      <label class="ck"><input type="checkbox"><span>⚡ Select energy (≈150–200 J biphasic), charge, announce "STAND CLEAR," ensure no one (and no oxygen flow) touches the patient</span></label>
+      <label class="ck"><input type="checkbox"><span>🖲️ Deliver shock — HOLD the discharge until the machine fires on the next sensed complex (there is a deliberate delay; do not release early)</span></label>
+      <label class="ck"><input type="checkbox"><span>📈 Reassess rhythm and pulse; if still in AF, re-confirm SYNC (it often defaults OFF after a shock) and escalate energy</span></label>
+      <label class="ck"><input type="checkbox"><span>🧪 Post-conversion: 12-lead to confirm the delta wave, keep AV-nodal blockers away, refer EP for ablation</span></label>
+      <div class="ck-progress" data-progress>0 / 7 complete</div>
+    </div>
+
+    <!-- 🩺 PROCEDURE GUIDE 2 -->
+    <div class="checklist" id="ckDefib">
+      <h3 style="margin-top:0">🩺 Procedure Guide — If he loses his pulse: ACLS Defibrillation (UNSYNCHRONIZED)</h3>
+      <p style="font-size:13px">⚠️ Pre-excited AF can degenerate to <strong>VF</strong> — then switch immediately to <strong>UNSYNCHRONIZED</strong> defibrillation. SYNC cannot find a complex in VF and will never fire — so turn it OFF.</p>
+      <label class="ck"><input type="checkbox"><span>🚫 Confirm no pulse → call arrest, start high-quality CPR (100–120/min, depth 5–6 cm, full recoil)</span></label>
+      <label class="ck"><input type="checkbox"><span>🔌 Defibrillator to <strong>UNSYNCHRONIZED</strong>, charge to max (200 J biphasic), clear, shock at minimal interruption to compressions</span></label>
+      <label class="ck"><input type="checkbox"><span>💉 Adrenaline 1 mg IV every 3–5 min; consider procainamide for refractory pre-excited rhythm — <strong>avoid AV-nodal blockers</strong></span></label>
+      <label class="ck"><input type="checkbox"><span>🧠 Treat reversible causes — the 4 H's &amp; 4 T's; here especially hypoxia and the accessory pathway itself</span></label>
+      <label class="ck"><input type="checkbox"><span>🔁 Rhythm/pulse check every 2 min; minimize hands-off time; rotate compressors</span></label>
+      <label class="ck"><input type="checkbox"><span>🫀 ROSC → post-arrest care, urgent EP referral for accessory-pathway ablation, ICU</span></label>
+      <div class="ck-progress" data-progress>0 / 6 complete</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S8 — NURSING CARE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s8">
+  <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+  <div class="section-content">
+    <h3>🛏️ Resus / EP-bay nursing priorities — minute by minute</h3>
+    <ul>
+      <li>📟 <strong>Continuous telemetry with the defibrillator at the bedside, pads attached.</strong> Keep the machine charged-ready and in the correct mode for the current rhythm.</li>
+      <li>🔌 <strong>Know your modes cold:</strong> SYNC for cardioversion of a patient WITH a pulse; UNSYNC (defib) for pulseless VT/VF. Re-check SYNC after every shock — it commonly resets to OFF.</li>
+      <li>🚫 <strong>Be the last line of defence on drugs:</strong> if anyone reaches for adenosine, verapamil, diltiazem, a beta-blocker, digoxin or IV amiodarone in this patient — challenge it. In pre-excited AF these can precipitate VF.</li>
+      <li>🩸 <strong>BP every 2–5 min</strong> (cycle the NIBP, or read the arterial line once placed). A falling pressure means escalate now, not at the next set of obs.</li>
+      <li>💤 Prepare sedation drugs and airway adjuncts before the shock; assign a team member to the airway.</li>
+      <li>🧠 <strong>Neuro/consciousness checks</strong> — a patient who stops responding is losing output; a patient who slumps may have lost the pulse → check it, don't assume.</li>
+      <li>📋 <strong>Document the rhythm strip before and after each intervention</strong>, the energy delivered, and the time — the pre-conversion strip and the post-conversion delta wave are gold for the EP team.</li>
+      <li>👨‍👩‍👦 Keep the partner/family updated and supported (see S16) — assign a liaison if staffing allows; a young person collapsing is terrifying to watch.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who re-checks SYNC after every shock and refuses to hand over an AV-nodal blocker in WPW is doing half the antiarrhythmic work in the room."</div>
+    <div class="callout warn"><b class="ct">📢 Escalate IMMEDIATELY for</b>Loss of pulse (→ switch to UNSYNC defib + CPR) · the rate climbing or the rhythm becoming chaotic (→ impending VF) · BP falling despite conversion · falling consciousness · any prescription for an AV-nodal blocker (adenosine, verapamil, beta-blocker, digoxin, IV amiodarone) in this patient.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S9 — INVESTIGATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s9">
+  <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+  <div class="section-content">
+    <h3>🧾 Results board (22:10, drawn during resuscitation)</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>Result</th><th>Reference</th><th>Interpretation</th></tr>
+      <tr><td>Potassium</td><td class="ok-v">4.1 mmol/L</td><td>3.5–5.0</td><td>Normal — this is not an electrolyte arrhythmia. The mechanism is structural-electrical (an accessory pathway), not metabolic.</td></tr>
+      <tr><td>Magnesium</td><td class="ok-v">0.84 mmol/L</td><td>0.7–1.0</td><td>Normal. Still worth keeping in the upper range during cardioversion, but it is not the driver here.</td></tr>
+      <tr><td>Troponin I</td><td class="hi">0.08 ng/mL ↑</td><td>&lt; 0.04</td><td>Mildly raised — demand ischemia from an extreme rate in a structurally normal heart, not an acute coronary event. Trends down after conversion.</td></tr>
+      <tr><td>TSH</td><td class="ok-v">Pending</td><td>—</td><td>Thyrotoxicosis is a classic AF trigger in the young — worth excluding as the precipitant of tonight's AF.</td></tr>
+      <tr><td>Ethanol</td><td class="hi">Detectable</td><td>—</td><td>Recent alcohol — a recognised "holiday heart" trigger for AF in a structurally normal young heart.</td></tr>
+      <tr><td>Lactate</td><td class="hi">3.0 mmol/L ↑</td><td>&lt; 2.0</td><td>Tissue hypoperfusion from the extreme-rate low-output state — a marker that he is unstable, not "stable enough to wait."</td></tr>
+      <tr><td>Coagulation</td><td class="ok-v">Normal</td><td>—</td><td>Baseline before likely cardioversion / ablation. Consider thromboembolic risk of cardioverting AF (here, an unstable emergency overrides).</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Unlike scar-VT, the bloods here are nearly normal — the danger isn't in the chemistry, it's in the wiring. Don't be reassured by a normal potassium; read the rhythm and the old ECG."</div>
+
+    <div class="callout info"><b class="ct">🧠 The single most valuable 'investigation' is the OLD ECG</b>Hunt down any prior 12-lead. A <strong>short PR with a delta wave</strong> is the diagnosis-confirming finding and explains everything. The post-conversion ECG tonight should show the same — and that delta wave is the green light for EP referral and curative ablation. The ECG, not the blood panel, is the test that saves him.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S10 — ECG / IMAGING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s10">
+  <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging</h2></div>
+  <div class="section-content">
+    <h3>🫀 The presenting rhythm — read it like a detective</h3>
+    <div class="ecg-fig">
+      <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Pre-excited atrial fibrillation: fast, broad, irregular with varying QRS width">
+        <rect width="820" height="150" fill="#0b1220"/>
+        <g stroke="#1e3a5f" stroke-width="1">
+          <line x1="0" y1="30" x2="820" y2="30"/><line x1="0" y1="60" x2="820" y2="60"/>
+          <line x1="0" y1="90" x2="820" y2="90"/><line x1="0" y1="120" x2="820" y2="120"/>
+        </g>
+        <polyline fill="none" stroke="#86efac" stroke-width="2.4" points="0,75 26,75 40,36 56,114 70,75 96,75 108,30 124,118 138,75 178,75 190,40 206,110 220,75 240,75 252,34 268,116 282,75 318,75 330,46 344,104 356,75 374,75 386,30 402,118 416,75 452,75 464,40 480,112 494,75 512,75 524,34 540,114 554,75 590,75 602,48 616,102 630,75 650,75 662,32 678,116 692,75 728,75 740,40 756,112 770,75 800,75"/>
+        <text x="86" y="22" fill="#fca5a5" font-size="12" font-weight="700">↑ very wide beat (pathway)</text>
+        <text x="560" y="22" fill="#fcd34d" font-size="12" font-weight="700">↑ narrower fusion beat</text>
+      </svg>
+      <div class="ecg-cap">Fast, broad, <strong>irregular</strong> tachycardia with <strong>beat-to-beat varying QRS width</strong>. Wide beats are conducted down the <span style="color:#fca5a5">accessory pathway</span>; narrower beats are <span style="color:#fcd34d">fusion/AV-node</span> beats. Irregular + varying width + very fast = <strong>pre-excited AF</strong>.</div>
+    </div>
+
+    <h3>🔎 The pre-excited-AF-vs-other-broad-tachycardia toolkit (memorize the high-yield ones)</h3>
+    <table class="tbl">
+      <tr><th>Feature</th><th>Why it means pre-excited AF</th></tr>
+      <tr><td>🌀 <strong>Irregularly irregular</strong></td><td>The underlying rhythm is atrial fibrillation — chaotic atrial activity. Regular broad tachycardia points instead toward VT or antidromic AVRT.</td></tr>
+      <tr><td>📐 <strong>Varying QRS width &amp; morphology</strong></td><td>Each beat is a changing fusion of pathway and AV-node conduction → no two complexes look alike. This is near-specific for pre-excited AF.</td></tr>
+      <tr><td>⚡ <strong>Extremely fast (often &gt;250–300)</strong></td><td>Faster than the AV node would ever allow — proof the impulses are bypassing the node via the accessory pathway.</td></tr>
+      <tr><td>📈 <strong>Delta wave on the resting / post-conversion ECG</strong></td><td>Short PR + slurred QRS upstroke = the manifest accessory pathway. The diagnosis-clinching finding.</td></tr>
+      <tr><td>🧒 <strong>Young, structurally normal heart</strong></td><td>Makes scar-related VT unlikely and pre-excitation the prime suspect for a broad, fast, irregular rhythm.</td></tr>
+      <tr><td>🔁 <strong>History of regular SVT (AVRT)</strong></td><td>Prior orthodromic AVRT confirms an accessory pathway exists; AF in such a heart becomes pre-excited AF.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Irregular + varying QRS width + blisteringly fast = pre-excited AF. Find a delta wave on any old strip and the argument is over — and so is the case for AV-nodal blockers."</div>
+
+    <h3>🫀 Post-conversion 12-lead &amp; echo</h3>
+    <ul>
+      <li>📈 <strong>Post-shock 12-lead:</strong> sinus rhythm ~70/min with a <strong>short PR (~100 ms) and a delta wave</strong> — the manifest accessory pathway revealed. Delta-wave polarity helps localise the pathway for ablation.</li>
+      <li>🩻 <strong>Echo:</strong> structurally normal heart, normal LV function, no scar — confirming the danger is purely electrical.</li>
+      <li>🔬 <strong>EP study (this admission):</strong> measures the accessory pathway's anterograde refractory period and the <strong>SPERRI</strong>, induces and maps the pathway, then delivers curative radiofrequency ablation.</li>
+    </ul>
+
+    <div class="callout warn"><b class="ct">⚠️ The ECG's favorite lie in a fast broad rhythm</b>"It's fast and the QRS is wide — it must be VT, give amiodarone." But an <strong>irregular</strong> broad tachycardia with <strong>varying QRS width</strong> in a young patient is pre-excited AF, where IV amiodarone is itself unsafe and AV-nodal blockers are lethal. Let the irregularity and the changing QRS — not just the width — guide you.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S11 — MEDICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s11">
+  <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+  <div class="section-content">
+    <h3>💉 Acute drugs — what, why, and the traps</h3>
+    <table class="tbl">
+      <tr><th>Drug</th><th>Role tonight</th><th>Mechanism / caution</th></tr>
+      <tr><td><strong>Procainamide IV</strong></td><td>Drug of choice for <em>stable</em> pre-excited AF</td><td>Class Ia — slows conduction in and prolongs refractoriness of the accessory pathway; can restore sinus rhythm. Stop for hypotension, QRS widening &gt; 50%, or excessive QT prolongation.</td></tr>
+      <tr><td><strong>Ibutilide IV</strong></td><td>Alternative pathway-acting agent for stable pre-excited AF</td><td>Class III — prolongs accessory-pathway refractoriness and can convert AF. Watch QT and Torsades; correct K⁺/Mg²⁺ first.</td></tr>
+      <tr><td><strong>Synchronized DC cardioversion</strong></td><td>First-line for the <strong>UNSTABLE</strong> patient (and a safe default whenever unsure)</td><td>Resets every cell at once — correct whether it's pre-excited AF, VT or SVT. Confirm SYNC mode.</td></tr>
+      <tr><td><strong>Sedation (ketamine / midazolam + fentanyl)</strong></td><td>For conscious synchronized cardioversion</td><td>Ketamine preserves BP better in shock. Don't delay a shock for sedation if peri-arrest.</td></tr>
+      <tr><td class="hi"><strong>Adenosine</strong> 🚫</td><td>CONTRAINDICATED</td><td>Blocks the AV node → more impulses down the pathway → can accelerate the ventricular rate and precipitate VF. Also won't terminate AF.</td></tr>
+      <tr><td class="hi"><strong>Verapamil / diltiazem</strong> 🚫</td><td>CONTRAINDICATED</td><td>AV-nodal block + vasodilatation → faster pathway conduction and falling BP → VF risk.</td></tr>
+      <tr><td class="hi"><strong>Beta-blockers / Digoxin</strong> 🚫</td><td>CONTRAINDICATED</td><td>Both slow the AV node (digoxin may even shorten pathway refractoriness), shunting conduction to the pathway → VF risk. Remember the mnemonic <strong>ABCD</strong>.</td></tr>
+      <tr><td class="hi"><strong>IV amiodarone</strong> ⚠️</td><td>Avoid in pre-excited AF</td><td>Can paradoxically accelerate accessory-pathway conduction and cause hypotension — not the safe "do-everything" drug it is elsewhere.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"ABCD — <strong>A</strong>denosine, <strong>B</strong>eta-blockers, <strong>C</strong>alcium-channel blockers, <strong>D</strong>igoxin — don't give them in pre-excited AF. Procainamide or shock. Never the seatbelt-cutters."</div>
+
+    <div class="callout danger"><b class="ct">🚫 The 'never' list in pre-excited AF</b>❌ Adenosine · ❌ Verapamil / diltiazem · ❌ Beta-blockers · ❌ Digoxin · ❌ IV amiodarone (avoid). Each blocks/bypasses the AV node and can <strong>accelerate accessory-pathway conduction into VF</strong>. When the patient is unstable or you are unsure, the safest "drug" is <strong>synchronized electricity</strong>; when stable, <strong>procainamide or ibutilide</strong>.</div>
+
+    <h3>🏠 Definitive &amp; long-term therapy (this admission, not just tonight)</h3>
+    <ul>
+      <li>🛣️ <strong>Catheter ablation of the accessory pathway</strong> — curative in ~95%, abolishes the sudden-death risk. This is the headline treatment, now a Class I indication after pre-excited AF.</li>
+      <li>🔬 <strong>EP study &amp; risk stratification</strong> — measure SPERRI / anterograde pathway ERP, induce and map, then ablate in the same session.</li>
+      <li>💊 <strong>Bridging antiarrhythmics</strong> (e.g. flecainide/propafenone in a structurally normal heart, or sotalol) only if ablation is delayed — but ablation is the goal.</li>
+      <li>🍺 <strong>Address AF triggers</strong> — alcohol, thyroid status, stimulants — while arranging definitive therapy.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S12 — MONITORING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s12">
+  <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+  <div class="section-content">
+    <h3>📡 What to watch and why</h3>
+    <ul>
+      <li>📈 <strong>Continuous telemetry</strong> with the defibrillator at the bedside until definitively treated; print strips of any AF recurrence or runs of pre-excitation.</li>
+      <li>🩸 <strong>Invasive arterial line</strong> for beat-to-beat BP through cardioversion and any procainamide infusion.</li>
+      <li>📐 <strong>QRS width and QT on every 12-lead</strong> — procainamide/ibutilide widen QRS and prolong QT; stop procainamide if QRS widens &gt; 50% or QT prolongs excessively.</li>
+      <li>🌀 <strong>Watch for AF recurrence and for any acceleration of rate</strong> — a climbing or chaotic rate signals impending VF; have the defibrillator ready in UNSYNC.</li>
+      <li>📈 <strong>Confirm the delta wave</strong> on the post-conversion ECG and document it for the EP team.</li>
+      <li>💤 <strong>Sedation/airway readiness</strong> kept at bedside in case of recurrence requiring repeat cardioversion.</li>
+      <li>🔬 <strong>Pre-procedure monitoring</strong> en route to the EP lab for ablation — the destination of this admission.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After you convert pre-excited AF, the monitor's job changes from 'is he in AF?' to 'is the delta wave there, and is anyone about to give him an AV-nodal blocker?' — guard both."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S13 — COMPLICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s13">
+  <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+  <div class="section-content">
+    <h3>💀 What can go wrong — and the mechanism</h3>
+    <ul>
+      <li>⚡ <strong>Degeneration to VF / sudden cardiac death</strong> — the great fear; extreme rates down an unguarded pathway fall on the vulnerable period. Treatment pivots to UNSYNC defibrillation + CPR.</li>
+      <li>☠️ <strong>Iatrogenic acceleration from an AV-nodal blocker</strong> — adenosine, verapamil, beta-blocker, digoxin or IV amiodarone shunting conduction to the pathway → faster ventricular rate → VF. The classic lethal error.</li>
+      <li>🧠 <strong>Cardiogenic shock / cerebral hypoperfusion</strong> — prolonged extreme-rate low-output state; the syncope was the warning.</li>
+      <li>🩸 <strong>Post-cardioversion complications</strong> — skin burns, transient bradyarrhythmia, and (because we are cardioverting AF) a thromboembolic risk — though in an unstable emergency the shock cannot wait.</li>
+      <li>💊 <strong>Pro-arrhythmia from therapy</strong> — procainamide/ibutilide can prolong QT and provoke Torsades; titrate and monitor.</li>
+      <li>🔁 <strong>Recurrence</strong> — until the pathway is ablated, another bout of AF can reproduce the whole emergency. Definitive treatment is not optional.</li>
+    </ul>
+
+    <!-- 🎭 M&M CONFERENCE MODULE -->
+    <div class="mm">
+      <h3>🎭 Morbidity &amp; Mortality Conference — "The Young Man They Called SVT"</h3>
+      <div class="mm-case">
+        <strong>The case:</strong> A 24-year-old man arrived to a busy ED with palpitations and a fast, broad, irregular tachycardia at 270, BP 90/60, alert and talking. The tired night team called it "fast SVT — he's young and fine." They gave <strong>IV verapamil</strong> (and, when that didn't work, a slug of adenosine). Within two minutes his ventricular rate <strong>accelerated</strong>, the rhythm degenerated into <strong>VF</strong>, and a long resuscitation followed. He did not survive. His clinic ECG from a year before, projected at the M&amp;M, showed an unmistakable <strong>short PR and delta wave</strong> — WPW that nobody had checked.
+      </div>
+      <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+      <div class="swiss">
+        <div class="hole"><b>🧠 ANCHORING</b>"He's young, it's just SVT" — youth does not make a broad irregular tachycardia benign.</div>
+        <div class="hole"><b>📈 ECG NOT READ</b>The irregularity and varying QRS width (and the old delta wave) were there and unread.</div>
+        <div class="hole"><b>🌀 PATTERN MISSED</b>Fast + broad + IRREGULAR = pre-excited AF, not simple SVT.</div>
+        <div class="hole"><b>💊 LETHAL DRUG</b>Verapamil/adenosine → AV-nodal block → faster pathway conduction → VF.</div>
+        <div class="hole"><b>🌙 SYSTEM</b>Night fatigue, no senior/EP review, no "FBI = hands off the AV node" default.</div>
+      </div>
+      <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> recognise the triad — <em>fast + broad + irregular = pre-excited AF</em>; never give AV-nodal blockers (ABCD); if unstable, synchronized cardioversion (correct whatever the rhythm); if stable, procainamide/ibutilide; check the old ECG for a delta wave; get senior/EP eyes early; then ablate. <strong>This is exactly why the crew held the adenosine tonight.</strong></p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Too young to be dangerous' is the sentence written on the chart of WPW patients who then die in pre-excited AF. Youth is not a diagnosis."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S14 — DIFFERENTIALS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s14">
+  <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials</h2></div>
+  <div class="section-content">
+    <h3>🧩 The fast broad-complex tachycardia differential</h3>
+    <table class="tbl">
+      <tr><th>Diagnosis</th><th>Clues</th><th>Why it matters</th></tr>
+      <tr><td>⚡ <strong>Pre-excited AF (WPW + AF)</strong> (this patient)</td><td><strong>Irregular</strong>, very fast (&gt;250), <strong>varying QRS width</strong>, delta-wave history, young normal heart</td><td>AV-nodal blockers can precipitate VF → use procainamide/ibutilide or cardiovert, then ablate.</td></tr>
+      <tr><td>🫀 <strong>Monomorphic VT</strong></td><td><strong>Regular</strong>, <strong>uniform</strong> QRS, older patient, prior MI / scar</td><td>Default for regular wide tachy with structural disease; unstable → cardiovert; ICD long-term.</td></tr>
+      <tr><td>🔁 <strong>Antidromic AVRT (WPW)</strong></td><td><strong>Regular</strong> wide tachycardia, down the pathway and up the AV node</td><td>Also WPW, but regular; can use procainamide; vagal/cautious approach — still avoid pure AV-nodal blockers when unsure.</td></tr>
+      <tr><td>🔂 <strong>SVT with aberrancy / rate-related BBB</strong></td><td>Regular or AF that is broad due to bundle branch block (constant morphology), no delta wave</td><td>AF with fixed BBB is broad but <em>uniform</em> width — unlike the varying width of pre-excitation.</td></tr>
+      <tr><td>🌪️ <strong>Polymorphic VT / Torsades</strong></td><td>Continuously changing axis; long QT (Torsades) or ischemia</td><td>Different therapy — magnesium &amp; fix QT, or revascularize.</td></tr>
+      <tr><td>🧪 <strong>Toxic / metabolic wide tachy</strong></td><td>Hyperkalemia (sine wave), sodium-channel toxicity (wide QRS, R in aVR)</td><td>Specific antidotes — calcium, sodium bicarbonate.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"REGULAR + uniform wide tachycardia → think VT. IRREGULAR + varying-width wide tachycardia in a young heart → think pre-excited AF (and keep your hands off the AV node)."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S15 — PLAN -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s15">
+  <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan</h2></div>
+  <div class="section-content">
+    <h3>🧭 Tonight → this week → for life</h3>
+    <ol>
+      <li>⚡ <strong>Tonight (done):</strong> synchronized cardioversion → sinus rhythm; AV-nodal blockers kept out; procainamide ready for recurrence; defibrillator kept ready; admission to a monitored bed.</li>
+      <li>📈 <strong>Confirm the diagnosis:</strong> post-conversion 12-lead showing short PR + delta wave; identify the AF trigger (alcohol, thyroid); exclude structural disease on echo.</li>
+      <li>🔬 <strong>EP study &amp; risk stratification</strong> — measure SPERRI / anterograde pathway ERP, induce and map the accessory pathway.</li>
+      <li>🛣️ <strong>Catheter ablation of the accessory pathway</strong> — curative, now a Class I indication after pre-excited AF; aim to do it this admission.</li>
+      <li>💊 <strong>Bridge only if ablation is delayed</strong> (flecainide/propafenone or sotalol in a structurally normal heart) — never an AV-nodal blocker; address AF triggers.</li>
+      <li>👨‍👩‍👦 <strong>Shared decision-making &amp; education</strong> — what WPW and the accessory pathway are, why ablation cures it, sports clearance after ablation, family screening, and a clear "call 911 for palpitations + presyncope" safety net.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Cardioversion treats the episode; ablation treats the disease — and in WPW, ablation actually cures it. Send him to the EP lab, or he comes back in pre-excited AF."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S16 — PROGRESS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s16">
+  <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+  <div class="section-content">
+    <h3>📅 Course in hospital</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Night 1, 21:56</div>Single synchronized shock at 150 J → sinus rhythm. BP recovers to 112/70 over a few minutes. Post-shock 12-lead shows a clear short PR and delta wave.</div>
+      <div class="t-item"><div class="t-time">Night 1, 23:00</div>One short self-terminating run of AF; no AV-nodal blocker given. Procainamide kept on standby. He stabilises, GCS 15.</div>
+      <div class="t-item"><div class="t-time">Day 1</div>Echo normal (structurally normal heart). Troponin falls. TSH normal; AF attributed to alcohol + accessory pathway. EP consulted.</div>
+      <div class="t-item"><div class="t-time">Day 2</div>EP study: anterograde pathway ERP short, <strong>SPERRI 220 ms</strong> — a high-risk pathway. Left-lateral accessory pathway mapped.</div>
+      <div class="t-item"><div class="t-time">Day 2</div>Radiofrequency <strong>ablation of the accessory pathway</strong> — delta wave abolished, no inducible tachycardia after ablation. Curative.</div>
+      <div class="t-item"><div class="t-time">Day 3</div>Arrhythmia-free, delta wave gone on repeat ECG, mobilising well. Ready for discharge with no long-term antiarrhythmic.</div>
+    </div>
+
+    <!-- 👨‍👩‍👦 FAMILY & PATIENT JOURNEY MODULE -->
+    <h3>👨‍👩‍👦 Family &amp; Patient Journey</h3>
+    <div class="journey">
+      <div class="j-card"><div class="j-who">🧔 The patient — Mr. J.K.</div><p>"I've had 'palpitations' since I was a teenager and was always told it was nothing. I didn't know I had an extra wire that could kill me. They shocked me, found it, and burned it out. I'm told it's actually <em>cured</em> — I can play again."</p></div>
+      <div class="j-card"><div class="j-who">👩 His partner</div><p>"He just dropped. The paramedic kept telling me what was happening and that they were being careful with which drugs they gave. The hardest part was the silence before the shock — then the monitor beeped slow and steady and I could breathe."</p></div>
+      <div class="j-card"><div class="j-who">🚑 The paramedic</div><p>"My job was the defibrillator and the truth — and holding that adenosine. The rhythm was too wide and too irregular for a simple SVT, and the word 'WPW' stopped me. Sometimes good care is the drug you <em>don't</em> give."</p></div>
+      <div class="j-card"><div class="j-who">🎓 The team's reflection</div><p>"This wasn't a clever diagnosis — it was a disciplined one. We read fast + broad + irregular as pre-excited AF, kept our hands off the AV node, shocked him, and sent him to the EP lab for a cure."</p></div>
+    </div>
+
+    <div class="callout pink"><b class="ct">💗 The human thread</b>For a 28-year-old athlete, this is the rare cardiac emergency with a true cure. Ablation doesn't just control his arrhythmia — it <em>removes</em> the lethal pathway, and with it the shadow of sudden death. Explaining that the danger is gone, that family members should be screened, and what to do if symptoms ever recur, is as much treatment as the procedure itself.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S17 — DISCHARGE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s17">
+  <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+  <div class="section-content">
+    <h3>📋 Discharge plan &amp; safety net</h3>
+    <ul>
+      <li>💊 <strong>Medications:</strong> after successful ablation, usually <strong>no long-term antiarrhythmic</strong> needed. If ablation were deferred, a structurally-normal-heart agent (flecainide/propafenone or sotalol) — and a written warning that AV-nodal blockers must be avoided until cured.</li>
+      <li>🛣️ <strong>Post-ablation care:</strong> groin/access-site care, repeat ECG confirming the delta wave is gone, EP follow-up to confirm durable success, and counselling on the small recurrence rate.</li>
+      <li>🍺 <strong>Trigger plan:</strong> moderate alcohol, address any thyroid issue, and recognise that AF was the spark that lit the emergency.</li>
+      <li>⚽ <strong>Sports clearance:</strong> return-to-play discussed with cardiology/EP after confirmed successful ablation and resolution of pre-excitation.</li>
+      <li>🚩 <strong>Red flags → call emergency services:</strong> palpitations with dizziness/presyncope, syncope, fast irregular heartbeat, chest pain or breathlessness.</li>
+      <li>📚 <strong>Education &amp; family:</strong> what WPW is in plain language, why ablation is curative, the importance of family screening (a cousin already has "an electrical problem"), and CPR/AED awareness for his partner.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Discharge after pre-excited AF is not 'rhythm fixed, go home' — it is a confirmed delta wave, a completed ablation, a trigger plan, family screening, and a patient who knows which drugs nearly killed him."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S18 — CLINICAL PEARLS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s18">
+  <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+  <div class="section-content">
+    <div class="pearl-grid">
+      <div class="pearl"><b>⚡ FBI = pre-excited AF</b>Fast + Broad + Irregular = pre-excited atrial fibrillation. Hands OFF the AV node.</div>
+      <div class="pearl"><b>🚫 ABCD don't apply</b>Adenosine, Beta-blockers, Calcium-channel blockers, Digoxin — never in pre-excited AF; they can precipitate VF.</div>
+      <div class="pearl"><b>💉 Procainamide or shock</b>Stable → IV procainamide (or ibutilide). Unstable → synchronized cardioversion. Never an AV-nodal blocker.</div>
+      <div class="pearl"><b>🪢 The AV node is the seatbelt</b>It's the only rate-limiter to the ventricle. Blocking it in AF cuts the seatbelt at 250 km/h.</div>
+      <div class="pearl"><b>📐 Varying QRS = pre-excitation</b>Beat-to-beat changing QRS width in an irregular fast rhythm is near-specific for pre-excited AF.</div>
+      <div class="pearl"><b>🔀 Irregular vs regular</b>Regular + uniform broad → think VT. Irregular + varying width → think pre-excited AF.</div>
+      <div class="pearl"><b>📈 Find the delta wave</b>Short PR + slurred upstroke on any old ECG confirms WPW and explains the whole night.</div>
+      <div class="pearl"><b>🧬 Pattern vs syndrome</b>Delta wave alone = WPW pattern. Delta wave + arrhythmia = WPW syndrome → ablate.</div>
+      <div class="pearl"><b>🛣️ Ablation cures it</b>Accessory-pathway ablation is curative (~95%) and abolishes the sudden-death risk.</div>
+      <div class="pearl"><b>🧮 SPERRI &lt; 250 ms = danger</b>The shortest pre-excited R–R interval risk-stratifies the pathway; short = high VF risk.</div>
+      <div class="pearl"><b>🩺 "Too young" is a trap</b>A structurally normal young heart can suffer sudden death in pre-excited AF. Youth is not a diagnosis.</div>
+      <div class="pearl"><b>⚠️ Amiodarone isn't safe here</b>IV amiodarone can accelerate pathway conduction — not the do-everything drug in pre-excitation.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S19 — MCQs / ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s19">
+  <div class="sec-header"><span class="s-badge">S19</span><h2>🧠 MCQs / Assessment</h2></div>
+  <div class="section-content">
+    <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP and feed your dashboard. Each shows a full explanation.</em></p>
+    <div id="mcqHost"></div>
+    <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · Case c-wpw-009 — Pre-excited Atrial Fibrillation in WPW (FBI)<br>
+  ⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."
+</div>
+
+</div><!-- /#caseScroll -->
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ XP / DASHBOARD CORE ============ */
+  var XP = 0, XP_MAX = 1200;
+  var awarded = {}; // dedupe one-time awards by key
+  var xpVal = document.getElementById('xpVal');
+  var xpFill = document.getElementById('xpFill');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+  }
+  function addXP(amount, key, label){
+    if(key){ if(awarded[key]) return; awarded[key] = true; }
+    XP += amount;
+    if(XP > XP_MAX) XP = XP_MAX;
+    xpVal.textContent = XP;
+    xpFill.style.width = Math.min(100, Math.round(XP / XP_MAX * 100)) + '%';
+    showToast('+' + amount + ' XP' + (label ? ' · ' + label : ''));
+  }
+  function earnBadge(id){
+    var b = document.getElementById(id);
+    if(b && !b.classList.contains('earned')){ b.classList.add('earned'); }
+  }
+
+  /* Dashboard minimize */
+  var dash = document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){
+    dash.classList.toggle('collapsed');
+    this.textContent = dash.classList.contains('collapsed') ? '+' : '–';
+  });
+
+  /* ============ INTERNAL SCROLL SIZING ============ */
+  /* Size the scroll box to the visible window so the sticky tab bar stays in
+     view. When embedded (srcDoc iframe, same-origin), the host page stretches
+     the iframe to full content height and scrolls the OUTER page — so we size
+     this box from the parent window's height minus whatever app chrome sits
+     above the iframe, and scroll internally instead. Standalone → 100vh. */
+  var caseScroll = document.getElementById('caseScroll');
+  var topnav = document.getElementById('topnav');
+  /* The tab bar is position:fixed, so it's out of flow — reserve space at the
+     top of the scroll content (and offset anchor jumps) by its real height. */
+  function setNavOffset(){
+    var navH = topnav ? topnav.offsetHeight : 70;
+    caseScroll.style.paddingTop = navH + 'px';
+    caseScroll.style.scrollPaddingTop = (navH + 14) + 'px';
+  }
+  function sizeScroller(){
+    try {
+      var p = window.parent;
+      if(p && p !== window && window.frameElement){
+        var rectTop = window.frameElement.getBoundingClientRect().top;
+        if(rectTop < 0) rectTop = 0;          // parent scrolled past the chrome
+        var ph = p.innerHeight || 800;
+        var h = ph - rectTop - 6;             // leave the bottom edge breathing room
+        if(h < 460) h = 460;                  // sane minimum on short windows
+        caseScroll.style.height = h + 'px';
+      } else {
+        caseScroll.style.height = '100vh';
+      }
+    } catch(e){ caseScroll.style.height = '100vh'; }
+    setNavOffset();
+  }
+  sizeScroller();
+  window.addEventListener('resize', sizeScroller);
+  window.addEventListener('load', sizeScroller);
+  try { if(window.parent && window.parent !== window) window.parent.addEventListener('resize', sizeScroller); } catch(e){}
+
+  /* ============ NAV: scroll-spy active + visited ============ */
+  var navchips = Array.prototype.slice.call(document.querySelectorAll('.navchip'));
+  var sections = navchips.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited = {};
+  var visitVal = document.getElementById('visitVal');
+
+  function markVisited(idx){
+    var sec = sections[idx];
+    if(!sec) return;
+    if(!visited[sec.id]){
+      visited[sec.id] = true;
+      navchips[idx].classList.add('visited');
+      var count = Object.keys(visited).length;
+      visitVal.textContent = count + ' / 19';
+      addXP(8, 'visit-' + sec.id, 'Section read');
+      if(count >= 19){ earnBadge('bdg-explorer'); addXP(60, 'allvisited', 'Ward Explorer!'); }
+    }
+  }
+  function setActive(idx){
+    navchips.forEach(function(c){ c.classList.remove('active'); });
+    if(navchips[idx]) navchips[idx].classList.add('active');
+  }
+
+  /* True tabs: each chip shows ONLY its section, hidden via CSS otherwise.
+     No scrollIntoView and no scroll-spy — nothing can scroll the tab bar away,
+     which also sidesteps every srcDoc-iframe scrolling quirk. The hero banner
+     and vitals strip belong to the case intro, so they show on S1 only. */
+  var heroBits = [document.querySelector('.hero'), document.querySelector('.vitals-strip')]
+    .filter(function(el){ return !!el; });
+
+  function showSection(idx){
+    sections.forEach(function(s, i){ if(s) s.classList.toggle('sec-active', i === idx); });
+    heroBits.forEach(function(el){ el.style.display = (idx === 0) ? '' : 'none'; });
+    caseScroll.scrollTop = 0;
+    setActive(idx);
+    markVisited(idx);
+  }
+
+  navchips.forEach(function(chip, idx){
+    chip.addEventListener('click', function(ev){
+      ev.preventDefault();
+      showSection(idx);
+    });
+  });
+  showSection(0);
+
+  /* ============ FLAG GAME (S2) ============ */
+  var flagBtns = document.querySelectorAll('#flagGame .flag-btn');
+  var flagResult = document.getElementById('flagResult');
+  var flagsFound = 0, flagsTotal = 0, flagWrong = 0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good') === '1') flagsTotal++; });
+  flagBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.dataset.locked) return;
+      btn.dataset.locked = '1';
+      var good = btn.getAttribute('data-good') === '1';
+      if(good){
+        btn.classList.add('flag-good');
+        flagsFound++;
+        addXP(10, 'flag-' + flagsFound + '-' + Math.random(), 'Pre-excited AF flag spotted');
+      } else {
+        btn.classList.add('flag-bad');
+        flagWrong++;
+        showToast('❌ Not a pre-excited-AF flag');
+      }
+      if(flagsFound === flagsTotal){
+        flagResult.textContent = '✅ All ' + flagsTotal + ' pre-excited AF red flags found' + (flagWrong ? ' (with ' + flagWrong + ' wrong pick' + (flagWrong>1?'s':'') + ')' : ' — flawless!');
+        earnBadge('bdg-vt');
+        addXP(30, 'flags-complete', 'FBI-Spotter badge');
+      } else {
+        flagResult.textContent = flagsFound + ' / ' + flagsTotal + ' pre-excited AF red flags found…';
+      }
+    });
+  });
+
+  /* ============ BRANCHING SCENARIO (S3) ============ */
+  var scText = document.getElementById('scText');
+  var scChoices = document.getElementById('scChoices');
+  var scFeedback = document.getElementById('scFeedback');
+  var scRestart = document.getElementById('scRestart');
+  var scStab = document.getElementById('scStab');
+  var scTime = document.getElementById('scTime');
+  var scXP = document.getElementById('scXP');
+  var pathXP = 0, scStability = 2, scElapsed = 0;
+
+  var STEPS = {
+    start: {
+      text: "The junior doctor looks at you, syringe of adenosine in one hand, defibrillator paddles in the other. BP 80/50 and falling. Monitor: fast, broad, IRREGULAR tachycardia over 250. The partner says he was told he has 'WPW.' The patient is drowsy and gray. What do you do FIRST?",
+      choices: [
+        { t: "🚫 Take the adenosine away and prepare synchronized cardioversion", good:true, ds:1, dt:10, xp:40, fb:"✅ Exactly. This is pre-excited AF and he is UNSTABLE (shock, prior syncope, drowsy). Remove the lethal AV-nodal blocker and go to electricity. You've bought him a future.", next:"sedate" },
+        { t: "💉 Give the adenosine — 'it's a fast SVT, worth a try'", good:false, ds:-2, dt:20, xp:0, fb:"☠️ Catastrophe. Adenosine blocks the AV node → even more impulses pour down the accessory pathway → the ventricular rate accelerates and degenerates toward VF. This is the M&M case in S13. Restart and choose again.", end:true },
+        { t: "💊 Give IV verapamil to 'slow the rate'", good:false, ds:-2, dt:18, xp:0, fb:"☠️ Lethal. Verapamil blocks the AV node and drops the BP — in pre-excited AF that shunts conduction to the pathway and can precipitate VF. Never an AV-nodal blocker here.", next:"start2" }
+      ]
+    },
+    start2: {
+      text: "You stop the verapamil before it runs. BP now 72/44, he's barely rousable. The defibrillator is ready and the partner is frightened. Now what?",
+      choices: [
+        { t: "⚡ Synchronized cardioversion now", good:true, ds:1, dt:8, xp:30, fb:"✅ Finally — the right call. Lesson banked: in unstable pre-excited AF, go to synchronized shock first and keep every AV-nodal blocker out.", next:"sedate" },
+        { t: "💉 Try IV amiodarone over 20 minutes", good:false, ds:-1, dt:20, xp:0, fb:"⚠️ Wrong twice over: too slow for a crashing patient, and IV amiodarone can itself accelerate accessory-pathway conduction in pre-excited AF. Shock him.", next:"sedate" }
+      ]
+    },
+    sedate: {
+      text: "He's barely conscious, BP 74/46. The defibrillator is charged and in SYNC. Before you press the button?",
+      choices: [
+        { t: "💤 Give a quick dose of ketamine, then shock — and check SYNC is on", good:true, ds:1, dt:6, xp:30, fb:"✅ Ideal: brief sedation for a conscious shock (ketamine preserves BP), and confirm SYNC so the machine fires on a complex. Now deliver it.", next:"shock" },
+        { t: "🔌 Shock immediately with no sedation, no SYNC check", good:false, ds:0, dt:3, xp:10, fb:"⚠️ Defensible if peri-arrest, but a conscious unsedated shock is agony, and an unchecked SYNC mode risks an unsynchronized shock → VF. Confirm SYNC at minimum.", next:"shock" }
+      ]
+    },
+    shock: {
+      text: "Synchronized shock at 150 J delivered. Rhythm converts to sinus at 72 — and the 12-lead now shows a short PR and a delta wave. BP climbs to 112/70. Final move of the first few minutes?",
+      choices: [
+        { t: "📞 Keep AV-nodal blockers out, have procainamide ready, and refer EP for accessory-pathway ablation", good:true, ds:1, dt:5, xp:40, fb:"🏆 Perfect close. The shock bought the rhythm; protecting him from AV-nodal blockers and getting him to ablation cures the disease. Case stabilized.", end:true },
+        { t: "💉 Now give a beta-blocker to keep the rate down", good:false, ds:-1, dt:10, xp:0, fb:"⚠️ No — a beta-blocker is an AV-nodal blocker. If he flips back into pre-excited AF on it, you could precipitate VF. Procainamide or shock, then ablate.", end:true }
+      ]
+    }
+  };
+
+  function renderStab(){
+    var s = Math.max(0, Math.min(5, scStability + 2)); // map -2..3 → 0..5
+    var dots = '';
+    for(var i=0;i<5;i++) dots += (i < s ? '●' : '○');
+    scStab.textContent = dots;
+  }
+  function renderStep(key){
+    var step = STEPS[key];
+    scText.textContent = step.text;
+    scFeedback.className = 'feedback';
+    scFeedback.style.display = 'none';
+    scChoices.innerHTML = '';
+    step.choices.forEach(function(ch){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = ch.t;
+      b.addEventListener('click', function(){
+        pathXP += ch.xp; scXP.textContent = pathXP;
+        scElapsed += ch.dt; scTime.textContent = scElapsed + ' s';
+        scStability += ch.ds; renderStab();
+        if(ch.xp) addXP(ch.xp, null, 'Scenario choice');
+        scFeedback.textContent = ch.fb;
+        scFeedback.className = 'feedback ' + (ch.good ? 'good' : 'bad');
+        scFeedback.style.display = 'block';
+        Array.prototype.forEach.call(scChoices.children, function(c){ c.disabled = true; c.style.opacity = .6; });
+        if(ch.end){
+          scRestart.style.display = 'inline-block';
+          if(ch.good && key === 'shock'){ earnBadge('bdg-shock'); addXP(20, 'scenario-win', 'Right Therapy!'); }
+        } else if(ch.next){
+          setTimeout(function(){ renderStep(ch.next); }, 1400);
+        }
+      });
+      scChoices.appendChild(b);
+    });
+  }
+  scRestart.addEventListener('click', function(){
+    pathXP = 0; scStability = 2; scElapsed = 0;
+    scXP.textContent = 0; scTime.textContent = '0 s'; renderStab();
+    scRestart.style.display = 'none';
+    renderStep('start');
+  });
+  renderStab();
+  renderStep('start');
+
+  /* ============ REVEAL BUTTONS ============ */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.getAttribute('data-target'));
+      if(!t) return;
+      if(t.classList.contains('reveal-shown')){
+        t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden');
+      } else {
+        t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown');
+        addXP(8, 'reveal-' + btn.getAttribute('data-target'), 'Self-test');
+      }
+    });
+  });
+
+  /* ============ SPERRI SIM (S6) ============ */
+  var kRange = document.getElementById('kRange');
+  var kVal = document.getElementById('kVal');
+  var kNeedle = document.getElementById('kNeedle');
+  var kReadout = document.getElementById('kReadout');
+  if(kRange){
+    var simUsed = false;
+    function updateK(){
+      var k = parseInt(kRange.value,10); // 150 .. 400 ms (SPERRI)
+      kVal.textContent = k;
+      var pct = (k - 150) / (400 - 150) * 100;
+      // Shorter SPERRI = higher risk → put the danger end (short) on the RIGHT of the gauge.
+      kNeedle.style.left = (100 - pct) + '%';
+      var msg, cls;
+      if(k < 200){ msg = '🔴 SPERRI &lt; 200 ms — extremely high-risk accessory pathway. Many impulses reach the ventricle; high risk of degeneration to VF. Urgent ablation.'; cls='bad'; }
+      else if(k < 250){ msg = '🔴 SPERRI &lt; 250 ms — HIGH-risk pathway (the classic threshold). This is a danger zone for sudden death — ablate.'; cls='bad'; }
+      else if(k < 300){ msg = '🟠 SPERRI 250–300 ms — intermediate risk. Less alarming, but a symptomatic pathway with documented pre-excited AF still warrants ablation.'; cls='warn-r'; }
+      else if(k < 350){ msg = '🟢 SPERRI 300–350 ms — lower-risk conduction; fewer impulses reach the ventricle per unit time. Still treat the syndrome, but the immediate VF risk is lower.'; cls='good'; }
+      else { msg = '🟢 SPERRI &gt; 350 ms — a relatively "slow," lower-risk pathway. Lowest VF risk band, but pre-excited AF that occurred still mandates definitive therapy.'; cls='good'; }
+      kReadout.innerHTML = msg;
+      kReadout.className = 'readout ' + cls;
+      if(!simUsed){ simUsed = true; addXP(15, 'ksim', 'Risk Stratifier'); }
+    }
+    kRange.addEventListener('input', updateK);
+    updateK();
+  }
+
+  /* ============ CHECKLISTS (S7) ============ */
+  var allChecklistsDone = 0, totalChecklists = document.querySelectorAll('.checklist').length;
+  document.querySelectorAll('.checklist').forEach(function(list){
+    var boxes = list.querySelectorAll('input[type=checkbox]');
+    var prog = list.querySelector('[data-progress]');
+    var total = boxes.length;
+    var doneAwarded = false;
+    function refresh(){
+      var done = 0;
+      boxes.forEach(function(b){
+        if(b.checked){ done++; b.closest('.ck').classList.add('done'); }
+        else { b.closest('.ck').classList.remove('done'); }
+      });
+      prog.textContent = done + ' / ' + total + ' complete';
+      if(done === total && !doneAwarded){
+        doneAwarded = true;
+        allChecklistsDone++;
+        addXP(25, 'ck-' + list.id, 'Checklist done');
+        if(allChecklistsDone >= totalChecklists){ earnBadge('bdg-ck'); addXP(20, 'allck', 'Checklist Champion'); }
+      }
+    }
+    boxes.forEach(function(b){
+      b.addEventListener('change', function(){
+        if(b.checked) addXP(4, null, 'Step checked');
+        refresh();
+      });
+    });
+  });
+
+  /* ============ MCQs (S19) ============ */
+  var MCQS = [
+    {
+      q: "A 28-year-old with a delta-wave history presents with a fast, broad, IRREGULAR tachycardia at >250/min, BP 80/50, drowsy after a syncope. Which class of drugs is contraindicated, and why?",
+      opts: ["AV-nodal blockers (adenosine, verapamil, beta-blockers, digoxin) — they shunt conduction down the accessory pathway and can precipitate VF","Class Ia agents — they slow the pathway","IV magnesium — it prolongs the QT","Loop diuretics — they cause hypokalemia"],
+      correct: 0,
+      exp: "In pre-excited AF, AV-nodal blockers (Adenosine, Beta-blockers, Calcium-channel blockers, Digoxin — 'ABCD') remove the AV node's competition, so even more atrial impulses conduct down the unguarded accessory pathway. The ventricular rate accelerates and can degenerate into VF. They are contraindicated."
+    },
+    {
+      q: "If this patient were hemodynamically STABLE, the antiarrhythmic drug of choice for pre-excited AF would be:",
+      opts: ["IV adenosine","IV verapamil","IV procainamide (or ibutilide)","IV digoxin"],
+      correct: 2,
+      exp: "Procainamide (a class Ia agent) — or ibutilide — slows conduction in and prolongs the refractoriness of the accessory pathway, and can restore sinus rhythm. The AV-nodal blockers (adenosine, verapamil, digoxin) are contraindicated."
+    },
+    {
+      q: "This patient is unstable (shock, syncope, drowsy). The best immediate management is:",
+      opts: ["IV verapamil to slow the rate","Synchronized DC cardioversion","IV digoxin loading","Observe on telemetry and recheck in 15 minutes"],
+      correct: 1,
+      exp: "An unstable tachyarrhythmia — including pre-excited AF — is treated with synchronized cardioversion, which is correct whatever the underlying rhythm. Instability collapses the differential; drugs are too slow and AV-nodal blockers are dangerous."
+    },
+    {
+      q: "On the resting/post-conversion ECG, the delta wave (a slurred QRS upstroke with a short PR) means:",
+      opts: ["Old myocardial infarction","Early ventricular activation via an accessory pathway bypassing the AV node","Hyperkalemia","Left bundle branch block"],
+      correct: 1,
+      exp: "A delta wave with a short PR is the fingerprint of ventricular pre-excitation: an accessory pathway (bundle of Kent) connects atrium to ventricle directly, so part of the ventricle depolarises early — without the AV-nodal delay — producing the short PR and slurred upstroke."
+    },
+    {
+      q: "The shortest pre-excited R–R interval (SPERRI) during AF is used to:",
+      opts: ["Estimate ejection fraction","Risk-stratify the accessory pathway — a SPERRI < 250 ms indicates a high-risk pathway prone to VF","Diagnose hyperthyroidism","Measure left atrial size"],
+      correct: 1,
+      exp: "The SPERRI reflects how fast the accessory pathway can conduct AF to the ventricle. A SPERRI < 250 ms (≈ a pre-excited rate > 240/min), or an inducible rapid pre-excited AF at EP study, identifies a high-risk pathway with greater VF/sudden-death risk."
+    },
+    {
+      q: "Which feature best distinguishes pre-excited AF from monomorphic VT?",
+      opts: ["A very fast rate","A broad QRS","An irregularly irregular rhythm with varying QRS width/morphology (vs a regular, uniform QRS in VT)","Hypotension"],
+      correct: 2,
+      exp: "Pre-excited AF is irregularly irregular with beat-to-beat varying QRS width (changing fusion of pathway and AV-node conduction). Monomorphic VT is regular with a uniform QRS. Both can be fast, broad and cause hypotension — the irregularity and varying width are the discriminators."
+    },
+    {
+      q: "What is the definitive, curative treatment for this patient's WPW with pre-excited AF?",
+      opts: ["Lifelong amiodarone","Catheter ablation of the accessory pathway","Permanent pacemaker","Implantable cardioverter-defibrillator (ICD)"],
+      correct: 1,
+      exp: "Radiofrequency catheter ablation of the accessory pathway cures WPW in roughly 95% of cases and abolishes the sudden-death risk. After pre-excited AF it is a Class I indication — the destination of this admission."
+    },
+    {
+      q: "By what mechanism does pre-excited AF degenerate into ventricular fibrillation?",
+      opts: ["The atria stop contracting","The accessory pathway has no decremental brake, so AF (400–600/min) conducts very rapidly to the ventricle; short coupling intervals fall on the vulnerable period and trigger VF","Profound bradycardia causes asystole then VF","Coronary thrombosis causes infarction"],
+      correct: 1,
+      exp: "Unlike the AV node, the accessory pathway lacks rate-limiting (decremental) conduction. In AF it can deliver hundreds of impulses per minute to the ventricle; the very short R–R intervals can land on the ventricle's vulnerable period and provoke VF — the route to sudden death, and exactly what AV-nodal blockers can accelerate."
+    }
+  ];
+
+  var host = document.getElementById('mcqHost');
+  var mcqVal = document.getElementById('mcqVal');
+  var mcqScore = 0, mcqAnswered = 0;
+  var letters = ['A','B','C','D','E'];
+
+  MCQS.forEach(function(item, qi){
+    var box = document.createElement('div');
+    box.className = 'mcq';
+    var html = '<div class="mcq-q">QUESTION ' + (qi+1) + ' / ' + MCQS.length + '</div>';
+    html += '<div class="mcq-stem">' + item.q + '</div>';
+    item.opts.forEach(function(opt, oi){
+      html += '<label class="mcq-opt" data-oi="' + oi + '"><strong>' + letters[oi] + '.</strong> ' + opt + '</label>';
+    });
+    html += '<div class="mcq-exp"></div>';
+    box.innerHTML = html;
+    host.appendChild(box);
+
+    var opts = box.querySelectorAll('.mcq-opt');
+    var exp = box.querySelector('.mcq-exp');
+    var locked = false;
+    opts.forEach(function(label){
+      label.addEventListener('click', function(){
+        if(locked) return;
+        locked = true;
+        var oi = parseInt(label.getAttribute('data-oi'),10);
+        box.classList.add('answered');
+        var correct = item.correct;
+        if(oi === correct){
+          label.classList.add('picked-right');
+          mcqScore++;
+          addXP(25, null, 'Correct answer');
+        } else {
+          label.classList.add('picked-wrong');
+          opts[correct].classList.add('show-right');
+          showToast('❌ Correct: ' + letters[correct]);
+        }
+        exp.innerHTML = '<strong>' + (oi === correct ? '✅ Correct. ' : '📘 Explanation. ') + '</strong>' + item.exp;
+        mcqAnswered++;
+        mcqVal.textContent = mcqScore + ' / ' + MCQS.length;
+        if(mcqAnswered === MCQS.length){
+          var done = document.getElementById('mcqDone');
+          var summary = document.getElementById('mcqSummary');
+          done.style.display = 'block';
+          summary.textContent = 'You scored ' + mcqScore + ' / ' + MCQS.length + '. ' +
+            (mcqScore === MCQS.length ? 'Flawless — FBI = pre-excited AF, hands off the AV node, every time. 🏆' :
+             mcqScore >= 6 ? 'Strong — review the misses and the contrast pairs in S6.' :
+             'Revisit S3, S5, S6 and S11 — the FBI rule and the ABCD contraindications are the whole case.');
+          if(mcqScore >= 7){ earnBadge('bdg-quiz'); addXP(50, 'quizace', 'Quiz Ace!'); }
+        }
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
