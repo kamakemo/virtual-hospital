@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICD Electrical Storm — Virtual Teaching Hospital</title>
+<!-- META
+id: c-storm-018
+title: ICD Electrical Storm
+hospital: cardiology
+department: cv-ep
+bednumber: 11
+chiefcomplaint: An ICD patient receiving repeated shocks — multiple sustained VT episodes in 24 hours
+system: Cardiology
+severity: critical
+tags: Electrical storm, ICD shocks, Beta-blockade, Sedation, Catheter ablation, Magnet
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --radius:16px;
+    --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  /* Internal scroll viewport. When this case is embedded the host app stretches
+     the iframe to full content height and the OUTER page scrolls, which would
+     let a sticky bar scroll away. We instead scroll inside this box (sized to
+     the visible window by JS) so the section tab bar stays pinned at the top.
+     Standalone, it falls back to the full viewport height. */
+  #caseScroll{height:100vh; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; scroll-padding-top:92px}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:36px 24px 80px; position:relative; overflow:hidden}
+  .hero::after{content:"📈"; position:absolute; right:-20px; top:-30px; font-size:220px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{max-width:1100px; margin:0 auto; position:relative; z-index:1}
+  .hero .crumbs{font-size:13px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:10px 0 6px; font-size:clamp(26px,4vw,40px); line-height:1.15}
+  .hero .sub{font-size:16px; opacity:.95}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; backdrop-filter:blur(4px)}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== LIVE ECG STRIP IN HERO ===== */
+  .ecg-banner{max-width:1100px; margin:14px auto 0; position:relative; z-index:1}
+  .ecg-banner svg{width:100%; height:64px; display:block; background:rgba(0,0,0,.18); border-radius:12px; border:1px solid rgba(255,255,255,.25)}
+  .ecg-trace{stroke:#86efac; stroke-width:2.4; fill:none; stroke-dasharray:1600; stroke-dashoffset:1600; animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{stroke-dashoffset:0}}
+
+  /* ===== VITALS STRIP ===== */
+  .vitals-strip{max-width:1100px; margin:-52px auto 0; padding:0 24px; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:11px; font-weight:700; letter-spacing:.6px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:21px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== HORIZONTAL SECTION SIDEBAR (fixed — always visible) ===== */
+  .topnav{position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.10)}
+  .topnav .rail{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; max-width:1180px; margin:0 auto; scrollbar-width:thin}
+  .navchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink2); font-size:11px; font-weight:700; text-decoration:none; min-width:78px; text-align:center; transition:all .18s; cursor:pointer}
+  .navchip .s-id{font-size:10px; letter-spacing:1px; color:#94a3b8}
+  .navchip .s-emoji{font-size:16px}
+  .navchip:hover{border-color:var(--rose); color:var(--rose); transform:translateY(-2px)}
+  .navchip.active{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; border-color:#b91c1c}
+  .navchip.active .s-id{color:#fecaca}
+  .navchip.visited:not(.active){border-color:var(--emerald-line); background:var(--emerald-soft)}
+
+  /* ===== DASHBOARD WIDGET ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:215px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10.5px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:760px){.dash{display:none}}
+
+  /* ===== MAIN / SECTIONS (tabbed: one section visible at a time) ===== */
+  main{max-width:1100px; margin:26px auto 80px; padding:0 24px}
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:26px; overflow:hidden}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16.5px; margin:26px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14.5px; margin:18px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:24px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15.5px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:14px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px; letter-spacing:.4px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14.5px}
+
+  /* ===== INTERACTIVE BITS ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:10px 18px; font-weight:700; font-size:14px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:22px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:15px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 15px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 15px; margin-top:12px; font-size:14px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim sliders */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:14px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:14px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Heart/circuit diagram */
+  .heart-fig{display:flex; gap:18px; flex-wrap:wrap; align-items:center; background:var(--slate-soft); border-radius:16px; padding:18px; margin:14px 0}
+  .heart-fig svg{flex:0 0 auto}
+  .heart-legend{flex:1; min-width:230px; font-size:13.5px}
+  .lg{display:flex; align-items:center; gap:8px; margin:5px 0}
+  .lg .sw{width:14px; height:14px; border-radius:4px; flex:0 0 auto}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Journey cards */
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:14px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:15px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:14px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13.5px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:22px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14.5px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:13px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .footer{max-width:1100px; margin:0 auto 36px; padding:0 24px; text-align:center; color:#94a3b8; font-size:12.5px}
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="caseScroll">
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · ⚡ EP Lab · 🛏️ Bed 11</div>
+    <h1>⚡ ICD Electrical Storm — "The Fire You Put Out With Calm"</h1>
+    <div class="sub">😖 A man with an implanted defibrillator is being shocked again and again — awake, terrified, in pain. He has had five sustained VT episodes since morning. Someone wants to "ride it out." Don't.</div>
+    <div class="chips">
+      <span class="chip crit">🔴 CRITICAL</span>
+      <span class="chip">⚡ Electrical Storm</span>
+      <span class="chip">🔌 Repeated ICD Shocks</span>
+      <span class="chip">🧲 Magnet · Sympatholysis</span>
+      <span class="chip">🎮 Interactive Case</span>
+      <span class="chip">⏱️ Break the loop now</span>
+    </div>
+    <div class="ecg-banner" title="Recurrent VT interrupted by ICD shocks">
+      <svg viewBox="0 0 800 64" preserveAspectRatio="none" aria-label="Recurrent ventricular tachycardia rhythm strip">
+        <polyline class="ecg-trace" points="0,40 40,40 55,12 70,58 85,40 130,40 145,12 160,58 175,40 220,40 235,12 250,58 265,40 310,40 325,12 340,58 355,40 400,40 415,12 430,58 445,40 490,40 505,12 520,58 535,40 580,40 595,12 610,58 625,40 670,40 685,12 700,58 715,40 760,40 775,12 790,58 800,40"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== LIVE VITALS ===================== -->
+<div class="vitals-strip">
+  <div class="vitals-grid">
+    <div class="vital alert"><div class="v-label">💓 HR</div><div class="v-num">126</div></div>
+    <div class="vital warn"><div class="v-label">🩸 BP</div><div class="v-num">158/96</div></div>
+    <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">24</div></div>
+    <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">96%</div></div>
+    <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.7°</div></div>
+    <div class="vital warn"><div class="v-label">🧠 GCS</div><div class="v-num">15</div></div>
+    <div class="vital alert"><div class="v-label">🔌 Shocks/24h</div><div class="v-num">7</div></div>
+    <div class="vital alert"><div class="v-label">😖 Distress</div><div class="v-num">Extreme</div></div>
+  </div>
+</div>
+
+<!-- ===================== HORIZONTAL SECTION SIDEBAR ===================== -->
+<nav class="topnav" id="topnav">
+  <div class="rail">
+    <a class="navchip" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navchip" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navchip" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navchip" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navchip" href="#s5"><span class="s-emoji">🎓</span><span>Consultant Round</span><span class="s-id">S5</span></a>
+    <a class="navchip" href="#s6"><span class="s-emoji">📖</span><span>Teaching Points</span><span class="s-id">S6</span></a>
+    <a class="navchip" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navchip" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navchip" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navchip" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navchip" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navchip" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navchip" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navchip" href="#s14"><span class="s-emoji">🔀</span><span>Differentials</span><span class="s-id">S14</span></a>
+    <a class="navchip" href="#s15"><span class="s-emoji">🗺️</span><span>Plan</span><span class="s-id">S15</span></a>
+    <a class="navchip" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navchip" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navchip" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navchip" href="#s19"><span class="s-emoji">🧠</span><span>MCQs</span><span class="s-id">S19</span></a>
+  </div>
+</nav>
+
+<!-- ===================== SCORE DASHBOARD ===================== -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections visited</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-vt">⚡ Storm-Spotter</span>
+      <span class="badge" id="bdg-shock">🔌 Storm Broken</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champion</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Ward Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running sims, taking the right path and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- S1 — PROFILE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s1">
+  <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+  <div class="section-content">
+    <div class="callout danger">
+      <b class="ct">🚨 YOU ARE HERE — 16:42, EP Lab Recovery Bay, Bed 11</b>
+      The man on the trolley flinches and cries out as his chest jolts — the seventh ICD shock since dawn. He is wide awake, drenched in sweat, gripping the rail: <em>"Please… make it stop… it keeps hitting me."</em> Each shock leaves him trembling, heart pounding harder than before. A junior is reaching for the defibrillator pads "in case he arrests" while the monitor shows another run of VT building. This is not one arrhythmia — it is a <strong>storm</strong>, and every shock is pouring petrol on it. Break the loop, don't ride it out.
+    </div>
+
+    <h3>👤 Patient Identity</h3>
+    <table class="tbl">
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>🧔 Name</td><td><strong>Mr. T.K.</strong></td></tr>
+      <tr><td>🎂 Age / Sex</td><td>62-year-old male</td></tr>
+      <tr><td>🆔 MRN</td><td>EP-11873</td></tr>
+      <tr><td>⚖️ Weight</td><td>88 kg</td></tr>
+      <tr><td>💼 Occupation</td><td>Retired bus driver</td></tr>
+      <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+    </table>
+
+    <h3>📜 Past Medical History — the substrate and the trigger</h3>
+    <ul>
+      <li>🫀 <strong>Ischemic cardiomyopathy, EF 30%</strong>, prior inferior MI with a basal-inferior <strong>scar</strong> — the re-entry substrate that feeds every VT tonight.</li>
+      <li>🔌 <strong>Secondary-prevention ICD</strong> implanted 3 years ago after a single sustained VT. Tonight that same device is firing again and again.</li>
+      <li>💧 On <strong>furosemide</strong> for congestion; today's bloods show <strong>K⁺ 3.3, Mg²⁺ 0.55</strong> — the electrolyte gasoline.</li>
+      <li>💊 Was on <strong>amiodarone and a beta-blocker</strong>, but <strong>ran out 5 days ago</strong> and didn't refill ("the pharmacy was shut, I felt fine"). The damping is gone.</li>
+      <li>😟 Two weeks of worsening breathlessness and ankle swelling — <strong>decompensating heart failure</strong>, another storm trigger.</li>
+      <li>🚬 Ex-smoker, 30 pack-years. Hypertension, type 2 diabetes, dyslipidemia.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Electrical storm is a sympathetic firestorm — you put it out with beta-blockade and sedation, not by riding out the shocks."</div>
+
+    <h3>🧬 Why THIS patient? — substrate + trigger + the shock loop</h3>
+    <p>His scarred, failing ventricle has always been an arrhythmic ventricle — the substrate was set years ago. This week, three things lit it: <strong>stopping his amiodarone and beta-blocker</strong> (removing both the antiarrhythmic and the sympatholytic brake), <strong>low potassium and magnesium</strong> (shortening refractoriness), and <strong>decompensating heart failure</strong> (stretch and wall stress that provoke ectopy). Each VT triggers an appropriate ICD shock. The shock is <em>painful and terrifying</em> → a surge of <strong>catecholamines</strong> floods the heart → adrenaline <strong>lowers the VF threshold</strong> and provokes the next VT → another shock → more adrenaline. A self-feeding loop: <strong>substrate ignites, the shock fans the flames.</strong> Three ingredients, one storm — and the shocks themselves are now part of the disease.</p>
+
+    <div class="callout warn"><b class="ct">🔥 Triggers / risk factors for electrical storm</b>
+    🫀 Scar / prior MI (the substrate) · 💔 Low EF, decompensated HF · ⚡ Electrolyte derangement (low K⁺, low Mg²⁺) · 🩻 New or active ischemia · 💊 Antiarrhythmic / beta-blocker non-adherence · 📏 QT change or pro-arrhythmic drugs · 😖 Pain, fear, catecholamine surge (the shock loop itself) · 🔌 An ICD that keeps shocking (appropriately or inappropriately)</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S2 — HANDOVER -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s2">
+  <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+  <div class="section-content">
+    <h3>📻 Ward Nurse Handover — listen for the loop</h3>
+    <div class="callout info">
+      <b class="ct">🎙️ SBAR from the EP recovery nurse (verbatim)</b>
+      <p><strong>S:</strong> "Bed 11 — Mr. T.K., ICD patient, ischemic cardiomyopathy EF 30%. He's been getting shocked all day — I've counted <strong>seven shocks</strong> since this morning, at least five separate runs of VT. He's awake for every single one and absolutely petrified."</p>
+      <p><strong>B:</strong> "Secondary-prevention ICD three years ago. Ran out of his amiodarone and beta-blocker five days ago. Last potassium 3.3, magnesium 0.55. Two weeks more breathless, legs swollen."</p>
+      <p><strong>A:</strong> "Between shocks his heart races, he's flushed, BP 158/96, pouring sweat, in pain. The covering doctor said <strong>'just let the ICD do its job and shock him — keep the pads ready.'</strong>"</p>
+      <p><strong>R:</strong> "I've got the crash trolley, pads, IV access. But every shock seems to make the next VT come faster. Something is wrong — he's not getting better, he's getting <em>worse</em>. We haven't interrogated the device or called EP yet."</p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Before treating the storm, ask: are these shocks REAL? Interrogate the device — and a magnet buys time by suspending shock therapy."</div>
+
+    <h3>🚩 Spot-the-Red-Flag — tap each feature that defines / drives an electrical storm</h3>
+    <p>🎮 <em>Interactive: click every feature that confirms or fuels the electrical storm (not the distractors). Each correct flag = +10 XP. Wrong picks cost you.</em></p>
+    <div id="flagGame">
+      <button class="btn ghost flag-btn" data-good="1">🔁 ≥3 sustained VT/VF episodes in 24 h</button>
+      <button class="btn ghost flag-btn" data-good="1">🔌 Repeated appropriate ICD shocks</button>
+      <button class="btn ghost flag-btn" data-good="1">😖 Pain/catecholamine ↔ shock vicious cycle</button>
+      <button class="btn ghost flag-btn" data-good="1">⚡ Low K⁺ / low Mg²⁺ / ischemia / HF trigger</button>
+      <button class="btn ghost flag-btn" data-good="1">📟 Need to interrogate the device</button>
+      <button class="btn ghost flag-btn" data-good="1">💊 Recent drug (amiodarone/β-blocker) non-adherence</button>
+      <button class="btn ghost flag-btn" data-good="0">🌡️ Temperature 36.7°C</button>
+      <button class="btn ghost flag-btn" data-good="0">🫁 SpO₂ 96% on air</button>
+    </div>
+    <p id="flagResult" style="font-weight:700"></p>
+
+    <h3>⏱️ Timeline so far</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">06:10</div>First shock of the day on the ward — terrifying but "the device working."</div>
+      <div class="t-item"><div class="t-time">06:10–16:30</div>At least <strong>five separate VT runs</strong>, <strong>seven shocks</strong>. Between episodes he is tachycardic, hypertensive, flushed, sweating — a clear catecholamine surge.</div>
+      <div class="t-item"><div class="t-time">16:00</div>Covering doctor (by phone) says "let the ICD shock him, keep pads ready." Nobody has interrogated the device or given sympatholysis.</div>
+      <div class="t-item"><div class="t-time">16:42</div>You arrive. He is awake, in pain, building toward the next VT. The clock is the enemy: every shock pours more catecholamines on the fire.</div>
+    </div>
+
+    <div class="callout ok"><b class="ct">🏅 The nurse's instinct is right</b>"He's getting worse, not better" is the key observation. An ICD storm is not a series of independent rescues — it is a self-feeding loop where each painful shock raises catecholamines and provokes the next VT. Recognizing that "the device is doing its job" is <em>not enough</em> — and may be feeding the fire — is the whole case.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S3 — INITIAL ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s3">
+  <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+  <div class="section-content">
+    <h3>🅰️🅱️🅲️ Primary Survey — between the shocks</h3>
+    <table class="tbl">
+      <tr><th>Step</th><th>Finding</th><th>What it means mechanistically</th></tr>
+      <tr><td>🅰️ Airway</td><td>Patent, talking, begging for it to stop.</td><td>Awake and conscious — which means every shock is felt fully. A conscious, repeatedly shocked patient is a catecholamine pump; sedation is therapeutic, not just kind.</td></tr>
+      <tr><td>🅱️ Breathing</td><td>RR 24, SpO₂ 96% on air, mild bibasal crackles.</td><td>Mild congestion from decompensating HF — one of the storm triggers. Oxygenation is preserved between VT runs; it collapses during sustained VT.</td></tr>
+      <tr><td>🅲️ Circulation</td><td><strong>BP 158/96</strong> between episodes, HR 126 sinus, flushed, diaphoretic, peripheries warm then clammy after each shock.</td><td>Hypertension and sinus tachycardia <em>between</em> VTs = a massive sympathetic/catecholamine surge driven by pain and fear. This adrenergic drive is exactly what lowers the VF threshold and provokes the next VT. Breaking it is the core of therapy.</td></tr>
+      <tr><td>🅳 Disability</td><td>GCS 15, hypervigilant, trembling, anticipating the next shock.</td><td>Psychological terror is not a side issue — fear is a direct, measurable driver of catecholamine release and further arrhythmia.</td></tr>
+      <tr><td>🅴 Exposure</td><td>ICD pocket left infraclavicular, no swelling/erythema; old inferior chest leads. Skin reddened over shock pads.</td><td>Confirms the device is in situ and firing. The next step is to <strong>interrogate it</strong> and have a <strong>magnet</strong> ready.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Every shock pours catecholamines on the fire; sedate and beta-block to break the loop, then ablate the substrate."</div>
+
+    <h3>🧭 The first question is NOT 'stable or unstable' — it is 'are the shocks REAL?'</h3>
+    <p>In a shocking ICD patient, the very first move is to <strong>interrogate the device</strong>: are the therapies <strong>APPROPRIATE</strong> (real VT/VF) or <strong>INAPPROPRIATE</strong> (AF/SVT with rapid conduction, T-wave oversensing, lead fracture/noise)? The answer changes everything. If <em>inappropriate</em>, or to buy time and stop traumatic repeated shocks while you assess, place a <strong>magnet</strong> over the ICD — this <strong>suspends tachyarrhythmia detection and shock therapy</strong> (it does NOT change pacing in an ICD). If <em>appropriate</em>, you are in true VT storm and must break the sympathetic loop.</p>
+
+    <div class="callout danger"><b class="ct">🧲 First moves: INTERROGATE + have a MAGNET ready</b>Get the device programmer / EP on the way and a doughnut <strong>magnet</strong> at the bedside. A magnet over an ICD <strong>turns shock therapy OFF</strong> while you sort out appropriateness, sedate, and start sympatholysis — without leaving the patient defenceless if you keep the external defibrillator and pads attached. <strong>Never</strong> confuse this with a magnet over a pacemaker (which causes asynchronous pacing).</div>
+
+    <!-- 🎬 BRANCHING SCENARIO ENGINE -->
+    <div class="scenario" id="scenarioBox">
+      <h3>🎬 Choose Your Path — "Breaking the Storm"</h3>
+      <div class="hud"><span>❤️ Stability: <b id="scStab">●●○○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 s</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+      <div class="scene-text" id="scText">Mr. T.K. has been shocked seven times today and is building toward another VT. He is awake, in pain, BP 158/96, flushed and sweating. The covering doctor said to "let the ICD do its job." What do you do FIRST?</div>
+      <div class="choices" id="scChoices"></div>
+      <div class="feedback" id="scFeedback"></div>
+      <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+    </div>
+
+    <div class="callout info"><b class="ct">🧮 What if the shocks were INAPPROPRIATE?</b>
+    If interrogation shows the "VT" was actually <strong>rapidly conducted AF</strong> or <strong>lead-noise oversensing</strong>, the patient is being traumatized by the device for nothing. The immediate move is a <strong>magnet</strong> to suspend shock therapy, then fix the cause: rate-control the AF, or recognize and replace a <strong>fractured lead</strong>. Failing to apply a magnet or interrogate — and simply letting it keep shocking — is the cardinal error in inappropriate-shock storm.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S4 — RESIDENT REVIEW -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s4">
+  <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+  <div class="section-content">
+    <p><em>The cardiology resident arrives at 16:44. Her reasoning, out loud:</em></p>
+
+    <h3>🧠 Name the syndrome, then break the loop</h3>
+    <p>"Five sustained VT episodes and seven shocks in one day — that is, by definition, an <strong>electrical storm</strong>: ≥3 sustained VT/VF episodes (or appropriate ICD therapies) in 24 hours. The dangerous instinct is to treat each shock as a separate save and feel reassured the device is 'working.' But each painful shock is a catecholamine bolus that provokes the next VT. The device working is <em>not</em> the same as the patient improving. My job is to <strong>break the sympathetic loop</strong>, not to admire the shocks."</p>
+
+    <h3>🎯 Immediate priorities (her actual order of operations)</h3>
+    <ol>
+      <li>📟 <strong>Interrogate the device / call EP:</strong> are the shocks appropriate? Have a <strong>magnet</strong> at the bedside to suspend shock therapy if needed and to stop traumatic repeated shocks while we work.</li>
+      <li>💉 <strong>Break the sympathetic firestorm:</strong> IV <strong>beta-blockade</strong> — non-selective <strong>propranolol</strong> is preferred (or esmolol infusion) — this is the single most important drug in true VT storm.</li>
+      <li>💤 <strong>Heavy sedation, often intubation:</strong> a calm, sedated patient stops generating catecholamines. Sedation here is antiarrhythmic, not just compassionate.</li>
+      <li>💊 <strong>Antiarrhythmic:</strong> IV <strong>amiodarone</strong> load (± lidocaine), restarting what he stopped.</li>
+      <li>🧪 <strong>Correct triggers in parallel:</strong> magnesium and potassium to target, treat decompensated HF, and look hard for new ischemia (angiography if suspected).</li>
+      <li>🔧 <strong>Reprogram the device:</strong> ATP-before-shock, extended detection, raised rate thresholds — reduce the shock burden while we stabilize.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In storm, the beta-blocker and the sedative are the antiarrhythmics. Calm the patient, calm the heart — then fix the potassium and hunt the trigger."</div>
+
+    <h3>🤔 "But beta-blockers in a failing heart — isn't that risky?"</h3>
+    <p>"Here, beta-blockade is <strong>therapeutic, not contraindicated</strong>. The whole storm is being driven by sympathetic overdrive; non-selective beta-blockade (propranolol) blunts it more completely than a selective agent. I'll titrate carefully in decompensated HF and support the circulation if needed — but withholding sympatholysis out of reflex 'don't beta-block heart failure' thinking is exactly how a storm becomes fatal."</p>
+
+    <div class="callout purple"><b class="ct">🧪 Resident's self-test (answer before reading on)</b>
+    Someone suggests "just keep letting the ICD shock him until EP arrives — at least he's protected." Good plan?
+    <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+    <div class="reveal-hidden" id="rev1"><p><strong>No.</strong> Riding out repeated shocks without sympatholysis and sedation feeds the storm — each shock is a catecholamine surge that provokes the next VT, plus severe pain and psychological trauma. "Protected" is not the same as "treated." Interrogate, apply a magnet if appropriate, beta-block, sedate, correct triggers — and reprogram so ATP terminates VT painlessly before a shock is even delivered.</p></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S5 — CONSULTANT ROUND -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s5">
+  <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round</h2></div>
+  <div class="section-content">
+    <p><em>The on-call consultant electrophysiologist, by phone at 16:50, then at the bedside:</em></p>
+
+    <h3>🗂️ Are these shocks APPROPRIATE or INAPPROPRIATE? — it changes everything</h3>
+    <div class="vs">
+      <div class="side a"><h4>🔴 APPROPRIATE shocks (true VT storm — this patient)</h4>
+        <ul><li>Device correctly detects real VT/VF</li><li>Cause: scar re-entry, ischemia, HF, electrolytes, drug withdrawal</li><li>Treat: <strong>sympatholysis</strong> (propranolol/esmolol) + sedation + amiodarone + fix triggers</li><li>Refractory → ablation, mechanical support, stellate ganglion block</li></ul></div>
+      <div class="side b"><h4>🔵 INAPPROPRIATE shocks</h4>
+        <ul><li>Device shocks a non-VT: rapidly conducted <strong>AF/SVT</strong>, <strong>T-wave oversensing</strong>, or <strong>lead fracture/noise</strong></li><li>Patient shocked for nothing → trauma + pro-arrhythmia</li><li>Treat: <strong>MAGNET</strong> to suspend shocks, then fix the cause (rate-control AF, replace lead, reprogram sensing)</li><li>Interrogate FIRST — never just keep shocking</li></ul></div>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A magnet over an ICD turns shock therapy OFF; over a pacemaker it turns asynchronous pacing ON — never confuse the two."</div>
+
+    <h3>🌀 Confirming the storm — and why the shocks make it worse</h3>
+    <p>Electrical storm = <strong>≥ 3 separate sustained episodes of VT/VF (or appropriate ICD therapies) in 24 hours</strong>, or incessant VT. Mr. T.K. has had five runs and seven shocks — this is a storm. It is fundamentally a <strong>sympathetically-driven emergency</strong>: each shock causes pain and fear → catecholamine surge → the surge lowers the VF threshold and provokes more VT → more shocks. The treatment is to <strong>cut the sympathetic drive</strong>: non-selective beta-blockade, deep sedation (often intubation), and, if refractory, a stellate ganglion block. Antiarrhythmics and trigger-correction support this; ablation cures the substrate.</p>
+
+    <h3>🧭 Consultant's commandments for the next hour</h3>
+    <ol>
+      <li>📟 "<strong>Interrogate the device before you treat.</strong> If shocks are inappropriate, a magnet fixes the immediate problem. If appropriate, the magnet still buys time and stops traumatizing him while we sedate and beta-block."</li>
+      <li>💉 "<strong>Break the firestorm:</strong> propranolol (or esmolol) plus heavy sedation/intubation is the core therapy — beta-blockers are <em>therapeutic</em> here. Amiodarone supports them; magnesium and potassium support both."</li>
+      <li>🗺️ "<strong>If it's refractory,</strong> escalate fast: urgent <strong>catheter ablation</strong> of the VT substrate, <strong>mechanical support</strong> (IABP/Impella/VA-ECMO), and <strong>stellate ganglion block</strong>. And reprogram — ATP before shocks, longer detection — to cut the shock burden."</li>
+    </ol>
+
+    <div class="callout danger"><b class="ct">☠️ The consultant's war memory (more in S13 M&amp;M)</b>"The worst storm I saw mismanaged was a man shocked <em>thirty-four times</em> overnight. Nobody interrogated the device. Half those shocks were for <strong>rapidly conducted AF</strong> — completely inappropriate — and the rest were a storm nobody sedated or beta-blocked. He was awake and screaming for most of it; the psychological trauma was lifelong, and the relentless catecholamine surge degenerated a treatable rhythm into refractory VF. A magnet and a syringe of propranolol in the first hour would have changed everything."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S6 — TEACHING POINTS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s6">
+  <div class="sec-header"><span class="s-badge">S6</span><h2>📖 Teaching Points</h2></div>
+  <div class="section-content">
+    <h3>🔬 The mechanism — the vicious cycle of electrical storm</h3>
+    <ol>
+      <li>🧱 <strong>The substrate:</strong> a scarred, failing ventricle harbors slow-conducting channels through fibrosis — the maze that scar-related re-entry VT lives in.</li>
+      <li>🔥 <strong>The trigger ignites it:</strong> a new insult — low K⁺/Mg²⁺, fresh ischemia, decompensated HF, a QT change, or <strong>stopping the amiodarone/beta-blocker</strong> — tips an irritable ventricle into sustained VT.</li>
+      <li>🔌 <strong>The ICD fires:</strong> the device detects VT and delivers a shock. In an awake patient this is <strong>agonizing and terrifying</strong> — like a kick from a horse to the chest.</li>
+      <li>😖 <strong>Pain + fear → catecholamine surge:</strong> the shock floods the body with adrenaline. Sympathetic tone soars (you see it as the hypertension and sinus tachycardia <em>between</em> episodes).</li>
+      <li>⚡ <strong>The surge lowers the VF threshold:</strong> catecholamines shorten refractoriness, increase automaticity and dispersion → the next VT comes faster and easier → another shock → more adrenaline. A self-amplifying loop.</li>
+      <li>💥 <strong>Why it kills:</strong> repeated shocks are themselves pro-arrhythmic and exhaust the myocardium; the relentless sympathetic drive can degenerate the storm into refractory VF and death — unless the loop is broken.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The storm feeds on adrenaline. Beta-blockade and sedation starve it; ablation removes the substrate it grew from. The shocks alone never end it."</div>
+
+    <h3>⚖️ Contrast pair #1 — APPROPRIATE vs INAPPROPRIATE shocks (interrogate!)</h3>
+    <div class="vs">
+      <div class="side a"><h4>✅ APPROPRIATE (real VT/VF)</h4><ul><li>Device correctly senses true VT/VF and treats it</li><li>This is genuine electrical storm → sympatholysis + sedation + amiodarone + fix triggers</li><li>Magnet still useful to stop traumatic repeated shocks while you sedate</li><li>Refractory → ablation, mechanical support, stellate block</li></ul></div>
+      <div class="side b"><h4>❌ INAPPROPRIATE (not VT)</h4><ul><li>Rapidly conducted <strong>AF/SVT</strong>, <strong>T-wave oversensing</strong>, or <strong>lead fracture/noise</strong></li><li>Patient shocked for nothing → trauma + pro-arrhythmia</li><li><strong>Magnet</strong> suspends shocks immediately; then fix the cause (rate control, lead replacement, reprogram sensing)</li><li>Cardinal error: not interrogating, just letting it keep shocking</li></ul></div>
+    </div>
+    <p>😈 <strong>The trap:</strong> assuming "the device is shocking, so it must be VT." A fractured lead or oversensed AF can deliver dozens of agonizing, useless, pro-arrhythmic shocks. <strong>Interrogate first; a magnet is the bedside off-switch.</strong></p>
+
+    <h3>⚖️ Contrast pair #2 — MAGNET over an ICD vs over a PACEMAKER</h3>
+    <div class="vs">
+      <div class="side a"><h4>🧲 Magnet over an ICD</h4><ul><li><strong>Suspends tachyarrhythmia detection &amp; shock therapy</strong></li><li>Does <strong>NOT</strong> change pacing</li><li>Use to stop inappropriate or traumatic repeated shocks while you assess and sedate</li><li>Keep external defibrillator + pads on — the patient is now unprotected from real VF</li></ul></div>
+      <div class="side b"><h4>🧲 Magnet over a PACEMAKER</h4><ul><li>Causes <strong>asynchronous (fixed-rate) pacing</strong> at the magnet rate</li><li>Does <strong>nothing</strong> to shock therapy (a pacemaker has none)</li><li>Used e.g. to override oversensing/inhibition in the OR</li><li>Never confuse with an ICD — opposite effect</li></ul></div>
+    </div>
+    <p>💡 <em>Why it matters:</em> reach for a magnet thinking it'll "reset" an ICD's pacing, or expect it to defibrillate, and you misunderstand the device. <strong>ICD + magnet = shocks OFF. Pacemaker + magnet = asynchronous pacing ON.</strong></p>
+
+    <!-- 🎮 INTERACTIVE SIM: sympathetic drive vs sympatholysis -->
+    <div class="sim" id="kSim">
+      <h3 style="margin-top:0">🎮 Simulation — The Adrenergic Dial: how sympathetic drive feeds the storm</h3>
+      <p style="font-size:13.5px">Drag the dial from a calm, sedated, beta-blocked patient toward an awake, terrified, repeatedly-shocked one. Watch how rising adrenergic drive lowers the VF threshold and accelerates VT recurrence and shock frequency.</p>
+      <label for="kRange">😖 Sympathetic drive (pain / catecholamines): <b id="kVal">3.1</b> /10</label>
+      <input type="range" id="kRange" min="20" max="75" value="31">
+      <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+      <div class="readout bad" id="kReadout">Set the dial to explore.</div>
+      <p style="font-size:12.5px; margin-top:10px; color:var(--ink2)">🎯 Goal: drag adrenergic drive into the <strong>low "sedated + beta-blocked" band</strong> — that is where the storm stops. Beta-blockade and sedation shift the safe zone; an awake, repeatedly shocked, pain-driven patient sits in the red where every shock provokes the next VT.</p>
+    </div>
+
+    <!-- 📚 EBM MODULE -->
+    <div class="ebm">
+      <h3>📚 Evidence-Based Medicine Corner</h3>
+      <table class="tbl">
+        <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+        <tr><td><span class="lvl">RCT</span> OPTIC (2006)</td><td>Amiodarone + beta-blocker reduced ICD shocks more than beta-blocker alone or sotalol in ICD patients.</td><td>Combination antiarrhythmic + beta-blockade is the medical backbone for reducing shock burden.</td></tr>
+        <tr><td><span class="lvl">RCT</span> MADIT-RIT (2012)</td><td>Programming higher detection rate / longer delays markedly reduced inappropriate and total ICD therapies and mortality.</td><td>Reprogramming (ATP-before-shock, extended detection, raised thresholds) is a powerful, immediate way to cut shocks.</td></tr>
+        <tr><td><span class="lvl">RCT</span> PARTITA (2022)</td><td>Early catheter ablation after a first ICD shock for VT reduced death and worsening HF vs waiting.</td><td>Ablation is not a last resort — early ablation reduces shocks and improves outcomes, especially in storm.</td></tr>
+        <tr><td><span class="lvl">EVIDENCE</span> Stellate ganglion block / cardiac sympathetic denervation</td><td>Percutaneous left/bilateral stellate ganglion block and surgical denervation suppress refractory VT storm.</td><td>A powerful sympatholytic rescue when drugs and sedation fail — reflects the storm's adrenergic core.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2017 AHA/ACC/HRS &amp; 2022 ESC VA Guidelines</td><td>Storm = sympatholysis (beta-blockade) + sedation, antiarrhythmics, correct triggers, reprogram, escalate to ablation/mechanical support.</td><td>Exactly the algorithm driving S3, S7 and S11.</td></tr>
+      </table>
+    </div>
+
+    <!-- 🔬 ADVANCED TOPICS -->
+    <div class="callout purple">
+      <h3 style="margin-top:0">🔬 Fellowship Corner — Advanced Topics</h3>
+      <ul>
+        <li>💉 <strong>Refractory storm escalation ladder:</strong> non-selective beta-blockade (propranolol) → esmolol infusion + deep sedation/intubation → IV amiodarone ± lidocaine → <strong>stellate ganglion block</strong> → <strong>mechanical support</strong> (IABP/Impella/VA-ECMO) → emergent <strong>catheter ablation</strong> → cardiac sympathetic denervation in extremis.</li>
+        <li>🗺️ <strong>VT substrate mapping &amp; ablation:</strong> electroanatomic mapping of the scar border zone, late potentials and local abnormal ventricular activities (LAVA); substrate homogenization vs activation/entrainment mapping. Mechanical support enables mapping of haemodynamically unstable VT.</li>
+        <li>🔧 <strong>Device programming to cut shocks (MADIT-RIT, OPTIC):</strong> ATP-before-shock terminates much monomorphic VT painlessly; longer detection windows and higher rate thresholds avoid treating self-terminating or non-VT rhythms.</li>
+        <li>🧲 <strong>The magnet, precisely:</strong> over an ICD it suspends tachy detection/therapy (no pacing change); over a pacemaker it forces asynchronous pacing. Know your device — chest X-ray and the device card identify it.</li>
+        <li>🔌 <strong>Lead failure as a storm cause:</strong> a fractured lead generates noise oversensed as VF → repeated inappropriate shocks. Look for non-physiologic intervals, lead impedance changes, and the "lead alert"; a magnet stops the shocks until the lead is revised.</li>
+        <li>🫀 <strong>Non-ischemic &amp; channelopathy storms:</strong> sarcoidosis, ARVC, Brugada (quinidine, isoproterenol), CPVT and LQTS each have storm phenotypes with specific therapies beyond generic sympatholysis.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S7 — ORDERS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s7">
+  <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+  <div class="section-content">
+    <h3>🖊️ The order set, written as you'd actually write it (16:46)</h3>
+    <ul>
+      <li>📟 <strong>Interrogate the ICD now</strong> (call EP / device tech) — confirm appropriate vs inappropriate; <strong>magnet at the bedside</strong> to suspend shocks if needed. Keep external defibrillator + pads attached.</li>
+      <li>💉 <strong>IV beta-blockade — PROPRANOLOL</strong> (non-selective, preferred) or <strong>esmolol infusion</strong>; titrate to break the sympathetic drive. This is the cornerstone — beta-blockers are THERAPEUTIC in storm.</li>
+      <li>💤 <strong>Sedation, often intubation:</strong> e.g. midazolam/propofol ± opioid; involve anaesthesia/ICU. A calm, sedated patient stops fuelling the storm.</li>
+      <li>💊 <strong>Amiodarone 300 mg IV</strong> over 20–60 min then 900 mg/24 h (± lidocaine) — restart the antiarrhythmic he stopped.</li>
+      <li>🧪 <strong>Magnesium sulfate 2 g IV</strong>; <strong>potassium</strong> to target 4.5–5.0 mmol/L (monitored line). Correct the electrolyte trigger.</li>
+      <li>🩻 <strong>Hunt for ischemia &amp; treat HF:</strong> 12-lead, serial troponin; if ischemia suspected, urgent coronary angiography. Treat decompensated heart failure (diuresis, afterload).</li>
+      <li>🔧 <strong>Reprogram the device:</strong> ATP-before-shock, extended detection, raised rate thresholds — reduce the shock burden while stabilizing.</li>
+      <li>📞 <strong>Escalate early</strong> for refractory storm: EP for <strong>catheter ablation</strong>, consideration of <strong>mechanical support</strong> (IABP/Impella/VA-ECMO) and <strong>stellate ganglion block</strong>.</li>
+      <li>🛏️ CCU/ICU admission, continuous monitoring, second large-bore IV, NPO if intubation likely.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In electrical storm there are two first priorities: ask if the shocks are real (interrogate ± magnet), and break the sympathetic drive (beta-block + sedate). Everything else makes those two work."</div>
+
+    <!-- 🩺 PROCEDURE GUIDE 1 -->
+    <div class="checklist" id="ckCV">
+      <h3 style="margin-top:0">🩺 Procedure Guide — Breaking the Storm — tick as you go</h3>
+      <label class="ck"><input type="checkbox"><span>📟 Interrogate the ICD (or call EP) — confirm APPROPRIATE vs INAPPROPRIATE shocks; keep external defibrillator + pads attached</span></label>
+      <label class="ck"><input type="checkbox"><span>🧲 Magnet ready/applied to suspend shock therapy if shocks are inappropriate or to stop traumatic repeated shocks while you stabilize (does NOT change pacing)</span></label>
+      <label class="ck"><input type="checkbox"><span>💉 IV beta-blockade — propranolol (non-selective, preferred) or esmolol infusion — the core sympatholytic</span></label>
+      <label class="ck"><input type="checkbox"><span>💤 Heavy sedation ± intubation (involve anaesthesia/ICU) — a calm patient stops generating catecholamines</span></label>
+      <label class="ck"><input type="checkbox"><span>💊 Amiodarone load (± lidocaine); correct K⁺ to 4.5–5.0 and Mg²⁺ &gt; 1.0</span></label>
+      <label class="ck"><input type="checkbox"><span>🩻 Find &amp; treat the trigger — ischemia (angiography if suspected), decompensated HF, restart withdrawn drugs</span></label>
+      <label class="ck"><input type="checkbox"><span>🔧 Reprogram device (ATP-before-shock, longer detection, raised thresholds); escalate refractory storm to ablation/mechanical support/stellate block</span></label>
+      <div class="ck-progress" data-progress>0 / 7 complete</div>
+    </div>
+
+    <!-- 🩺 PROCEDURE GUIDE 2 -->
+    <div class="checklist" id="ckDefib">
+      <h3 style="margin-top:0">🩺 Procedure Guide — If he loses his pulse: ACLS Defibrillation (UNSYNCHRONIZED)</h3>
+      <p style="font-size:13px">⚠️ If a VT degenerates to VF / pulseless VT and the ICD fails to convert it, switch immediately to <strong>external UNSYNCHRONIZED</strong> defibrillation and CPR — do not wait for the device.</p>
+      <label class="ck"><input type="checkbox"><span>🚫 Confirm no pulse → call arrest, start high-quality CPR (100–120/min, depth 5–6 cm, full recoil)</span></label>
+      <label class="ck"><input type="checkbox"><span>🔌 External defibrillator to <strong>UNSYNCHRONIZED</strong>, charge to max (200 J biphasic), clear, shock at minimal interruption to compressions</span></label>
+      <label class="ck"><input type="checkbox"><span>💉 Adrenaline 1 mg IV every 3–5 min; amiodarone 300 mg after the 3rd shock (then 150 mg)</span></label>
+      <label class="ck"><input type="checkbox"><span>🧠 Treat reversible causes — the 4 H's &amp; 4 T's; here especially <strong>hypokalemia/hypomagnesemia</strong> and ischemia (Thrombosis–coronary)</span></label>
+      <label class="ck"><input type="checkbox"><span>🔁 Rhythm/pulse check every 2 min; minimize hands-off time; rotate compressors</span></label>
+      <label class="ck"><input type="checkbox"><span>🫀 ROSC → post-arrest care, urgent coronary angiography if ischemic cause suspected, ICU, EP review of device</span></label>
+      <div class="ck-progress" data-progress>0 / 6 complete</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S8 — NURSING CARE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s8">
+  <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+  <div class="section-content">
+    <h3>🛏️ CCU nursing priorities — minute by minute</h3>
+    <ul>
+      <li>📟 <strong>Continuous telemetry with the external defibrillator and pads attached.</strong> The ICD is firing, but the patient may still need external defibrillation if a VT degenerates and the device fails.</li>
+      <li>🧲 <strong>Know the magnet rule cold:</strong> a magnet over an ICD <strong>suspends shock therapy</strong> (does NOT change pacing); over a pacemaker it causes asynchronous pacing. Have the magnet ready and know which device he has.</li>
+      <li>🔢 <strong>Count and document every shock and VT run with the time</strong> — the shock burden defines the storm and guides escalation; the strips are gold for EP.</li>
+      <li>🩸 <strong>BP every 2–5 min</strong>; flag the hypertension and sinus tachycardia <em>between</em> episodes — that is the sympathetic surge you are trying to suppress.</li>
+      <li>💉 <strong>Run the beta-blocker, sedation, amiodarone, magnesium and potassium as prescribed</strong> on a monitored line; double-check concentrations and rates.</li>
+      <li>💤 <strong>Prepare sedation and airway equipment early</strong> — intubation is often part of breaking the storm; assign a team member to the airway.</li>
+      <li>🔇 <strong>Calm the room — this is active treatment.</strong> Fear and pain drive the catecholamines that feed the storm. A composed bedside, reassurance, and analgesia are antiarrhythmic.</li>
+      <li>👨‍👩‍👦 Keep the family updated and supported (see S16) — repeated shocks are terrifying to witness and to receive.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who keeps the magnet within reach, counts every shock, and keeps the patient calm and sedated is doing half the antiarrhythmic work in the room."</div>
+    <div class="callout warn"><b class="ct">📢 Escalate IMMEDIATELY for</b>Another VT/shock despite therapy (→ refractory storm pathway) · loss of pulse (→ external UNSYNC defib + CPR) · shocks that look inappropriate (→ interrogate / magnet) · rising sedation/airway needs · falling BP from beta-blockade in decompensated HF (→ support circulation) · any plan to simply "keep shocking" without sympatholysis.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S9 — INVESTIGATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s9">
+  <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+  <div class="section-content">
+    <h3>🧾 Results board (16:50, drawn during resuscitation)</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>Result</th><th>Reference</th><th>Interpretation</th></tr>
+      <tr><td>📟 Device interrogation</td><td class="hi">5 VT episodes, 7 appropriate shocks /24h</td><td>—</td><td><strong>Confirms true electrical storm</strong> — therapies are APPROPRIATE (real VT), not inappropriate. This is a storm to sedate and beta-block, not a sensing problem.</td></tr>
+      <tr><td>Potassium</td><td class="lo">3.3 mmol/L ↓</td><td>3.5–5.0</td><td>A trigger. Hypokalemia shortens/heterogenizes refractoriness → more VT. Replace toward 4.5–5.0.</td></tr>
+      <tr><td>Magnesium</td><td class="lo">0.55 mmol/L ↓</td><td>0.7–1.0</td><td>Low Mg²⁺ destabilizes membranes and blocks effective K⁺ repletion. Give 2 g IV.</td></tr>
+      <tr><td>Troponin I</td><td class="hi">0.18 ng/mL ↑</td><td>&lt; 0.04</td><td>Mildly raised — repeated VT/shocks cause demand ischemia, OR a new ischemic trigger. Serial values + angiography decide.</td></tr>
+      <tr><td>Creatinine</td><td class="hi">1.7 mg/dL ↑</td><td>0.7–1.2</td><td>Cardiorenal from low output / decompensated HF; affects drug dosing and K⁺ handling.</td></tr>
+      <tr><td>NT-proBNP</td><td class="hi">4200 pg/mL ↑</td><td>&lt; 300</td><td>Confirms decompensated heart failure — one of tonight's storm triggers; treat it in parallel.</td></tr>
+      <tr><td>Amiodarone / drug levels</td><td class="lo">Sub-therapeutic (stopped 5 d)</td><td>—</td><td>Withdrawal of his antiarrhythmic and beta-blocker removed the brake — a key reversible cause.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The device interrogation is the most important test — it tells you whether the shocks are real, and whether you are fighting a storm or a sensing fault."</div>
+
+    <div class="callout info"><b class="ct">🧠 Why a mildly positive troponin doesn't relabel this as 'just an MI'</b>Repeated VT and external/ICD shocks raise troponin through supply–demand mismatch and direct injury. The question is whether ischemia is the <em>cause</em> or the <em>consequence</em>. Break the storm, get a clean post-stabilization 12-lead and serial troponins, and pursue angiography if a culprit lesion is suspected as the driver — ischemia is a classic storm trigger.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S10 — ECG / IMAGING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s10">
+  <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging</h2></div>
+  <div class="section-content">
+    <h3>🫀 The storm on the strip — VT, a shock, then VT again</h3>
+    <div class="ecg-fig">
+      <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Recurrent monomorphic VT terminated by an ICD shock then recurring">
+        <rect width="820" height="150" fill="#0b1220"/>
+        <g stroke="#1e3a5f" stroke-width="1">
+          <line x1="0" y1="30" x2="820" y2="30"/><line x1="0" y1="60" x2="820" y2="60"/>
+          <line x1="0" y1="90" x2="820" y2="90"/><line x1="0" y1="120" x2="820" y2="120"/>
+        </g>
+        <polyline fill="none" stroke="#86efac" stroke-width="2.4" points="0,75 30,75 45,40 60,110 75,75 120,75 135,40 150,110 165,75 210,75 225,40 240,110 255,75 300,75 315,40 330,110 345,75 360,75"/>
+        <line x1="380" y1="10" x2="380" y2="140" stroke="#fca5a5" stroke-width="3"/>
+        <polyline fill="none" stroke="#fcd34d" stroke-width="2.4" points="400,75 430,75 445,72 460,78 475,75 520,75 535,72 550,78 565,75"/>
+        <polyline fill="none" stroke="#86efac" stroke-width="2.4" points="585,75 600,40 615,110 630,75 675,75 690,40 705,110 720,75 765,75 780,40 795,110 810,75"/>
+        <text x="300" y="22" fill="#fca5a5" font-size="12" font-weight="700">↑ sustained VT</text>
+        <text x="384" y="22" fill="#fca5a5" font-size="12" font-weight="700">⚡ shock</text>
+        <text x="430" y="64" fill="#fcd34d" font-size="12" font-weight="700">brief sinus →</text>
+        <text x="600" y="135" fill="#fca5a5" font-size="12" font-weight="700">↑ VT recurs (storm)</text>
+      </svg>
+      <div class="ecg-cap">Sustained monomorphic <span style="color:#fca5a5">VT</span> → an <span style="color:#fca5a5">ICD shock</span> → a few <span style="color:#fcd34d">sinus beats</span> → <span style="color:#fca5a5">VT recurs within seconds</span>. This recurrence-after-shock pattern, ≥3 times in 24 h, IS electrical storm — and the shock is feeding the next episode.</div>
+    </div>
+
+    <h3>🔎 What to look for on the strip and the printout</h3>
+    <table class="tbl">
+      <tr><th>Feature</th><th>What it tells you</th></tr>
+      <tr><td>🔁 <strong>VT recurring shortly after each shock</strong></td><td>The defining pattern of storm — and the signature of the catecholamine loop. The shock terminates one episode and provokes the next.</td></tr>
+      <tr><td>📟 <strong>Device electrograms (interrogation)</strong></td><td>The single most important "imaging" — confirms the rhythm was real VT/VF (appropriate) vs AF/noise/oversensing (inappropriate).</td></tr>
+      <tr><td>📏 <strong>Same monomorphic QRS each run</strong></td><td>Scar-related re-entry from a fixed circuit — the ablation target.</td></tr>
+      <tr><td>🩻 <strong>Inter-episode 12-lead</strong></td><td>Look for new ischemia (ST changes), QT prolongation, electrolyte signatures — the triggers to correct.</td></tr>
+      <tr><td>🔌 <strong>Lead parameters / non-physiologic intervals</strong></td><td>Suggest lead fracture/noise causing inappropriate shocks — a different problem with a magnet as the immediate fix.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In a shocking ICD patient, the most important investigation isn't the 12-lead — it's the device interrogation. It tells you if the storm is real before you treat it."</div>
+
+    <h3>🩻 Imaging &amp; substrate work-up</h3>
+    <ul>
+      <li>🩻 <strong>Echo:</strong> EF 28–30%, basal-inferior akinetic scar, dilated LV, moderate functional MR; assess for decompensation and thrombus.</li>
+      <li>🗺️ <strong>Coronary angiography:</strong> exclude/treat an acute ischemic trigger; viability assessment for revascularization.</li>
+      <li>🧲 <strong>Cardiac MRI / PET (later):</strong> delayed-enhancement scar mapping for ablation planning; exclude infiltrative causes (sarcoid).</li>
+      <li>📷 <strong>Chest X-ray:</strong> confirms device type and lead integrity (fracture, dislodgement) — relevant if inappropriate shocks are suspected.</li>
+    </ul>
+
+    <div class="callout warn"><b class="ct">⚠️ The storm's favorite lie</b>"The device is shocking, so it must be VT — just let it work." A fractured lead or rapidly conducted AF can deliver dozens of agonizing, useless, pro-arrhythmic shocks. <strong>Interrogate before you assume; a magnet is the immediate off-switch for inappropriate (or traumatic) shocks.</strong></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S11 — MEDICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s11">
+  <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+  <div class="section-content">
+    <h3>💉 Acute drugs — what, why, and the traps</h3>
+    <table class="tbl">
+      <tr><th>Drug</th><th>Role tonight</th><th>Mechanism / caution</th></tr>
+      <tr><td><strong>Propranolol IV (non-selective β-blocker)</strong></td><td><strong>Cornerstone of VT storm</strong> — breaks the sympathetic firestorm</td><td>Non-selective blockade blunts catecholamine drive more completely than selective agents. Therapeutic in storm. Titrate in decompensated HF; support circulation as needed.</td></tr>
+      <tr><td><strong>Esmolol infusion</strong></td><td>Alternative/titratable beta-blockade</td><td>Ultra-short-acting — easy to titrate and stop if hypotension; useful when haemodynamics are precarious.</td></tr>
+      <tr><td><strong>Sedation (midazolam / propofol ± opioid)</strong></td><td>Antiarrhythmic by removing pain/fear; enables intubation</td><td>A calm, sedated (often intubated) patient stops generating catecholamines. Sedation here is treatment, not just comfort.</td></tr>
+      <tr><td><strong>Amiodarone 300 mg IV</strong></td><td>Antiarrhythmic to suppress recurrence (restart what he stopped)</td><td>Class III (multichannel). Negative inotrope/vasodilator if pushed fast → give over 20–60 min. Prolongs QT — monitor.</td></tr>
+      <tr><td><strong>Lidocaine</strong></td><td>Adjunct, especially ischemia-driven storm</td><td>Class Ib, works best on ischemic/abnormal tissue; watch for neuro toxicity.</td></tr>
+      <tr><td><strong>Magnesium / Potassium (IV, monitored)</strong></td><td>Correct the electrolyte triggers</td><td>Give Mg²⁺ first (enables K⁺ repletion); target K⁺ 4.5–5.0, Mg²⁺ &gt; 1.0. Respect maximum infusion rates.</td></tr>
+      <tr><td><strong>Stellate ganglion block / sympathetic denervation</strong></td><td>Rescue for refractory storm</td><td>Direct sympatholysis when drugs/sedation fail — reflects the storm's adrenergic core.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Beta-blockers are THERAPEUTIC in electrical storm, not contraindicated. Withholding sympatholysis out of reflex 'don't beta-block heart failure' thinking is how a treatable storm turns fatal."</div>
+
+    <div class="callout danger"><b class="ct">🚫 The 'don't do this' list in electrical storm</b>❌ Don't simply "ride out" repeated shocks without sympatholysis + sedation · ❌ Don't withhold beta-blockade reflexively because the EF is low · ❌ Don't keep shocking an INAPPROPRIATE rhythm (AF/lead noise) — interrogate and apply a <strong>magnet</strong> · ❌ Don't confuse a magnet over an ICD (shocks OFF) with one over a pacemaker (asynchronous pacing). When the storm is refractory, the answer is <strong>ablation / mechanical support / stellate block</strong>, not more unmodified shocks.</div>
+
+    <h3>🏠 Substrate-modifying therapy (this admission, not just tonight)</h3>
+    <ul>
+      <li>💙 <strong>Optimize HFrEF GDMT:</strong> ARNI/ACEi, beta-blocker, MRA, SGLT2i — remodel the substrate and reduce arrhythmic death; treat the decompensation that triggered the storm.</li>
+      <li>🗺️ <strong>Catheter ablation</strong> of the VT circuit — increasingly early (PARTITA), reduces recurrent VT and shocks.</li>
+      <li>💊 <strong>Restart/continue amiodarone</strong> (or sotalol) + beta-blocker (OPTIC) to reduce shock burden.</li>
+      <li>🔧 <strong>Reprogram the ICD</strong> (ATP-before-shock, longer detection, raised thresholds — MADIT-RIT) to cut total and inappropriate shocks.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S12 — MONITORING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s12">
+  <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+  <div class="section-content">
+    <h3>📡 What to watch and why</h3>
+    <ul>
+      <li>📈 <strong>Continuous telemetry</strong> with the external defibrillator and pads at the bedside until ≥ 24–48 h storm-free; print and time every VT run and shock.</li>
+      <li>📟 <strong>Device interrogation &amp; ongoing EP review</strong> — appropriate vs inappropriate therapies, shock counts, lead parameters; reprogram as needed.</li>
+      <li>🩸 <strong>Invasive arterial line</strong> for beat-to-beat BP through beta-blocker titration, sedation and any mechanical support.</li>
+      <li>😖 <strong>Sympathetic markers:</strong> watch the inter-episode HR and BP — falling tachycardia/hypertension means your sympatholysis is working.</li>
+      <li>🧪 <strong>Serial K⁺ and Mg²⁺</strong> (q2–4h initially) — keep K⁺ 4.5–5.0, Mg²⁺ &gt; 1.0.</li>
+      <li>📐 <strong>QTc on every 12-lead</strong> — amiodarone, sotalol, low K⁺/Mg²⁺ all prolong it; a lengthening QT changes the rhythm risk.</li>
+      <li>🫀 <strong>Serial troponin &amp; NT-proBNP</strong> — track an ischemic trigger and the decompensated HF you are treating in parallel.</li>
+      <li>💤 <strong>Sedation depth &amp; airway</strong> — if intubated, standard ventilator and sedation monitoring; the calmer he is, the quieter the storm.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Once the storm starts breaking, the monitor's question changes from 'how many shocks?' to 'is the sympathetic drive falling?' — and the answers are the inter-episode HR, BP and the shock count."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S13 — COMPLICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s13">
+  <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+  <div class="section-content">
+    <h3>💀 What can go wrong — and the mechanism</h3>
+    <ul>
+      <li>⚡ <strong>Degeneration to refractory VF / cardiac arrest</strong> — relentless sympathetic drive and exhausted myocardium; treatment pivots to external UNSYNC defibrillation + CPR + mechanical support.</li>
+      <li>😱 <strong>Severe psychological trauma</strong> — repeated conscious shocks cause PTSD, anxiety and device aversion; under-recognized and a reason sedation matters.</li>
+      <li>🫀 <strong>Cardiogenic shock / worsening HF</strong> — the storm and the failing ventricle feed each other; may need IABP/Impella/VA-ECMO.</li>
+      <li>🔌 <strong>Inappropriate shocks</strong> — rapidly conducted AF, T-wave oversensing or a fractured lead deliver useless, pro-arrhythmic, traumatic shocks if not interrogated and a magnet applied.</li>
+      <li>💊 <strong>Pro-arrhythmia from therapy</strong> — antiarrhythmics prolong QT; over-aggressive beta-blockade in decompensated HF can drop output.</li>
+      <li>🔁 <strong>Recurrence</strong> — if the triggers (electrolytes, ischemia, HF, drug withdrawal) and substrate (scar) aren't addressed, the storm returns.</li>
+    </ul>
+
+    <!-- 🎭 M&M CONFERENCE MODULE -->
+    <div class="mm">
+      <h3>🎭 Morbidity &amp; Mortality Conference — "The Man Who Was Shocked Thirty-Four Times"</h3>
+      <div class="mm-case">
+        <strong>The case:</strong> A 68-year-old ICD patient arrived overnight being repeatedly shocked. The covering team "let the device do its job" and kept pads ready. <strong>Nobody interrogated the device and nobody applied a magnet.</strong> By morning he had been shocked <strong>34 times</strong> — and interrogation later showed that more than half were <strong>INAPPROPRIATE</strong>, triggered by a <strong>fractured lead</strong> oversensing noise as VF, the rest a true storm that was never sedated or beta-blocked. He was awake and screaming for most of the night. The relentless pain-driven catecholamine surge degenerated the rhythm into refractory VF; the resuscitation was lost. The psychological trauma — for him and the staff — was profound.
+      </div>
+      <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+      <div class="swiss">
+        <div class="hole"><b>📟 NEVER INTERROGATED</b>No one asked whether the shocks were real — half were lead-noise artefact.</div>
+        <div class="hole"><b>🧲 NO MAGNET</b>A magnet would have suspended the inappropriate/traumatic shocks in seconds.</div>
+        <div class="hole"><b>💉 NO SYMPATHOLYSIS</b>No beta-blocker, no sedation — the storm was fed, not fought.</div>
+        <div class="hole"><b>🔌 "LET IT DO ITS JOB"</b>The device shocking was mistaken for the patient being treated.</div>
+        <div class="hole"><b>🌙 SYSTEM</b>Night cover, no EP called, no "interrogate + sympatholysis" default.</div>
+      </div>
+      <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> interrogate the device early; apply a <strong>magnet</strong> to stop inappropriate/traumatic shocks; recognize and revise the <strong>fractured lead</strong>; for the true component, <strong>beta-block, sedate, load amiodarone, fix triggers</strong>, and escalate to ablation/mechanical support. <strong>This is exactly why your nurse said "he's getting worse, not better" tonight.</strong></p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Let the device do its job' is the sentence written on the chart of patients shocked to death. The device shocking is not the patient being treated."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S14 — DIFFERENTIALS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s14">
+  <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials</h2></div>
+  <div class="section-content">
+    <h3>🧩 The "repeatedly-shocked ICD patient" differential</h3>
+    <table class="tbl">
+      <tr><th>Diagnosis</th><th>Clues</th><th>Why it matters</th></tr>
+      <tr><td>⚡ <strong>True electrical storm — appropriate shocks</strong> (this patient)</td><td>≥3 sustained VT/VF in 24 h on interrogation; scar, HF, electrolytes, drug withdrawal; sympathetic surge between runs</td><td>Sympatholysis + sedation + amiodarone + fix triggers; refractory → ablation/support/stellate block.</td></tr>
+      <tr><td>🔌 <strong>Inappropriate shocks — rapidly conducted AF/SVT</strong></td><td>Irregular fast atrial rhythm sensed as VT; shocks don't correlate with collapse</td><td>Magnet to stop shocks; rate-control AF, reprogram detection — NOT a storm to sedate.</td></tr>
+      <tr><td>🪛 <strong>Inappropriate shocks — lead fracture / noise</strong></td><td>Non-physiologic intervals, impedance changes, "lead alert," shocks unrelated to symptoms</td><td>Magnet immediately; revise/replace the lead. A pure device problem masquerading as storm.</td></tr>
+      <tr><td>📈 <strong>T-wave oversensing</strong></td><td>Device counts T waves as extra beats → double-counts into the "VT" zone</td><td>Magnet + reprogram sensing; not a true arrhythmia.</td></tr>
+      <tr><td>🌀 <strong>Incessant / polymorphic VT</strong></td><td>Continuous or twisting VT; consider ischemia (normal QT) or long QT (Torsades)</td><td>Treat the specific cause — revascularize, or magnesium + fix QT — alongside sympatholysis.</td></tr>
+      <tr><td>🧪 <strong>Reversible trigger storms</strong></td><td>New ischemia, severe hypokalemia/hypomagnesemia, decompensated HF, drug withdrawal/proarrhythmia</td><td>Correcting the trigger is often what truly ends the storm.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"APPROPRIATE shocks → break the sympathetic storm. INAPPROPRIATE shocks (AF / lead noise) → magnet and fix the device. Interrogate to tell which — never assume."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S15 — PLAN -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s15">
+  <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan</h2></div>
+  <div class="section-content">
+    <h3>🧭 Tonight → this week → for life</h3>
+    <ol>
+      <li>⚡ <strong>Tonight (done):</strong> device interrogated (appropriate VT storm); magnet ready; IV propranolol + sedation (intubated); amiodarone load; magnesium and potassium repleted; HF treated; device reprogrammed (ATP-before-shock, longer detection). Storm settling.</li>
+      <li>🩻 <strong>Identify &amp; treat the triggers:</strong> coronary angiography for ischemia, full electrolyte correction, diuresis/afterload reduction for decompensated HF, and <strong>restart the antiarrhythmic/beta-blocker he stopped</strong> with an adherence plan.</li>
+      <li>🗺️ <strong>Urgent/early catheter ablation</strong> of the scar-related VT circuit — particularly after a storm; reduces recurrence and shocks (PARTITA).</li>
+      <li>🔧 <strong>Optimize device programming</strong> for the long term (ATP-before-shock, extended detection, raised thresholds — MADIT-RIT) and continue amiodarone + beta-blocker (OPTIC) to cut shock burden.</li>
+      <li>💙 <strong>Optimize HFrEF GDMT</strong> (ARNI/ACEi, beta-blocker, MRA, SGLT2i) and assess for revascularization / advanced HF therapies.</li>
+      <li>🧠 <strong>Psychological support &amp; education:</strong> address shock-related trauma; explain ATP vs shock, what to do after a shock, and a clear safety net.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Sympatholysis stops tonight's storm; ablation, reprogramming, GDMT and adherence stop the next one. Send him home with all of them planned, or the storm returns."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S16 — PROGRESS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s16">
+  <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+  <div class="section-content">
+    <h3>📅 Course in CCU/ICU</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Day 0, 17:00</div>Device interrogated → true VT storm (appropriate shocks). IV propranolol + sedation (intubated). Magnet on standby. No further shocks after sympatholysis takes hold.</div>
+      <div class="t-item"><div class="t-time">Day 0, 19:00</div>Magnesium and potassium corrected (K⁺ 4.7 / Mg²⁺ 1.0); amiodarone loaded; HF diuresed. Two short ATP-terminated VT runs — no shocks.</div>
+      <div class="t-item"><div class="t-time">Day 1</div>Storm-free 18 h. Device reprogrammed (ATP-before-shock, longer detection). Sedation lightened, extubated. Troponin settling.</div>
+      <div class="t-item"><div class="t-time">Day 2</div>Coronary angiography: old occluded RCA, no new culprit — medical therapy + EP pathway. GDMT uptitrated; amiodarone + beta-blocker restarted.</div>
+      <div class="t-item"><div class="t-time">Day 4</div>Elective <strong>catheter ablation</strong> of the basal-inferior VT circuit by EP. No inducible clinical VT post-ablation.</div>
+      <div class="t-item"><div class="t-time">Day 6</div>Storm-free 48 h, mobilizing, electrolytes stable, device checked and reprogrammed. Psychology review for shock trauma. Ready for discharge.</div>
+    </div>
+
+    <!-- 👨‍👩‍👦 FAMILY & PATIENT JOURNEY MODULE -->
+    <h3>👨‍👩‍👦 Family &amp; Patient Journey</h3>
+    <div class="journey">
+      <div class="j-card"><div class="j-who">🧔 The patient — Mr. T.K.</div><p>"It hit me again and again — like being kicked in the chest by a horse, over and over, and I was awake for all of it. The moment they put me to sleep and gave that injection, the kicking stopped. I didn't know you could be shocked <em>too much</em>."</p></div>
+      <div class="j-card"><div class="j-who">👩 His wife</div><p>"Watching him jerk and cry out every few minutes was the worst night of my life. A nurse explained they were going to calm his nerves down to stop the shocks. When the monitor went quiet and steady, I finally cried with relief."</p></div>
+      <div class="j-card"><div class="j-who">👩‍⚕️ The bedside nurse</div><p>"I kept saying he was getting worse, not better. Once we interrogated the device and started the propranolol and sedation, the storm just… stopped. The magnet stayed in my pocket the whole time, just in case."</p></div>
+      <div class="j-card"><div class="j-who">🎓 The team's reflection</div><p>"We stopped admiring the shocks and started treating the storm. Interrogate, sympatholysis, sedation, fix the triggers, then ablate — the device shocking was never the same as the patient being treated."</p></div>
+    </div>
+
+    <div class="callout pink"><b class="ct">💗 The human thread</b>An ICD shock that saves a life in your living room can also, in a storm, become repeated trauma that haunts a patient for years. Recognizing the psychological injury of repeated shocks — and treating it with sedation in the moment and psychology afterward — is as much a part of storm care as the propranolol.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S17 — DISCHARGE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s17">
+  <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+  <div class="section-content">
+    <h3>📋 Discharge plan &amp; safety net</h3>
+    <ul>
+      <li>💊 <strong>Medications:</strong> restarted amiodarone (with thyroid/LFT monitoring) and beta-blocker, optimized HFrEF GDMT (ARNI/beta-blocker/MRA/SGLT2i), statin, with a clear written schedule. Review the diuretic dose that drove the hypokalemia.</li>
+      <li>🔧 <strong>ICD reprogrammed</strong> (ATP-before-shock, longer detection, raised thresholds), device clinic follow-up, remote monitoring enabled; carry the device ID card.</li>
+      <li>🗺️ <strong>EP follow-up</strong> after VT ablation; cardiology and heart-failure clinic appointments booked before he leaves.</li>
+      <li>💉 <strong>Adherence plan:</strong> the storm was partly triggered by running out of medication — set up automatic refills, a pillbox, and a pharmacy contact. Hammer home that stopping the antiarrhythmic/beta-blocker can light a storm.</li>
+      <li>🚩 <strong>Red flags → call emergency services:</strong> a single shock + feeling well = urgent review; <strong>two or more shocks, or repeated shocks = emergency</strong>; palpitations with dizziness, chest pain, breathlessness, or fainting.</li>
+      <li>🧠 <strong>Psychological support &amp; education:</strong> address shock-related anxiety/PTSD; explain what an ICD does, ATP (painless) vs shock, what to do after a shock, and offer CPR/AED training to his wife.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Discharge after a storm is not 'shocks stopped, go home' — it is restarted drugs with an adherence plan, a reprogrammed device, an ablation done, optimized HF therapy, and a patient whose trauma has been addressed."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S18 — CLINICAL PEARLS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s18">
+  <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+  <div class="section-content">
+    <div class="pearl-grid">
+      <div class="pearl"><b>⚡ Storm = ≥3 in 24 h</b>Electrical storm = ≥3 separate sustained VT/VF episodes (or appropriate ICD therapies) in 24 h, or incessant VT.</div>
+      <div class="pearl"><b>🔥 It's a sympathetic firestorm</b>Each shock → pain + fear → catecholamines → lower VF threshold → more VT. Break the loop; don't ride it out.</div>
+      <div class="pearl"><b>📟 Interrogate first</b>Ask "are these shocks REAL?" Appropriate = true VT/VF; inappropriate = AF/SVT, T-wave oversensing, lead noise.</div>
+      <div class="pearl"><b>🧲 Magnet over an ICD = shocks OFF</b>It suspends tachy detection/therapy and does NOT change pacing. Buys time; keep external pads on.</div>
+      <div class="pearl"><b>🧲 Magnet over a pacemaker = async pacing</b>Opposite effect — fixed-rate pacing, no shock change. Never confuse the two devices.</div>
+      <div class="pearl"><b>💉 Beta-blockers are therapeutic</b>Non-selective propranolol (or esmolol) is the cornerstone — not contraindicated, even in low EF.</div>
+      <div class="pearl"><b>💤 Sedation is antiarrhythmic</b>A calm, sedated (often intubated) patient stops generating the catecholamines that feed the storm.</div>
+      <div class="pearl"><b>🧪 Fix the triggers</b>Correct K⁺/Mg²⁺, hunt ischemia, treat decompensated HF, restart withdrawn drugs — that's often what ends it.</div>
+      <div class="pearl"><b>🔧 Reprogram to cut shocks</b>ATP-before-shock, longer detection, raised thresholds (MADIT-RIT) reduce total and inappropriate shocks.</div>
+      <div class="pearl"><b>🗺️ Refractory → escalate fast</b>Catheter ablation, mechanical support (IABP/Impella/ECMO), stellate ganglion block — not more unmodified shocks.</div>
+      <div class="pearl"><b>🩹 ATP &gt; shock</b>Anti-tachycardia pacing terminates much monomorphic VT painlessly — a shock should be the last resort.</div>
+      <div class="pearl"><b>😱 Treat the trauma</b>Repeated conscious shocks cause real psychological injury — sedate in the moment, support afterward.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S19 — MCQs / ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s19">
+  <div class="sec-header"><span class="s-badge">S19</span><h2>🧠 MCQs / Assessment</h2></div>
+  <div class="section-content">
+    <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP and feed your dashboard. Each shows a full explanation.</em></p>
+    <div id="mcqHost"></div>
+    <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · Case c-storm-018 — ICD Electrical Storm<br>
+  ⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."
+</div>
+
+</div><!-- /#caseScroll -->
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ XP / DASHBOARD CORE ============ */
+  var XP = 0, XP_MAX = 1200;
+  var awarded = {}; // dedupe one-time awards by key
+  var xpVal = document.getElementById('xpVal');
+  var xpFill = document.getElementById('xpFill');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+  }
+  function addXP(amount, key, label){
+    if(key){ if(awarded[key]) return; awarded[key] = true; }
+    XP += amount;
+    if(XP > XP_MAX) XP = XP_MAX;
+    xpVal.textContent = XP;
+    xpFill.style.width = Math.min(100, Math.round(XP / XP_MAX * 100)) + '%';
+    showToast('+' + amount + ' XP' + (label ? ' · ' + label : ''));
+  }
+  function earnBadge(id){
+    var b = document.getElementById(id);
+    if(b && !b.classList.contains('earned')){ b.classList.add('earned'); }
+  }
+
+  /* Dashboard minimize */
+  var dash = document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){
+    dash.classList.toggle('collapsed');
+    this.textContent = dash.classList.contains('collapsed') ? '+' : '–';
+  });
+
+  /* ============ INTERNAL SCROLL SIZING ============ */
+  /* Size the scroll box to the visible window so the sticky tab bar stays in
+     view. When embedded (srcDoc iframe, same-origin), the host page stretches
+     the iframe to full content height and scrolls the OUTER page — so we size
+     this box from the parent window's height minus whatever app chrome sits
+     above the iframe, and scroll internally instead. Standalone → 100vh. */
+  var caseScroll = document.getElementById('caseScroll');
+  var topnav = document.getElementById('topnav');
+  /* The tab bar is position:fixed, so it's out of flow — reserve space at the
+     top of the scroll content (and offset anchor jumps) by its real height. */
+  function setNavOffset(){
+    var navH = topnav ? topnav.offsetHeight : 70;
+    caseScroll.style.paddingTop = navH + 'px';
+    caseScroll.style.scrollPaddingTop = (navH + 14) + 'px';
+  }
+  function sizeScroller(){
+    try {
+      var p = window.parent;
+      if(p && p !== window && window.frameElement){
+        var rectTop = window.frameElement.getBoundingClientRect().top;
+        if(rectTop < 0) rectTop = 0;          // parent scrolled past the chrome
+        var ph = p.innerHeight || 800;
+        var h = ph - rectTop - 6;             // leave the bottom edge breathing room
+        if(h < 460) h = 460;                  // sane minimum on short windows
+        caseScroll.style.height = h + 'px';
+      } else {
+        caseScroll.style.height = '100vh';
+      }
+    } catch(e){ caseScroll.style.height = '100vh'; }
+    setNavOffset();
+  }
+  sizeScroller();
+  window.addEventListener('resize', sizeScroller);
+  window.addEventListener('load', sizeScroller);
+  try { if(window.parent && window.parent !== window) window.parent.addEventListener('resize', sizeScroller); } catch(e){}
+
+  /* ============ NAV: scroll-spy active + visited ============ */
+  var navchips = Array.prototype.slice.call(document.querySelectorAll('.navchip'));
+  var sections = navchips.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited = {};
+  var visitVal = document.getElementById('visitVal');
+
+  function markVisited(idx){
+    var sec = sections[idx];
+    if(!sec) return;
+    if(!visited[sec.id]){
+      visited[sec.id] = true;
+      navchips[idx].classList.add('visited');
+      var count = Object.keys(visited).length;
+      visitVal.textContent = count + ' / 19';
+      addXP(8, 'visit-' + sec.id, 'Section read');
+      if(count >= 19){ earnBadge('bdg-explorer'); addXP(60, 'allvisited', 'Ward Explorer!'); }
+    }
+  }
+  function setActive(idx){
+    navchips.forEach(function(c){ c.classList.remove('active'); });
+    if(navchips[idx]) navchips[idx].classList.add('active');
+  }
+
+  /* True tabs: each chip shows ONLY its section, hidden via CSS otherwise.
+     No scrollIntoView and no scroll-spy — nothing can scroll the tab bar away,
+     which also sidesteps every srcDoc-iframe scrolling quirk. The hero banner
+     and vitals strip belong to the case intro, so they show on S1 only. */
+  var heroBits = [document.querySelector('.hero'), document.querySelector('.vitals-strip')]
+    .filter(function(el){ return !!el; });
+
+  function showSection(idx){
+    sections.forEach(function(s, i){ if(s) s.classList.toggle('sec-active', i === idx); });
+    heroBits.forEach(function(el){ el.style.display = (idx === 0) ? '' : 'none'; });
+    caseScroll.scrollTop = 0;
+    setActive(idx);
+    markVisited(idx);
+  }
+
+  navchips.forEach(function(chip, idx){
+    chip.addEventListener('click', function(ev){
+      ev.preventDefault();
+      showSection(idx);
+    });
+  });
+  showSection(0);
+
+  /* ============ FLAG GAME (S2) ============ */
+  var flagBtns = document.querySelectorAll('#flagGame .flag-btn');
+  var flagResult = document.getElementById('flagResult');
+  var flagsFound = 0, flagsTotal = 0, flagWrong = 0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good') === '1') flagsTotal++; });
+  flagBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.dataset.locked) return;
+      btn.dataset.locked = '1';
+      var good = btn.getAttribute('data-good') === '1';
+      if(good){
+        btn.classList.add('flag-good');
+        flagsFound++;
+        addXP(10, 'flag-' + flagsFound + '-' + Math.random(), 'Storm flag spotted');
+      } else {
+        btn.classList.add('flag-bad');
+        flagWrong++;
+        showToast('❌ Not a storm-defining flag');
+      }
+      if(flagsFound === flagsTotal){
+        flagResult.textContent = '✅ All ' + flagsTotal + ' storm red flags found' + (flagWrong ? ' (with ' + flagWrong + ' wrong pick' + (flagWrong>1?'s':'') + ')' : ' — flawless!');
+        earnBadge('bdg-vt');
+        addXP(30, 'flags-complete', 'Storm-Spotter badge');
+      } else {
+        flagResult.textContent = flagsFound + ' / ' + flagsTotal + ' storm red flags found…';
+      }
+    });
+  });
+
+  /* ============ BRANCHING SCENARIO (S3) ============ */
+  var scText = document.getElementById('scText');
+  var scChoices = document.getElementById('scChoices');
+  var scFeedback = document.getElementById('scFeedback');
+  var scRestart = document.getElementById('scRestart');
+  var scStab = document.getElementById('scStab');
+  var scTime = document.getElementById('scTime');
+  var scXP = document.getElementById('scXP');
+  var pathXP = 0, scStability = 2, scElapsed = 0;
+
+  var STEPS = {
+    start: {
+      text: "Mr. T.K. has been shocked seven times today and is building toward another VT. He is awake, in pain, BP 158/96, flushed and sweating. The covering doctor said to 'let the ICD do its job.' What do you do FIRST?",
+      choices: [
+        { t: "📟 Interrogate the device (call EP) and get a magnet to the bedside — are these shocks appropriate?", good:true, ds:1, dt:10, xp:40, fb:"✅ Exactly. Before treating the storm, confirm the shocks are REAL. Interrogation shows true VT/VF (appropriate) — and a magnet at the bedside can suspend shock therapy to stop traumatizing him while you act. Now break the loop.", next:"sympatholysis" },
+        { t: "🔌 Do nothing — let the ICD keep shocking until EP arrives, he's protected", good:false, ds:-2, dt:20, xp:0, fb:"☠️ This is the M&M error (S13). Riding out repeated shocks without sympatholysis or sedation feeds the storm — each shock is a catecholamine surge that provokes the next VT, plus pain and trauma. 'Protected' is not 'treated.' Restart and choose again.", end:true },
+        { t: "💊 Push more amiodarone and wait to see if the VT settles", good:false, ds:-1, dt:15, xp:5, fb:"⚠️ Amiodarone helps, but it is not the core of storm therapy and won't break the sympathetic loop on its own. First interrogate the device and start sympatholysis.", next:"start2" }
+      ]
+    },
+    start2: {
+      text: "Amiodarone alone hasn't settled it — he's shocked again and even more distressed, BP 170/100, drenched. The storm is feeding on his fear. Now what?",
+      choices: [
+        { t: "📟 Interrogate the device + magnet ready, then IV beta-blockade and sedation", good:true, ds:1, dt:8, xp:30, fb:"✅ Now you're treating the storm: confirm the shocks are real, suspend traumatic shocks with a magnet if needed, and cut the sympathetic drive. Lesson banked.", next:"sympatholysis" },
+        { t: "🔌 Keep shocking and hope it tires itself out", good:false, ds:-2, dt:20, xp:0, fb:"☠️ It won't — repeated shocks pour catecholamines on the fire and can degenerate into refractory VF. Break the sympathetic loop.", next:"sympatholysis" }
+      ]
+    },
+    sympatholysis: {
+      text: "Interrogation confirms true VT storm (appropriate shocks). He is awake and terrified, BP 165/98. The magnet is at the bedside, external pads on. Your core therapy?",
+      choices: [
+        { t: "💉 IV propranolol (non-selective beta-blockade) + heavy sedation (± intubation)", good:true, ds:1, dt:6, xp:30, fb:"✅ Ideal: non-selective beta-blockade plus sedation is the cornerstone of VT storm — sympatholysis breaks the catecholamine loop. Calm the patient, calm the heart. Now support it with amiodarone and fix the triggers.", next:"triggers" },
+        { t: "🩹 Shock him again immediately and skip the beta-blocker/sedation", good:false, ds:-1, dt:8, xp:0, fb:"⚠️ Another shock without sympatholysis just feeds the storm. Beta-blockade and sedation are THERAPEUTIC here — they are the treatment, not the shocks.", next:"triggers" }
+      ]
+    },
+    triggers: {
+      text: "Propranolol and sedation are working — the shocks have stopped and his sinus tachycardia is settling. His K⁺ is 3.3, Mg²⁺ 0.55, NT-proBNP high, and amiodarone was stopped 5 days ago. Final move?",
+      choices: [
+        { t: "🧪 Correct K⁺/Mg²⁺, restart amiodarone, treat the decompensated HF, and reprogram (ATP-before-shock)", good:true, ds:1, dt:5, xp:40, fb:"🏆 Perfect close. Sympatholysis bought the calm; correcting the triggers and reprogramming the device keep the storm from returning. If it had stayed refractory you'd escalate to ablation / mechanical support / stellate ganglion block. Storm broken.", end:true },
+        { t: "🎉 Done — the shocks stopped, leave the triggers for the morning", good:false, ds:-1, dt:10, xp:0, fb:"⚠️ Premature. Untreated hypokalemia, hypomagnesemia, decompensated HF and the missing antiarrhythmic will relight the storm. Always fix the triggers and reprogram.", end:true }
+      ]
+    }
+  };
+
+  function renderStab(){
+    var s = Math.max(0, Math.min(5, scStability + 2)); // map -2..3 → 0..5
+    var dots = '';
+    for(var i=0;i<5;i++) dots += (i < s ? '●' : '○');
+    scStab.textContent = dots;
+  }
+  function renderStep(key){
+    var step = STEPS[key];
+    scText.textContent = step.text;
+    scFeedback.className = 'feedback';
+    scFeedback.style.display = 'none';
+    scChoices.innerHTML = '';
+    step.choices.forEach(function(ch){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = ch.t;
+      b.addEventListener('click', function(){
+        pathXP += ch.xp; scXP.textContent = pathXP;
+        scElapsed += ch.dt; scTime.textContent = scElapsed + ' s';
+        scStability += ch.ds; renderStab();
+        if(ch.xp) addXP(ch.xp, null, 'Scenario choice');
+        scFeedback.textContent = ch.fb;
+        scFeedback.className = 'feedback ' + (ch.good ? 'good' : 'bad');
+        scFeedback.style.display = 'block';
+        Array.prototype.forEach.call(scChoices.children, function(c){ c.disabled = true; c.style.opacity = .6; });
+        if(ch.end){
+          scRestart.style.display = 'inline-block';
+          if(ch.good && key === 'triggers'){ earnBadge('bdg-shock'); addXP(20, 'scenario-win', 'Storm Broken!'); }
+        } else if(ch.next){
+          setTimeout(function(){ renderStep(ch.next); }, 1400);
+        }
+      });
+      scChoices.appendChild(b);
+    });
+  }
+  scRestart.addEventListener('click', function(){
+    pathXP = 0; scStability = 2; scElapsed = 0;
+    scXP.textContent = 0; scTime.textContent = '0 s'; renderStab();
+    scRestart.style.display = 'none';
+    renderStep('start');
+  });
+  renderStab();
+  renderStep('start');
+
+  /* ============ REVEAL BUTTONS ============ */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.getAttribute('data-target'));
+      if(!t) return;
+      if(t.classList.contains('reveal-shown')){
+        t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden');
+      } else {
+        t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown');
+        addXP(8, 'reveal-' + btn.getAttribute('data-target'), 'Self-test');
+      }
+    });
+  });
+
+  /* ============ ADRENERGIC DRIVE SIM (S6) ============ */
+  var kRange = document.getElementById('kRange');
+  var kVal = document.getElementById('kVal');
+  var kNeedle = document.getElementById('kNeedle');
+  var kReadout = document.getElementById('kReadout');
+  if(kRange){
+    var simUsed = false;
+    function updateK(){
+      var k = (parseInt(kRange.value,10) / 10); // 2.0 .. 7.5
+      kVal.textContent = k.toFixed(1);
+      var pct = (parseInt(kRange.value,10) - 20) / (75 - 20) * 100;
+      kNeedle.style.left = pct + '%';
+      var msg, cls;
+      if(k < 3.0){ msg = '🟢 Low adrenergic drive — sedated and beta-blocked. VF threshold is high, VT recurrence and shocks fall away. This is where the storm stops.'; cls='good'; }
+      else if(k < 4.5){ msg = '🟢 Controlled drive — sympatholysis is working; occasional VT but ATP-terminable, shocks rare. Keep the patient calm and beta-blocked.'; cls='good'; }
+      else if(k <= 5.5){ msg = '🟠 Rising sympathetic drive — pain/anxiety creeping back; VF threshold falling, VT recurring faster. Deepen sedation and beta-blockade now.'; cls='warn-r'; }
+      else if(k <= 6.5){ msg = '🔴 High adrenergic drive — awake, frightened, repeatedly shocked. Each shock pours catecholamines on the fire → more VT → more shocks.'; cls='bad'; }
+      else { msg = '🔴 Catecholamine firestorm — relentless shocks, refractory VT risking degeneration to VF. Break it: beta-block, sedate/intubate, stellate block, escalate.'; cls='bad'; }
+      kReadout.innerHTML = msg;
+      kReadout.className = 'readout ' + cls;
+      if(!simUsed){ simUsed = true; addXP(15, 'ksim', 'Sympatholysis Master'); }
+    }
+    kRange.addEventListener('input', updateK);
+    updateK();
+  }
+
+  /* ============ CHECKLISTS (S7) ============ */
+  var allChecklistsDone = 0, totalChecklists = document.querySelectorAll('.checklist').length;
+  document.querySelectorAll('.checklist').forEach(function(list){
+    var boxes = list.querySelectorAll('input[type=checkbox]');
+    var prog = list.querySelector('[data-progress]');
+    var total = boxes.length;
+    var doneAwarded = false;
+    function refresh(){
+      var done = 0;
+      boxes.forEach(function(b){
+        if(b.checked){ done++; b.closest('.ck').classList.add('done'); }
+        else { b.closest('.ck').classList.remove('done'); }
+      });
+      prog.textContent = done + ' / ' + total + ' complete';
+      if(done === total && !doneAwarded){
+        doneAwarded = true;
+        allChecklistsDone++;
+        addXP(25, 'ck-' + list.id, 'Checklist done');
+        if(allChecklistsDone >= totalChecklists){ earnBadge('bdg-ck'); addXP(20, 'allck', 'Checklist Champion'); }
+      }
+    }
+    boxes.forEach(function(b){
+      b.addEventListener('change', function(){
+        if(b.checked) addXP(4, null, 'Step checked');
+        refresh();
+      });
+    });
+  });
+
+  /* ============ MCQs (S19) ============ */
+  var MCQS = [
+    {
+      q: "Electrical (VT) storm is best defined as:",
+      opts: ["A single sustained VT episode requiring cardioversion","Three or more separate sustained VT/VF episodes (or appropriate ICD therapies) within 24 hours, or incessant VT","Any inappropriate ICD shock","Polymorphic VT lasting more than 30 seconds"],
+      correct: 1,
+      exp: "Electrical storm = ≥3 separate sustained episodes of VT/VF (or appropriate ICD therapies) within 24 hours, or incessant VT. A single episode is not a storm; the diagnosis hinges on recurrence within a 24-hour window."
+    },
+    {
+      q: "A conscious ICD patient is having recurrent appropriate shocks for true VT storm. The single most important pharmacological intervention to break it is:",
+      opts: ["IV verapamil","IV non-selective beta-blockade (e.g. propranolol) plus heavy sedation","IV digoxin","A magnesium bolus alone"],
+      correct: 1,
+      exp: "Electrical storm is sympathetically driven. Non-selective beta-blockade (propranolol, or esmolol) plus heavy sedation (often intubation) is the cornerstone — it cuts the catecholamine drive that lowers the VF threshold. Beta-blockers are therapeutic here, not contraindicated."
+    },
+    {
+      q: "Before treating a repeatedly-shocked ICD patient, the crucial first question is:",
+      opts: ["What is the ejection fraction?","Are the shocks APPROPRIATE (real VT/VF) or INAPPROPRIATE — so interrogate the device","Has the patient eaten recently?","Is the patient febrile?"],
+      correct: 1,
+      exp: "You must interrogate the device to determine whether the shocks are appropriate (real VT/VF = true storm) or inappropriate (AF/SVT, T-wave oversensing, lead fracture/noise). The two situations have completely different management; never assume the shocks are real."
+    },
+    {
+      q: "What does placing a magnet over an ICD do — and how does that differ from a pacemaker?",
+      opts: ["It defibrillates the patient; over a pacemaker it does nothing","It suspends tachyarrhythmia detection/shock therapy (no pacing change); over a pacemaker it causes asynchronous pacing","It causes asynchronous pacing; over a pacemaker it suspends shocks","It reprograms both devices to factory settings"],
+      correct: 1,
+      exp: "A magnet over an ICD suspends tachyarrhythmia detection and shock therapy and does NOT change pacing — useful to stop inappropriate or traumatic repeated shocks while you assess (keep external pads on). Over a PACEMAKER a magnet causes asynchronous (fixed-rate) pacing. Never confuse the two."
+    },
+    {
+      q: "A VT storm remains refractory despite beta-blockade, sedation, amiodarone and correction of triggers. Appropriate escalation includes:",
+      opts: ["Stopping all antiarrhythmics","Urgent catheter ablation, mechanical circulatory support (IABP/Impella/VA-ECMO), and stellate ganglion block","Switching to oral metoprolol only","Removing the ICD"],
+      correct: 1,
+      exp: "Refractory storm escalates to urgent catheter ablation of the VT substrate, mechanical circulatory support, and stellate ganglion block / cardiac sympathetic denervation — reflecting the storm's adrenergic core and the need to treat the substrate, not just deliver more shocks."
+    },
+    {
+      q: "Which reversible triggers should be actively sought and corrected in electrical storm?",
+      opts: ["Only the ejection fraction","Hypokalemia/hypomagnesemia, new ischemia, decompensated heart failure, and antiarrhythmic/beta-blocker withdrawal","Only the QRS duration","Body temperature and oxygen saturation"],
+      correct: 1,
+      exp: "Correcting triggers is often what truly ends the storm: replace K⁺ (4.5–5.0) and Mg²⁺ (>1.0), hunt and treat new ischemia (angiography), treat decompensated HF, and restart any withdrawn antiarrhythmic/beta-blocker. The substrate plus a trigger ignites the storm."
+    },
+    {
+      q: "Why do repeated ICD shocks tend to WORSEN an electrical storm?",
+      opts: ["They directly damage the SA node","Each shock causes pain and fear → a catecholamine surge that lowers the VF threshold and provokes more VT","They deplete potassium with every discharge","They reset the device to a faster pacing rate"],
+      correct: 1,
+      exp: "Each shock is painful and frightening, triggering a sympathetic/catecholamine surge. Catecholamines shorten refractoriness and lower the VF threshold, provoking the next VT and another shock — a self-amplifying vicious cycle. Breaking the sympathetic drive (beta-block + sedate) interrupts it."
+    },
+    {
+      q: "What is the role of anti-tachycardia pacing (ATP) and reprogramming in managing an ICD patient with VT?",
+      opts: ["ATP is more painful than a shock and should be disabled","ATP painlessly terminates much monomorphic VT; programming ATP-before-shock, longer detection and higher thresholds (MADIT-RIT) reduces total and inappropriate shocks","Reprogramming has no effect on shock burden","ATP only works for atrial fibrillation"],
+      correct: 1,
+      exp: "ATP painlessly terminates much monomorphic VT without a shock. Programming ATP-before-shock, extended detection windows and raised rate thresholds (MADIT-RIT) markedly reduces total and inappropriate shocks — and thus the catecholamine-driven storm burden."
+    }
+  ];
+
+  var host = document.getElementById('mcqHost');
+  var mcqVal = document.getElementById('mcqVal');
+  var mcqScore = 0, mcqAnswered = 0;
+  var letters = ['A','B','C','D','E'];
+
+  MCQS.forEach(function(item, qi){
+    var box = document.createElement('div');
+    box.className = 'mcq';
+    var html = '<div class="mcq-q">QUESTION ' + (qi+1) + ' / ' + MCQS.length + '</div>';
+    html += '<div class="mcq-stem">' + item.q + '</div>';
+    item.opts.forEach(function(opt, oi){
+      html += '<label class="mcq-opt" data-oi="' + oi + '"><strong>' + letters[oi] + '.</strong> ' + opt + '</label>';
+    });
+    html += '<div class="mcq-exp"></div>';
+    box.innerHTML = html;
+    host.appendChild(box);
+
+    var opts = box.querySelectorAll('.mcq-opt');
+    var exp = box.querySelector('.mcq-exp');
+    var locked = false;
+    opts.forEach(function(label){
+      label.addEventListener('click', function(){
+        if(locked) return;
+        locked = true;
+        var oi = parseInt(label.getAttribute('data-oi'),10);
+        box.classList.add('answered');
+        var correct = item.correct;
+        if(oi === correct){
+          label.classList.add('picked-right');
+          mcqScore++;
+          addXP(25, null, 'Correct answer');
+        } else {
+          label.classList.add('picked-wrong');
+          opts[correct].classList.add('show-right');
+          showToast('❌ Correct: ' + letters[correct]);
+        }
+        exp.innerHTML = '<strong>' + (oi === correct ? '✅ Correct. ' : '📘 Explanation. ') + '</strong>' + item.exp;
+        mcqAnswered++;
+        mcqVal.textContent = mcqScore + ' / ' + MCQS.length;
+        if(mcqAnswered === MCQS.length){
+          var done = document.getElementById('mcqDone');
+          var summary = document.getElementById('mcqSummary');
+          done.style.display = 'block';
+          summary.textContent = 'You scored ' + mcqScore + ' / ' + MCQS.length + '. ' +
+            (mcqScore === MCQS.length ? 'Flawless — you break the storm, you never just ride out the shocks. 🏆' :
+             mcqScore >= 6 ? 'Strong — review the misses and the contrast pairs in S6.' :
+             'Revisit S3, S5, S6 and S11 — interrogate, sympatholysis and the magnet rule are the whole case.');
+          if(mcqScore >= 7){ earnBadge('bdg-quiz'); addXP(50, 'quizace', 'Quiz Ace!'); }
+        }
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>

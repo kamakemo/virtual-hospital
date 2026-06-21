@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sick Sinus Syndrome — Tachy-Brady Syndrome — Virtual Teaching Hospital</title>
+<!-- META
+id: c-sss-017
+title: Sick Sinus Syndrome — Tachy-Brady Syndrome
+hospital: cardiology
+department: cv-ep
+bednumber: 10
+chiefcomplaint: Recurrent syncope and palpitations with sinus pauses and alternating fast and slow rhythms
+system: Cardiology
+severity: urgent
+tags: Sick sinus syndrome, Tachy-brady, Sinus pause, Pacemaker, Chronotropic incompetence
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --radius:16px;
+    --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  /* Internal scroll viewport. When this case is embedded the host app stretches
+     the iframe to full content height and the OUTER page scrolls, which would
+     let a sticky bar scroll away. We instead scroll inside this box (sized to
+     the visible window by JS) so the section tab bar stays pinned at the top.
+     Standalone, it falls back to the full viewport height. */
+  #caseScroll{height:100vh; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; scroll-padding-top:92px}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:36px 24px 80px; position:relative; overflow:hidden}
+  .hero::after{content:"📈"; position:absolute; right:-20px; top:-30px; font-size:220px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{max-width:1100px; margin:0 auto; position:relative; z-index:1}
+  .hero .crumbs{font-size:13px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:10px 0 6px; font-size:clamp(26px,4vw,40px); line-height:1.15}
+  .hero .sub{font-size:16px; opacity:.95}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; backdrop-filter:blur(4px)}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== LIVE ECG STRIP IN HERO ===== */
+  .ecg-banner{max-width:1100px; margin:14px auto 0; position:relative; z-index:1}
+  .ecg-banner svg{width:100%; height:64px; display:block; background:rgba(0,0,0,.18); border-radius:12px; border:1px solid rgba(255,255,255,.25)}
+  .ecg-trace{stroke:#86efac; stroke-width:2.4; fill:none; stroke-dasharray:1600; stroke-dashoffset:1600; animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{stroke-dashoffset:0}}
+
+  /* ===== VITALS STRIP ===== */
+  .vitals-strip{max-width:1100px; margin:-52px auto 0; padding:0 24px; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:11px; font-weight:700; letter-spacing:.6px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:21px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== HORIZONTAL SECTION SIDEBAR (fixed — always visible) ===== */
+  .topnav{position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.10)}
+  .topnav .rail{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; max-width:1180px; margin:0 auto; scrollbar-width:thin}
+  .navchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink2); font-size:11px; font-weight:700; text-decoration:none; min-width:78px; text-align:center; transition:all .18s; cursor:pointer}
+  .navchip .s-id{font-size:10px; letter-spacing:1px; color:#94a3b8}
+  .navchip .s-emoji{font-size:16px}
+  .navchip:hover{border-color:var(--rose); color:var(--rose); transform:translateY(-2px)}
+  .navchip.active{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; border-color:#b91c1c}
+  .navchip.active .s-id{color:#fecaca}
+  .navchip.visited:not(.active){border-color:var(--emerald-line); background:var(--emerald-soft)}
+
+  /* ===== DASHBOARD WIDGET ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:215px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10.5px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:760px){.dash{display:none}}
+
+  /* ===== MAIN / SECTIONS (tabbed: one section visible at a time) ===== */
+  main{max-width:1100px; margin:26px auto 80px; padding:0 24px}
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:26px; overflow:hidden}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16.5px; margin:26px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14.5px; margin:18px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:24px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15.5px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:14px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px; letter-spacing:.4px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14.5px}
+
+  /* ===== INTERACTIVE BITS ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:10px 18px; font-weight:700; font-size:14px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:22px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:15px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 15px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 15px; margin-top:12px; font-size:14px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim sliders */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:14px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:14px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Heart/circuit diagram */
+  .heart-fig{display:flex; gap:18px; flex-wrap:wrap; align-items:center; background:var(--slate-soft); border-radius:16px; padding:18px; margin:14px 0}
+  .heart-fig svg{flex:0 0 auto}
+  .heart-legend{flex:1; min-width:230px; font-size:13.5px}
+  .lg{display:flex; align-items:center; gap:8px; margin:5px 0}
+  .lg .sw{width:14px; height:14px; border-radius:4px; flex:0 0 auto}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Journey cards */
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:14px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:15px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:14px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13.5px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:22px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14.5px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:13px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .footer{max-width:1100px; margin:0 auto 36px; padding:0 24px; text-align:center; color:#94a3b8; font-size:12.5px}
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="caseScroll">
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · ⚡ EP Lab · 🛏️ Bed 10</div>
+    <h1>📈 Sick Sinus Syndrome — "The Node That Races Also Stalls"</h1>
+    <div class="sub">🫀 A 78-year-old keeps fainting and feeling her heart gallop. Her Holter shows bursts of fast AF followed by long, silent pauses. Someone wants to give a beta-blocker for the AF. Pause first — literally.</div>
+    <div class="chips">
+      <span class="chip crit">🟠 URGENT</span>
+      <span class="chip">🐢 Sinus Pauses / Arrest</span>
+      <span class="chip">🐇 Tachy-Brady</span>
+      <span class="chip">🔋 Pacemaker</span>
+      <span class="chip">🎮 Interactive Case</span>
+      <span class="chip">⏱️ Match the faint to the pause</span>
+    </div>
+    <div class="ecg-banner" title="Tachy-brady rhythm strip — fast burst then a long pause">
+      <svg viewBox="0 0 800 64" preserveAspectRatio="none" aria-label="Tachy-brady rhythm strip with a long sinus pause">
+        <polyline class="ecg-trace" points="0,40 25,40 33,20 41,58 49,40 75,40 83,20 91,58 99,40 125,40 133,20 141,58 149,40 175,40 183,20 191,58 199,40 225,40 233,20 241,58 249,40 275,40 283,20 291,58 299,40 480,40 488,18 500,56 512,40 590,40 598,18 610,56 622,40 700,40 708,18 720,56 732,40 800,40"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== LIVE VITALS ===================== -->
+<div class="vitals-strip">
+  <div class="vitals-grid">
+    <div class="vital warn"><div class="v-label">💓 HR (rest)</div><div class="v-num">44</div></div>
+    <div class="vital alert"><div class="v-label">🐇 HR (AF burst)</div><div class="v-num">158</div></div>
+    <div class="vital alert"><div class="v-label">⏸️ Longest Pause</div><div class="v-num">5.8 s</div></div>
+    <div class="vital warn"><div class="v-label">🩸 BP</div><div class="v-num">102/58</div></div>
+    <div class="vital"><div class="v-label">🌬️ RR</div><div class="v-num">16</div></div>
+    <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">97%</div></div>
+    <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.6°</div></div>
+    <div class="vital warn"><div class="v-label">😵 Presyncope</div><div class="v-num">Yes</div></div>
+  </div>
+</div>
+
+<!-- ===================== HORIZONTAL SECTION SIDEBAR ===================== -->
+<nav class="topnav" id="topnav">
+  <div class="rail">
+    <a class="navchip" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navchip" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navchip" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navchip" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navchip" href="#s5"><span class="s-emoji">🎓</span><span>Consultant Round</span><span class="s-id">S5</span></a>
+    <a class="navchip" href="#s6"><span class="s-emoji">📖</span><span>Teaching Points</span><span class="s-id">S6</span></a>
+    <a class="navchip" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navchip" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navchip" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navchip" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navchip" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navchip" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navchip" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navchip" href="#s14"><span class="s-emoji">🔀</span><span>Differentials</span><span class="s-id">S14</span></a>
+    <a class="navchip" href="#s15"><span class="s-emoji">🗺️</span><span>Plan</span><span class="s-id">S15</span></a>
+    <a class="navchip" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navchip" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navchip" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navchip" href="#s19"><span class="s-emoji">🧠</span><span>MCQs</span><span class="s-id">S19</span></a>
+  </div>
+</nav>
+
+<!-- ===================== SCORE DASHBOARD ===================== -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections visited</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-vt">🐢 Pause-Spotter</span>
+      <span class="badge" id="bdg-shock">🔋 Paced In Time</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champion</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Ward Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running sims, taking the right path and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- S1 — PROFILE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s1">
+  <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+  <div class="section-content">
+    <div class="callout danger">
+      <b class="ct">🚨 YOU ARE HERE — 10:40, EP Day Unit Bed 10</b>
+      Mrs. E.M., 78, is sitting up clutching her chest monitor. Twenty minutes ago she felt her heart "flutter like a trapped bird," then the room "went white" and she nearly slid off the chair. The telemetry tells two stories on one strip: a burst of fast atrial fibrillation, then — as it stops — a flat, silent line for almost <strong>six seconds</strong> before a slow escape beat limps in. A keen junior is reaching for a <strong>beta-blocker</strong> to "settle the fast heart." Stop them. In this disease, the drug that calms the race can stall the floor out from under her.
+    </div>
+
+    <h3>👤 Patient Identity</h3>
+    <table class="tbl">
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>👵 Name</td><td><strong>Mrs. E.M.</strong></td></tr>
+      <tr><td>🎂 Age / Sex</td><td>78-year-old female</td></tr>
+      <tr><td>🆔 MRN</td><td>EP-31017</td></tr>
+      <tr><td>⚖️ Weight</td><td>62 kg</td></tr>
+      <tr><td>💼 Occupation</td><td>Retired schoolteacher</td></tr>
+      <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+    </table>
+
+    <h3>📜 Past Medical History — the node has been aging out loud</h3>
+    <ul>
+      <li>🐢 <strong>Two unexplained syncopal episodes</strong> in the last 6 months — once at the bus stop, once after standing from gardening. Each preceded by a few seconds of "everything fading." No aura, no tongue-bite, rapid full recovery — classic for a <strong>cardiac (arrhythmic) faint</strong>, not a seizure.</li>
+      <li>🐇 <strong>Intermittent palpitations</strong> — "racing and irregular" — lasting minutes, sometimes ending with a near-faint. This is the tachy half of <strong>tachy-brady syndrome</strong>; the near-faint at the END is the post-tachycardia pause.</li>
+      <li>🫀 <strong>Hypertension</strong>, on a <strong>beta-blocker (bisoprolol)</strong> started a year ago for "palpitations" — possibly unmasking or worsening her bradycardia.</li>
+      <li>🩺 <strong>Resting bradycardia</strong> noted at clinic (HR 44–50) and <strong>poor heart-rate rise on exertion</strong> — she gets breathless on the stairs her pulse "won't climb for." That is <strong>chronotropic incompetence</strong>.</li>
+      <li>🦋 No known thyroid disease — but TSH was never checked despite the bradycardia. <strong>Hypothyroidism is a classic reversible mimic.</strong></li>
+      <li>😴 Loud snoring, witnessed apneas — possible obstructive sleep apnea (raises vagal tone, worsens nocturnal pauses).</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In sick sinus the disease cuts both ways — the node that races also stalls. Pace the brady so you can finally treat the tachy."</div>
+
+    <h3>🧬 Why THIS patient? — a worn-out sinus node, overdrive-suppressed</h3>
+    <p>Sick sinus syndrome (sinus node dysfunction) is, at its core, <strong>age-related fibrosis and degeneration of the sinoatrial node and surrounding atrium</strong>. The pacemaker cells become unreliable — slow to fire (bradycardia), or unable to push their impulse out to the atrium (SA exit block), or silent altogether (sinus arrest / pause). Layer on top the <strong>diseased atrium's tendency to fibrillate</strong>, and you get the signature <strong>tachy-brady</strong> pattern. The cruel twist is the physiology of <strong>overdrive suppression</strong>: any fast atrial rhythm hyperpolarizes and suppresses the sinus node. So when a burst of AF finally stops, the already-sick node — now deeply suppressed — is slow to wake. The result is a long <strong>post-tachycardia pause</strong>, the exact moment her brain goes white and she faints. One node. Two faces. One faint born in the gap between them.</p>
+
+    <div class="callout warn"><b class="ct">🔥 Risk factors / associations for sinus node dysfunction</b>
+    👵 Advancing age (idiopathic fibrosis — the #1 cause) · 🫀 Ischemic heart disease / prior inferior MI (SA nodal artery) · 💊 AV-nodal & QT drugs (beta-blockers, non-DHP CCBs, digoxin, antiarrhythmics) · 🦋 Hypothyroidism · ⚡ Hyperkalemia · 😴 Obstructive sleep apnea / high vagal tone (athletes) · 🧬 Infiltrative/inflammatory disease (amyloid, sarcoid), cardiac surgery, congenital</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S2 — HANDOVER -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s2">
+  <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+  <div class="section-content">
+    <h3>📻 Day-Unit Nurse Handover — listen for the trap</h3>
+    <div class="callout info">
+      <b class="ct">🎙️ SBAR from the EP day-unit nurse (verbatim)</b>
+      <p><strong>S:</strong> "Bed 10 — Mrs. E.M., 78, here for a Holter review after two faints. While she was sitting here she had a run of fast irregular palpitations, then went pale and nearly passed out. Telemetry caught a burst of AF at ~158, and when it stopped there was a <strong>pause of almost 6 seconds</strong> before a slow beat came in."</p>
+      <p><strong>B:</strong> "Resting heart rate's been in the low 40s. On bisoprolol for 'palpitations.' Thyroid never checked. Her exercise heart rate barely rises — gets breathless on stairs."</p>
+      <p><strong>A:</strong> "She's awake now, BP 102/58, a bit shaken. The covering doctor on the phone said 'she's in AF — load her with a <strong>beta-blocker and digoxin</strong> to control the rate.' I held it because the last thing on the strip wasn't fast — it was a six-second flat line."</p>
+      <p><strong>R:</strong> "I've got transcutaneous pacing pads on and atropine drawn up just in case. Something about rate-controlling a heart that just paused for six seconds didn't sit right."</p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Treat the AF in tachy-brady and you may unmask a killer pause — protect the floor with a pacemaker first."</div>
+
+    <h3>🚩 Spot-the-Red-Flag — tap each feature that screams sick sinus / tachy-brady</h3>
+    <p>🎮 <em>Interactive: click every feature that points to sick sinus syndrome (tachy-brady), not a benign or unrelated finding. Each correct flag = +10 XP. Wrong picks cost you.</em></p>
+    <div id="flagGame">
+      <button class="btn ghost flag-btn" data-good="1">🐢 Sinus pauses / sinus arrest on telemetry</button>
+      <button class="btn ghost flag-btn" data-good="1">🔀 Alternating tachycardia (AF) and bradycardia</button>
+      <button class="btn ghost flag-btn" data-good="1">⏸️ Long pause on termination of the fast rhythm</button>
+      <button class="btn ghost flag-btn" data-good="1">😵 Syncope that correlates in time with a pause</button>
+      <button class="btn ghost flag-btn" data-good="1">🏃 Chronotropic incompetence (rate won't rise on exertion)</button>
+      <button class="btn ghost flag-btn" data-good="1">👵 Elderly with degenerative SA node disease</button>
+      <button class="btn ghost flag-btn" data-good="0">🌡️ Temperature 36.6°C</button>
+      <button class="btn ghost flag-btn" data-good="0">🫁 SpO₂ 97% on air</button>
+    </div>
+    <p id="flagResult" style="font-weight:700"></p>
+
+    <h3>⏱️ Timeline so far</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">10:18</div>Sudden fast irregular palpitations while seated; telemetry shows AF at ~158/min.</div>
+      <div class="t-item"><div class="t-time">10:22</div>AF self-terminates → <strong>5.8-second sinus pause</strong> → patient pale, nearly faints. Slow junctional escape rescues her.</div>
+      <div class="t-item"><div class="t-time">10:30</div>Covering doctor (by phone) says "she's in AF — beta-blocker + digoxin for rate control." Nurse <strong>withholds it</strong> — 🏅 instinct worth its weight in gold.</div>
+      <div class="t-item"><div class="t-time">10:40</div>You arrive. Pacing pads are on, atropine ready. The task: correlate the faint to the pause, exclude reversible causes, and protect the floor before anyone touches the tachy.</div>
+    </div>
+
+    <div class="callout ok"><b class="ct">🏅 Praise where due</b>The nurse who held the rate-controlling drugs prevented a catastrophe. In tachy-brady syndrome, beta-blockers/digoxin given for the AF further suppress an already-sick sinus node — so when the AF converts, the post-tachycardia pause that follows can be <strong>prolonged into asystole</strong> → syncope, a fall, or arrest. The right sequence is to <strong>protect the brady (pacemaker) first</strong>, then treat the tachy safely.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S3 — INITIAL ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s3">
+  <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+  <div class="section-content">
+    <h3>🅰️🅱️🅲️ Primary Survey — what your hands, eyes and ears find</h3>
+    <table class="tbl">
+      <tr><th>Step</th><th>Finding</th><th>What it means mechanistically</th></tr>
+      <tr><td>🅰️ Airway</td><td>Patent, speaking in full sentences now (between episodes).</td><td>She is well between attacks — the danger is paroxysmal, not constant. Inter-ictal normality is the rule in sick sinus.</td></tr>
+      <tr><td>🅱️ Breathing</td><td>RR 16, SpO₂ 97% on air, chest clear.</td><td>No respiratory cause; the faint is circulatory. SpO₂ is a distractor, not a flag.</td></tr>
+      <tr><td>🅲️ Circulation</td><td><strong>Resting HR 44</strong>, irregular during bursts; BP 102/58. During the pause her pulse simply <strong>vanished</strong> for ~6 s then a slow beat returned. No murmurs; warm peripheries between attacks.</td><td>The bradycardia and pauses are the output problem. A 6-second standstill drops cerebral perfusion below the syncope threshold — the brain needs only ~6–8 s of asystole to black out.</td></tr>
+      <tr><td>🅳 Disability</td><td>GCS 15 now; describes "greying out" then quick, complete recovery during episodes.</td><td>Abrupt loss and rapid full recovery = Stokes-Adams (cardiac) syncope from a transient pause, not a slow post-ictal seizure recovery.</td></tr>
+      <tr><td>🅴 Exposure</td><td>No injuries today (lucky); a healing bruise on the hip from the gardening faint. Pacing pads on.</td><td>The bruise is the warning shot — the next unprotected pause could be a hip fracture or head injury.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"No symptom–rhythm correlation, no pacemaker — a number on a monitor isn't an indication; a faint that matches a pause is."</div>
+
+    <h3>🧭 The single most important question: is the SYNCOPE caused by the RHYTHM?</h3>
+    <p>Sinus node dysfunction is managed not by the number on the monitor but by <strong>symptom–rhythm correlation</strong>. Asymptomatic bradycardia and brief pauses — common in the elderly, in athletes, and at night — may need <strong>nothing at all</strong>. The decision to pace hinges on proving that her <em>symptoms</em> (presyncope, syncope) occur <em>at the same time</em> as the bradycardia or pause. Here, the telemetry caught a 5.8-second pause coinciding exactly with her near-faint — the correlation is established. The parallel question is: is there a <strong>reversible cause</strong> (her beta-blocker? hypothyroidism?) that, once removed, makes the node behave?</p>
+
+    <div class="callout danger"><b class="ct">🔋 The decision tree starts here: REVERSIBLE first, then SYMPTOM-CORRELATED brady → PACE</b>Before implanting anything, <strong>stop the offending AV-nodal drug and check the thyroid</strong> — fix what is fixable. If symptomatic bradycardia/pauses persist despite that (i.e. the disease is intrinsic and irreversible), she needs a <strong>permanent pacemaker</strong>. Only once the brady is protected can you safely rate-control or anticoagulate the AF. Sequence is everything.</div>
+
+    <!-- 🎬 BRANCHING SCENARIO ENGINE -->
+    <div class="scenario" id="scenarioBox">
+      <h3>🎬 Choose Your Path — "The Tachy-Brady Sequence"</h3>
+      <div class="hud"><span>❤️ Stability: <b id="scStab">●●○○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 s</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+      <div class="scene-text" id="scText">The junior holds a syringe of metoprolol in one hand ("she's in AF, let's rate-control") and you have the pacing pads and atropine at the bedside. The strip shows: AF bursts at 158, then a documented 5.8-second pause causing her near-faint. Resting rate 44. What do you do FIRST?</div>
+      <div class="choices" id="scChoices"></div>
+      <div class="feedback" id="scFeedback"></div>
+      <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+    </div>
+
+    <div class="callout info"><b class="ct">🧮 If the pauses were ASYMPTOMATIC instead</b>
+    A short nocturnal pause or sinus bradycardia of 45/min in a fit older adult with <em>no</em> symptoms is often a normal variant and needs <strong>observation, not a pacemaker</strong>. The same number means different things depending on whether a symptom sits on top of it. Pace symptomatic, irreversible disease — not a frightening-looking number alone.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S4 — RESIDENT REVIEW -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s4">
+  <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+  <div class="section-content">
+    <p><em>The cardiology resident arrives at 10:42. Her reasoning, out loud:</em></p>
+
+    <h3>🧠 Pattern recognition first, then physiology</h3>
+    <p>"Elderly. Syncope. Palpitations. The strip shows fast AF that ends in a long pause, with resting bradycardia and an exercise rate that won't climb. That is <strong>sick sinus syndrome with tachy-brady</strong> — the two faces of one diseased node. The trap here isn't a diagnosis I'll miss; it's a <em>sequencing</em> error I might make. If I treat the AF first, the same drugs that control the rate will deepen the suppression of her sinus node and lengthen the next pause. I must protect the floor before I touch the ceiling."</p>
+
+    <h3>🎯 Immediate priorities (her actual order of operations)</h3>
+    <ol>
+      <li>🚫 <strong>Don't rate-control the AF yet:</strong> hold the beta-blocker, digoxin and non-DHP CCB. Say it out loud and remove the syringe from the bedside.</li>
+      <li>🔎 <strong>Confirm symptom–rhythm correlation:</strong> the 5.8-second pause coincides with her near-faint on the same strip. Diagnosis locked.</li>
+      <li>🔄 <strong>Hunt reversible causes NOW:</strong> stop her <em>own</em> bisoprolol, send a <strong>TSH</strong>, check K⁺ and look for ischemia. Don't implant hardware for a drug effect or a fixable thyroid.</li>
+      <li>🛡️ <strong>Bridge the brady safely:</strong> keep transcutaneous pacing pads on, atropine to hand for a symptomatic acute pause; admit to a monitored bed.</li>
+      <li>🔋 <strong>Plan the permanent pacemaker</strong> (atrial-based / dual-chamber) for symptomatic, irreversible disease — the only thing that lets you then treat the tachy.</li>
+      <li>🩸 <strong>Address stroke risk in parallel:</strong> calculate CHA₂DS₂-VASc for the AF and plan anticoagulation — but the pacing decision comes first.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Never implant a pacemaker for bradycardia until you've stopped the beta-blocker and checked the thyroid — and never rate-control the tachy until the brady is paced."</div>
+
+    <h3>🤔 "But she's in AF right now — shouldn't I control the rate?"</h3>
+    <p>"Her ventricular rate during the AF burst was tolerated and self-terminated. The thing that actually hurt her was not the fast rate — it was the <strong>pause after it stopped</strong>. Give a rate-controlling drug to suppress the next AF burst and you also suppress the recovery of the sinus node, turning the next 6-second pause into a 10-second one. In tachy-brady, <strong>the brady is the lethal half</strong>. Pace first; rate-control and anticoagulate after."</p>
+
+    <div class="callout purple"><b class="ct">🧪 Resident's self-test (answer before reading on)</b>
+    The team asks: "Her resting rate is 44 and she has pauses — can't we just implant the pacemaker today and move on?"
+    <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+    <div class="reveal-hidden" id="rev1"><p><strong>Not yet.</strong> She is on a <em>beta-blocker</em> and has <em>never had a TSH</em>. Implanting a permanent device for what might be a drug-induced or hypothyroid bradycardia means committing her to lifelong hardware for a reversible problem. <strong>Stop the bisoprolol, check the thyroid (and K⁺), and reassess.</strong> If symptomatic bradycardia/pauses persist once reversible causes are excluded, <em>then</em> the pacemaker is a Class I indication. Bridge safely with monitoring/atropine/transcutaneous pacing in the meantime.</p></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S5 — CONSULTANT ROUND -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s5">
+  <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round</h2></div>
+  <div class="section-content">
+    <p><em>The on-call consultant electrophysiologist, by phone at 10:55, then at the bedside:</em></p>
+
+    <h3>🗂️ Name the problem precisely — intrinsic vs extrinsic changes everything</h3>
+    <div class="vs">
+      <div class="side a"><h4>🔴 Intrinsic SSS (this patient, probably)</h4>
+        <ul><li>Degenerative SA node fibrosis → unreliable impulse generation and exit</li><li>Tachy-brady: paroxysmal AF/flutter + sinus pauses, with overdrive-suppression pauses</li><li>Symptomatic + irreversible → <strong>permanent pacemaker</strong></li><li>Then anticoagulate and rate-control / ablate the AF safely</li></ul></div>
+      <div class="side b"><h4>🔵 Extrinsic / reversible bradycardia</h4>
+        <ul><li>AV-nodal & QT drugs (beta-blocker, non-DHP CCB, digoxin, antiarrhythmics)</li><li><strong>Hypothyroidism</strong>, hyperkalemia, ischemia (inferior MI / SA artery)</li><li>High vagal tone (athletes, OSA, vasovagal)</li><li><strong>Fix the cause — do NOT implant</strong></li></ul></div>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Intrinsic sinus disease earns a pacemaker; extrinsic bradycardia earns a fix. Stop the drug and check the thyroid before you ever reach for the lead."</div>
+
+    <h3>🐢🐇 What exactly IS tachy-brady — and why the pause kills?</h3>
+    <p>Tachy-brady syndrome is the subtype of sick sinus where a diseased atrium throws <strong>paroxysms of tachyarrhythmia (usually AF or flutter)</strong> on a background of <strong>sinus node dysfunction</strong>. The signature event is the <strong>post-tachycardia pause</strong>: the fast rhythm <em>overdrive-suppresses</em> the already-sick sinus node, so when the tachycardia abruptly stops, the node is too suppressed to fire promptly. The gap before an escape beat appears is exactly when the patient faints. This is why the therapeutic dilemma is unavoidable — the tachy needs rate-controlling/antiarrhythmic drugs, but those very drugs deepen the suppression and lengthen the lethal pause.</p>
+
+    <h3>🧭 Consultant's three commandments for the next hours</h3>
+    <ol>
+      <li>🔄 "<strong>Reversible first.</strong> Stop her beta-blocker, get a TSH, check potassium, exclude ischemia. I will not implant a device for a tablet or a thyroid she can fix."</li>
+      <li>🔋 "If symptomatic bradycardia/pauses persist once she's off the offending drug and euthyroid, she gets a <strong>permanent pacemaker</strong> — atrial-based or dual-chamber. That's the floor I build so I can then work on the ceiling."</li>
+      <li>🩸 "<strong>Only then</strong> do I treat the AF: rate control or antiarrhythmic/ablation become safe because the pacemaker guarantees a backup rate — and I anticoagulate by <strong>CHA₂DS₂-VASc</strong>, because tachy-brady AF still causes strokes."</li>
+    </ol>
+
+    <div class="callout danger"><b class="ct">☠️ The consultant's war memory (more in S13 M&amp;M)</b>"The last tachy-brady patient I saw mishandled was an 80-year-old started on a beta-blocker and digoxin for AF on a busy take, with no pacemaker. Her AF converted overnight and the sinus node — overdrive-suppressed and now drugged — simply didn't wake. She had a prolonged asystolic pause, syncoped on the way to the toilet, and fractured her skull on the floor. The Holter, reviewed later, showed the tachy-brady pattern in plain sight. The fast rhythm wasn't what hurt her. The silence after it was."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S6 — TEACHING POINTS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s6">
+  <div class="sec-header"><span class="s-badge">S6</span><h2>📖 Teaching Points</h2></div>
+  <div class="section-content">
+    <h3>🔬 The mechanism — WHY a sick node both races and stalls (the WHY behind the WHY)</h3>
+    <ol>
+      <li>🧱 <strong>The substrate:</strong> with age, the sinoatrial node and surrounding atrial myocardium undergo <strong>idiopathic fibrosis</strong>. Pacemaker cells dwindle and the tissue that carries their impulse out to the atrium becomes patchy and unreliable.</li>
+      <li>🐢 <strong>The brady faces:</strong> this manifests as inappropriate <strong>sinus bradycardia</strong>, <strong>SA exit block</strong> (the impulse forms but can't get out), and <strong>sinus arrest / pauses</strong> (no impulse at all). Escape rhythms from the AV junction are slow and unreliable.</li>
+      <li>🐇 <strong>The tachy face:</strong> the same diseased, fibrotic atrium is fertile ground for <strong>atrial fibrillation/flutter</strong>. So one organ produces both halves of tachy-brady.</li>
+      <li>⏸️ <strong>Why the pause follows the tachy — overdrive suppression:</strong> any sustained fast atrial rhythm continually depolarizes and <em>suppresses</em> the sinus node (via increased Na/K-pump activity and hyperpolarization). A healthy node recovers in a beat or two; a <em>sick</em> node, already barely firing, stays suppressed far longer. When the tachycardia stops, the node is slow to restart → a long <strong>post-tachycardia pause</strong> → syncope.</li>
+      <li>💥 <strong>Why it harms:</strong> ~6–8 seconds of ventricular standstill drops cerebral perfusion below the threshold for consciousness → Stokes-Adams syncope, falls, fractures, head injury, and — if the escape fails — asystolic arrest. Chronotropic incompetence adds chronic exertional fatigue and breathlessness.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The fast rhythm presses the sinus node down; in a healthy heart it springs back, in a sick one it stays down — and the patient faints in the silence. A pacemaker is the floor under that silence."</div>
+
+    <h3>⚖️ Contrast pair #1 — Intrinsic SSS vs extrinsic/reversible bradycardia (the implant you regret)</h3>
+    <div class="vs">
+      <div class="side a"><h4>🔴 Intrinsic SSS → PACE</h4><ul><li>Elderly, degenerative SA node disease</li><li>Symptomatic brady/pauses persist <strong>after</strong> stopping AV-nodal drugs &amp; correcting thyroid</li><li>Symptom–rhythm correlation documented</li><li>Definitive therapy: <strong>permanent pacemaker</strong></li></ul></div>
+      <div class="side b"><h4>🔵 Extrinsic / reversible → FIX, don't implant</h4><ul><li>On a beta-blocker, non-DHP CCB, digoxin, antiarrhythmic</li><li><strong>Hypothyroid</strong>, hyperkalemic, ischemic (inferior MI / SA artery), or high vagal tone</li><li>Brady resolves once the cause is removed</li><li>A pacemaker here is permanent hardware for a temporary problem</li></ul></div>
+    </div>
+    <p>😈 <strong>The trap:</strong> a frightening number (HR 38, a 5-second pause) tempts you to implant immediately. But if it's drug-induced or hypothyroid, you've committed an elderly patient to lifelong hardware, lead complications and follow-up for something a stopped tablet or levothyroxine would have fixed. <strong>Reversible causes are excluded first — every time.</strong></p>
+
+    <h3>⚖️ Contrast pair #2 — Tachy-brady syndrome vs isolated bradycardia / isolated AF</h3>
+    <div class="vs">
+      <div class="side a"><h4>🐢🐇 Tachy-brady (tonight)</h4><ul><li>BOTH paroxysmal tachy (AF/flutter) AND brady/pauses in one patient</li><li>The post-tachycardia pause is the dangerous event</li><li><strong>Therapeutic dilemma:</strong> rate-control drugs worsen the brady</li><li>Usually needs a <strong>pacemaker</strong> to enable safe AF treatment</li></ul></div>
+      <div class="side b"><h4>🐢 / 🐇 Isolated brady or isolated AF</h4><ul><li>Isolated symptomatic SND: pace the brady (no tachy dilemma)</li><li>Isolated AF with a healthy node: rate-control/anticoagulate freely — no pause risk</li><li>No overdrive-suppression trap</li><li>Simpler, single-axis decisions</li></ul></div>
+    </div>
+    <p>💡 <em>Why it matters:</em> recognizing the <strong>combination</strong> is what stops you from "just rate-controlling the AF." In tachy-brady, the AF and the pauses are linked; treating one without protecting against the other is how patients get hurt.</p>
+
+    <!-- 🎮 INTERACTIVE SIM: post-tachycardia pause length -->
+    <div class="sim" id="kSim">
+      <h3 style="margin-top:0">🎮 Simulation — The Pause Dial: how a post-tachycardia pause tips into syncope</h3>
+      <p style="font-size:13.5px">Drag the dial to set the length of the pause after an AF burst terminates. Watch where presyncope becomes syncope becomes asystolic danger. This is the "invisible vital sign" that decides whether she faints.</p>
+      <label for="kRange">⏸️ Post-tachycardia pause duration: <b id="kVal">2.0</b> s</label>
+      <input type="range" id="kRange" min="0" max="80" value="20">
+      <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+      <div class="readout bad" id="kReadout">Set the dial to explore.</div>
+      <p style="font-size:12.5px; margin-top:10px; color:var(--ink2)">🎯 Rough thresholds: pauses &lt; 3 s are usually asymptomatic; ~3–6 s cause lightheadedness/presyncope; &gt; ~6 s commonly cause frank syncope; very long pauses risk asystolic arrest. A pacemaker abolishes the pause by guaranteeing a backup rate.</p>
+    </div>
+
+    <!-- 📚 EBM MODULE -->
+    <div class="ebm">
+      <h3>📚 Evidence-Based Medicine Corner</h3>
+      <table class="tbl">
+        <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2018 ACC/AHA/HRS Bradycardia</td><td>Pacing for sinus node dysfunction is indicated when <strong>symptoms are correlated with the bradycardia/pause</strong>; reversible causes must be excluded first.</td><td>The whole case in one line: prove symptom–rhythm correlation, exclude reversible causes, then pace symptomatic irreversible SND (Class I).</td></tr>
+        <tr><td><span class="lvl">RCT</span> MOST / CTOPP / DANPACE</td><td>In SND, atrial-based / dual-chamber pacing reduces AF and pacemaker syndrome vs single-chamber ventricular pacing; physiologic pacing is preferred.</td><td>Choose an <strong>atrial-based or dual-chamber</strong> system, and minimize unnecessary RV pacing.</td></tr>
+        <tr><td><span class="lvl">RCT</span> Multiple AF trials</td><td>After pacing protects the brady, AF can be rate-controlled or rhythm-controlled (drugs/ablation) safely; anticoagulation reduces stroke.</td><td>Pace first, <strong>then</strong> treat the tachy and anticoagulate — the sequence the dilemma demands.</td></tr>
+        <tr><td><span class="lvl">SCORE</span> CHA₂DS₂-VASc</td><td>Stratifies stroke risk in AF; this 78-year-old female with hypertension already scores ≥ 2.</td><td>The AF component of tachy-brady is <strong>not benign</strong> — anticoagulate by score, not by how brief the bursts feel.</td></tr>
+        <tr><td><span class="lvl">DIAGNOSTIC</span> Holter / event / loop recorder</td><td>Symptom–rhythm correlation in intermittent syncope often needs prolonged monitoring; implantable loop recorders capture rare events.</td><td>If a 24-h Holter misses it, escalate to longer monitoring — <strong>no correlation, no pacemaker</strong>.</td></tr>
+      </table>
+    </div>
+
+    <!-- 🔬 ADVANCED TOPICS -->
+    <div class="callout purple">
+      <h3 style="margin-top:0">🔬 Fellowship Corner — Advanced Topics</h3>
+      <ul>
+        <li>🧪 <strong>Sinus node function testing:</strong> corrected sinus node recovery time (cSNRT) and sinoatrial conduction time on EP study can confirm intrinsic dysfunction when non-invasive correlation is elusive; intrinsic heart rate after autonomic blockade separates intrinsic from autonomic causes.</li>
+        <li>🔋 <strong>Pacing mode &amp; minimizing RV pacing:</strong> DDD(R) with algorithms (e.g. managed ventricular pacing) to keep intrinsic AV conduction; rate-adaptive (R) sensors specifically address <strong>chronotropic incompetence</strong>. Avoid VVI where atrial pacing is feasible (pacemaker syndrome, AF).</li>
+        <li>🫀 <strong>Conduction-system / His-bundle &amp; LBB-area pacing:</strong> emerging physiologic alternatives to reduce pacing-induced dyssynchrony in patients needing frequent ventricular pacing.</li>
+        <li>🦋 <strong>Reversible mimics to exhaust:</strong> hypothyroidism, hyperkalemia, drug effect, inferior ischemia/SA-nodal artery disease, hypothermia, raised intracranial pressure, OSA, and the athletic/high-vagal-tone heart — none of which should be paced.</li>
+        <li>🧬 <strong>Familial SND &amp; channelopathies:</strong> SCN5A and HCN4 mutations cause early-onset sinus node dysfunction; consider in young patients without degenerative disease.</li>
+        <li>🩸 <strong>AF management after pacing:</strong> rate control, antiarrhythmics (now safe with backup pacing), and catheter ablation; "pace and ablate" (AV-node ablation + pacing) for refractory rapid AF in selected patients.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S7 — ORDERS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s7">
+  <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+  <div class="section-content">
+    <h3>🖊️ The order set, written as you'd actually write it (10:48)</h3>
+    <ul>
+      <li>🚨 <strong>HOLD all rate-controlling / AV-nodal drugs for the AF</strong> (beta-blocker, digoxin, non-DHP CCB, antiarrhythmics) until the brady is protected — flag on chart and whiteboard.</li>
+      <li>🔄 <strong>Stop her own bisoprolol</strong> (the likely culprit/contributor) and document the reason — reversible-cause exclusion.</li>
+      <li>🛡️ <strong>Apply transcutaneous pacing pads; keep atropine 0.5 mg IV drawn up</strong> for a symptomatic acute pause/bradycardia as a bridge. Have isoprenaline available if needed.</li>
+      <li>🧪 <strong>Send TSH, U&amp;E (K⁺), troponin, FBC, Mg²⁺, Ca²⁺, digoxin level if relevant</strong> — exclude hypothyroidism, hyperkalemia, ischemia, drug effect.</li>
+      <li>📟 <strong>Admit to a monitored bed; continuous telemetry</strong>; document every pause length and any symptom occurring with it (symptom–rhythm correlation log).</li>
+      <li>🔋 <strong>Refer EP for permanent pacemaker</strong> (atrial-based / dual-chamber, rate-adaptive for chronotropic incompetence) — for symptomatic, irreversible SND once reversible causes excluded.</li>
+      <li>🩸 <strong>Calculate CHA₂DS₂-VASc and plan anticoagulation</strong> for the AF component (this patient scores ≥ 2) — to be safely treated alongside/after pacing.</li>
+      <li>😴 <strong>Screen for OSA</strong> (sleep study) given snoring/apneas — a treatable contributor to nocturnal pauses.</li>
+      <li>🙅 <strong>Do NOT load beta-blocker + digoxin for "rate control" tonight</strong> — the explicit trap; record the reasoning.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In tachy-brady there are only two early priorities: protect the brady (reversible-cause check, then a pacemaker) and resist the urge to rate-control the AF until you have. Everything else makes those two safe."</div>
+
+    <!-- 🩺 PROCEDURE GUIDE 1 -->
+    <div class="checklist" id="ckCV">
+      <h3 style="margin-top:0">🩺 Procedure Guide — The Tachy-Brady Sequence — tick as you go</h3>
+      <label class="ck"><input type="checkbox"><span>🔎 Confirm symptom–rhythm correlation (the documented pause coincides with the presyncope/syncope)</span></label>
+      <label class="ck"><input type="checkbox"><span>🚫 Hold all rate-controlling/AV-nodal drugs for the AF until the brady is protected</span></label>
+      <label class="ck"><input type="checkbox"><span>🔄 Exclude/treat reversible causes — stop the beta-blocker, send TSH, check K⁺, exclude ischemia and OSA</span></label>
+      <label class="ck"><input type="checkbox"><span>🛡️ Bridge safely — telemetry, transcutaneous pacing pads on, atropine ready for a symptomatic pause</span></label>
+      <label class="ck"><input type="checkbox"><span>🔋 If symptomatic brady persists once reversible causes are excluded → refer for a permanent pacemaker (atrial-based/dual-chamber, rate-adaptive)</span></label>
+      <label class="ck"><input type="checkbox"><span>🩸 AFTER pacing — rate-control/rhythm-control the AF safely and anticoagulate by CHA₂DS₂-VASc</span></label>
+      <label class="ck"><input type="checkbox"><span>📋 Document the reasoning: why no rate-control first, why pace, why the sequence</span></label>
+      <div class="ck-progress" data-progress>0 / 7 complete</div>
+    </div>
+
+    <!-- 🩺 PROCEDURE GUIDE 2 -->
+    <div class="checklist" id="ckDefib">
+      <h3 style="margin-top:0">🩺 Procedure Guide — If a pause becomes a symptomatic emergency: acute bradycardia bridge</h3>
+      <p style="font-size:13px">⚠️ If she has a prolonged symptomatic pause / haemodynamically significant bradycardia before the pacemaker is in, follow the ACLS bradycardia algorithm as a bridge.</p>
+      <label class="ck"><input type="checkbox"><span>🩺 Confirm symptomatic bradycardia/pause with hypoperfusion (presyncope/syncope, hypotension) — not an asymptomatic number</span></label>
+      <label class="ck"><input type="checkbox"><span>💉 Atropine 0.5 mg IV, repeat to a max of 3 mg (may be limited benefit in intrinsic SA disease / post-transplant)</span></label>
+      <label class="ck"><input type="checkbox"><span>🔌 Transcutaneous pacing — set rate and current to capture, sedate/analgese for the discomfort</span></label>
+      <label class="ck"><input type="checkbox"><span>💧 If atropine/TCP insufficient: isoprenaline or dopamine/adrenaline infusion as a chronotropic bridge</span></label>
+      <label class="ck"><input type="checkbox"><span>🔄 Re-check and treat reversible causes in parallel (drugs, K⁺, thyroid, ischemia)</span></label>
+      <label class="ck"><input type="checkbox"><span>🔋 Arrange urgent temporary transvenous pacing / expedited permanent pacemaker</span></label>
+      <div class="ck-progress" data-progress>0 / 6 complete</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S8 — NURSING CARE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s8">
+  <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+  <div class="section-content">
+    <h3>🛏️ Ward / monitored-bed nursing priorities — episode by episode</h3>
+    <ul>
+      <li>📟 <strong>Continuous telemetry with transcutaneous pacing pads attached and the defibrillator/pacing unit at the bedside.</strong> Keep atropine drawn up and within reach.</li>
+      <li>⏱️ <strong>Log every pause and every symptom on the same clock:</strong> the symptom–rhythm correlation you document is what justifies the pacemaker. Print the strip of any pause &gt; 3 s and note what the patient felt at that second.</li>
+      <li>🚫 <strong>Question any order to rate-control the AF before pacing:</strong> a prescription for a beta-blocker, digoxin or diltiazem in this patient is the trap — flag it to the team.</li>
+      <li>🩸 <strong>BP and conscious-level checks with each palpitation/near-faint</strong> — a near-faint at the END of a fast run is the post-tachycardia pause; treat it as a warning, not a curiosity.</li>
+      <li>🛡️ <strong>Falls precautions:</strong> bed low, call bell in reach, assist with all transfers and toileting — the next unprotected pause could mean a fracture or head injury.</li>
+      <li>🦋 <strong>Chase the reversible-cause bloods</strong> (TSH, K⁺, troponin) and confirm the beta-blocker has been stopped and documented.</li>
+      <li>🔋 <strong>Pre-pacemaker prep when planned:</strong> consent support, IV access, anticoagulation/bridging plan, antibiotic prophylaxis, and post-implant arm-movement/wound education.</li>
+      <li>🧠 <strong>Educate the patient:</strong> what a pause is, why she fainted, why we're not "just slowing the fast heart," and to report any palpitations-then-dizziness immediately.</li>
+      <li>👨‍👩‍👦 Keep the family updated and supported (see S16) — repeated faints are frightening; explain the plan in plain language.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who times the faint to the pause and questions the rate-control order is doing half the diagnostic and half the protective work in the room."</div>
+    <div class="callout warn"><b class="ct">📢 Escalate IMMEDIATELY for</b>Any pause causing loss of consciousness · a pause &gt; 6 s or progressing toward asystole (→ atropine / transcutaneous pacing) · a fall or head injury · new chest pain / ST changes (ischemic SA disease) · hyperkalemia on the gas · any prescription for a rate-controlling/AV-nodal drug before the pacemaker is in.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S9 — INVESTIGATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s9">
+  <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+  <div class="section-content">
+    <h3>🧾 Results board (11:20, during monitored workup)</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>Result</th><th>Reference</th><th>Interpretation</th></tr>
+      <tr><td>Holter / telemetry</td><td class="hi">AF bursts + 5.8 s pause ↑</td><td>—</td><td>The diagnosis. Paroxysmal AF terminating in a long post-tachycardia pause that coincides with her near-faint = tachy-brady SSS with symptom–rhythm correlation.</td></tr>
+      <tr><td>TSH</td><td class="hi">11.4 mIU/L ↑</td><td>0.4–4.0</td><td>Subclinical-to-overt <strong>hypothyroidism</strong> — a reversible contributor to bradycardia. Must be treated and the rhythm reassessed before committing to "irreversible."</td></tr>
+      <tr><td>Free T4</td><td class="lo">10 pmol/L ↓</td><td>12–22</td><td>Confirms hypothyroidism. Start levothyroxine (cautiously in the elderly) and recheck the resting rate.</td></tr>
+      <tr><td>Potassium</td><td class="ok-v">4.4 mmol/L</td><td>3.5–5.0</td><td>Normal — excludes hyperkalemia as the brady driver.</td></tr>
+      <tr><td>Troponin I</td><td class="ok-v">&lt; 0.04 ng/mL</td><td>&lt; 0.04</td><td>No acute ischemia — argues against an acute inferior MI / SA-nodal artery event as the cause.</td></tr>
+      <tr><td>Drug history</td><td class="hi">On bisoprolol ↑</td><td>—</td><td>A beta-blocker actively suppressing the SA/AV nodes — a second reversible contributor. Stopped and documented.</td></tr>
+      <tr><td>Digoxin</td><td class="ok-v">Not on digoxin</td><td>—</td><td>Excludes digoxin-induced bradycardia/SA block here.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Before you call sinus disease 'irreversible,' make her euthyroid and drug-free — two reversible causes were hiding in plain sight on this very board."</div>
+
+    <div class="callout info"><b class="ct">🧠 Why finding hypothyroidism and a beta-blocker does NOT cancel the diagnosis</b>It refines it. Stop the bisoprolol and treat the hypothyroidism, then re-monitor. If the symptomatic bradycardia and post-tachycardia pauses <em>persist</em> once she's euthyroid and off the drug, the underlying SA node is intrinsically diseased and the pacemaker indication stands. If they <em>resolve</em>, you've spared her a lifetime of hardware. Either way, you don't implant until the reversible layers are peeled back — and you still anticoagulate the AF.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S10 — ECG / IMAGING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s10">
+  <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging</h2></div>
+  <div class="section-content">
+    <h3>🫀 The presenting rhythm — read it like a detective</h3>
+    <div class="ecg-fig">
+      <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Tachy-brady strip — fast AF burst terminating in a long sinus pause then a slow escape">
+        <rect width="820" height="150" fill="#0b1220"/>
+        <g stroke="#1e3a5f" stroke-width="1">
+          <line x1="0" y1="30" x2="820" y2="30"/><line x1="0" y1="60" x2="820" y2="60"/>
+          <line x1="0" y1="90" x2="820" y2="90"/><line x1="0" y1="120" x2="820" y2="120"/>
+        </g>
+        <polyline fill="none" stroke="#86efac" stroke-width="2.4" points="0,75 18,75 26,45 34,110 42,75 70,75 78,48 86,108 94,75 120,75 128,45 136,112 144,75 168,75 176,50 184,106 192,75 215,75 223,46 231,110 239,75 260,75 268,75 600,75 615,40 628,112 640,75 760,75 775,46 788,108 800,75 815,75"/>
+        <text x="120" y="22" fill="#fca5a5" font-size="12" font-weight="700">↑ AF burst (~158)</text>
+        <text x="360" y="68" fill="#fcd34d" font-size="12" font-weight="700">↑ 5.8 s sinus pause</text>
+        <text x="610" y="22" fill="#86efac" font-size="12" font-weight="700">↑ slow escape</text>
+      </svg>
+      <div class="ecg-cap">A run of <span style="color:#fca5a5">fast irregular AF</span> abruptly terminates into a long, flat <span style="color:#fcd34d">post-tachycardia pause</span> — the sinus node, overdrive-suppressed, is slow to wake — before a <span style="color:#86efac">slow junctional escape</span> rescues her. This tachy → pause → escape sequence, timed to her near-faint, is the signature of tachy-brady SSS.</div>
+    </div>
+
+    <h3>🔎 The sick-sinus ECG/monitoring toolkit (memorize the high-yield ones)</h3>
+    <table class="tbl">
+      <tr><th>Feature</th><th>Why it means sinus node dysfunction</th></tr>
+      <tr><td>🐢 <strong>Inappropriate sinus bradycardia</strong></td><td>Persistently slow sinus rate (e.g. &lt; 50) without a physiologic reason (sleep, athleticism, drugs) — the node fires too slowly.</td></tr>
+      <tr><td>⏸️ <strong>Sinus pause / sinus arrest</strong></td><td>The node fails to fire → a flat line with no P wave; the pause is NOT a multiple of the underlying P–P interval (vs SA exit block, which is).</td></tr>
+      <tr><td>🚪 <strong>SA exit block</strong></td><td>The impulse forms but can't leave the node → dropped P–QRS complexes at a multiple of the sinus cycle (Wenckebach-type or fixed).</td></tr>
+      <tr><td>🐇 <strong>Paroxysmal AF / flutter</strong></td><td>The diseased atrium fibrillates — the tachy half of tachy-brady; bursts that end in a pause are the giveaway.</td></tr>
+      <tr><td>⏸️🐇 <strong>Post-tachycardia pause</strong></td><td>Overdrive-suppressed node is slow to resume after the tachy stops → the long pause that causes syncope. Near-diagnostic of tachy-brady.</td></tr>
+      <tr><td>🏃 <strong>Chronotropic incompetence</strong></td><td>Failure of the heart rate to rise appropriately with exertion (e.g. unable to reach ~80% of age-predicted max) → exertional fatigue/breathlessness.</td></tr>
+      <tr><td>⏱️ <strong>Prolonged monitoring (Holter/event/loop recorder)</strong></td><td>Captures the intermittent event and proves symptom–rhythm correlation — the indication, not the number, drives pacing.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Catch the faint and the pause on the same strip and the argument is over — it's symptomatic sinus node dysfunction. The number alone never was the diagnosis; the correlation is."</div>
+
+    <h3>🫀 Other imaging &amp; workup</h3>
+    <ul>
+      <li>📈 <strong>12-lead ECG (between attacks):</strong> sinus bradycardia ~46/min, first-degree AV delay, no acute ischemia; old changes only — a structurally aging conduction system.</li>
+      <li>🩻 <strong>Echo:</strong> preserved EF, mild LA dilatation (the substrate for AF), no significant valve disease — confirms a primarily electrical, not pump, problem.</li>
+      <li>😴 <strong>Sleep study (later):</strong> for the snoring/apneas — OSA worsens nocturnal pauses via vagal surges and is independently treatable.</li>
+    </ul>
+
+    <div class="callout warn"><b class="ct">⚠️ The monitoring's favorite lie in sick sinus</b>"There's a scary pause on the strip, so implant a pacemaker." A pause without a documented <em>symptom</em> at that moment — especially nocturnal, in athletes, or on a rate-slowing drug — may be benign or reversible. The only reassuring path is <strong>symptom–rhythm correlation plus reversible-cause exclusion</strong>. Absent those, you risk implanting hardware for a number.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S11 — MEDICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s11">
+  <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+  <div class="section-content">
+    <h3>💉 Drugs — what, why, and the traps</h3>
+    <table class="tbl">
+      <tr><th>Drug</th><th>Role here</th><th>Mechanism / caution</th></tr>
+      <tr><td><strong>Stop the beta-blocker (bisoprolol)</strong></td><td>Reversible-cause exclusion — first move</td><td>Beta-blockade suppresses SA/AV nodes and worsens bradycardia/pauses. In SSS, the offending drug is often the whole problem. Stop and reassess before implanting.</td></tr>
+      <tr><td><strong>Levothyroxine</strong></td><td>Treat the hypothyroidism (reversible contributor)</td><td>Start low and titrate in the elderly/cardiac patient. Correcting hypothyroidism may improve the resting rate — reassess the need to pace afterward.</td></tr>
+      <tr><td><strong>Atropine 0.5 mg IV</strong></td><td>Acute bridge for a symptomatic pause/bradycardia</td><td>Vagolytic; raises rate transiently. May have limited effect in intrinsic SA disease — have transcutaneous pacing ready as backup.</td></tr>
+      <tr><td><strong>Transcutaneous / temporary pacing; isoprenaline</strong></td><td>Bridge to permanent pacemaker if symptomatic</td><td>Guarantees a backup rate while reversible causes are addressed. Isoprenaline as a chronotropic infusion if atropine/TCP insufficient.</td></tr>
+      <tr><td><strong>Anticoagulant (DOAC)</strong></td><td>Stroke prevention for the AF component (CHA₂DS₂-VASc ≥ 2)</td><td>Tachy-brady AF still embolizes. Start by score, independent of how brief the bursts are; balance against bleeding/falls risk.</td></tr>
+      <tr><td><strong>AF rate/rhythm control (beta-blocker, non-DHP CCB, antiarrhythmic, ablation)</strong></td><td>Treat the tachy — but ONLY after pacing protects the brady</td><td>These are the drugs that worsen the pause. Safe once a pacemaker guarantees a floor rate; unsafe before.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Every drug that calms the AF in tachy-brady also deepens the pause. They are safe only once a pacemaker has built a floor under the patient — never before."</div>
+
+    <div class="callout danger"><b class="ct">🚫 The 'not yet' list in unprotected tachy-brady</b>❌ Beta-blocker for the AF · ❌ Digoxin · ❌ Non-DHP calcium-channel blockers (diltiazem/verapamil) · ❌ AV-nodal-slowing antiarrhythmics — all worsen the post-tachycardia pause while the brady is unprotected. ✅ The "drug" that protects the floor is a <strong>pacemaker</strong>; until then, atropine/transcutaneous pacing bridge a symptomatic pause.</div>
+
+    <h3>🏠 Definitive &amp; long-term therapy (this admission, not just today)</h3>
+    <ul>
+      <li>🔋 <strong>Permanent pacemaker</strong> (atrial-based / dual-chamber, rate-adaptive for chronotropic incompetence) — Class I for symptomatic, irreversible SND with documented symptom–rhythm correlation.</li>
+      <li>🩸 <strong>Anticoagulation</strong> by CHA₂DS₂-VASc for the AF — safe to continue lifelong.</li>
+      <li>🐇 <strong>AF rhythm/rate control or ablation</strong> — now safe because the pacemaker provides a backup rate.</li>
+      <li>🦋 <strong>Maintain euthyroid state</strong> and review all rate-slowing drugs at every visit.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S12 — MONITORING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s12">
+  <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+  <div class="section-content">
+    <h3>📡 What to watch and why</h3>
+    <ul>
+      <li>📈 <strong>Continuous telemetry</strong> with transcutaneous pacing pads attached until the permanent pacemaker is in; print strips of every pause and tag the symptom at that moment.</li>
+      <li>⏱️ <strong>Symptom–rhythm correlation log</strong> — the single most important "monitor": each presyncope/syncope timed against the rhythm. This is what justifies the device.</li>
+      <li>🐇 <strong>Track AF burden and the post-tachycardia pause length</strong> — both the ceiling and the floor; rising pause length signals escalating risk.</li>
+      <li>🦋 <strong>Re-check TSH and resting rate after starting levothyroxine</strong> and after stopping the beta-blocker — to see whether the bradycardia was reversible.</li>
+      <li>🩸 <strong>Confirm anticoagulation started/levels appropriate</strong> for the AF, and monitor for bleeding/falls risk.</li>
+      <li>🔋 <strong>After implant:</strong> interrogate the device — pacing percentage, mode (minimize RV pacing), rate-response settings for exertion, AF-detection diagnostics, and lead/wound checks.</li>
+      <li>🛡️ <strong>Falls and injury surveillance</strong> until the rhythm is protected — a single unprotected pause can fracture a hip or skull.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Before the pacemaker the monitor asks 'did a faint match a pause?'; after it, the monitor asks 'is the device pacing when it should and the AF anticoagulated?' — both questions, one disease."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S13 — COMPLICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s13">
+  <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+  <div class="section-content">
+    <h3>💀 What can go wrong — and the mechanism</h3>
+    <ul>
+      <li>⏸️ <strong>Prolonged asystolic pause → syncope/arrest</strong> — the great fear; a post-tachycardia pause with no escape rhythm. The classic harm if the AF is rate-controlled before the brady is paced.</li>
+      <li>🤕 <strong>Falls, fractures, head injury</strong> — sudden Stokes-Adams syncope with no warning; in the elderly a single faint can be life-changing.</li>
+      <li>🧠 <strong>Stroke / systemic embolism</strong> — the AF component embolizes if not anticoagulated; under-treated because bursts feel "brief."</li>
+      <li>🔋 <strong>Implanting for a reversible cause</strong> — committing a patient to lifelong hardware, lead complications and infection risk for a drug effect or hypothyroidism that would have resolved.</li>
+      <li>🩹 <strong>Pacemaker-related:</strong> pocket infection/haematoma, lead displacement/perforation, pneumothorax, pacemaker syndrome (if poorly chosen mode), and AF promotion by unnecessary RV pacing.</li>
+      <li>🏃 <strong>Untreated chronotropic incompetence</strong> — chronic exertional fatigue/breathlessness even after the pauses are fixed, unless a rate-adaptive device is programmed.</li>
+    </ul>
+
+    <!-- 🎭 M&M CONFERENCE MODULE -->
+    <div class="mm">
+      <h3>🎭 Morbidity &amp; Mortality Conference — "The Pause After the Race"</h3>
+      <div class="mm-case">
+        <strong>The case:</strong> An 80-year-old woman with palpitations and intermittent dizziness was admitted with paroxysmal AF on a busy take. The night team, focused on the fast rate, started <strong>bisoprolol and digoxin for rate control</strong> — with no pacemaker and without reviewing the prior Holter, which had shown sinus pauses. Overnight her AF converted to sinus. The overdrive-suppressed, now <em>doubly drugged</em> sinus node failed to wake: a <strong>prolonged asystolic pause</strong>. She got up for the toilet, blacked out mid-stride, and struck her head on the bathroom floor — a subdural haematoma. The Holter projected at the M&amp;M showed the tachy-brady pattern in plain sight. <em>(The mirror-image error the panel also discussed: a different patient had a pacemaker implanted for a "5-second pause" that turned out to be entirely due to a beta-blocker — which, once stopped, resolved completely, leaving needless hardware.)</em>
+      </div>
+      <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+      <div class="swiss">
+        <div class="hole"><b>🧠 TUNNEL VISION</b>"She's in AF — control the rate." The fast rhythm was treated; the brady half was invisible.</div>
+        <div class="hole"><b>📈 PRIOR HOLTER UNREAD</b>Documented sinus pauses were on file and never reviewed.</div>
+        <div class="hole"><b>🔄 REVERSIBLE NOT CHECKED</b>The mirror case: paced a beta-blocker effect; never stopped the drug or checked thyroid first.</div>
+        <div class="hole"><b>💊 SEQUENCE ERROR</b>Rate-control drugs given BEFORE protecting the brady → killer post-conversion pause.</div>
+        <div class="hole"><b>🌙 SYSTEM</b>Night take, no senior review, no "pace before you rate-control tachy-brady" default.</div>
+      </div>
+      <p style="margin-bottom:0"><strong>🛡️ What would have saved her:</strong> recognize tachy-brady; <em>never</em> rate-control the AF before the brady is protected; exclude reversible causes (stop the drug, check the thyroid) before implanting; document symptom–rhythm correlation; review the prior Holter; get senior/EP eyes early. <strong>This is exactly why your nurse held the rate-control tonight.</strong></p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'She's just in AF, control the rate' is the sentence written on the chart of tachy-brady patients who then arrest in the pause after it converts. The fast rhythm is rarely the killer; the silence after it is."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S14 — DIFFERENTIALS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s14">
+  <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials</h2></div>
+  <div class="section-content">
+    <h3>🧩 The bradycardia / syncope-with-pause differential</h3>
+    <table class="tbl">
+      <tr><th>Diagnosis</th><th>Clues</th><th>Why it matters</th></tr>
+      <tr><td>🐢🐇 <strong>Sick sinus / tachy-brady</strong> (this patient)</td><td>Elderly, syncope + palpitations, sinus pauses, AF bursts ending in a long pause, chronotropic incompetence, symptom–rhythm correlation</td><td>Default here. Exclude reversible causes, then pace the symptomatic brady; treat AF and anticoagulate after.</td></tr>
+      <tr><td>💊 <strong>Drug-induced bradycardia</strong></td><td>On beta-blocker, non-DHP CCB, digoxin, antiarrhythmic; resolves when stopped</td><td>Reversible — <strong>do not implant</strong>. The commonest mimic; always the first thing to exclude.</td></tr>
+      <tr><td>🦋 <strong>Hypothyroidism</strong></td><td>Bradycardia, fatigue, cold intolerance; high TSH, low T4</td><td>Reversible with levothyroxine — re-assess the rhythm before committing to a pacemaker.</td></tr>
+      <tr><td>🚪 <strong>AV block (2nd/3rd degree)</strong></td><td>Block is at the AV node/His-Purkinje, not the sinus node; dropped QRS with marching P waves / dissociation</td><td>Also pace-able but a different lesion; distinguish on the ECG — P-wave behaviour tells you the level of block.</td></tr>
+      <tr><td>🧠 <strong>Reflex (vasovagal) / carotid sinus hypersensitivity</strong></td><td>Situational triggers, prodrome; CSM provokes a pause; high vagal tone</td><td>Often managed without a pacemaker; a reversible/autonomic cause, not intrinsic node disease.</td></tr>
+      <tr><td>🧪 <strong>Hyperkalemia / ischemia / hypothermia</strong></td><td>Metabolic clues, inferior ST changes (SA-nodal artery), low core temp</td><td>Reversible — treat the cause; bradycardia resolves without hardware.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"REVERSIBLE bradycardia → fix the cause (drug, thyroid, K⁺, ischemia). INTRINSIC, symptomatic, irreversible sinus disease → pace. Sort which one you're holding before you reach for a lead."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S15 — PLAN -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s15">
+  <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan</h2></div>
+  <div class="section-content">
+    <h3>🧭 Today → this week → for life</h3>
+    <ol>
+      <li>🔄 <strong>Today (done):</strong> held all AF rate-control drugs; stopped bisoprolol; sent TSH (high) and started levothyroxine; confirmed symptom–rhythm correlation (5.8 s pause = near-faint); pacing pads on, atropine ready; monitored admission.</li>
+      <li>🦋 <strong>Exclude/treat reversible causes:</strong> re-monitor after the beta-blocker washes out and she's becoming euthyroid; screen for OSA; document whether the brady persists.</li>
+      <li>🔋 <strong>Permanent pacemaker</strong> (atrial-based / dual-chamber, rate-adaptive) — Class I if symptomatic bradycardia/pauses persist once reversible causes are addressed.</li>
+      <li>🩸 <strong>Anticoagulate the AF</strong> by CHA₂DS₂-VASc (score ≥ 2) — start now and continue, balanced against falls/bleeding risk.</li>
+      <li>🐇 <strong>Treat the tachy safely AFTER pacing:</strong> rate or rhythm control, antiarrhythmic, or AF ablation — now safe with a backup pacing floor.</li>
+      <li>👨‍👩‍👦 <strong>Shared decision-making &amp; education:</strong> what a pacemaker does and doesn't do, device follow-up, anticoagulation, when to seek help, and that the pacemaker is what makes treating her AF safe.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Fix the reversible, pace the brady, then treat and anticoagulate the tachy — in that order. Skip a step and she comes back in a pause or a stroke."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S16 — PROGRESS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s16">
+  <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+  <div class="section-content">
+    <h3>📅 Course on the monitored ward</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Day 1, 10:48</div>AF rate-control held; bisoprolol stopped; TSH 11.4 → levothyroxine started; pacing pads on, atropine ready. Symptom–rhythm correlation documented (5.8 s pause = near-faint).</div>
+      <div class="t-item"><div class="t-time">Day 1, evening</div>Further AF burst at 150 self-terminates → a 4.2 s pause with presyncope (slightly shorter off the beta-blocker, but still symptomatic). Anticoagulation started (CHA₂DS₂-VASc 4).</div>
+      <div class="t-item"><div class="t-time">Day 2</div>Resting rate still 44–48, recurrent symptomatic pauses despite drug withdrawal — i.e. the disease is intrinsic, not merely drug-induced. EP consulted for permanent pacemaker.</div>
+      <div class="t-item"><div class="t-time">Day 3</div>Echo: preserved EF, mild LA dilatation. Sleep study arranged for snoring/apneas. Levothyroxine continued, TSH trending down.</div>
+      <div class="t-item"><div class="t-time">Day 4</div>Dual-chamber rate-adaptive pacemaker implanted uneventfully. No further symptomatic pauses; the floor is now guaranteed.</div>
+      <div class="t-item"><div class="t-time">Day 6</div>With the pacemaker protecting the brady, a beta-blocker is reintroduced to rate-control the AF safely; anticoagulation continued. Mobilizing well, device checked. Ready for discharge.</div>
+    </div>
+
+    <!-- 👨‍👩‍👦 FAMILY & PATIENT JOURNEY MODULE -->
+    <h3>👨‍👩‍👦 Family &amp; Patient Journey</h3>
+    <div class="journey">
+      <div class="j-card"><div class="j-who">👵 The patient — Mrs. E.M.</div><p>"I kept fainting and no one could tell me why. They showed me the strip — my heart raced, then just stopped for nearly six seconds. That's the moment I blacked out. The little box they put in means there's now a floor I can't fall through."</p></div>
+      <div class="j-card"><div class="j-who">👨 Her son</div><p>"Twice she went down and we thought it was 'just her age.' Learning it was a pacemaker problem, fixable, was a relief — and frightening to think a beta-blocker for the racing could have made the next faint worse."</p></div>
+      <div class="j-card"><div class="j-who">👩‍⚕️ The bedside nurse</div><p>"My job was the pacing pads, the symptom log and the truth — and holding that rate-control drug. Sometimes good care is the drug you <em>don't</em> give until the floor is built."</p></div>
+      <div class="j-card"><div class="j-who">🎓 The team's reflection</div><p>"This wasn't a clever diagnosis — it was a disciplined one. We excluded the reversible causes, proved the pause caused the faint, paced first, and only then treated the AF."</p></div>
+    </div>
+
+    <div class="callout pink"><b class="ct">💗 The human thread</b>A pacemaker isn't just hardware — it is a quiet guarantee that the next time her sinus node falls silent, something will catch her. For an elderly woman who had stopped trusting her own body to stay upright, that floor is as much treatment as the device itself. Preparing her for the implant, the follow-ups and what it does — and doesn't — do is part of the care.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S17 — DISCHARGE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s17">
+  <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+  <div class="section-content">
+    <h3>📋 Discharge plan &amp; safety net</h3>
+    <ul>
+      <li>💊 <strong>Medications:</strong> levothyroxine (with TSH recheck plan), anticoagulant for the AF (CHA₂DS₂-VASc), and — now safe with the pacemaker — a rate-controlling agent for the AF if needed. Clear written schedule; review every rate-slowing drug at follow-up.</li>
+      <li>🔋 <strong>Pacemaker in situ:</strong> wound care, arm-movement restrictions early, carry the device ID card, avoid strong magnetic fields, and attend device clinic for interrogation (pacing %, mode, rate-response, AF diagnostics).</li>
+      <li>🦋 <strong>Thyroid &amp; electrolytes:</strong> recheck TSH and U&amp;E with the GP/clinic; confirm euthyroid state and that the offending beta-blocker change is documented.</li>
+      <li>🩺 <strong>EP / cardiology follow-up</strong> for AF management (rate vs rhythm vs ablation) and any residual chronotropic symptoms; sleep clinic for OSA.</li>
+      <li>🚩 <strong>Red flags → seek urgent care:</strong> recurrent faints or near-faints (especially with palpitations), prolonged dizziness, an injury from a collapse, breathlessness, or symptoms suggesting the device isn't pacing.</li>
+      <li>📚 <strong>Education:</strong> what sick sinus and tachy-brady are in plain language, why she was paced before her AF was treated, anticoagulation and bleeding/falls precautions, and CPR/AED awareness for the family.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Discharge in tachy-brady is not 'pacemaker in, go home' — it is a protected floor, an anticoagulated and treated AF, a corrected thyroid, and a family who knows why the sequence mattered."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S18 — CLINICAL PEARLS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s18">
+  <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+  <div class="section-content">
+    <div class="pearl-grid">
+      <div class="pearl"><b>🐢🐇 Two faces, one node</b>In sick sinus the node that races also stalls. Recognize tachy-brady as a single disease, not two separate problems.</div>
+      <div class="pearl"><b>⏸️ The pause is the killer</b>In tachy-brady the dangerous event is the post-tachycardia pause, not the fast rate. Overdrive suppression of a sick node makes it slow to wake.</div>
+      <div class="pearl"><b>🔄 Reversible first</b>Never implant for bradycardia until you've stopped the beta-blocker and checked the thyroid. Don't pace a drug effect or hypothyroidism.</div>
+      <div class="pearl"><b>🔎 Correlation, not the number</b>No symptom–rhythm correlation, no pacemaker. A faint that matches a pause is the indication; a scary number alone is not.</div>
+      <div class="pearl"><b>🔋 Pace, then treat the tachy</b>Protect the brady with a pacemaker first; only then is it safe to rate-control, rhythm-control or ablate the AF.</div>
+      <div class="pearl"><b>💊 Rate-control = deeper pause</b>Beta-blockers/digoxin/non-DHP CCBs given for the AF worsen the post-tachycardia pause while the brady is unprotected.</div>
+      <div class="pearl"><b>🩸 Anticoagulate the AF</b>Tachy-brady AF still strokes. Anticoagulate by CHA₂DS₂-VASc regardless of how brief the bursts feel.</div>
+      <div class="pearl"><b>🏃 Chronotropic incompetence</b>A rate that won't rise on exertion is part of SSS; treat with a rate-adaptive (R) pacing mode.</div>
+      <div class="pearl"><b>🔋 Choose the mode</b>Atrial-based/dual-chamber pacing beats single-chamber VVI in SND — less AF, less pacemaker syndrome. Minimize unnecessary RV pacing.</div>
+      <div class="pearl"><b>⏱️ Catch the rare event</b>Intermittent syncope often needs Holter → event → implantable loop recorder to prove correlation.</div>
+      <div class="pearl"><b>🚪 Pause vs exit block</b>Sinus arrest ≠ multiple of P–P; SA exit block = a multiple of the sinus cycle. Read the P waves.</div>
+      <div class="pearl"><b>🩺 Asymptomatic ≠ disease</b>Brief nocturnal pauses or athletic bradycardia may be normal. Pace symptomatic, irreversible disease — not a frightening number.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S19 — MCQs / ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s19">
+  <div class="sec-header"><span class="s-badge">S19</span><h2>🧠 MCQs / Assessment</h2></div>
+  <div class="section-content">
+    <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP and feed your dashboard. Each shows a full explanation.</em></p>
+    <div id="mcqHost"></div>
+    <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · Case c-sss-017 — Sick Sinus Syndrome (Tachy-Brady Syndrome)<br>
+  ⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."
+</div>
+
+</div><!-- /#caseScroll -->
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ XP / DASHBOARD CORE ============ */
+  var XP = 0, XP_MAX = 1200;
+  var awarded = {}; // dedupe one-time awards by key
+  var xpVal = document.getElementById('xpVal');
+  var xpFill = document.getElementById('xpFill');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+  }
+  function addXP(amount, key, label){
+    if(key){ if(awarded[key]) return; awarded[key] = true; }
+    XP += amount;
+    if(XP > XP_MAX) XP = XP_MAX;
+    xpVal.textContent = XP;
+    xpFill.style.width = Math.min(100, Math.round(XP / XP_MAX * 100)) + '%';
+    showToast('+' + amount + ' XP' + (label ? ' · ' + label : ''));
+  }
+  function earnBadge(id){
+    var b = document.getElementById(id);
+    if(b && !b.classList.contains('earned')){ b.classList.add('earned'); }
+  }
+
+  /* Dashboard minimize */
+  var dash = document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){
+    dash.classList.toggle('collapsed');
+    this.textContent = dash.classList.contains('collapsed') ? '+' : '–';
+  });
+
+  /* ============ INTERNAL SCROLL SIZING ============ */
+  /* Size the scroll box to the visible window so the sticky tab bar stays in
+     view. When embedded (srcDoc iframe, same-origin), the host page stretches
+     the iframe to full content height and scrolls the OUTER page — so we size
+     this box from the parent window's height minus whatever app chrome sits
+     above the iframe, and scroll internally instead. Standalone → 100vh. */
+  var caseScroll = document.getElementById('caseScroll');
+  var topnav = document.getElementById('topnav');
+  /* The tab bar is position:fixed, so it's out of flow — reserve space at the
+     top of the scroll content (and offset anchor jumps) by its real height. */
+  function setNavOffset(){
+    var navH = topnav ? topnav.offsetHeight : 70;
+    caseScroll.style.paddingTop = navH + 'px';
+    caseScroll.style.scrollPaddingTop = (navH + 14) + 'px';
+  }
+  function sizeScroller(){
+    try {
+      var p = window.parent;
+      if(p && p !== window && window.frameElement){
+        var rectTop = window.frameElement.getBoundingClientRect().top;
+        if(rectTop < 0) rectTop = 0;          // parent scrolled past the chrome
+        var ph = p.innerHeight || 800;
+        var h = ph - rectTop - 6;             // leave the bottom edge breathing room
+        if(h < 460) h = 460;                  // sane minimum on short windows
+        caseScroll.style.height = h + 'px';
+      } else {
+        caseScroll.style.height = '100vh';
+      }
+    } catch(e){ caseScroll.style.height = '100vh'; }
+    setNavOffset();
+  }
+  sizeScroller();
+  window.addEventListener('resize', sizeScroller);
+  window.addEventListener('load', sizeScroller);
+  try { if(window.parent && window.parent !== window) window.parent.addEventListener('resize', sizeScroller); } catch(e){}
+
+  /* ============ NAV: scroll-spy active + visited ============ */
+  var navchips = Array.prototype.slice.call(document.querySelectorAll('.navchip'));
+  var sections = navchips.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited = {};
+  var visitVal = document.getElementById('visitVal');
+
+  function markVisited(idx){
+    var sec = sections[idx];
+    if(!sec) return;
+    if(!visited[sec.id]){
+      visited[sec.id] = true;
+      navchips[idx].classList.add('visited');
+      var count = Object.keys(visited).length;
+      visitVal.textContent = count + ' / 19';
+      addXP(8, 'visit-' + sec.id, 'Section read');
+      if(count >= 19){ earnBadge('bdg-explorer'); addXP(60, 'allvisited', 'Ward Explorer!'); }
+    }
+  }
+  function setActive(idx){
+    navchips.forEach(function(c){ c.classList.remove('active'); });
+    if(navchips[idx]) navchips[idx].classList.add('active');
+  }
+
+  /* True tabs: each chip shows ONLY its section, hidden via CSS otherwise.
+     No scrollIntoView and no scroll-spy — nothing can scroll the tab bar away,
+     which also sidesteps every srcDoc-iframe scrolling quirk. The hero banner
+     and vitals strip belong to the case intro, so they show on S1 only. */
+  var heroBits = [document.querySelector('.hero'), document.querySelector('.vitals-strip')]
+    .filter(function(el){ return !!el; });
+
+  function showSection(idx){
+    sections.forEach(function(s, i){ if(s) s.classList.toggle('sec-active', i === idx); });
+    heroBits.forEach(function(el){ el.style.display = (idx === 0) ? '' : 'none'; });
+    caseScroll.scrollTop = 0;
+    setActive(idx);
+    markVisited(idx);
+  }
+
+  navchips.forEach(function(chip, idx){
+    chip.addEventListener('click', function(ev){
+      ev.preventDefault();
+      showSection(idx);
+    });
+  });
+  showSection(0);
+
+  /* ============ FLAG GAME (S2) ============ */
+  var flagBtns = document.querySelectorAll('#flagGame .flag-btn');
+  var flagResult = document.getElementById('flagResult');
+  var flagsFound = 0, flagsTotal = 0, flagWrong = 0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good') === '1') flagsTotal++; });
+  flagBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.dataset.locked) return;
+      btn.dataset.locked = '1';
+      var good = btn.getAttribute('data-good') === '1';
+      if(good){
+        btn.classList.add('flag-good');
+        flagsFound++;
+        addXP(10, 'flag-' + flagsFound + '-' + Math.random(), 'SSS flag spotted');
+      } else {
+        btn.classList.add('flag-bad');
+        flagWrong++;
+        showToast('❌ Not a sick-sinus flag');
+      }
+      if(flagsFound === flagsTotal){
+        flagResult.textContent = '✅ All ' + flagsTotal + ' sick-sinus red flags found' + (flagWrong ? ' (with ' + flagWrong + ' wrong pick' + (flagWrong>1?'s':'') + ')' : ' — flawless!');
+        earnBadge('bdg-vt');
+        addXP(30, 'flags-complete', 'Pause-Spotter badge');
+      } else {
+        flagResult.textContent = flagsFound + ' / ' + flagsTotal + ' sick-sinus red flags found…';
+      }
+    });
+  });
+
+  /* ============ BRANCHING SCENARIO (S3) ============ */
+  var scText = document.getElementById('scText');
+  var scChoices = document.getElementById('scChoices');
+  var scFeedback = document.getElementById('scFeedback');
+  var scRestart = document.getElementById('scRestart');
+  var scStab = document.getElementById('scStab');
+  var scTime = document.getElementById('scTime');
+  var scXP = document.getElementById('scXP');
+  var pathXP = 0, scStability = 2, scElapsed = 0;
+
+  var STEPS = {
+    start: {
+      text: "The junior holds a syringe of metoprolol in one hand (\"she's in AF, let's rate-control\") and you have the pacing pads and atropine at the bedside. The strip shows: AF bursts at 158, then a documented 5.8-second pause causing her near-faint. Resting rate 44. What do you do FIRST?",
+      choices: [
+        { t: "🚫 Stop the rate-control plan; hold the offending drugs and exclude reversible causes (stop her beta-blocker, send TSH)", good:true, ds:1, dt:10, xp:40, fb:"✅ Exactly. In tachy-brady the brady is the lethal half. Hold the AF rate-control, stop her own beta-blocker and check the thyroid — fix what's reversible before any hardware, and never deepen the pause first.", next:"reversible" },
+        { t: "💉 Give the metoprolol — 'she's in AF, control the rate'", good:false, ds:-2, dt:20, xp:0, fb:"☠️ Catastrophe in the making. Rate-controlling the AF deepens suppression of her sick sinus node — when the AF converts, the post-tachycardia pause lengthens into asystole → syncope/arrest. This is the M&M case in S13. Restart and choose again.", end:true },
+        { t: "🔋 Rush her straight to a permanent pacemaker implant today", good:false, ds:-1, dt:15, xp:5, fb:"⚠️ Premature. She's on a beta-blocker and has never had a TSH — you might be implanting hardware for a reversible cause. Exclude reversible causes first, bridging safely meanwhile.", next:"reversible" }
+      ]
+    },
+    reversible: {
+      text: "You stop her bisoprolol and send a TSH — it comes back at 11.4 (hypothyroid). You start levothyroxine and re-monitor. Over the next day she STILL has symptomatic pauses (4.2 s) with presyncope despite being off the beta-blocker. Now what?",
+      choices: [
+        { t: "🔋 Refer for a permanent pacemaker — symptomatic brady persists after excluding reversible causes", good:true, ds:1, dt:8, xp:30, fb:"✅ Right. Reversible causes were addressed and the symptomatic bradycardia/pauses persist — this is intrinsic, irreversible SND with documented correlation. Class I pacemaker indication.", next:"protect" },
+        { t: "💊 Restart the beta-blocker now to control the AF bursts", good:false, ds:-1, dt:20, xp:0, fb:"⚠️ Not yet — the brady is still unprotected. Rate-controlling the AF now will worsen the next pause. Protect the floor with a pacemaker first; then the beta-blocker is safe.", next:"protect" }
+      ]
+    },
+    protect: {
+      text: "A dual-chamber, rate-adaptive pacemaker is planned. While you wait, the team asks about the AF that keeps recurring. What's the right move now?",
+      choices: [
+        { t: "🩸 Anticoagulate by CHA₂DS₂-VASc now, and treat the tachy (rate/rhythm control) ONLY once the pacemaker protects the brady", good:true, ds:1, dt:6, xp:30, fb:"✅ Ideal sequence. Tachy-brady AF still strokes — anticoagulate by score now. Rate/rhythm control and ablation become safe once the pacemaker guarantees a backup rate.", next:"close" },
+        { t: "🐇 Push a rate-control infusion now to stop the AF bursts before the pacemaker", good:false, ds:0, dt:3, xp:10, fb:"⚠️ Tempting, but the brady is still unprotected — you risk a killer post-conversion pause. Anticoagulate now; defer rate/rhythm control until after pacing.", next:"close" }
+      ]
+    },
+    close: {
+      text: "The pacemaker is implanted, anticoagulation is running, and a beta-blocker now safely rate-controls her AF. She's had no further symptomatic pauses. Final reflection — what was the single principle that protected her?",
+      choices: [
+        { t: "🛡️ Pace the brady FIRST so you can safely treat the tachy — and exclude reversible causes before implanting", good:true, ds:1, dt:5, xp:40, fb:"🏆 Perfect close. Reversible-cause exclusion, then pace the symptomatic brady, then treat and anticoagulate the AF. Sequence was everything. Case stabilized.", end:true },
+        { t: "🎉 The key was just controlling the fast AF rate from the start", good:false, ds:-1, dt:10, xp:0, fb:"⚠️ That's the very trap. Controlling the AF first is what causes the killer pause. The protective principle was pacing the brady before treating the tachy.", end:true }
+      ]
+    }
+  };
+
+  function renderStab(){
+    var s = Math.max(0, Math.min(5, scStability + 2)); // map -2..3 → 0..5
+    var dots = '';
+    for(var i=0;i<5;i++) dots += (i < s ? '●' : '○');
+    scStab.textContent = dots;
+  }
+  function renderStep(key){
+    var step = STEPS[key];
+    scText.textContent = step.text;
+    scFeedback.className = 'feedback';
+    scFeedback.style.display = 'none';
+    scChoices.innerHTML = '';
+    step.choices.forEach(function(ch){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = ch.t;
+      b.addEventListener('click', function(){
+        pathXP += ch.xp; scXP.textContent = pathXP;
+        scElapsed += ch.dt; scTime.textContent = scElapsed + ' s';
+        scStability += ch.ds; renderStab();
+        if(ch.xp) addXP(ch.xp, null, 'Scenario choice');
+        scFeedback.textContent = ch.fb;
+        scFeedback.className = 'feedback ' + (ch.good ? 'good' : 'bad');
+        scFeedback.style.display = 'block';
+        Array.prototype.forEach.call(scChoices.children, function(c){ c.disabled = true; c.style.opacity = .6; });
+        if(ch.end){
+          scRestart.style.display = 'inline-block';
+          if(ch.good && key === 'close'){ earnBadge('bdg-shock'); addXP(20, 'scenario-win', 'Paced In Time!'); }
+        } else if(ch.next){
+          setTimeout(function(){ renderStep(ch.next); }, 1400);
+        }
+      });
+      scChoices.appendChild(b);
+    });
+  }
+  scRestart.addEventListener('click', function(){
+    pathXP = 0; scStability = 2; scElapsed = 0;
+    scXP.textContent = 0; scTime.textContent = '0 s'; renderStab();
+    scRestart.style.display = 'none';
+    renderStep('start');
+  });
+  renderStab();
+  renderStep('start');
+
+  /* ============ REVEAL BUTTONS ============ */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.getAttribute('data-target'));
+      if(!t) return;
+      if(t.classList.contains('reveal-shown')){
+        t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden');
+      } else {
+        t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown');
+        addXP(8, 'reveal-' + btn.getAttribute('data-target'), 'Self-test');
+      }
+    });
+  });
+
+  /* ============ POST-TACHYCARDIA PAUSE SIM (S6) ============ */
+  var kRange = document.getElementById('kRange');
+  var kVal = document.getElementById('kVal');
+  var kNeedle = document.getElementById('kNeedle');
+  var kReadout = document.getElementById('kReadout');
+  if(kRange){
+    var simUsed = false;
+    function updateK(){
+      var k = (parseInt(kRange.value,10) / 10); // 0.0 .. 8.0 seconds
+      kVal.textContent = k.toFixed(1);
+      var pct = (parseInt(kRange.value,10) - 0) / (80 - 0) * 100;
+      kNeedle.style.left = pct + '%';
+      var msg, cls;
+      if(k < 3.0){ msg = '🟢 Short pause — usually asymptomatic. A healthy or mildly sick node tolerates this; no syncope. Often a normal variant, especially at night.'; cls='good'; }
+      else if(k < 4.5){ msg = '🟠 Moderate pause — lightheadedness / presyncope likely. Cerebral perfusion dips; this is the warning zone of tachy-brady.'; cls='warn-r'; }
+      else if(k < 6.0){ msg = '🟠 Long pause — frank presyncope, often near-syncope. Symptom–rhythm correlation here strongly supports pacing.'; cls='warn-r'; }
+      else if(k < 7.0){ msg = '🔴 ~6 s and beyond — frank SYNCOPE. The brain blacks out after ~6–8 s of standstill. This is her faint — a clear pacemaker indication.'; cls='bad'; }
+      else { msg = '🔴 Very long pause — risk of asystolic arrest if no escape rhythm appears. A pacemaker abolishes the pause by guaranteeing a backup rate.'; cls='bad'; }
+      kReadout.innerHTML = msg;
+      kReadout.className = 'readout ' + cls;
+      if(!simUsed){ simUsed = true; addXP(15, 'ksim', 'Pause Master'); }
+    }
+    kRange.addEventListener('input', updateK);
+    updateK();
+  }
+
+  /* ============ CHECKLISTS (S7) ============ */
+  var allChecklistsDone = 0, totalChecklists = document.querySelectorAll('.checklist').length;
+  document.querySelectorAll('.checklist').forEach(function(list){
+    var boxes = list.querySelectorAll('input[type=checkbox]');
+    var prog = list.querySelector('[data-progress]');
+    var total = boxes.length;
+    var doneAwarded = false;
+    function refresh(){
+      var done = 0;
+      boxes.forEach(function(b){
+        if(b.checked){ done++; b.closest('.ck').classList.add('done'); }
+        else { b.closest('.ck').classList.remove('done'); }
+      });
+      prog.textContent = done + ' / ' + total + ' complete';
+      if(done === total && !doneAwarded){
+        doneAwarded = true;
+        allChecklistsDone++;
+        addXP(25, 'ck-' + list.id, 'Checklist done');
+        if(allChecklistsDone >= totalChecklists){ earnBadge('bdg-ck'); addXP(20, 'allck', 'Checklist Champion'); }
+      }
+    }
+    boxes.forEach(function(b){
+      b.addEventListener('change', function(){
+        if(b.checked) addXP(4, null, 'Step checked');
+        refresh();
+      });
+    });
+  });
+
+  /* ============ MCQs (S19) ============ */
+  var MCQS = [
+    {
+      q: "A 78-year-old has recurrent syncope and palpitations. Telemetry shows bursts of fast AF that, on termination, are followed by long sinus pauses, plus resting bradycardia. This pattern is best described as:",
+      opts: ["Isolated atrial fibrillation","Sick sinus syndrome (tachy-brady syndrome)","Complete (third-degree) AV block","Vasovagal syncope"],
+      correct: 1,
+      exp: "Paroxysmal tachyarrhythmia (AF/flutter) alternating with sinus bradycardia/pauses — with a long post-tachycardia pause — is the tachy-brady form of sick sinus syndrome (sinus node dysfunction). The long pause reflects overdrive suppression of a diseased sinus node."
+    },
+    {
+      q: "Why does a long pause follow termination of the AF burst in tachy-brady syndrome?",
+      opts: ["The AV node is completely blocked","The fast rhythm overdrive-suppresses an already-sick sinus node, which is then slow to resume","Hyperkalemia develops during the tachycardia","The ventricle is in tachycardia-induced cardiomyopathy"],
+      correct: 1,
+      exp: "Any sustained fast atrial rhythm suppresses the sinus node. A healthy node recovers quickly; a diseased one stays suppressed, so when the tachycardia stops there is a long post-tachycardia pause — the moment the patient faints."
+    },
+    {
+      q: "In tachy-brady syndrome, what is the central therapeutic dilemma?",
+      opts: ["Anticoagulants increase the heart rate","The drugs that control the tachycardia worsen the bradycardia/pauses","Pacemakers cause atrial fibrillation directly","Beta-blockers shorten the QT dangerously"],
+      correct: 1,
+      exp: "The tachycardia needs rate-controlling/antiarrhythmic drugs, but those same AV-nodal/sinus-suppressing drugs deepen the bradycardia and lengthen the pauses. You frequently cannot treat the tachy safely until a pacemaker protects the brady."
+    },
+    {
+      q: "Before implanting a permanent pacemaker for this patient's bradycardia, the FIRST step is to:",
+      opts: ["Exclude reversible causes — stop AV-nodal drugs (e.g. beta-blocker) and check the thyroid (and K⁺)","Start amiodarone","Perform immediate cardioversion","Give IV calcium"],
+      correct: 0,
+      exp: "Reversible causes (beta-blockers, non-DHP CCBs, digoxin, antiarrhythmics; hypothyroidism; hyperkalemia; ischemia; high vagal tone) must be excluded first. Implanting hardware for a drug effect or hypothyroidism that would resolve is a classic error."
+    },
+    {
+      q: "What is required to justify a permanent pacemaker in sinus node dysfunction?",
+      opts: ["Any pause longer than 2 seconds on telemetry","Documented symptom–rhythm correlation (symptoms occurring with the bradycardia/pause)","A resting heart rate below 60","An abnormal echocardiogram"],
+      correct: 1,
+      exp: "Pacing in SND is driven by symptom–rhythm correlation, not a number alone. Asymptomatic pauses (especially nocturnal or in athletes) may need nothing. Prolonged monitoring (Holter/event/loop recorder) establishes the link between the faint and the pause."
+    },
+    {
+      q: "For symptomatic, irreversible sinus node dysfunction, the definitive therapy is:",
+      opts: ["Lifelong atropine","A permanent pacemaker (atrial-based / dual-chamber)","An implantable cardioverter-defibrillator","Catheter ablation of the sinus node"],
+      correct: 1,
+      exp: "A permanent pacemaker — preferably atrial-based or dual-chamber, with rate-adaptive pacing for chronotropic incompetence — is the definitive treatment for symptomatic, irreversible SND. After pacing, the AF can be treated and anticoagulated safely."
+    },
+    {
+      q: "Regarding the atrial fibrillation component of this patient's tachy-brady syndrome, you should:",
+      opts: ["Ignore it because the bursts are brief","Anticoagulate according to CHA₂DS₂-VASc","Avoid anticoagulation because she has bradycardia","Only anticoagulate if the AF becomes permanent"],
+      correct: 1,
+      exp: "Tachy-brady AF still causes strokes. Anticoagulation should be guided by CHA₂DS₂-VASc (this 78-year-old hypertensive woman already scores ≥ 2), independent of how brief the bursts feel — balanced against bleeding/falls risk."
+    },
+    {
+      q: "Which action is the dangerous error to AVOID in unprotected tachy-brady syndrome?",
+      opts: ["Documenting symptom–rhythm correlation","Giving an AV-nodal rate-controlling drug for the AF before the bradycardia is paced","Checking the thyroid function","Calculating the CHA₂DS₂-VASc score"],
+      correct: 1,
+      exp: "Rate-controlling the AF with a beta-blocker/digoxin/non-DHP CCB before protecting the brady deepens sinus node suppression — on conversion, the post-tachycardia pause can extend into asystole, causing syncope, falls or arrest. Pace first, then treat the tachy."
+    }
+  ];
+
+  var host = document.getElementById('mcqHost');
+  var mcqVal = document.getElementById('mcqVal');
+  var mcqScore = 0, mcqAnswered = 0;
+  var letters = ['A','B','C','D','E'];
+
+  MCQS.forEach(function(item, qi){
+    var box = document.createElement('div');
+    box.className = 'mcq';
+    var html = '<div class="mcq-q">QUESTION ' + (qi+1) + ' / ' + MCQS.length + '</div>';
+    html += '<div class="mcq-stem">' + item.q + '</div>';
+    item.opts.forEach(function(opt, oi){
+      html += '<label class="mcq-opt" data-oi="' + oi + '"><strong>' + letters[oi] + '.</strong> ' + opt + '</label>';
+    });
+    html += '<div class="mcq-exp"></div>';
+    box.innerHTML = html;
+    host.appendChild(box);
+
+    var opts = box.querySelectorAll('.mcq-opt');
+    var exp = box.querySelector('.mcq-exp');
+    var locked = false;
+    opts.forEach(function(label){
+      label.addEventListener('click', function(){
+        if(locked) return;
+        locked = true;
+        var oi = parseInt(label.getAttribute('data-oi'),10);
+        box.classList.add('answered');
+        var correct = item.correct;
+        if(oi === correct){
+          label.classList.add('picked-right');
+          mcqScore++;
+          addXP(25, null, 'Correct answer');
+        } else {
+          label.classList.add('picked-wrong');
+          opts[correct].classList.add('show-right');
+          showToast('❌ Correct: ' + letters[correct]);
+        }
+        exp.innerHTML = '<strong>' + (oi === correct ? '✅ Correct. ' : '📘 Explanation. ') + '</strong>' + item.exp;
+        mcqAnswered++;
+        mcqVal.textContent = mcqScore + ' / ' + MCQS.length;
+        if(mcqAnswered === MCQS.length){
+          var done = document.getElementById('mcqDone');
+          var summary = document.getElementById('mcqSummary');
+          done.style.display = 'block';
+          summary.textContent = 'You scored ' + mcqScore + ' / ' + MCQS.length + '. ' +
+            (mcqScore === MCQS.length ? 'Flawless — you pace the brady before you treat the tachy every time. 🏆' :
+             mcqScore >= 6 ? 'Strong — review the misses and the contrast pairs in S6.' :
+             'Revisit S3, S5, S6 and S11 — the reversible-first, pace-then-treat logic is the whole case.');
+          if(mcqScore >= 7){ earnBadge('bdg-quiz'); addXP(50, 'quizace', 'Quiz Ace!'); }
+        }
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
