@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catecholaminergic Polymorphic VT (CPVT) — Virtual Teaching Hospital</title>
+<!-- META
+id: c-cpvt-015
+title: Catecholaminergic Polymorphic VT (CPVT)
+hospital: cardiology
+department: cv-ep
+bednumber: 8
+chiefcomplaint: Exercise-induced collapse with a normal resting ECG and bidirectional VT on exertion
+system: Cardiology
+severity: critical
+tags: CPVT, RyR2, Bidirectional VT, Beta-blockers, Flecainide, Exercise
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --radius:16px;
+    --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  /* Internal scroll viewport. When this case is embedded the host app stretches
+     the iframe to full content height and the OUTER page scrolls, which would
+     let a sticky bar scroll away. We instead scroll inside this box (sized to
+     the visible window by JS) so the section tab bar stays pinned at the top.
+     Standalone, it falls back to the full viewport height. */
+  #caseScroll{height:100vh; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; scroll-padding-top:92px}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:36px 24px 80px; position:relative; overflow:hidden}
+  .hero::after{content:"📈"; position:absolute; right:-20px; top:-30px; font-size:220px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{max-width:1100px; margin:0 auto; position:relative; z-index:1}
+  .hero .crumbs{font-size:13px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:10px 0 6px; font-size:clamp(26px,4vw,40px); line-height:1.15}
+  .hero .sub{font-size:16px; opacity:.95}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; backdrop-filter:blur(4px)}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== LIVE ECG STRIP IN HERO ===== */
+  .ecg-banner{max-width:1100px; margin:14px auto 0; position:relative; z-index:1}
+  .ecg-banner svg{width:100%; height:64px; display:block; background:rgba(0,0,0,.18); border-radius:12px; border:1px solid rgba(255,255,255,.25)}
+  .ecg-trace{stroke:#86efac; stroke-width:2.4; fill:none; stroke-dasharray:1600; stroke-dashoffset:1600; animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{stroke-dashoffset:0}}
+
+  /* ===== VITALS STRIP ===== */
+  .vitals-strip{max-width:1100px; margin:-52px auto 0; padding:0 24px; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:11px; font-weight:700; letter-spacing:.6px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:21px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== HORIZONTAL SECTION SIDEBAR (fixed — always visible) ===== */
+  .topnav{position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.10)}
+  .topnav .rail{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; max-width:1180px; margin:0 auto; scrollbar-width:thin}
+  .navchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink2); font-size:11px; font-weight:700; text-decoration:none; min-width:78px; text-align:center; transition:all .18s; cursor:pointer}
+  .navchip .s-id{font-size:10px; letter-spacing:1px; color:#94a3b8}
+  .navchip .s-emoji{font-size:16px}
+  .navchip:hover{border-color:var(--rose); color:var(--rose); transform:translateY(-2px)}
+  .navchip.active{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; border-color:#b91c1c}
+  .navchip.active .s-id{color:#fecaca}
+  .navchip.visited:not(.active){border-color:var(--emerald-line); background:var(--emerald-soft)}
+
+  /* ===== DASHBOARD WIDGET ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:215px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10.5px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:760px){.dash{display:none}}
+
+  /* ===== MAIN / SECTIONS (tabbed: one section visible at a time) ===== */
+  main{max-width:1100px; margin:26px auto 80px; padding:0 24px}
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:26px; overflow:hidden}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16.5px; margin:26px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14.5px; margin:18px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:24px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15.5px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:14px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px; letter-spacing:.4px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14.5px}
+
+  /* ===== INTERACTIVE BITS ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:10px 18px; font-weight:700; font-size:14px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:22px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:15px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 15px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 15px; margin-top:12px; font-size:14px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim sliders */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:14px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:14px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Heart/circuit diagram */
+  .heart-fig{display:flex; gap:18px; flex-wrap:wrap; align-items:center; background:var(--slate-soft); border-radius:16px; padding:18px; margin:14px 0}
+  .heart-fig svg{flex:0 0 auto}
+  .heart-legend{flex:1; min-width:230px; font-size:13.5px}
+  .lg{display:flex; align-items:center; gap:8px; margin:5px 0}
+  .lg .sw{width:14px; height:14px; border-radius:4px; flex:0 0 auto}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Journey cards */
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:14px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:15px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:14px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13.5px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:22px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14.5px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:13px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .footer{max-width:1100px; margin:0 auto 36px; padding:0 24px; text-align:center; color:#94a3b8; font-size:12.5px}
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="caseScroll">
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · ⚡ EP Lab · 🛏️ Bed 8</div>
+    <h1>🏃 Catecholaminergic Polymorphic VT — "The Heart That Looks Perfect at Rest"</h1>
+    <div class="sub">⚡ A 14-year-old collapses on the football pitch. Her resting 12-lead is flawless, her QT normal, her echo pristine. On the treadmill she runs bidirectional VT. The resting ECG is the great liar.</div>
+    <div class="chips">
+      <span class="chip crit">🔴 CRITICAL</span>
+      <span class="chip">🏃 Exercise-Induced Syncope</span>
+      <span class="chip">🔀 Bidirectional VT</span>
+      <span class="chip">🧬 RyR2 / DADs</span>
+      <span class="chip">🎮 Interactive Case</span>
+      <span class="chip">💊 Beta-blocker + Flecainide</span>
+    </div>
+    <div class="ecg-banner" title="Bidirectional VT rhythm strip">
+      <svg viewBox="0 0 800 64" preserveAspectRatio="none" aria-label="Bidirectional ventricular tachycardia rhythm strip">
+        <polyline class="ecg-trace" points="0,40 40,40 55,12 70,40 110,40 125,58 140,40 180,40 195,12 210,40 250,40 265,58 280,40 320,40 335,12 350,40 390,40 405,58 420,40 460,40 475,12 490,40 530,40 545,58 560,40 600,40 615,12 630,40 670,40 685,58 700,40 740,40 755,12 770,40 800,40"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== LIVE VITALS ===================== -->
+<div class="vitals-strip">
+  <div class="vitals-grid">
+    <div class="vital warn"><div class="v-label">💓 HR (rest)</div><div class="v-num">72</div></div>
+    <div class="vital alert"><div class="v-label">💓 HR (peak)</div><div class="v-num">210</div></div>
+    <div class="vital"><div class="v-label">🩸 BP</div><div class="v-num">112/70</div></div>
+    <div class="vital"><div class="v-label">🌬️ RR</div><div class="v-num">18</div></div>
+    <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">99%</div></div>
+    <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.8°</div></div>
+    <div class="vital ok-v"><div class="v-label">📐 QTc (rest)</div><div class="v-num">410 ms</div></div>
+    <div class="vital alert"><div class="v-label">🔀 Stress ECG</div><div class="v-num">BiVT</div></div>
+  </div>
+</div>
+
+<!-- ===================== HORIZONTAL SECTION SIDEBAR ===================== -->
+<nav class="topnav" id="topnav">
+  <div class="rail">
+    <a class="navchip" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navchip" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navchip" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navchip" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navchip" href="#s5"><span class="s-emoji">🎓</span><span>Consultant Round</span><span class="s-id">S5</span></a>
+    <a class="navchip" href="#s6"><span class="s-emoji">📖</span><span>Teaching Points</span><span class="s-id">S6</span></a>
+    <a class="navchip" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navchip" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navchip" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navchip" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navchip" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navchip" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navchip" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navchip" href="#s14"><span class="s-emoji">🔀</span><span>Differentials</span><span class="s-id">S14</span></a>
+    <a class="navchip" href="#s15"><span class="s-emoji">🗺️</span><span>Plan</span><span class="s-id">S15</span></a>
+    <a class="navchip" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navchip" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navchip" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navchip" href="#s19"><span class="s-emoji">🧠</span><span>MCQs</span><span class="s-id">S19</span></a>
+  </div>
+</nav>
+
+<!-- ===================== SCORE DASHBOARD ===================== -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections visited</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-vt">⚡ VT-Spotter</span>
+      <span class="badge" id="bdg-shock">🔌 Shock On Time</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champion</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Ward Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running sims, taking the right path and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- S1 — PROFILE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s1">
+  <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+  <div class="section-content">
+    <div class="callout danger">
+      <b class="ct">🚨 YOU ARE HERE — EP Clinic, Bed 8, the morning after a pitch-side collapse</b>
+      A 14-year-old girl is wheeled into the electrophysiology clinic. Last night she sprinted for a ball, dropped like a stone, and was unconscious for ~30 seconds before waking confused. The ambulance ECG, taken once she had recovered, is <strong>completely normal</strong>. The A&amp;E team almost discharged her with "vasovagal syncope, drink more water." Her mother, pale, says quietly: <em>"My brother died at sixteen, running. They never found why."</em> This is not a faint. This is a heart that <strong>looks perfect at rest and kills under adrenaline</strong> — and the only way to catch it is to make it run.
+    </div>
+
+    <h3>👤 Patient Identity</h3>
+    <table class="tbl">
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>👧 Name</td><td><strong>Miss A.K.</strong></td></tr>
+      <tr><td>🎂 Age / Sex</td><td>14-year-old female</td></tr>
+      <tr><td>🆔 MRN</td><td>EP-20815</td></tr>
+      <tr><td>⚖️ Weight</td><td>48 kg</td></tr>
+      <tr><td>🎒 Occupation</td><td>School student, county-level footballer</td></tr>
+      <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+    </table>
+
+    <h3>📜 Past History — every "faint" was a warning shot</h3>
+    <ul>
+      <li>🏃 <strong>Three previous "blackouts" — all during exertion or excitement:</strong> once swimming a race, once being startled by a loud bang at a fireworks display, once sprinting in PE. Each was labelled <strong>vasovagal</strong>. Two were briefly called "seizures" because of a few limb jerks (convulsive syncope from cerebral hypoperfusion — a classic CPVT trap).</li>
+      <li>❤️ <strong>Resting examination, ECG, QT and echo have always been normal</strong> — which is exactly why she was repeatedly reassured and sent home. The resting heart of CPVT is electrically and structurally <strong>normal</strong>.</li>
+      <li>🧬 <strong>Family history of sudden cardiac death:</strong> a maternal uncle died at 16 while running; a cousin has "unexplained fainting." This vertical, exertional, young-death pattern screams an <strong>inherited arrhythmia syndrome</strong>.</li>
+      <li>💊 <strong>No QT-prolonging drugs, no structural disease, no ischemia</strong> — she is 14. The diagnosis lives in the calcium-handling machinery of the cell, not in the coronary arteries.</li>
+      <li>🚭 No smoking, no alcohol, no recreational drugs. No fever, no recent illness.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Exercise- or emotion-induced syncope with a NORMAL resting ECG is CPVT until a stress test proves otherwise — the resting 12-lead is the great liar."</div>
+
+    <h3>🧬 Why THIS patient? — a calcium leak that only opens under adrenaline</h3>
+    <p>CPVT is a <strong>channelopathy of intracellular calcium handling</strong>. The commonest culprit is a gain-of-function mutation in <strong>RyR2</strong>, the ryanodine receptor that releases calcium from the sarcoplasmic reticulum (SR) on each beat (autosomal dominant). A recessive form involves <strong>CASQ2</strong> (calsequestrin, the SR's calcium buffer). At rest the system behaves: the leak is silent. But under <strong>catecholamine drive</strong> — sport, fright, anger, a startle — phosphorylation of the channel makes the leaky RyR2 dump calcium into the cytosol during <em>diastole</em>. The sodium–calcium exchanger pumps that calcium out in exchange for sodium, generating a depolarizing <strong>transient inward current</strong> → <strong>delayed afterdepolarizations (DADs)</strong> → triggered beats → bidirectional/polymorphic VT → VF. <strong>Adrenaline is the trigger; the resting heart is innocent.</strong> That is why she has collapsed only ever while running or startled, and why every resting test has been spotless.</p>
+
+    <div class="callout warn"><b class="ct">🔥 Red-flag features of an inherited arrhythmia in the young</b>
+    🏃 Syncope during <strong>exertion or emotion</strong> (not on standing) · 🧬 Family history of <strong>sudden/unexplained death &lt; 40</strong> · 😵 Syncope with <strong>seizure-like</strong> activity miscalled epilepsy · 🏊 Syncope while <strong>swimming</strong> · 🔔 Collapse on being <strong>startled</strong> · 📈 A <strong>normal resting ECG</strong> that lulls the team into reassurance.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S2 — HANDOVER -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s2">
+  <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+  <div class="section-content">
+    <h3>📻 A&amp;E to EP Handover — listen for the trap</h3>
+    <div class="callout info">
+      <b class="ct">🎙️ SBAR from the overnight A&amp;E registrar (verbatim)</b>
+      <p><strong>S:</strong> "14-year-old girl, collapsed during a football match, out cold for about 30 seconds, woke confused with a couple of limb jerks. Now completely well and wants to go home."</p>
+      <p><strong>B:</strong> "Third 'faint' in two years, all during sport or excitement. Two were called seizures. Resting ECG, QT and bloods all normal. Echo on the morning round looks structurally normal."</p>
+      <p><strong>A:</strong> "She looks fine, vitals normal, sitting up texting. The plan on the board says <strong>discharge as vasovagal, advise hydration, follow-up with the GP</strong>."</p>
+      <p><strong>R:</strong> "I held the discharge because the family history bothered me — an uncle who died at 16 running. Can EP see her before she leaves? Something about a normal ECG in a kid who keeps collapsing while sprinting doesn't sit right."</p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A normal resting ECG never rules out CPVT. The diagnosis hides in adrenaline — you have to provoke it to see it. Discharging exertional syncope on the strength of a resting strip is how these children die."</div>
+
+    <h3>🚩 Spot-the-Red-Flag — tap each feature that points to CPVT</h3>
+    <p>🎮 <em>Interactive: click every feature that points to CPVT (not a benign faint, long QT, or Brugada). Each correct flag = +10 XP. Wrong picks cost you.</em></p>
+    <div id="flagGame">
+      <button class="btn ghost flag-btn" data-good="1">🏃 Exercise / emotion-induced syncope</button>
+      <button class="btn ghost flag-btn" data-good="1">📈 NORMAL resting 12-lead ECG</button>
+      <button class="btn ghost flag-btn" data-good="1">🔀 Bidirectional VT on the stress test</button>
+      <button class="btn ghost flag-btn" data-good="1">🧬 Family history of sudden cardiac death</button>
+      <button class="btn ghost flag-btn" data-good="1">👧 Young age, structurally normal heart</button>
+      <button class="btn ghost flag-btn" data-good="1">🧪 RyR2 mutation on genetic testing</button>
+      <button class="btn ghost flag-btn" data-good="0">📏 Prolonged QT at rest</button>
+      <button class="btn ghost flag-btn" data-good="0">⛰️ Coved ST elevation V1–V2 (Brugada)</button>
+      <button class="btn ghost flag-btn" data-good="0">🌡️ Fever the day before</button>
+    </div>
+    <p id="flagResult" style="font-weight:700"></p>
+
+    <h3>⏱️ Timeline so far</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Yesterday 16:40</div>Sprinted for the ball, collapsed mid-stride, unconscious ~30 s with brief limb jerking, then spontaneous recovery.</div>
+      <div class="t-item"><div class="t-time">Yesterday 17:15</div>A&amp;E: well, vitals normal, resting ECG normal, QTc 410 ms, troponin negative, bloods normal.</div>
+      <div class="t-item"><div class="t-time">Yesterday 22:00</div>Discharge as "vasovagal" drafted; registrar <strong>holds it</strong> on the strength of the family history — 🏅 instinct worth its weight in gold.</div>
+      <div class="t-item"><div class="t-time">Today 09:00</div>You see her in EP. The plan: do NOT clear her for sport, and provoke the heart with an exercise stress test before anyone says "faint" again.</div>
+    </div>
+
+    <div class="callout ok"><b class="ct">🏅 Praise where due</b>The registrar who refused to discharge a child with recurrent exertional syncope and a family history of young sudden death may have just saved her life. The resting ECG said "go home." The history said "stress-test me." When the two disagree, the history wins.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S3 — INITIAL ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s3">
+  <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+  <div class="section-content">
+    <h3>🩺 Targeted assessment — the resting exam is normal on purpose</h3>
+    <table class="tbl">
+      <tr><th>Domain</th><th>Finding</th><th>What it means</th></tr>
+      <tr><td>👁️ General</td><td>Well, alert, no distress, normal growth.</td><td>Between episodes the CPVT patient is entirely well. Appearance reassures falsely.</td></tr>
+      <tr><td>❤️ Cardiovascular (rest)</td><td>HR 72 regular, BP 112/70, normal heart sounds, no murmur, normal pulses.</td><td>A structurally normal heart. The resting exam can never make this diagnosis.</td></tr>
+      <tr><td>📈 Resting 12-lead</td><td>Sinus rhythm, <strong>QTc 410 ms</strong>, no delta wave, no coved ST, normal axis.</td><td><strong>Normal.</strong> Rules out (at rest) long QT and Brugada pattern — but does NOT rule out CPVT, which is invisible at rest.</td></tr>
+      <tr><td>🫀 Echocardiogram</td><td>Structurally normal heart, normal function, no hypertrophy, no scar.</td><td>Excludes HCM, ARVC, anomalous coronary — CPVT lives in the calcium handling, not the anatomy.</td></tr>
+      <tr><td>🧬 History &amp; family tree</td><td>Exertional/emotional syncope ×3; uncle dead at 16 running.</td><td>The single most powerful data point. This is an inherited arrhythmia until disproven.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In CPVT the resting heart is a perfect alibi. The crime only happens under adrenaline — so the exercise stress test, not the resting strip, is your detective."</div>
+
+    <h3>🧭 The single most important decision: do NOT clear her — provoke her</h3>
+    <p>The dangerous fork here is not "stable vs unstable" — she is well right now. The fork is <strong>"reassure and discharge" vs "provoke and diagnose."</strong> A child with recurrent exertional syncope, a family history of young sudden death, and a normal resting ECG must NOT be cleared for sport. She needs the heart pushed under controlled, monitored catecholamine load — an <strong>exercise (treadmill) stress test</strong>, with crash facilities present — to reproduce the arrhythmia and make the diagnosis.</p>
+
+    <div class="callout danger"><b class="ct">⚡ The decision is made: EXERCISE STRESS TEST to provoke and diagnose</b>Run a graded treadmill protocol with continuous 12-lead monitoring and a defibrillator at the bedside. The classic CPVT signature appears at a <strong>heart-rate threshold (~110–130/min)</strong>: isolated PVCs → bigeminy → couplets → <strong>bidirectional VT</strong> (beat-to-beat 180° QRS-axis alternation) → polymorphic VT. Recovery is the danger zone — keep her monitored well into cool-down. Never give a catecholamine (e.g. isoprenaline/epinephrine) casually; the substrate hates it.</div>
+
+    <!-- 🎬 BRANCHING SCENARIO ENGINE -->
+    <div class="scenario" id="scenarioBox">
+      <h3>🎬 Choose Your Path — "The Diagnosis and the First Decisions"</h3>
+      <div class="hud"><span>❤️ Stability: <b id="scStab">●●○○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 s</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+      <div class="scene-text" id="scText">She is well and well-looking. Resting ECG, QT and echo are all normal. Mum is asking when she can get back to football. The A&amp;E note says "vasovagal — discharge." There is a family history of young sudden death. What do you do FIRST?</div>
+      <div class="choices" id="scChoices"></div>
+      <div class="feedback" id="scFeedback"></div>
+      <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+    </div>
+
+    <div class="callout info"><b class="ct">🧮 If she ever DOES arrest</b>
+    If a CPVT patient collapses pulseless, run standard ACLS — but be acutely aware that <strong>boluses of epinephrine, which we give in cardiac arrest, can themselves drive the arrhythmia</strong>. Defibrillate VF, but get expert help fast, deepen sedation, load beta-blockade and flecainide, and avoid gratuitous adrenergic stimulation. The same catecholamine that resuscitates can re-ignite the storm.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S4 — RESIDENT REVIEW -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s4">
+  <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+  <div class="section-content">
+    <p><em>The cardiology resident reviews her before the stress test. Her reasoning, out loud:</em></p>
+
+    <h3>🧠 Pattern recognition first, then physiology</h3>
+    <p>"Young. Recurrent syncope <strong>only during exertion or emotion</strong>. A family tree with a 16-year-old who died running. A resting ECG that is perfect. That triad isn't vasovagal — it's an <strong>adrenergically triggered arrhythmia syndrome</strong>, and the one that classically gives a normal QT and a normal resting ECG is <strong>CPVT</strong>. The trap is the normal resting strip seducing you into 'reassure and discharge.' Anyone can be well between events; the question is what her heart does at 130 beats a minute."</p>
+
+    <h3>🎯 Immediate priorities (her actual order of operations)</h3>
+    <ol>
+      <li>🚫 <strong>Do NOT clear her for sport or discharge as vasovagal.</strong> Activity restriction starts today, before any test confirms anything.</li>
+      <li>🏃 <strong>Exercise stress test to provoke and diagnose</strong> — graded treadmill, continuous 12-lead, defibrillator and crash team present, watch into recovery.</li>
+      <li>💊 <strong>Start a non-selective beta-blocker (nadolol) early</strong> — first-line therapy that blunts the catecholamine trigger; do not wait for genetics to come back.</li>
+      <li>🧬 <strong>Genetic testing (RyR2, CASQ2)</strong> and <strong>cascade family screening</strong> — this is an inherited disease; relatives may be silent carriers.</li>
+      <li>💉 <strong>Plan flecainide as add-on</strong> if exercise-induced ectopy persists on beta-blockade — it directly inhibits the leaky RyR2.</li>
+      <li>📋 <strong>Counsel on avoiding adrenergic triggers</strong> — competitive sport, stimulants, decongestants — and arrange close EP follow-up.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Restrict the exercise first, prove the diagnosis with a stress test second, start the beta-blocker before the genetics return — because the next sprint could be the last one."</div>
+
+    <h3>🤔 "But the ECG is normal — what if it really is just vasovagal?"</h3>
+    <p>"Then the stress test will be clean and we'll be delighted to have been thorough. The asymmetry of harm is the whole point: over-investigate a faint and you cost an afternoon; under-investigate exertional syncope in a child with a family history of young sudden death and you sign a death certificate. We provoke, we monitor, we treat. We never clear an exercise-collapser on a resting ECG alone."</p>
+
+    <div class="callout purple"><b class="ct">🧪 Resident's self-test (answer before reading on)</b>
+    Someone suggests giving IV epinephrine in clinic "to bring out the arrhythmia faster than the treadmill." Wise?
+    <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+    <div class="reveal-hidden" id="rev1"><p><strong>Be very careful.</strong> Catecholamine (epinephrine/isoprenaline) provocation <em>can</em> unmask CPVT and is used in specialist labs, but it directly feeds the exact trigger that causes lethal arrhythmia in this substrate. The <strong>exercise treadmill test is the preferred, more physiological and controllable provocation</strong>. If a drug challenge is done at all, it is in expert hands with full resuscitation readiness and conservative dosing — casually pushing epinephrine in a CPVT heart can precipitate the very VF you fear.</p></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S5 — CONSULTANT ROUND -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s5">
+  <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round</h2></div>
+  <div class="section-content">
+    <p><em>The consultant electrophysiologist reviews the treadmill trace and the family tree:</em></p>
+
+    <h3>🗂️ Name the syndrome precisely — it changes the treatment</h3>
+    <div class="vs">
+      <div class="side a"><h4>🔴 CPVT (this patient)</h4>
+        <ul><li><strong>Normal</strong> resting ECG and QT; structurally normal heart</li><li>Trigger: <strong>catecholamines</strong> (exercise, emotion, startle)</li><li>Signature: <strong>bidirectional VT</strong> on exertion (beat-to-beat axis flip), or polymorphic VT</li><li>Mechanism: RyR2/CASQ2 → SR Ca²⁺ leak → <strong>DADs</strong> → triggered activity</li><li>Treatment: <strong>nadolol</strong> + flecainide + sport restriction; LCSD/ICD for refractory</li></ul></div>
+      <div class="side b"><h4>🔵 Congenital Long QT Syndrome</h4>
+        <ul><li><strong>Prolonged QT at rest</strong> on the resting ECG</li><li>Trigger varies by subtype (LQT1 exercise/swim, LQT2 startle/auditory, LQT3 sleep)</li><li>Arrhythmia: <strong>Torsades de Pointes</strong> (twisting around baseline)</li><li>Mechanism: ion-channel repolarization defect (K⁺/Na⁺)</li><li>Treatment: beta-blockers, avoid QT drugs, ICD for high risk</li></ul></div>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Long QT shows its hand at rest; CPVT hides until you make the heart run. A normal QT does not reassure you out of an inherited arrhythmia — it just sends you to the treadmill."</div>
+
+    <h3>🔀 What is "bidirectional VT" — and is she in it?</h3>
+    <p>Bidirectional VT is a ventricular tachycardia in which the <strong>QRS axis alternates 180° from beat to beat</strong> — one beat points up, the next points down, in a regular alternating pattern. It is the classic exercise signature of CPVT, arising from alternating foci of DAD-triggered activity (often the two fascicles firing in turn). The two great causes are <strong>CPVT</strong> and <strong>digoxin toxicity</strong> — the consultant's first question on seeing it is "which adrenaline (or which drug) am I feeding?" On this 14-year-old, not on digoxin, with exertional syncope and a positive family history, bidirectional VT on the treadmill is essentially diagnostic of CPVT.</p>
+
+    <h3>🧭 Consultant's three commandments for this child</h3>
+    <ol>
+      <li>💊 "<strong>Nadolol, a non-selective beta-blocker, is first-line</strong> — it is the most effective single drug, beating selective agents. Start it, push the dose, and restrict competitive sport. The beta-blocker is the foundation everything else sits on."</li>
+      <li>💉 "If exercise still provokes ectopy on full beta-blockade, <strong>add flecainide</strong> — it inhibits the RyR2 leak directly and cuts exercise-induced arrhythmia. Beta-blocker plus flecainide is the combination that controls most patients."</li>
+      <li>🔌 "Reserve the <strong>ICD for arrest survivors or breakthrough events on maximal therapy — and never as a substitute for drugs.</strong> A painful shock is a catecholamine surge that can trigger MORE VT and even a shock storm. The ICD goes in alongside maximal beta-blockade and flecainide, programmed conservatively."</li>
+    </ol>
+
+    <div class="callout danger"><b class="ct">☠️ The consultant's war memory (more in S13 M&amp;M)</b>"I once inherited a boy with an ICD and nothing else — implanted after an arrest, then sent home on a tiny dose of a selective beta-blocker. He ran for a bus, went into VT, the device shocked him, the pain poured adrenaline onto the fire, he stormed, shock after shock, and we lost him in a corridor. The ICD didn't fail. We failed it — by giving it no drug therapy to lean on. <strong>An ICD alone can pour petrol on the fire.</strong>"</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S6 — TEACHING POINTS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s6">
+  <div class="sec-header"><span class="s-badge">S6</span><h2>📖 Teaching Points</h2></div>
+  <div class="section-content">
+    <h3>🔬 The mechanism — WHY adrenaline makes a normal heart fire (the WHY behind the WHY)</h3>
+    <ol>
+      <li>🧬 <strong>The defective gene:</strong> a gain-of-function mutation in <strong>RyR2</strong> (the ryanodine receptor, autosomal dominant) or loss-of-function in <strong>CASQ2</strong> (calsequestrin, the SR's calcium buffer, recessive) makes the sarcoplasmic reticulum <strong>prone to leak calcium</strong>.</li>
+      <li>🔥 <strong>The trigger — catecholamines:</strong> under sport, fright or anger, β-adrenergic signalling phosphorylates the channel and loads the SR. Now the leaky RyR2 releases calcium into the cytosol during <strong>diastole</strong>, when it should be silent.</li>
+      <li>🔁 <strong>The exchanger generates current:</strong> the sodium–calcium exchanger (NCX) extrudes that diastolic calcium, importing 3 Na⁺ for each Ca²⁺ → a net <strong>inward (depolarizing) transient current</strong>.</li>
+      <li>⚡ <strong>Delayed afterdepolarizations (DADs):</strong> that current drags the membrane back up <em>after</em> repolarization. If it reaches threshold → a <strong>triggered beat</strong> → couplets → bidirectional VT → polymorphic VT → VF.</li>
+      <li>💥 <strong>Why it kills, and why the resting ECG lies:</strong> at rest there is no catecholamine drive, the leak is silent, and the 12-lead and QT are normal. Only adrenaline opens the trap — so the rhythm appears <em>exactly</em> when the child is sprinting or terrified, and disappears the moment they stop. The danger is in exertion; the alibi is in the resting strip.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"CPVT is a calcium leak that only opens under adrenaline. Block the adrenaline (beta-blocker) and plug the leak (flecainide) — and never trust the heart's behaviour at rest."</div>
+
+    <h3>⚖️ Contrast pair #1 — CPVT vs Congenital Long QT Syndrome</h3>
+    <div class="vs">
+      <div class="side a"><h4>🏃 CPVT</h4><ul><li><strong>Normal resting ECG and QT</strong></li><li>Arrhythmia only under catecholamines (exercise/emotion)</li><li>Signature: <strong>bidirectional</strong> / polymorphic VT on stress</li><li>RyR2/CASQ2 → SR Ca²⁺ leak → DADs</li><li>Diagnosed by <strong>exercise stress test</strong>, not resting strip</li></ul></div>
+      <div class="side b"><h4>📏 Long QT Syndrome</h4><ul><li><strong>Prolonged QT visible at rest</strong></li><li>Torsades de Pointes (twisting around baseline)</li><li>Ion-channel repolarization defect (KCNQ1, KCNH2, SCN5A)</li><li>LQT1 exercise/swim, LQT2 startle, LQT3 sleep</li><li>Diagnosed largely by the <strong>resting QTc</strong> ± stress/genetics</li></ul></div>
+    </div>
+    <p>😈 <strong>The trap:</strong> both can cause exercise-induced syncope in a young person, but the resting ECG separates them — long QT shows itself at rest, CPVT does not. Calling a CPVT child "normal ECG, therefore fine" is the lethal error. <strong>A normal QT sends you to the treadmill, it does not send you home.</strong></p>
+
+    <h3>⚖️ Contrast pair #2 — Bidirectional VT: CPVT vs Digoxin toxicity</h3>
+    <div class="vs">
+      <div class="side a"><h4>🧬 CPVT (this patient)</h4><ul><li>Young, structurally normal heart, not on digoxin</li><li>Bidirectional VT provoked by <strong>exercise/emotion</strong></li><li>Mechanism: RyR2 SR Ca²⁺ leak → DADs</li><li>Treat the substrate: nadolol + flecainide, sport restriction</li></ul></div>
+      <div class="side b"><h4>💊 Digoxin toxicity</h4><ul><li>Older patient on digoxin, often renal impairment / low K⁺</li><li>Bidirectional VT plus other digoxin rhythms (e.g. PAT with block)</li><li>Mechanism: Na/K-ATPase poisoning → Ca²⁺ overload → <strong>DADs</strong> (same final pathway!)</li><li>Treat the toxin: stop digoxin, correct K⁺/Mg²⁺, <strong>digoxin-specific antibody (Fab)</strong></li></ul></div>
+    </div>
+    <p>💡 <em>Why it matters:</em> bidirectional VT has essentially two answers. Both work through DAD-triggered activity from calcium overload — but one is fixed by treating a genetic calcium leak and one by reversing a drug. Always ask, as the consultant did, "which adrenaline — or which drug — am I feeding?"</p>
+
+    <!-- 🎮 INTERACTIVE SIM: adrenergic load → DAD-triggered VT risk -->
+    <div class="sim" id="kSim">
+      <h3 style="margin-top:0">🎮 Simulation — The Adrenaline Dial: how exertion tunes DAD-triggered VT risk</h3>
+      <p style="font-size:13.5px">Drag the dial through rest → walk → jog → sprint → terror. Watch how rising catecholamine load opens the RyR2 leak and breeds delayed afterdepolarizations and bidirectional VT — and how <strong>beta-blockade blunts the whole curve</strong>.</p>
+      <label for="kRange">🏃 Exertion / adrenergic intensity: <b id="kVal">3.1</b> / 10</label>
+      <input type="range" id="kRange" min="20" max="75" value="31">
+      <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+      <div class="readout bad" id="kReadout">Set the dial to explore.</div>
+      <p style="font-size:12.5px; margin-top:10px; color:var(--ink2)">🎯 On full <strong>nadolol + flecainide</strong> the whole curve is shifted right: the heart-rate threshold for ectopy rises and bidirectional VT no longer appears at ordinary exertion. The goal of therapy is to push the danger zone beyond anything daily life demands — and to remove competitive sport entirely.</p>
+    </div>
+
+    <!-- 📚 EBM MODULE -->
+    <div class="ebm">
+      <h3>📚 Evidence-Based Medicine Corner</h3>
+      <table class="tbl">
+        <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+        <tr><td><span class="lvl">COHORT</span> Nadolol superiority studies</td><td>Non-selective beta-blockade (nadolol) reduced arrhythmic events more effectively than selective agents (e.g. metoprolol/bisoprolol) in CPVT cohorts.</td><td>Use <strong>nadolol</strong> at adequate dose as the first-line drug; non-selective beats selective.</td></tr>
+        <tr><td><span class="lvl">RCT/STUDY</span> Flecainide (Watanabe, van der Werf)</td><td>Flecainide directly inhibits RyR2 (and Na current) and significantly reduced exercise-induced ventricular arrhythmia when added to beta-blockade.</td><td><strong>Add flecainide</strong> when exercise still provokes ectopy on a beta-blocker — strong mechanistic and clinical support.</td></tr>
+        <tr><td><span class="lvl">COHORT</span> Left cardiac sympathetic denervation (LCSD)</td><td>LCSD reduced syncope and ICD shocks in patients with breakthrough events despite drugs.</td><td>An effective option for <strong>refractory</strong> CPVT before/alongside an ICD.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2013 HRS/EHRA/APHRS &amp; 2022 ESC VA</td><td>Beta-blocker + activity restriction for all; flecainide add-on; ICD for arrest survivors/breakthrough — always with drug therapy.</td><td>Exactly the ladder driving S7, S11 and S15.</td></tr>
+        <tr><td><span class="lvl">CONSENSUS</span> ICD-storm caution</td><td>In CPVT, painful ICD shocks trigger catecholamine surges that can provoke further VT and electrical storm.</td><td><strong>Never an ICD alone:</strong> combine with maximal drug therapy, program conservatively (long detection, ATP).</td></tr>
+      </table>
+    </div>
+
+    <!-- 🔬 ADVANCED TOPICS -->
+    <div class="callout purple">
+      <h3 style="margin-top:0">🔬 Fellowship Corner — Advanced Topics</h3>
+      <ul>
+        <li>🧬 <strong>Genetics &amp; inheritance:</strong> RyR2 (autosomal dominant, ~60% of cases), CASQ2 (autosomal recessive); newer genes (TECRL, CALM, TRDN). Cascade screening of first-degree relatives is mandatory — silent carriers may be at risk.</li>
+        <li>💊 <strong>Why flecainide here is not "pro-arrhythmic CAST flecainide":</strong> in a structurally normal heart with a calcium-leak substrate, flecainide's direct RyR2 inhibition is therapeutic — the opposite of its danger in ischemic/structural disease.</li>
+        <li>🔪 <strong>Left cardiac sympathetic denervation (LCSD):</strong> removal of the lower stellate ganglion and T2–T4 thoracic ganglia reduces left-sided sympathetic input to the heart; an antiadrenergic surgical option for refractory cases.</li>
+        <li>🔌 <strong>ICD pitfalls in CPVT:</strong> shocks are pro-arrhythmic via catecholamine surge → shock storm; programme long detection, ATP-before-shock, high rate cut-offs, and always pair with maximal beta-blockade/flecainide and LCSD if needed.</li>
+        <li>🏊 <strong>Phenotype clues:</strong> swimming-triggered and startle-triggered events overlap with LQT1/LQT2 — genetics and the stress test disambiguate. "Seizures" during exertion that are actually convulsive syncope are a classic missed CPVT presentation.</li>
+        <li>🧪 <strong>Bidirectional VT differential</strong> beyond CPVT and digoxin: rare Andersen–Tawil syndrome and severe myocarditis — but in a young exertional-syncope patient, CPVT leads the field.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S7 — ORDERS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s7">
+  <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+  <div class="section-content">
+    <h3>🖊️ The order set, written as you'd actually write it (Day 1, EP clinic)</h3>
+    <ul>
+      <li>🚫 <strong>STRICT EXERCISE / COMPETITIVE-SPORT RESTRICTION</strong> from today — flag on the chart and in the school letter. No clearance for football, sprinting or strenuous PE pending full work-up.</li>
+      <li>🏃 <strong>Exercise treadmill stress test</strong> — continuous 12-lead, defibrillator and crash team at the bedside, monitor well into recovery. Document the heart-rate threshold for ectopy and any bidirectional/polymorphic VT.</li>
+      <li>💊 <strong>Start nadolol</strong> (non-selective beta-blocker), titrate to maximal tolerated dose (e.g. ~1–2 mg/kg/day) — first-line, do not wait for genetics.</li>
+      <li>💉 <strong>Flecainide add-on</strong> if exercise still provokes ectopy on full beta-blockade; recheck with repeat stress testing.</li>
+      <li>🧬 <strong>Genetic testing (RyR2, CASQ2 ± extended panel)</strong> and referral for <strong>cascade family screening</strong> of first-degree relatives.</li>
+      <li>🧪 Baseline bloods (U&amp;E, Mg²⁺, Ca²⁺, TFTs), resting 12-lead, formal echocardiogram to confirm a structurally normal heart.</li>
+      <li>📋 <strong>Avoid adrenergic stimulants</strong> — no decongestants/sympathomimetics, caution with high-caffeine energy drinks; advise avoidance of intense emotional/competitive triggers where possible.</li>
+      <li>📞 EP follow-up, genetics clinic, and discussion of LCSD/ICD ONLY for arrest survivors or breakthrough events on maximal drug therapy.</li>
+      <li>👨‍👩‍👧 Family counselling, written CPVT information, and a clear safety-net plan (call emergency services for syncope/collapse).</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In CPVT there are two foundations: take away the adrenaline (restrict sport, start nadolol) and plug the leak (flecainide). Every other order exists to confirm the diagnosis and protect the family."</div>
+
+    <!-- 🩺 PROCEDURE GUIDE 1 -->
+    <div class="checklist" id="ckCV">
+      <h3 style="margin-top:0">🩺 Procedure Guide — Exercise Stress Test in suspected CPVT — tick as you go</h3>
+      <label class="ck"><input type="checkbox"><span>🧑‍⚕️ Confirm indication (exertional/emotional syncope, normal resting ECG, family history) and that resuscitation facilities + defibrillator are at the bedside</span></label>
+      <label class="ck"><input type="checkbox"><span>📈 Record a clean baseline resting 12-lead and QTc; attach continuous monitoring</span></label>
+      <label class="ck"><input type="checkbox"><span>🏃 Begin graded treadmill protocol; raise heart rate progressively and watch for the ectopy threshold (~110–130/min)</span></label>
+      <label class="ck"><input type="checkbox"><span>🔀 Document the progression: PVCs → bigeminy → couplets → <strong>bidirectional VT</strong> → polymorphic VT; stop the test if sustained VT appears</span></label>
+      <label class="ck"><input type="checkbox"><span>🧊 Monitor closely through <strong>recovery</strong> — arrhythmia often peaks early in cool-down; do not unhook the patient too soon</span></label>
+      <label class="ck"><input type="checkbox"><span>💊 Start/confirm nadolol and plan repeat stress testing on therapy to prove suppression</span></label>
+      <label class="ck"><input type="checkbox"><span>🧬 Send genetic testing and arrange cascade family screening</span></label>
+      <div class="ck-progress" data-progress>0 / 7 complete</div>
+    </div>
+
+    <!-- 🩺 PROCEDURE GUIDE 2 -->
+    <div class="checklist" id="ckDefib">
+      <h3 style="margin-top:0">🩺 Procedure Guide — If she arrests: ACLS with the CPVT caveat</h3>
+      <p style="font-size:13px">⚠️ Sustained polymorphic VT/VF with no pulse → defibrillate and run ACLS — but remember the <strong>catecholamine paradox</strong>: epinephrine, beta-agonists and the pain of shocks all feed this substrate. Get EP help early and lean hard on antiadrenergic therapy.</p>
+      <label class="ck"><input type="checkbox"><span>🚫 Confirm no pulse → call arrest, start high-quality CPR (100–120/min, depth 5–6 cm, full recoil)</span></label>
+      <label class="ck"><input type="checkbox"><span>🔌 Defibrillate VF / pulseless polymorphic VT (UNSYNCHRONIZED), minimal interruption to compressions</span></label>
+      <label class="ck"><input type="checkbox"><span>💊 Give IV/<strong>beta-blockade</strong> (e.g. esmolol/propranolol) early — sympatholysis is therapeutic in this storm; minimise gratuitous epinephrine</span></label>
+      <label class="ck"><input type="checkbox"><span>🧪 Correct K⁺/Mg²⁺, consider IV flecainide/amiodarone per expert advice; deepen sedation to lower catecholamine drive</span></label>
+      <label class="ck"><input type="checkbox"><span>🔁 Rhythm/pulse check every 2 min; treat reversible causes; call EP/intensive care urgently</span></label>
+      <label class="ck"><input type="checkbox"><span>🫀 ROSC → ICU, maximise nadolol + flecainide, consider LCSD; plan ICD as part of (not instead of) drug therapy</span></label>
+      <div class="ck-progress" data-progress>0 / 6 complete</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S8 — NURSING CARE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s8">
+  <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+  <div class="section-content">
+    <h3>🛏️ Nursing priorities — protect against the adrenaline trigger</h3>
+    <ul>
+      <li>📟 <strong>Continuous telemetry with a defibrillator at the bedside</strong> during and after the stress test — watch into recovery, where the arrhythmia often peaks.</li>
+      <li>🧊 <strong>Keep the environment calm and the patient settled.</strong> Fear, pain and agitation are catecholamine surges — in CPVT a stressful bedside is literally arrhythmogenic. Explain procedures gently, minimise startle.</li>
+      <li>💊 <strong>Give nadolol on time, every time</strong> — adherence is the difference between a quiet heart and a fatal sprint. Watch for bradycardia/fatigue/wheeze (non-selective beta-blockade) and report.</li>
+      <li>🏃 <strong>Reinforce activity restriction</strong> at every interaction; do NOT let a well-looking teenager be cleared to "just kick a ball around the ward."</li>
+      <li>🚫 <strong>Avoid adrenergic stimulants</strong> — flag decongestants, sympathomimetics, high-caffeine energy drinks on the chart; double-check before any PRN.</li>
+      <li>📋 <strong>Document every rhythm strip</strong> from the stress test and any spontaneous ectopy with the heart rate at which it appeared — gold for the EP team and for titrating therapy.</li>
+      <li>🧠 <strong>Recognise convulsive syncope:</strong> a "seizure" during exertion in this patient is cardiac until proven otherwise — check pulse and rhythm first, don't reach for anticonvulsants.</li>
+      <li>👨‍👩‍👧 Support the patient and family through a frightening, life-changing diagnosis (see S16); arrange a liaison if staffing allows.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In CPVT the nurse who keeps the room calm, the beta-blocker on time and the sport off the menu is doing half the antiarrhythmic work in the building."</div>
+    <div class="callout warn"><b class="ct">📢 Escalate IMMEDIATELY for</b>Any syncope or collapse · ventricular ectopy/VT on the monitor (especially in recovery) · a "seizure" during/after exertion (check rhythm first) · missed beta-blocker doses · any prescription for a sympathomimetic/decongestant in this patient · an ICD shock (likely catecholamine surge → risk of further VT).</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S9 — INVESTIGATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s9">
+  <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+  <div class="section-content">
+    <h3>🧾 Results board (Day 1)</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>Result</th><th>Reference</th><th>Interpretation</th></tr>
+      <tr><td>Resting 12-lead ECG</td><td class="ok-v">Normal sinus, QTc 410 ms</td><td>QTc &lt; 450 ms</td><td><strong>The great liar.</strong> Normal at rest — does NOT exclude CPVT. Excludes (at rest) long QT and Brugada pattern.</td></tr>
+      <tr><td><strong>Exercise stress test</strong></td><td class="hi">PVCs at HR ~120 → bidirectional VT</td><td>No exercise-induced VT</td><td><strong>Diagnostic.</strong> Reproducible ectopy at a heart-rate threshold escalating to bidirectional VT is the hallmark of CPVT.</td></tr>
+      <tr><td>Echocardiogram</td><td class="ok-v">Structurally normal</td><td>Normal</td><td>No HCM, ARVC, scar or anomalous coronary. CPVT lives in calcium handling, not anatomy.</td></tr>
+      <tr><td>Genetic testing</td><td class="hi">RyR2 pathogenic variant +</td><td>—</td><td>Confirms CPVT and enables cascade family screening (autosomal dominant).</td></tr>
+      <tr><td>Potassium / Magnesium</td><td class="ok-v">4.2 / 0.85 mmol/L</td><td>3.5–5.0 / 0.7–1.0</td><td>Normal — the arrhythmia here is genetic, not electrolyte-driven (unlike Torsades).</td></tr>
+      <tr><td>Troponin</td><td class="ok-v">Negative</td><td>&lt; 0.04</td><td>No ischemia/myocarditis — consistent with a primary channelopathy.</td></tr>
+      <tr><td>Digoxin</td><td class="ok-v">Not on digoxin</td><td>—</td><td>Excludes the other classic cause of bidirectional VT.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The resting ECG and the stress test in CPVT tell opposite stories — one says 'normal,' the other says 'bidirectional VT.' Believe the one you had to make her run for."</div>
+
+    <div class="callout info"><b class="ct">🧠 Why genetics confirm but the stress test diagnoses</b>A positive RyR2 variant clinches CPVT and, crucially, lets you screen the family — but a negative genetic test does NOT exclude it (not all genes/variants are found). The <strong>provoked phenotype</strong> — reproducible exercise-induced ectopy escalating to bidirectional VT — is the clinical anchor. Treat the phenotype; use the genotype to protect the relatives.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S10 — ECG / IMAGING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s10">
+  <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging</h2></div>
+  <div class="section-content">
+    <h3>🫀 The provoked rhythm — read it like a detective</h3>
+    <div class="ecg-fig">
+      <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Bidirectional VT with beat-to-beat QRS axis alternation provoked on exercise">
+        <rect width="820" height="150" fill="#0b1220"/>
+        <g stroke="#1e3a5f" stroke-width="1">
+          <line x1="0" y1="30" x2="820" y2="30"/><line x1="0" y1="60" x2="820" y2="60"/>
+          <line x1="0" y1="90" x2="820" y2="90"/><line x1="0" y1="120" x2="820" y2="120"/>
+        </g>
+        <polyline fill="none" stroke="#86efac" stroke-width="2.4" points="0,75 40,75 55,40 70,75 110,75 125,110 140,75 180,75 195,40 210,75 250,75 265,110 280,75 320,75 335,40 350,75 390,75 405,110 420,75 460,75 475,40 490,75 530,75 545,110 560,75 600,75 615,40 630,75 670,75 685,110 700,75 740,75 755,40 770,75 815,75"/>
+        <text x="50" y="28" fill="#fca5a5" font-size="12" font-weight="700">↑ axis up</text>
+        <text x="120" y="135" fill="#fcd34d" font-size="12" font-weight="700">↓ axis down (next beat)</text>
+      </svg>
+      <div class="ecg-cap">Provoked on the treadmill: <strong>bidirectional VT</strong> — the QRS axis flips <span style="color:#fca5a5">up</span> then <span style="color:#fcd34d">down</span> on alternate beats, a regular beat-to-beat 180° alternation. The resting strip on this same child was entirely normal. This pattern + exertional syncope + normal QT = CPVT (or digoxin toxicity — she is not on digoxin).</div>
+    </div>
+
+    <h3>🔎 The CPVT-vs-mimics toolkit (memorize the high-yield ones)</h3>
+    <table class="tbl">
+      <tr><th>Feature</th><th>Why it points to CPVT</th></tr>
+      <tr><td>🔀 <strong>Bidirectional VT</strong></td><td>Beat-to-beat 180° QRS-axis alternation, classically provoked by exercise — alternating DAD-triggered foci. CPVT and digoxin toxicity are the two great causes.</td></tr>
+      <tr><td>📈 <strong>Normal resting ECG / QT</strong></td><td>Between events the 12-lead and QTc are normal — the opposite of long QT, and the reason CPVT is so often missed.</td></tr>
+      <tr><td>🏃 <strong>Heart-rate threshold</strong></td><td>Ectopy reproducibly appears above ~110–130/min on exertion and worsens with rate — a catecholamine-dose-dependent arrhythmia.</td></tr>
+      <tr><td>📊 <strong>Escalating ectopy</strong></td><td>PVCs → bigeminy → couplets → bidirectional/polymorphic VT as exertion increases; suppression on therapy confirms control.</td></tr>
+      <tr><td>🧊 <strong>Recovery-phase arrhythmia</strong></td><td>Ectopy often peaks early in cool-down — never unhook the monitor the moment exercise stops.</td></tr>
+      <tr><td>🧬 <strong>Structurally normal heart</strong></td><td>Echo/MRI normal — distinguishes CPVT from ARVC, HCM, scar VT and anomalous coronary.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"See bidirectional VT and ask: which adrenaline am I feeding? In a young exertional-syncope patient not on digoxin, the answer is CPVT — find the threshold, suppress it, prove it on a repeat test."</div>
+
+    <h3>🫀 Resting ECG, echo &amp; further imaging</h3>
+    <ul>
+      <li>📈 <strong>Resting 12-lead:</strong> sinus rhythm, normal axis, <strong>QTc 410 ms</strong>, no delta wave, no coved ST — entirely normal. (A slightly low resting heart rate is sometimes seen.)</li>
+      <li>🩻 <strong>Echocardiogram:</strong> structurally normal heart, normal biventricular size and function, no hypertrophy or scar — excludes structural causes of exercise syncope.</li>
+      <li>🧲 <strong>Cardiac MRI (if any doubt):</strong> to exclude ARVC and other infiltrative/structural disease — in CPVT it is normal, by definition.</li>
+    </ul>
+
+    <div class="callout warn"><b class="ct">⚠️ The ECG's favorite lie in CPVT</b>"The resting 12-lead is normal, so her heart is fine and this is vasovagal." A normal resting ECG is <strong>expected</strong> in CPVT and reassures you of nothing. The only test that tells the truth is the one that adds adrenaline — the <strong>exercise stress test</strong>. Absent that, assume an inherited arrhythmia.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S11 — MEDICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s11">
+  <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+  <div class="section-content">
+    <h3>💉 The drugs — what, why, and the traps</h3>
+    <table class="tbl">
+      <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+      <tr><td><strong>Nadolol</strong> (non-selective beta-blocker)</td><td><strong>First-line</strong> — the cornerstone of CPVT therapy</td><td>Blunts the catecholamine trigger; non-selective beats selective agents. Titrate to maximal tolerated dose. Watch bradycardia, fatigue, bronchospasm; never stop abruptly.</td></tr>
+      <tr><td><strong>Flecainide</strong></td><td><strong>Add-on</strong> when exercise still provokes ectopy on full beta-blockade</td><td>Directly inhibits the leaky <strong>RyR2</strong> and Na current → fewer DADs. (Its CAST danger is in structural/ischemic hearts — here the heart is normal and the effect is therapeutic.) Recheck with a stress test.</td></tr>
+      <tr><td><strong>Propranolol / esmolol (IV)</strong></td><td>Acute antiadrenergic control during an electrical storm</td><td>Sympatholysis is therapeutic in CPVT storm; titrate, watch for hypotension/bradycardia.</td></tr>
+      <tr><td><strong>LCSD (surgical, not a drug)</strong></td><td>Left cardiac sympathetic denervation for refractory cases</td><td>Reduces left-sided sympathetic drive; effective add-on for breakthrough events; mild ptosis/anhidrosis possible.</td></tr>
+      <tr><td><strong>ICD</strong></td><td>Secondary prevention in arrest survivors / breakthrough on maximal therapy</td><td>⚠️ <strong>Never alone.</strong> A painful shock is a catecholamine surge that can trigger MORE VT/shock storm. Always combine with maximal beta-blocker + flecainide; program conservatively (long detection, ATP).</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Beta-blocker plus flecainide; an ICD alone can pour petrol on the fire. The shock that should save a CPVT heart can, if it stands alone, be the spark that storms it."</div>
+
+    <div class="callout danger"><b class="ct">🚫 The 'never' list in CPVT</b>❌ Catecholamines / sympathomimetics as casual "diagnostic" tests · ❌ Decongestants, stimulants, high-dose caffeine · ❌ Clearing the patient for competitive sport · ❌ Stopping the beta-blocker abruptly · ❌ Implanting an ICD as a stand-alone substitute for drug therapy. When in doubt, <strong>reduce the adrenaline</strong> and lean on nadolol + flecainide.</div>
+
+    <h3>🏠 Long-term, disease-modifying strategy</h3>
+    <ul>
+      <li>💊 <strong>Maximal nadolol + flecainide</strong>, with adherence reinforced at every visit — these are the foundation.</li>
+      <li>🏃 <strong>Lifelong avoidance of competitive/strenuous sport and adrenergic triggers</strong> — lifestyle is treatment.</li>
+      <li>🔪 <strong>LCSD</strong> for breakthrough events despite drugs.</li>
+      <li>🔌 <strong>ICD</strong> for arrest survivors or recurrent syncope/VT on maximal therapy — always alongside drugs, conservatively programmed.</li>
+      <li>🧬 <strong>Cascade family screening</strong> and treatment of affected relatives.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S12 — MONITORING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s12">
+  <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+  <div class="section-content">
+    <h3>📡 What to watch and why</h3>
+    <ul>
+      <li>🏃 <strong>Repeat exercise stress testing on therapy</strong> — the key outcome measure: nadolol ± flecainide should suppress exercise-induced ectopy and abolish bidirectional VT. If it doesn't, escalate.</li>
+      <li>📟 <strong>Telemetry during and after every provocation</strong>, with attention to the <strong>recovery phase</strong> where arrhythmia peaks; defibrillator at the bedside.</li>
+      <li>📈 <strong>Holter / ambulatory monitoring</strong> to capture day-to-day ectopy and correlate with symptoms and activity.</li>
+      <li>💊 <strong>Beta-blocker dose &amp; adherence</strong> — heart rate, symptoms, and exercise-test response; a quietly skipped nadolol is a quietly re-armed disease.</li>
+      <li>🔌 <strong>If an ICD is placed:</strong> monitor for appropriate vs inappropriate shocks; in CPVT every shock risks a catecholamine surge — review programming (long detection, high rate cut-off, ATP).</li>
+      <li>🧬 <strong>Family screening status</strong> — ensure first-degree relatives are tested and, if affected, treated.</li>
+      <li>🧠 <strong>Symptom diary</strong> — any palpitations, dizziness, near-faint or collapse, and the activity that triggered it.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In CPVT the monitor's job is to answer one question — 'can adrenaline still make her heart misbehave?' — and the test that answers it is a repeat stress test on full therapy."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S13 — COMPLICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s13">
+  <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+  <div class="section-content">
+    <h3>💀 What can go wrong — and the mechanism</h3>
+    <ul>
+      <li>⚡ <strong>Sudden cardiac death</strong> — the great fear; exercise/emotion triggers bidirectional/polymorphic VT degenerating to VF. Often the first "symptom" in undiagnosed family members.</li>
+      <li>😵 <strong>Recurrent exertional syncope / convulsive syncope</strong> — repeatedly misdiagnosed as vasovagal or epilepsy, delaying the real diagnosis for years.</li>
+      <li>🌀 <strong>Electrical storm</strong> — runs of VT, especially under stress, pain or after ICD shocks; sympathetically driven, needs deep antiadrenergic therapy.</li>
+      <li>🔌 <strong>ICD shock storm (the CPVT-specific trap)</strong> — a painful shock pours catecholamines onto the substrate → more VT → more shocks, a self-feeding cycle. The device meant to save can ignite the storm if it stands alone.</li>
+      <li>💊 <strong>Under-treatment from a normal resting ECG</strong> — false reassurance leading to inadequate drugs or clearance for sport; and inadvertent adrenergic stimulation (decongestants, stimulants, fright).</li>
+      <li>🧬 <strong>Unrecognised affected relatives</strong> — without cascade screening, the disease silently endangers the family.</li>
+    </ul>
+
+    <!-- 🎭 M&M CONFERENCE MODULE -->
+    <div class="mm">
+      <h3>🎭 Morbidity &amp; Mortality Conference — "The Child Who Was Cleared to Play"</h3>
+      <div class="mm-case">
+        <strong>The case:</strong> A 13-year-old boy had three "faints," all while playing sport, and one episode called a "seizure" after a startle. Each time the <strong>resting ECG was normal</strong>, the QT normal, the echo normal — so he was reassured, never stress-tested, never genetically screened, and <strong>cleared to play competitive football</strong>. His mother had mentioned a brother who "died young, running," but it was never charted. Six weeks later he collapsed during a match and could not be revived. At post-mortem the heart was structurally normal; targeted genetics found a pathogenic <strong>RyR2 variant</strong>. (In a separate near-miss the M&amp;M reviewed, a CPVT teenager arrested in recovery and received repeated <strong>epinephrine</strong> in the code, which the substrate hated and which fuelled refractory VF.)
+      </div>
+      <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+      <div class="swiss">
+        <div class="hole"><b>🧠 NORMAL ECG = ALL CLEAR</b>A normal resting 12-lead was taken as proof of a normal heart — in CPVT it proves nothing.</div>
+        <div class="hole"><b>🏃 NEVER PROVOKED</b>No exercise stress test was ever done — the one test that would have shown bidirectional VT.</div>
+        <div class="hole"><b>🧬 FAMILY HX UNHEARD</b>A young exertional death in the family was mentioned but never charted or acted on.</div>
+        <div class="hole"><b>⚽ CLEARED FOR SPORT</b>The single most dangerous environment for this disease was actively permitted.</div>
+        <div class="hole"><b>💉 ADRENALINE FED</b>In the near-miss, epinephrine in the code poured fuel on a catecholamine-driven arrhythmia.</div>
+      </div>
+      <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> treat exertional syncope with a normal resting ECG as CPVT until a stress test says otherwise; provoke the heart (treadmill) before clearing anyone for sport; chart and act on a family history of young sudden death; start nadolol and restrict sport early; screen the family; and in a code, minimise gratuitous catecholamines. <strong>This is exactly why the registrar refused to discharge our patient as 'vasovagal.'</strong></p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Normal resting ECG, must be a faint' is the sentence written in the notes of children who then die of CPVT. A resting strip is not a stress test."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S14 — DIFFERENTIALS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s14">
+  <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials</h2></div>
+  <div class="section-content">
+    <h3>🧩 The exertional-syncope-in-the-young differential</h3>
+    <table class="tbl">
+      <tr><th>Diagnosis</th><th>Clues</th><th>Why it matters</th></tr>
+      <tr><td>🏃 <strong>CPVT</strong> (this patient)</td><td>Exercise/emotion syncope, <strong>normal resting ECG/QT</strong>, bidirectional VT on stress, RyR2/CASQ2, family SCD</td><td>Default for exertional syncope with a normal resting strip; treat with nadolol + flecainide, restrict sport.</td></tr>
+      <tr><td>📏 <strong>Congenital Long QT syndrome</strong></td><td><strong>Prolonged QT at rest</strong>; LQT1 exercise/swim, LQT2 startle, LQT3 sleep; Torsades</td><td>Separated from CPVT by the resting QTc; beta-blockers + avoid QT drugs.</td></tr>
+      <tr><td>⛰️ <strong>Brugada syndrome</strong></td><td><strong>Coved ST elevation V1–V2</strong>; events at rest/sleep, worse with <strong>fever</strong></td><td>Opposite trigger profile (rest/fever, not exercise); quinidine, fever control, ICD for high risk.</td></tr>
+      <tr><td>💪 <strong>Hypertrophic cardiomyopathy / ARVC</strong></td><td>Murmur or abnormal ECG/echo/MRI; structural disease</td><td>Excluded here by a structurally normal heart; different management and sport advice.</td></tr>
+      <tr><td>🩺 <strong>Vasovagal / neurocardiogenic syncope</strong></td><td>Prodrome, upright posture, warmth/nausea, NOT mid-sprint</td><td>The benign mimic that gets CPVT misdiagnosed — but vasovagal rarely strikes at peak exertion.</td></tr>
+      <tr><td>💊 <strong>Digoxin toxicity</strong></td><td>Bidirectional VT in an older patient on digoxin, low K⁺/renal impairment</td><td>The other cause of bidirectional VT — excluded here (young, not on digoxin); needs digoxin Fab.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Exertional syncope + normal resting ECG → CPVT. Prolonged QT at rest → long QT. Coved ST + fever/rest → Brugada. The resting strip and the trigger sort the inherited arrhythmias."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S15 — PLAN -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s15">
+  <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan</h2></div>
+  <div class="section-content">
+    <h3>🧭 Today → this admission → for life</h3>
+    <ol>
+      <li>🏃 <strong>Today (done):</strong> exercise stress test reproduced bidirectional VT → CPVT confirmed; competitive sport restricted; nadolol started and titrated; defibrillator-ready provocation.</li>
+      <li>💉 <strong>Add flecainide</strong> if a repeat stress test on full beta-blockade still shows exercise-induced ectopy; re-test to prove suppression.</li>
+      <li>🧬 <strong>Genetic confirmation &amp; cascade family screening</strong> — RyR2 found; screen and, where affected, treat first-degree relatives.</li>
+      <li>🔪 <strong>Consider LCSD</strong> for breakthrough events despite maximal drugs.</li>
+      <li>🔌 <strong>ICD only</strong> for an aborted arrest or recurrent syncope/VT on maximal therapy — and always combined with maximal nadolol + flecainide, programmed conservatively.</li>
+      <li>👨‍👩‍👧 <strong>Shared decision-making &amp; education</strong> — what CPVT is, why sport and adrenergic triggers are dangerous, adherence, a school action plan, and a clear "call emergency services for any collapse" safety net.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The stress test makes the diagnosis; nadolol + flecainide + sport restriction make the future. Send her home with all of those and a screened family, or she comes back during a sprint."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S16 — PROGRESS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s16">
+  <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+  <div class="section-content">
+    <h3>📅 Course in the EP service</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Day 1</div>Exercise stress test (defibrillator at bedside) reproduces PVCs at HR ~120 escalating to bidirectional VT in recovery → CPVT confirmed. Sport restricted; nadolol started.</div>
+      <div class="t-item"><div class="t-time">Day 2</div>RyR2 pathogenic variant returns (autosomal dominant). Cascade family screening arranged; mother and younger sibling referred.</div>
+      <div class="t-item"><div class="t-time">Day 4</div>Nadolol uptitrated to maximal tolerated dose. Repeat stress test: ectopy reduced but a couplet still at peak exertion → <strong>flecainide added</strong>.</div>
+      <div class="t-item"><div class="t-time">Day 7</div>Repeat stress test on nadolol + flecainide: no bidirectional VT, only rare isolated PVCs. Symptom-free, no syncope.</div>
+      <div class="t-item"><div class="t-time">Day 10</div>No arrest, no breakthrough on maximal drugs → ICD NOT required at this stage; LCSD held in reserve. Discharge planned with close EP follow-up.</div>
+      <div class="t-item"><div class="t-time">Week 4</div>Family screening: mother carries the variant with mild stress-test ectopy (started on nadolol); sibling unaffected.</div>
+    </div>
+
+    <!-- 👨‍👩‍👦 FAMILY & PATIENT JOURNEY MODULE -->
+    <h3>👨‍👩‍👦 Family &amp; Patient Journey</h3>
+    <div class="journey">
+      <div class="j-card"><div class="j-who">👧 The patient — Miss A.K.</div><p>"For two years everyone told me I was a fainter and to drink more water. Giving up competitive football is the hardest thing — but they showed me the trace from the treadmill. My heart was doing something terrifying that no resting test ever caught. Now I take my tablets and I'm still here."</p></div>
+      <div class="j-card"><div class="j-who">👩 Her mother</div><p>"I lost my brother at sixteen, running, and no one ever explained why. When the doctor said her heart was the same hidden problem and that I might carry it too, I cried — but for the first time someone was finally looking. They're testing all of us now."</p></div>
+      <div class="j-card"><div class="j-who">👩‍⚕️ The EP nurse</div><p>"My job was to keep her calm, give the nadolol on time, and protect her from anything that spikes adrenaline. With CPVT, a calm room and a steady drug regimen are part of the treatment, not just the kindness."</p></div>
+      <div class="j-card"><div class="j-who">🎓 The team's reflection</div><p>"This wasn't a clever diagnosis — it was a disciplined one. We refused to trust a normal resting ECG in a child who collapses while sprinting, we made her heart run, and the bidirectional VT told us everything."</p></div>
+    </div>
+
+    <div class="callout pink"><b class="ct">💗 The human thread</b>A CPVT diagnosis reshapes a young life — no competitive sport, daily medication, and the weight of knowing it runs in the family. But it is profoundly treatable: nadolol, flecainide and trigger avoidance turn a lethal hidden disease into a managed condition. The hardest conversations — about giving up the sport she loves and about screening the relatives she loves — are as much treatment as any tablet.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S17 — DISCHARGE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s17">
+  <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+  <div class="section-content">
+    <h3>📋 Discharge plan &amp; safety net</h3>
+    <ul>
+      <li>💊 <strong>Medications:</strong> nadolol at maximal tolerated dose + flecainide, with a clear written schedule and a "never stop the beta-blocker abruptly" warning. Provide a sick-day/forgotten-dose plan.</li>
+      <li>🏃 <strong>Activity:</strong> strict avoidance of competitive and strenuous sport; a school letter excusing high-intensity PE; counsel on emotional/startle triggers and graded, gentle activity only as advised by EP.</li>
+      <li>🚫 <strong>Avoid adrenergic stimulants:</strong> no decongestants/sympathomimetics, caution with high-caffeine energy drinks; check medications with pharmacy.</li>
+      <li>🧬 <strong>Genetics &amp; family:</strong> cascade screening of first-degree relatives booked; affected relatives referred for treatment; genetic counselling for the family.</li>
+      <li>🚩 <strong>Red flags → call emergency services:</strong> any collapse or faint, palpitations with dizziness, a "seizure" during exertion (treat as cardiac), or — if an ICD is ever placed — any shock.</li>
+      <li>📚 <strong>Education:</strong> what CPVT is in plain language, why a normal resting ECG never reassured us, the importance of adherence and trigger avoidance, and CPR/AED training offered to the family.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Discharge in CPVT is not 'ECG normal, go home' — it is nadolol and flecainide, no competitive sport, no stimulants, a screened family, and a household that knows to call for any collapse."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S18 — CLINICAL PEARLS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s18">
+  <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+  <div class="section-content">
+    <div class="pearl-grid">
+      <div class="pearl"><b>📈 The resting ECG lies</b>Exercise/emotion-induced syncope with a NORMAL resting ECG is CPVT until a stress test proves otherwise. The resting 12-lead is the great liar.</div>
+      <div class="pearl"><b>🏃 Provoke to diagnose</b>The exercise treadmill test, not the resting strip, makes the diagnosis — reproducible ectopy at a heart-rate threshold escalating to bidirectional VT.</div>
+      <div class="pearl"><b>🔬 Calcium-leak mechanism</b>RyR2 gain-of-function → diastolic SR Ca²⁺ leak → NCX inward current → DADs → triggered bidirectional/polymorphic VT. Adrenaline is the trigger.</div>
+      <div class="pearl"><b>💊 Nadolol first</b>Non-selective beta-blockade (nadolol) is first-line and beats selective agents. Start early, titrate to maximum, restrict sport.</div>
+      <div class="pearl"><b>💉 Flecainide add-on</b>Flecainide directly inhibits the leaky RyR2 — strong evidence as an add-on when exercise still provokes ectopy on a beta-blocker.</div>
+      <div class="pearl"><b>🔀 Bidirectional VT = 2 answers</b>Bidirectional VT means CPVT or digoxin toxicity — find out which adrenaline (or drug) you're feeding.</div>
+      <div class="pearl"><b>🔌 Never an ICD alone</b>Beta-blocker plus flecainide; an ICD alone can pour petrol on the fire — a painful shock surges catecholamines and can storm the heart.</div>
+      <div class="pearl"><b>🧬 It runs in families</b>RyR2 is autosomal dominant, CASQ2 recessive. A young exertional death in the family is a red flag — screen first-degree relatives.</div>
+      <div class="pearl"><b>😵 "Seizures" can be cardiac</b>Convulsive syncope during exertion is CPVT until proven otherwise — check the rhythm before reaching for anticonvulsants.</div>
+      <div class="pearl"><b>🚫 Avoid adrenaline</b>No competitive sport, no sympathomimetics/decongestants, minimise startle and stress — lifestyle is treatment.</div>
+      <div class="pearl"><b>🧊 Watch recovery</b>Arrhythmia often peaks early in cool-down — never unhook the monitor the moment exercise stops.</div>
+      <div class="pearl"><b>🔪 LCSD for refractory</b>Left cardiac sympathetic denervation reduces events when drugs aren't enough — before, or alongside, an ICD.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S19 — MCQs / ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s19">
+  <div class="sec-header"><span class="s-badge">S19</span><h2>🧠 MCQs / Assessment</h2></div>
+  <div class="section-content">
+    <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP and feed your dashboard. Each shows a full explanation.</em></p>
+    <div id="mcqHost"></div>
+    <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · Case c-cpvt-015 — Catecholaminergic Polymorphic VT (CPVT)<br>
+  ⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."
+</div>
+
+</div><!-- /#caseScroll -->
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ XP / DASHBOARD CORE ============ */
+  var XP = 0, XP_MAX = 1200;
+  var awarded = {}; // dedupe one-time awards by key
+  var xpVal = document.getElementById('xpVal');
+  var xpFill = document.getElementById('xpFill');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+  }
+  function addXP(amount, key, label){
+    if(key){ if(awarded[key]) return; awarded[key] = true; }
+    XP += amount;
+    if(XP > XP_MAX) XP = XP_MAX;
+    xpVal.textContent = XP;
+    xpFill.style.width = Math.min(100, Math.round(XP / XP_MAX * 100)) + '%';
+    showToast('+' + amount + ' XP' + (label ? ' · ' + label : ''));
+  }
+  function earnBadge(id){
+    var b = document.getElementById(id);
+    if(b && !b.classList.contains('earned')){ b.classList.add('earned'); }
+  }
+
+  /* Dashboard minimize */
+  var dash = document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){
+    dash.classList.toggle('collapsed');
+    this.textContent = dash.classList.contains('collapsed') ? '+' : '–';
+  });
+
+  /* ============ INTERNAL SCROLL SIZING ============ */
+  /* Size the scroll box to the visible window so the sticky tab bar stays in
+     view. When embedded (srcDoc iframe, same-origin), the host page stretches
+     the iframe to full content height and scrolls the OUTER page — so we size
+     this box from the parent window's height minus whatever app chrome sits
+     above the iframe, and scroll internally instead. Standalone → 100vh. */
+  var caseScroll = document.getElementById('caseScroll');
+  var topnav = document.getElementById('topnav');
+  /* The tab bar is position:fixed, so it's out of flow — reserve space at the
+     top of the scroll content (and offset anchor jumps) by its real height. */
+  function setNavOffset(){
+    var navH = topnav ? topnav.offsetHeight : 70;
+    caseScroll.style.paddingTop = navH + 'px';
+    caseScroll.style.scrollPaddingTop = (navH + 14) + 'px';
+  }
+  function sizeScroller(){
+    try {
+      var p = window.parent;
+      if(p && p !== window && window.frameElement){
+        var rectTop = window.frameElement.getBoundingClientRect().top;
+        if(rectTop < 0) rectTop = 0;          // parent scrolled past the chrome
+        var ph = p.innerHeight || 800;
+        var h = ph - rectTop - 6;             // leave the bottom edge breathing room
+        if(h < 460) h = 460;                  // sane minimum on short windows
+        caseScroll.style.height = h + 'px';
+      } else {
+        caseScroll.style.height = '100vh';
+      }
+    } catch(e){ caseScroll.style.height = '100vh'; }
+    setNavOffset();
+  }
+  sizeScroller();
+  window.addEventListener('resize', sizeScroller);
+  window.addEventListener('load', sizeScroller);
+  try { if(window.parent && window.parent !== window) window.parent.addEventListener('resize', sizeScroller); } catch(e){}
+
+  /* ============ NAV: scroll-spy active + visited ============ */
+  var navchips = Array.prototype.slice.call(document.querySelectorAll('.navchip'));
+  var sections = navchips.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited = {};
+  var visitVal = document.getElementById('visitVal');
+
+  function markVisited(idx){
+    var sec = sections[idx];
+    if(!sec) return;
+    if(!visited[sec.id]){
+      visited[sec.id] = true;
+      navchips[idx].classList.add('visited');
+      var count = Object.keys(visited).length;
+      visitVal.textContent = count + ' / 19';
+      addXP(8, 'visit-' + sec.id, 'Section read');
+      if(count >= 19){ earnBadge('bdg-explorer'); addXP(60, 'allvisited', 'Ward Explorer!'); }
+    }
+  }
+  function setActive(idx){
+    navchips.forEach(function(c){ c.classList.remove('active'); });
+    if(navchips[idx]) navchips[idx].classList.add('active');
+  }
+
+  /* True tabs: each chip shows ONLY its section, hidden via CSS otherwise.
+     No scrollIntoView and no scroll-spy — nothing can scroll the tab bar away,
+     which also sidesteps every srcDoc-iframe scrolling quirk. The hero banner
+     and vitals strip belong to the case intro, so they show on S1 only. */
+  var heroBits = [document.querySelector('.hero'), document.querySelector('.vitals-strip')]
+    .filter(function(el){ return !!el; });
+
+  function showSection(idx){
+    sections.forEach(function(s, i){ if(s) s.classList.toggle('sec-active', i === idx); });
+    heroBits.forEach(function(el){ el.style.display = (idx === 0) ? '' : 'none'; });
+    caseScroll.scrollTop = 0;
+    setActive(idx);
+    markVisited(idx);
+  }
+
+  navchips.forEach(function(chip, idx){
+    chip.addEventListener('click', function(ev){
+      ev.preventDefault();
+      showSection(idx);
+    });
+  });
+  showSection(0);
+
+  /* ============ FLAG GAME (S2) ============ */
+  var flagBtns = document.querySelectorAll('#flagGame .flag-btn');
+  var flagResult = document.getElementById('flagResult');
+  var flagsFound = 0, flagsTotal = 0, flagWrong = 0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good') === '1') flagsTotal++; });
+  flagBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.dataset.locked) return;
+      btn.dataset.locked = '1';
+      var good = btn.getAttribute('data-good') === '1';
+      if(good){
+        btn.classList.add('flag-good');
+        flagsFound++;
+        addXP(10, 'flag-' + flagsFound + '-' + Math.random(), 'CPVT flag spotted');
+      } else {
+        btn.classList.add('flag-bad');
+        flagWrong++;
+        showToast('❌ Not a CPVT-specific flag');
+      }
+      if(flagsFound === flagsTotal){
+        flagResult.textContent = '✅ All ' + flagsTotal + ' CPVT red flags found' + (flagWrong ? ' (with ' + flagWrong + ' wrong pick' + (flagWrong>1?'s':'') + ')' : ' — flawless!');
+        earnBadge('bdg-vt');
+        addXP(30, 'flags-complete', 'VT-Spotter badge');
+      } else {
+        flagResult.textContent = flagsFound + ' / ' + flagsTotal + ' CPVT red flags found…';
+      }
+    });
+  });
+
+  /* ============ BRANCHING SCENARIO (S3) ============ */
+  var scText = document.getElementById('scText');
+  var scChoices = document.getElementById('scChoices');
+  var scFeedback = document.getElementById('scFeedback');
+  var scRestart = document.getElementById('scRestart');
+  var scStab = document.getElementById('scStab');
+  var scTime = document.getElementById('scTime');
+  var scXP = document.getElementById('scXP');
+  var pathXP = 0, scStability = 2, scElapsed = 0;
+
+  var STEPS = {
+    start: {
+      text: "She is well and well-looking. Resting ECG, QT and echo are all normal. Mum is asking when she can get back to football. The A&E note says 'vasovagal — discharge.' There is a family history of young sudden death. What do you do FIRST?",
+      choices: [
+        { t: "🚫 Do NOT clear her — restrict sport and arrange an exercise stress test", good:true, ds:1, dt:10, xp:40, fb:"✅ Exactly. Exertional syncope + family history of young SCD + normal resting ECG = provoke, don't reassure. Restrict sport today and stress-test the heart under monitoring. You've protected her future." , next:"provoke" },
+        { t: "🏠 Discharge as vasovagal — the resting ECG is normal", good:false, ds:-2, dt:20, xp:0, fb:"☠️ Catastrophe. The resting ECG is normal in CPVT BY DESIGN — it reassures you of nothing. Discharging exertional syncope on a resting strip is the M&M case in S13. Restart and choose again.", end:true },
+        { t: "💉 Give IV epinephrine in clinic to 'bring out the arrhythmia fast'", good:false, ds:-1, dt:15, xp:5, fb:"⚠️ Dangerous. Catecholamine challenge directly feeds the exact lethal trigger and is for expert labs only. The treadmill test is the safer, preferred provocation.", next:"provoke" }
+      ]
+    },
+    provoke: {
+      text: "On the treadmill, with a defibrillator at the bedside, her heart rate climbs. At ~120/min PVCs appear, then couplets, then a run of bidirectional VT. She feels lightheaded. Next move?",
+      choices: [
+        { t: "🛑 Stop the test, recover her on the monitor, and start a non-selective beta-blocker (nadolol)", good:true, ds:1, dt:8, xp:30, fb:"✅ Right. The diagnosis is made — bidirectional VT on exertion = CPVT. Stop, watch through recovery (arrhythmia peaks early in cool-down), and start nadolol, the first-line drug.", next:"drug" },
+        { t: "🏃 Push her harder to 'confirm sustained VT' before stopping", good:false, ds:-2, dt:20, xp:0, fb:"☠️ No. You already have your answer; driving the catecholamine load further risks degeneration to VF. Stop and treat.", next:"drug" }
+      ]
+    },
+    drug: {
+      text: "CPVT confirmed. She's on maximal nadolol, but a repeat stress test still shows a couplet at peak exertion. RyR2 variant has come back positive. What now?",
+      choices: [
+        { t: "💉 Add flecainide and recheck with a stress test", good:true, ds:1, dt:6, xp:30, fb:"✅ Ideal. Flecainide directly inhibits the leaky RyR2 and cuts exercise-induced ectopy — the evidence-based add-on to a beta-blocker. Re-test to prove suppression.", next:"device" },
+        { t: "🔌 Implant an ICD now and stop fiddling with drugs", good:false, ds:0, dt:10, xp:5, fb:"⚠️ Premature and dangerous as a stand-alone. No arrest, no maximal drug therapy yet — and an ICD alone can pour petrol on the fire. Optimise drugs first.", next:"device" }
+      ]
+    },
+    device: {
+      text: "On nadolol + flecainide the bidirectional VT is gone, only rare PVCs remain, and she's symptom-free. The family asks about 'the shock box.' Final decision of the work-up?",
+      choices: [
+        { t: "📋 No ICD now — maximal drugs + sport restriction + family screening; reserve ICD/LCSD for breakthrough", good:true, ds:1, dt:5, xp:40, fb:"🏆 Perfect close. She has no aborted arrest and is controlled on drugs, so an ICD isn't indicated yet — and would risk shock-storm. Screen the family, hold ICD/LCSD in reserve. Case stabilised.", end:true },
+        { t: "🔌 Put in an ICD anyway 'to be safe' and relax the drugs", good:false, ds:-1, dt:10, xp:0, fb:"⚠️ Wrong on both counts. An ICD as a substitute for drugs is the classic CPVT error — a painful shock surges catecholamines and can storm the heart. Drugs stay maximal; ICD is for arrest/breakthrough only.", end:true }
+      ]
+    }
+  };
+
+  function renderStab(){
+    var s = Math.max(0, Math.min(5, scStability + 2)); // map -2..3 → 0..5
+    var dots = '';
+    for(var i=0;i<5;i++) dots += (i < s ? '●' : '○');
+    scStab.textContent = dots;
+  }
+  function renderStep(key){
+    var step = STEPS[key];
+    scText.textContent = step.text;
+    scFeedback.className = 'feedback';
+    scFeedback.style.display = 'none';
+    scChoices.innerHTML = '';
+    step.choices.forEach(function(ch){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = ch.t;
+      b.addEventListener('click', function(){
+        pathXP += ch.xp; scXP.textContent = pathXP;
+        scElapsed += ch.dt; scTime.textContent = scElapsed + ' s';
+        scStability += ch.ds; renderStab();
+        if(ch.xp) addXP(ch.xp, null, 'Scenario choice');
+        scFeedback.textContent = ch.fb;
+        scFeedback.className = 'feedback ' + (ch.good ? 'good' : 'bad');
+        scFeedback.style.display = 'block';
+        Array.prototype.forEach.call(scChoices.children, function(c){ c.disabled = true; c.style.opacity = .6; });
+        if(ch.end){
+          scRestart.style.display = 'inline-block';
+          if(ch.good && key === 'device'){ earnBadge('bdg-shock'); addXP(20, 'scenario-win', 'Shock On Time!'); }
+        } else if(ch.next){
+          setTimeout(function(){ renderStep(ch.next); }, 1400);
+        }
+      });
+      scChoices.appendChild(b);
+    });
+  }
+  scRestart.addEventListener('click', function(){
+    pathXP = 0; scStability = 2; scElapsed = 0;
+    scXP.textContent = 0; scTime.textContent = '0 s'; renderStab();
+    scRestart.style.display = 'none';
+    renderStep('start');
+  });
+  renderStab();
+  renderStep('start');
+
+  /* ============ REVEAL BUTTONS ============ */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.getAttribute('data-target'));
+      if(!t) return;
+      if(t.classList.contains('reveal-shown')){
+        t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden');
+      } else {
+        t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown');
+        addXP(8, 'reveal-' + btn.getAttribute('data-target'), 'Self-test');
+      }
+    });
+  });
+
+  /* ============ ADRENALINE / DAD-VT RISK SIM (S6) ============ */
+  var kRange = document.getElementById('kRange');
+  var kVal = document.getElementById('kVal');
+  var kNeedle = document.getElementById('kNeedle');
+  var kReadout = document.getElementById('kReadout');
+  if(kRange){
+    var simUsed = false;
+    function updateK(){
+      var k = (parseInt(kRange.value,10) / 10); // 2.0 .. 7.5 (adrenergic intensity /10)
+      kVal.textContent = k.toFixed(1);
+      var pct = (parseInt(kRange.value,10) - 20) / (75 - 20) * 100;
+      kNeedle.style.left = pct + '%';
+      var msg, cls;
+      if(k < 3.0){ msg = '🟢 Rest / light activity — minimal catecholamine drive. RyR2 leak silent, no DADs. The resting heart looks (and is) electrically normal — this is the great alibi.'; cls='good'; }
+      else if(k < 4.5){ msg = '🟢 Mild exertion — heart rate climbing but below the ectopy threshold. On nadolol + flecainide the heart stays quiet here. Safe band of daily-life activity.'; cls='good'; }
+      else if(k <= 6.0){ msg = '🟠 Moderate–vigorous exertion (HR ~110–130) — the threshold zone. β-drive loads the SR, the leaky RyR2 fires DADs → PVCs, bigeminy, couplets. Beta-blockade blunts this; without it, danger rises.'; cls='warn-r'; }
+      else { msg = '🔴 Sprint / terror / startle — maximal catecholamine surge. DAD-triggered activity escalates to BIDIRECTIONAL VT → polymorphic VT → VF. This is where undiagnosed CPVT kills. Block the adrenaline and plug the leak.'; cls='bad'; }
+      kReadout.innerHTML = msg;
+      kReadout.className = 'readout ' + cls;
+      if(!simUsed){ simUsed = true; addXP(15, 'ksim', 'Titration Master'); }
+    }
+    kRange.addEventListener('input', updateK);
+    updateK();
+  }
+
+  /* ============ CHECKLISTS (S7) ============ */
+  var allChecklistsDone = 0, totalChecklists = document.querySelectorAll('.checklist').length;
+  document.querySelectorAll('.checklist').forEach(function(list){
+    var boxes = list.querySelectorAll('input[type=checkbox]');
+    var prog = list.querySelector('[data-progress]');
+    var total = boxes.length;
+    var doneAwarded = false;
+    function refresh(){
+      var done = 0;
+      boxes.forEach(function(b){
+        if(b.checked){ done++; b.closest('.ck').classList.add('done'); }
+        else { b.closest('.ck').classList.remove('done'); }
+      });
+      prog.textContent = done + ' / ' + total + ' complete';
+      if(done === total && !doneAwarded){
+        doneAwarded = true;
+        allChecklistsDone++;
+        addXP(25, 'ck-' + list.id, 'Checklist done');
+        if(allChecklistsDone >= totalChecklists){ earnBadge('bdg-ck'); addXP(20, 'allck', 'Checklist Champion'); }
+      }
+    }
+    boxes.forEach(function(b){
+      b.addEventListener('change', function(){
+        if(b.checked) addXP(4, null, 'Step checked');
+        refresh();
+      });
+    });
+  });
+
+  /* ============ MCQs (S19) ============ */
+  var MCQS = [
+    {
+      q: "A 14-year-old with recurrent exercise-induced syncope, a normal resting ECG and a family history of young sudden death has a normal echo. The investigation most likely to make the diagnosis is:",
+      opts: ["A repeat resting 12-lead ECG","An exercise (treadmill) stress test","A 24-hour urinary catecholamine collection","Reassurance and discharge as vasovagal"],
+      correct: 1,
+      exp: "CPVT is invisible at rest — the resting ECG and QT are normal. The diagnosis is made by PROVOKING the heart: an exercise stress test reproduces ectopy at a heart-rate threshold escalating to bidirectional VT. Repeating a resting ECG adds nothing; discharge is dangerous."
+    },
+    {
+      q: "What is the underlying mechanism of CPVT?",
+      opts: ["A potassium-channel repolarization defect prolonging the QT","A gain-of-function RyR2 mutation causing diastolic SR calcium leak and delayed afterdepolarizations","A coronary artery occlusion causing scar-related re-entry","An accessory pathway pre-exciting the ventricle"],
+      correct: 1,
+      exp: "CPVT is a calcium-handling channelopathy: gain-of-function RyR2 (or loss of CASQ2) causes diastolic calcium leak from the sarcoplasmic reticulum under catecholamine stress. The Na/Ca exchanger generates an inward current producing delayed afterdepolarizations (DADs) → triggered activity → bidirectional/polymorphic VT."
+    },
+    {
+      q: "Why does a normal resting ECG NOT exclude CPVT?",
+      opts: ["Because the ECG was probably recorded incorrectly","Because the arrhythmia is triggered by catecholamines and the resting heart is electrically normal","Because CPVT always prolongs the QT, which was missed","Because CPVT only affects the atria"],
+      correct: 1,
+      exp: "In CPVT the substrate is a catecholamine-triggered calcium leak. At rest there is no adrenergic drive, the leak is silent, and the 12-lead and QT are normal. The arrhythmia appears only under exertion or emotion — which is exactly why provocation (the stress test) is essential."
+    },
+    {
+      q: "The first-line drug therapy for CPVT is:",
+      opts: ["A non-selective beta-blocker such as nadolol","IV verapamil","Amiodarone monotherapy","A calcium supplement"],
+      correct: 0,
+      exp: "Non-selective beta-blockade — nadolol — is first-line and outperforms selective agents. It blunts the catecholamine trigger and, with strict sport restriction, is the foundation of CPVT treatment, started before genetic results return."
+    },
+    {
+      q: "A patient on maximal nadolol still has exercise-induced ventricular ectopy. The best evidence-based add-on is:",
+      opts: ["Digoxin","Flecainide","A loop diuretic","Sotalol monotherapy in place of the beta-blocker"],
+      correct: 1,
+      exp: "Flecainide directly inhibits the leaky RyR2 (and the sodium current), reducing exercise-induced arrhythmia when added to a beta-blocker (Watanabe, van der Werf). In a structurally normal heart this is therapeutic — unlike its CAST danger in ischemic/structural disease."
+    },
+    {
+      q: "Bidirectional VT (beat-to-beat 180° QRS-axis alternation) in a young, structurally normal heart NOT on digoxin most likely indicates:",
+      opts: ["Digoxin toxicity","CPVT","Acute STEMI","Wolff-Parkinson-White"],
+      correct: 1,
+      exp: "Bidirectional VT has two classic causes: CPVT and digoxin toxicity (both act via DAD-triggered activity from calcium overload). In a young patient with exertional syncope and no digoxin exposure, bidirectional VT points to CPVT."
+    },
+    {
+      q: "Why must an ICD in CPVT always be combined with maximal drug therapy and conservative programming?",
+      opts: ["Because ICDs are unreliable in young patients","Because a painful shock triggers a catecholamine surge that can provoke more VT and an ICD shock storm","Because the ICD lead damages the RyR2 channel","Because ICDs prolong the QT interval"],
+      correct: 1,
+      exp: "In CPVT a painful ICD shock is itself a catecholamine surge that feeds the substrate, provoking further VT and potentially a self-feeding shock storm. The ICD is reserved for arrest survivors/breakthrough events and is always combined with maximal nadolol + flecainide and programmed conservatively (long detection, ATP) — never as a stand-alone."
+    },
+    {
+      q: "Regarding the inheritance of CPVT:",
+      opts: ["RyR2-related CPVT is autosomal dominant; CASQ2-related CPVT is autosomal recessive","Both forms are X-linked","CPVT is never inherited","RyR2 is recessive and CASQ2 is dominant"],
+      correct: 0,
+      exp: "The common RyR2 form is autosomal dominant; the rarer CASQ2 (calsequestrin) form is autosomal recessive. Because it is inherited, cascade screening of first-degree relatives is essential — silent carriers may be at risk of sudden death."
+    }
+  ];
+
+  var host = document.getElementById('mcqHost');
+  var mcqVal = document.getElementById('mcqVal');
+  var mcqScore = 0, mcqAnswered = 0;
+  var letters = ['A','B','C','D','E'];
+
+  MCQS.forEach(function(item, qi){
+    var box = document.createElement('div');
+    box.className = 'mcq';
+    var html = '<div class="mcq-q">QUESTION ' + (qi+1) + ' / ' + MCQS.length + '</div>';
+    html += '<div class="mcq-stem">' + item.q + '</div>';
+    item.opts.forEach(function(opt, oi){
+      html += '<label class="mcq-opt" data-oi="' + oi + '"><strong>' + letters[oi] + '.</strong> ' + opt + '</label>';
+    });
+    html += '<div class="mcq-exp"></div>';
+    box.innerHTML = html;
+    host.appendChild(box);
+
+    var opts = box.querySelectorAll('.mcq-opt');
+    var exp = box.querySelector('.mcq-exp');
+    var locked = false;
+    opts.forEach(function(label){
+      label.addEventListener('click', function(){
+        if(locked) return;
+        locked = true;
+        var oi = parseInt(label.getAttribute('data-oi'),10);
+        box.classList.add('answered');
+        var correct = item.correct;
+        if(oi === correct){
+          label.classList.add('picked-right');
+          mcqScore++;
+          addXP(25, null, 'Correct answer');
+        } else {
+          label.classList.add('picked-wrong');
+          opts[correct].classList.add('show-right');
+          showToast('❌ Correct: ' + letters[correct]);
+        }
+        exp.innerHTML = '<strong>' + (oi === correct ? '✅ Correct. ' : '📘 Explanation. ') + '</strong>' + item.exp;
+        mcqAnswered++;
+        mcqVal.textContent = mcqScore + ' / ' + MCQS.length;
+        if(mcqAnswered === MCQS.length){
+          var done = document.getElementById('mcqDone');
+          var summary = document.getElementById('mcqSummary');
+          done.style.display = 'block';
+          summary.textContent = 'You scored ' + mcqScore + ' / ' + MCQS.length + '. ' +
+            (mcqScore === MCQS.length ? 'Flawless — you never trust a resting ECG in an exercise-collapser. 🏆' :
+             mcqScore >= 6 ? 'Strong — review the misses and the contrast pairs in S6.' :
+             'Revisit S3, S5, S6 and S11 — the provoke-diagnose-treat logic is the whole case.');
+          if(mcqScore >= 7){ earnBadge('bdg-quiz'); addXP(50, 'quizace', 'Quiz Ace!'); }
+        }
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>

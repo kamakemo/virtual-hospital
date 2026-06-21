@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brugada Syndrome — Fever-Unmasked VF — Virtual Teaching Hospital</title>
+<!-- META
+id: c-brugada-014
+title: Brugada Syndrome — Fever-Unmasked VF
+hospital: cardiology
+department: cv-ep
+bednumber: 7
+chiefcomplaint: Nocturnal agonal breathing and an aborted VF arrest during a febrile illness
+system: Cardiology
+severity: critical
+tags: Brugada syndrome, Coved ST elevation, SCN5A, ICD, Quinidine, Fever
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --radius:16px;
+    --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  /* Internal scroll viewport. When this case is embedded the host app stretches
+     the iframe to full content height and the OUTER page scrolls, which would
+     let a sticky bar scroll away. We instead scroll inside this box (sized to
+     the visible window by JS) so the section tab bar stays pinned at the top.
+     Standalone, it falls back to the full viewport height. */
+  #caseScroll{height:100vh; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; scroll-padding-top:92px}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:36px 24px 80px; position:relative; overflow:hidden}
+  .hero::after{content:"📈"; position:absolute; right:-20px; top:-30px; font-size:220px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{max-width:1100px; margin:0 auto; position:relative; z-index:1}
+  .hero .crumbs{font-size:13px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:10px 0 6px; font-size:clamp(26px,4vw,40px); line-height:1.15}
+  .hero .sub{font-size:16px; opacity:.95}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; backdrop-filter:blur(4px)}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== LIVE ECG STRIP IN HERO ===== */
+  .ecg-banner{max-width:1100px; margin:14px auto 0; position:relative; z-index:1}
+  .ecg-banner svg{width:100%; height:64px; display:block; background:rgba(0,0,0,.18); border-radius:12px; border:1px solid rgba(255,255,255,.25)}
+  .ecg-trace{stroke:#86efac; stroke-width:2.4; fill:none; stroke-dasharray:1600; stroke-dashoffset:1600; animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{stroke-dashoffset:0}}
+
+  /* ===== VITALS STRIP ===== */
+  .vitals-strip{max-width:1100px; margin:-52px auto 0; padding:0 24px; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:11px; font-weight:700; letter-spacing:.6px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:21px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== HORIZONTAL SECTION SIDEBAR (fixed — always visible) ===== */
+  .topnav{position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.10)}
+  .topnav .rail{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; max-width:1180px; margin:0 auto; scrollbar-width:thin}
+  .navchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink2); font-size:11px; font-weight:700; text-decoration:none; min-width:78px; text-align:center; transition:all .18s; cursor:pointer}
+  .navchip .s-id{font-size:10px; letter-spacing:1px; color:#94a3b8}
+  .navchip .s-emoji{font-size:16px}
+  .navchip:hover{border-color:var(--rose); color:var(--rose); transform:translateY(-2px)}
+  .navchip.active{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; border-color:#b91c1c}
+  .navchip.active .s-id{color:#fecaca}
+  .navchip.visited:not(.active){border-color:var(--emerald-line); background:var(--emerald-soft)}
+
+  /* ===== DASHBOARD WIDGET ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:215px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10.5px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:760px){.dash{display:none}}
+
+  /* ===== MAIN / SECTIONS (tabbed: one section visible at a time) ===== */
+  main{max-width:1100px; margin:26px auto 80px; padding:0 24px}
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:26px; overflow:hidden}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16.5px; margin:26px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14.5px; margin:18px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:24px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15.5px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:14px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px; letter-spacing:.4px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14.5px}
+
+  /* ===== INTERACTIVE BITS ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:10px 18px; font-weight:700; font-size:14px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:22px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:15px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 15px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 15px; margin-top:12px; font-size:14px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim sliders */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:14px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:14px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Heart/circuit diagram */
+  .heart-fig{display:flex; gap:18px; flex-wrap:wrap; align-items:center; background:var(--slate-soft); border-radius:16px; padding:18px; margin:14px 0}
+  .heart-fig svg{flex:0 0 auto}
+  .heart-legend{flex:1; min-width:230px; font-size:13.5px}
+  .lg{display:flex; align-items:center; gap:8px; margin:5px 0}
+  .lg .sw{width:14px; height:14px; border-radius:4px; flex:0 0 auto}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Journey cards */
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:14px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:15px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:14px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13.5px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:22px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14.5px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:13px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .footer{max-width:1100px; margin:0 auto 36px; padding:0 24px; text-align:center; color:#94a3b8; font-size:12.5px}
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="caseScroll">
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · ⚡ EP Lab · 🛏️ Bed 7</div>
+    <h1>📈 Brugada Syndrome — "The Fever That Unmasks a Killer"</h1>
+    <div class="sub">🌡️ A 40-year-old man, structurally normal heart, found gasping in his sleep during a febrile illness — an aborted VF arrest. His V1–V2 carry a coved ST elevation that names the disease. No drug saves him long-term; only a box does.</div>
+    <div class="chips">
+      <span class="chip crit">🔴 CRITICAL</span>
+      <span class="chip">🩻 Type 1 Coved ST</span>
+      <span class="chip">🧬 SCN5A Channelopathy</span>
+      <span class="chip">🌡️ Fever-Unmasked VF</span>
+      <span class="chip">🎮 Interactive Case</span>
+      <span class="chip">🔌 ICD or Nothing</span>
+    </div>
+    <div class="ecg-banner" title="Type 1 Brugada coved ST rhythm strip">
+      <svg viewBox="0 0 800 64" preserveAspectRatio="none" aria-label="Brugada type 1 coved ST elevation strip">
+        <polyline class="ecg-trace" points="0,40 30,40 40,18 50,24 70,30 90,40 130,40 145,18 160,28 178,33 200,40 240,40 250,18 262,24 282,30 300,40 340,40 352,18 366,27 386,33 408,40 448,40 458,18 470,24 490,30 510,40 550,40 562,18 576,28 596,33 616,40 656,40 666,18 680,25 700,31 720,40 760,40 772,18 786,27 800,33"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== LIVE VITALS ===================== -->
+<div class="vitals-strip">
+  <div class="vitals-grid">
+    <div class="vital warn"><div class="v-label">💓 HR</div><div class="v-num">104</div></div>
+    <div class="vital warn"><div class="v-label">🩸 BP</div><div class="v-num">108/68</div></div>
+    <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">22</div></div>
+    <div class="vital warn"><div class="v-label">🫁 SpO₂</div><div class="v-num">93%</div></div>
+    <div class="vital alert"><div class="v-label">🌡️ Temp</div><div class="v-num">38.8°</div></div>
+    <div class="vital warn"><div class="v-label">🧠 GCS</div><div class="v-num">13</div></div>
+    <div class="vital alert"><div class="v-label">📈 V1–V2</div><div class="v-num">Type 1</div></div>
+    <div class="vital alert"><div class="v-label">💥 Rhythm</div><div class="v-num">ROSC</div></div>
+  </div>
+</div>
+
+<!-- ===================== HORIZONTAL SECTION SIDEBAR ===================== -->
+<nav class="topnav" id="topnav">
+  <div class="rail">
+    <a class="navchip" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navchip" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navchip" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navchip" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navchip" href="#s5"><span class="s-emoji">🎓</span><span>Consultant Round</span><span class="s-id">S5</span></a>
+    <a class="navchip" href="#s6"><span class="s-emoji">📖</span><span>Teaching Points</span><span class="s-id">S6</span></a>
+    <a class="navchip" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navchip" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navchip" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navchip" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navchip" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navchip" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navchip" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navchip" href="#s14"><span class="s-emoji">🔀</span><span>Differentials</span><span class="s-id">S14</span></a>
+    <a class="navchip" href="#s15"><span class="s-emoji">🗺️</span><span>Plan</span><span class="s-id">S15</span></a>
+    <a class="navchip" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navchip" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navchip" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navchip" href="#s19"><span class="s-emoji">🧠</span><span>MCQs</span><span class="s-id">S19</span></a>
+  </div>
+</nav>
+
+<!-- ===================== SCORE DASHBOARD ===================== -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections visited</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-vt">📈 Coved-Spotter</span>
+      <span class="badge" id="bdg-shock">🌡️ Fever Defused</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champion</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Ward Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running sims, taking the right path and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- S1 — PROFILE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s1">
+  <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+  <div class="section-content">
+    <div class="callout danger">
+      <b class="ct">🚨 YOU ARE HERE — 03:40, EP Lab admission bay, Bed 7</b>
+      Three hours ago his wife woke to a horrible noise — her husband <strong>gasping, agonal, unresponsive</strong> in bed during a feverish night. She started CPR; the paramedics found him in <strong>ventricular fibrillation</strong> and shocked him once into a perfusing rhythm. He is now drowsy, febrile at 38.8°C, and the 12-lead taped to his chest shows a <strong>coved ST elevation in V1–V2</strong> that you recognize instantly. He has a structurally normal heart. The disease has a name, and tonight it nearly took him.
+    </div>
+
+    <h3>👤 Patient Identity</h3>
+    <table class="tbl">
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>🧔 Name</td><td><strong>Mr. A.T.</strong></td></tr>
+      <tr><td>🎂 Age / Sex</td><td>40-year-old male</td></tr>
+      <tr><td>🆔 MRN</td><td>EP-20714</td></tr>
+      <tr><td>⚖️ Weight</td><td>76 kg</td></tr>
+      <tr><td>💼 Occupation</td><td>Restaurant owner, of South-East Asian heritage</td></tr>
+      <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+    </table>
+
+    <h3>📜 Past Medical History — the clues hide in the family tree</h3>
+    <ul>
+      <li>💪 <strong>Previously fit and well</strong>, no known structural heart disease, no prior MI. A genuinely <strong>normal heart on every imaging test</strong> — this is the paradox of Brugada: the danger is electrical, not structural.</li>
+      <li>😵 <strong>Two prior episodes of unexplained nocturnal syncope</strong> over the last two years, each attributed to "fainting" or "a vasovagal turn" and never investigated with a cardiac lens.</li>
+      <li>🌙 A history of <strong>restless, gasping, almost groaning breathing in sleep</strong> that his wife had noticed and worried about — the kind of nocturnal agonal pattern that, in this disease, can be self-terminating VF.</li>
+      <li>⚰️ <strong>Family history:</strong> a younger brother who "died in his sleep at 39" and a paternal uncle who "drowned" while perfectly healthy — both <strong>sudden, unexplained, nocturnal deaths</strong>. In SE-Asian communities this pattern carries folk names — <strong>SUNDS / "Bangungut" / Lai Tai</strong>.</li>
+      <li>🍶 Tonight he had a viral illness with fever, took paracetamol late, and (as he often did when unwell) had <strong>a large meal and a couple of beers</strong> before bed — vagotonic triggers that compound the fever.</li>
+      <li>🚭 Non-smoker. No hypertension, no diabetes, normal lipids. Nothing in the "usual" cardiac risk profile points at him — which is exactly the trap.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A young man with a structurally normal heart, nocturnal cardiac arrest and a coved ST elevation in V1–V2 is Brugada syndrome — and the only thing that reliably saves him long-term is a defibrillator."</div>
+
+    <h3>🧬 Why THIS patient? — a sodium channel, a fever, and the night</h3>
+    <p>Brugada syndrome is an inherited <strong>cardiac channelopathy</strong>, classically an autosomal-dominant loss-of-function mutation in <strong>SCN5A</strong>, the gene for the cardiac sodium channel (Naᵥ1.5). Reduced inward sodium current (<strong>↓I<sub>Na</sub></strong>) during early repolarization unmasks the transient outward potassium current (<strong>I<sub>to</sub></strong>) in the <strong>right-ventricular outflow-tract (RVOT) epicardium</strong>, where I<sub>to</sub> is densest. The epicardium repolarizes faster than the endocardium → a <strong>transmural voltage gradient</strong> → the coved ST elevation on the surface ECG, and the substrate for <strong>"phase 2 re-entry"</strong>: a closely-coupled premature beat that ignites <strong>polymorphic VT/VF</strong>. The substrate is genetic and lifelong; tonight three things tipped it over the edge — <strong>FEVER</strong> (sodium channels gate worse when hot), a <strong>vagotonic large meal/alcohol</strong>, and the <strong>nocturnal, high-vagal-tone</strong> small hours when Brugada events cluster.</p>
+
+    <div class="callout warn"><b class="ct">🔥 Triggers that unmask / worsen Brugada</b>
+    🌡️ <strong>Fever</strong> (the most actionable) · 💊 <strong>Sodium-channel blockers</strong> (class I antiarrhythmics, some anesthetics, tricyclics, cocaine) · 🍷 Vagotonic states — large meals, alcohol, the early hours of sleep · 🧪 Electrolyte shifts (hyper/hypokalemia, hypercalcemia) · 👨 Male sex &amp; SE-Asian ancestry (higher prevalence and risk).</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S2 — HANDOVER -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s2">
+  <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+  <div class="section-content">
+    <h3>📻 Paramedic / ED Handover — listen for the trap</h3>
+    <div class="callout info">
+      <b class="ct">🎙️ SBAR from the resus team (verbatim)</b>
+      <p><strong>S:</strong> "Mr. A.T., 40, found by his wife at home around 00:40 — agonal, gasping breathing in his sleep, then unresponsive. She started CPR. We arrived to a shockable rhythm — <strong>ventricular fibrillation</strong> — and one DC shock gave us ROSC."</p>
+      <p><strong>B:</strong> "Fit and well, no cardiac history, but a <strong>brother who died in his sleep at 39</strong>. He's been <strong>febrile with a viral illness</strong> for two days. Structurally normal heart as far as anyone knows."</p>
+      <p><strong>A:</strong> "ROSC for 40 minutes, GCS 13 and improving, temp 38.8°C. The 12-lead shows a <strong>coved ST elevation in V1–V2</strong>. The receiving night doctor on the phone said 'looks like an anterior STEMI — activate the cath lab and load him with a sodium-channel antiarrhythmic if he runs VT again.'"</p>
+      <p><strong>R:</strong> "Something didn't fit — no chest pain history, normal heart, that family story, and the ST shape looked <em>coved</em> not territorial. We held the antiarrhythmic and brought him straight to you in EP."</p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The phone diagnosis of 'anterior STEMI, give a class-I drug' is how a Brugada patient gets pushed into VF. A coved ST in V1–V2 in a structurally normal, febrile heart is Brugada until proven otherwise."</div>
+
+    <h3>🚩 Spot-the-Red-Flag — tap each feature that screams BRUGADA</h3>
+    <p>🎮 <em>Interactive: click every feature that points to Brugada syndrome (not an acute STEMI or benign variant). Each correct flag = +10 XP. Wrong picks cost you.</em></p>
+    <div id="flagGame">
+      <button class="btn ghost flag-btn" data-good="1">📈 Coved (type 1) ST elevation in V1–V2</button>
+      <button class="btn ghost flag-btn" data-good="1">🌡️ Fever during the illness</button>
+      <button class="btn ghost flag-btn" data-good="1">🌙 Nocturnal / aborted VF arrest</button>
+      <button class="btn ghost flag-btn" data-good="1">⚰️ Family history of sudden cardiac death</button>
+      <button class="btn ghost flag-btn" data-good="1">👨 Male, South-East Asian ancestry</button>
+      <button class="btn ghost flag-btn" data-good="1">🧬 SCN5A loss-of-function mutation</button>
+      <button class="btn ghost flag-btn" data-good="0">🫀 Territorial ST elevation with reciprocal change</button>
+      <button class="btn ghost flag-btn" data-good="0">🍵 He prefers green tea</button>
+    </div>
+    <p id="flagResult" style="font-weight:700"></p>
+
+    <h3>⏱️ Timeline so far</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">00:38</div>Wife wakes to agonal, groaning breathing; husband unresponsive. Bystander CPR started immediately.</div>
+      <div class="t-item"><div class="t-time">00:52</div>Paramedics: rhythm is <strong>ventricular fibrillation</strong>. One DC shock → ROSC. Temp 38.8°C.</div>
+      <div class="t-item"><div class="t-time">01:10</div>12-lead: <strong>coved ST elevation V1–V2</strong>. Phone advice "anterior STEMI, give a class-I antiarrhythmic." Team <strong>withholds the sodium-channel drug</strong> — 🏅 instinct worth its weight in gold.</div>
+      <div class="t-item"><div class="t-time">03:40</div>You take over in the EP admission bay. He is rousable, still febrile. The enemy now is the fever and any further VF — both can be defused.</div>
+    </div>
+
+    <div class="callout ok"><b class="ct">🏅 Praise where due</b>The team that held the class-I antiarrhythmic prevented a catastrophe. Sodium-channel blockers (the class I drugs, some anesthetics) <strong>accentuate</strong> the Brugada substrate — they are literally the provocation drugs used to <em>diagnose</em> the disease. Giving one to an unrecognized Brugada patient in VF storm can drive the rhythm rather than break it.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S3 — INITIAL ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s3">
+  <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+  <div class="section-content">
+    <h3>🅰️🅱️🅲️ Primary Survey — the post-arrest, febrile patient</h3>
+    <table class="tbl">
+      <tr><th>Step</th><th>Finding</th><th>What it means mechanistically</th></tr>
+      <tr><td>🅰️ Airway</td><td>Patent, own gag, rousable to voice, GCS 13.</td><td>Improving post-ROSC consciousness — encouraging, but a febrile Brugada heart can re-fibrillate at any moment; airway kit stays ready.</td></tr>
+      <tr><td>🅱️ Breathing</td><td>RR 22, SpO₂ 93% on 4 L, clear chest, no pulmonary edema.</td><td>The lungs are not the problem — this was a primary <strong>arrhythmic</strong> arrest in a structurally normal heart, not pump failure.</td></tr>
+      <tr><td>🅲️ Circulation</td><td>HR 104 sinus, <strong>BP 108/68</strong>, warm peripheries, normal heart sounds, no murmur, no signs of heart failure.</td><td>Haemodynamically he looks deceptively well between events — which is precisely the danger. The threat is the next VF, not the current output.</td></tr>
+      <tr><td>🅳 Disability</td><td>GCS 13, mildly confused, post-ictal-like after arrest, no focal deficit.</td><td>Cerebral effect of the arrest/hypoxia, recovering. Watch for re-arrest as consciousness fluctuates.</td></tr>
+      <tr><td>🅴 Exposure</td><td><strong>Temp 38.8°C</strong>, flushed, no rash, no chest scars. ECG dots and pads already on.</td><td>The fever is not incidental — it is the active <strong>trigger</strong> still in the room. Treating it is part of the resuscitation.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In a young arrest survivor with a normal heart, your eyes go to the right precordial leads and your hand goes to the thermometer — coved V1–V2 plus a fever is Brugada being provoked in front of you."</div>
+
+    <h3>🧭 The single most important question: is the SUBSTRATE still being provoked?</h3>
+    <p>Unlike a scar-related VT, the acute emergency here is not a single circuit to shock once — it is a <strong>genetically primed myocardium being inflamed by a trigger</strong>. The two pivotal questions are: (1) <strong>Is he still in / re-entering VF?</strong> If yes → <strong>defibrillate</strong>. (2) <strong>Is the trigger still active?</strong> The fever is — so <strong>aggressive antipyresis</strong> is genuine antiarrhythmic therapy. The definitive answer to "how do we stop him dying next month" is an <strong>ICD</strong>, but tonight's job is to defuse the fever, be ready to shock recurrent VF, and protect him from any provoking drug.</p>
+
+    <div class="callout danger"><b class="ct">⚡ The decision framework: DEFIBRILLATE recurrent VF · COOL the fever · PROTECT from class-I drugs</b>A perfusing post-ROSC Brugada patient does not need a "rate-control" or "rhythm" drug. He needs the fever brought down hard, the defibrillator at the bedside for recurrent VF, the Brugada "avoid" list enforced, and — for electrical storm — <strong>isoproterenol</strong> and <strong>quinidine</strong>, never a sodium-channel blocker.</div>
+
+    <!-- 🎬 BRANCHING SCENARIO ENGINE -->
+    <div class="scenario" id="scenarioBox">
+      <h3>🎬 Choose Your Path — "The First Hour After ROSC"</h3>
+      <div class="hud"><span>❤️ Stability: <b id="scStab">●●○○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 s</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+      <div class="scene-text" id="scText">He's rousable post-ROSC, BP 108/68, temp 38.8°C, sinus at 104. The coved ST in V1–V2 stares at you. The night doctor on the phone still wants a class-I antiarrhythmic "to stabilize the rhythm" and the cath lab "for the STEMI." What do you do FIRST?</div>
+      <div class="choices" id="scChoices"></div>
+      <div class="feedback" id="scFeedback"></div>
+      <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+    </div>
+
+    <div class="callout info"><b class="ct">🧮 If he tips into electrical storm</b>
+    If he starts running <em>repeated</em> VF/polymorphic VT, this becomes Brugada <strong>electrical storm</strong>: defibrillate each episode, infuse <strong>isoproterenol</strong> (a beta-agonist that augments the L-type calcium current and "fills in" the epicardial action-potential dome, flattening the ST elevation), and start oral <strong>quinidine</strong> (an I<sub>to</sub> blocker that attacks the mechanism itself). The one thing you must never reach for is a sodium-channel blocker — it is the provocation, not the cure.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S4 — RESIDENT REVIEW -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s4">
+  <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+  <div class="section-content">
+    <p><em>The cardiology/EP resident arrives at 03:48. Her reasoning, out loud:</em></p>
+
+    <h3>🧠 Pattern recognition first, then physiology</h3>
+    <p>"Young man. Structurally normal heart. Nocturnal VF arrest during a fever. Family story of sudden nocturnal death. And a <strong>coved</strong> ST elevation in V1–V2 — not the convex-territorial elevation of a STEMI, no reciprocal changes, no chest pain. This is <strong>type 1 Brugada</strong>, provoked by fever. The dangerous instinct is to label the ST elevation 'anterior STEMI' and reach for the cath lab and a class-I drug — the exact two moves that miss the diagnosis and can kill him."</p>
+
+    <h3>🎯 Immediate priorities (her actual order of operations)</h3>
+    <ol>
+      <li>🚫 <strong>Protect him from provoking drugs:</strong> NO class-I antiarrhythmics, no problem anesthetics, flag <strong>brugadadrugs.org</strong> at the bedside and on the chart.</li>
+      <li>🌡️ <strong>Aggressive fever control NOW:</strong> paracetamol, active cooling, treat the source. The fever is an active arrhythmic trigger — antipyresis is antiarrhythmic.</li>
+      <li>🔌 <strong>Defibrillator at the bedside, pads on,</strong> ready to shock recurrent VF instantly; continuous telemetry.</li>
+      <li>💉 <strong>For electrical storm:</strong> draw up <strong>isoproterenol</strong> and plan oral <strong>quinidine</strong> — the storm-specific therapy. Keep them in mind even before they're needed.</li>
+      <li>🧪 <strong>Confirm and characterize:</strong> high right-precordial leads (V1–V2 one–two intercostal spaces up) to capture the type 1 pattern; serial 12-leads as the fever falls; electrolytes; troponin (will be mildly up post-arrest, not a STEMI).</li>
+      <li>🛡️ <strong>Plan the only proven therapy:</strong> this is an <strong>aborted sudden cardiac death</strong> → a secondary-prevention <strong>ICD</strong> is the definitive answer, arranged this admission once he's stable.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Cool the fever first, keep the defibrillator within arm's reach second, and plan the ICD third — because no pill reliably stops Brugada, but a defibrillator catches what the pills can't."</div>
+
+    <h3>🤔 "But the ST elevation — shouldn't we just treat it as a STEMI?"</h3>
+    <p>"No. A STEMI gives <strong>territorial, convex ('tombstone') ST elevation with reciprocal depression and an evolving troponin/wall-motion story</strong>. Brugada gives a <strong>coved ST elevation confined to the right precordial leads</strong> in a structurally normal heart, often dynamic with fever, with no reciprocal change. Activating the cath lab here delays the real treatment and risks giving a sodium-channel-blocking sedative/antiarrhythmic. When the heart is normal and the ST is coved in V1–V2 with this story — it's Brugada."</p>
+
+    <div class="callout purple"><b class="ct">🧪 Resident's self-test (answer before reading on)</b>
+    Someone suggests loading IV procainamide "to suppress any further VT." Good idea in this patient?
+    <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+    <div class="reveal-hidden" id="rev1"><p><strong>No — it's exactly backwards.</strong> Procainamide is a class Ia <em>sodium-channel blocker</em>; it is one of the agents used to <strong>provoke</strong> the Brugada pattern in diagnostic testing. In a manifesting, febrile Brugada patient it accentuates the substrate and can precipitate VF, not suppress it. For Brugada arrhythmia the mechanism-targeted drugs are <strong>quinidine</strong> (I<sub>to</sub> blocker) and <strong>isoproterenol</strong> (for storm) — and the cornerstone is the <strong>ICD</strong> plus fever control.</p></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S5 — CONSULTANT ROUND -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s5">
+  <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round</h2></div>
+  <div class="section-content">
+    <p><em>The on-call consultant electrophysiologist, by phone at 03:55, then at the bedside:</em></p>
+
+    <h3>🗂️ Name the ECG pattern precisely — it changes the certainty</h3>
+    <div class="vs">
+      <div class="side a"><h4>🔴 Type 1 (coved) — this patient, DIAGNOSTIC</h4>
+        <ul><li><strong>Coved</strong> ST elevation ≥ 2 mm with a <strong>descending ST into a negative T wave</strong> in ≥ 1 right precordial lead (V1–V2)</li><li>Spontaneous type 1 (especially with symptoms) = the high-risk phenotype</li><li>Needs no provocation to call it Brugada</li><li>Aborted SCA / sustained VT → <strong>ICD</strong></li></ul></div>
+      <div class="side b"><h4>🔵 Type 2 (saddleback) — SUGGESTIVE, not diagnostic</h4>
+        <ul><li><strong>Saddleback</strong> ST elevation with a positive/biphasic T wave</li><li>Suggestive only — needs <strong>confirmation</strong> (high leads, a fever ECG, or a sodium-channel-blocker provocation test) to convert to a diagnostic type 1</li><li>Asymptomatic, drug-induced-only type 1 is a <strong>lower-risk</strong> group</li></ul></div>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Type 1 is coved and diagnostic; type 2 is saddleback and only suggestive. A coved ST in V1–V2 with syncope or an aborted arrest is the dangerous one — and it earns a defibrillator."</div>
+
+    <h3>🌀 What is "Brugada electrical storm" — and what defuses it?</h3>
+    <p>Electrical storm = <strong>≥ 3 episodes of VF / sustained VT in 24 hours</strong>. In Brugada the storm is mechanism-specific: the epicardial action-potential dome is lost and phase-2 re-entry fires repeatedly. The playbook is <strong>not</strong> the usual antiarrhythmic ladder — it is <strong>defibrillate each episode</strong>, <strong>isoproterenol infusion</strong> (restores the calcium current and the dome, normalizing the ST segment), <strong>aggressive fever control</strong>, and <strong>quinidine</strong> (blocks I<sub>to</sub>, the upstream culprit). Sodium-channel blockers are contraindicated. For truly refractory storm, <strong>epicardial RVOT substrate ablation</strong> can eliminate the abnormal substrate.</p>
+
+    <h3>🧭 Consultant's three commandments for the next hour</h3>
+    <ol>
+      <li>🌡️ "Treat the fever like a loaded gun. Every degree of temperature is more I<sub>to</sub>, more ST elevation, more VF risk. Antipyretics and cooling are <strong>first-line antiarrhythmic therapy</strong> in a febrile Brugada patient."</li>
+      <li>🔌 "He survived an arrest — that fact alone decides his future. Aborted SCA in Brugada is a <strong>Class I indication for an ICD</strong>. No drug substitutes for it; quinidine is an adjunct, not a replacement."</li>
+      <li>🚫 "Guard the chart. One reflex dose of a class-I antiarrhythmic, one wrong anesthetic agent, one missed fever — any of these can re-ignite VF. The whole team must know the <strong>brugadadrugs.org</strong> list."</li>
+    </ol>
+
+    <div class="callout danger"><b class="ct">☠️ The consultant's war memory (more in S13 M&amp;M)</b>"The last Brugada I lost was never diagnosed in life. A 38-year-old with two days of fever and a syncopal episode was sent home from a busy ED as 'a viral illness with a faint.' His V1–V2 — on an ECG nobody overlaid the right-precordial lens onto — showed a coved type 1 pattern. He died in his sleep that night in VF, his wife beside him. At the M&amp;M the strip was unmistakable. The disease was screaming in the right precordial leads; we just weren't listening."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S6 — TEACHING POINTS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s6">
+  <div class="sec-header"><span class="s-badge">S6</span><h2>📖 Teaching Points</h2></div>
+  <div class="section-content">
+    <h3>🔬 The mechanism — WHY a sodium channel makes VF (the WHY behind the WHY)</h3>
+    <ol>
+      <li>🧬 <strong>The genotype:</strong> a loss-of-function mutation (classically <strong>SCN5A</strong>, Naᵥ1.5) reduces the inward sodium current <strong>I<sub>Na</sub></strong> that drives phase 0 and braces the early action potential.</li>
+      <li>⚖️ <strong>The unmasked current:</strong> with weaker I<sub>Na</sub>, the transient outward potassium current <strong>I<sub>to</sub></strong> — densest in the <strong>RV outflow-tract epicardium</strong> — wins the tug-of-war and produces a deep "phase 1 notch," losing the action-potential <strong>dome</strong> in the epicardium while the endocardium keeps it.</li>
+      <li>📈 <strong>The transmural gradient = the ECG:</strong> epicardium repolarizes earlier than endocardium → a voltage gradient across the RVOT wall → the surface <strong>coved ST elevation in V1–V2</strong>.</li>
+      <li>🔁 <strong>Phase 2 re-entry:</strong> where the dome is lost in some epicardial regions but preserved in adjacent ones, the dome can <em>propagate</em> sideways into dome-less tissue and fire a very <strong>closely-coupled premature beat (R-on-T)</strong> — the spark for <strong>polymorphic VT / VF</strong>.</li>
+      <li>🌡️ <strong>Why fever ignites it:</strong> the mutant sodium channel gates even worse at higher temperatures — fever further <strong>reduces I<sub>Na</sub></strong>, deepening the notch, accentuating the coved ST, and tipping a stable substrate into VF. This is why a febrile night, not a treadmill, is when Brugada kills.</li>
+      <li>💥 <strong>Why it kills at night:</strong> events cluster in sleep and the early hours when <strong>vagal tone is high and heart rate slow</strong> — bradycardia and vagotonia further accentuate the substrate, so the "Bangungut"/SUNDS deaths happen in bed.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Brugada is a sodium channel that quits early, a potassium current that wins, and an epicardial dome that collapses — fever pushes it over, and only a defibrillator reliably catches the fall."</div>
+
+    <h3>⚖️ Contrast pair #1 — Brugada vs STEMI (the lethal mimic)</h3>
+    <div class="vs">
+      <div class="side a"><h4>📈 Brugada IS… (assume this in the right story)</h4><ul><li><strong>Coved</strong> ST elevation confined to <strong>V1–V2</strong> (right precordial)</li><li>Structurally <strong>normal heart</strong>, no chest pain</li><li><strong>No reciprocal</strong> ST depression; pattern often <strong>dynamic with fever</strong></li><li>Young patient, family history of sudden death, nocturnal arrest</li><li>Troponin only mildly raised (post-arrest), not an evolving infarct curve</li></ul></div>
+      <div class="side b"><h4>🫀 STEMI is NOT that…</h4><ul><li><strong>Territorial</strong>, convex ("tombstone") ST elevation following a coronary territory</li><li><strong>Reciprocal</strong> ST depression in opposite leads</li><li>Ischemic chest pain, evolving troponin and wall-motion abnormality</li><li>Older, atherosclerotic risk profile</li><li>Answer is reperfusion (PCI/lysis) — not relevant to Brugada</li></ul></div>
+    </div>
+    <p>😈 <strong>The trap:</strong> a tired team sees "ST elevation in V1–V2" and pattern-matches to "anterior STEMI." That sends the patient to the cath lab and — worse — toward sedatives/antiarrhythmics that <em>block sodium channels</em> and accentuate the very substrate. <strong>Coved, not convex; right precordial only, no reciprocal change; normal heart — read it as Brugada.</strong></p>
+
+    <h3>⚖️ Contrast pair #2 — Brugada vs ARVC (two RV diseases, different substrate)</h3>
+    <div class="vs">
+      <div class="side a"><h4>🧬 Brugada (tonight)</h4><ul><li><strong>Channelopathy</strong> — structurally normal RV</li><li>ECG: <strong>coved ST elevation V1–V2</strong>, fever-/drug-unmasked</li><li>Substrate: functional, in the <strong>RVOT epicardium</strong> (phase-2 re-entry)</li><li>Therapy: ICD, quinidine, fever control, avoid Na-channel blockers</li></ul></div>
+      <div class="side b"><h4>🫀 ARVC</h4><ul><li><strong>Cardiomyopathy</strong> — fibrofatty replacement of the RV myocardium</li><li>ECG: <strong>epsilon waves</strong>, T-wave inversion V1–V3, exercise-related VT (LBBB morphology)</li><li>Substrate: structural — seen on MRI/echo as a dilated, akinetic RV</li><li>Therapy: ICD, beta-blockers, exercise restriction, ablation</li></ul></div>
+    </div>
+    <p>💡 <em>Why it matters:</em> both are inherited RV diseases that cause sudden death, but one is electrical (Brugada — normal imaging) and one is structural (ARVC — abnormal RV on imaging). Imaging and the precise ECG pattern separate them and steer the lifestyle and drug advice.</p>
+
+    <!-- 🎮 INTERACTIVE SIM: body temperature / ST elevation -->
+    <div class="sim" id="kSim">
+      <h3 style="margin-top:0">🎮 Simulation — The Fever Dial: how body temperature tunes ST elevation &amp; VF risk in Brugada</h3>
+      <p style="font-size:13.5px">Drag the dial. Watch what rising temperature does to the sodium channel, the coved ST elevation, and the risk of VF. This is the single most actionable "invisible vital sign" in this case.</p>
+      <label for="kRange">🌡️ Body temperature: <b id="kVal">38.8</b> °C</label>
+      <input type="range" id="kRange" min="20" max="75" value="51">
+      <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+      <div class="readout bad" id="kReadout">Set the dial to explore.</div>
+      <p style="font-size:12.5px; margin-top:10px; color:var(--ink2)">🎯 Goal in a febrile Brugada patient: <strong>drive the temperature back toward 36.5–37.0 °C</strong> with antipyretics and cooling. Higher fever → more I<sub>to</sub>, deeper coved ST, higher VF risk. Antipyresis is antiarrhythmic therapy.</p>
+    </div>
+
+    <!-- 📚 EBM MODULE -->
+    <div class="ebm">
+      <h3>📚 Evidence-Based Medicine Corner</h3>
+      <table class="tbl">
+        <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2013 HRS/EHRA/APHRS Expert Consensus</td><td>Defined the diagnostic type 1 pattern; ICD recommended for aborted SCA or documented sustained VT; quinidine as adjunct / for non-ICD candidates.</td><td>The framework driving this whole case — type 1 + aborted arrest = ICD.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2022 ESC Ventricular Arrhythmia Guideline</td><td>ICD is the only therapy proven to prevent SCD in Brugada; reaffirms quinidine for recurrent VT/storm and ICD for survivors of cardiac arrest.</td><td>No drug replaces the ICD for the aborted-arrest survivor; quinidine reduces shocks.</td></tr>
+        <tr><td><span class="lvl">OBS</span> Fever &amp; Brugada registries</td><td>Fever is a well-documented trigger that unmasks the type 1 pattern and precipitates VF; check an ECG with every significant fever in known/suspected Brugada.</td><td>Counsel every patient: treat fever early and aggressively; get an ECG when febrile.</td></tr>
+        <tr><td><span class="lvl">OBS</span> Quinidine series (I<sub>to</sub> blockade)</td><td>Quinidine reduces VF/electrical storm and ICD shocks by blocking the transient outward current.</td><td>Mechanism-matched drug: for storm, recurrent shocks, or non-ICD candidates.</td></tr>
+        <tr><td><span class="lvl">OBS</span> Isoproterenol &amp; RVOT ablation</td><td>Isoproterenol terminates Brugada electrical storm; epicardial RVOT substrate ablation eliminates the abnormal substrate in refractory cases.</td><td>Storm ladder: defibrillate → isoproterenol + quinidine + fever control → ablation.</td></tr>
+      </table>
+    </div>
+
+    <!-- 🔬 ADVANCED TOPICS -->
+    <div class="callout purple">
+      <h3 style="margin-top:0">🔬 Fellowship Corner — Advanced Topics</h3>
+      <ul>
+        <li>🧬 <strong>Genetics beyond SCN5A:</strong> SCN5A explains only ~20–30% of cases; many other loci modulate the phenotype, inheritance is variable-penetrance autosomal dominant, and a negative gene test does not exclude the disease. Family cascade screening (ECG ± fever/drug challenge) matters as much as genotyping.</li>
+        <li>🧪 <strong>Provocation testing:</strong> a <strong>sodium-channel-blocker challenge</strong> (ajmaline, flecainide, procainamide) under continuous monitoring can convert a saddleback/borderline ECG to a diagnostic type 1 — done deliberately and cautiously, the mirror image of why these drugs are dangerous unsupervised.</li>
+        <li>📈 <strong>High right-precordial leads:</strong> placing V1–V2 one or two intercostal spaces higher increases sensitivity for the type 1 pattern by sitting closer to the RVOT.</li>
+        <li>🗺️ <strong>Epicardial substrate &amp; ablation:</strong> abnormal late, fractionated electrograms over the <strong>RVOT epicardium</strong> mark the substrate; epicardial ablation there can normalize the ECG and reduce VF — a substrate-modifying, not just episode-treating, therapy.</li>
+        <li>⚡ <strong>Risk stratification debates:</strong> the role of programmed electrical stimulation, the prognostic weight of spontaneous vs drug-induced type 1, syncope characterization, SCN5A status, and computed risk scores (e.g. Shanghai score) for the asymptomatic patient.</li>
+        <li>🔌 <strong>Device choice:</strong> the <strong>subcutaneous ICD (S-ICD)</strong> is attractive in young Brugada patients with no pacing need — but vet eligibility with S-ICD screening, as the dynamic right-precordial ECG can cause sensing issues.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S7 — ORDERS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s7">
+  <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+  <div class="section-content">
+    <h3>🖊️ The order set, written as you'd actually write it (03:50)</h3>
+    <ul>
+      <li>🚨 <strong>NO class-I antiarrhythmics (flecainide, procainamide, ajmaline), NO sodium-channel-blocking sedatives/anesthetics, NO tricyclics/cocaine</strong> — flag <strong>brugadadrugs.org</strong> on the chart and whiteboard.</li>
+      <li>🌡️ <strong>Aggressive fever control:</strong> paracetamol 1 g, active surface cooling, treat the infective source; target temperature back toward 36.5–37.0 °C. Recheck temperature and the V1–V2 ST segment frequently.</li>
+      <li>🔌 <strong>Defibrillator at the bedside, pads attached, in UNSYNCHRONIZED mode</strong> — Brugada arrhythmia is VF/polymorphic VT → defibrillate (not synchronized cardioversion) if it recurs.</li>
+      <li>💉 <strong>For electrical storm:</strong> <strong>isoproterenol infusion</strong> (titrate to suppress VF and normalize the ST) and <strong>oral quinidine</strong> loading per EP — the storm-specific, mechanism-matched therapy.</li>
+      <li>🫀 Serial 12-lead ECGs (with <strong>high right-precordial leads</strong>, V1–V2 one–two spaces up) as the fever falls; troponin (expect mild post-arrest rise, NOT a STEMI curve); U&amp;E, Ca²⁺, glucose.</li>
+      <li>📞 Refer EP urgently → plan a <strong>secondary-prevention ICD</strong> (aborted SCA = Class I indication) this admission once stable.</li>
+      <li>🫁 O₂ to SpO₂ ≥ 94%, continuous telemetry, post-arrest care bundle, NPO until stable, head-up nursing.</li>
+      <li>👨‍👩‍👦 <strong>First-degree family ECG screening</strong> arranged; counsel on fever, the drug-avoid list, and genetic referral.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In manifesting Brugada there are only three priorities: defibrillate any VF, cool the fever hard, and protect him from sodium-channel blockers — every other order exists to get him safely to an ICD."</div>
+
+    <!-- 🩺 PROCEDURE GUIDE 1 -->
+    <div class="checklist" id="ckCV">
+      <h3 style="margin-top:0">🩺 Procedure Guide — Managing a Manifesting / Febrile Brugada Patient — tick as you go</h3>
+      <label class="ck"><input type="checkbox"><span>📈 Confirm the pattern: <strong>coved type 1</strong> ST elevation in V1–V2, structurally normal heart — distinguish from STEMI (no reciprocal change, no territorial pattern)</span></label>
+      <label class="ck"><input type="checkbox"><span>🌡️ Start <strong>aggressive antipyresis &amp; cooling</strong> immediately and treat the infective source — fever is the active trigger</span></label>
+      <label class="ck"><input type="checkbox"><span>🚫 Enforce the <strong>brugadadrugs.org avoid-list</strong> — no class-I antiarrhythmics, no sodium-channel-blocking sedatives/anesthetics; flag on chart</span></label>
+      <label class="ck"><input type="checkbox"><span>🔌 Pads on, defibrillator at bedside in <strong>UNSYNCHRONIZED</strong> mode, continuous telemetry; ready to shock recurrent VF instantly</span></label>
+      <label class="ck"><input type="checkbox"><span>💉 Prepare <strong>isoproterenol</strong> and plan <strong>quinidine</strong> for electrical storm; do NOT reach for a sodium-channel blocker</span></label>
+      <label class="ck"><input type="checkbox"><span>🛡️ Refer EP and plan the <strong>secondary-prevention ICD</strong> — the only proven long-term therapy after an aborted arrest</span></label>
+      <label class="ck"><input type="checkbox"><span>👨‍👩‍👦 Arrange <strong>family ECG screening</strong> and genetic counseling; counsel the patient on fever and drug avoidance</span></label>
+      <div class="ck-progress" data-progress>0 / 7 complete</div>
+    </div>
+
+    <!-- 🩺 PROCEDURE GUIDE 2 -->
+    <div class="checklist" id="ckDefib">
+      <h3 style="margin-top:0">🩺 Procedure Guide — If he re-arrests in VF: ACLS Defibrillation (UNSYNCHRONIZED)</h3>
+      <p style="font-size:13px">⚠️ Brugada arrhythmia is VF / polymorphic VT → <strong>UNSYNCHRONIZED</strong> defibrillation. Do not waste time looking for an R wave to synchronize to.</p>
+      <label class="ck"><input type="checkbox"><span>🚫 Confirm no pulse → call arrest, start high-quality CPR (100–120/min, depth 5–6 cm, full recoil)</span></label>
+      <label class="ck"><input type="checkbox"><span>🔌 Defibrillator to <strong>UNSYNCHRONIZED</strong>, charge to max (200 J biphasic), clear, shock at minimal interruption to compressions</span></label>
+      <label class="ck"><input type="checkbox"><span>💉 Adrenaline 1 mg IV every 3–5 min; for recurrent VF reach for <strong>isoproterenol</strong> — NOT a sodium-channel blocker like procainamide</span></label>
+      <label class="ck"><input type="checkbox"><span>🌡️ Treat the reversible trigger — here above all the <strong>FEVER</strong> (cool aggressively) and any provoking drug just given</span></label>
+      <label class="ck"><input type="checkbox"><span>🔁 Rhythm/pulse check every 2 min; minimize hands-off time; rotate compressors</span></label>
+      <label class="ck"><input type="checkbox"><span>🫀 ROSC → post-arrest care, urgent EP, plan the ICD; consider quinidine ± RVOT ablation for ongoing storm</span></label>
+      <div class="ck-progress" data-progress>0 / 6 complete</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S8 — NURSING CARE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s8">
+  <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+  <div class="section-content">
+    <h3>🛏️ EP / CCU nursing priorities — minute by minute</h3>
+    <ul>
+      <li>📟 <strong>Continuous telemetry with the defibrillator at the bedside, pads attached, in UNSYNC (defib) mode.</strong> Brugada arrhythmia is VF — keep the machine charged-ready to shock.</li>
+      <li>🌡️ <strong>Own the temperature.</strong> Re-check it frequently, give antipyretics on time, apply active cooling — in Brugada the fever chart <em>is</em> an arrhythmia chart. Escalate every spike.</li>
+      <li>🛡️ <strong>Be the drug gatekeeper.</strong> Know the Brugada "avoid" list; question any class-I antiarrhythmic, certain anti-emetics/anesthetics, or tricyclics prescribed for this patient before they're given.</li>
+      <li>🩸 <strong>Frequent obs</strong> with the right-precordial 12-lead repeated as the fever falls; document each strip — the EP team uses the dynamic ST changes.</li>
+      <li>🧠 <strong>Neuro/consciousness checks</strong> — a patient who slumps may have re-arrested in VF; check the pulse and the monitor, don't assume a faint.</li>
+      <li>📋 <strong>Document the rhythm strip before/after any event</strong>, the temperature at the time, and any drug given — fever-linked ST changes are gold for diagnosis and counseling.</li>
+      <li>🔇 <strong>Calm, restful environment</strong> — but remember the paradox: Brugada events favor rest and the early hours, so vigilance must be highest overnight, not lowest.</li>
+      <li>👨‍👩‍👦 Support the family who performed the CPR (see S16); their bystander resuscitation likely saved his life, and they will need to learn the fever/drug rules too.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who drives the fever down and blocks the wrong drug from reaching this patient is doing half the antiarrhythmic work in the room."</div>
+    <div class="callout warn"><b class="ct">📢 Escalate IMMEDIATELY for</b>Loss of pulse (→ UNSYNC defibrillation + CPR) · recurrent VF/polymorphic VT (→ electrical-storm pathway: isoproterenol, quinidine) · a rising temperature despite antipyretics · deepening coved ST on the repeat ECG · any prescription on the Brugada avoid-list · falling consciousness.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S9 — INVESTIGATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s9">
+  <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+  <div class="section-content">
+    <h3>🧾 Results board (04:10, post-ROSC)</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>Result</th><th>Reference</th><th>Interpretation</th></tr>
+      <tr><td>Temperature</td><td class="hi">38.8 °C ↑</td><td>36.5–37.3</td><td>The trigger. Fever accentuates the coved ST and VF risk. Cool aggressively — this is antiarrhythmic, not just supportive.</td></tr>
+      <tr><td>Troponin I</td><td class="hi">0.09 ng/mL ↑</td><td>&lt; 0.04</td><td>Mildly raised post-arrest (CPR/defibrillation, demand) — <strong>not</strong> an evolving STEMI curve. Trend it: it should settle, unlike an infarct.</td></tr>
+      <tr><td>Potassium</td><td class="ok-v">4.2 mmol/L</td><td>3.5–5.0</td><td>Normal — important to confirm, as both hyper- and hypokalemia can modulate the Brugada ECG and arrhythmia risk.</td></tr>
+      <tr><td>Calcium / Magnesium</td><td class="ok-v">Normal</td><td>—</td><td>Excludes electrolyte mimics/modulators of the ST pattern.</td></tr>
+      <tr><td>CRP / WCC</td><td class="hi">Raised ↑</td><td>—</td><td>Confirms the febrile infective illness that provoked tonight's event — identify and treat the source.</td></tr>
+      <tr><td>Coronary angiography</td><td class="ok-v">Normal coronaries</td><td>—</td><td>No culprit lesion — confirms this was NOT a STEMI and the ST elevation is the Brugada pattern, not ischemia.</td></tr>
+      <tr><td>Genetic testing</td><td class="ok-v">SCN5A — pending</td><td>—</td><td>Confirms the channelopathy and enables family cascade screening; a negative result does not exclude the clinical diagnosis.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A mildly raised troponin and ST elevation in V1–V2 after an arrest is not automatically a STEMI — in a young, structurally normal, febrile heart with a coved ST, it's Brugada, and the cath film proves it by being clean."</div>
+
+    <div class="callout info"><b class="ct">🧠 Why the normal coronary angiogram is the clincher, not the contradiction</b>The phone diagnosis was "anterior STEMI." A normal angiogram with a mildly settling troponin and a <em>coved</em> (not territorial) ST elevation in a structurally normal heart with this family story re-frames everything: the ST elevation is the disease's signature, not an occlusion. Now the job is fever control, an ICD, and protecting him from provoking drugs — not reperfusion.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S10 — ECG / IMAGING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s10">
+  <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging</h2></div>
+  <div class="section-content">
+    <h3>🫀 The presenting ECG — read the right precordial leads like a detective</h3>
+    <div class="ecg-fig">
+      <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Brugada type 1 coved ST elevation in V1 and V2 with a saddleback comparison">
+        <rect width="820" height="150" fill="#0b1220"/>
+        <g stroke="#1e3a5f" stroke-width="1">
+          <line x1="0" y1="30" x2="820" y2="30"/><line x1="0" y1="60" x2="820" y2="60"/>
+          <line x1="0" y1="90" x2="820" y2="90"/><line x1="0" y1="120" x2="820" y2="120"/>
+        </g>
+        <polyline fill="none" stroke="#86efac" stroke-width="2.4" points="0,95 60,95 80,40 96,55 130,72 175,98 210,95 270,95 290,38 306,52 340,70 385,100 420,95 480,95 500,40 516,55 552,73 598,99 632,95 690,95 712,55 726,60 742,55 770,92 800,95 820,95"/>
+        <text x="80" y="26" fill="#fca5a5" font-size="12" font-weight="700">↓ V1: coved (type 1)</text>
+        <text x="500" y="26" fill="#fca5a5" font-size="12" font-weight="700">↓ V2: coved (type 1)</text>
+        <text x="690" y="46" fill="#fcd34d" font-size="12" font-weight="700">saddleback (type 2)</text>
+      </svg>
+      <div class="ecg-cap">Right precordial leads. <span style="color:#fca5a5">V1 and V2</span> show <strong>coved</strong> ST elevation ≥ 2 mm descending into a negative T wave — the <strong>type 1</strong>, diagnostic pattern. For contrast, a <span style="color:#fcd34d">saddleback (type 2)</span> shape is shown — only suggestive, needing confirmation. No reciprocal change, structurally normal heart.</div>
+    </div>
+
+    <h3>🔎 The Brugada ECG toolkit (memorize the high-yield ones)</h3>
+    <table class="tbl">
+      <tr><th>Feature</th><th>Why it means Brugada (not STEMI / benign variant)</th></tr>
+      <tr><td>📈 <strong>Coved type 1 ST elevation</strong></td><td>≥ 2 mm in ≥ 1 right precordial lead (V1–V2), descending into a <strong>negative T wave</strong> — diagnostic for Brugada; no provocation needed.</td></tr>
+      <tr><td>🪑 <strong>Saddleback type 2</strong></td><td>ST elevation with a positive/biphasic T — <strong>suggestive only</strong>; confirm with high leads, a fever ECG, or a sodium-channel-blocker challenge.</td></tr>
+      <tr><td>📍 <strong>Right-precordial localization</strong></td><td>Changes confined to V1–V2 (and high leads V1–V2 one–two spaces up), reflecting the RVOT epicardial substrate — not a coronary territory.</td></tr>
+      <tr><td>🚫 <strong>No reciprocal ST depression</strong></td><td>Unlike STEMI; the Brugada pattern is a primary repolarization signature, not a regional ischemic injury current.</td></tr>
+      <tr><td>🌡️ <strong>Dynamic with fever / vagal tone</strong></td><td>The ST elevation deepens with fever and bradycardia/vagotonia and may flatten as the fever settles — a moving target unlike a fixed infarct.</td></tr>
+      <tr><td>🧬 <strong>Normal structural heart</strong></td><td>Normal echo/MRI distinguishes it from STEMI (wall-motion abnormality) and ARVC (fibrofatty, dilated RV).</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Coved and descending into a negative T = type 1 = Brugada, diagnostic. Saddleback = type 2 = suggestive, confirm it. And put V1–V2 a space or two higher when you suspect it — the RVOT is closer there."</div>
+
+    <h3>🫀 Imaging &amp; structural workup</h3>
+    <ul>
+      <li>🩻 <strong>Echocardiogram:</strong> structurally <strong>normal heart</strong> — normal biventricular size and function, no wall-motion abnormality, normal RV. The normal heart is part of the diagnosis.</li>
+      <li>🧲 <strong>Cardiac MRI:</strong> excludes ARVC (no fibrofatty RV, no RV dilatation/aneurysm) and other structural mimics — reinforcing that this is an <strong>electrical</strong>, not structural, disease.</li>
+      <li>📈 <strong>Repeat / high-lead ECGs as the fever settles:</strong> document how dynamic the ST elevation is; capture the diagnostic type 1 at peak fever and its relative normalization when afebrile.</li>
+    </ul>
+
+    <div class="callout warn"><b class="ct">⚠️ The ECG's favorite lie in Brugada</b>"ST elevation in V1–V2, so it's an anterior STEMI — to the cath lab and load an antiarrhythmic." In a young, painless, structurally normal, febrile patient with a <strong>coved</strong> ST and no reciprocal change, that misread sends him toward reperfusion he doesn't need and a sodium-channel-blocking drug that can kill him. Read the <em>shape</em> and the <em>story</em>, not just the lead.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S11 — MEDICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s11">
+  <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+  <div class="section-content">
+    <h3>💉 Acute &amp; long-term drugs — what, why, and the traps</h3>
+    <table class="tbl">
+      <tr><th>Drug / Therapy</th><th>Role</th><th>Mechanism / caution</th></tr>
+      <tr><td><strong>Antipyretics + cooling (paracetamol)</strong></td><td>First-line "antiarrhythmic" in febrile Brugada</td><td>Removes the active trigger. Drive temperature toward normal; recheck the V1–V2 ST as it falls. Treat the infective source.</td></tr>
+      <tr><td><strong>Quinidine (oral)</strong></td><td><strong>I<sub>to</sub> blocker</strong> — reduces VF/electrical storm and ICD shocks; adjunct or for non-ICD candidates</td><td>Attacks the mechanism (restores the epicardial dome). GI side effects, QT effects, drug interactions — EP-supervised.</td></tr>
+      <tr><td><strong>Isoproterenol (IV)</strong></td><td>Acute <strong>electrical storm</strong> therapy</td><td>Beta-agonist augments L-type Ca²⁺ current → "fills in" the action-potential dome → normalizes ST, suppresses VF. Titrate; watch HR/ischemia.</td></tr>
+      <tr><td><strong>ICD</strong></td><td><strong>The only proven therapy</strong> to prevent SCD; Class I after aborted SCA / sustained VT</td><td>No drug substitutes for it in the aborted-arrest survivor. Consider S-ICD in young patients with no pacing need (screen eligibility).</td></tr>
+      <tr><td><strong>Epicardial RVOT ablation</strong></td><td>Substrate modification for <strong>refractory</strong> storm / frequent shocks</td><td>Targets abnormal late epicardial electrograms over the RVOT; can normalize the ECG. Specialist procedure.</td></tr>
+      <tr><td><strong>❌ Class-I antiarrhythmics (flecainide, procainamide, ajmaline)</strong></td><td><strong>AVOID</strong> therapeutically — these are diagnostic <em>provocation</em> agents</td><td>Sodium-channel blockade accentuates the substrate and can precipitate VF. The opposite of treatment.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In Brugada storm, reach for isoproterenol and quinidine, never a sodium-channel blocker — and remember that no drug replaces the defibrillator that catches the rhythm you can't."</div>
+
+    <div class="callout danger"><b class="ct">🚫 The Brugada 'never' list (brugadadrugs.org)</b>❌ Class I antiarrhythmics (flecainide, procainamide, ajmaline, propafenone) · ❌ certain anesthetic/sedative agents (e.g. propofol in high/prolonged doses, bupivacaine) · ❌ tricyclic/some other antidepressants · ❌ cocaine and excess alcohol · ❌ ignoring a fever. The safest "drug" when a febrile Brugada patient destabilizes is <strong>defibrillation, cooling, isoproterenol and quinidine</strong> — and an <strong>ICD</strong> for the long run.</div>
+
+    <h3>🏠 Long-term, disease-modifying strategy (this admission and for life)</h3>
+    <ul>
+      <li>🔌 <strong>Secondary-prevention ICD</strong> — he is an aborted SCA survivor; this is the cornerstone, a Class I indication.</li>
+      <li>💊 <strong>Quinidine</strong> as adjunct to reduce shocks/storm, or as the option for those who cannot/again decline an ICD.</li>
+      <li>🌡️ <strong>Lifelong fever discipline:</strong> treat every fever early and aggressively, and check an ECG with any significant fever.</li>
+      <li>📵 <strong>Drug avoidance:</strong> carry the brugadadrugs.org list; tell every future anesthetist, dentist and prescriber.</li>
+      <li>👨‍👩‍👦 <strong>Family screening &amp; genetic counseling</strong> — first-degree relatives need ECGs (± provocation) and the same fever/drug rules.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S12 — MONITORING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s12">
+  <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+  <div class="section-content">
+    <h3>📡 What to watch and why</h3>
+    <ul>
+      <li>📈 <strong>Continuous telemetry</strong> with the defibrillator at the bedside (UNSYNC/defib mode) until arrhythmia-free and afebrile; print strips of any ectopy or polymorphic runs.</li>
+      <li>🌡️ <strong>Temperature trend</strong> — the most modifiable arrhythmia driver here. Treat aggressively and watch the V1–V2 ST segment track with it.</li>
+      <li>📈 <strong>Serial right-precordial 12-leads (with high V1–V2)</strong> — document how the coved type 1 pattern deepens with fever and settles with antipyresis.</li>
+      <li>🫀 <strong>Serial troponin</strong> — expect a small post-arrest rise that <em>settles</em> (demand/CPR), confirming this is not an evolving infarct.</li>
+      <li>🧪 <strong>Electrolytes (K⁺, Ca²⁺)</strong> — keep them normal; both extremes modulate the Brugada ECG and arrhythmia risk.</li>
+      <li>💉 If isoproterenol is running for storm: monitor HR, BP and for ischemia; titrate to ST normalization and VF suppression.</li>
+      <li>🔋 After ICD implant: monitor for appropriate vs inappropriate detections/shocks; the dynamic right-precordial ECG can challenge S-ICD sensing — verify programming.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After you stabilize a Brugada patient, the monitor's two most important readings are the temperature and the shape of V1–V2 — keep one low and the other will follow."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S13 — COMPLICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s13">
+  <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+  <div class="section-content">
+    <h3>💀 What can go wrong — and the mechanism</h3>
+    <ul>
+      <li>⚡ <strong>Recurrent VF / sudden cardiac death</strong> — the great fear; the genetic substrate plus an active trigger (fever, a provoking drug) can re-fibrillate at any moment. Treatment is UNSYNC defibrillation + trigger removal.</li>
+      <li>🌀 <strong>Electrical storm</strong> (≥ 3 VF/VT episodes/24 h) — phase-2 re-entry firing repeatedly; needs isoproterenol, quinidine, fever control, and sometimes RVOT ablation.</li>
+      <li>🧠 <strong>Anoxic brain injury</strong> — from the arrest itself if resuscitation was delayed; bystander CPR (as here) is what preserves the brain.</li>
+      <li>💊 <strong>Iatrogenic provocation</strong> — a class-I antiarrhythmic, the wrong anesthetic, or an untreated fever can <em>cause</em> the next VF. The therapy list and the fever chart are themselves safety devices.</li>
+      <li>🔌 <strong>ICD-related issues</strong> — inappropriate shocks (the dynamic right-precordial ECG can confuse S-ICD sensing), lead/device complications, and the psychological burden of living with shocks.</li>
+      <li>⚰️ <strong>Undiagnosed at-risk relatives</strong> — a "complication" of missing the diagnosis is the next family member who dies in their sleep, unscreened.</li>
+    </ul>
+
+    <!-- 🎭 M&M CONFERENCE MODULE -->
+    <div class="mm">
+      <h3>🎭 Morbidity &amp; Mortality Conference — "The Fever Sent Home"</h3>
+      <div class="mm-case">
+        <strong>The case:</strong> A 38-year-old man came to a busy ED at 23:00 with two days of fever and a single syncopal episode while standing. He felt better on arrival, vitals near normal, and a junior team labelled it "a viral illness with a vasovagal faint." His ECG was filed as "non-specific anterior changes." He was discharged with paracetamol advice. <strong>That night he died in his sleep in ventricular fibrillation</strong>, his wife beside him. At the M&amp;M the filed ECG, viewed through the right-precordial lens, showed an unmistakable <strong>coved type 1 Brugada pattern in V1–V2</strong> — accentuated by his fever. A separate near-miss the same month: an unrecognized Brugada patient given a <strong>class-I antiarrhythmic / a sodium-channel-blocking anesthetic</strong> who promptly went into VF on the table.
+      </div>
+      <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+      <div class="swiss">
+        <div class="hole"><b>🧠 ANCHORING</b>"Young + febrile + faint = viral/vasovagal" — syncope in this setting can be aborted VF.</div>
+        <div class="hole"><b>📈 ECG NOT READ</b>A coved type 1 pattern in V1–V2 was on the strip and filed as "non-specific."</div>
+        <div class="hole"><b>🌡️ FEVER UNDERRATED</b>The fever was the active trigger — sent home untreated and unmonitored.</div>
+        <div class="hole"><b>💊 LETHAL DRUG</b>A class-I/sodium-channel-blocking agent precipitated VF in the near-miss case.</div>
+        <div class="hole"><b>👨‍👩‍👦 FAMILY MISSED</b>No one asked about sudden nocturnal deaths in the family.</div>
+      </div>
+      <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> apply the universal rule — <em>a coved ST in V1–V2 with syncope and fever is Brugada</em>; treat the fever aggressively and admit/monitor; never give sodium-channel blockers; ask about sudden nocturnal deaths; refer for an ICD after an aborted arrest. <strong>This is exactly why your team held the antiarrhythmic and cooled the fever tonight.</strong></p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Just a viral faint' is the line written on the chart of patients who then die of Brugada in their sleep. A febrile syncope with a coved V1–V2 is a cardiac emergency, not a discharge."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S14 — DIFFERENTIALS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s14">
+  <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials</h2></div>
+  <div class="section-content">
+    <h3>🧩 The "ST elevation in V1–V2 / young arrest" differential</h3>
+    <table class="tbl">
+      <tr><th>Diagnosis</th><th>Clues</th><th>Why it matters</th></tr>
+      <tr><td>🧬 <strong>Brugada syndrome</strong> (this patient)</td><td>Coved type 1 ST in V1–V2, structurally normal heart, fever/nocturnal, family history of SCD, SCN5A</td><td>Default in the right story; ICD is the only proven therapy. Avoid sodium-channel blockers.</td></tr>
+      <tr><td>🫀 <strong>Anterior STEMI</strong></td><td>Ischemic chest pain, <strong>territorial</strong> convex ST elevation with reciprocal change, evolving troponin/wall-motion, culprit on angiography</td><td>The lethal mimic — sends you to reperfusion. A normal angiogram and coved (not territorial) ST re-frame it as Brugada.</td></tr>
+      <tr><td>📈 <strong>Benign early repolarization / RBBB</strong></td><td>J-point elevation, concave ST, typical RBBB template, asymptomatic, no high-risk family story</td><td>Common over-read; lacks the coved descent into a negative T and the clinical risk profile of Brugada.</td></tr>
+      <tr><td>🫀 <strong>ARVC</strong></td><td><strong>Epsilon waves</strong>, T-inversion V1–V3, exercise-related VT, <strong>abnormal RV on imaging</strong></td><td>Other inherited RV disease — but structural; imaging separates it from Brugada's normal heart.</td></tr>
+      <tr><td>🧪 <strong>Brugada phenocopy (metabolic/toxic)</strong></td><td>Hyperkalemia, sodium-channel-blocker toxicity, hypothermia, RV ischemia mimicking the pattern</td><td>Correct the cause and the pattern resolves — a true Brugada pattern persists/recurs with triggers.</td></tr>
+      <tr><td>🌡️ <strong>Other channelopathies (LQTS, CPVT)</strong></td><td>Long QT (Torsades) or exercise/emotion-induced bidirectional VT (CPVT) — different ECG and triggers</td><td>All cause young SCD but have distinct ECGs and therapies; the coved V1–V2 points specifically to Brugada.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"COVED ST in V1–V2, normal heart, febrile/nocturnal → think Brugada. TERRITORIAL ST with reciprocal change and pain → think STEMI (and keep sodium-channel blockers away from the Brugada patient)."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S15 — PLAN -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s15">
+  <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan</h2></div>
+  <div class="section-content">
+    <h3>🧭 Tonight → this week → for life</h3>
+    <ol>
+      <li>🌡️ <strong>Tonight (done):</strong> aggressive fever control toward normal; defibrillator at bedside in defib mode; class-I antiarrhythmics and other avoid-list drugs banned on the chart; post-arrest care; EP referral.</li>
+      <li>🫀 <strong>Confirm &amp; characterize:</strong> normal coronary angiography (excludes STEMI), normal echo/MRI (excludes ARVC), serial high-lead ECGs documenting the dynamic type 1 pattern, SCN5A genetics.</li>
+      <li>🔌 <strong>Secondary-prevention ICD</strong> — now a Class I indication after an aborted VF arrest; the only therapy proven to prevent SCD. Discuss S-ICD vs transvenous.</li>
+      <li>💊 <strong>Quinidine</strong> considered as adjunct to reduce shocks/storm; isoproterenol kept in reserve for any acute storm.</li>
+      <li>🌡️ <strong>Lifelong fever &amp; drug discipline:</strong> treat fever early, ECG with significant fever, carry and share the brugadadrugs.org avoid-list.</li>
+      <li>👨‍👩‍👦 <strong>Family cascade screening &amp; genetic counseling</strong> — ECGs (± provocation) for first-degree relatives, plus education on fever/drug rules and what to do if a relative collapses.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Cooling treats tonight; the ICD treats the disease; the avoid-list and family screening treat the future. Send him home with all four, or the next fever finds him unprotected."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S16 — PROGRESS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s16">
+  <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+  <div class="section-content">
+    <h3>📅 Course in EP / CCU</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Night 1, 04:30</div>Temperature brought to 37.4 °C with antipyretics and cooling; the coved ST in V1–V2 visibly flattens on the repeat 12-lead. No further VF overnight.</div>
+      <div class="t-item"><div class="t-time">Day 1</div>Coronary angiography normal; troponin settles — confirms this was Brugada, not a STEMI. Echo normal heart. Brugada avoid-list embedded in the chart.</div>
+      <div class="t-item"><div class="t-time">Day 2</div>One brief, self-terminating run of polymorphic VT during a fever spike; defibrillator was at the bedside, fever re-treated aggressively, no shock needed. Quinidine started.</div>
+      <div class="t-item"><div class="t-time">Day 3</div>Cardiac MRI excludes ARVC. SCN5A mutation confirmed; genetics counseling arranged for the family.</div>
+      <div class="t-item"><div class="t-time">Day 4</div>Secondary-prevention <strong>ICD implanted</strong> after a long, honest conversation with the patient and his wife. Afebrile, arrhythmia-free.</div>
+      <div class="t-item"><div class="t-time">Day 6</div>Stable, mobilizing, ICD checked, family ECG screening booked. Ready for discharge with a fever/drug plan.</div>
+    </div>
+
+    <!-- 👨‍👩‍👦 FAMILY & PATIENT JOURNEY MODULE -->
+    <h3>👨‍👩‍👦 Family &amp; Patient Journey</h3>
+    <div class="journey">
+      <div class="j-card"><div class="j-who">🧔 The patient — Mr. A.T.</div><p>"My brother died in his sleep and nobody knew why. I always thought my night-time gasping was just bad dreams. Now I know it had a name — and that a fever could have killed me. The box in my chest is the safety net I didn't know I needed."</p></div>
+      <div class="j-card"><div class="j-who">👩 His wife</div><p>"I woke to that awful sound and just started compressions like the TV course taught me. They told me afterward that those minutes were what kept his brain alive. The hardest part now is learning which fevers and which medicines to fear."</p></div>
+      <div class="j-card"><div class="j-who">👩‍⚕️ The bedside nurse</div><p>"My job was the defibrillator, the thermometer and the truth — driving the fever down and refusing the wrong drug. Sometimes good care is the medicine you <em>don't</em> give and the temperature you won't let rise."</p></div>
+      <div class="j-card"><div class="j-who">🎓 The team's reflection</div><p>"This wasn't a clever diagnosis — it was a disciplined one. We read the <em>shape</em> of V1–V2, believed the family story, treated the fever, and let the ICD do what no pill can."</p></div>
+    </div>
+
+    <div class="callout pink"><b class="ct">💗 The human thread</b>An ICD in a 40-year-old is a lifelong companion that may one day deliver a shock that saves his life in his own bed. But the deeper thread runs through the whole family tree: a brother and an uncle already lost to the same disease, and children who may carry the same gene. Screening and counseling the family is as much treatment as the device — it may catch the next person before their first fever.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S17 — DISCHARGE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s17">
+  <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+  <div class="section-content">
+    <h3>📋 Discharge plan &amp; safety net</h3>
+    <ul>
+      <li>💊 <strong>Medications:</strong> quinidine if started by EP (with a clear plan and side-effect counseling); a written list of <strong>drugs to avoid</strong> (brugadadrugs.org) to show every future prescriber, dentist and anesthetist.</li>
+      <li>🔌 <strong>ICD in situ:</strong> wound care, device ID card, avoid strong magnetic fields, device-clinic follow-up; clear advice on what a shock feels like and what to do (one shock + feeling well = urgent review; multiple shocks = emergency).</li>
+      <li>🌡️ <strong>Fever protocol:</strong> treat any fever early and aggressively with antipyretics, and seek an ECG/medical review for any significant fever — this is the single most important self-management rule.</li>
+      <li>🍷 <strong>Lifestyle:</strong> avoid excess alcohol, cocaine, and very large heavy meals at night; recognize these as vagotonic triggers.</li>
+      <li>🚩 <strong>Red flags → call emergency services:</strong> syncope/near-syncope, palpitations with dizziness, an ICD shock, and — for the family — any witnessed collapse or agonal night-time breathing (start CPR, call for help).</li>
+      <li>👨‍👩‍👦 <strong>Family &amp; genetics:</strong> first-degree relatives referred for ECG (± provocation) and genetic counseling; CPR/AED training offered to the household.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Discharge after aborted Brugada arrest is not 'shock worked, go home' — it is a defibrillator, an avoid-drug card, a fever plan, and a whole family booked for screening."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S18 — CLINICAL PEARLS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s18">
+  <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+  <div class="section-content">
+    <div class="pearl-grid">
+      <div class="pearl"><b>📈 Coved = Brugada</b>A coved (type 1) ST elevation in V1–V2 with syncope or arrest is Brugada — and only a defibrillator reliably saves him long-term.</div>
+      <div class="pearl"><b>🌡️ Fever unmasks it</b>Fever reduces I<sub>Na</sub> and deepens the pattern. Treat every fever like a threat and get an ECG when febrile.</div>
+      <div class="pearl"><b>🔌 ICD is the only proven therapy</b>For aborted SCA or documented sustained VT, the ICD is Class I — no drug substitutes for it.</div>
+      <div class="pearl"><b>💊 Quinidine + isoproterenol for storm</b>Quinidine (I<sub>to</sub> blocker) and isoproterenol calm Brugada electrical storm. Never a sodium-channel blocker.</div>
+      <div class="pearl"><b>🚫 Avoid the avoid-list</b>Class-I antiarrhythmics, certain anesthetics, tricyclics, cocaine accentuate the substrate. Carry brugadadrugs.org.</div>
+      <div class="pearl"><b>🧬 SCN5A / ↓I<sub>Na</sub> → I<sub>to</sub> wins</b>Loss-of-function sodium channel unmasks I<sub>to</sub> in the RVOT epicardium → lost dome → phase-2 re-entry → VF.</div>
+      <div class="pearl"><b>1️⃣ Type 1 vs 2️⃣ Type 2</b>Type 1 = coved, diagnostic. Type 2 = saddleback, suggestive — confirm with high leads, fever, or provocation.</div>
+      <div class="pearl"><b>🫀 Coved, not convex</b>Brugada is coved, right-precordial, no reciprocal change, normal heart — STEMI is territorial, convex, with reciprocal change.</div>
+      <div class="pearl"><b>🧬 Brugada vs ARVC</b>Both inherited RV diseases; Brugada has a normal heart, ARVC has fibrofatty RV on imaging and epsilon waves.</div>
+      <div class="pearl"><b>📈 High right-precordial leads</b>Place V1–V2 one or two intercostal spaces higher to unmask the type 1 pattern — closer to the RVOT.</div>
+      <div class="pearl"><b>⚖️ Risk stratify</b>Spontaneous type 1 + syncope/aborted arrest = HIGH risk. Drug-induced-only type 1 and asymptomatic = lower risk.</div>
+      <div class="pearl"><b>👨‍👩‍👦 Screen the family</b>Inherited disease — ECG (± provocation) and genetic counseling for first-degree relatives can prevent the next nocturnal death.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S19 — MCQs / ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s19">
+  <div class="sec-header"><span class="s-badge">S19</span><h2>🧠 MCQs / Assessment</h2></div>
+  <div class="section-content">
+    <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP and feed your dashboard. Each shows a full explanation.</em></p>
+    <div id="mcqHost"></div>
+    <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · Case c-brugada-014 — Brugada Syndrome — Fever-Unmasked VF<br>
+  ⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."
+</div>
+
+</div><!-- /#caseScroll -->
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ XP / DASHBOARD CORE ============ */
+  var XP = 0, XP_MAX = 1200;
+  var awarded = {}; // dedupe one-time awards by key
+  var xpVal = document.getElementById('xpVal');
+  var xpFill = document.getElementById('xpFill');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+  }
+  function addXP(amount, key, label){
+    if(key){ if(awarded[key]) return; awarded[key] = true; }
+    XP += amount;
+    if(XP > XP_MAX) XP = XP_MAX;
+    xpVal.textContent = XP;
+    xpFill.style.width = Math.min(100, Math.round(XP / XP_MAX * 100)) + '%';
+    showToast('+' + amount + ' XP' + (label ? ' · ' + label : ''));
+  }
+  function earnBadge(id){
+    var b = document.getElementById(id);
+    if(b && !b.classList.contains('earned')){ b.classList.add('earned'); }
+  }
+
+  /* Dashboard minimize */
+  var dash = document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){
+    dash.classList.toggle('collapsed');
+    this.textContent = dash.classList.contains('collapsed') ? '+' : '–';
+  });
+
+  /* ============ INTERNAL SCROLL SIZING ============ */
+  /* Size the scroll box to the visible window so the sticky tab bar stays in
+     view. When embedded (srcDoc iframe, same-origin), the host page stretches
+     the iframe to full content height and scrolls the OUTER page — so we size
+     this box from the parent window's height minus whatever app chrome sits
+     above the iframe, and scroll internally instead. Standalone → 100vh. */
+  var caseScroll = document.getElementById('caseScroll');
+  var topnav = document.getElementById('topnav');
+  /* The tab bar is position:fixed, so it's out of flow — reserve space at the
+     top of the scroll content (and offset anchor jumps) by its real height. */
+  function setNavOffset(){
+    var navH = topnav ? topnav.offsetHeight : 70;
+    caseScroll.style.paddingTop = navH + 'px';
+    caseScroll.style.scrollPaddingTop = (navH + 14) + 'px';
+  }
+  function sizeScroller(){
+    try {
+      var p = window.parent;
+      if(p && p !== window && window.frameElement){
+        var rectTop = window.frameElement.getBoundingClientRect().top;
+        if(rectTop < 0) rectTop = 0;          // parent scrolled past the chrome
+        var ph = p.innerHeight || 800;
+        var h = ph - rectTop - 6;             // leave the bottom edge breathing room
+        if(h < 460) h = 460;                  // sane minimum on short windows
+        caseScroll.style.height = h + 'px';
+      } else {
+        caseScroll.style.height = '100vh';
+      }
+    } catch(e){ caseScroll.style.height = '100vh'; }
+    setNavOffset();
+  }
+  sizeScroller();
+  window.addEventListener('resize', sizeScroller);
+  window.addEventListener('load', sizeScroller);
+  try { if(window.parent && window.parent !== window) window.parent.addEventListener('resize', sizeScroller); } catch(e){}
+
+  /* ============ NAV: scroll-spy active + visited ============ */
+  var navchips = Array.prototype.slice.call(document.querySelectorAll('.navchip'));
+  var sections = navchips.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited = {};
+  var visitVal = document.getElementById('visitVal');
+
+  function markVisited(idx){
+    var sec = sections[idx];
+    if(!sec) return;
+    if(!visited[sec.id]){
+      visited[sec.id] = true;
+      navchips[idx].classList.add('visited');
+      var count = Object.keys(visited).length;
+      visitVal.textContent = count + ' / 19';
+      addXP(8, 'visit-' + sec.id, 'Section read');
+      if(count >= 19){ earnBadge('bdg-explorer'); addXP(60, 'allvisited', 'Ward Explorer!'); }
+    }
+  }
+  function setActive(idx){
+    navchips.forEach(function(c){ c.classList.remove('active'); });
+    if(navchips[idx]) navchips[idx].classList.add('active');
+  }
+
+  /* True tabs: each chip shows ONLY its section, hidden via CSS otherwise.
+     No scrollIntoView and no scroll-spy — nothing can scroll the tab bar away,
+     which also sidesteps every srcDoc-iframe scrolling quirk. The hero banner
+     and vitals strip belong to the case intro, so they show on S1 only. */
+  var heroBits = [document.querySelector('.hero'), document.querySelector('.vitals-strip')]
+    .filter(function(el){ return !!el; });
+
+  function showSection(idx){
+    sections.forEach(function(s, i){ if(s) s.classList.toggle('sec-active', i === idx); });
+    heroBits.forEach(function(el){ el.style.display = (idx === 0) ? '' : 'none'; });
+    caseScroll.scrollTop = 0;
+    setActive(idx);
+    markVisited(idx);
+  }
+
+  navchips.forEach(function(chip, idx){
+    chip.addEventListener('click', function(ev){
+      ev.preventDefault();
+      showSection(idx);
+    });
+  });
+  showSection(0);
+
+  /* ============ FLAG GAME (S2) ============ */
+  var flagBtns = document.querySelectorAll('#flagGame .flag-btn');
+  var flagResult = document.getElementById('flagResult');
+  var flagsFound = 0, flagsTotal = 0, flagWrong = 0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good') === '1') flagsTotal++; });
+  flagBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.dataset.locked) return;
+      btn.dataset.locked = '1';
+      var good = btn.getAttribute('data-good') === '1';
+      if(good){
+        btn.classList.add('flag-good');
+        flagsFound++;
+        addXP(10, 'flag-' + flagsFound + '-' + Math.random(), 'Brugada flag spotted');
+      } else {
+        btn.classList.add('flag-bad');
+        flagWrong++;
+        showToast('❌ Not a Brugada-specific flag');
+      }
+      if(flagsFound === flagsTotal){
+        flagResult.textContent = '✅ All ' + flagsTotal + ' Brugada red flags found' + (flagWrong ? ' (with ' + flagWrong + ' wrong pick' + (flagWrong>1?'s':'') + ')' : ' — flawless!');
+        earnBadge('bdg-vt');
+        addXP(30, 'flags-complete', 'Coved-Spotter badge');
+      } else {
+        flagResult.textContent = flagsFound + ' / ' + flagsTotal + ' Brugada red flags found…';
+      }
+    });
+  });
+
+  /* ============ BRANCHING SCENARIO (S3) ============ */
+  var scText = document.getElementById('scText');
+  var scChoices = document.getElementById('scChoices');
+  var scFeedback = document.getElementById('scFeedback');
+  var scRestart = document.getElementById('scRestart');
+  var scStab = document.getElementById('scStab');
+  var scTime = document.getElementById('scTime');
+  var scXP = document.getElementById('scXP');
+  var pathXP = 0, scStability = 2, scElapsed = 0;
+
+  var STEPS = {
+    start: {
+      text: "He's rousable post-ROSC, BP 108/68, temp 38.8°C, sinus at 104. The coved ST in V1–V2 stares at you. The night doctor on the phone still wants a class-I antiarrhythmic 'to stabilize the rhythm' and the cath lab 'for the STEMI.' What do you do FIRST?",
+      choices: [
+        { t: "🌡️ Decline the class-I drug, start aggressive fever control, defibrillator on standby", good:true, ds:1, dt:10, xp:40, fb:"✅ Exactly. The fever is the active trigger — antipyresis is antiarrhythmic. You refuse the provoking drug and keep the defibrillator close for recurrent VF. You've defused the immediate danger.", next:"storm" },
+        { t: "💉 Load IV procainamide 'to suppress further VT'", good:false, ds:-2, dt:20, xp:0, fb:"☠️ Catastrophe. Procainamide is a class-I sodium-channel blocker — a Brugada PROVOCATION drug. It accentuates the substrate and can drive VF. This is the M&M case in S13. Restart and choose again.", end:true },
+        { t: "🫀 Rush him straight to the cath lab as an 'anterior STEMI'", good:false, ds:-1, dt:15, xp:5, fb:"⚠️ This is a coved ST in a structurally normal, febrile heart with a family story — Brugada, not a STEMI. The angiogram will be clean. Treat the fever and protect him from provoking drugs instead.", next:"start2" }
+      ]
+    },
+    start2: {
+      text: "Angiography is normal (as expected — no culprit). He's still febrile at 38.8°C and the coved ST persists. The defibrillator is at the bedside. Now what?",
+      choices: [
+        { t: "🌡️ Aggressive fever control now and enforce the drug avoid-list", good:true, ds:1, dt:8, xp:30, fb:"✅ Finally — the right call. Cool the fever hard, ban the sodium-channel blockers, keep the defibrillator ready. Lesson banked: in Brugada, the fever is the emergency.", next:"storm" },
+        { t: "💉 Start an amiodarone infusion to 'cover the rhythm'", good:false, ds:-1, dt:20, xp:0, fb:"⚠️ Not the answer here. The mechanism-matched options are quinidine and (for storm) isoproterenol, plus fever control and an ICD — not an empiric amiodarone drip.", next:"storm" }
+      ]
+    },
+    storm: {
+      text: "Temperature is coming down, but he suddenly runs a burst of polymorphic VT that degenerates toward VF. The defibrillator is charged. What now?",
+      choices: [
+        { t: "🔌 Defibrillate (UNSYNC), then start isoproterenol and plan quinidine; keep cooling", good:true, ds:1, dt:6, xp:30, fb:"✅ Ideal: Brugada arrhythmia is VF → UNSYNC defibrillation, then the storm-specific drugs (isoproterenol now, quinidine to follow) and continued fever control. Now stabilize and plan the ICD.", next:"icd" },
+        { t: "🔌 Synchronized cardioversion and a bolus of flecainide", good:false, ds:-1, dt:10, xp:5, fb:"⚠️ Two errors: VF can't be synchronized (use UNSYNC defib), and flecainide is a class-I sodium-channel blocker that worsens Brugada. Reach for isoproterenol and quinidine, never a class-I drug.", next:"icd" }
+      ]
+    },
+    icd: {
+      text: "He's stabilized: afebrile, no further VF, normal heart confirmed. He survived an aborted VF arrest. What secures his future?",
+      choices: [
+        { t: "🛡️ Plan a secondary-prevention ICD (± quinidine) and family screening", good:true, ds:1, dt:5, xp:40, fb:"🏆 Perfect close. Aborted SCA in Brugada = Class I ICD — the only proven therapy. Quinidine as adjunct, lifelong fever/drug discipline, and family ECG screening. Case stabilized.", end:true },
+        { t: "💊 Discharge on quinidine alone — 'a pill is enough'", good:false, ds:-1, dt:10, xp:0, fb:"⚠️ No pill reliably prevents Brugada SCD long-term. After an aborted arrest the defibrillator is the cornerstone; quinidine is an adjunct, not a replacement.", end:true }
+      ]
+    }
+  };
+
+  function renderStab(){
+    var s = Math.max(0, Math.min(5, scStability + 2)); // map -2..3 → 0..5
+    var dots = '';
+    for(var i=0;i<5;i++) dots += (i < s ? '●' : '○');
+    scStab.textContent = dots;
+  }
+  function renderStep(key){
+    var step = STEPS[key];
+    scText.textContent = step.text;
+    scFeedback.className = 'feedback';
+    scFeedback.style.display = 'none';
+    scChoices.innerHTML = '';
+    step.choices.forEach(function(ch){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = ch.t;
+      b.addEventListener('click', function(){
+        pathXP += ch.xp; scXP.textContent = pathXP;
+        scElapsed += ch.dt; scTime.textContent = scElapsed + ' s';
+        scStability += ch.ds; renderStab();
+        if(ch.xp) addXP(ch.xp, null, 'Scenario choice');
+        scFeedback.textContent = ch.fb;
+        scFeedback.className = 'feedback ' + (ch.good ? 'good' : 'bad');
+        scFeedback.style.display = 'block';
+        Array.prototype.forEach.call(scChoices.children, function(c){ c.disabled = true; c.style.opacity = .6; });
+        if(ch.end){
+          scRestart.style.display = 'inline-block';
+          if(ch.good && key === 'icd'){ earnBadge('bdg-shock'); addXP(20, 'scenario-win', 'Fever Defused!'); }
+        } else if(ch.next){
+          setTimeout(function(){ renderStep(ch.next); }, 1400);
+        }
+      });
+      scChoices.appendChild(b);
+    });
+  }
+  scRestart.addEventListener('click', function(){
+    pathXP = 0; scStability = 2; scElapsed = 0;
+    scXP.textContent = 0; scTime.textContent = '0 s'; renderStab();
+    scRestart.style.display = 'none';
+    renderStep('start');
+  });
+  renderStab();
+  renderStep('start');
+
+  /* ============ REVEAL BUTTONS ============ */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.getAttribute('data-target'));
+      if(!t) return;
+      if(t.classList.contains('reveal-shown')){
+        t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden');
+      } else {
+        t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown');
+        addXP(8, 'reveal-' + btn.getAttribute('data-target'), 'Self-test');
+      }
+    });
+  });
+
+  /* ============ POTASSIUM SIM (S6) ============ */
+  var kRange = document.getElementById('kRange');
+  var kVal = document.getElementById('kVal');
+  var kNeedle = document.getElementById('kNeedle');
+  var kReadout = document.getElementById('kReadout');
+  if(kRange){
+    var simUsed = false;
+    function updateK(){
+      var k = (parseInt(kRange.value,10) / 10) + 31; // 33.0 .. 38.5 °C
+      kVal.textContent = k.toFixed(1);
+      var pct = (parseInt(kRange.value,10) - 20) / (75 - 20) * 100;
+      kNeedle.style.left = pct + '%';
+      var msg, cls;
+      if(k < 36.0){ msg = '🟢 Below normal / well-controlled — the sodium channel gates better when cool; the coved ST flattens and VF risk is at its lowest. This is the target after cooling.'; cls='good'; }
+      else if(k <= 37.3){ msg = '🟢 Normothermia — baseline substrate, lowest arrhythmia risk. Keep him here with antipyretics. This is where you want a Brugada patient.'; cls='good'; }
+      else if(k < 38.5){ msg = '🟠 Low-grade fever — I_to begins to win, the coved ST deepens and VF risk rises. Treat the fever NOW; antipyresis is antiarrhythmic.'; cls='warn-r'; }
+      else if(k < 40.0){ msg = '🔴 High fever — markedly reduced I_Na, pronounced coved ST elevation, high VF risk. This is tonight’s trigger. Cool aggressively, defibrillator at the bedside.'; cls='bad'; }
+      else { msg = '🔴 Dangerous hyperpyrexia — maximal substrate accentuation; expect electrical storm. Aggressive cooling, isoproterenol and quinidine, ready to defibrillate.'; cls='bad'; }
+      kReadout.innerHTML = msg;
+      kReadout.className = 'readout ' + cls;
+      if(!simUsed){ simUsed = true; addXP(15, 'ksim', 'Titration Master'); }
+    }
+    kRange.addEventListener('input', updateK);
+    updateK();
+  }
+
+  /* ============ CHECKLISTS (S7) ============ */
+  var allChecklistsDone = 0, totalChecklists = document.querySelectorAll('.checklist').length;
+  document.querySelectorAll('.checklist').forEach(function(list){
+    var boxes = list.querySelectorAll('input[type=checkbox]');
+    var prog = list.querySelector('[data-progress]');
+    var total = boxes.length;
+    var doneAwarded = false;
+    function refresh(){
+      var done = 0;
+      boxes.forEach(function(b){
+        if(b.checked){ done++; b.closest('.ck').classList.add('done'); }
+        else { b.closest('.ck').classList.remove('done'); }
+      });
+      prog.textContent = done + ' / ' + total + ' complete';
+      if(done === total && !doneAwarded){
+        doneAwarded = true;
+        allChecklistsDone++;
+        addXP(25, 'ck-' + list.id, 'Checklist done');
+        if(allChecklistsDone >= totalChecklists){ earnBadge('bdg-ck'); addXP(20, 'allck', 'Checklist Champion'); }
+      }
+    }
+    boxes.forEach(function(b){
+      b.addEventListener('change', function(){
+        if(b.checked) addXP(4, null, 'Step checked');
+        refresh();
+      });
+    });
+  });
+
+  /* ============ MCQs (S19) ============ */
+  var MCQS = [
+    {
+      q: "A 40-year-old man with a structurally normal heart survives a nocturnal VF arrest during a febrile illness. His ECG shows ST elevation ≥ 2 mm in V1–V2 that is coved and descends into a negative T wave. This pattern is:",
+      opts: ["Type 2 (saddleback) Brugada — only suggestive","Type 1 (coved) Brugada — diagnostic","Benign early repolarization","An evolving anterior STEMI"],
+      correct: 1,
+      exp: "A coved ST elevation ≥ 2 mm descending into a negative T wave in ≥ 1 right precordial lead (V1–V2) is the type 1 pattern — diagnostic of Brugada syndrome, needing no provocation. The saddleback type 2 is only suggestive and requires confirmation."
+    },
+    {
+      q: "What is the underlying mechanism of Brugada syndrome?",
+      opts: ["Gain-of-function of the cardiac potassium channel","SCN5A loss-of-function (reduced I_Na) unmasking I_to in the RVOT epicardium, causing phase-2 re-entry","Coronary atherosclerosis with plaque rupture","Fibrofatty replacement of the right ventricular myocardium"],
+      correct: 1,
+      exp: "Brugada is classically an SCN5A loss-of-function mutation reducing inward sodium current (I_Na). This unmasks the transient outward current (I_to) in the RV outflow-tract epicardium, producing a transmural gradient (the coved ST) and phase-2 re-entry that triggers polymorphic VT/VF."
+    },
+    {
+      q: "Which therapy is the only one proven to prevent sudden cardiac death in a Brugada patient who has survived an aborted arrest?",
+      opts: ["Lifelong amiodarone","An implantable cardioverter-defibrillator (ICD)","A permanent pacemaker","Beta-blockers"],
+      correct: 1,
+      exp: "No drug reliably prevents Brugada events long-term. After aborted SCA or documented sustained VT/VF, the ICD is the only proven therapy and a Class I indication. Quinidine is an adjunct (or for non-ICD candidates), not a replacement."
+    },
+    {
+      q: "Why is fever so important in Brugada syndrome?",
+      opts: ["Fever has no effect on the Brugada ECG","Fever further reduces sodium current, deepening the coved ST and precipitating VF — so it must be treated aggressively","Fever is protective against arrhythmia","Fever only matters if the patient has a structural cardiomyopathy"],
+      correct: 1,
+      exp: "The mutant sodium channel gates even worse at higher temperatures, so fever further reduces I_Na, accentuates the coved ST elevation, and can precipitate VF. Aggressive antipyresis is genuine antiarrhythmic therapy, and patients should get an ECG with any significant fever."
+    },
+    {
+      q: "Which class of drug should be AVOIDED in a patient with Brugada syndrome?",
+      opts: ["Antipyretics such as paracetamol","Sodium-channel blockers (class I antiarrhythmics, certain anesthetics, tricyclics, cocaine)","Beta-2 agonists","Oral rehydration solutions"],
+      correct: 1,
+      exp: "Sodium-channel blockers accentuate the Brugada substrate — they are the very drugs used to provoke the pattern diagnostically — and can precipitate VF. The brugadadrugs.org list (class I antiarrhythmics, some anesthetics, tricyclics, cocaine) must be avoided."
+    },
+    {
+      q: "A Brugada patient develops electrical storm (recurrent VF). After defibrillating each episode, the mechanism-matched drug therapy is:",
+      opts: ["IV flecainide and synchronized cardioversion","Isoproterenol infusion and oral quinidine","IV verapamil","Digoxin and a beta-blocker bolus"],
+      correct: 1,
+      exp: "For Brugada electrical storm: defibrillate each episode, give isoproterenol (augments the L-type calcium current and restores the epicardial action-potential dome) and quinidine (blocks I_to, the upstream culprit), plus aggressive fever control. Sodium-channel blockers like flecainide are contraindicated."
+    },
+    {
+      q: "How is the ST elevation of Brugada distinguished from an anterior STEMI?",
+      opts: ["Brugada has territorial ST elevation with reciprocal depression","Brugada is coved, confined to the right precordial leads, with no reciprocal change, in a structurally normal heart — STEMI is territorial, convex, with reciprocal change and an evolving troponin/wall-motion story","They are indistinguishable on ECG","STEMI never causes V1–V2 ST elevation"],
+      correct: 1,
+      exp: "Brugada gives a coved ST elevation confined to V1–V2 with no reciprocal change in a structurally normal heart (often dynamic with fever); a normal angiogram and settling troponin confirm it. STEMI gives territorial convex ST elevation with reciprocal depression, ischemic pain, evolving troponin and a culprit lesion."
+    },
+    {
+      q: "Which combination represents the HIGHEST-risk Brugada phenotype?",
+      opts: ["Drug-induced-only type 1 in an asymptomatic patient","A spontaneous type 1 pattern with syncope or an aborted cardiac arrest","An asymptomatic type 2 (saddleback) pattern","A normal ECG with a positive family history alone"],
+      correct: 1,
+      exp: "A spontaneous type 1 pattern together with syncope or aborted SCA is the high-risk group — these patients warrant an ICD. Drug-induced-only type 1 and asymptomatic patients are lower risk; risk stratification weighs spontaneity of the pattern and the presence of symptoms."
+    }
+  ];
+
+  var host = document.getElementById('mcqHost');
+  var mcqVal = document.getElementById('mcqVal');
+  var mcqScore = 0, mcqAnswered = 0;
+  var letters = ['A','B','C','D','E'];
+
+  MCQS.forEach(function(item, qi){
+    var box = document.createElement('div');
+    box.className = 'mcq';
+    var html = '<div class="mcq-q">QUESTION ' + (qi+1) + ' / ' + MCQS.length + '</div>';
+    html += '<div class="mcq-stem">' + item.q + '</div>';
+    item.opts.forEach(function(opt, oi){
+      html += '<label class="mcq-opt" data-oi="' + oi + '"><strong>' + letters[oi] + '.</strong> ' + opt + '</label>';
+    });
+    html += '<div class="mcq-exp"></div>';
+    box.innerHTML = html;
+    host.appendChild(box);
+
+    var opts = box.querySelectorAll('.mcq-opt');
+    var exp = box.querySelector('.mcq-exp');
+    var locked = false;
+    opts.forEach(function(label){
+      label.addEventListener('click', function(){
+        if(locked) return;
+        locked = true;
+        var oi = parseInt(label.getAttribute('data-oi'),10);
+        box.classList.add('answered');
+        var correct = item.correct;
+        if(oi === correct){
+          label.classList.add('picked-right');
+          mcqScore++;
+          addXP(25, null, 'Correct answer');
+        } else {
+          label.classList.add('picked-wrong');
+          opts[correct].classList.add('show-right');
+          showToast('❌ Correct: ' + letters[correct]);
+        }
+        exp.innerHTML = '<strong>' + (oi === correct ? '✅ Correct. ' : '📘 Explanation. ') + '</strong>' + item.exp;
+        mcqAnswered++;
+        mcqVal.textContent = mcqScore + ' / ' + MCQS.length;
+        if(mcqAnswered === MCQS.length){
+          var done = document.getElementById('mcqDone');
+          var summary = document.getElementById('mcqSummary');
+          done.style.display = 'block';
+          summary.textContent = 'You scored ' + mcqScore + ' / ' + MCQS.length + '. ' +
+            (mcqScore === MCQS.length ? 'Flawless — you read the coved V1–V2 and reach for the ICD every time. 🏆' :
+             mcqScore >= 6 ? 'Strong — review the misses and the contrast pairs in S6.' :
+             'Revisit S3, S5, S6 and S11 — the Brugada mechanism, fever and ICD logic is the whole case.');
+          if(mcqScore >= 7){ earnBadge('bdg-quiz'); addXP(50, 'quizace', 'Quiz Ace!'); }
+        }
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
