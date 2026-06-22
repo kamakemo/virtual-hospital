@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hypertensive Emergency & SCAPE (Flash Pulmonary Edema) — Virtual Teaching Hospital</title>
+<!-- META
+id: c-htnemerg-026
+title: Hypertensive Emergency & SCAPE (Flash Pulmonary Edema)
+hospital: cardiology
+department: cv-ccu
+bednumber: 8
+chiefcomplaint: Blood pressure 230/130 with acute pulmonary edema and respiratory distress
+system: Cardiology
+severity: critical
+tags: Hypertensive emergency, SCAPE, Flash pulmonary edema, Nitroglycerin, Target-organ damage, Controlled BP lowering
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --radius:16px;
+    --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  /* Internal scroll viewport. When this case is embedded the host app stretches
+     the iframe to full content height and the OUTER page scrolls, which would
+     let a sticky bar scroll away. We instead scroll inside this box (sized to
+     the visible window by JS) so the section tab bar stays pinned at the top.
+     Standalone, it falls back to the full viewport height. */
+  #caseScroll{height:100vh; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; scroll-padding-top:92px}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:36px 24px 80px; position:relative; overflow:hidden}
+  .hero::after{content:"📈"; position:absolute; right:-20px; top:-30px; font-size:220px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{max-width:1100px; margin:0 auto; position:relative; z-index:1}
+  .hero .crumbs{font-size:13px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:10px 0 6px; font-size:clamp(26px,4vw,40px); line-height:1.15}
+  .hero .sub{font-size:16px; opacity:.95}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; backdrop-filter:blur(4px)}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== LIVE ECG STRIP IN HERO ===== */
+  .ecg-banner{max-width:1100px; margin:14px auto 0; position:relative; z-index:1}
+  .ecg-banner svg{width:100%; height:64px; display:block; background:rgba(0,0,0,.18); border-radius:12px; border:1px solid rgba(255,255,255,.25)}
+  .ecg-trace{stroke:#86efac; stroke-width:2.4; fill:none; stroke-dasharray:1600; stroke-dashoffset:1600; animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{stroke-dashoffset:0}}
+
+  /* ===== VITALS STRIP ===== */
+  .vitals-strip{max-width:1100px; margin:-52px auto 0; padding:0 24px; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:11px; font-weight:700; letter-spacing:.6px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:21px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== HORIZONTAL SECTION SIDEBAR (fixed — always visible) ===== */
+  .topnav{position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.10)}
+  .topnav .rail{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; max-width:1180px; margin:0 auto; scrollbar-width:thin}
+  .navchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink2); font-size:11px; font-weight:700; text-decoration:none; min-width:78px; text-align:center; transition:all .18s; cursor:pointer}
+  .navchip .s-id{font-size:10px; letter-spacing:1px; color:#94a3b8}
+  .navchip .s-emoji{font-size:16px}
+  .navchip:hover{border-color:var(--rose); color:var(--rose); transform:translateY(-2px)}
+  .navchip.active{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; border-color:#b91c1c}
+  .navchip.active .s-id{color:#fecaca}
+  .navchip.visited:not(.active){border-color:var(--emerald-line); background:var(--emerald-soft)}
+
+  /* ===== DASHBOARD WIDGET ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:215px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10.5px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:760px){.dash{display:none}}
+
+  /* ===== MAIN / SECTIONS (tabbed: one section visible at a time) ===== */
+  main{max-width:1100px; margin:26px auto 80px; padding:0 24px}
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:26px; overflow:hidden}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16.5px; margin:26px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14.5px; margin:18px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:24px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15.5px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:14px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px; letter-spacing:.4px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14.5px}
+
+  /* ===== INTERACTIVE BITS ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:10px 18px; font-weight:700; font-size:14px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:22px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:15px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 15px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 15px; margin-top:12px; font-size:14px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim sliders */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:14px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:14px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Heart/circuit diagram */
+  .heart-fig{display:flex; gap:18px; flex-wrap:wrap; align-items:center; background:var(--slate-soft); border-radius:16px; padding:18px; margin:14px 0}
+  .heart-fig svg{flex:0 0 auto}
+  .heart-legend{flex:1; min-width:230px; font-size:13.5px}
+  .lg{display:flex; align-items:center; gap:8px; margin:5px 0}
+  .lg .sw{width:14px; height:14px; border-radius:4px; flex:0 0 auto}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Journey cards */
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:14px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:15px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:14px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13.5px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:22px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14.5px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:13px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .footer{max-width:1100px; margin:0 auto 36px; padding:0 24px; text-align:center; color:#94a3b8; font-size:12.5px}
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="caseScroll">
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · 💗 Coronary Care Unit · 🛏️ Bed 8</div>
+    <h1>📈 Hypertensive Emergency & SCAPE — "The Number Isn't the Emergency, the Organ Is"</h1>
+    <div class="sub">⚡ A 58-year-old crashes through the doors at 232/130, drowning in flash pulmonary edema, soaked in sweat and gasping. Someone is reaching for sublingual nifedipine to "crack the pressure." Stop them.</div>
+    <div class="chips">
+      <span class="chip crit">🔴 CRITICAL</span>
+      <span class="chip">🩸 BP 232/130</span>
+      <span class="chip">🌊 SCAPE / Flash Pulmonary Edema</span>
+      <span class="chip">💉 High-Dose Nitroglycerin</span>
+      <span class="chip">🎮 Interactive Case</span>
+      <span class="chip">⏱️ Lower it — but not too fast</span>
+    </div>
+    <div class="ecg-banner" title="Sinus tachycardia with LVH strain in hypertensive emergency">
+      <svg viewBox="0 0 800 64" preserveAspectRatio="none" aria-label="Sinus tachycardia rhythm strip">
+        <polyline class="ecg-trace" points="0,40 40,40 55,12 70,58 85,40 130,40 145,12 160,58 175,40 220,40 235,12 250,58 265,40 310,40 325,12 340,58 355,40 400,40 415,12 430,58 445,40 490,40 505,12 520,58 535,40 580,40 595,12 610,58 625,40 670,40 685,12 700,58 715,40 760,40 775,12 790,58 800,40"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== LIVE VITALS ===================== -->
+<div class="vitals-strip">
+  <div class="vitals-grid">
+    <div class="vital alert"><div class="v-label">🩸 BP</div><div class="v-num">232/130</div></div>
+    <div class="vital alert"><div class="v-label">💓 HR</div><div class="v-num">110</div></div>
+    <div class="vital alert"><div class="v-label">🌬️ RR</div><div class="v-num">34</div></div>
+    <div class="vital alert"><div class="v-label">🫁 SpO₂</div><div class="v-num">84%</div></div>
+    <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.8°</div></div>
+    <div class="vital warn"><div class="v-label">🧠 GCS</div><div class="v-num">14</div></div>
+    <div class="vital alert"><div class="v-label">🌊 Crackles</div><div class="v-num">To apices</div></div>
+    <div class="vital alert"><div class="v-label">😖 Distress</div><div class="v-num">High</div></div>
+  </div>
+</div>
+
+<!-- ===================== HORIZONTAL SECTION SIDEBAR ===================== -->
+<nav class="topnav" id="topnav">
+  <div class="rail">
+    <a class="navchip" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navchip" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navchip" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navchip" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navchip" href="#s5"><span class="s-emoji">🎓</span><span>Consultant Round</span><span class="s-id">S5</span></a>
+    <a class="navchip" href="#s6"><span class="s-emoji">📖</span><span>Teaching Points</span><span class="s-id">S6</span></a>
+    <a class="navchip" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navchip" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navchip" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navchip" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navchip" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navchip" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navchip" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navchip" href="#s14"><span class="s-emoji">🔀</span><span>Differentials</span><span class="s-id">S14</span></a>
+    <a class="navchip" href="#s15"><span class="s-emoji">🗺️</span><span>Plan</span><span class="s-id">S15</span></a>
+    <a class="navchip" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navchip" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navchip" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navchip" href="#s19"><span class="s-emoji">🧠</span><span>MCQs</span><span class="s-id">S19</span></a>
+  </div>
+</nav>
+
+<!-- ===================== SCORE DASHBOARD ===================== -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections visited</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-vt">🩸 Emergency-Spotter</span>
+      <span class="badge" id="bdg-shock">💉 Vasodilated On Time</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champion</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Ward Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running sims, taking the right path and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- S1 — PROFILE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s1">
+  <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+  <div class="section-content">
+    <div class="callout danger">
+      <b class="ct">🚨 YOU ARE HERE — 02:41, CCU Bed 8</b>
+      The cuff reads <strong>232/130</strong>. The patient is bolt-upright, tripod, drenched, pink froth at the lips, talking in two-word gasps: <em>"Can't… breathe."</em> The monitor's SpO₂ alarm is wailing at 84%. A junior is uncapping <strong>sublingual nifedipine</strong> because "the pressure's sky-high — crack it." Your hand reaches the trolley first. This is not a number to read about — it is an organ failing in front of you that you must reverse <strong>now, but not recklessly</strong>.
+    </div>
+
+    <h3>👤 Patient Identity</h3>
+    <table class="tbl">
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>🧔 Name</td><td><strong>Mr. A.O.</strong></td></tr>
+      <tr><td>🎂 Age / Sex</td><td>58-year-old male</td></tr>
+      <tr><td>🆔 MRN</td><td>CV-20826</td></tr>
+      <tr><td>⚖️ Weight</td><td>96 kg</td></tr>
+      <tr><td>💼 Occupation</td><td>Long-haul truck driver</td></tr>
+      <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+    </table>
+
+    <h3>📜 Past Medical History — every line loads the gun</h3>
+    <ul>
+      <li>🩸 <strong>Long-standing hypertension</strong>, poorly controlled — clinic readings often 170–190 systolic. A stiff, hypertrophied left ventricle is one catecholamine surge away from flooding the lungs.</li>
+      <li>💔 <strong>LV hypertrophy on a prior ECG/echo, preserved EF (~55%, HFpEF physiology).</strong> A thick, stiff ventricle ejects poorly against a sudden afterload spike — the substrate for SCAPE.</li>
+      <li>💊 On <strong>amlodipine + lisinopril</strong> but <strong>ran out 8 days ago</strong> ("I was on the road, didn't refill"). Abrupt non-adherence is tonight's accelerant.</li>
+      <li>🚬 Current smoker, 35 pack-years. Renal arteries never imaged — <strong>renovascular disease</strong> remains an unanswered question.</li>
+      <li>😴 Loud snorer, witnessed apneas — <strong>untreated OSA</strong> drives nocturnal sympathetic surges and morning flash edema.</li>
+      <li>🍔 High-salt diet, obesity, dyslipidemia. Several prior ED visits for "high blood pressure" sent home without organ-damage workup.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A blood pressure of 232/130 is only an emergency when an organ is being injured by it. Tonight the lungs are drowning — so this is an emergency, and the lungs, not the number, set the urgency."</div>
+
+    <h3>🧬 Why THIS patient? — stiff ventricle + afterload surge + redistribution</h3>
+    <p>SCAPE — <strong>Sympathetic Crashing Acute Pulmonary Edema</strong> — is an afterload catastrophe, not a volume catastrophe. A surge of sympathetic tone (pain, anxiety, OSA, the rebound of stopped antihypertensives) abruptly <strong>raises systemic vascular resistance and venoconstricts</strong>. The stiff, hypertrophied left ventricle suddenly cannot eject against the wall it's facing → <strong>LV end-diastolic pressure spikes</strong> → pressure backs up through the pulmonary capillaries → fluid <strong>redistributes</strong> from the venous reservoir into the alveoli within minutes. Crucially, this man may be <strong>euvolemic or even dry</strong> — there is no extra litre of body water to remove; the same fluid has simply been shoved into the wrong compartment by afterload. That is why the cure is <strong>vasodilation (offload the afterload)</strong>, not buckets of furosemide.</p>
+
+    <div class="callout warn"><b class="ct">🔥 Risk factors / triggers for hypertensive emergency &amp; SCAPE</b>
+    🩸 Poorly controlled / untreated hypertension · 💊 Abrupt stopping of antihypertensives (rebound) · 💔 LV hypertrophy / HFpEF (stiff ventricle) · 😴 Obstructive sleep apnea · 🔧 Renovascular disease / renal artery stenosis (esp. bilateral → recurrent flash edema) · 🧪 Cocaine / sympathomimetics, pheochromocytoma · 🤰 Pre-eclampsia / eclampsia · 🧂 High salt load, non-adherence</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S2 — HANDOVER -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s2">
+  <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+  <div class="section-content">
+    <h3>📻 Paramedic / Nurse Handover — listen for the trap</h3>
+    <div class="callout info">
+      <b class="ct">🎙️ SBAR from the resus nurse (verbatim)</b>
+      <p><strong>S:</strong> "Bed 8 — Mr. A.O., 58, came in fighting for breath. BP 232 over 130, pink froth at the mouth, SpO₂ 84 on room air, crackles to the apices both sides. This came on over an hour, out of nowhere."</p>
+      <p><strong>B:</strong> "Known hypertension, ran out of his amlodipine and lisinopril over a week ago, smoker, snores terribly. No chest pain, no slurred speech, moving all four limbs."</p>
+      <p><strong>A:</strong> "He's diaphoretic and exhausted, GCS 14, sats creeping up only to 88 on a mask. The covering doctor on the phone said the pressure's the problem — give <strong>sublingual nifedipine and a big slug of IV furosemide</strong> and it'll settle."</p>
+      <p><strong>R:</strong> "I've got high-flow O₂ on, a line in, GTN and a BiPAP machine pulled to the bedside. I held the nifedipine because… dropping a pressure like that off a cliff didn't feel right. He's drowning."</p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The phone order of 'sublingual nifedipine to crack the pressure' is how hypertensive-emergency patients get a watershed stroke. Never let a voice down a wire turn a controlled descent into a freefall."</div>
+
+    <h3>🚩 Spot-the-Red-Flag — tap each feature that makes this an EMERGENCY (not just a high number)</h3>
+    <p>🎮 <em>Interactive: click every feature that signals a true hypertensive EMERGENCY with acute target-organ damage (not asymptomatic urgency). Each correct flag = +10 XP. Wrong picks cost you.</em></p>
+    <div id="flagGame">
+      <button class="btn ghost flag-btn" data-good="1">🌊 Acute pulmonary edema / SCAPE</button>
+      <button class="btn ghost flag-btn" data-good="1">🫁 Flash pulmonary edema with hypoxia (SpO₂ 84%)</button>
+      <button class="btn ghost flag-btn" data-good="1">⚡ Catecholamine / sympathetic surge (diaphoresis, tachypnea)</button>
+      <button class="btn ghost flag-btn" data-good="1">🧠 Hypertensive encephalopathy if confusion/papilledema appear</button>
+      <button class="btn ghost flag-btn" data-good="1">💔 Acute target-organ damage (heart, brain, kidney, eyes)</button>
+      <button class="btn ghost flag-btn" data-good="0">🩸 Asymptomatic high BP with no organ damage</button>
+      <button class="btn ghost flag-btn" data-good="0">🌡️ Temperature 36.8°C / a fever</button>
+      <button class="btn ghost flag-btn" data-good="0">☕ He likes his coffee strong</button>
+    </div>
+    <p id="flagResult" style="font-weight:700"></p>
+
+    <h3>⏱️ Timeline so far</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">01:30</div>Woke from sleep acutely breathless and panicked (classic nocturnal/early-morning flash edema in untreated OSA).</div>
+      <div class="t-item"><div class="t-time">02:10</div>Brought in: BP 232/130, SpO₂ 84% on air, crackles to the apices, pink frothy sputum. No chest pain, no focal deficit.</div>
+      <div class="t-item"><div class="t-time">02:30</div>Covering doctor (by phone) says "drop the pressure — sublingual nifedipine + big furosemide." Nurse <strong>withholds the nifedipine</strong> — 🏅 instinct worth its weight in gold.</div>
+      <div class="t-item"><div class="t-time">02:41</div>You arrive. GTN and BiPAP are at the bedside. The clock is the enemy: every minute hypoxic and hypertensive strains the very heart and brain you're trying to protect.</div>
+    </div>
+
+    <div class="callout ok"><b class="ct">🏅 Praise where due</b>The nurse who held the sublingual nifedipine prevented a catastrophe. Short-acting sublingual nifedipine (and over-aggressive IV boluses) produce an <strong>uncontrolled, precipitous</strong> fall in BP — the brain, heart and kidneys lose autoregulation and infarct in <strong>watershed zones</strong>. Withholding it bought time for a <em>controlled</em>, titratable descent.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S3 — INITIAL ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s3">
+  <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+  <div class="section-content">
+    <h3>🅰️🅱️🅲️ Primary Survey — what your hands, eyes and ears find</h3>
+    <table class="tbl">
+      <tr><th>Step</th><th>Finding</th><th>What it means mechanistically</th></tr>
+      <tr><td>🅰️ Airway</td><td>Patent, sitting bolt upright, can only manage two-word phrases.</td><td>Two-word dyspnea = critical work of breathing; he is on the edge of respiratory failure and intubation.</td></tr>
+      <tr><td>🅱️ Breathing</td><td>RR 34, SpO₂ 84% on air (88% on mask), <strong>crackles to the apices</strong>, pink frothy sputum, accessory muscle use.</td><td>Alveoli flooded by fluid redistributed under high LV filling pressure → V/Q mismatch and shunt → profound hypoxia. This is flash (SCAPE) edema — minutes, not hours.</td></tr>
+      <tr><td>🅲️ Circulation</td><td><strong>BP 232/130</strong> (MAP ≈ 164), HR 110, warm but diaphoretic, bounding pulses, <strong>no</strong> raised JVP to suggest gross fluid overload, S4 gallop.</td><td>The afterload surge — not whole-body volume excess — is the engine. Often euvolemic: the problem is <em>where</em> the fluid is, driven by pressure and venoconstriction.</td></tr>
+      <tr><td>🅳 Disability</td><td>GCS 14, anxious; no focal deficit, speech intact, pupils equal.</td><td>Reassuring for now — but screen actively for encephalopathy/stroke; their presence changes BP targets entirely.</td></tr>
+      <tr><td>🅴 Exposure</td><td>No rash, equal symmetrical pulses, no inter-arm BP difference, no tearing back pain, soft abdomen.</td><td>Symmetric pulses and no tearing pain make <strong>aortic dissection</strong> (the great exception) less likely — but you must consciously exclude it before choosing a strategy.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Crackles to the apices + a sympathetic, sweaty, gasping patient at 232/130 with often-normal JVP = SCAPE: an afterload problem you vasodilate, not a fluid problem you flood with diuretic."</div>
+
+    <h3>🧭 The single most important fork: EMERGENCY or URGENCY?</h3>
+    <p>Severe hypertension management forks on one question. <strong>Hypertensive EMERGENCY</strong> = severely elevated BP <strong>WITH acute target-organ damage</strong> (brain — encephalopathy/stroke; heart — ACS, acute pulmonary edema; aorta — dissection; kidney — AKI; eyes — papilledema; pregnancy — eclampsia). <strong>Hypertensive URGENCY</strong> = severely elevated BP <strong>WITHOUT</strong> acute organ damage — managed with <em>oral</em> agents and follow-up, not aggressive IV lowering. Mr. A.O. has acute pulmonary edema and hypoxia — <strong>EMERGENCY</strong>.</p>
+
+    <div class="callout danger"><b class="ct">💉 The decision is made: EMERGENCY (SCAPE) → IV VASODILATION + NIV, CONTROLLED DESCENT</b>This man gets <strong>high-dose IV nitroglycerin</strong> (offload the afterload and preload) plus <strong>non-invasive ventilation (BiPAP)</strong> to recruit alveoli and reduce LV transmural pressure — while lowering the MAP in a <strong>controlled</strong> way (~10–20% in the first hour). Do <em>not</em> drop it off a cliff with sublingual nifedipine, and do <em>not</em> reach reflexively for heavy furosemide in a euvolemic patient.</div>
+
+    <!-- 🎬 BRANCHING SCENARIO ENGINE -->
+    <div class="scenario" id="scenarioBox">
+      <h3>🎬 Choose Your Path — "The First 60 Seconds"</h3>
+      <div class="hud"><span>❤️ Stability: <b id="scStab">●●○○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 s</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+      <div class="scene-text" id="scText">The junior holds sublingual nifedipine in one hand; the nurse holds the GTN and BiPAP mask in the other. BP 232/130, SpO₂ 84%, drowning in froth. The patient is awake but exhausted. What do you do FIRST?</div>
+      <div class="choices" id="scChoices"></div>
+      <div class="feedback" id="scFeedback"></div>
+      <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+    </div>
+
+    <div class="callout info"><b class="ct">🧮 If this were URGENCY instead</b>
+    A patient with BP 220/120 but <em>no</em> acute organ damage — no edema, clear chest, no neuro signs, normal renal function and fundi — has hypertensive <strong>urgency</strong>. There is no benefit (and real harm) in rapid IV lowering. Restart or initiate <strong>oral</strong> agents, treat pain/anxiety, and arrange close follow-up to bring the pressure down over <strong>days</strong>. The organ damage, not the number, decides how fast you move.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S4 — RESIDENT REVIEW -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s4">
+  <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+  <div class="section-content">
+    <p><em>The cardiology resident arrives at 02:43. Her reasoning, out loud:</em></p>
+
+    <h3>🧠 Pattern recognition first, then physiology</h3>
+    <p>"Severe hypertension <em>with</em> flash pulmonary edema and hypoxia — that's a hypertensive <strong>emergency</strong>, and the phenotype is <strong>SCAPE</strong>: a sympathetic afterload crash, not slow congestive overload. The number is dramatic, but the number isn't the diagnosis — the <em>drowning lung</em> is. And SCAPE is an afterload problem: the lever that fixes it is <strong>vasodilation</strong>, with the patient sitting up on positive-pressure ventilation. The dangerous instinct is to treat the digit on the monitor and forget the organ — or to slam the pressure down so hard you trade hypoxia for a stroke."</p>
+
+    <h3>🎯 Immediate priorities (her actual order of operations)</h3>
+    <ol>
+      <li>🚫 <strong>Kill the freefall pathway:</strong> no sublingual nifedipine, no big IV hydralazine bolus, nothing that drops BP uncontrollably. Say it out loud and remove the capsule from the bedside.</li>
+      <li>🫁 <strong>Non-invasive ventilation (CPAP/BiPAP) now</strong> — it recruits flooded alveoli, raises SpO₂, reduces work of breathing and lowers LV transmural pressure (preload <em>and</em> afterload help). Often it buys the biggest early win.</li>
+      <li>💉 <strong>High-dose IV nitroglycerin, titrated:</strong> the key lever in SCAPE — venodilation at low dose, meaningful <strong>afterload</strong> reduction at higher doses. Start and uptitrate fast against BP and symptoms.</li>
+      <li>🧭 <strong>Controlled descent:</strong> aim to drop the <strong>MAP by ~10–20% in the first hour</strong>, then gradually over 24–48 h — not to "normal" in ten minutes.</li>
+      <li>💧 <strong>Diurese only if truly volume-overloaded:</strong> this patient may be euvolemic; give furosemide judiciously, not as the headline therapy. The cure is offload, not dehydration.</li>
+      <li>🔎 <strong>Exclude the exceptions &amp; find the cause:</strong> consciously rule out aortic dissection (symmetric pulses, no tearing pain, CXR/CT if any doubt), look for ischemia (ECG, troponin), and ask <em>why now</em> — stopped meds, OSA, renovascular disease.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Vasodilate and ventilate the SCAPE patient first; lower the MAP only ~10–20% in the first hour; chase the cause third — but always treat the organ, never the number."</div>
+
+    <h3>🤔 "But the pressure is terrifyingly high — shouldn't I just normalize it fast?"</h3>
+    <p>"No. The brain, heart and kidneys have spent years autoregulating to a high pressure; their autoregulatory curve is <strong>shifted right</strong>. Yank the MAP down too fast and perfusion falls off the cliff of that shifted curve → <strong>watershed cerebral, myocardial and renal infarction</strong>. A controlled ~10–20% MAP reduction in the first hour relieves the organ stress without dropping perfusion below the new floor. Going faster doesn't make him safer — it trades a high number for an infarct."</p>
+
+    <div class="callout purple"><b class="ct">🧪 Resident's self-test (answer before reading on)</b>
+    Someone suggests "this is pulmonary edema — let's give 80 mg of IV furosemide and another 80 if it doesn't settle." Good idea in this SCAPE patient?
+    <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+    <div class="reveal-hidden" id="rev1"><p><strong>Not as the main therapy.</strong> SCAPE is afterload-driven redistribution in an often <em>euvolemic</em> patient — the lungs are flooded, but the body isn't fluid-overloaded. Heavy diuresis can dehydrate him, worsen renal perfusion and reflexively activate more sympathetic/RAAS drive while never addressing the afterload that caused the flood. The headline therapy is <strong>high-dose nitroglycerin + NIV</strong>; reserve a measured dose of furosemide for genuine volume overload.</p></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S5 — CONSULTANT ROUND -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s5">
+  <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round</h2></div>
+  <div class="section-content">
+    <p><em>The on-call cardiology consultant, by phone at 02:50, then at the bedside:</em></p>
+
+    <h3>🗂️ Name the phenotype precisely — it changes the lever</h3>
+    <div class="vs">
+      <div class="side a"><h4>🌊 SCAPE / flash pulmonary edema (this patient)</h4>
+        <ul><li>Abrupt sympathetic <strong>afterload</strong> surge + venoconstriction → fluid <strong>redistributes</strong> into alveoli in minutes</li><li>Often <strong>euvolemic</strong> or dry — the problem is location, not total body water</li><li>Lever: <strong>vasodilation</strong> (high-dose IV nitroglycerin) + <strong>NIV/BiPAP</strong></li><li>Diuresis only if truly overloaded</li></ul></div>
+      <div class="side b"><h4>💧 Classic volume-overload ADHF</h4>
+        <ul><li>Days of gradual fluid accumulation → true whole-body excess</li><li>Raised JVP, peripheral edema, weight gain, often only mildly hypertensive</li><li>Lever: <strong>diuresis</strong> ± vasodilators to remove genuine excess fluid</li><li>The fluid really needs to come <em>out</em> of the body</li></ul></div>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"SCAPE is an afterload flood you vasodilate; classic ADHF is a volume flood you diurese. Same wet lungs, opposite levers — read the JVP, the tempo and the blood pressure to tell them apart."</div>
+
+    <h3>🛑 The exceptions that BREAK the slow-controlled rule</h3>
+    <p>"Most emergencies want a <em>gentle</em> ~10–20% MAP drop. But memorize the exceptions, because applying the wrong rule kills:</p>
+    <ul>
+      <li>🩸 <strong>Aortic dissection:</strong> lower <strong>fast</strong>. <strong>Rate first</strong> — IV beta-blocker to HR &lt; 60 to drop dP/dt — <strong>then</strong> a vasodilator, targeting SBP &lt; 120 within ~20 min. A vasodilator <em>without</em> rate control causes reflex tachycardia that propagates the tear.</li>
+      <li>🧠 <strong>Acute ischemic stroke:</strong> <strong>permissive hypertension</strong> — generally only treat above high thresholds (or to enable thrombolysis), because lowering pressure can extend the ischemic penumbra.</li>
+      <li>🩸 <strong>Intracerebral hemorrhage:</strong> specific (lower) SBP targets per guideline.</li>
+      <li>🤰 <strong>Eclampsia / pre-eclampsia:</strong> <strong>magnesium</strong> for seizure prophylaxis plus labetalol or hydralazine; deliver the baby.</li>
+    </ul>
+
+    <h3>🧭 Consultant's three commandments for the next hour</h3>
+    <ol>
+      <li>💉 "This is SCAPE — <strong>high-dose nitroglycerin and BiPAP</strong> are the engine. Titrate the GTN up aggressively against the BP and the breathing. Furosemide is a passenger here, not the driver."</li>
+      <li>🧭 "Drop the <strong>MAP ~10–20% in the first hour</strong>, then ease the rest over a day or two. I'd rather see 200/110 in twenty minutes than 120/70 — going too low too fast is how we cause the stroke we came to prevent."</li>
+      <li>🔎 "Then ask <strong>why now</strong>: stopped meds, sleep apnea, renal artery stenosis (think bilateral if he keeps flashing), cocaine, pheochromocytoma. SCAPE is a symptom — fix the lungs tonight, fix the substrate this admission."</li>
+    </ol>
+
+    <div class="callout danger"><b class="ct">☠️ The consultant's war memory (more in S13 M&amp;M)</b>"The worst hypertensive case I saw mishandled was a man at 240/140 with a thunderclap headache and a sweating, sky-high pressure. A locum gave him a <strong>10 mg sublingual nifedipine capsule</strong> to 'crack it.' His MAP fell by half in fifteen minutes. He went cortically blind from bilateral watershed occipital infarcts and never read a newspaper again. The pressure obeyed; the brain didn't survive the obedience. We don't crack pressures here — we lower them on a leash."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S6 — TEACHING POINTS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s6">
+  <div class="sec-header"><span class="s-badge">S6</span><h2>📖 Teaching Points</h2></div>
+  <div class="section-content">
+    <h3>🔬 The mechanism — WHY afterload floods the lung (the WHY behind the WHY)</h3>
+    <ol>
+      <li>⚡ <strong>The trigger:</strong> a sympathetic/catecholamine surge (OSA, anxiety, pain, stopped antihypertensives, sympathomimetics) abruptly raises systemic vascular resistance and <strong>venoconstricts</strong> — squeezing blood centrally.</li>
+      <li>💪 <strong>The stiff ventricle meets a wall:</strong> a hypertrophied, non-compliant left ventricle suddenly faces a much higher <strong>afterload</strong>. It cannot eject against it; <strong>LV end-diastolic pressure rises sharply</strong>.</li>
+      <li>🌊 <strong>Pressure backs up &amp; fluid REDISTRIBUTES:</strong> the high LV filling pressure transmits backward to the pulmonary capillaries. Plasma is forced across into the alveoli within <strong>minutes</strong> — flash edema. Importantly this is <em>redistributed</em> fluid; total body water may be normal (euvolemic).</li>
+      <li>💉 <strong>Why vasodilators fix it:</strong> nitroglycerin venodilates (↓ preload) and, at higher doses, dilates arteries (↓ afterload). Drop the afterload and the failing LV can suddenly eject; LVEDP falls and the alveolar flood drains back into the vasculature. <strong>NIV</strong> adds positive intrathoracic pressure that recruits alveoli and further offloads the LV.</li>
+      <li>💥 <strong>Why heavy diuresis is the wrong headline:</strong> in a euvolemic SCAPE patient there is no excess body water to remove. Aggressive furosemide dehydrates, triggers reflex sympathetic/RAAS activation (more afterload), and worsens renal perfusion — treating the symptom's shadow while the afterload still drives the flood.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"SCAPE is fluid in the wrong room, pushed there by afterload. Open the doors with a vasodilator and prop the lung open with BiPAP — don't try to bail the water out of a body that isn't actually overfull."</div>
+
+    <h3>⚖️ Contrast pair #1 — Hypertensive EMERGENCY vs URGENCY (the lethal label error)</h3>
+    <div class="vs">
+      <div class="side a"><h4>🚨 EMERGENCY (treat the organ)</h4><ul><li>Severe BP <strong>WITH acute target-organ damage</strong></li><li>Brain (encephalopathy/stroke), heart (ACS, pulmonary edema), aorta (dissection), kidney (AKI), eyes (papilledema), pregnancy (eclampsia)</li><li><strong>IV titratable</strong> agents, controlled descent (~10–20% MAP/hour), monitored bed</li></ul></div>
+      <div class="side b"><h4>🩸 URGENCY (treat over days)</h4><ul><li>Severe BP <strong>WITHOUT</strong> acute organ damage</li><li>No edema, no neuro signs, normal fundi, stable renal function</li><li><strong>Oral</strong> agents, restart meds, treat pain/anxiety, close follow-up</li><li>Rapid IV lowering offers no benefit and real harm</li></ul></div>
+    </div>
+    <p>😈 <strong>The trap:</strong> reacting to the <em>number</em> instead of the <em>organ</em> — either treating asymptomatic urgency with dangerous IV boluses, or under-treating a true emergency because "the patient looks okay." <strong>The organ damage, not the digit on the monitor, defines the emergency and dictates the tempo.</strong></p>
+
+    <h3>⚖️ Contrast pair #2 — Controlled lowering vs the DISSECTION/STROKE exceptions</h3>
+    <div class="vs">
+      <div class="side a"><h4>🧭 Most emergencies (tonight)</h4><ul><li>Drop MAP <strong>~10–20% in the first hour</strong>, then gradually over 24–48 h</li><li>IV titratable: nitroglycerin (SCAPE), nicardipine, clevidipine, labetalol</li><li>Goal: relieve organ stress without watershed infarction</li></ul></div>
+      <div class="side b"><h4>🛑 The exceptions</h4><ul><li><strong>Aortic dissection:</strong> rate first (β-blocker, HR &lt; 60), THEN vasodilator; SBP &lt; 120 in ~20 min</li><li><strong>Ischemic stroke:</strong> permissive hypertension; only treat above thresholds / pre-lytic</li><li><strong>ICH:</strong> specific lower SBP targets · <strong>Eclampsia:</strong> magnesium + labetalol/hydralazine</li></ul></div>
+    </div>
+    <p>💡 <em>Why it matters:</em> give a vasodilator alone in dissection and reflex tachycardia widens the tear; lower the pressure aggressively in acute ischemic stroke and you extend the infarct. <strong>Know which rule the organ in front of you obeys before you reach for an agent.</strong></p>
+
+    <!-- 🎮 INTERACTIVE SIM: rate of MAP reduction / organ perfusion -->
+    <div class="sim" id="kSim">
+      <h3 style="margin-top:0">🎮 Simulation — The Descent Dial: how the rate of MAP reduction in hour 1 tunes organ perfusion</h3>
+      <p style="font-size:13.5px">Drag the dial. It sets how far you drop the <strong>MAP in the first hour</strong>. Watch what too-fast and too-slow do to the organs you're trying to protect. This is the single most important decision in this case.</p>
+      <label for="kRange">📉 MAP reduction in hour 1: <b id="kVal">3</b> %</label>
+      <input type="range" id="kRange" min="20" max="75" value="31">
+      <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+      <div class="readout bad" id="kReadout">Set the dial to explore.</div>
+      <p style="font-size:12.5px; margin-top:10px; color:var(--ink2)">🎯 Safe band for most hypertensive emergencies: <strong>~10–20% MAP drop in the first hour</strong>. Too fast → watershed stroke/MI/AKI. Too little → ongoing target-organ damage. (Exceptions: dissection wants faster; ischemic stroke wants permissive/slower.)</p>
+    </div>
+
+    <!-- 📚 EBM MODULE -->
+    <div class="ebm">
+      <h3>📚 Evidence-Based Medicine Corner</h3>
+      <table class="tbl">
+        <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+        <tr><td><span class="lvl">PRINCIPLE</span> Controlled-lowering rationale</td><td>Chronic hypertension shifts the autoregulatory curve right; abrupt large MAP drops cause cerebral/myocardial/renal watershed hypoperfusion.</td><td>Lower MAP ~10–20% in the first hour, then gradually over 24–48 h. Avoid sublingual nifedipine and uncontrolled boluses.</td></tr>
+        <tr><td><span class="lvl">EVIDENCE</span> High-dose nitroglycerin + NIV in SCAPE</td><td>Aggressive IV nitroglycerin (afterload + preload reduction) with non-invasive ventilation rapidly reverses flash pulmonary edema and reduces intubation; heavy diuresis is often unnecessary in euvolemic SCAPE.</td><td>Vasodilation + BiPAP is the driver; diurese only if genuinely volume-overloaded.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> Aortic dissection BP/HR targets</td><td>Acute dissection: control rate first (β-blocker, HR &lt; 60) then vasodilator; target SBP &lt; 120 mmHg within ~20 min.</td><td>The dissection exception: rate before pressure, and lower fast — opposite to the gentle rule.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> Acute stroke BP thresholds</td><td>Ischemic stroke: permissive hypertension (treat only above thresholds, e.g. before/around thrombolysis); ICH has specific lower targets.</td><td>Don't aggressively lower BP in acute ischemic stroke — you can extend the infarct.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2017 ACC/AHA &amp; 2018 ESC hypertension</td><td>Define hypertensive emergency by acute target-organ damage; recommend IV titratable agents, organ-specific targets, and controlled reduction.</td><td>Exactly the framework driving S3, S7 and S11 — emergency vs urgency, organ-specific, titrate IV.</td></tr>
+      </table>
+    </div>
+
+    <!-- 🔬 ADVANCED TOPICS -->
+    <div class="callout purple">
+      <h3 style="margin-top:0">🔬 Fellowship Corner — Advanced Topics</h3>
+      <ul>
+        <li>🧠 <strong>Cerebral autoregulation &amp; the shifted curve:</strong> chronic hypertension shifts the autoregulatory plateau rightward; the safe lower limit of MAP is higher than normal, which is precisely why precipitous drops cause watershed infarction.</li>
+        <li>🔧 <strong>Recurrent flash pulmonary edema &amp; bilateral renal artery stenosis (Pickering syndrome):</strong> repeated SCAPE episodes with preserved EF should trigger renovascular imaging — revascularization can abolish the flashes.</li>
+        <li>🧪 <strong>Secondary hypertension workup:</strong> pheochromocytoma (paroxysmal surges — avoid unopposed β-blockade), primary aldosteronism, renovascular disease, Cushing, thyroid, OSA, cocaine/sympathomimetics, NSAID/contraceptive contributions.</li>
+        <li>💉 <strong>Agent pharmacology nuance:</strong> nicardipine/clevidipine (smooth arterial vasodilation, easy titration), labetalol (combined α/β — caution in decompensated failure/bradycardia), nitroprusside (potent but watch <strong>cyanide/thiocyanate</strong> toxicity, esp. renal/hepatic impairment and prolonged infusions), fenoldopam (renal-protective dopamine-1 agonist).</li>
+        <li>🤰 <strong>Pregnancy-specific:</strong> pre-eclampsia/eclampsia — magnesium for seizure prophylaxis, labetalol/hydralazine/oral nifedipine for BP, avoid ACEi/ARB; definitive treatment is delivery.</li>
+        <li>🩺 <strong>Hypertensive encephalopathy &amp; PRES:</strong> headache, confusion, visual change, seizures with posterior white-matter edema on MRI; reversible with controlled BP reduction — a diagnosis you confirm by improvement.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S7 — ORDERS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s7">
+  <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+  <div class="section-content">
+    <h3>🖊️ The order set, written as you'd actually write it (02:45)</h3>
+    <ul>
+      <li>🚨 <strong>NO sublingual nifedipine, NO uncontrolled IV bolus, NO heavy diuresis as first move</strong> — flag on chart and whiteboard; the goal is a controlled descent, not a freefall.</li>
+      <li>🫁 <strong>Non-invasive ventilation (CPAP/BiPAP)</strong> immediately for the SCAPE patient — recruit alveoli, raise SpO₂, offload the LV; prepare for intubation if he tires.</li>
+      <li>💉 <strong>High-dose IV nitroglycerin infusion</strong>, titrated aggressively against BP and respiratory distress (afterload + preload reduction — the key lever in SCAPE).</li>
+      <li>🧭 <strong>Target a controlled MAP reduction of ~10–20% in the first hour</strong>, then gradual lowering over 24–48 h. Document the target on the chart.</li>
+      <li>💧 <strong>Furosemide only if genuinely volume-overloaded</strong> (raised JVP, history of gradual weight gain) — a measured dose, not the headline therapy in euvolemic SCAPE.</li>
+      <li>🩻 <strong>Target-organ-damage screen:</strong> 12-lead ECG + serial troponin, U&amp;E/creatinine, urinalysis, fundoscopy (papilledema), neuro exam; <strong>CXR ± CT aorta if any dissection concern</strong>.</li>
+      <li>🔎 Consider alternative IV titratable agents if needed: <strong>nicardipine / clevidipine / labetalol</strong> (nitroprusside reserved — watch cyanide/thiocyanate).</li>
+      <li>🫁 High-flow O₂ to SpO₂ ≥ 94% (via NIV), continuous monitoring, two IV lines, NPO pending stability, urinary catheter to track output.</li>
+      <li>📞 Refer cardiology/CCU; arrange secondary-hypertension workup (renovascular imaging if recurrent flash edema, OSA assessment) once stabilized.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In SCAPE there are only two engines: vasodilate (high-dose nitroglycerin) and ventilate (BiPAP). Every other order exists to make those two safer, to lower the pressure on a leash, and to find why the lungs flooded tonight."</div>
+
+    <!-- 🩺 PROCEDURE GUIDE 1 -->
+    <div class="checklist" id="ckCV">
+      <h3 style="margin-top:0">🩺 Procedure Guide — Managing SCAPE / Hypertensive Emergency — tick as you go</h3>
+      <label class="ck"><input type="checkbox"><span>🧑‍⚕️ Confirm hypertensive EMERGENCY = severe BP <strong>WITH acute target-organ damage</strong> (here: acute pulmonary edema + hypoxia) — not asymptomatic urgency</span></label>
+      <label class="ck"><input type="checkbox"><span>🛑 Consciously exclude the exceptions (aortic dissection, acute stroke) — symmetric pulses, no tearing pain, focused neuro exam — before choosing the descent strategy</span></label>
+      <label class="ck"><input type="checkbox"><span>🫁 Start <strong>NIV (CPAP/BiPAP)</strong>, sit the patient up, high-flow O₂; prepare airway kit in case of fatigue</span></label>
+      <label class="ck"><input type="checkbox"><span>💉 Start and uptitrate <strong>high-dose IV nitroglycerin</strong> against BP and breathing (the SCAPE lever)</span></label>
+      <label class="ck"><input type="checkbox"><span>🧭 Target a <strong>controlled MAP drop of ~10–20% in the first hour</strong> — not normalization in minutes</span></label>
+      <label class="ck"><input type="checkbox"><span>💧 Add furosemide <strong>only</strong> if truly volume-overloaded; reassess euvolemia (JVP, history, response)</span></label>
+      <label class="ck"><input type="checkbox"><span>🔎 Screen organs &amp; trigger: ECG/troponin, renal function, fundi, then chase the cause (stopped meds, OSA, renovascular)</span></label>
+      <div class="ck-progress" data-progress>0 / 7 complete</div>
+    </div>
+
+    <!-- 🩺 PROCEDURE GUIDE 2 -->
+    <div class="checklist" id="ckDefib">
+      <h3 style="margin-top:0">🩺 Procedure Guide — If it's AORTIC DISSECTION instead: the exception pathway</h3>
+      <p style="font-size:13px">⚠️ Severe hypertension with tearing chest/back pain, pulse/BP asymmetry, or a widened mediastinum → this is the exception that <strong>breaks the slow rule</strong>. Rate before pressure, and lower <strong>fast</strong>.</p>
+      <label class="ck"><input type="checkbox"><span>🩸 Recognize dissection clues: tearing pain radiating to the back, inter-arm BP difference, pulse deficit, widened mediastinum on CXR → urgent CT aorta</span></label>
+      <label class="ck"><input type="checkbox"><span>💊 <strong>RATE FIRST</strong> — IV beta-blocker (e.g. esmolol/labetalol) to drop heart rate to <strong>&lt; 60</strong> and reduce aortic wall stress (dP/dt)</span></label>
+      <label class="ck"><input type="checkbox"><span>💉 <strong>THEN</strong> add a vasodilator — never a vasodilator alone (reflex tachycardia propagates the tear)</span></label>
+      <label class="ck"><input type="checkbox"><span>🎯 Target <strong>SBP &lt; 120 mmHg within ~20 min</strong> while controlling pain</span></label>
+      <label class="ck"><input type="checkbox"><span>📞 Emergent surgical/vascular consult; type A → theatre; type B → BP control ± endovascular</span></label>
+      <label class="ck"><input type="checkbox"><span>🧠 Contrast the stroke exception: in acute ischemic stroke, <strong>do NOT</strong> aggressively lower BP (permissive hypertension)</span></label>
+      <div class="ck-progress" data-progress>0 / 6 complete</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S8 — NURSING CARE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s8">
+  <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+  <div class="section-content">
+    <h3>🛏️ CCU nursing priorities — minute by minute</h3>
+    <ul>
+      <li>📟 <strong>Continuous BP, SpO₂ and ECG monitoring with the NIV machine at the bedside.</strong> A controlled descent only happens if you can <em>see</em> the pressure fall in real time.</li>
+      <li>🩸 <strong>Know your target cold:</strong> the team wants the MAP down ~10–20% in the first hour — <em>not</em> normalized in minutes. Flag immediately if the pressure plummets faster than that.</li>
+      <li>🫁 <strong>Optimize the NIV:</strong> good mask seal, reassure the frightened patient (NIV fails when patients panic and fight the mask), titrate FiO₂ to SpO₂ ≥ 94%, watch for fatigue signaling need to intubate.</li>
+      <li>🧪 <strong>Run the nitroglycerin infusion precisely</strong> on a monitored line/pump; double-check concentration and rate, and titrate to the BP target the team set — uncontrolled drops are themselves dangerous.</li>
+      <li>💧 <strong>Strict fluid balance &amp; catheter</strong> — but remember many SCAPE patients are euvolemic; don't assume large diuresis is the goal.</li>
+      <li>🧠 <strong>Neuro / consciousness checks</strong> — new confusion, visual change or focal weakness during BP lowering may mean you've dropped it too far (watershed) — escalate at once.</li>
+      <li>📋 <strong>Document each BP, the infusion rate, and the time</strong> — the descent curve is the record that proves the lowering was controlled.</li>
+      <li>🔇 <strong>Calm the room:</strong> fear and pain drive the catecholamine surge that fuels SCAPE. A composed bedside and analgesia/anxiolysis are part of the antihypertensive treatment.</li>
+      <li>👨‍👩‍👦 Keep the family updated and supported (see S16) — assign a liaison if staffing allows; watching someone drown in air is terrifying.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who watches the pressure fall on a leash — never faster than ~10–20% in the first hour — and keeps a frightened patient calm on the mask is doing half the antihypertensive work in the room."</div>
+    <div class="callout warn"><b class="ct">📢 Escalate IMMEDIATELY for</b>BP falling far faster than the target (→ stop/slow the infusion) · new confusion, visual loss or focal neurology (watershed) · tiring on NIV / falling SpO₂ (→ prepare to intubate) · new tearing chest/back pain or pulse asymmetry (→ dissection) · new chest pain / ST changes · falling urine output · any order for sublingual nifedipine or a big uncontrolled bolus in this patient.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S9 — INVESTIGATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s9">
+  <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+  <div class="section-content">
+    <h3>🧾 Results board (03:05, drawn during resuscitation)</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>Result</th><th>Reference</th><th>Interpretation</th></tr>
+      <tr><td>Creatinine</td><td class="hi">1.9 mg/dL ↑</td><td>0.7–1.2</td><td>Acute kidney injury — a target organ. Confirms emergency, not urgency. Guides agent choice and warns against over-fast lowering (renal watershed).</td></tr>
+      <tr><td>Troponin I</td><td class="hi">0.09 ng/mL ↑</td><td>&lt; 0.04</td><td>Mildly raised — demand ischemia from the hypertensive, tachycardic, hypoxic heart. Serial values + ECG decide if there's a true ACS driver.</td></tr>
+      <tr><td>BNP / NT-proBNP</td><td class="hi">Elevated ↑</td><td>—</td><td>Reflects acute LV wall stress from the afterload surge; supports cardiac pulmonary edema but doesn't distinguish SCAPE from volume overload — the bedside does.</td></tr>
+      <tr><td>Potassium</td><td class="ok-v">4.1 mmol/L</td><td>3.5–5.0</td><td>Normal now; recheck after any diuresis. Watch with ACEi restart and AKI.</td></tr>
+      <tr><td>Lactate</td><td class="hi">3.0 mmol/L ↑</td><td>&lt; 2.0</td><td>Hypoxia and work of breathing — a marker of how sick the SCAPE is, expected to fall with NIV + vasodilation.</td></tr>
+      <tr><td>Urinalysis</td><td class="hi">Proteinuria, few RBC casts</td><td>—</td><td>Hypertensive renal injury / thrombotic microangiopathy features — more evidence of target-organ damage.</td></tr>
+      <tr><td>Toxicology</td><td class="ok-v">Pending</td><td>—</td><td>Cocaine/sympathomimetics can cause a catecholamine surge → SCAPE; relevant to cause and to avoiding unopposed β-blockade.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The bloodwork's job is to prove an organ is being injured (creatinine, troponin, urinalysis, fundi) — because that, not the systolic number, is what turns a high reading into a hypertensive emergency."</div>
+
+    <div class="callout info"><b class="ct">🧠 Why a mildly positive troponin does NOT automatically relabel this as 'just an MI'</b>Severe hypertension with tachycardia and hypoxia raises troponin through supply–demand mismatch in a strained, thick LV. The question is whether ischemia is the <em>cause</em> or the <em>consequence</em>. Treat the SCAPE, get a clean ECG, trend the troponin: a culprit-pattern STEMI → cath lab; a settling troponin with no ST elevation → the hypertension/SCAPE was primary and ischemia secondary.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S10 — ECG / IMAGING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s10">
+  <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging</h2></div>
+  <div class="section-content">
+    <h3>🫀 The presenting ECG — read it like a detective</h3>
+    <div class="ecg-fig">
+      <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Sinus tachycardia with LV hypertrophy and strain pattern">
+        <rect width="820" height="150" fill="#0b1220"/>
+        <g stroke="#1e3a5f" stroke-width="1">
+          <line x1="0" y1="30" x2="820" y2="30"/><line x1="0" y1="60" x2="820" y2="60"/>
+          <line x1="0" y1="90" x2="820" y2="90"/><line x1="0" y1="120" x2="820" y2="120"/>
+        </g>
+        <polyline fill="none" stroke="#86efac" stroke-width="2.4" points="0,75 20,75 26,70 32,78 44,18 52,118 60,90 72,75 120,75 140,70 146,78 158,18 166,118 174,90 186,75 234,75 254,70 260,78 272,18 280,118 288,90 300,75 348,75 368,70 374,78 386,18 394,118 402,90 414,75 462,75 482,70 488,78 500,18 508,118 516,90 528,75 576,75 596,70 602,78 614,18 622,118 630,90 642,75 690,75 710,70 716,78 728,18 736,118 744,90 756,75 804,75 820,75"/>
+        <text x="40" y="14" fill="#fca5a5" font-size="12" font-weight="700">↑ tall R (LVH)</text>
+        <text x="300" y="138" fill="#fcd34d" font-size="12" font-weight="700">↓ down-sloping ST / T inversion (strain)</text>
+      </svg>
+      <div class="ecg-cap">Sinus <span style="color:#fca5a5">tachycardia</span> with tall left-precordial R waves (<strong>LV hypertrophy</strong>) and <span style="color:#fcd34d">down-sloping ST depression / T-wave inversion</span> — the LVH <strong>strain</strong> pattern of a chronically pressure-loaded ventricle now acutely overwhelmed. No clear new ST elevation → favors SCAPE/hypertensive emergency over a primary STEMI.</div>
+    </div>
+
+    <h3>🔎 The hypertensive-emergency assessment toolkit (memorize the high-yield ones)</h3>
+    <table class="tbl">
+      <tr><th>Feature / test</th><th>Why it matters</th></tr>
+      <tr><td>📈 <strong>LVH with strain on ECG</strong></td><td>Marks the chronically pressure-loaded, stiff ventricle that is the substrate for SCAPE; also screen for ischemic ST/T changes (ACS as cause).</td></tr>
+      <tr><td>🫁 <strong>CXR / lung ultrasound</strong></td><td>Bilateral interstitial/alveolar edema (B-lines, bat-wing); helps separate cardiac pulmonary edema from other dyspnea and tracks response.</td></tr>
+      <tr><td>👁️ <strong>Fundoscopy</strong></td><td>Papilledema, flame hemorrhages, exudates = hypertensive retinopathy / malignant hypertension — direct evidence of acute target-organ damage.</td></tr>
+      <tr><td>🧠 <strong>CT/MRI brain</strong></td><td>If encephalopathy, focal deficit or seizures — distinguish stroke/ICH/PRES, which carry <em>different</em> BP targets (the exceptions).</td></tr>
+      <tr><td>🩸 <strong>CT aorta</strong></td><td>Whenever dissection is plausible (tearing pain, pulse/BP asymmetry, widened mediastinum) — because dissection breaks the slow-lowering rule.</td></tr>
+      <tr><td>🫀 <strong>Echocardiogram</strong></td><td>LVH, preserved vs reduced EF, diastolic dysfunction, valve disease; confirms the stiff-ventricle SCAPE physiology and excludes mechanical causes.</td></tr>
+      <tr><td>🔧 <strong>Renal / renovascular imaging</strong></td><td>Recurrent flash edema → suspect bilateral renal artery stenosis (Pickering syndrome); part of the secondary-hypertension workup.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The ECG and CXR tell you the heart and lungs are the injured organs; the fundi, creatinine and brain imaging tell you which other organs are involved — and which rule (gentle, or the dissection/stroke exception) you must follow."</div>
+
+    <h3>🫀 Post-stabilization imaging &amp; workup</h3>
+    <ul>
+      <li>📈 <strong>Repeat 12-lead</strong> after BP control: resolution of strain changes and no new ST elevation supports hypertensive SCAPE rather than acute coronary occlusion.</li>
+      <li>🩻 <strong>Echo:</strong> concentric LVH, EF ~55% with diastolic dysfunction (HFpEF), no critical valve lesion — the classic stiff-ventricle SCAPE substrate; reassess volume status.</li>
+      <li>🧲 <strong>Secondary workup (later):</strong> renovascular imaging (recurrent flash edema), plasma/urine metanephrines (pheochromocytoma), aldosterone:renin ratio, sleep study for OSA.</li>
+    </ul>
+
+    <div class="callout warn"><b class="ct">⚠️ The favorite lie in severe hypertension + dyspnea</b>"The pressure is huge, so just hammer it down and the breathing will follow." A huge number with <em>tearing pain</em> may be dissection (lower fast, rate first), and a huge number with a <em>focal deficit</em> may be stroke (don't lower aggressively). Always ask <strong>which organ</strong> is involved before you choose how fast — the organ, not the number, sets the strategy.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S11 — MEDICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s11">
+  <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+  <div class="section-content">
+    <h3>💉 Acute drugs — what, why, and the traps</h3>
+    <table class="tbl">
+      <tr><th>Drug</th><th>Role tonight</th><th>Mechanism / caution</th></tr>
+      <tr><td><strong>Nitroglycerin (high-dose IV)</strong></td><td>The key lever in SCAPE — venodilation (↓ preload) and, at higher doses, arterial dilation (↓ afterload)</td><td>Titrate aggressively against BP and breathing. Tolerance and headache; avoid with recent PDE5 inhibitor use (severe hypotension).</td></tr>
+      <tr><td><strong>Non-invasive ventilation (CPAP/BiPAP)</strong></td><td>Recruits flooded alveoli, raises SpO₂, lowers LV transmural pressure (preload + afterload help)</td><td>Not a drug but a core therapy. Needs a calm patient and good seal; escalate to intubation if tiring.</td></tr>
+      <tr><td><strong>Nicardipine / Clevidipine (IV)</strong></td><td>Smooth, titratable arterial vasodilation for controlled MAP reduction</td><td>Calcium-channel blockers, easy to titrate. Clevidipine ultra-short-acting (lipid emulsion). Useful when GTN alone insufficient.</td></tr>
+      <tr><td><strong>Labetalol (IV)</strong></td><td>Combined α/β blockade; controlled lowering; useful in many emergencies and in pregnancy</td><td>Caution in decompensated heart failure, bradycardia, severe asthma. Avoid as sole agent in dissection (still useful for rate there).</td></tr>
+      <tr><td><strong>Sodium nitroprusside (IV)</strong></td><td>Potent, rapidly titratable arterial + venous vasodilator for refractory cases</td><td>Watch <strong>cyanide / thiocyanate toxicity</strong> (esp. renal/hepatic impairment, prolonged or high-rate infusions); can cause coronary steal.</td></tr>
+      <tr><td><strong>Furosemide (IV)</strong></td><td>Only if <em>truly</em> volume-overloaded — not the headline therapy in euvolemic SCAPE</td><td>Aggressive diuresis in a euvolemic SCAPE patient dehydrates and reflexively raises sympathetic/RAAS drive (more afterload). Use judiciously.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Sublingual nifedipine and uncontrolled boluses belong in the bin. Use IV titratable agents you can dial up and down — and in SCAPE, the dial that matters most is high-dose nitroglycerin."</div>
+
+    <div class="callout danger"><b class="ct">🚫 The 'never' list in hypertensive emergency</b>❌ Sublingual / immediate-release nifedipine (uncontrolled precipitous drop → watershed stroke) · ❌ aggressive normalization of BP in minutes (autoregulation can't follow) · ❌ a vasodilator <em>alone</em> in suspected aortic dissection (reflex tachycardia widens the tear — rate first) · ❌ aggressive BP lowering in acute ischemic stroke (permissive hypertension) · ❌ heavy diuresis as the headline move in euvolemic SCAPE. When in doubt, lower it <strong>on a leash</strong> with a titratable IV agent.</div>
+
+    <h3>🏠 Substrate-modifying therapy (this admission, not just tonight)</h3>
+    <ul>
+      <li>💙 <strong>Restart &amp; optimize oral antihypertensives</strong> once stable — long-acting agents, address the non-adherence that triggered tonight.</li>
+      <li>😴 <strong>Treat OSA</strong> (CPAP at home) — untreated apnea drives the nocturnal sympathetic surges behind recurrent flash edema.</li>
+      <li>🔧 <strong>Investigate &amp; treat secondary causes</strong> — renovascular disease (revascularize if recurrent flash edema), aldosteronism, pheochromocytoma.</li>
+      <li>🧂 <strong>Lifestyle &amp; adherence:</strong> salt restriction, smoking cessation, weight loss, blister-pack/reminder strategies, and a system that doesn't send severe hypertension home without an organ-damage check.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S12 — MONITORING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s12">
+  <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+  <div class="section-content">
+    <h3>📡 What to watch and why</h3>
+    <ul>
+      <li>🩸 <strong>Continuous / very frequent BP</strong> — ideally an <strong>arterial line</strong> for beat-to-beat pressure while titrating IV vasodilators; the controlled descent only works if you can see it.</li>
+      <li>📉 <strong>MAP trend against the target</strong> — confirm you're achieving ~10–20% in the first hour, not overshooting; a too-rapid fall is itself a complication to act on.</li>
+      <li>🫁 <strong>SpO₂ and work of breathing</strong> on NIV — rising sats and falling RR mean the SCAPE is reversing; tiring or stagnant sats mean prepare to intubate.</li>
+      <li>🧠 <strong>Serial neuro checks</strong> — new confusion, visual change or focal deficit during lowering signals watershed hypoperfusion → ease off.</li>
+      <li>🫀 <strong>Serial ECG &amp; troponin</strong> — rising troponin/ST changes suggest a true ACS driver; settling values suggest demand ischemia from the hypertensive crisis.</li>
+      <li>💧 <strong>Urine output &amp; renal function</strong> — both a target organ and a perfusion gauge; falling output may mean BP dropped too far.</li>
+      <li>📈 <strong>Wean to oral agents</strong> as BP stabilizes — overlap IV and oral, then taper the infusion as long-acting oral therapy takes hold.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Once the lungs start to dry, the monitor's job changes from 'how high is the pressure?' to 'am I lowering it on a controlled slope?' — and the two numbers that answer it are the MAP trend and the neuro exam."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S13 — COMPLICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s13">
+  <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+  <div class="section-content">
+    <h3>💀 What can go wrong — and the mechanism</h3>
+    <ul>
+      <li>🧠 <strong>Watershed cerebral infarction / cortical blindness</strong> — from lowering BP too far/too fast below the right-shifted autoregulatory floor. The signature harm of "cracking" the pressure.</li>
+      <li>🫁 <strong>Respiratory failure / intubation</strong> — if NIV fails or vasodilation is delayed, the flooded lung wins and the patient tires.</li>
+      <li>💔 <strong>Myocardial infarction / demand ischemia</strong> — the strained, hypoxic, tachycardic LV, or a precipitous BP drop reducing coronary perfusion.</li>
+      <li>🩸 <strong>Acute kidney injury</strong> — both from the hypertensive injury itself and from over-aggressive lowering or over-diuresis (renal watershed/hypovolemia).</li>
+      <li>🩸 <strong>Missed aortic dissection</strong> — treating with a vasodilator alone, or applying the gentle rule, when the real diagnosis needed rate-first, fast lowering.</li>
+      <li>🔁 <strong>Recurrence / rebound</strong> — if the trigger (stopped meds, OSA, renovascular disease) isn't addressed, the flash edema returns, sometimes within days.</li>
+    </ul>
+
+    <!-- 🎭 M&M CONFERENCE MODULE -->
+    <div class="mm">
+      <h3>🎭 Morbidity &amp; Mortality Conference — "The Pressure Obeyed, the Brain Didn't"</h3>
+      <div class="mm-case">
+        <strong>The case:</strong> A 62-year-old man arrived at 03:00 with BP 240/140, a pounding headache and a sweating, sky-high pressure. A busy night team, fixated on the number, gave a <strong>10 mg immediate-release sublingual nifedipine capsule</strong> "to crack it," followed by a large hydralazine bolus. Over fifteen minutes his MAP fell by nearly half. He became confused, then cortically <strong>blind</strong> from bilateral watershed occipital infarcts — a deficit he never recovered. At the M&amp;M, the pre-treatment notes showed no acute organ damage at all: this had been a hypertensive <em>urgency</em> that demanded oral agents and follow-up, mistreated as if the number itself were the emergency. <em>(The sibling error, in a different patient: a SCAPE patient drowned in repeated boluses of furosemide while the afterload was never touched — and an aortic dissection given a vasodilator without a beta-blocker first, whose reflex tachycardia widened the tear.)</em>
+      </div>
+      <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+      <div class="swiss">
+        <div class="hole"><b>🔢 TREATED THE NUMBER</b>Reacted to 240/140, not to the (absent) organ damage — urgency mislabeled as emergency.</div>
+        <div class="hole"><b>💊 LETHAL DRUG</b>Sublingual nifedipine → uncontrolled precipitous fall → watershed infarction.</div>
+        <div class="hole"><b>⏱️ TOO FAST</b>MAP halved in 15 min — far beyond the safe ~10–20% in the first hour.</div>
+        <div class="hole"><b>🧠 AUTOREGULATION IGNORED</b>Chronic hypertensives can't perfuse the brain at a suddenly 'normal' pressure.</div>
+        <div class="hole"><b>🌙 SYSTEM</b>Night fatigue, no senior review, no "emergency vs urgency" default.</div>
+      </div>
+      <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> apply the universal rule — <em>the organ damage, not the number, makes it an emergency</em>; for true emergencies use IV titratable agents and drop the MAP only ~10–20% in the first hour; never give sublingual nifedipine or uncontrolled boluses; know the exceptions (dissection → fast, rate first; stroke → permissive). <strong>This is exactly why your nurse held the nifedipine tonight.</strong></p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'The pressure was so high I had to crack it fast' is the sentence written on the chart of patients who then go cortically blind. A high number is not a license to freefall."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S14 — DIFFERENTIALS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s14">
+  <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials</h2></div>
+  <div class="section-content">
+    <h3>🧩 Severe hypertension + acute dyspnea — the differential</h3>
+    <table class="tbl">
+      <tr><th>Diagnosis</th><th>Clues</th><th>Why it matters</th></tr>
+      <tr><td>🌊 <strong>SCAPE / hypertensive emergency with flash pulmonary edema</strong> (this patient)</td><td>Abrupt severe dyspnea, BP very high, crackles to apices, sympathetic/diaphoretic, often euvolemic, LVH strain on ECG</td><td>Default here; treat with high-dose nitroglycerin + NIV and controlled MAP reduction. Afterload, not volume.</td></tr>
+      <tr><td>💧 <strong>Volume-overload decompensated HF (ADHF)</strong></td><td>Gradual onset over days, raised JVP, peripheral edema, weight gain, often only mildly hypertensive</td><td>Headline therapy is diuresis — the opposite lever to SCAPE. Read the tempo and JVP.</td></tr>
+      <tr><td>🩸 <strong>Hypertensive urgency (no organ damage)</strong></td><td>Severe BP but clear chest, normal fundi/renal function, no neuro signs, no edema</td><td>Oral agents + follow-up; rapid IV lowering is harmful. Don't mislabel as emergency.</td></tr>
+      <tr><td>🩸 <strong>Aortic dissection</strong></td><td>Tearing chest/back pain, inter-arm BP/pulse asymmetry, widened mediastinum</td><td>Breaks the rule: rate first (β-blocker, HR &lt; 60), then vasodilator, SBP &lt; 120 fast.</td></tr>
+      <tr><td>💔 <strong>Acute coronary syndrome</strong></td><td>Ischemic chest pain, ST changes, rising troponin; can both cause and result from the crisis</td><td>May need the cath lab; nitrates help both ischemia and SCAPE, but identify a true STEMI.</td></tr>
+      <tr><td>🧠 <strong>Hypertensive encephalopathy / stroke / ICH</strong></td><td>Headache, confusion, visual change, seizures, or focal deficit</td><td>Brain imaging dictates BP targets — encephalopathy/PRES vs ischemic stroke (permissive) vs ICH (specific targets).</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Severe BP + drowning lungs that came on in MINUTES → think SCAPE (vasodilate). Severe BP + tearing pain → think dissection (rate first, fast). Severe BP + focal deficit → think stroke (hands off the pressure)."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S15 — PLAN -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s15">
+  <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan</h2></div>
+  <div class="section-content">
+    <h3>🧭 Tonight → this week → for life</h3>
+    <ol>
+      <li>💉 <strong>Tonight (done):</strong> NIV/BiPAP + high-dose IV nitroglycerin → SpO₂ recovering, lungs clearing; MAP lowered ~10–20% in the first hour on a leash; dissection and stroke excluded; CCU admission with arterial line.</li>
+      <li>🫀 <strong>Identify &amp; treat the trigger:</strong> reconcile the stopped antihypertensives, assess for OSA, screen for renovascular disease, and trend troponin/ECG to settle the ACS question.</li>
+      <li>💊 <strong>Wean IV to oral:</strong> overlap and transition from the nitroglycerin infusion to optimized long-acting oral antihypertensives as BP stabilizes.</li>
+      <li>🔧 <strong>Secondary-hypertension workup</strong> — renovascular imaging (especially given recurrent flash-edema risk), aldosterone:renin ratio, metanephrines, sleep study; treat what you find.</li>
+      <li>💙 <strong>Organ recovery &amp; protection</strong> — monitor renal function recovery, optimize HFpEF management, statin, smoking cessation, salt restriction.</li>
+      <li>👨‍👩‍👦 <strong>Shared decision-making &amp; education</strong> — why never to stop medications abruptly, what flash pulmonary edema feels like, OSA treatment, and a clear "call 911 for sudden severe breathlessness" safety net.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Vasodilation and BiPAP treat the episode; treating the OSA, the renovascular disease and the non-adherence — and never letting him run out of tablets again — treat the disease. Send him home with all of it planned, or he flashes again."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S16 — PROGRESS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s16">
+  <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+  <div class="section-content">
+    <h3>📅 Course in CCU</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Night 1, 02:55</div>NIV + high-dose nitroglycerin started. Over the first hour MAP falls from ~164 to ~138 (~16% — within target); SpO₂ climbs to 94% on NIV, RR settles to 24. No new neuro deficit.</div>
+      <div class="t-item"><div class="t-time">Night 1, 04:30</div>Lungs clearing, frothy sputum resolved; BP eased to ~180/104 on a controlled slope. No diuretic needed beyond a single modest dose — he was essentially euvolemic (SCAPE physiology confirmed).</div>
+      <div class="t-item"><div class="t-time">Day 1</div>Troponin plateaus then falls; no new ST elevation — crisis deemed primary hypertensive SCAPE, not ACS. NIV weaned to nasal O₂. Long-acting oral antihypertensives started.</div>
+      <div class="t-item"><div class="t-time">Day 2</div>Echo: concentric LVH, EF 55% with diastolic dysfunction (HFpEF) — the stiff-ventricle substrate. Creatinine improving as perfusion normalizes. Nitroglycerin infusion weaned off.</div>
+      <div class="t-item"><div class="t-time">Day 3</div>Renovascular imaging and sleep study arranged; OSA strongly suspected. Medication reconciliation and adherence plan with pharmacy and family.</div>
+      <div class="t-item"><div class="t-time">Day 5</div>BP controlled on oral agents, organ function recovered, mobilizing. Ready for discharge with CPAP referral and follow-up.</div>
+    </div>
+
+    <!-- 👨‍👩‍👦 FAMILY & PATIENT JOURNEY MODULE -->
+    <h3>👨‍👩‍👦 Family &amp; Patient Journey</h3>
+    <div class="journey">
+      <div class="j-card"><div class="j-who">🧔 The patient — Mr. A.O.</div><p>"I genuinely thought I was drowning in my own bed. They put a mask on me and started a drip, and slowly I could breathe again. They told me they brought the pressure down on purpose <em>slowly</em> — that fast wasn't safer. And that I can never just run out of my tablets on the road again."</p></div>
+      <div class="j-card"><div class="j-who">👩 His wife</div><p>"A nurse stood with me and explained every number on the screen. The hardest part was the gurgling sound when he breathed. Then the mask went on, the drip went up, and the gurgle just… faded. I could breathe when he could."</p></div>
+      <div class="j-card"><div class="j-who">👩‍⚕️ The bedside nurse</div><p>"My job was the mask, the nitroglycerin and watching the pressure come down on a leash — never too fast. And holding that nifedipine capsule. Sometimes good care is the drug you <em>don't</em> give."</p></div>
+      <div class="j-card"><div class="j-who">🎓 The team's reflection</div><p>"This wasn't a clever diagnosis — it was a disciplined one. We treated the drowning organ, not the frightening number, vasodilated instead of just diuresing, and lowered the pressure under control."</p></div>
+    </div>
+
+    <div class="callout pink"><b class="ct">💗 The human thread</b>A blood pressure number is abstract until it floods someone's lungs at 2 a.m. Helping Mr. A.O. understand <em>why</em> the tablets matter — that this terrifying night was the rebound of eight days without them — and treating his sleep apnea, is as much treatment as any infusion. Adherence is not nagging; it is the prevention of the next flood.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S17 — DISCHARGE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s17">
+  <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+  <div class="section-content">
+    <h3>📋 Discharge plan &amp; safety net</h3>
+    <ul>
+      <li>💊 <strong>Medications:</strong> optimized long-acting oral antihypertensives with a clear written schedule and a refill/adherence plan (the eight days off tablets caused tonight). Statin; address any contributors (NSAIDs, sympathomimetics).</li>
+      <li>😴 <strong>OSA pathway:</strong> sleep study and CPAP referral — treating apnea reduces the nocturnal sympathetic surges behind recurrent flash edema.</li>
+      <li>🔧 <strong>Secondary-cause follow-up:</strong> renovascular imaging results and plan (revascularization if bilateral renal artery stenosis with recurrent flash edema), aldosterone/metanephrine results reviewed.</li>
+      <li>🩸 <strong>Home BP monitoring &amp; targets:</strong> teach correct technique, give a log, set a target, and explain that the goal is steady control over weeks — not chasing the number day to day.</li>
+      <li>🚩 <strong>Red flags → call emergency services:</strong> sudden severe breathlessness (especially waking from sleep), chest pain, tearing back pain, sudden weakness/visual change/confusion, or froth/pink sputum.</li>
+      <li>📚 <strong>Education:</strong> what a hypertensive emergency and flash pulmonary edema are in plain language, why <em>never</em> to stop medications abruptly, smoking cessation, salt reduction, and weight management.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Discharge after SCAPE is not 'pressure down, go home' — it is optimized long-acting medications he won't run out of, the OSA treated, the secondary causes chased, and a family who knows what 2 a.m. breathlessness means."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S18 — CLINICAL PEARLS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s18">
+  <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+  <div class="section-content">
+    <div class="pearl-grid">
+      <div class="pearl"><b>🚨 Organ, not number</b>Hypertensive EMERGENCY = high BP + acute target-organ damage; URGENCY = high BP alone. Treat the organ, not the digit.</div>
+      <div class="pearl"><b>🧭 ~10–20% in hour one</b>In most emergencies drop the MAP only ~10–20% in the first hour, then over 24–48 h. Faster trades a high number for a watershed stroke.</div>
+      <div class="pearl"><b>🌊 SCAPE = afterload</b>Flash edema is an afterload flood with redistribution. Fix it with high-dose nitroglycerin + BiPAP, not buckets of furosemide.</div>
+      <div class="pearl"><b>💧 Often euvolemic</b>SCAPE patients are frequently euvolemic — the fluid is in the wrong room, not in excess. Vasodilate first; diurese only if truly overloaded.</div>
+      <div class="pearl"><b>🩸 Dissection breaks the rule</b>Aortic dissection: rate first (β-blocker, HR &lt; 60), then vasodilator, SBP &lt; 120 fast. A vasodilator alone widens the tear.</div>
+      <div class="pearl"><b>🧠 Stroke is permissive</b>Acute ischemic stroke: don't aggressively lower BP — permissive hypertension protects the penumbra (treat only above thresholds / pre-lytic).</div>
+      <div class="pearl"><b>🚫 No sublingual nifedipine</b>Immediate-release nifedipine causes an uncontrolled precipitous drop → watershed infarction. Use IV titratable agents instead.</div>
+      <div class="pearl"><b>💉 Titratable IV agents</b>Nitroglycerin, nicardipine, clevidipine, labetalol — dial up and down. Nitroprusside works but watch cyanide/thiocyanate.</div>
+      <div class="pearl"><b>👁️ Hunt the organ damage</b>ECG/troponin, creatinine, urinalysis and fundi turn a high reading into a diagnosis of emergency.</div>
+      <div class="pearl"><b>🔧 Recurrent flash = renovascular</b>Repeated SCAPE with preserved EF → suspect bilateral renal artery stenosis (Pickering syndrome); image it.</div>
+      <div class="pearl"><b>🤰 Eclampsia = magnesium</b>Pregnant: magnesium for seizures plus labetalol/hydralazine; avoid ACEi/ARB; deliver the baby.</div>
+      <div class="pearl"><b>🩺 SCAPE is a symptom</b>Always ask "why now?" — stopped meds, OSA, renovascular disease, sympathomimetics. Treat the flood and the cause.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S19 — MCQs / ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s19">
+  <div class="sec-header"><span class="s-badge">S19</span><h2>🧠 MCQs / Assessment</h2></div>
+  <div class="section-content">
+    <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP and feed your dashboard. Each shows a full explanation.</em></p>
+    <div id="mcqHost"></div>
+    <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · Case c-htnemerg-026 — Hypertensive Emergency &amp; SCAPE (Flash Pulmonary Edema)<br>
+  ⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."
+</div>
+
+</div><!-- /#caseScroll -->
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ XP / DASHBOARD CORE ============ */
+  var XP = 0, XP_MAX = 1200;
+  var awarded = {}; // dedupe one-time awards by key
+  var xpVal = document.getElementById('xpVal');
+  var xpFill = document.getElementById('xpFill');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+  }
+  function addXP(amount, key, label){
+    if(key){ if(awarded[key]) return; awarded[key] = true; }
+    XP += amount;
+    if(XP > XP_MAX) XP = XP_MAX;
+    xpVal.textContent = XP;
+    xpFill.style.width = Math.min(100, Math.round(XP / XP_MAX * 100)) + '%';
+    showToast('+' + amount + ' XP' + (label ? ' · ' + label : ''));
+  }
+  function earnBadge(id){
+    var b = document.getElementById(id);
+    if(b && !b.classList.contains('earned')){ b.classList.add('earned'); }
+  }
+
+  /* Dashboard minimize */
+  var dash = document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){
+    dash.classList.toggle('collapsed');
+    this.textContent = dash.classList.contains('collapsed') ? '+' : '–';
+  });
+
+  /* ============ INTERNAL SCROLL SIZING ============ */
+  /* Size the scroll box to the visible window so the sticky tab bar stays in
+     view. When embedded (srcDoc iframe, same-origin), the host page stretches
+     the iframe to full content height and scrolls the OUTER page — so we size
+     this box from the parent window's height minus whatever app chrome sits
+     above the iframe, and scroll internally instead. Standalone → 100vh. */
+  var caseScroll = document.getElementById('caseScroll');
+  var topnav = document.getElementById('topnav');
+  /* The tab bar is position:fixed, so it's out of flow — reserve space at the
+     top of the scroll content (and offset anchor jumps) by its real height. */
+  function setNavOffset(){
+    var navH = topnav ? topnav.offsetHeight : 70;
+    caseScroll.style.paddingTop = navH + 'px';
+    caseScroll.style.scrollPaddingTop = (navH + 14) + 'px';
+  }
+  function sizeScroller(){
+    try {
+      var p = window.parent;
+      if(p && p !== window && window.frameElement){
+        var rectTop = window.frameElement.getBoundingClientRect().top;
+        if(rectTop < 0) rectTop = 0;          // parent scrolled past the chrome
+        var ph = p.innerHeight || 800;
+        var h = ph - rectTop - 6;             // leave the bottom edge breathing room
+        if(h < 460) h = 460;                  // sane minimum on short windows
+        caseScroll.style.height = h + 'px';
+      } else {
+        caseScroll.style.height = '100vh';
+      }
+    } catch(e){ caseScroll.style.height = '100vh'; }
+    setNavOffset();
+  }
+  sizeScroller();
+  window.addEventListener('resize', sizeScroller);
+  window.addEventListener('load', sizeScroller);
+  try { if(window.parent && window.parent !== window) window.parent.addEventListener('resize', sizeScroller); } catch(e){}
+
+  /* ============ NAV: scroll-spy active + visited ============ */
+  var navchips = Array.prototype.slice.call(document.querySelectorAll('.navchip'));
+  var sections = navchips.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited = {};
+  var visitVal = document.getElementById('visitVal');
+
+  function markVisited(idx){
+    var sec = sections[idx];
+    if(!sec) return;
+    if(!visited[sec.id]){
+      visited[sec.id] = true;
+      navchips[idx].classList.add('visited');
+      var count = Object.keys(visited).length;
+      visitVal.textContent = count + ' / 19';
+      addXP(8, 'visit-' + sec.id, 'Section read');
+      if(count >= 19){ earnBadge('bdg-explorer'); addXP(60, 'allvisited', 'Ward Explorer!'); }
+    }
+  }
+  function setActive(idx){
+    navchips.forEach(function(c){ c.classList.remove('active'); });
+    if(navchips[idx]) navchips[idx].classList.add('active');
+  }
+
+  /* True tabs: each chip shows ONLY its section, hidden via CSS otherwise.
+     No scrollIntoView and no scroll-spy — nothing can scroll the tab bar away,
+     which also sidesteps every srcDoc-iframe scrolling quirk. The hero banner
+     and vitals strip belong to the case intro, so they show on S1 only. */
+  var heroBits = [document.querySelector('.hero'), document.querySelector('.vitals-strip')]
+    .filter(function(el){ return !!el; });
+
+  function showSection(idx){
+    sections.forEach(function(s, i){ if(s) s.classList.toggle('sec-active', i === idx); });
+    heroBits.forEach(function(el){ el.style.display = (idx === 0) ? '' : 'none'; });
+    caseScroll.scrollTop = 0;
+    setActive(idx);
+    markVisited(idx);
+  }
+
+  navchips.forEach(function(chip, idx){
+    chip.addEventListener('click', function(ev){
+      ev.preventDefault();
+      showSection(idx);
+    });
+  });
+  showSection(0);
+
+  /* ============ FLAG GAME (S2) ============ */
+  var flagBtns = document.querySelectorAll('#flagGame .flag-btn');
+  var flagResult = document.getElementById('flagResult');
+  var flagsFound = 0, flagsTotal = 0, flagWrong = 0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good') === '1') flagsTotal++; });
+  flagBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.dataset.locked) return;
+      btn.dataset.locked = '1';
+      var good = btn.getAttribute('data-good') === '1';
+      if(good){
+        btn.classList.add('flag-good');
+        flagsFound++;
+        addXP(10, 'flag-' + flagsFound + '-' + Math.random(), 'Emergency flag spotted');
+      } else {
+        btn.classList.add('flag-bad');
+        flagWrong++;
+        showToast('❌ Not a target-organ-damage flag');
+      }
+      if(flagsFound === flagsTotal){
+        flagResult.textContent = '✅ All ' + flagsTotal + ' emergency red flags found' + (flagWrong ? ' (with ' + flagWrong + ' wrong pick' + (flagWrong>1?'s':'') + ')' : ' — flawless!');
+        earnBadge('bdg-vt');
+        addXP(30, 'flags-complete', 'Emergency-Spotter badge');
+      } else {
+        flagResult.textContent = flagsFound + ' / ' + flagsTotal + ' emergency red flags found…';
+      }
+    });
+  });
+
+  /* ============ BRANCHING SCENARIO (S3) ============ */
+  var scText = document.getElementById('scText');
+  var scChoices = document.getElementById('scChoices');
+  var scFeedback = document.getElementById('scFeedback');
+  var scRestart = document.getElementById('scRestart');
+  var scStab = document.getElementById('scStab');
+  var scTime = document.getElementById('scTime');
+  var scXP = document.getElementById('scXP');
+  var pathXP = 0, scStability = 2, scElapsed = 0;
+
+  var STEPS = {
+    start: {
+      text: "The junior holds sublingual nifedipine in one hand; the nurse holds the GTN and BiPAP mask in the other. BP 232/130, SpO₂ 84%, drowning in froth. The patient is awake but exhausted. What do you do FIRST?",
+      choices: [
+        { t: "🫁 Put on BiPAP and start high-dose IV nitroglycerin — vasodilate and ventilate", good:true, ds:1, dt:10, xp:40, fb:"✅ Exactly. This is SCAPE — an afterload flood. NIV recruits alveoli and high-dose nitroglycerin offloads the LV. You've attacked the actual mechanism, on a controlled descent.", next:"target" },
+        { t: "💊 Give the sublingual nifedipine — 'the pressure's huge, crack it'", good:false, ds:-2, dt:20, xp:0, fb:"☠️ Catastrophe. Immediate-release sublingual nifedipine drops the BP uncontrollably; the right-shifted autoregulation can't follow and the brain infarcts in watershed zones. This is the M&M case in S13. Restart and choose again.", end:true },
+        { t: "💧 Push 80 mg IV furosemide as the headline therapy", good:false, ds:-1, dt:15, xp:5, fb:"⚠️ Wrong lever. SCAPE is afterload-driven redistribution in an often EUVOLEMIC patient — heavy diuresis dehydrates and never touches the afterload. Vasodilate and ventilate first.", next:"start2" }
+      ]
+    },
+    start2: {
+      text: "Furosemide alone did little (as expected) — the afterload is still flooding the lungs. SpO₂ 83%, he's tiring. The nurse has BiPAP and GTN ready. Now what?",
+      choices: [
+        { t: "🫁 BiPAP + high-dose IV nitroglycerin now", good:true, ds:1, dt:8, xp:30, fb:"✅ Finally — the right call. Lesson banked: in SCAPE, vasodilate and ventilate; furosemide is a passenger, not the driver.", next:"target" },
+        { t: "💊 Give sublingual nifedipine to bring the number down fast", good:false, ds:-1, dt:20, xp:0, fb:"⚠️ No — an uncontrolled freefall risks a watershed stroke. Use a titratable IV vasodilator (nitroglycerin) and lower it on a leash.", next:"target" }
+      ]
+    },
+    target: {
+      text: "BiPAP is on, nitroglycerin running, SpO₂ climbing to 90%. The MAP is ~164. How far do you aim to lower the MAP in this FIRST hour?",
+      choices: [
+        { t: "🧭 By ~10–20% — a controlled descent, then gradually over 24–48 h", good:true, ds:1, dt:6, xp:30, fb:"✅ Ideal. A ~10–20% MAP reduction relieves organ stress without dropping perfusion off the right-shifted autoregulatory cliff. Keep titrating to that target.", next:"resolve" },
+        { t: "⚡ Normalize it to ~120/80 within ten minutes", good:false, ds:-1, dt:3, xp:0, fb:"⚠️ Too fast and too far. Chronic hypertensives can't perfuse the brain/heart/kidney at a suddenly 'normal' pressure — you'd cause watershed infarction. Aim ~10–20% in hour one.", next:"resolve" }
+      ]
+    },
+    resolve: {
+      text: "Over the first hour the MAP falls ~16% to ~138, SpO₂ is 94% on NIV, the froth has cleared. Creatinine is up and troponin mildly raised. Final move of the first phase?",
+      choices: [
+        { t: "🔎 Screen the organs &amp; chase the cause — ECG/troponin, fundi, renal function; ask why now (stopped meds, OSA, renovascular)", good:true, ds:1, dt:5, xp:40, fb:"🏆 Perfect close. You reversed the flood on a controlled slope and confirmed target-organ involvement — now find why it happened so it doesn't recur. Case stabilized.", end:true },
+        { t: "🎉 Done — lungs are dry, sit back", good:false, ds:-1, dt:10, xp:0, fb:"⚠️ Premature. Without finding the trigger (stopped meds, OSA, renal artery stenosis) and protecting the injured organs, he flashes again within days. Always chase the cause.", end:true }
+      ]
+    }
+  };
+
+  function renderStab(){
+    var s = Math.max(0, Math.min(5, scStability + 2)); // map -2..3 → 0..5
+    var dots = '';
+    for(var i=0;i<5;i++) dots += (i < s ? '●' : '○');
+    scStab.textContent = dots;
+  }
+  function renderStep(key){
+    var step = STEPS[key];
+    scText.textContent = step.text;
+    scFeedback.className = 'feedback';
+    scFeedback.style.display = 'none';
+    scChoices.innerHTML = '';
+    step.choices.forEach(function(ch){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = ch.t;
+      b.addEventListener('click', function(){
+        pathXP += ch.xp; scXP.textContent = pathXP;
+        scElapsed += ch.dt; scTime.textContent = scElapsed + ' s';
+        scStability += ch.ds; renderStab();
+        if(ch.xp) addXP(ch.xp, null, 'Scenario choice');
+        scFeedback.textContent = ch.fb;
+        scFeedback.className = 'feedback ' + (ch.good ? 'good' : 'bad');
+        scFeedback.style.display = 'block';
+        Array.prototype.forEach.call(scChoices.children, function(c){ c.disabled = true; c.style.opacity = .6; });
+        if(ch.end){
+          scRestart.style.display = 'inline-block';
+          if(ch.good && key === 'resolve'){ earnBadge('bdg-shock'); addXP(20, 'scenario-win', 'Vasodilated On Time!'); }
+        } else if(ch.next){
+          setTimeout(function(){ renderStep(ch.next); }, 1400);
+        }
+      });
+      scChoices.appendChild(b);
+    });
+  }
+  scRestart.addEventListener('click', function(){
+    pathXP = 0; scStability = 2; scElapsed = 0;
+    scXP.textContent = 0; scTime.textContent = '0 s'; renderStab();
+    scRestart.style.display = 'none';
+    renderStep('start');
+  });
+  renderStab();
+  renderStep('start');
+
+  /* ============ REVEAL BUTTONS ============ */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.getAttribute('data-target'));
+      if(!t) return;
+      if(t.classList.contains('reveal-shown')){
+        t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden');
+      } else {
+        t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown');
+        addXP(8, 'reveal-' + btn.getAttribute('data-target'), 'Self-test');
+      }
+    });
+  });
+
+  /* ============ MAP-REDUCTION SIM (S6) ============ */
+  var kRange = document.getElementById('kRange');
+  var kVal = document.getElementById('kVal');
+  var kNeedle = document.getElementById('kNeedle');
+  var kReadout = document.getElementById('kReadout');
+  if(kRange){
+    var simUsed = false;
+    function updateK(){
+      var k = (parseInt(kRange.value,10) / 10); // 2.0 .. 7.5  (% MAP drop in hour 1)
+      kVal.textContent = k.toFixed(0);
+      var pct = (parseInt(kRange.value,10) - 20) / (75 - 20) * 100;
+      kNeedle.style.left = pct + '%';
+      var msg, cls;
+      if(k < 5){ msg = '🔴 Too little — barely touching the MAP. The target organs keep being injured by the ongoing pressure; the emergency is not being treated.'; cls='bad'; }
+      else if(k < 10){ msg = '🟠 Under-treating — some relief but the organ stress persists. Push toward the safe band to actually reverse the damage.'; cls='warn-r'; }
+      else if(k <= 20){ msg = '🟢 Safe band — a controlled ~10–20% MAP drop in the first hour relieves organ stress while perfusion stays above the right-shifted autoregulatory floor. This is the target.'; cls='good'; }
+      else if(k <= 35){ msg = '🟠 Too fast — perfusion is approaching the cliff edge. Risk of watershed cerebral/myocardial/renal hypoperfusion rises. Ease the infusion.'; cls='warn-r'; }
+      else { msg = '🔴 Freefall — the MAP is collapsing far beyond the safe band. The brain, heart and kidneys infarct in watershed zones (the sublingual-nifedipine catastrophe). Stop and slow down.'; cls='bad'; }
+      kReadout.innerHTML = msg;
+      kReadout.className = 'readout ' + cls;
+      if(!simUsed){ simUsed = true; addXP(15, 'ksim', 'Titration Master'); }
+    }
+    kRange.addEventListener('input', updateK);
+    updateK();
+  }
+
+  /* ============ CHECKLISTS (S7) ============ */
+  var allChecklistsDone = 0, totalChecklists = document.querySelectorAll('.checklist').length;
+  document.querySelectorAll('.checklist').forEach(function(list){
+    var boxes = list.querySelectorAll('input[type=checkbox]');
+    var prog = list.querySelector('[data-progress]');
+    var total = boxes.length;
+    var doneAwarded = false;
+    function refresh(){
+      var done = 0;
+      boxes.forEach(function(b){
+        if(b.checked){ done++; b.closest('.ck').classList.add('done'); }
+        else { b.closest('.ck').classList.remove('done'); }
+      });
+      prog.textContent = done + ' / ' + total + ' complete';
+      if(done === total && !doneAwarded){
+        doneAwarded = true;
+        allChecklistsDone++;
+        addXP(25, 'ck-' + list.id, 'Checklist done');
+        if(allChecklistsDone >= totalChecklists){ earnBadge('bdg-ck'); addXP(20, 'allck', 'Checklist Champion'); }
+      }
+    }
+    boxes.forEach(function(b){
+      b.addEventListener('change', function(){
+        if(b.checked) addXP(4, null, 'Step checked');
+        refresh();
+      });
+    });
+  });
+
+  /* ============ MCQs (S19) ============ */
+  var MCQS = [
+    {
+      q: "A 58-year-old with poorly controlled hypertension presents with BP 232/130 and acute flash pulmonary edema (SpO₂ 84%). What makes this a hypertensive EMERGENCY rather than urgency?",
+      opts: ["The systolic pressure is above 220 mmHg","The presence of acute target-organ damage (acute pulmonary edema)","His heart rate is 110","He stopped his antihypertensives"],
+      correct: 1,
+      exp: "A hypertensive emergency is defined by acute target-organ damage (here, acute pulmonary edema/SCAPE), not by the absolute number. The same BP without organ damage would be urgency, managed with oral agents and follow-up. The organ damage, not the digit, defines the emergency."
+    },
+    {
+      q: "In most hypertensive emergencies, how far should you lower the mean arterial pressure (MAP) in the FIRST hour?",
+      opts: ["Normalize it to 120/80 as fast as possible","By about 10–20%, then gradually over 24–48 hours","By at least 50% within 15 minutes","Do not lower it at all in the first hour"],
+      correct: 1,
+      exp: "Aim to reduce the MAP by ~10–20% in the first hour, then gradually over 24–48 h. Chronic hypertension shifts cerebral autoregulation rightward, so a precipitous drop causes watershed cerebral, myocardial and renal infarction. (Exceptions: aortic dissection wants faster lowering; ischemic stroke wants permissive hypertension.)"
+    },
+    {
+      q: "What is the headline treatment for SCAPE (sympathetic crashing acute pulmonary edema) in this patient?",
+      opts: ["High-dose IV nitroglycerin plus non-invasive ventilation","Large repeated boluses of IV furosemide","Sublingual nifedipine to rapidly normalize BP","IV fluids to support the blood pressure"],
+      correct: 0,
+      exp: "SCAPE is an afterload problem with fluid redistribution in an often euvolemic patient. High-dose IV nitroglycerin (afterload + preload reduction) plus NIV/BiPAP is the key lever. Heavy diuresis is usually unnecessary and can be harmful; sublingual nifedipine causes a dangerous uncontrolled drop."
+    },
+    {
+      q: "How does the management of acute AORTIC DISSECTION differ from the usual controlled-lowering rule?",
+      opts: ["You should lower BP even more slowly than usual","Rate control first with a beta-blocker (HR < 60), THEN a vasodilator, targeting SBP < 120 fast","Give a vasodilator alone and avoid beta-blockers","Use permissive hypertension and do not treat the BP"],
+      correct: 1,
+      exp: "Dissection breaks the slow rule: control heart rate first with an IV beta-blocker to HR < 60 (reducing aortic wall stress/dP/dt), THEN add a vasodilator, targeting SBP < 120 mmHg within ~20 min. A vasodilator alone causes reflex tachycardia that propagates the tear."
+    },
+    {
+      q: "A patient with severe hypertension and an acute ISCHEMIC STROKE arrives. What is the correct BP approach?",
+      opts: ["Aggressively normalize BP immediately","Permissive hypertension — generally only treat above thresholds (e.g. before thrombolysis)","Drop the MAP by 50% in the first hour","Give sublingual nifedipine"],
+      correct: 1,
+      exp: "Acute ischemic stroke is an exception favoring permissive hypertension: aggressive lowering can reduce perfusion to the ischemic penumbra and extend the infarct. BP is generally only treated above defined thresholds or to enable thrombolysis. Intracerebral hemorrhage, by contrast, has specific lower targets."
+    },
+    {
+      q: "Why is immediate-release sublingual nifedipine harmful in hypertensive emergency?",
+      opts: ["It has no antihypertensive effect","It causes an uncontrolled, precipitous fall in BP that can produce watershed cerebral/myocardial infarction","It raises the blood pressure further","It is only dangerous in pregnancy"],
+      correct: 1,
+      exp: "Sublingual nifedipine produces a rapid, uncontrolled drop in BP. Because autoregulation is shifted rightward in chronic hypertension, perfusion falls off a cliff and the brain, heart and kidneys can infarct in watershed zones (the classic cortical-blindness catastrophe). Use titratable IV agents instead."
+    },
+    {
+      q: "Which agents are appropriate IV titratable choices for hypertensive emergency?",
+      opts: ["Sublingual nifedipine and oral captopril","Nitroglycerin, nicardipine, clevidipine, labetalol (nitroprusside with caution for cyanide/thiocyanate)","IV adenosine","High-dose oral amlodipine only"],
+      correct: 1,
+      exp: "Hypertensive emergencies need IV titratable agents that can be dialed up and down: nitroglycerin (the SCAPE lever), nicardipine, clevidipine, labetalol. Nitroprusside is potent but risks cyanide/thiocyanate toxicity. Sublingual/immediate-release oral agents give an uncontrolled drop and are avoided."
+    },
+    {
+      q: "Which assessment best confirms that a high blood pressure reading represents acute TARGET-ORGAN DAMAGE?",
+      opts: ["A single very high systolic number alone","ECG/troponin, creatinine/urinalysis, fundoscopy and neuro exam (and imaging as indicated)","The patient's anxiety level","The cuff size used"],
+      correct: 1,
+      exp: "Acute target-organ damage is what makes a high BP an emergency, so you look for it directly: cardiac (ECG, troponin, pulmonary edema), renal (creatinine, urinalysis), neurological (encephalopathy, focal deficit, papilledema on fundoscopy), and aortic (dissection assessment). The number alone does not define the emergency."
+    }
+  ];
+
+  var host = document.getElementById('mcqHost');
+  var mcqVal = document.getElementById('mcqVal');
+  var mcqScore = 0, mcqAnswered = 0;
+  var letters = ['A','B','C','D','E'];
+
+  MCQS.forEach(function(item, qi){
+    var box = document.createElement('div');
+    box.className = 'mcq';
+    var html = '<div class="mcq-q">QUESTION ' + (qi+1) + ' / ' + MCQS.length + '</div>';
+    html += '<div class="mcq-stem">' + item.q + '</div>';
+    item.opts.forEach(function(opt, oi){
+      html += '<label class="mcq-opt" data-oi="' + oi + '"><strong>' + letters[oi] + '.</strong> ' + opt + '</label>';
+    });
+    html += '<div class="mcq-exp"></div>';
+    box.innerHTML = html;
+    host.appendChild(box);
+
+    var opts = box.querySelectorAll('.mcq-opt');
+    var exp = box.querySelector('.mcq-exp');
+    var locked = false;
+    opts.forEach(function(label){
+      label.addEventListener('click', function(){
+        if(locked) return;
+        locked = true;
+        var oi = parseInt(label.getAttribute('data-oi'),10);
+        box.classList.add('answered');
+        var correct = item.correct;
+        if(oi === correct){
+          label.classList.add('picked-right');
+          mcqScore++;
+          addXP(25, null, 'Correct answer');
+        } else {
+          label.classList.add('picked-wrong');
+          opts[correct].classList.add('show-right');
+          showToast('❌ Correct: ' + letters[correct]);
+        }
+        exp.innerHTML = '<strong>' + (oi === correct ? '✅ Correct. ' : '📘 Explanation. ') + '</strong>' + item.exp;
+        mcqAnswered++;
+        mcqVal.textContent = mcqScore + ' / ' + MCQS.length;
+        if(mcqAnswered === MCQS.length){
+          var done = document.getElementById('mcqDone');
+          var summary = document.getElementById('mcqSummary');
+          done.style.display = 'block';
+          summary.textContent = 'You scored ' + mcqScore + ' / ' + MCQS.length + '. ' +
+            (mcqScore === MCQS.length ? 'Flawless — you treat the organ, not the number, every time. 🏆' :
+             mcqScore >= 6 ? 'Strong — review the misses and the contrast pairs in S6.' :
+             'Revisit S3, S5, S6 and S11 — the emergency-vs-urgency and controlled-lowering logic is the whole case.');
+          if(mcqScore >= 7){ earnBadge('bdg-quiz'); addXP(50, 'quizace', 'Quiz Ace!'); }
+        }
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Post-Cardiac-Arrest Care After ROSC — Virtual Teaching Hospital</title>
+<!-- META
+id: c-ohca-027
+title: Post-Cardiac-Arrest Care After ROSC
+hospital: cardiology
+department: cv-ccu
+bednumber: 9
+chiefcomplaint: Comatose after return of spontaneous circulation from an out-of-hospital VF arrest
+system: Cardiology
+severity: critical
+tags: Post-arrest syndrome, ROSC, Targeted temperature management, Neuroprognostication, Coronary angiography, Oxygenation
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --radius:16px;
+    --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  /* Internal scroll viewport. When this case is embedded the host app stretches
+     the iframe to full content height and the OUTER page scrolls, which would
+     let a sticky bar scroll away. We instead scroll inside this box (sized to
+     the visible window by JS) so the section tab bar stays pinned at the top.
+     Standalone, it falls back to the full viewport height. */
+  #caseScroll{height:100vh; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; scroll-padding-top:92px}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:36px 24px 80px; position:relative; overflow:hidden}
+  .hero::after{content:"📈"; position:absolute; right:-20px; top:-30px; font-size:220px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{max-width:1100px; margin:0 auto; position:relative; z-index:1}
+  .hero .crumbs{font-size:13px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:10px 0 6px; font-size:clamp(26px,4vw,40px); line-height:1.15}
+  .hero .sub{font-size:16px; opacity:.95}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; backdrop-filter:blur(4px)}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== LIVE ECG STRIP IN HERO ===== */
+  .ecg-banner{max-width:1100px; margin:14px auto 0; position:relative; z-index:1}
+  .ecg-banner svg{width:100%; height:64px; display:block; background:rgba(0,0,0,.18); border-radius:12px; border:1px solid rgba(255,255,255,.25)}
+  .ecg-trace{stroke:#86efac; stroke-width:2.4; fill:none; stroke-dasharray:1600; stroke-dashoffset:1600; animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{stroke-dashoffset:0}}
+
+  /* ===== VITALS STRIP ===== */
+  .vitals-strip{max-width:1100px; margin:-52px auto 0; padding:0 24px; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:11px; font-weight:700; letter-spacing:.6px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:21px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== HORIZONTAL SECTION SIDEBAR (fixed — always visible) ===== */
+  .topnav{position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.10)}
+  .topnav .rail{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; max-width:1180px; margin:0 auto; scrollbar-width:thin}
+  .navchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink2); font-size:11px; font-weight:700; text-decoration:none; min-width:78px; text-align:center; transition:all .18s; cursor:pointer}
+  .navchip .s-id{font-size:10px; letter-spacing:1px; color:#94a3b8}
+  .navchip .s-emoji{font-size:16px}
+  .navchip:hover{border-color:var(--rose); color:var(--rose); transform:translateY(-2px)}
+  .navchip.active{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; border-color:#b91c1c}
+  .navchip.active .s-id{color:#fecaca}
+  .navchip.visited:not(.active){border-color:var(--emerald-line); background:var(--emerald-soft)}
+
+  /* ===== DASHBOARD WIDGET ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:215px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10.5px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:760px){.dash{display:none}}
+
+  /* ===== MAIN / SECTIONS (tabbed: one section visible at a time) ===== */
+  main{max-width:1100px; margin:26px auto 80px; padding:0 24px}
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:26px; overflow:hidden}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16.5px; margin:26px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14.5px; margin:18px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:24px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15.5px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:14px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px; letter-spacing:.4px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14.5px}
+
+  /* ===== INTERACTIVE BITS ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:10px 18px; font-weight:700; font-size:14px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:22px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:15px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 15px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 15px; margin-top:12px; font-size:14px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim sliders */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:14px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:14px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Heart/circuit diagram */
+  .heart-fig{display:flex; gap:18px; flex-wrap:wrap; align-items:center; background:var(--slate-soft); border-radius:16px; padding:18px; margin:14px 0}
+  .heart-fig svg{flex:0 0 auto}
+  .heart-legend{flex:1; min-width:230px; font-size:13.5px}
+  .lg{display:flex; align-items:center; gap:8px; margin:5px 0}
+  .lg .sw{width:14px; height:14px; border-radius:4px; flex:0 0 auto}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Journey cards */
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:14px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:15px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:14px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13.5px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:22px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14.5px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:13px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .footer{max-width:1100px; margin:0 auto 36px; padding:0 24px; text-align:center; color:#94a3b8; font-size:12.5px}
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="caseScroll">
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · 💗 Coronary Care Unit · 🛏️ Bed 9</div>
+    <h1>🧠 Post-Cardiac-Arrest Care After ROSC — "The Resuscitation Isn't the End"</h1>
+    <div class="sub">⚡ A 58-year-old is back in sinus rhythm after a witnessed VF arrest in the street — but still comatose, intubated and ventilated. The pulse is the easy part. The next 72 hours decide whether his brain comes back.</div>
+    <div class="chips">
+      <span class="chip crit">🔴 CRITICAL</span>
+      <span class="chip">🫀 Return of Spontaneous Circulation</span>
+      <span class="chip">🌡️ Targeted Temperature Management</span>
+      <span class="chip">🧠 Neuroprognostication</span>
+      <span class="chip">🎮 Interactive Case</span>
+      <span class="chip">⏱️ The first 72 hours</span>
+    </div>
+    <div class="ecg-banner" title="Post-ROSC sinus rhythm strip">
+      <svg viewBox="0 0 800 64" preserveAspectRatio="none" aria-label="Post-ROSC organised sinus rhythm strip">
+        <polyline class="ecg-trace" points="0,40 30,40 38,36 46,40 70,40 78,18 86,58 94,40 110,40 118,38 150,40 230,40 238,36 246,40 270,40 278,18 286,58 294,40 310,40 318,38 350,40 430,40 438,36 446,40 470,40 478,18 486,58 494,40 510,40 518,38 550,40 630,40 638,36 646,40 670,40 678,18 686,58 694,40 710,40 718,38 760,40 800,40"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== LIVE VITALS ===================== -->
+<div class="vitals-strip">
+  <div class="vitals-grid">
+    <div class="vital alert"><div class="v-label">🧠 GCS</div><div class="v-num">3 (E1V1M1)</div></div>
+    <div class="vital warn"><div class="v-label">🩸 MAP</div><div class="v-num">70</div></div>
+    <div class="vital"><div class="v-label">💓 HR</div><div class="v-num">96</div></div>
+    <div class="vital warn"><div class="v-label">🫁 SpO₂</div><div class="v-num">99%</div></div>
+    <div class="vital warn"><div class="v-label">🌬️ EtCO₂</div><div class="v-num">29</div></div>
+    <div class="vital warn"><div class="v-label">🌡️ Temp</div><div class="v-num">38.1°</div></div>
+    <div class="vital alert"><div class="v-label">🫀 Rhythm</div><div class="v-num">Post-VF</div></div>
+    <div class="vital"><div class="v-label">🫧 Airway</div><div class="v-num">Intubated</div></div>
+  </div>
+</div>
+
+<!-- ===================== HORIZONTAL SECTION SIDEBAR ===================== -->
+<nav class="topnav" id="topnav">
+  <div class="rail">
+    <a class="navchip" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navchip" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navchip" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navchip" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navchip" href="#s5"><span class="s-emoji">🎓</span><span>Consultant Round</span><span class="s-id">S5</span></a>
+    <a class="navchip" href="#s6"><span class="s-emoji">📖</span><span>Teaching Points</span><span class="s-id">S6</span></a>
+    <a class="navchip" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navchip" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navchip" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navchip" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navchip" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navchip" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navchip" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navchip" href="#s14"><span class="s-emoji">🔀</span><span>Differentials</span><span class="s-id">S14</span></a>
+    <a class="navchip" href="#s15"><span class="s-emoji">🗺️</span><span>Plan</span><span class="s-id">S15</span></a>
+    <a class="navchip" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navchip" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navchip" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navchip" href="#s19"><span class="s-emoji">🧠</span><span>MCQs</span><span class="s-id">S19</span></a>
+  </div>
+</nav>
+
+<!-- ===================== SCORE DASHBOARD ===================== -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections visited</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-vt">🧠 Brain-Protector</span>
+      <span class="badge" id="bdg-shock">🎯 ROSC Bundle Done</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champion</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Ward Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running sims, taking the right path and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- S1 — PROFILE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s1">
+  <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+  <div class="section-content">
+    <div class="callout danger">
+      <b class="ct">🚨 YOU ARE HERE — 08:52, CCU Bed 9</b>
+      The ambulance crew wheels in Mr. A.K., who collapsed on a railway platform 40 minutes ago. A bystander started compressions; the public-access defibrillator delivered <strong>two shocks for VF</strong>; ROSC was achieved en route. He is back — heart beating, blood pressure supported — but <strong>comatose, intubated and not moving</strong>. The crew breathe a sigh of relief and start to walk away. <strong>Stop. This is where the real work begins.</strong> The next 72 hours, not the last 40 minutes, decide whether he survives with a brain.
+    </div>
+
+    <h3>👤 Patient Identity</h3>
+    <table class="tbl">
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>🧔 Name</td><td><strong>Mr. A.K.</strong></td></tr>
+      <tr><td>🎂 Age / Sex</td><td>58-year-old male</td></tr>
+      <tr><td>🆔 MRN</td><td>CV-90271</td></tr>
+      <tr><td>⚖️ Weight</td><td>92 kg</td></tr>
+      <tr><td>💼 Occupation</td><td>Warehouse supervisor</td></tr>
+      <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+    </table>
+
+    <h3>📜 The arrest — every detail predicts the brain</h3>
+    <ul>
+      <li>👀 <strong>Witnessed collapse</strong> on a busy platform — someone saw him go down and the clock started immediately.</li>
+      <li>🙌 <strong>Bystander CPR within ~1 minute</strong> — the single biggest modifiable determinant of neurological outcome. Brain perfusion was never fully off.</li>
+      <li>⚡ <strong>Shockable rhythm (VF), AED two shocks</strong> — a "good" arrest rhythm, far better prognosis than asystole/PEA, and points to a primary cardiac (likely coronary) cause.</li>
+      <li>⏱️ <strong>Low-flow time ~8 minutes</strong> to ROSC — short, which is why we do <em>not</em> write him off.</li>
+      <li>🫁 Intubated by the crew, ventilated, sedated for transport. Pupils currently 3 mm, sluggish (uninterpretable this early, on sedation).</li>
+      <li>🫀 First post-ROSC 12-lead is being printed as he arrives — <strong>this ECG decides whether he goes to the cath lab now.</strong></li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After ROSC the BRAIN is the patient. Avoid hypoxia, hyperoxia, hypotension, hypocapnia and FEVER — every one of them extends the injury you just bought a chance to limit."</div>
+
+    <h3>🧬 Why THIS patient? — a heart that arrested, and a brain that paid</h3>
+    <p>A witnessed, shockable, bystander-CPR'd out-of-hospital arrest in a middle-aged man is, until proven otherwise, an <strong>acute coronary event</strong> that triggered VF. The resuscitation restored a circulation — but the whole body has just survived a global ischemia-then-reperfusion insult. The clinical state that follows has a name: <strong>post-cardiac-arrest syndrome</strong>. Four processes now run in parallel — brain injury, myocardial stunning, a systemic inflammatory (SIRS-like) reperfusion state, and the persistent precipitating pathology (the coronary lesion that started it). Tonight's job is to support the failing organs while protecting the brain from a <em>second</em> injury that we can actually prevent.</p>
+
+    <div class="callout warn"><b class="ct">🔥 Favourable vs unfavourable arrest features (for outcome)</b>
+    ✅ Witnessed · ✅ Bystander CPR · ✅ Shockable rhythm (VF/pVT) · ✅ Short no-flow / low-flow time · ✅ Early ROSC · ❌ Unwitnessed · ❌ No bystander CPR · ❌ Asystole/PEA · ❌ Prolonged downtime — but <strong>no single feature decides the outcome on day one.</strong></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S2 — HANDOVER -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s2">
+  <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+  <div class="section-content">
+    <h3>📻 Paramedic Handover — listen for the trap</h3>
+    <div class="callout info">
+      <b class="ct">🎙️ ATMIST / SBAR from the crew (verbatim)</b>
+      <p><strong>S:</strong> "58-year-old man, witnessed VF arrest on the platform 0840. Bystander CPR almost immediately, AED two shocks, ROSC at about 0848. Now intubated, ventilated, sedated."</p>
+      <p><strong>B:</strong> "No known history from bystanders, smoker, complained of chest tightness to a colleague before he dropped. We've got 12-lead leads on — looks like ST elevation inferiorly."</p>
+      <p><strong>A:</strong> "Still comatose, not moving, no sedation holiday done. We pushed FiO₂ to 100% and bagged him hard on the way — sats are 100%, EtCO₂ was 28. BP's holding around 95 systolic on a bit of metaraminol."</p>
+      <p><strong>R:</strong> "He's back, that's the main thing — we figured you'd cool him and sort the rest. Honestly we thought about whether it's even worth it, he looked rough."</p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'He's back, that's the main thing' is where post-arrest patients are quietly lost — the handover that ends at ROSC misses the four things that now kill the brain: hyperoxia, hypocapnia, hypotension and fever."</div>
+
+    <h3>🚩 Spot-the-Red-Flag — tap each real problem you must act on now</h3>
+    <p>🎮 <em>Interactive: click every feature that is a genuine post-arrest priority or hazard. Each correct flag = +10 XP. The "do nothing / prognosticate now" distractors cost you.</em></p>
+    <div id="flagGame">
+      <button class="btn ghost flag-btn" data-good="1">🧠 Comatose after ROSC — post-arrest brain injury, the main outcome driver</button>
+      <button class="btn ghost flag-btn" data-good="1">🫀 Post-arrest syndrome: brain injury + myocardial stunning + ischemia-reperfusion SIRS</button>
+      <button class="btn ghost flag-btn" data-good="1">📈 ST elevation on the post-ROSC ECG — possible STEMI for the cath lab</button>
+      <button class="btn ghost flag-btn" data-good="1">⚠️ Must avoid hyperoxia, hypoxia, hypocapnia and FEVER</button>
+      <button class="btn ghost flag-btn" data-good="1">⏳ Delay neuroprognostication ≥ 72 h off sedation, multimodal</button>
+      <button class="btn ghost flag-btn" data-good="0">🙂 He's awake and following commands, needs nothing further</button>
+      <button class="btn ghost flag-btn" data-good="0">🔮 Prognosticate immediately on today's poor exam</button>
+      <button class="btn ghost flag-btn" data-good="0">🌬️ Keep FiO₂ at 100% indefinitely to be safe</button>
+    </div>
+    <p id="flagResult" style="font-weight:700"></p>
+
+    <h3>⏱️ Timeline so far</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">08:40</div>Witnessed collapse, VF. Bystander CPR within a minute.</div>
+      <div class="t-item"><div class="t-time">08:43</div>AED: two shocks for VF, compressions continued.</div>
+      <div class="t-item"><div class="t-time">08:48</div>ROSC. Intubated, ventilated, sedated for transport. FiO₂ 100%, hand-ventilated.</div>
+      <div class="t-item"><div class="t-time">08:52</div>Arrives CCU comatose. Post-ROSC 12-lead shows inferior ST elevation. SpO₂ 100% on 100% O₂, EtCO₂ 28, temp 38.1°C — three things to fix in the next five minutes.</div>
+    </div>
+
+    <div class="callout warn"><b class="ct">🛑 Three immediate corrections the handover just revealed</b>The crew did the hard part. But: <strong>FiO₂ 100% with SpO₂ 100% = hyperoxia</strong> (titrate down to SpO₂ 94–98%); <strong>EtCO₂ 28 = over-ventilation / hypocapnia</strong> (cerebral vasoconstriction — slow the rate to normocapnia); <strong>temp 38.1°C = early fever</strong> (start active temperature control now). Good resuscitation can still be undone in the first hour.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S3 — INITIAL ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s3">
+  <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+  <div class="section-content">
+    <h3>🅰️🅱️🅲️ Primary Survey — the post-ROSC re-sweep</h3>
+    <table class="tbl">
+      <tr><th>Step</th><th>Finding</th><th>What it means mechanistically</th></tr>
+      <tr><td>🅰️ Airway</td><td>ETT in situ, size 8.0 at 22 cm; confirm with waveform capnography and CXR.</td><td>Secure airway is assumed but must be <strong>verified</strong> — a displaced or oesophageal tube is a re-arrest waiting to happen. Capnography is the gold standard.</td></tr>
+      <tr><td>🅱️ Breathing</td><td>Ventilated; SpO₂ 100% on FiO₂ 1.0; EtCO₂ 28; lung-protective settings not yet set.</td><td><strong>Hyperoxia</strong> generates oxidative free radicals that extend reperfusion brain injury; <strong>hypocapnia</strong> from over-ventilation vasoconstricts cerebral vessels and worsens ischemia. Target SpO₂ 94–98% and normocapnia (PaCO₂ ~4.5–6.0 kPa / 35–45 mmHg).</td></tr>
+      <tr><td>🅲️ Circulation</td><td><strong>MAP ~70</strong> on low-dose vasopressor, HR 96 sinus, cool peripheries, lactate elevated, post-ROSC ECG with inferior ST elevation.</td><td><strong>Myocardial stunning</strong> + vasoplegic SIRS lower output and pressure. Maintain <strong>MAP ≥ 65</strong> (often higher) with fluids/pressors/inotropes. The ST elevation flags a coronary culprit → <strong>cath lab</strong>.</td></tr>
+      <tr><td>🅳 Disability</td><td>GCS 3, no purposeful movement, pupils 3 mm sluggish (on sedation).</td><td>Coma is expected immediately post-ROSC. The exam now is <strong>NOT prognostic</strong> — it is confounded by sedation, hypothermia and the acute insult. Do not draw conclusions yet.</td></tr>
+      <tr><td>🅴 Exposure</td><td>Temp <strong>38.1°C</strong> and rising; no rash; cannula sites clean; glucose 11.2.</td><td>Pyrexia accelerates cerebral metabolic demand and worsens secondary injury. Start <strong>active temperature control</strong>; treat hyper/hypoglycaemia.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The post-ROSC primary survey isn't ABC, it's ABC + the brain bundle: SpO₂ 94–98%, normocapnia, MAP ≥ 65, no fever — and a 12-lead in your hand."</div>
+
+    <h3>🧭 The single most important question: is there a STEMI on the post-ROSC ECG?</h3>
+    <p>After airway, breathing and circulation are stabilised, the fork is the <strong>ECG</strong>. <strong>ST elevation (or new LBBB / unequivocal ischemia, or ongoing instability) → activate the cath lab now</strong> — a coronary occlusion is the persistent precipitating cause and revascularising it treats both the heart and the risk of re-arrest. <strong>No ST elevation → immediate routine angiography is NOT helpful</strong> (COACT, TOMAHAWK) and the patient goes to the ICU for the brain-protection bundle while the cause is worked up. Mr. A.K. has inferior ST elevation — <strong>cath lab</strong>.</p>
+
+    <div class="callout danger"><b class="ct">⚡ The decision is made: STEMI on post-ROSC ECG → CATH LAB NOW + post-arrest bundle</b>Immediate angiography for the ST-elevation OHCA, then transfer to ICU for oxygenation/ventilation targets, haemodynamic support, targeted temperature management and <strong>deferred</strong> neuroprognostication. Two patients in one bed — the heart and the brain — and the bundle treats both.</div>
+
+    <!-- 🎬 BRANCHING SCENARIO ENGINE -->
+    <div class="scenario" id="scenarioBox">
+      <h3>🎬 Choose Your Path — "The First Hour After ROSC"</h3>
+      <div class="hud"><span>🧠 Brain protection: <b id="scStab">●●○○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 s</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+      <div class="scene-text" id="scText">Mr. A.K. is comatose and intubated. SpO₂ reads 100% on FiO₂ 1.0, EtCO₂ 28, MAP 70 on low-dose pressor, temp 38.1°C, and the post-ROSC 12-lead shows inferior ST elevation. The team looks to you. What is your FIRST move in the bundle?</div>
+      <div class="choices" id="scChoices"></div>
+      <div class="feedback" id="scFeedback"></div>
+      <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+    </div>
+
+    <div class="callout info"><b class="ct">🧮 If there were NO ST elevation</b>
+    A comatose OHCA survivor <em>without</em> ST elevation does <strong>not</strong> benefit from immediate routine angiography (COACT, TOMAHAWK). Go to the ICU, run the brain-protection bundle, and pursue angiography on a delayed/selective basis (e.g. for recurrent instability, ongoing ischemia, or a high clinical suspicion of a treatable coronary cause). The brain bundle is identical either way.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S4 — RESIDENT REVIEW -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s4">
+  <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+  <div class="section-content">
+    <p><em>The critical-care resident arrives at 08:55. Her reasoning, out loud:</em></p>
+
+    <h3>🧠 Frame the patient: this is post-cardiac-arrest syndrome</h3>
+    <p>"He has ROSC, but he has just survived a whole-body ischemia–reperfusion injury. I'm going to think in four buckets at once: <strong>(1) brain injury</strong> — the thing that will most likely determine his outcome; <strong>(2) myocardial stunning</strong> — transient, supportable with inotropes; <strong>(3) systemic ischemia–reperfusion / SIRS</strong> — vasoplegia and capillary leak that I'll treat with fluids and pressors; and <strong>(4) the precipitating cause</strong> — his inferior STEMI, which goes to the cath lab. Every order I write maps to one of those four."</p>
+
+    <h3>🎯 Immediate priorities (her actual order of operations)</h3>
+    <ol>
+      <li>🫁 <strong>Fix the ventilator FIRST:</strong> titrate FiO₂ down to <strong>SpO₂ 94–98%</strong> (stop the hyperoxia) and slow the rate to <strong>normocapnia</strong> (the EtCO₂ of 28 means I'm vasoconstricting his brain). Lung-protective tidal volumes.</li>
+      <li>🩸 <strong>Haemodynamics:</strong> keep <strong>MAP ≥ 65</strong> (I'll often aim a little higher) with fluids and norepinephrine; add inotrope if stunning dominates the echo.</li>
+      <li>🌡️ <strong>Temperature control NOW:</strong> he's 38.1°C — start active cooling/normothermia and <strong>above all prevent fever</strong>. Antipyretics, surface or intravascular device, target ≤ 37.5°C.</li>
+      <li>📈 <strong>STEMI → cath lab:</strong> activate interventional cardiology in parallel; revascularising the culprit treats the cause and reduces re-arrest.</li>
+      <li>🧪 <strong>Find and fix the rest:</strong> ABG, electrolytes (K⁺/Mg²⁺), glucose, treat reversible causes; sedation/analgesia and consider neuromuscular blockade for shivering during temperature control.</li>
+      <li>⏳ <strong>Hands off the prognosis:</strong> the neuro exam now is uninterpretable. <strong>No prognostication today.</strong> We re-examine ≥ 72 h after rewarming, off sedation, with multiple modalities.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Protect the brain first, revascularise the heart second, and refuse to prognosticate today — the early exam is a confounded exam."</div>
+
+    <h3>🤔 "Someone wants to call the family in and say it's hopeless. He's GCS 3."</h3>
+    <p>"Absolutely not. He is sedated, possibly still hypothermic, hours out from a global insult — his exam tells us nothing about his ceiling. Prognosticating now risks a <strong>self-fulfilling prophecy</strong>: we predict a poor outcome, withdraw care, and guarantee the death we predicted. The rule is hard and protective: <strong>wait at least 72 hours off sedation and use multimodal testing.</strong>"</p>
+
+    <div class="callout purple"><b class="ct">🧪 Resident's self-test (answer before reading on)</b>
+    A colleague says: "Sats are 100% — great, leave the FiO₂ where it is." Is that good post-arrest care?
+    <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+    <div class="reveal-hidden" id="rev1"><p><strong>No.</strong> SpO₂ 100% on FiO₂ 1.0 almost always means a high PaO₂ — i.e. <strong>hyperoxia</strong>, which drives oxidative free-radical injury in reperfused brain. Titrate FiO₂ down to a target <strong>SpO₂ 94–98%</strong> (avoiding the opposite error of hypoxia). The window matters: both ends are harmful.</p></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S5 — CONSULTANT ROUND -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s5">
+  <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round</h2></div>
+  <div class="section-content">
+    <p><em>The intensivist and on-call cardiologist, at the bedside at 09:10:</em></p>
+
+    <h3>🗂️ Two questions that branch the management</h3>
+    <div class="vs">
+      <div class="side a"><h4>📈 STEMI OHCA (this patient)</h4>
+        <ul><li>ST elevation / new LBBB / ongoing ischemia on the post-ROSC ECG</li><li><strong>Immediate coronary angiography ± PCI</strong> — revascularise the culprit</li><li>Treats the persistent precipitating cause and lowers re-arrest risk</li><li>Plus the full brain-protection bundle in the ICU</li></ul></div>
+      <div class="side b"><h4>🚫 Non-STEMI OHCA</h4>
+        <ul><li>No ST elevation, haemodynamically stabilising</li><li><strong>Immediate routine angiography did NOT improve outcomes</strong> (COACT, TOMAHAWK)</li><li>Delayed/selective angiography; ICU first for the brain bundle</li><li>Still hunt for and treat the cause (PE, electrolytes, primary arrhythmia)</li></ul></div>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"STEMI on the post-ROSC ECG → cath lab now. No ST elevation → immediate routine angiography is not helpful (COACT/TOMAHAWK). The ECG, not the fact of the arrest, sends him to the lab."</div>
+
+    <h3>🌡️ What "targeted temperature management" actually means in 2026</h3>
+    <p>"For years we argued about 33°C versus 36°C. <strong>TTM</strong> showed 33°C and 36°C were equivalent; <strong>TTM2</strong> showed targeted hypothermia (33°C) did not beat targeted normothermia with <em>aggressive fever prevention</em>. So the modern message is simple and humbling: <strong>the essential intervention is preventing pyrexia.</strong> Control the temperature actively, keep it ≤ 37.5°C, and above all <strong>do not let him get hot</strong> — fever after arrest is itself a second neurological insult."</p>
+
+    <h3>🧭 Consultant's three commandments for the next 72 hours</h3>
+    <ol>
+      <li>🫁 "Mind the gases: <strong>SpO₂ 94–98%</strong>, <strong>normocapnia</strong>. Hyperoxia oxidises the brain; hypocapnia starves it of flow. There is a target window, not a 'more is better'."</li>
+      <li>🌡️ "<strong>Targeted temperature management is, above all, the avoidance of fever.</strong> Pick a target ≤ 37.5°C, control it with a feedback device, and treat shivering."</li>
+      <li>⏳ "<strong>Never prognosticate too early.</strong> Wait at least 72 hours off sedation, and be multimodal — exam, EEG, SSEPs, NSE, imaging. One bad sign on day one is not a verdict; it's a confounder."</li>
+    </ol>
+
+    <div class="callout danger"><b class="ct">☠️ The consultant's war memory (more in S13 M&amp;M)</b>"The worst post-arrest outcome I ever saw wasn't a death from the arrest — it was a withdrawal of care at <strong>24 hours</strong> on a single poor neurological exam, in a man who was still sedated and might well have recovered. We talked ourselves into hopelessness and then made it true. Since that case I treat the 72-hour rule as sacred. Prognosis is the last thing we decide, not the first."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S6 — TEACHING POINTS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s6">
+  <div class="sec-header"><span class="s-badge">S6</span><h2>📖 Teaching Points</h2></div>
+  <div class="section-content">
+    <h3>🔬 The mechanism — the four faces of post-cardiac-arrest syndrome</h3>
+    <ol>
+      <li>🧠 <strong>Brain injury (the main determinant of outcome):</strong> global ischemia during the arrest, then a paradoxical <strong>reperfusion injury</strong> on ROSC — oxidative stress, excitotoxicity, microcirculatory failure, cerebral oedema and <strong>impaired autoregulation</strong> (so cerebral flow becomes pressure-passive, which is why MAP and PaCO₂ matter so much). Most post-arrest deaths in those who reach ICU are from this.</li>
+      <li>💔 <strong>Myocardial stunning / dysfunction:</strong> transient global hypokinesis after the arrest, even without new infarction. It is <strong>reversible</strong> over hours-to-days and is supported with inotropes ± mechanical support — it is not a reason to give up.</li>
+      <li>🔥 <strong>Systemic ischemia–reperfusion (SIRS-like) state:</strong> a "sepsis-like" syndrome — <strong>vasoplegia, capillary leak, coagulopathy</strong> — driving the need for fluids and vasopressors and the relative adrenal/vascular failure seen post-arrest.</li>
+      <li>🫀 <strong>The persistent precipitating pathology:</strong> whatever caused the arrest is still there — most often <strong>coronary occlusion</strong>, but also PE, electrolyte derangement, primary arrhythmia, hypoxia, toxins. Find it and fix it, or he re-arrests.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"ROSC restores a circulation, not a patient. Four fires now burn at once — brain, heart, the whole vasculature, and the original cause — and the brain is the one you can lose by inattention to oxygen, CO₂, pressure and temperature."</div>
+
+    <h3>⚖️ Contrast pair #1 — Hypoxia vs Hyperoxia (both harmful — aim for the window)</h3>
+    <div class="vs">
+      <div class="side a"><h4>🔻 Hypoxia</h4><ul><li>Insufficient O₂ delivery to an already-injured brain</li><li>Deepens ischemic/anoxic injury</li><li>Avoid low SpO₂ and de-saturation events</li></ul></div>
+      <div class="side b"><h4>🔺 Hyperoxia</h4><ul><li>Supra-physiological PaO₂ from FiO₂ 1.0 / SpO₂ 100%</li><li>Generates oxidative free radicals → worsens reperfusion injury</li><li>Titrate FiO₂ <em>down</em> once an SpO₂ probe reads reliably</li></ul></div>
+    </div>
+    <p>🎯 <strong>The target window:</strong> SpO₂ <strong>94–98%</strong> / normal PaO₂. The instinct "100% sats = good" is the trap — after arrest, both ends of the oxygen scale extend brain injury.</p>
+
+    <h3>⚖️ Contrast pair #2 — STEMI OHCA vs non-STEMI OHCA (the angiography decision)</h3>
+    <div class="vs">
+      <div class="side a"><h4>📈 STEMI OHCA</h4><ul><li>ST elevation / new LBBB / ongoing instability on the post-ROSC ECG</li><li><strong>Immediate cath lab</strong> — revascularise the culprit</li><li>Treats the cause and reduces re-arrest</li></ul></div>
+      <div class="side b"><h4>🚫 Non-STEMI OHCA</h4><ul><li>No ST elevation, stabilising haemodynamics</li><li><strong>No benefit from immediate routine angiography</strong> (COACT, TOMAHAWK)</li><li>ICU first, brain bundle, delayed/selective angiography</li></ul></div>
+    </div>
+    <p>💡 <em>Why it matters:</em> rushing every comatose OHCA to the lab exposes patients to risk without benefit when there's no ST elevation — but missing a true STEMI leaves the engine of the arrest running. Read the post-ROSC ECG carefully.</p>
+
+    <h3>⚖️ Contrast pair #3 — Early vs Delayed neuroprognostication; Normocapnia vs Hypocapnia</h3>
+    <p>🧠 <strong>Early prognostication</strong> on a single confounded sign risks a self-fulfilling prophecy; <strong>delayed (≥ 72 h, off sedation), multimodal</strong> prognostication is the standard. 🌬️ <strong>Normocapnia</strong> keeps cerebral blood flow appropriate; <strong>hypocapnia</strong> (from over-ventilation) vasoconstricts cerebral vessels and worsens ischemia. Don't bag a post-arrest brain to a low CO₂.</p>
+
+    <!-- 🎮 INTERACTIVE SIM: oxygenation target -->
+    <div class="sim" id="kSim">
+      <h3 style="margin-top:0">🎮 Simulation — The Oxygen Dial: how PaO₂/SpO₂ tunes secondary brain injury</h3>
+      <p style="font-size:13.5px">Drag the dial. Watch how too little and too much oxygen both injure the reperfused brain — and find the safe window in the middle. This is the "invisible vital sign" of post-arrest care.</p>
+      <label for="kRange">🫁 Oxygenation (SpO₂ proxy): <b id="kVal">99</b> %</label>
+      <input type="range" id="kRange" min="20" max="75" value="71">
+      <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+      <div class="readout bad" id="kReadout">Set the dial to explore.</div>
+      <p style="font-size:12.5px; margin-top:10px; color:var(--ink2)">🎯 Target band after ROSC: <strong>SpO₂ 94–98% / normal PaO₂</strong>. Too low → hypoxic injury. Too high → oxidative reperfusion injury. The middle of the dial is the only safe place.</p>
+    </div>
+
+    <!-- 📚 EBM MODULE -->
+    <div class="ebm">
+      <h3>📚 Evidence-Based Medicine Corner</h3>
+      <table class="tbl">
+        <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+        <tr><td><span class="lvl">RCT</span> TTM (2013)</td><td>Targeted temperature 33°C vs 36°C gave equivalent survival and neurological outcome after OHCA.</td><td>The magic number isn't 33°C — controlled temperature and avoided fever is what matters.</td></tr>
+        <tr><td><span class="lvl">RCT</span> TTM2 (2021)</td><td>Targeted hypothermia (33°C) did not improve outcomes vs targeted normothermia with active fever prevention (≤ 37.5°C).</td><td>Targeted temperature management is, above all, the <strong>avoidance of fever</strong>; normothermia with aggressive pyrexia control is acceptable.</td></tr>
+        <tr><td><span class="lvl">RCT</span> COACT (2019)</td><td>In OHCA <em>without</em> ST elevation, immediate vs delayed angiography did not improve survival.</td><td>No ST elevation → no rush to the cath lab; ICU and the brain bundle first.</td></tr>
+        <tr><td><span class="lvl">RCT</span> TOMAHAWK (2021)</td><td>Confirmed no benefit of immediate routine angiography in resuscitated OHCA without ST elevation.</td><td>Reserve immediate angiography for STEMI / ongoing instability.</td></tr>
+        <tr><td><span class="lvl">RCT</span> Oxygen-target trials</td><td>Studies of conservative vs liberal oxygen (and trials such as EXACT) support avoiding both hyperoxia and hypoxia after ROSC.</td><td>Titrate to <strong>SpO₂ 94–98%</strong>; don't sit on 100% on FiO₂ 1.0.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2020/2021 ILCOR-AHA-ERC &amp; ERC-ESICM</td><td>Post-arrest care bundle (oxygenation, ventilation, haemodynamics, TTM, angiography) and multimodal, delayed (≥ 72 h) neuroprognostication.</td><td>The framework driving every section of this case.</td></tr>
+      </table>
+    </div>
+
+    <!-- 🔬 ADVANCED TOPICS -->
+    <div class="callout purple">
+      <h3 style="margin-top:0">🔬 Fellowship Corner — Advanced Topics</h3>
+      <ul>
+        <li>🧠 <strong>Multimodal neuroprognostication:</strong> no single test decides outcome. Combine clinical exam (bilateral absent pupillary/corneal reflexes ≥ 72 h, myoclonus pattern), <strong>EEG</strong> (suppression, burst-suppression, status), <strong>somatosensory evoked potentials</strong> (bilateral absent N20), <strong>NSE</strong> biomarker trends, and <strong>neuroimaging</strong> (CT loss of grey–white differentiation, MRI diffusion changes).</li>
+        <li>🌡️ <strong>TTM logistics:</strong> surface vs intravascular feedback-controlled devices, controlled rewarming ≤ 0.25–0.5°C/h, and the central role of <strong>shivering control</strong> (counter-warming, magnesium, sedation, neuromuscular blockade) so cooling actually works.</li>
+        <li>🫀 <strong>Refractory arrest &amp; ECPR:</strong> selected refractory VF arrests may go to <strong>extracorporeal CPR (VA-ECMO)</strong> as a bridge to revascularisation; mechanical support (Impella/IABP) for severe post-arrest myocardial stunning and cardiogenic shock.</li>
+        <li>🩸 <strong>Haemodynamic nuance:</strong> impaired cerebral autoregulation makes flow pressure-passive — some advocate individualised, often <em>higher</em> MAP targets; balance against myocardial work. Treat the vasoplegic SIRS state like distributive shock.</li>
+        <li>🧪 <strong>Self-fulfilling prophecy bias:</strong> early prognostication that triggers withdrawal of life-sustaining therapy contaminates the very outcome data — a key reason guidelines mandate delay and multimodality.</li>
+        <li>🔌 <strong>Secondary prevention:</strong> for a non-reversible primary arrhythmic arrest, plan an <strong>ICD</strong> later; for an ischemic cause, revascularisation ± ICD per recovered EF.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S7 — ORDERS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s7">
+  <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+  <div class="section-content">
+    <h3>🖊️ The post-ROSC order set, written as you'd actually write it (09:00)</h3>
+    <ul>
+      <li>🫁 <strong>Ventilation:</strong> titrate FiO₂ to <strong>SpO₂ 94–98%</strong> (stop hyperoxia); ventilate to <strong>normocapnia</strong> (PaCO₂ 35–45 mmHg / 4.5–6.0 kPa); lung-protective tidal volume 6–8 mL/kg; confirm tube position with capnography + CXR.</li>
+      <li>🩸 <strong>Haemodynamics:</strong> target <strong>MAP ≥ 65</strong> (consider higher); fluids + norepinephrine; add inotrope (e.g. dobutamine) if echo shows stunning/low output; arterial line.</li>
+      <li>🌡️ <strong>Targeted temperature management:</strong> active control to a constant target ≤ 37.5°C; <strong>aggressively prevent fever</strong>; feedback-controlled device; antipyretics; treat shivering (sedation ± neuromuscular blockade).</li>
+      <li>📈 <strong>STEMI on post-ROSC ECG → activate cath lab now</strong> for angiography ± PCI; dual antiplatelet/anticoagulation per protocol.</li>
+      <li>🧪 <strong>Bloods/gases:</strong> ABG, U&amp;E, K⁺/Mg²⁺, glucose (avoid hypo- and marked hyper-glycaemia), troponin, lactate, CBC, coagulation, toxicology if indicated.</li>
+      <li>💤 <strong>Sedation/analgesia</strong> short-acting where possible (to allow a later clean neuro exam); continuous EEG if available.</li>
+      <li>🧠 <strong>Neuroprotection:</strong> head-up 30°, normoglycaemia, treat seizures; <strong>document explicitly: NO prognostication before ≥ 72 h off sedation, multimodal.</strong></li>
+      <li>📟 Continuous telemetry, SpO₂, capnography, core-temperature probe, hourly urine output, NG tube, VTE and stress-ulcer prophylaxis as appropriate.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Every post-ROSC order serves one of two masters: revascularise the cause, or protect the brain — oxygen window, normocapnia, MAP ≥ 65 and no fever."</div>
+
+    <!-- 🩺 PROCEDURE GUIDE 1 -->
+    <div class="checklist" id="ckCV">
+      <h3 style="margin-top:0">🩺 Procedure Guide — The Post-ROSC Care Bundle — tick as you go</h3>
+      <label class="ck"><input type="checkbox"><span>🫧 Confirm a secure airway with waveform capnography; verify ETT position on CXR</span></label>
+      <label class="ck"><input type="checkbox"><span>🫁 Titrate FiO₂ to <strong>SpO₂ 94–98%</strong> (correct hyperoxia) and ventilate to <strong>normocapnia</strong> (correct the hypocapnia)</span></label>
+      <label class="ck"><input type="checkbox"><span>🩸 Establish arterial line; support <strong>MAP ≥ 65</strong> with fluids/pressors ± inotrope for myocardial stunning</span></label>
+      <label class="ck"><input type="checkbox"><span>🌡️ Start <strong>targeted temperature management</strong> (≤ 37.5°C), control shivering, and <strong>aggressively prevent fever</strong></span></label>
+      <label class="ck"><input type="checkbox"><span>📈 Read the post-ROSC 12-lead → <strong>STEMI = cath lab now</strong>; no ST elevation = ICU + delayed/selective angiography</span></label>
+      <label class="ck"><input type="checkbox"><span>🧪 Send ABG, electrolytes, glucose, troponin, lactate; treat reversible causes</span></label>
+      <label class="ck"><input type="checkbox"><span>⏳ Document the plan: <strong>defer neuroprognostication ≥ 72 h</strong> off sedation, multimodal</span></label>
+      <div class="ck-progress" data-progress>0 / 7 complete</div>
+    </div>
+
+    <!-- 🩺 PROCEDURE GUIDE 2 -->
+    <div class="checklist" id="ckDefib">
+      <h3 style="margin-top:0">🩺 Procedure Guide — If he re-arrests: back to ACLS</h3>
+      <p style="font-size:13px">⚠️ Post-ROSC patients can re-arrest — the precipitating cause is still present. Be ready to return instantly to high-quality resuscitation.</p>
+      <label class="ck"><input type="checkbox"><span>🚫 Confirm loss of pulse → call arrest, start high-quality CPR (100–120/min, depth 5–6 cm, full recoil)</span></label>
+      <label class="ck"><input type="checkbox"><span>🔌 Defibrillator ready; shock shockable rhythms (VF/pVT) at minimal interruption to compressions</span></label>
+      <label class="ck"><input type="checkbox"><span>💉 Adrenaline 1 mg IV every 3–5 min; amiodarone 300 mg after the 3rd shock for refractory VF/pVT</span></label>
+      <label class="ck"><input type="checkbox"><span>🧠 Treat reversible causes — 4 H's &amp; 4 T's; here especially <strong>coronary Thrombosis</strong>, hypoxia and electrolytes</span></label>
+      <label class="ck"><input type="checkbox"><span>🫀 Consider <strong>ECPR (VA-ECMO)</strong> pathway for refractory shockable arrest in a selected candidate</span></label>
+      <label class="ck"><input type="checkbox"><span>🔁 Re-achieve ROSC → resume the post-arrest bundle; re-target oxygen, CO₂, MAP and temperature</span></label>
+      <div class="ck-progress" data-progress>0 / 6 complete</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S8 — NURSING CARE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s8">
+  <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+  <div class="section-content">
+    <h3>🛏️ CCU/ICU nursing priorities — hour by hour</h3>
+    <ul>
+      <li>🫁 <strong>Guard the oxygen window:</strong> as soon as the SpO₂ probe reads reliably, titrate FiO₂ down to keep <strong>SpO₂ 94–98%</strong> — flag any 100% on high FiO₂ as hyperoxia, and any desaturation as hypoxia.</li>
+      <li>🌬️ <strong>Watch the CO₂:</strong> capnography continuously; report EtCO₂ trending low (over-ventilation/hypocapnia) so the rate can be adjusted to <strong>normocapnia</strong>.</li>
+      <li>🩸 <strong>MAP ≥ 65:</strong> hourly (or beat-to-beat arterial) BP; titrate vasopressors to target, report drops promptly — the post-arrest vasculature is leaky and labile.</li>
+      <li>🌡️ <strong>Temperature is a nursing-led therapy:</strong> run the feedback-controlled device to the set target, monitor core temperature continuously, and <strong>treat fever and shivering aggressively</strong> — fever is a second brain injury.</li>
+      <li>💤 <strong>Sedation/shivering:</strong> manage sedation and neuromuscular blockade per protocol; remember NMB can mask seizures — escalate if continuous EEG shows activity.</li>
+      <li>🧠 <strong>Neuro obs without over-reading them:</strong> document pupils, movements and any myoclonus, but understand these are <strong>not prognostic yet</strong> — never imply a verdict to the family.</li>
+      <li>📋 <strong>Document targets met and missed:</strong> oxygen, CO₂, MAP, temperature, glucose — the post-arrest bundle is a checklist the bedside owns.</li>
+      <li>👨‍👩‍👦 <strong>Support the family with honest uncertainty:</strong> "he is critically ill and it is too early to know" — never "hopeless" on day one (see S16).</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who keeps the SpO₂ in the window, the CO₂ normal, the MAP up and the temperature from rising is delivering most of the brain protection in the room."</div>
+    <div class="callout warn"><b class="ct">📢 Escalate IMMEDIATELY for</b>Loss of pulse / re-arrest · SpO₂ &lt; 94% or persistent 100% on high FiO₂ · EtCO₂ trending low · MAP &lt; 65 despite pressors · <strong>temperature rising / fever</strong> · seizures or sustained myoclonus · new ST changes or recurrent instability · any move to prognosticate or withdraw before 72 h.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S9 — INVESTIGATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s9">
+  <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+  <div class="section-content">
+    <h3>🧾 Results board (09:20, post-ROSC)</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>Result</th><th>Reference</th><th>Interpretation</th></tr>
+      <tr><td>ABG — PaO₂</td><td class="hi">38 kPa (285 mmHg) ↑</td><td>10–13 kPa</td><td><strong>Hyperoxia</strong> from FiO₂ 1.0. Oxidative free radicals worsen reperfusion brain injury — titrate FiO₂ down to SpO₂ 94–98%.</td></tr>
+      <tr><td>ABG — PaCO₂</td><td class="lo">3.6 kPa (27 mmHg) ↓</td><td>4.5–6.0 kPa</td><td><strong>Hypocapnia</strong> from over-ventilation → cerebral vasoconstriction → worse ischemia. Slow the rate to normocapnia.</td></tr>
+      <tr><td>Lactate</td><td class="hi">5.8 mmol/L ↑</td><td>&lt; 2.0</td><td>Reflects the arrest/low-output state and ischemia–reperfusion. Expect it to clear as perfusion improves; persistent rise = trouble.</td></tr>
+      <tr><td>Troponin I</td><td class="hi">2.4 ng/mL ↑</td><td>&lt; 0.04</td><td>Consistent with the STEMI that precipitated the arrest (plus arrest-related demand). Supports immediate angiography.</td></tr>
+      <tr><td>Potassium</td><td class="lo">3.3 mmol/L ↓</td><td>3.5–5.0</td><td>Correct toward 4.5 — an arrhythmogenic milieu in a heart that just fibrillated. Replace K⁺ and Mg²⁺.</td></tr>
+      <tr><td>Glucose</td><td class="hi">11.2 mmol/L ↑</td><td>4.0–7.8</td><td>Stress hyperglycaemia. Control moderately — avoid both marked hyperglycaemia and hypoglycaemia.</td></tr>
+      <tr><td>Core temperature</td><td class="hi">38.1°C ↑</td><td>≤ 37.5 target</td><td>Early fever = a second neurological insult. Start active temperature control now.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The first ABG after ROSC is a report card on the resuscitation that follows it: too much O₂, too little CO₂ — fix both before you do anything clever."</div>
+
+    <div class="callout info"><b class="ct">🧠 Why the early neuro tests don't go on this board yet</b>EEG, SSEPs, NSE and neuroimaging are part of <strong>prognostication</strong>, and prognostication is deliberately <strong>deferred ≥ 72 h</strong>, off sedation, and read <strong>multimodally</strong>. Sending them today to "get an answer" invites a confounded, premature, self-fulfilling conclusion. Today's investigations support resuscitation and cause-finding; tomorrow's support prognosis.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S10 — ECG / IMAGING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s10">
+  <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging</h2></div>
+  <div class="section-content">
+    <h3>🫀 The post-ROSC 12-lead — read it like it decides the cath lab (it does)</h3>
+    <div class="ecg-fig">
+      <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Post-ROSC ECG showing inferior ST elevation">
+        <rect width="820" height="150" fill="#0b1220"/>
+        <g stroke="#1e3a5f" stroke-width="1">
+          <line x1="0" y1="30" x2="820" y2="30"/><line x1="0" y1="60" x2="820" y2="60"/>
+          <line x1="0" y1="90" x2="820" y2="90"/><line x1="0" y1="120" x2="820" y2="120"/>
+        </g>
+        <polyline fill="none" stroke="#86efac" stroke-width="2.4" points="0,90 40,90 48,86 56,90 80,90 90,55 100,118 110,72 118,70 150,70 230,70 240,90 248,86 256,90 280,90 290,55 300,118 310,72 318,70 350,70 430,70 440,90 448,86 456,90 480,90 490,55 500,118 510,72 518,70 550,70 630,70 640,90 648,86 656,90 680,90 690,55 700,118 710,72 718,70 760,70 820,70"/>
+        <text x="120" y="60" fill="#fca5a5" font-size="12" font-weight="700">↑ ST elevation</text>
+        <text x="520" y="60" fill="#fcd34d" font-size="12" font-weight="700">↑ elevated J-point/ST</text>
+      </svg>
+      <div class="ecg-cap">Post-ROSC sinus rhythm with <span style="color:#fca5a5">inferior ST elevation</span> and a persistently <span style="color:#fcd34d">elevated ST segment</span>. In a resuscitated OHCA this is a <strong>STEMI → immediate cath lab</strong>. Had there been no ST elevation, immediate routine angiography would not be indicated (COACT/TOMAHAWK).</div>
+    </div>
+
+    <h3>🔎 The post-ROSC imaging &amp; workup toolkit</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>Why / what it answers</th></tr>
+      <tr><td>📈 <strong>Post-ROSC 12-lead ECG</strong></td><td>The fork in the road: ST elevation / new LBBB / ongoing ischemia → cath lab; otherwise ICU first. Repeat it — the first one can be transiently abnormal post-arrest.</td></tr>
+      <tr><td>🫀 <strong>Coronary angiography</strong></td><td>Immediate for STEMI/instability; revascularise the culprit (the persistent precipitating cause). Delayed/selective if no ST elevation.</td></tr>
+      <tr><td>🩻 <strong>Echocardiography</strong></td><td>Quantifies post-arrest <strong>myocardial stunning</strong> and guides inotrope/mechanical support; screens for mechanical/structural causes.</td></tr>
+      <tr><td>🫁 <strong>CXR / CT</strong></td><td>Confirm ETT and lines; CT chest/CTPA if PE suspected as the arrest cause; CT head for trauma or to support later prognostication (grey–white loss).</td></tr>
+      <tr><td>🧠 <strong>Continuous EEG</strong></td><td>Detects seizures/status (which are treatable) and contributes — <em>later</em> — to multimodal prognostication. Not a day-one verdict tool.</td></tr>
+      <tr><td>🧠 <strong>SSEPs / NSE / MRI</strong></td><td>Components of <strong>delayed (≥ 72 h), multimodal</strong> neuroprognostication — never used in isolation, never used early.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"One ECG sends him to the cath lab or to the ICU; one rule keeps you honest with the family — no prognostication before 72 hours, and never on a single test."</div>
+
+    <h3>🫀 Post-procedure imaging in this patient</h3>
+    <ul>
+      <li>📈 <strong>Cath lab:</strong> occluded dominant RCA (the inferior STEMI culprit) — primary PCI with stent, TIMI 3 flow restored. The engine of the arrest is switched off.</li>
+      <li>🩻 <strong>Echo (post-PCI):</strong> EF 35% with inferior hypokinesis and global stunning out of proportion to the infarct — expected to improve over days as stunning resolves.</li>
+      <li>🧠 <strong>CT head (for completeness, not prognosis):</strong> no haemorrhage, preserved grey–white differentiation early — reassuring but not predictive on day zero.</li>
+    </ul>
+
+    <div class="callout warn"><b class="ct">⚠️ The post-arrest ECG's favourite lie</b>"The post-ROSC ECG is always abnormal, so ignore it." Wrong — a clear STEMI pattern is the trigger for immediate revascularisation. But also beware over-reading transient post-arrest repolarisation changes as STEMI when there is none. <strong>Read it carefully, repeat it, and correlate clinically.</strong></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S11 — MEDICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s11">
+  <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+  <div class="section-content">
+    <h3>💉 Post-ROSC drugs — what, why, and the traps</h3>
+    <table class="tbl">
+      <tr><th>Drug / measure</th><th>Role now</th><th>Mechanism / caution</th></tr>
+      <tr><td><strong>Oxygen (titrated FiO₂)</strong></td><td>Maintain SpO₂ 94–98% / normal PaO₂</td><td>Treat O₂ as a drug with a therapeutic window. Both hyperoxia (oxidative injury) and hypoxia (anoxic injury) extend brain damage.</td></tr>
+      <tr><td><strong>Norepinephrine</strong></td><td>First-line vasopressor for MAP ≥ 65 in the vasoplegic SIRS state</td><td>Restores perfusion pressure to a brain with impaired autoregulation. Titrate; ensure adequate volume first.</td></tr>
+      <tr><td><strong>Dobutamine / inotrope</strong></td><td>Supports post-arrest myocardial stunning / low output</td><td>Increases contractility while stunning recovers. Watch for tachy-arrhythmia and hypotension from vasodilation.</td></tr>
+      <tr><td><strong>Antipyretics + TTM device</strong></td><td>Targeted temperature management; <strong>prevent fever</strong> (≤ 37.5°C)</td><td>Fever is a second neurological insult. Feedback-controlled cooling is more reliable than antipyretics alone.</td></tr>
+      <tr><td><strong>Sedation / analgesia (short-acting)</strong></td><td>Comfort, ventilator synchrony, shivering control</td><td>Prefer short-acting agents so a clean neuro exam is possible later; sedation confounds the early exam (don't prognosticate through it).</td></tr>
+      <tr><td><strong>Neuromuscular blockade</strong></td><td>For refractory shivering during temperature control</td><td>Effective for shivering but <strong>masks seizures</strong> — pair with continuous EEG.</td></tr>
+      <tr><td><strong>Antiplatelets / anticoagulation</strong></td><td>For the STEMI culprit at PCI</td><td>Per ACS protocol; balance against arrest-related bleeding risk and any CPR trauma.</td></tr>
+      <tr><td><strong>K⁺ / Mg²⁺ replacement</strong></td><td>Stabilise the post-VF myocardium</td><td>Correct toward K⁺ 4.5, Mg²⁺ &gt; 1.0 to reduce re-arrhythmia. Monitor with serial gases.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Oxygen is a drug with a ceiling, vasopressors defend the brain's perfusion, and fever-control is a therapy — the post-arrest 'medications' are mostly numbers you keep inside a window."</div>
+
+    <div class="callout danger"><b class="ct">🚫 The 'don't' list in post-cardiac-arrest care</b>❌ Don't leave FiO₂ at 1.0 once SpO₂ reads reliably (hyperoxia) · ❌ Don't hyperventilate to a low CO₂ (cerebral vasoconstriction) · ❌ Don't let the patient become febrile · ❌ Don't sedate heavily and then "read" the neuro exam as if it were prognostic · ❌ Don't rush a non-STEMI OHCA to immediate routine angiography · ❌ Don't prognosticate or withdraw before ≥ 72 h, off sedation, multimodal.</div>
+
+    <h3>🏠 Cause- and prevention-directed therapy (this admission)</h3>
+    <ul>
+      <li>🫀 <strong>Revascularisation</strong> of the culprit coronary lesion (done at primary PCI) + full secondary-prevention ACS therapy (antiplatelets, statin, ACEi/ARB, beta-blocker as tolerated).</li>
+      <li>💙 <strong>Optimise heart-failure therapy</strong> if EF remains reduced after stunning resolves; reassess EF before any device decision.</li>
+      <li>🔌 <strong>ICD planning later</strong> for a non-reversible primary arrhythmic substrate, or per recovered EF after an ischemic cause — decided weeks out, not on day one.</li>
+      <li>🧠 <strong>Neuro-rehabilitation pathway</strong> for survivors with hypoxic-ischemic brain injury.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S12 — MONITORING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s12">
+  <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+  <div class="section-content">
+    <h3>📡 What to watch and why</h3>
+    <ul>
+      <li>🫁 <strong>SpO₂ + serial ABGs</strong> — keep SpO₂ <strong>94–98%</strong> and PaO₂ normal; the number you titrate against to avoid both hyperoxia and hypoxia.</li>
+      <li>🌬️ <strong>Continuous capnography + PaCO₂</strong> — maintain <strong>normocapnia</strong>; a falling EtCO₂ flags over-ventilation/hypocapnia (or falling output — check the pulse).</li>
+      <li>🩸 <strong>Invasive arterial pressure</strong> — beat-to-beat MAP to defend <strong>MAP ≥ 65</strong> (often higher) through a labile, vasoplegic circulation.</li>
+      <li>🌡️ <strong>Continuous core temperature</strong> with a feedback-controlled device — the central monitored therapy; <strong>any upward drift toward fever is an alarm.</strong></li>
+      <li>🫀 <strong>Continuous ECG / telemetry</strong> — watch for re-arrhythmia and recurrent ischemia; serial troponin to track the infarct.</li>
+      <li>🧠 <strong>Continuous EEG</strong> — detect treatable seizures/status (especially under neuromuscular blockade); contributes <em>later</em> to prognostication.</li>
+      <li>🧪 <strong>Serial K⁺/Mg²⁺, glucose, lactate</strong> — keep electrolytes in band, glucose moderate, and watch lactate clearance as a perfusion marker.</li>
+      <li>💧 <strong>Urine output / renal function</strong> — the kidney is a downstream marker of the same hypoperfusion that threatens the brain.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After ROSC the monitor's job is to keep four numbers in their windows — oxygen, CO₂, MAP and temperature — because every one outside its window is more brain lost."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S13 — COMPLICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s13">
+  <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+  <div class="section-content">
+    <h3>💀 What can go wrong — and the mechanism</h3>
+    <ul>
+      <li>🔁 <strong>Re-arrest</strong> — the precipitating cause persists until treated; revascularise and correct electrolytes/oxygenation to prevent it.</li>
+      <li>🧠 <strong>Hypoxic-ischemic brain injury</strong> — the main determinant of outcome; worsened by hyperoxia, hypoxia, hypocapnia, hypotension and <strong>fever</strong>. Cerebral oedema and seizures may follow.</li>
+      <li>💔 <strong>Post-arrest myocardial dysfunction / cardiogenic shock</strong> — stunning ± the underlying infarct; supportable and usually reversible.</li>
+      <li>🔥 <strong>Systemic reperfusion/SIRS state</strong> — vasoplegia, capillary leak, coagulopathy, AKI, and a sepsis-like picture (and genuine secondary infections, e.g. aspiration pneumonia).</li>
+      <li>🌡️ <strong>Temperature complications</strong> — fever (extends injury), and the hazards of cooling itself (shivering, bradycardia, electrolyte shifts, infection).</li>
+      <li>⚖️ <strong>Premature prognostication / self-fulfilling prophecy</strong> — withdrawing care too early on confounded signs, causing the very death it predicts.</li>
+    </ul>
+
+    <!-- 🎭 M&M CONFERENCE MODULE -->
+    <div class="mm">
+      <h3>🎭 Morbidity &amp; Mortality Conference — "The Patient We Gave Up On Too Soon"</h3>
+      <div class="mm-case">
+        <strong>The case:</strong> A 52-year-old woman, witnessed VF arrest, bystander CPR, ROSC after 10 minutes, comatose on arrival. Overnight she was deeply sedated, mildly hypothermic, and her oxygen and CO₂ targets were never set — she sat at FiO₂ 1.0 and ran febrile to 38.6°C unrecognised for hours. At the <strong>24-hour</strong> ward round, a single neurological exam — absent motor response, sluggish pupils, all while still sedated and cool — was read as "devastating hypoxic brain injury." The family were told it was hopeless and care was withdrawn. At the M&amp;M, three things were obvious in hindsight: she had been <strong>hyperoxic and febrile</strong> (extending the very injury that was then used to condemn her), the exam was <strong>confounded by sedation and temperature</strong>, and the angiogram had been deferred so a treatable proximal LAD lesion went un-revascularised. The 72-hour, off-sedation, multimodal assessment that might have told the truth was never done.
+      </div>
+      <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+      <div class="swiss">
+        <div class="hole"><b>⏳ TOO EARLY</b>Prognosis declared at 24 h, not after ≥ 72 h off sedation — a self-fulfilling prophecy.</div>
+        <div class="hole"><b>🩻 SINGLE TEST</b>One confounded clinical exam, no EEG/SSEP/NSE/imaging — never multimodal.</div>
+        <div class="hole"><b>🌡️ FEVER MISSED</b>Unrecognised pyrexia extended the brain injury overnight.</div>
+        <div class="hole"><b>🫁 HYPEROXIA</b>FiO₂ 1.0 left running — oxidative reperfusion injury.</div>
+        <div class="hole"><b>🫀 CAUSE MISSED</b>Treatable coronary occlusion never revascularised.</div>
+      </div>
+      <p style="margin-bottom:0"><strong>🛡️ What would have saved her:</strong> set the bundle on arrival (SpO₂ 94–98%, normocapnia, MAP ≥ 65, <strong>no fever</strong>); revascularise a treatable cause; and — above all — <strong>refuse to prognosticate before 72 hours, off sedation, multimodally.</strong> "Devastating brain injury" on day one, through sedation and fever, is a hypothesis, not a verdict. <strong>This is exactly why we defer the prognosis tonight in Bed 9.</strong></p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'It's hopeless' said at 24 hours through sedation and fever is how recoverable patients are lost. Prognosis is the last decision after arrest, never the first."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S14 — DIFFERENTIALS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s14">
+  <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials</h2></div>
+  <div class="section-content">
+    <h3>🧩 What caused the arrest? — the persistent precipitating pathology</h3>
+    <table class="tbl">
+      <tr><th>Cause</th><th>Clues</th><th>Why it matters</th></tr>
+      <tr><td>🫀 <strong>Acute coronary occlusion / STEMI</strong> (this patient)</td><td>Chest pain pre-arrest, shockable VF, ST elevation on post-ROSC ECG, raised troponin</td><td>Most common cause of shockable OHCA; immediate angiography ± PCI treats the cause and prevents re-arrest.</td></tr>
+      <tr><td>🫁 <strong>Pulmonary embolism</strong></td><td>Often PEA arrest, risk factors, RV strain on echo/ECG, sudden hypoxia</td><td>May warrant thrombolysis/thrombectomy; CTPA when stable. A non-coronary cause to actively exclude.</td></tr>
+      <tr><td>⚡ <strong>Primary arrhythmia / channelopathy</strong></td><td>Structurally normal heart, family history, prior syncope, no culprit on angiography</td><td>Drives later ICD planning for a non-reversible arrhythmic substrate.</td></tr>
+      <tr><td>🧪 <strong>Electrolyte / metabolic</strong></td><td>↑/↓K⁺, ↓Mg²⁺, acidosis, hypoglycaemia</td><td>Reversible 'H' causes — correct them and they may be the whole story.</td></tr>
+      <tr><td>🌬️ <strong>Hypoxia / respiratory</strong></td><td>Preceding hypoxic event, airway obstruction, asthma/COPD</td><td>A reversible cause; secure the airway and oxygenation (within the target window).</td></tr>
+      <tr><td>☠️ <strong>Toxins / overdose</strong></td><td>History, pupils, drug screen, specific toxidromes</td><td>Specific antidotes; a reversible cause especially in younger arrests.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After ROSC, run the 4 H's and 4 T's like a checklist — the arrest's cause is still in the room, and shockable OHCA is a coronary occlusion until proven otherwise."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S15 — PLAN -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s15">
+  <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan</h2></div>
+  <div class="section-content">
+    <h3>🧭 The first hour → the first 72 hours → beyond</h3>
+    <ol>
+      <li>🫁 <strong>First hour (done):</strong> titrate FiO₂ to SpO₂ 94–98%; ventilate to normocapnia; arterial line; MAP ≥ 65 with fluids/norepinephrine; start targeted temperature management (≤ 37.5°C, prevent fever); primary PCI of the inferior-STEMI culprit.</li>
+      <li>🌡️ <strong>First 24–48 h:</strong> maintain the bundle; control shivering; continuous EEG; serial gases/electrolytes/troponin/lactate; echo to track stunning; treat seizures and reversible insults; controlled rewarming if hypothermia was used.</li>
+      <li>⏳ <strong>At ≥ 72 h, off sedation:</strong> perform <strong>multimodal neuroprognostication</strong> — clinical exam (pupillary/corneal reflexes, motor, myoclonus), EEG, SSEPs (N20), NSE trend, neuroimaging — <strong>never on a single finding.</strong></li>
+      <li>🫀 <strong>Cause &amp; prevention:</strong> complete the ACS pathway; reassess EF after stunning resolves; plan <strong>ICD</strong> later if a non-reversible arrhythmic substrate or persistently low EF.</li>
+      <li>🧠 <strong>If recovering:</strong> wean sedation and ventilation, neuro-rehabilitation referral, cognitive and functional assessment.</li>
+      <li>👨‍👩‍👦 <strong>Family throughout:</strong> honest, repeated updates that it is "too early to know," with the explicit plan to reassess at 72 h — protecting them from a premature verdict.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Treat the cause now, protect the brain for 72 hours, then — and only then — let multiple tests, off sedation, tell you the prognosis."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S16 — PROGRESS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s16">
+  <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+  <div class="section-content">
+    <h3>📅 Course in CCU/ICU</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Day 0, 09:40</div>Primary PCI to occluded RCA, TIMI 3 restored. Returns to ICU on the full bundle: SpO₂ 96%, PaCO₂ normal, MAP 72 on norepinephrine, temperature controlled at 36.5°C, fever prevented.</div>
+      <div class="t-item"><div class="t-time">Day 1</div>Lactate clears, vasopressor weaning. Continuous EEG shows reactive background, no seizures. Sedation kept short-acting. <strong>No prognostication attempted.</strong></div>
+      <div class="t-item"><div class="t-time">Day 2</div>Echo: EF improving (35→45%) as stunning resolves. Temperature held ≤ 37.5°C, no fever spikes. Off vasopressors.</div>
+      <div class="t-item"><div class="t-time">Day 3 (≥ 72 h)</div>Sedation stopped and cleared. <strong>Multimodal assessment:</strong> pupillary and corneal reflexes present, localising to pain, EEG reactive, SSEP N20 present, NSE trending down, MRI without devastating injury — a reassuring, consistent picture.</div>
+      <div class="t-item"><div class="t-time">Day 4</div>Extubated; confused but improving; follows simple commands. Neuro-rehab and cardiology pathways engaged.</div>
+      <div class="t-item"><div class="t-time">Day 7</div>Oriented, mobilising with help, mild short-term memory difficulty. EF 48%. Transferred to cardiology ward.</div>
+    </div>
+
+    <!-- 👨‍👩‍👦 FAMILY & PATIENT JOURNEY MODULE -->
+    <h3>👨‍👩‍👦 Family &amp; Patient Journey</h3>
+    <div class="journey">
+      <div class="j-card"><div class="j-who">🧔 The patient — Mr. A.K.</div><p>"I remember the platform, then waking up days later with my wife crying and a tube gone from my throat. They tell me a stranger pushed on my chest until the ambulance came. I'm here because nobody decided too soon that I wasn't worth waiting for."</p></div>
+      <div class="j-card"><div class="j-who">👩 His wife</div><p>"On the first day someone almost said the word 'hopeless,' and the consultant stopped them — said it was far too early to know. They explained they'd give him every chance for three days before judging anything. Those three days gave me my husband back."</p></div>
+      <div class="j-card"><div class="j-who">👩‍⚕️ The bedside nurse</div><p>"My whole shift was four numbers — his oxygen, his CO₂, his blood pressure and his temperature — and not letting any of them drift. Brain protection isn't dramatic. It's relentless attention to the boring numbers."</p></div>
+      <div class="j-card"><div class="j-who">🎓 The team's reflection</div><p>"We didn't do anything heroic. We ran the bundle, fixed the artery, prevented fever, and refused to guess the ending before 72 hours. The discipline was the treatment."</p></div>
+    </div>
+
+    <div class="callout pink"><b class="ct">💗 The human thread</b>Survival after cardiac arrest is rarely a single dramatic save — it is the patient and family living through a long, frightening uncertainty while a team holds the line on oxygen, CO₂, pressure and temperature, and resists the urge to declare the ending early. The kindest thing you can offer a family on day one is honest uncertainty and a clear plan to wait.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S17 — DISCHARGE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s17">
+  <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+  <div class="section-content">
+    <h3>📋 Discharge plan &amp; safety net</h3>
+    <ul>
+      <li>💊 <strong>Medications:</strong> full secondary-prevention ACS therapy (dual antiplatelet, high-intensity statin, ACEi/ARB, beta-blocker as tolerated) with a clear written schedule; heart-failure therapy if EF remains reduced.</li>
+      <li>🫀 <strong>Cardiology follow-up:</strong> repeat echo to reassess EF after stunning fully resolves; <strong>ICD decision deferred and reviewed</strong> per recovered EF / arrhythmic risk — not decided on the acute admission.</li>
+      <li>🧠 <strong>Neuro-rehabilitation:</strong> cognitive and functional assessment, rehab referral, and support for the common post-arrest cognitive/emotional after-effects (memory, fatigue, mood).</li>
+      <li>👨‍👩‍👦 <strong>Family &amp; community:</strong> CPR/AED training offered to the family; acknowledge and support the psychological impact on the patient and relatives (and the bystander who saved him).</li>
+      <li>🚩 <strong>Red flags → seek urgent care:</strong> chest pain, breathlessness, syncope/presyncope, palpitations, or any collapse — the substrate that arrested once needs vigilance.</li>
+      <li>📚 <strong>Education:</strong> what happened in plain language, the importance of medication adherence and risk-factor control, smoking cessation, and follow-up appointments booked before discharge.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Surviving the arrest is the start: discharge after ROSC means a revascularised cause, optimised secondary prevention, a deferred device decision, neuro-rehab, and a family trained to act if it happens again."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S18 — CLINICAL PEARLS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s18">
+  <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+  <div class="section-content">
+    <div class="pearl-grid">
+      <div class="pearl"><b>🧠 The brain is the patient</b>Post-arrest brain injury is the main determinant of outcome. Avoid hypoxia, hyperoxia, hypotension, hypocapnia and fever — each extends the injury.</div>
+      <div class="pearl"><b>🫀 Four fires at once</b>Post-arrest syndrome = brain injury + myocardial stunning + ischemia-reperfusion SIRS + the persistent precipitating cause. Treat all four.</div>
+      <div class="pearl"><b>🫁 Oxygen has a window</b>Both ends harm. Titrate FiO₂ to SpO₂ 94–98% / normal PaO₂; "100% sats on FiO₂ 1.0" is hyperoxia, not success.</div>
+      <div class="pearl"><b>🌬️ Normocapnia, not low CO₂</b>Hypocapnia from over-ventilation vasoconstricts cerebral vessels and worsens ischemia. Don't bag the brain to a low CO₂.</div>
+      <div class="pearl"><b>🩸 MAP ≥ 65</b>Autoregulation is impaired and flow is pressure-passive — defend perfusion pressure (often a little higher) with fluids/pressors.</div>
+      <div class="pearl"><b>🌡️ TTM = avoid fever</b>TTM2: targeted normothermia with aggressive fever prevention is acceptable. The essential intervention is preventing pyrexia (≤ 37.5°C).</div>
+      <div class="pearl"><b>📈 STEMI → cath lab now</b>ST elevation on the post-ROSC ECG goes straight to angiography ± PCI; it treats the cause and prevents re-arrest.</div>
+      <div class="pearl"><b>🚫 Non-STEMI OHCA</b>Immediate routine angiography did NOT improve outcomes (COACT, TOMAHAWK). ICU first, brain bundle, delayed/selective cath.</div>
+      <div class="pearl"><b>⏳ Never prognosticate early</b>Wait ≥ 72 h after rewarming and off sedation, and be multimodal — or risk a self-fulfilling prophecy.</div>
+      <div class="pearl"><b>🩻 Multimodal, always</b>Exam + EEG + SSEPs + NSE + imaging together. No single early sign is a verdict.</div>
+      <div class="pearl"><b>💔 Stunning recovers</b>Post-arrest myocardial dysfunction is transient and supportable — not a reason to give up; support it and reassess EF later.</div>
+      <div class="pearl"><b>🔌 Device later, not now</b>Plan an ICD for a non-reversible arrhythmic cause once EF and risk are reassessed — never decided on day one.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S19 — MCQs / ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s19">
+  <div class="sec-header"><span class="s-badge">S19</span><h2>🧠 MCQs / Assessment</h2></div>
+  <div class="section-content">
+    <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP and feed your dashboard. Each shows a full explanation.</em></p>
+    <div id="mcqHost"></div>
+    <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · Case c-ohca-027 — Post-Cardiac-Arrest Care After ROSC<br>
+  ⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."
+</div>
+
+</div><!-- /#caseScroll -->
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ XP / DASHBOARD CORE ============ */
+  var XP = 0, XP_MAX = 1200;
+  var awarded = {}; // dedupe one-time awards by key
+  var xpVal = document.getElementById('xpVal');
+  var xpFill = document.getElementById('xpFill');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+  }
+  function addXP(amount, key, label){
+    if(key){ if(awarded[key]) return; awarded[key] = true; }
+    XP += amount;
+    if(XP > XP_MAX) XP = XP_MAX;
+    xpVal.textContent = XP;
+    xpFill.style.width = Math.min(100, Math.round(XP / XP_MAX * 100)) + '%';
+    showToast('+' + amount + ' XP' + (label ? ' · ' + label : ''));
+  }
+  function earnBadge(id){
+    var b = document.getElementById(id);
+    if(b && !b.classList.contains('earned')){ b.classList.add('earned'); }
+  }
+
+  /* Dashboard minimize */
+  var dash = document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){
+    dash.classList.toggle('collapsed');
+    this.textContent = dash.classList.contains('collapsed') ? '+' : '–';
+  });
+
+  /* ============ INTERNAL SCROLL SIZING ============ */
+  /* Size the scroll box to the visible window so the sticky tab bar stays in
+     view. When embedded (srcDoc iframe, same-origin), the host page stretches
+     the iframe to full content height and scrolls the OUTER page — so we size
+     this box from the parent window's height minus whatever app chrome sits
+     above the iframe, and scroll internally instead. Standalone → 100vh. */
+  var caseScroll = document.getElementById('caseScroll');
+  var topnav = document.getElementById('topnav');
+  /* The tab bar is position:fixed, so it's out of flow — reserve space at the
+     top of the scroll content (and offset anchor jumps) by its real height. */
+  function setNavOffset(){
+    var navH = topnav ? topnav.offsetHeight : 70;
+    caseScroll.style.paddingTop = navH + 'px';
+    caseScroll.style.scrollPaddingTop = (navH + 14) + 'px';
+  }
+  function sizeScroller(){
+    try {
+      var p = window.parent;
+      if(p && p !== window && window.frameElement){
+        var rectTop = window.frameElement.getBoundingClientRect().top;
+        if(rectTop < 0) rectTop = 0;          // parent scrolled past the chrome
+        var ph = p.innerHeight || 800;
+        var h = ph - rectTop - 6;             // leave the bottom edge breathing room
+        if(h < 460) h = 460;                  // sane minimum on short windows
+        caseScroll.style.height = h + 'px';
+      } else {
+        caseScroll.style.height = '100vh';
+      }
+    } catch(e){ caseScroll.style.height = '100vh'; }
+    setNavOffset();
+  }
+  sizeScroller();
+  window.addEventListener('resize', sizeScroller);
+  window.addEventListener('load', sizeScroller);
+  try { if(window.parent && window.parent !== window) window.parent.addEventListener('resize', sizeScroller); } catch(e){}
+
+  /* ============ NAV: scroll-spy active + visited ============ */
+  var navchips = Array.prototype.slice.call(document.querySelectorAll('.navchip'));
+  var sections = navchips.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited = {};
+  var visitVal = document.getElementById('visitVal');
+
+  function markVisited(idx){
+    var sec = sections[idx];
+    if(!sec) return;
+    if(!visited[sec.id]){
+      visited[sec.id] = true;
+      navchips[idx].classList.add('visited');
+      var count = Object.keys(visited).length;
+      visitVal.textContent = count + ' / 19';
+      addXP(8, 'visit-' + sec.id, 'Section read');
+      if(count >= 19){ earnBadge('bdg-explorer'); addXP(60, 'allvisited', 'Ward Explorer!'); }
+    }
+  }
+  function setActive(idx){
+    navchips.forEach(function(c){ c.classList.remove('active'); });
+    if(navchips[idx]) navchips[idx].classList.add('active');
+  }
+
+  /* True tabs: each chip shows ONLY its section, hidden via CSS otherwise.
+     No scrollIntoView and no scroll-spy — nothing can scroll the tab bar away,
+     which also sidesteps every srcDoc-iframe scrolling quirk. The hero banner
+     and vitals strip belong to the case intro, so they show on S1 only. */
+  var heroBits = [document.querySelector('.hero'), document.querySelector('.vitals-strip')]
+    .filter(function(el){ return !!el; });
+
+  function showSection(idx){
+    sections.forEach(function(s, i){ if(s) s.classList.toggle('sec-active', i === idx); });
+    heroBits.forEach(function(el){ el.style.display = (idx === 0) ? '' : 'none'; });
+    caseScroll.scrollTop = 0;
+    setActive(idx);
+    markVisited(idx);
+  }
+
+  navchips.forEach(function(chip, idx){
+    chip.addEventListener('click', function(ev){
+      ev.preventDefault();
+      showSection(idx);
+    });
+  });
+  showSection(0);
+
+  /* ============ FLAG GAME (S2) ============ */
+  var flagBtns = document.querySelectorAll('#flagGame .flag-btn');
+  var flagResult = document.getElementById('flagResult');
+  var flagsFound = 0, flagsTotal = 0, flagWrong = 0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good') === '1') flagsTotal++; });
+  flagBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.dataset.locked) return;
+      btn.dataset.locked = '1';
+      var good = btn.getAttribute('data-good') === '1';
+      if(good){
+        btn.classList.add('flag-good');
+        flagsFound++;
+        addXP(10, 'flag-' + flagsFound + '-' + Math.random(), 'Post-arrest priority spotted');
+      } else {
+        btn.classList.add('flag-bad');
+        flagWrong++;
+        showToast('❌ Not a correct post-arrest action');
+      }
+      if(flagsFound === flagsTotal){
+        flagResult.textContent = '✅ All ' + flagsTotal + ' post-arrest priorities found' + (flagWrong ? ' (with ' + flagWrong + ' wrong pick' + (flagWrong>1?'s':'') + ')' : ' — flawless!');
+        earnBadge('bdg-vt');
+        addXP(30, 'flags-complete', 'Brain-Protector badge');
+      } else {
+        flagResult.textContent = flagsFound + ' / ' + flagsTotal + ' post-arrest priorities found…';
+      }
+    });
+  });
+
+  /* ============ BRANCHING SCENARIO (S3) ============ */
+  var scText = document.getElementById('scText');
+  var scChoices = document.getElementById('scChoices');
+  var scFeedback = document.getElementById('scFeedback');
+  var scRestart = document.getElementById('scRestart');
+  var scStab = document.getElementById('scStab');
+  var scTime = document.getElementById('scTime');
+  var scXP = document.getElementById('scXP');
+  var pathXP = 0, scStability = 2, scElapsed = 0;
+
+  var STEPS = {
+    start: {
+      text: "Mr. A.K. is comatose and intubated. SpO₂ reads 100% on FiO₂ 1.0, EtCO₂ 28, MAP 70 on low-dose pressor, temp 38.1°C, and the post-ROSC 12-lead shows inferior ST elevation. The team looks to you. What is your FIRST move in the bundle?",
+      choices: [
+        { t: "🫁 Secure ABC, then titrate FiO₂ to SpO₂ 94–98% and ventilate to normocapnia", good:true, ds:1, dt:10, xp:40, fb:"✅ Exactly. Stop the hyperoxia (100% on FiO₂ 1.0) and the hypocapnia (EtCO₂ 28). Both are extending the brain injury right now. The oxygen/CO₂ window is the first thing to fix.", next:"hemo" },
+        { t: "🌬️ Crank FiO₂ to 100% and hyperventilate 'to blow off acid'", good:false, ds:-2, dt:20, xp:0, fb:"☠️ Two errors at once. FiO₂ 1.0 = hyperoxia (oxidative injury) and hyperventilation = hypocapnia (cerebral vasoconstriction). You are deepening the very injury you're trying to limit. Restart and choose again.", end:true },
+        { t: "🔮 Examine the comatose patient and tell the family the outlook now", good:false, ds:-1, dt:15, xp:0, fb:"⚠️ Never. The exam is confounded by sedation and the acute insult — prognosticating now risks a self-fulfilling prophecy. Defer ≥ 72 h, off sedation, multimodal. Fix the physiology first.", next:"hemo" }
+      ]
+    },
+    hemo: {
+      text: "Gases corrected: SpO₂ now 96%, normocapnia. MAP drifts to 62 on the current pressor. Temp still 38.1°C. Next?",
+      choices: [
+        { t: "🩸 Fluids + norepinephrine to MAP ≥ 65, and start active temperature control to prevent fever", good:true, ds:1, dt:8, xp:30, fb:"✅ Right. Defend perfusion pressure for an autoregulation-impaired brain, and start targeted temperature management now — fever is a second neurological insult.", next:"ecg" },
+        { t: "💉 Let the MAP ride at 62 and leave the temperature alone", good:false, ds:-1, dt:20, xp:0, fb:"⚠️ Both wrong. MAP < 65 underperfuses a pressure-passive brain, and an unchecked temperature will climb into fever. Support the MAP and control the temperature.", next:"ecg" }
+      ]
+    },
+    ecg: {
+      text: "Bundle running: SpO₂ 96%, normocapnia, MAP 70, temperature controlled. The post-ROSC 12-lead clearly shows inferior ST elevation. What now?",
+      choices: [
+        { t: "📈 Activate the cath lab for immediate angiography ± PCI", good:true, ds:1, dt:6, xp:30, fb:"✅ Ideal. STEMI on the post-ROSC ECG → immediate coronary angiography. Revascularising the culprit treats the cause and reduces re-arrest, alongside the brain bundle.", next:"prog" },
+        { t: "🚫 Send him to ICU and arrange routine angiography in a few days regardless", good:false, ds:0, dt:10, xp:5, fb:"⚠️ That's the strategy for a NON-STEMI OHCA (COACT/TOMAHAWK). With clear ST elevation here, delay leaves a treatable coronary occlusion running. Go to the lab now.", next:"prog" }
+      ]
+    },
+    prog: {
+      text: "PCI done, culprit RCA stented, back in ICU on the full bundle. He remains comatose at hour 6. A colleague asks you to 'make the call' on his prognosis. Final move?",
+      choices: [
+        { t: "⏳ Continue the bundle and defer prognostication to ≥ 72 h, off sedation, multimodal", good:true, ds:1, dt:5, xp:40, fb:"🏆 Perfect close. The early exam is confounded; predicting a poor outcome now risks a self-fulfilling prophecy. Hold the bundle, wait at least 72 hours off sedation, and use multiple modalities. Case stabilised.", end:true },
+        { t: "🔮 Declare a poor prognosis now on the day-zero exam", good:false, ds:-1, dt:10, xp:0, fb:"⚠️ This is the M&M error in S13. A single early, sedated exam is not a verdict — it's a confounder. Never prognosticate before 72 h, off sedation, multimodal.", end:true }
+      ]
+    }
+  };
+
+  function renderStab(){
+    var s = Math.max(0, Math.min(5, scStability + 2)); // map -2..3 → 0..5
+    var dots = '';
+    for(var i=0;i<5;i++) dots += (i < s ? '●' : '○');
+    scStab.textContent = dots;
+  }
+  function renderStep(key){
+    var step = STEPS[key];
+    scText.textContent = step.text;
+    scFeedback.className = 'feedback';
+    scFeedback.style.display = 'none';
+    scChoices.innerHTML = '';
+    step.choices.forEach(function(ch){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = ch.t;
+      b.addEventListener('click', function(){
+        pathXP += ch.xp; scXP.textContent = pathXP;
+        scElapsed += ch.dt; scTime.textContent = scElapsed + ' s';
+        scStability += ch.ds; renderStab();
+        if(ch.xp) addXP(ch.xp, null, 'Scenario choice');
+        scFeedback.textContent = ch.fb;
+        scFeedback.className = 'feedback ' + (ch.good ? 'good' : 'bad');
+        scFeedback.style.display = 'block';
+        Array.prototype.forEach.call(scChoices.children, function(c){ c.disabled = true; c.style.opacity = .6; });
+        if(ch.end){
+          scRestart.style.display = 'inline-block';
+          if(ch.good && key === 'prog'){ earnBadge('bdg-shock'); addXP(20, 'scenario-win', 'ROSC Bundle Done!'); }
+        } else if(ch.next){
+          setTimeout(function(){ renderStep(ch.next); }, 1400);
+        }
+      });
+      scChoices.appendChild(b);
+    });
+  }
+  scRestart.addEventListener('click', function(){
+    pathXP = 0; scStability = 2; scElapsed = 0;
+    scXP.textContent = 0; scTime.textContent = '0 s'; renderStab();
+    scRestart.style.display = 'none';
+    renderStep('start');
+  });
+  renderStab();
+  renderStep('start');
+
+  /* ============ REVEAL BUTTONS ============ */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.getAttribute('data-target'));
+      if(!t) return;
+      if(t.classList.contains('reveal-shown')){
+        t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden');
+      } else {
+        t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown');
+        addXP(8, 'reveal-' + btn.getAttribute('data-target'), 'Self-test');
+      }
+    });
+  });
+
+  /* ============ OXYGENATION SIM (S6) ============ */
+  var kRange = document.getElementById('kRange');
+  var kVal = document.getElementById('kVal');
+  var kNeedle = document.getElementById('kNeedle');
+  var kReadout = document.getElementById('kReadout');
+  if(kRange){
+    var simUsed = false;
+    function updateK(){
+      var k = (parseInt(kRange.value,10) + 64); // 84 .. 139 -> map to SpO2-ish %
+      if(k > 100) k = 100;
+      kVal.textContent = k;
+      var pct = (parseInt(kRange.value,10) - 20) / (75 - 20) * 100;
+      kNeedle.style.left = pct + '%';
+      var raw = parseInt(kRange.value,10);
+      var msg, cls;
+      if(raw < 30){ msg = '🔴 Hypoxia — SpO₂ too low, insufficient O₂ delivery to an already-injured brain. Deepens anoxic injury. Raise FiO₂ to reach the target window.'; cls='bad'; }
+      else if(raw < 40){ msg = '🟠 Borderline low — drifting toward hypoxia. Nudge oxygenation up into the 94–98% band; avoid de-saturation events.'; cls='warn-r'; }
+      else if(raw <= 58){ msg = '🟢 Target window — SpO₂ 94–98% / normal PaO₂. Lowest secondary-injury risk. This is exactly where you want the post-ROSC brain.'; cls='good'; }
+      else if(raw <= 67){ msg = '🟠 Creeping high — SpO₂ at/near 100%. Check the ABG: you are probably hyperoxic. Titrate FiO₂ down.'; cls='warn-r'; }
+      else { msg = '🔴 Hyperoxia — SpO₂ 100% on high FiO₂, supra-physiological PaO₂. Oxidative free radicals worsen reperfusion brain injury. Titrate FiO₂ DOWN.'; cls='bad'; }
+      kReadout.innerHTML = msg;
+      kReadout.className = 'readout ' + cls;
+      if(!simUsed){ simUsed = true; addXP(15, 'ksim', 'Titration Master'); }
+    }
+    kRange.addEventListener('input', updateK);
+    updateK();
+  }
+
+  /* ============ CHECKLISTS (S7) ============ */
+  var allChecklistsDone = 0, totalChecklists = document.querySelectorAll('.checklist').length;
+  document.querySelectorAll('.checklist').forEach(function(list){
+    var boxes = list.querySelectorAll('input[type=checkbox]');
+    var prog = list.querySelector('[data-progress]');
+    var total = boxes.length;
+    var doneAwarded = false;
+    function refresh(){
+      var done = 0;
+      boxes.forEach(function(b){
+        if(b.checked){ done++; b.closest('.ck').classList.add('done'); }
+        else { b.closest('.ck').classList.remove('done'); }
+      });
+      prog.textContent = done + ' / ' + total + ' complete';
+      if(done === total && !doneAwarded){
+        doneAwarded = true;
+        allChecklistsDone++;
+        addXP(25, 'ck-' + list.id, 'Checklist done');
+        if(allChecklistsDone >= totalChecklists){ earnBadge('bdg-ck'); addXP(20, 'allck', 'Checklist Champion'); }
+      }
+    }
+    boxes.forEach(function(b){
+      b.addEventListener('change', function(){
+        if(b.checked) addXP(4, null, 'Step checked');
+        refresh();
+      });
+    });
+  });
+
+  /* ============ MCQs (S19) ============ */
+  var MCQS = [
+    {
+      q: "After ROSC from an out-of-hospital cardiac arrest, which component of post-cardiac-arrest syndrome is the MAIN determinant of the patient's eventual outcome?",
+      opts: ["Myocardial stunning","Hypoxic-ischemic brain injury","The systemic inflammatory (SIRS-like) state","Acute kidney injury"],
+      correct: 1,
+      exp: "Post-arrest brain injury (global ischemia plus reperfusion injury, oedema and impaired autoregulation) is the leading cause of death and disability in patients who reach the ICU after ROSC — which is why the entire bundle is built to protect it. Myocardial stunning and the SIRS state are usually reversible/supportable."
+    },
+    {
+      q: "What is the correct oxygenation target while managing a comatose patient after ROSC?",
+      opts: ["Keep FiO₂ at 1.0 to guarantee 100% saturation","Titrate to SpO₂ 94–98% / normal PaO₂, avoiding both hyperoxia and hypoxia","Aim for SpO₂ 85–88% to minimise oxygen","Oxygenation does not affect the brain after ROSC"],
+      correct: 1,
+      exp: "Both hyperoxia (oxidative free-radical injury) and hypoxia (anoxic injury) extend brain damage after ROSC. Treat oxygen as a drug with a window: titrate FiO₂ down to a target SpO₂ of 94–98% once the saturation reads reliably."
+    },
+    {
+      q: "Which statement best reflects modern targeted temperature management (TTM/TTM2) after cardiac arrest?",
+      opts: ["33°C is mandatory and clearly superior to all other targets","The essential intervention is active temperature control and the avoidance of FEVER (targeting ≤ 37.5°C is acceptable)","Temperature has no effect on neurological outcome","Patients should be allowed to run febrile to fight infection"],
+      correct: 1,
+      exp: "TTM showed 33°C and 36°C were equivalent; TTM2 showed targeted hypothermia did not beat targeted normothermia with aggressive fever prevention. The key message is controlled temperature and, above all, the avoidance of pyrexia (≤ 37.5°C) — fever is a second neurological insult."
+    },
+    {
+      q: "A comatose OHCA survivor has NO ST elevation on the post-ROSC ECG and is haemodynamically stabilising. Regarding coronary angiography, the evidence (COACT, TOMAHAWK) shows:",
+      opts: ["Immediate routine angiography improves survival and should be done in all comatose OHCA","Immediate routine angiography did NOT improve outcomes in OHCA without ST elevation","Angiography is contraindicated after any cardiac arrest","Thrombolysis is preferred over angiography in all cases"],
+      correct: 1,
+      exp: "COACT and TOMAHAWK showed no benefit of immediate routine angiography in resuscitated OHCA without ST elevation. Such patients go to the ICU for the brain bundle first, with delayed/selective angiography. STEMI or ongoing instability, by contrast, warrants immediate angiography."
+    },
+    {
+      q: "While ventilating a post-ROSC patient, why should you avoid hypocapnia (a low PaCO₂)?",
+      opts: ["It causes cerebral vasoconstriction and worsens cerebral ischemia","It improves cerebral oxygen delivery","It has no effect on the cerebral circulation","It directly stuns the myocardium"],
+      correct: 0,
+      exp: "Hypocapnia from over-ventilation causes cerebral vasoconstriction, reducing cerebral blood flow to an already-injured brain. Maintain normocapnia (PaCO₂ ~35–45 mmHg / 4.5–6.0 kPa); both hypocapnia and hypercapnia are harmful."
+    },
+    {
+      q: "When should neuroprognostication be performed in a comatose survivor of cardiac arrest?",
+      opts: ["Immediately on arrival, using the initial neurological exam","At ≥ 72 hours after rewarming and off sedation, using a multimodal assessment","At 6 hours, based on the pupillary response alone","Never — outcome cannot be predicted at all"],
+      correct: 1,
+      exp: "Prognostication is deliberately delayed to ≥ 72 hours after rewarming and off sedation, and must be multimodal (clinical exam, EEG, SSEPs, NSE biomarker, neuroimaging). Early prediction on a single confounded sign risks a self-fulfilling prophecy."
+    },
+    {
+      q: "What is the recommended haemodynamic target in the post-cardiac-arrest period?",
+      opts: ["MAP ≥ 65 mmHg (often higher), supported with fluids/vasopressors/inotropes","Systolic BP < 90 mmHg to reduce cardiac work","Any MAP is acceptable as long as there is a pulse","MAP < 50 mmHg to limit reperfusion"],
+      correct: 0,
+      exp: "Because cerebral autoregulation is impaired and flow becomes pressure-passive, maintain MAP ≥ 65 mmHg (often a little higher) using fluids, vasopressors and inotropes — treating the vasoplegic SIRS state and post-arrest myocardial dysfunction to protect cerebral perfusion."
+    },
+    {
+      q: "Post-cardiac-arrest syndrome classically comprises which four components?",
+      opts: ["Brain injury, myocardial stunning, systemic ischemia-reperfusion (SIRS-like) state, and the persistent precipitating pathology","Sepsis, DKA, pulmonary oedema, and renal failure","Stroke, MI, PE, and aortic dissection","Hyperoxia, hypocapnia, hypotension, and fever"],
+      correct: 0,
+      exp: "Post-arrest syndrome has four parts: (1) brain injury (the main outcome determinant), (2) myocardial stunning/dysfunction (reversible), (3) a systemic ischemia-reperfusion / SIRS-like state (vasoplegia, capillary leak), and (4) the persistent precipitating pathology (e.g. coronary occlusion). Hyperoxia/hypocapnia/hypotension/fever are harms to avoid, not the components themselves."
+    }
+  ];
+
+  var host = document.getElementById('mcqHost');
+  var mcqVal = document.getElementById('mcqVal');
+  var mcqScore = 0, mcqAnswered = 0;
+  var letters = ['A','B','C','D','E'];
+
+  MCQS.forEach(function(item, qi){
+    var box = document.createElement('div');
+    box.className = 'mcq';
+    var html = '<div class="mcq-q">QUESTION ' + (qi+1) + ' / ' + MCQS.length + '</div>';
+    html += '<div class="mcq-stem">' + item.q + '</div>';
+    item.opts.forEach(function(opt, oi){
+      html += '<label class="mcq-opt" data-oi="' + oi + '"><strong>' + letters[oi] + '.</strong> ' + opt + '</label>';
+    });
+    html += '<div class="mcq-exp"></div>';
+    box.innerHTML = html;
+    host.appendChild(box);
+
+    var opts = box.querySelectorAll('.mcq-opt');
+    var exp = box.querySelector('.mcq-exp');
+    var locked = false;
+    opts.forEach(function(label){
+      label.addEventListener('click', function(){
+        if(locked) return;
+        locked = true;
+        var oi = parseInt(label.getAttribute('data-oi'),10);
+        box.classList.add('answered');
+        var correct = item.correct;
+        if(oi === correct){
+          label.classList.add('picked-right');
+          mcqScore++;
+          addXP(25, null, 'Correct answer');
+        } else {
+          label.classList.add('picked-wrong');
+          opts[correct].classList.add('show-right');
+          showToast('❌ Correct: ' + letters[correct]);
+        }
+        exp.innerHTML = '<strong>' + (oi === correct ? '✅ Correct. ' : '📘 Explanation. ') + '</strong>' + item.exp;
+        mcqAnswered++;
+        mcqVal.textContent = mcqScore + ' / ' + MCQS.length;
+        if(mcqAnswered === MCQS.length){
+          var done = document.getElementById('mcqDone');
+          var summary = document.getElementById('mcqSummary');
+          done.style.display = 'block';
+          summary.textContent = 'You scored ' + mcqScore + ' / ' + MCQS.length + '. ' +
+            (mcqScore === MCQS.length ? 'Flawless — you protect the brain, fix the cause, and never prognosticate too early. 🏆' :
+             mcqScore >= 6 ? 'Strong — review the misses and the contrast pairs in S6.' :
+             'Revisit S3, S5, S6 and S11 — the oxygen window, TTM/fever, angiography and 72-hour prognostication logic is the whole case.');
+          if(mcqScore >= 7){ earnBadge('bdg-quiz'); addXP(50, 'quizace', 'Quiz Ace!'); }
+        }
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
