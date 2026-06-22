@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fulminant Myocarditis — Virtual Teaching Hospital</title>
+<!-- META
+id: c-myocarditis-028
+title: Fulminant Myocarditis
+hospital: cardiology
+department: cv-ccu
+bednumber: 10
+chiefcomplaint: A young adult in cardiogenic shock days after a viral illness, with raised troponin and clean coronaries
+system: Cardiology
+severity: critical
+tags: Myocarditis, Cardiogenic shock, Mechanical circulatory support, Giant cell, Cardiac MRI, Endomyocardial biopsy
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --radius:16px;
+    --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  /* Internal scroll viewport. When this case is embedded the host app stretches
+     the iframe to full content height and the OUTER page scrolls, which would
+     let a sticky bar scroll away. We instead scroll inside this box (sized to
+     the visible window by JS) so the section tab bar stays pinned at the top.
+     Standalone, it falls back to the full viewport height. */
+  #caseScroll{height:100vh; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; scroll-padding-top:92px}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:36px 24px 80px; position:relative; overflow:hidden}
+  .hero::after{content:"📈"; position:absolute; right:-20px; top:-30px; font-size:220px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{max-width:1100px; margin:0 auto; position:relative; z-index:1}
+  .hero .crumbs{font-size:13px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:10px 0 6px; font-size:clamp(26px,4vw,40px); line-height:1.15}
+  .hero .sub{font-size:16px; opacity:.95}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; backdrop-filter:blur(4px)}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== LIVE ECG STRIP IN HERO ===== */
+  .ecg-banner{max-width:1100px; margin:14px auto 0; position:relative; z-index:1}
+  .ecg-banner svg{width:100%; height:64px; display:block; background:rgba(0,0,0,.18); border-radius:12px; border:1px solid rgba(255,255,255,.25)}
+  .ecg-trace{stroke:#86efac; stroke-width:2.4; fill:none; stroke-dasharray:1600; stroke-dashoffset:1600; animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{stroke-dashoffset:0}}
+
+  /* ===== VITALS STRIP ===== */
+  .vitals-strip{max-width:1100px; margin:-52px auto 0; padding:0 24px; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:11px; font-weight:700; letter-spacing:.6px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:21px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== HORIZONTAL SECTION SIDEBAR (fixed — always visible) ===== */
+  .topnav{position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.10)}
+  .topnav .rail{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; max-width:1180px; margin:0 auto; scrollbar-width:thin}
+  .navchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink2); font-size:11px; font-weight:700; text-decoration:none; min-width:78px; text-align:center; transition:all .18s; cursor:pointer}
+  .navchip .s-id{font-size:10px; letter-spacing:1px; color:#94a3b8}
+  .navchip .s-emoji{font-size:16px}
+  .navchip:hover{border-color:var(--rose); color:var(--rose); transform:translateY(-2px)}
+  .navchip.active{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; border-color:#b91c1c}
+  .navchip.active .s-id{color:#fecaca}
+  .navchip.visited:not(.active){border-color:var(--emerald-line); background:var(--emerald-soft)}
+
+  /* ===== DASHBOARD WIDGET ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:215px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10.5px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:760px){.dash{display:none}}
+
+  /* ===== MAIN / SECTIONS (tabbed: one section visible at a time) ===== */
+  main{max-width:1100px; margin:26px auto 80px; padding:0 24px}
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:26px; overflow:hidden}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16.5px; margin:26px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14.5px; margin:18px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:24px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15.5px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:14px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px; letter-spacing:.4px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14.5px}
+
+  /* ===== INTERACTIVE BITS ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:10px 18px; font-weight:700; font-size:14px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:22px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:15px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 15px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 15px; margin-top:12px; font-size:14px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim sliders */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:14px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:14px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Heart/circuit diagram */
+  .heart-fig{display:flex; gap:18px; flex-wrap:wrap; align-items:center; background:var(--slate-soft); border-radius:16px; padding:18px; margin:14px 0}
+  .heart-fig svg{flex:0 0 auto}
+  .heart-legend{flex:1; min-width:230px; font-size:13.5px}
+  .lg{display:flex; align-items:center; gap:8px; margin:5px 0}
+  .lg .sw{width:14px; height:14px; border-radius:4px; flex:0 0 auto}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Journey cards */
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:14px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:15px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:14px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13.5px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:22px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14.5px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:13px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .footer{max-width:1100px; margin:0 auto 36px; padding:0 24px; text-align:center; color:#94a3b8; font-size:12.5px}
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="caseScroll">
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · 💗 CCU · 🛏️ Bed 10</div>
+    <h1>🔥 Fulminant Myocarditis — "The Heart That Looks Dead But Comes Back"</h1>
+    <div class="sub">⚡ A 24-year-old, well a week ago, now in cardiogenic shock with a globally stunned ventricle, raised troponin and pristine coronary arteries. Someone is about to call it a STEMI and send her home. Don't.</div>
+    <div class="chips">
+      <span class="chip crit">🔴 CRITICAL</span>
+      <span class="chip">🔥 Cardiogenic Shock</span>
+      <span class="chip">🫀 Clean Coronaries</span>
+      <span class="chip">🩸 Bridge-to-Recovery</span>
+      <span class="chip">🎮 Interactive Case</span>
+      <span class="chip">⏱️ Support it aggressively</span>
+    </div>
+    <div class="ecg-banner" title="Sinus tachycardia with diffuse low-amplitude ST/T changes">
+      <svg viewBox="0 0 800 64" preserveAspectRatio="none" aria-label="Sinus tachycardia with diffuse ST-T changes rhythm strip">
+        <polyline class="ecg-trace" points="0,40 40,40 55,12 70,58 85,40 130,40 145,12 160,58 175,40 220,40 235,12 250,58 265,40 310,40 325,12 340,58 355,40 400,40 415,12 430,58 445,40 490,40 505,12 520,58 535,40 580,40 595,12 610,58 625,40 670,40 685,12 700,58 715,40 760,40 775,12 790,58 800,40"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== LIVE VITALS ===================== -->
+<div class="vitals-strip">
+  <div class="vitals-grid">
+    <div class="vital alert"><div class="v-label">💓 HR</div><div class="v-num">125</div></div>
+    <div class="vital alert"><div class="v-label">🩸 BP</div><div class="v-num">85/55</div></div>
+    <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">28</div></div>
+    <div class="vital warn"><div class="v-label">🫁 SpO₂</div><div class="v-num">92%</div></div>
+    <div class="vital warn"><div class="v-label">🌡️ Temp</div><div class="v-num">37.9°</div></div>
+    <div class="vital warn"><div class="v-label">🧠 GCS</div><div class="v-num">14</div></div>
+    <div class="vital alert"><div class="v-label">🫀 EF</div><div class="v-num">22%</div></div>
+    <div class="vital alert"><div class="v-label">🧪 Lactate</div><div class="v-num">4.2</div></div>
+  </div>
+</div>
+
+<!-- ===================== HORIZONTAL SECTION SIDEBAR ===================== -->
+<nav class="topnav" id="topnav">
+  <div class="rail">
+    <a class="navchip" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navchip" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navchip" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navchip" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navchip" href="#s5"><span class="s-emoji">🎓</span><span>Consultant Round</span><span class="s-id">S5</span></a>
+    <a class="navchip" href="#s6"><span class="s-emoji">📖</span><span>Teaching Points</span><span class="s-id">S6</span></a>
+    <a class="navchip" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navchip" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navchip" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navchip" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navchip" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navchip" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navchip" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navchip" href="#s14"><span class="s-emoji">🔀</span><span>Differentials</span><span class="s-id">S14</span></a>
+    <a class="navchip" href="#s15"><span class="s-emoji">🗺️</span><span>Plan</span><span class="s-id">S15</span></a>
+    <a class="navchip" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navchip" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navchip" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navchip" href="#s19"><span class="s-emoji">🧠</span><span>MCQs</span><span class="s-id">S19</span></a>
+  </div>
+</nav>
+
+<!-- ===================== SCORE DASHBOARD ===================== -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections visited</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-vt">🔥 Myocarditis-Spotter</span>
+      <span class="badge" id="bdg-shock">🩸 Bridged In Time</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champion</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Ward Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running sims, taking the right path and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- S1 — PROFILE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s1">
+  <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+  <div class="section-content">
+    <div class="callout danger">
+      <b class="ct">🚨 YOU ARE HERE — 04:50, CCU Bed 10</b>
+      The monitor shows a sinus tachycardia at 125. A previously fit 24-year-old is mottled, cold to the knees and breathing fast. The night team has the cath-lab report on the screen: <em>"Clean coronaries — non-occlusive. Likely STEMI mimic, for discharge in the morning."</em> Her troponin is sky-high and her ventricle barely moves on the bedside echo. This is not a STEMI to send home — it is <strong>fulminant myocarditis</strong>, and the next hour decides whether she is bridged to recovery or coded overnight.
+    </div>
+
+    <h3>👤 Patient Identity</h3>
+    <table class="tbl">
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>🧑 Name</td><td><strong>Ms. A.N.</strong></td></tr>
+      <tr><td>🎂 Age / Sex</td><td>24-year-old female</td></tr>
+      <tr><td>🆔 MRN</td><td>CV-20810</td></tr>
+      <tr><td>⚖️ Weight</td><td>62 kg</td></tr>
+      <tr><td>💼 Occupation</td><td>Primary-school teacher</td></tr>
+      <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+    </table>
+
+    <h3>📜 History — every line points away from coronary disease</h3>
+    <ul>
+      <li>🤒 <strong>Viral prodrome 7 days ago</strong> — fever, coryza, sore throat and two days of vomiting/diarrhoea. She "felt over it" by day 4, then 48 h ago developed pleuritic chest pain, breathlessness and palpitations.</li>
+      <li>💪 <strong>Previously completely healthy</strong> — runs 5 km three times a week, no cardiac history, no risk factors for atherosclerosis. No smoking, no diabetes, no hypertension, normal lipids.</li>
+      <li>🧬 <strong>No family history</strong> of premature coronary disease or sudden cardiac death.</li>
+      <li>💊 No regular medications. Took <strong>ibuprofen</strong> at home for the chest pain (a problem — see S11).</li>
+      <li>🚫 No recent travel, no IV drug use, not pregnant, not on chemotherapy or <strong>immune-checkpoint inhibitors</strong> (a key question to ask in oncology patients).</li>
+      <li>📉 Over the last 12 h: progressive fatigue, near-syncope on standing, cold peripheries — the slide into <strong>cardiogenic shock</strong>.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Young patient + viral prodrome + acute heart failure + raised troponin + CLEAN coronaries = myocarditis until proven otherwise."</div>
+
+    <h3>🧬 Why THIS patient? — virus, inflammation, oedema, stunned muscle</h3>
+    <p>Fulminant myocarditis is <strong>myocardial inflammation</strong>, usually triggered by a virus (or a misdirected immune response). The infection or immune injury damages myocytes directly and ignites an inflammatory infiltrate; the muscle becomes <strong>oedematous and electrically irritable</strong>. Within days the left (± right) ventricle stops contracting properly — not because arteries are blocked, but because every fibre is sick at once. That is why the dysfunction is <strong>global and the coronaries are clean</strong>. The "fulminant" label means it arrives suddenly and crashes the haemodynamics — yet, paradoxically, the same acutely inflamed muscle that looks dead tonight often <strong>recovers completely</strong> once the inflammation settles, if you can keep her perfused through the storm.</p>
+
+    <div class="callout warn"><b class="ct">🔥 Causes of myocarditis to keep in mind</b>
+    🦠 <strong>Viral / lymphocytic</strong> (enterovirus/coxsackie, adenovirus, parvovirus B19, HHV-6, influenza, SARS-CoV-2) — commonest · 💉 <strong>Immune-checkpoint-inhibitor</strong> myocarditis (oncology patients — high mortality) · 🧟 <strong>Giant-cell</strong> (young, aggressive, arrhythmia/heart block) · 🌸 <strong>Eosinophilic</strong> (hypersensitivity/parasitic) · 🛡️ Autoimmune / systemic (sarcoid, lupus).</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S2 — HANDOVER -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s2">
+  <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+  <div class="section-content">
+    <h3>📻 Night-team Handover — listen for the trap</h3>
+    <div class="callout info">
+      <b class="ct">🎙️ SBAR from the cath-lab registrar (verbatim)</b>
+      <p><strong>S:</strong> "Bed 10 — 24-year-old, chest pain and breathlessness, came in with widespread ST/T changes and a troponin of 18,000. We called a STEMI and took her to the cath lab."</p>
+      <p><strong>B:</strong> "Viral illness last week. No risk factors at all. Echo on the table showed a globally poor LV, EF around 22%."</p>
+      <p><strong>A:</strong> "Coronaries are <strong>completely clean</strong> — no culprit, nothing to stent. The consensus on the floor is 'STEMI mimic, false alarm,' and the plan written is to <strong>reassure and discharge in the morning</strong>."</p>
+      <p><strong>R:</strong> "But she looks awful — cold, mottled, lactate 4.2, BP 85/55 and drifting down. I held off on the discharge note because… clean coronaries plus a dying ventricle didn't add up to 'go home.'"</p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"When the 'STEMI' has clean coronaries, think myocarditis and get the cardiac MRI — do not relabel a sick, shocked ventricle as a false alarm."</div>
+
+    <h3>🚩 Spot-the-Red-Flag — tap each feature that screams MYOCARDITIS</h3>
+    <p>🎮 <em>Interactive: click every feature that points to fulminant myocarditis (not a coronary STEMI or a benign mimic). Each correct flag = +10 XP. Wrong picks cost you.</em></p>
+    <div id="flagGame">
+      <button class="btn ghost flag-btn" data-good="1">🤒 Recent viral prodrome (week ago)</button>
+      <button class="btn ghost flag-btn" data-good="1">🧑 Young age, no coronary risk factors</button>
+      <button class="btn ghost flag-btn" data-good="1">🩸 Raised troponin with CLEAN coronaries</button>
+      <button class="btn ghost flag-btn" data-good="1">🫀 Global LV hypokinesis on echo</button>
+      <button class="btn ghost flag-btn" data-good="1">🧲 Cardiac-MRI oedema + late gadolinium enhancement</button>
+      <button class="btn ghost flag-btn" data-good="1">⚡ New arrhythmia / heart block</button>
+      <button class="btn ghost flag-btn" data-good="1">🔥 Cardiogenic shock that can recover</button>
+      <button class="btn ghost flag-btn" data-good="0">🎯 A clear coronary culprit lesion on angiography</button>
+      <button class="btn ghost flag-btn" data-good="0">🤚 Reproducible chest-wall tenderness</button>
+    </div>
+    <p id="flagResult" style="font-weight:700"></p>
+
+    <h3>⏱️ Timeline so far</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">7 days ago</div>Fever, coryza, sore throat and gastroenteritis — a typical viral prodrome.</div>
+      <div class="t-item"><div class="t-time">48 h ago</div>Pleuritic chest pain, breathlessness and palpitations begin.</div>
+      <div class="t-item"><div class="t-time">02:30</div>ED: diffuse ST/T changes + troponin 18,000 → "STEMI" call, taken to cath lab.</div>
+      <div class="t-item"><div class="t-time">03:40</div>Angiography: <strong>clean coronaries</strong>. Bedside echo: global LV hypokinesis, EF ~22%. Discharge plan written.</div>
+      <div class="t-item"><div class="t-time">04:50</div>You arrive. Lactate 4.2, mottled, BP sliding. The "false alarm" is in cardiogenic shock. The clock is the enemy.</div>
+    </div>
+
+    <div class="callout ok"><b class="ct">🏅 Praise where due</b>The registrar who refused to discharge a cold, lactate-4.2 patient just because her arteries were clean has prevented a catastrophe. Clean coronaries do not mean a well heart — they redirect the diagnosis toward myocarditis, which needs admission, monitoring and possibly mechanical circulatory support, not a discharge letter.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S3 — INITIAL ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s3">
+  <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+  <div class="section-content">
+    <h3>🅰️🅱️🅲️ Primary Survey — what your hands, eyes and ears find</h3>
+    <table class="tbl">
+      <tr><th>Step</th><th>Finding</th><th>What it means mechanistically</th></tr>
+      <tr><td>🅰️ Airway</td><td>Patent, talking in short sentences.</td><td>Short sentences = low output and rising respiratory effort; she is decompensating.</td></tr>
+      <tr><td>🅱️ Breathing</td><td>RR 28, SpO₂ 92% on air, bibasal crackles, mild pleuritic pain.</td><td>The failing LV backs up into the lungs → pulmonary congestion and hypoxia. Pleuritic pain hints at associated pericardial inflammation (myopericarditis).</td></tr>
+      <tr><td>🅲️ Circulation</td><td><strong>BP 85/55</strong>, HR 125, cool mottled peripheries to the knee, thready pulse, CRT 4 s, raised JVP, soft S1 with an <strong>S3 gallop</strong>.</td><td>Classic cardiogenic shock: a globally stunned, inflamed ventricle cannot generate output. The S3 gallop and raised JVP signal a failing, volume-overloaded heart — not a hypovolaemic or septic one.</td></tr>
+      <tr><td>🅳 Disability</td><td>GCS 14, anxious, intermittently vague.</td><td>Cerebral hypoperfusion from low output. A falling GCS = imminent collapse — act before unconsciousness.</td></tr>
+      <tr><td>🅴 Exposure</td><td>Low-grade fever 37.9°, no rash, no chest-wall tenderness, no focal deficit.</td><td>No chest-wall tenderness argues against a musculoskeletal cause; fever fits the post-viral inflammatory picture.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A young, post-viral patient with a globally weak heart, raised troponin and clean coronaries is in cardiogenic shock from myocarditis — name it, admit it, and get ready to support it."</div>
+
+    <h3>🧭 The single most important question: is she in SHOCK, and is it RECOVERABLE?</h3>
+    <p>The fork here is haemodynamic. Look for the markers of <strong>cardiogenic shock</strong>: hypotension (SBP &lt; 90 or needing support), cold/mottled peripheries, oliguria, rising lactate, end-organ hypoperfusion and a low cardiac output despite adequate filling. Ms. A.N. has all of them. The second, hope-giving question is unique to fulminant myocarditis: <strong>this shock is potentially fully reversible</strong> if you can perfuse her through the inflammatory storm.</p>
+
+    <div class="callout danger"><b class="ct">🔥 The decision: FULMINANT SHOCK → SUPPORT AGGRESSIVELY, ESCALATE EARLY TO MECHANICAL SUPPORT</b>This is not a heart to "watch overnight." Cardiogenic shock from fulminant myocarditis is a <strong>bridge-to-recovery</strong> problem: stabilise, give guideline-directed support, and escalate <strong>early</strong> to mechanical circulatory support (Impella/VA-ECMO) before she arrests. Do not lean on ever-climbing inotrope doses as the destination — they buy time, not survival.</div>
+
+    <!-- 🎬 BRANCHING SCENARIO ENGINE -->
+    <div class="scenario" id="scenarioBox">
+      <h3>🎬 Choose Your Path — "The First Hour of the Shock"</h3>
+      <div class="hud"><span>❤️ Stability: <b id="scStab">●●○○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 s</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+      <div class="scene-text" id="scText">The night team wants to discharge her as a "STEMI mimic." She is mottled, BP 85/55, lactate 4.2 and rising, EF ~22% on echo with clean coronaries. What do you do FIRST?</div>
+      <div class="choices" id="scChoices"></div>
+      <div class="feedback" id="scFeedback"></div>
+      <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+    </div>
+
+    <div class="callout info"><b class="ct">🧮 If she were NOT in shock (acute, non-fulminant myocarditis)</b>
+    A haemodynamically <em>stable</em> myocarditis buys time: admit and monitor (arrhythmia/block risk), confirm with <strong>cardiac MRI (Lake Louise criteria)</strong>, start cautious heart-failure therapy once stable, restrict exercise, avoid NSAIDs, and arrange follow-up. Endomyocardial biopsy is reserved for the unstable or the giant-cell/eosinophilic suspicion. The fulminant patient in front of you, by contrast, needs the resuscitation room and an early MCS conversation.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S4 — RESIDENT REVIEW -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s4">
+  <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+  <div class="section-content">
+    <p><em>The cardiology resident arrives at 04:55. Her reasoning, out loud:</em></p>
+
+    <h3>🧠 Pattern recognition first, then physiology</h3>
+    <p>"Young. Viral prodrome. Acute heart failure. Troponin 18,000. Clean coronaries. Global — not territorial — dysfunction. That pattern is <strong>myocarditis</strong>, and the haemodynamics make it <strong>fulminant</strong>. The dangerous instinct here is to be <em>reassured</em> by clean coronaries and call it a false alarm. Clean coronaries don't make her well — they tell me the troponin and the dead-looking ventricle are from inflammation, not occlusion. That is a more dangerous diagnosis tonight, not a safer one."</p>
+
+    <h3>🎯 Immediate priorities (her actual order of operations)</h3>
+    <ol>
+      <li>🚫 <strong>Cancel the discharge.</strong> Say it out loud and tear up the note. A shocked, lactate-4.2 patient does not go home.</li>
+      <li>🔥 <strong>Treat the cardiogenic shock:</strong> CCU, careful diuresis/decongestion if congested, cautious inotropic support to maintain perfusion — but with a low threshold to escalate.</li>
+      <li>🩸 <strong>Activate the mechanical-support pathway early:</strong> call cardiology/intensivist/MCS team NOW for Impella or VA-ECMO as a bridge-to-recovery, before she arrests. In fulminant myocarditis, early is everything.</li>
+      <li>⚡ <strong>Guard the rhythm:</strong> continuous telemetry; myocarditis causes ventricular arrhythmias and conduction block — have pacing and defibrillation ready.</li>
+      <li>🧲 <strong>Confirm and characterise:</strong> cardiac MRI (Lake Louise) when stable; and crucially, if there is heart block or refractory ventricular arrhythmia, suspect <strong>giant-cell</strong> myocarditis and arrange endomyocardial biopsy.</li>
+      <li>🚫 <strong>Stop the harm:</strong> no NSAIDs (she took ibuprofen at home — stop it), strict bed rest / no exercise.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Support the heart first; characterise it second; and biopsy it third — but pick up the phone for mechanical support before she crashes, because the ventricle you bridge tonight is the one that recovers next week."</div>
+
+    <h3>🤔 "But the coronaries are clean — isn't this a false alarm I can discharge?"</h3>
+    <p>"No. Clean coronaries with this troponin and this ventricle <em>is</em> the diagnosis of myocarditis, not the exclusion of disease. The asymmetry of harm is brutal: if I admit and support a patient who turns out milder, I've lost a CCU bed-night. If I discharge a fulminant myocarditis, she arrests at home overnight. When the STEMI has clean coronaries, the answer is admit, image and support — never reassure-and-discharge."</p>
+
+    <div class="callout purple"><b class="ct">🧪 Resident's self-test (answer before reading on)</b>
+    The night SHO wants to give her regular ibuprofen for the pleuritic chest pain. Good idea in this patient?
+    <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+    <div class="reveal-hidden" id="rev1"><p><strong>No.</strong> NSAIDs are <em>avoided</em> in acute myocarditis — experimentally they worsen myocardial inflammation and impair healing, and they promote fluid retention and renal injury in a patient already in shock. Treat her pain with paracetamol/opioid, support the heart, and stop the home ibuprofen. (Low-dose colchicine ± short steroid is used in the pericarditis-predominant picture, but the headline is: <strong>don't give NSAIDs to the shocked myocarditic heart.</strong>)</p></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S5 — CONSULTANT ROUND -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s5">
+  <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round</h2></div>
+  <div class="section-content">
+    <p><em>The on-call consultant cardiologist / advanced-heart-failure lead, by phone at 05:05, then at the bedside:</em></p>
+
+    <h3>🗂️ Name the subtype precisely — it changes the treatment</h3>
+    <div class="vs">
+      <div class="side a"><h4>🔴 Lymphocytic / viral myocarditis (most likely here)</h4>
+        <ul><li>Post-viral, diffuse LV dysfunction, raised troponin, clean coronaries</li><li>MRI: oedema (T2) + sub-epicardial/mid-wall LGE</li><li>Treatment: <strong>supportive care</strong>, GDMT once stable, MCS if fulminant</li><li>Most recover LV function — bridge them through</li></ul></div>
+      <div class="side b"><h4>🔵 The subtypes you must not miss</h4>
+        <ul><li><strong>Giant-cell:</strong> young, ventricular arrhythmia / heart block → <strong>immunosuppression + early transplant work-up</strong>; only <strong>biopsy</strong> makes the call</li><li><strong>Eosinophilic:</strong> corticosteroids + treat cause (allergy/parasite)</li><li><strong>Checkpoint-inhibitor:</strong> oncology patient → high-dose steroids and <strong>STOP the drug</strong></li></ul></div>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Giant-cell myocarditis is the one you must not miss — it needs immunosuppression and a transplant conversation, and only biopsy makes the call."</div>
+
+    <h3>🔥 What does "fulminant" actually mean — and why is it (oddly) hopeful?</h3>
+    <p>"Fulminant" = sudden onset (usually within 2 weeks of a viral illness) with <strong>severe haemodynamic compromise</strong> — cardiogenic shock needing inotropes or mechanical support. It looks like the worst presentation, and acutely it is. But the paradox of fulminant lymphocytic myocarditis is that, <strong>if you keep the patient alive through the inflammatory storm, most ventricles recover</strong> — frequently to near-normal function. That is why the entire strategy is <em>bridge-to-recovery</em>: aggressive, early mechanical support is not heroics, it is the treatment. The heart that looks dead tonight is the heart that walks out next week.</p>
+
+    <h3>🧭 Consultant's three commandments for the next hours</h3>
+    <ol>
+      <li>🩸 "Cardiogenic shock from fulminant myocarditis = <strong>early mechanical circulatory support</strong> (Impella or VA-ECMO) as a bridge-to-recovery. Don't keep climbing the inotrope ladder hoping she turns the corner — escalate to a pump before her organs fail."</li>
+      <li>🔬 "If there is ventricular arrhythmia or heart block, suspect <strong>giant-cell</strong> and get an <strong>endomyocardial biopsy</strong>. It is the gold standard and it <em>changes treatment</em> — giant-cell and eosinophilic both need immunosuppression."</li>
+      <li>🚫 "No NSAIDs. Strict rest, no exercise — an inflamed ventricle is an arrhythmic ventricle and exertion risks sudden death. And ask the oncology question: <strong>any checkpoint inhibitors?</strong> — that myocarditis kills and needs steroids plus stopping the drug."</li>
+    </ol>
+
+    <div class="callout danger"><b class="ct">☠️ The consultant's war memory (more in S13 M&amp;M)</b>"The last one I saw mishandled was a 26-year-old labelled 'STEMI mimic' after a clean cath. Reassured, discharged at 8 a.m. By midnight she was back in refractory shock, arrested in the ED, and we could not get ECMO cannulated in time. The cath report that 'reassured' everyone was the very reason to admit her: troponin sky-high, dead ventricle, clean arteries = fulminant myocarditis. Clean coronaries are not a discharge letter."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S6 — TEACHING POINTS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s6">
+  <div class="sec-header"><span class="s-badge">S6</span><h2>📖 Teaching Points</h2></div>
+  <div class="section-content">
+    <h3>🔬 The mechanism — WHY inflammation stuns the whole heart (the WHY behind the WHY)</h3>
+    <ol>
+      <li>🦠 <strong>The trigger:</strong> a virus (or a misdirected immune response — checkpoint inhibitor, autoimmune) reaches the myocardium. Direct viral injury and the immune attack against infected myocytes begin together.</li>
+      <li>🔥 <strong>Inflammation &amp; oedema:</strong> an inflammatory infiltrate floods the interstitium. The myocardium becomes <strong>oedematous</strong> (this is what MRI's T2 signal sees), and injured myocytes leak troponin — hence a very high troponin with <em>clean coronaries</em>.</li>
+      <li>🫀 <strong>Global systolic failure:</strong> because every fibre is sick at once, contraction fails <strong>globally</strong> (sometimes regionally), not in a single coronary territory. The LV — and often the RV — dilates and stops emptying. Stroke volume collapses → cardiogenic shock.</li>
+      <li>⚡ <strong>Arrhythmia &amp; block:</strong> inflamed, oedematous tissue is electrically unstable and the conduction system can be directly involved → ventricular arrhythmias and AV block (a red flag for giant-cell myocarditis).</li>
+      <li>🌱 <strong>Why fulminant can recover:</strong> the dysfunction is from <em>reversible</em> inflammation and oedema, not dead scarred muscle. Quell the inflammation and perfuse the body through it, and the stunned myocytes wake up — most ventricles recover. That is the whole rationale for bridge-to-recovery support.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Myocarditis is a heart drowning in inflammation, not starved by a blocked artery. Support it through the storm and the muscle comes back — that is why a pump beats a discharge letter."</div>
+
+    <h3>⚖️ Contrast pair #1 — MYOCARDITIS vs STEMI/ACS (the lethal mimic)</h3>
+    <div class="vs">
+      <div class="side a"><h4>🔥 MYOCARDITIS IS… (this patient)</h4><ul><li>Young, viral prodrome, no coronary risk factors</li><li><strong>Clean coronaries</strong> on angiography</li><li><strong>Global</strong> (diffuse) LV dysfunction, not one territory</li><li>Diffuse / saddle ST changes (often myopericarditic)</li><li>MRI: <strong>oedema + non-coronary, sub-epicardial/mid-wall LGE</strong></li></ul></div>
+      <div class="side b"><h4>🫀 STEMI / ACS is NOT that…</h4><ul><li>Older, coronary risk factors, atheroma</li><li><strong>Culprit artery</strong> with an occlusive lesion</li><li><strong>Territorial</strong> regional wall-motion abnormality</li><li>Territorial ST elevation with reciprocal change</li><li>LGE in a <strong>coronary, sub-endocardial/transmural</strong> pattern</li></ul></div>
+    </div>
+    <p>😈 <strong>The trap:</strong> when the cath is clean, the brain wants to file the case as a "false-alarm STEMI" and discharge. But clean coronaries in a shocked young patient with sky-high troponin is the <em>positive</em> finding for myocarditis. The cost of discharging a fulminant myocarditis (overnight arrest) vastly exceeds the cost of admitting and imaging a mimic. <strong>The asymmetry of harm is why "clean coronaries → get the MRI, admit, support."</strong></p>
+
+    <h3>⚖️ Contrast pair #2 — The myocarditis subtypes (they need different drugs)</h3>
+    <div class="vs">
+      <div class="side a"><h4>🦠 Lymphocytic / viral (commonest)</h4><ul><li>Post-viral, diffuse dysfunction</li><li>Usually <strong>supportive care</strong>; routine immunosuppression not proven</li><li>Most recover; bridge the fulminant ones with MCS</li><li>Specific antivirals rarely indicated</li></ul></div>
+      <div class="side b"><h4>🧟🌸💉 Giant-cell / Eosinophilic / Checkpoint</h4><ul><li><strong>Giant-cell:</strong> arrhythmia/block, young, fatal untreated → immunosuppression (steroids + ciclosporin) + transplant work-up; needs <strong>biopsy</strong></li><li><strong>Eosinophilic:</strong> corticosteroids + treat the cause</li><li><strong>Checkpoint-inhibitor:</strong> high-dose steroids + STOP the drug</li></ul></div>
+    </div>
+    <p>💡 <em>Why it matters:</em> the default for viral myocarditis is supportive care, but treating giant-cell or eosinophilic or checkpoint myocarditis as "just viral" wastes the window in which immunosuppression saves the heart (and the life). <strong>Biopsy is what separates them</strong> — which is why it is required when these subtypes are suspected.</p>
+
+    <!-- 🎮 INTERACTIVE SIM: mechanical support intensity vs recovery -->
+    <div class="sim" id="kSim">
+      <h3 style="margin-top:0">🎮 Simulation — The Support Dial: how mechanical support intensity tunes bridge-to-recovery survival</h3>
+      <p style="font-size:13.5px">Drag the dial from no support, through escalating inotropes, to Impella/VA-ECMO. Watch what under-support and over-reliance on inotropes do to a heart in fulminant shock. This is the single most important decision in this case.</p>
+      <label for="kRange">🩸 Support intensity: <b id="kVal">2.0</b> / 7.5</label>
+      <input type="range" id="kRange" min="20" max="75" value="20">
+      <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+      <div class="readout bad" id="kReadout">Set the dial to explore.</div>
+      <p style="font-size:12.5px; margin-top:10px; color:var(--ink2)">🎯 Target zone for fulminant shock: <strong>timely mechanical circulatory support (Impella / VA-ECMO) as a bridge-to-recovery</strong>. Too little support → end-organ failure and death. Endlessly escalating inotropes are not the goal — they raise demand on an inflamed heart; the pump unloads it and lets it recover.</p>
+    </div>
+
+    <!-- 📚 EBM MODULE -->
+    <div class="ebm">
+      <h3>📚 Evidence-Based Medicine Corner</h3>
+      <table class="tbl">
+        <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+        <tr><td><span class="lvl">COHORT</span> Fulminant myocarditis + MCS</td><td>Patients with fulminant (lymphocytic) myocarditis bridged with temporary mechanical support (IABP/Impella/VA-ECMO) have high rates of survival with <strong>recovery of LV function</strong>.</td><td>Don't write off the shocked young heart — bridge it. Early MCS as a bridge-to-recovery is the strategy, not endless inotropes.</td></tr>
+        <tr><td><span class="lvl">CRITERIA</span> Lake Louise (2009, updated 2018)</td><td>Cardiac MRI criteria for myocarditis: myocardial <strong>oedema (T2)</strong> plus <strong>non-ischaemic injury (LGE / native T1)</strong> in a non-coronary, often sub-epicardial/mid-wall pattern.</td><td>The non-invasive way to confirm myocarditis when the coronaries are clean — image the inflamed muscle.</td></tr>
+        <tr><td><span class="lvl">REGISTRY</span> Giant-cell myocarditis treatment</td><td>Untreated giant-cell myocarditis has very poor transplant-free survival; <strong>immunosuppression</strong> (corticosteroids + ciclosporin ± others) markedly improves it.</td><td>Biopsy to make the diagnosis, then immunosuppress and refer for transplant assessment — it changes everything.</td></tr>
+        <tr><td><span class="lvl">CONSENSUS</span> Checkpoint-inhibitor myocarditis</td><td>ICI myocarditis is rare but highly lethal; early <strong>high-dose corticosteroids</strong> and permanent <strong>cessation of the checkpoint inhibitor</strong> are the cornerstone.</td><td>Always ask the oncology drug history; treat suspected ICI myocarditis as an emergency with steroids and stop the drug.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2013 ESC position statement / AHA scientific statement</td><td>Defines the diagnostic pathway (troponin, ECG, echo, MRI) and the role of <strong>endomyocardial biopsy</strong> in unstable disease and suspected giant-cell/eosinophilic myocarditis.</td><td>Exactly the algorithm driving S3, S7, S9 and S11.</td></tr>
+      </table>
+    </div>
+
+    <!-- 🔬 ADVANCED TOPICS -->
+    <div class="callout purple">
+      <h3 style="margin-top:0">🔬 Fellowship Corner — Advanced Topics</h3>
+      <ul>
+        <li>🧲 <strong>Lake Louise criteria in detail:</strong> the 2018 update pairs a <strong>T2-based</strong> marker (oedema) with a <strong>T1-based</strong> marker (native T1, ECV or LGE) — meeting both is highly specific for acute myocarditis; LGE distribution (sub-epicardial inferolateral, mid-wall) distinguishes it from infarct.</li>
+        <li>🔬 <strong>Endomyocardial biopsy &amp; the Dallas criteria:</strong> the gold standard; sampling error limits sensitivity, so multiple samples and immunohistochemistry/viral PCR are used. It is <em>required</em> when giant-cell, eosinophilic or cardiac sarcoid is suspected because it changes therapy.</li>
+        <li>🧟 <strong>Giant-cell myocarditis:</strong> aggressive, young patients, ventricular arrhythmia and AV block out of proportion; multinucleated giant cells on biopsy; needs combined immunosuppression and early transplant evaluation — and often an ICD.</li>
+        <li>💉 <strong>Immune-checkpoint-inhibitor myocarditis:</strong> typically early after starting therapy, may overlap with myositis/myasthenia; treat with high-dose methylprednisolone, escalate to second-line immunosuppression if steroid-refractory, and permanently discontinue the ICI.</li>
+        <li>🩸 <strong>MCS escalation ladder in fulminant shock:</strong> inotropes/vasopressors (a temporising bridge, not the goal) → IABP → <strong>Impella</strong> (LV unloading) → <strong>VA-ECMO</strong> (biventricular + respiratory support; add an LV vent/Impella to unload) → durable VAD or transplant if no recovery.</li>
+        <li>🌱 <strong>Recovery and follow-up:</strong> serial echo/MRI tracks LV recovery; exercise restriction for 3–6 months; cardiac MRI and Holter guide return to sport; persistent dysfunction → chronic HFrEF GDMT and ICD/transplant pathways.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S7 — ORDERS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s7">
+  <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+  <div class="section-content">
+    <h3>🖊️ The order set, written as you'd actually write it (05:10)</h3>
+    <ul>
+      <li>🚫 <strong>CANCEL the discharge</strong> — admit to CCU, shock pathway. Flag on chart and whiteboard: "fulminant myocarditis, clean coronaries — NOT a STEMI mimic to discharge."</li>
+      <li>🩸 <strong>Activate the mechanical-circulatory-support pathway NOW</strong> — call cardiology + intensivist + MCS/ECMO team for early Impella/VA-ECMO as bridge-to-recovery. Do not wait for arrest.</li>
+      <li>💉 <strong>Cautious inotropic support</strong> to maintain perfusion (e.g. low-dose dobutamine/milrinone ± noradrenaline) as a <em>temporising bridge</em> — with a low threshold to move to a pump rather than climb the dose.</li>
+      <li>💧 <strong>Decongest if congested</strong> (IV furosemide guided by filling/perfusion); careful with preload in a shocked, dilated ventricle.</li>
+      <li>🚫 <strong>STOP the ibuprofen — no NSAIDs.</strong> Analgesia with paracetamol/opioid. Strict bed rest, NO exercise.</li>
+      <li>🧪 <strong>Bloods:</strong> serial troponin, BNP/NT-proBNP, U&amp;E, LFTs, CK, lactate, FBC with <strong>eosinophil count</strong>, CRP/ESR, viral serology/PCR, TSH, and an <strong>oncology/drug history for checkpoint inhibitors</strong>.</li>
+      <li>🧲 <strong>Cardiac MRI (Lake Louise)</strong> when haemodynamically able; meanwhile bedside echo to track LV/RV function.</li>
+      <li>🔬 <strong>Endomyocardial biopsy</strong> if heart block / ventricular arrhythmia / refractory shock — to diagnose giant-cell or eosinophilic myocarditis (changes treatment).</li>
+      <li>⚡ Continuous telemetry; defibrillator and <strong>temporary pacing</strong> available (myocarditis causes arrhythmia and AV block).</li>
+      <li>📞 Early referral to an advanced-heart-failure / transplant centre if giant-cell suspected or no recovery on support.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In fulminant myocarditis there are only two big moves: support the circulation early (Impella/ECMO bridge-to-recovery), and find the subtype (biopsy if giant-cell/eosinophilic) — everything else exists to keep her perfused until the heart recovers."</div>
+
+    <!-- 🩺 PROCEDURE GUIDE 1 -->
+    <div class="checklist" id="ckMCS">
+      <h3 style="margin-top:0">🩺 Procedure Guide — Escalating to Mechanical Circulatory Support — tick as you go</h3>
+      <label class="ck"><input type="checkbox"><span>🔥 Confirm cardiogenic shock from fulminant myocarditis (hypotension, hypoperfusion, rising lactate, global LV dysfunction, clean coronaries)</span></label>
+      <label class="ck"><input type="checkbox"><span>📞 Activate the MCS/ECMO team and the advanced-heart-failure consultant <strong>early</strong> — before multi-organ failure</span></label>
+      <label class="ck"><input type="checkbox"><span>💉 Bridge with cautious inotropes/vasopressors to a target MAP while the pump is set up — do NOT keep climbing doses as the endpoint</span></label>
+      <label class="ck"><input type="checkbox"><span>🩸 Choose the device for the failure pattern: <strong>Impella</strong> for LV unloading; <strong>VA-ECMO</strong> for bi-ventricular + respiratory failure (vent/unload the LV)</span></label>
+      <label class="ck"><input type="checkbox"><span>⚡ Keep defibrillator + temporary pacing ready — arrhythmia and AV block are common in the inflamed heart</span></label>
+      <label class="ck"><input type="checkbox"><span>🌱 Frame it as <strong>bridge-to-recovery</strong>: support, monitor daily echo for LV recovery, then wean the device</span></label>
+      <label class="ck"><input type="checkbox"><span>🔬 In parallel: biopsy if giant-cell/eosinophilic suspected; transplant-centre referral if no recovery</span></label>
+      <div class="ck-progress" data-progress>0 / 7 complete</div>
+    </div>
+
+    <!-- 🩺 PROCEDURE GUIDE 2 -->
+    <div class="checklist" id="ckBiopsy">
+      <h3 style="margin-top:0">🩺 Procedure Guide — Endomyocardial Biopsy &amp; Subtype-Specific Therapy</h3>
+      <p style="font-size:13px">⚠️ Biopsy is the gold standard and is <strong>required</strong> when giant-cell or eosinophilic myocarditis is suspected — it changes treatment.</p>
+      <label class="ck"><input type="checkbox"><span>🚩 Trigger biopsy for: refractory shock, ventricular arrhythmia, new high-grade AV block, or eosinophilia</span></label>
+      <label class="ck"><input type="checkbox"><span>🔬 Take multiple samples (reduce sampling error); send histology (Dallas), immunohistochemistry and viral PCR</span></label>
+      <label class="ck"><input type="checkbox"><span>🧟 If <strong>giant-cell</strong>: corticosteroids + ciclosporin (± additional agents) and <strong>early transplant evaluation</strong></span></label>
+      <label class="ck"><input type="checkbox"><span>🌸 If <strong>eosinophilic</strong>: corticosteroids and treat the underlying cause (drug/allergy/parasite)</span></label>
+      <label class="ck"><input type="checkbox"><span>💉 If <strong>checkpoint-inhibitor</strong> myocarditis: high-dose corticosteroids and permanently STOP the drug</span></label>
+      <label class="ck"><input type="checkbox"><span>🦠 If <strong>lymphocytic/viral</strong>: supportive care + GDMT once stable; routine immunosuppression not indicated</span></label>
+      <div class="ck-progress" data-progress>0 / 6 complete</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S8 — NURSING CARE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s8">
+  <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+  <div class="section-content">
+    <h3>🛏️ CCU nursing priorities — minute by minute</h3>
+    <ul>
+      <li>📟 <strong>Continuous telemetry with the defibrillator and pacing at the bedside.</strong> The inflamed heart throws ventricular arrhythmias and AV block without warning.</li>
+      <li>🩸 <strong>Know the shock pathway cold:</strong> escalating mottling, cool peripheries, falling urine output and rising lactate mean the inotropes are losing and it is time for the pump — escalate, don't wait.</li>
+      <li>🩺 <strong>BP / MAP and perfusion every 5–15 min</strong> (cycle the NIBP, read the arterial line once placed). A drifting pressure means call the team now, not at the next set of obs.</li>
+      <li>🩸 <strong>If on MCS (Impella/VA-ECMO):</strong> monitor cannula sites, flows, limb perfusion and bleeding; anticoagulation as prescribed; report low flows or limb ischaemia immediately.</li>
+      <li>💉 Prepare inotrope/vasopressor infusions accurately on a monitored line; double-check concentrations — errors are dangerous in a shocked patient.</li>
+      <li>🚫 <strong>Hold any NSAID order</strong> and query it — ibuprofen worsens myocarditis. Enforce strict bed rest / no exertion.</li>
+      <li>🧠 <strong>Neuro/consciousness and urine-output checks</strong> — a patient who becomes confused or anuric is losing end-organ perfusion → escalate.</li>
+      <li>🧪 <strong>Send serial troponin, lactate and the biopsy/viral samples</strong> promptly; document the rhythm and any arrhythmia for the team.</li>
+      <li>👨‍👩‍👦 Keep the family updated and supported (see S16) — assign a liaison if staffing allows; for a young patient this is terrifying.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who calls 'rising lactate, falling urine' early — and who refuses the NSAID — is doing half the bridge-to-recovery work in the room."</div>
+    <div class="callout warn"><b class="ct">📢 Escalate IMMEDIATELY for</b>Rising lactate / falling urine output despite inotropes (→ time for MCS) · new ventricular arrhythmia or AV block (→ pacing/defibrillation) · falling BP/MAP · new chest pain or worsening breathlessness · falling consciousness · device alarms / low ECMO or Impella flows / limb ischaemia · any prescription for an NSAID in this patient.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S9 — INVESTIGATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s9">
+  <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+  <div class="section-content">
+    <h3>🧾 Results board (05:00, during resuscitation)</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>Result</th><th>Reference</th><th>Interpretation</th></tr>
+      <tr><td>Troponin I</td><td class="hi">18,400 ng/L ↑↑</td><td>&lt; 40</td><td>Massively raised but with <strong>clean coronaries</strong> — this is myocyte injury from inflammation, not occlusion. The headline finding for myocarditis.</td></tr>
+      <tr><td>NT-proBNP</td><td class="hi">9,200 ng/L ↑↑</td><td>&lt; 125</td><td>Severe wall stress / acute heart failure from the failing, dilated ventricle.</td></tr>
+      <tr><td>Lactate</td><td class="hi">4.2 mmol/L ↑</td><td>&lt; 2.0</td><td>Tissue hypoperfusion = cardiogenic shock. A marker she needs support now, not observation.</td></tr>
+      <tr><td>Creatinine</td><td class="hi">1.5 mg/dL ↑</td><td>0.6–1.1</td><td>Early cardiorenal / hypoperfusion injury. Worsens with NSAIDs — another reason to stop the ibuprofen.</td></tr>
+      <tr><td>Eosinophils</td><td class="ok-v">Normal</td><td>—</td><td>No eosinophilia tonight (would suggest eosinophilic myocarditis). Recheck — it can evolve.</td></tr>
+      <tr><td>Coronary angiography</td><td class="ok-v">Clean — no culprit</td><td>—</td><td>Excludes an occlusive STEMI. In this context it <em>supports</em> myocarditis rather than reassuring.</td></tr>
+      <tr><td>Viral serology / PCR</td><td class="ok-v">Pending</td><td>—</td><td>May identify enterovirus/parvovirus/SARS-CoV-2 etc; rarely changes acute management but informs the picture.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A troponin of 18,000 with clean coronaries is not a normal cath — it is a positive test for myocarditis. Confirm it with cardiac MRI and, if giant-cell is in play, with biopsy."</div>
+
+    <div class="callout info"><b class="ct">🧠 How the diagnosis is actually nailed</b><strong>Cardiac MRI (Lake Louise criteria)</strong> shows myocardial <em>oedema</em> on T2 and <em>late gadolinium enhancement</em> in a non-coronary (sub-epicardial / mid-wall) pattern — the non-invasive confirmation. <strong>Endomyocardial biopsy</strong> is the gold standard and is <em>required</em> when giant-cell or eosinophilic myocarditis is suspected, because it changes treatment (immunosuppression). Echo shows the global hypokinesis; the clean cath excludes the mimic.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S10 — ECG / IMAGING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s10">
+  <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging</h2></div>
+  <div class="section-content">
+    <h3>🫀 The presenting ECG — diffuse, not territorial</h3>
+    <div class="ecg-fig">
+      <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Sinus tachycardia with diffuse low-amplitude ST/T changes">
+        <rect width="820" height="150" fill="#0b1220"/>
+        <g stroke="#1e3a5f" stroke-width="1">
+          <line x1="0" y1="30" x2="820" y2="30"/><line x1="0" y1="60" x2="820" y2="60"/>
+          <line x1="0" y1="90" x2="820" y2="90"/><line x1="0" y1="120" x2="820" y2="120"/>
+        </g>
+        <polyline fill="none" stroke="#86efac" stroke-width="2.4" points="0,80 30,80 40,78 52,46 60,80 75,86 90,80 150,80 162,78 174,46 182,80 197,86 212,80 280,80 292,78 304,46 312,80 327,86 342,80 410,80 422,78 434,46 442,80 457,86 472,80 540,80 552,78 564,46 572,80 587,86 602,80 670,80 682,78 694,46 702,80 717,86 732,80 800,80"/>
+        <text x="150" y="22" fill="#fcd34d" font-size="12" font-weight="700">↑ diffuse ST/T changes (all leads)</text>
+        <text x="540" y="22" fill="#fca5a5" font-size="12" font-weight="700">↑ sinus tachycardia ~125</text>
+      </svg>
+      <div class="ecg-cap">Sinus <span style="color:#fca5a5">tachycardia</span> with <span style="color:#fcd34d">diffuse, low-amplitude ST/T changes across many leads</span> — not the territorial ST elevation of a single-vessel STEMI. Diffuse changes, sometimes saddle-shaped (myopericarditis), low voltages, or new conduction block all fit myocarditis.</div>
+    </div>
+
+    <h3>🔎 The myocarditis-vs-STEMI imaging toolkit (memorize the high-yield ones)</h3>
+    <table class="tbl">
+      <tr><th>Feature</th><th>Why it points to myocarditis (not coronary STEMI)</th></tr>
+      <tr><td>🫀 <strong>Clean coronaries</strong></td><td>No occlusive culprit despite sky-high troponin → injury is from inflammation, not occlusion.</td></tr>
+      <tr><td>🌐 <strong>Global hypokinesis on echo</strong></td><td>Diffuse (sometimes regional) dysfunction across the whole ventricle — not confined to one coronary territory. RV may also be involved.</td></tr>
+      <tr><td>🧲 <strong>Cardiac MRI — oedema (T2)</strong></td><td>Bright myocardial signal = oedema, the hallmark of acute inflammation (Lake Louise T2 criterion).</td></tr>
+      <tr><td>✨ <strong>Late gadolinium enhancement (non-coronary)</strong></td><td>Sub-epicardial / mid-wall LGE, classically inferolateral — a non-ischaemic pattern that distinguishes it from infarct (which is sub-endocardial/transmural in a coronary territory).</td></tr>
+      <tr><td>📉 <strong>Diffuse ST/T changes, low voltages, block</strong></td><td>Widespread (often saddle) ST changes, low QRS voltages, or new AV/bundle block fit diffuse inflammation rather than a single occluded artery.</td></tr>
+      <tr><td>🔬 <strong>Endomyocardial biopsy</strong></td><td>The gold standard; required when giant-cell/eosinophilic is suspected — tissue diagnosis that changes treatment.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Territorial ST elevation + a culprit artery = STEMI. Diffuse changes + global dysfunction + clean coronaries + MRI oedema/LGE = myocarditis. Read the pattern, not just the troponin."</div>
+
+    <h3>🫀 Echo &amp; MRI in this patient</h3>
+    <ul>
+      <li>🩻 <strong>Echo:</strong> <strong>global LV hypokinesis, EF ~22%</strong>, mildly dilated and thickened (oedematous) walls, RV mildly impaired, small pericardial effusion, no regional pattern, no thrombus.</li>
+      <li>🧲 <strong>Cardiac MRI (when stable):</strong> high T2 signal (oedema) and <strong>sub-epicardial/mid-wall late gadolinium enhancement</strong> in a non-coronary distribution — meets <strong>Lake Louise criteria</strong> for acute myocarditis.</li>
+      <li>🔬 <strong>Endomyocardial biopsy (if indicated):</strong> sought urgently if heart block or ventricular arrhythmia raises suspicion of <strong>giant-cell</strong> myocarditis — it changes treatment to immunosuppression.</li>
+    </ul>
+
+    <div class="callout warn"><b class="ct">⚠️ The cath lab's favourite lie in the young chest-pain patient</b>"Clean coronaries, so it was a false alarm — discharge." A clean cath in a shocked young patient with a huge troponin and a globally dead ventricle is the <strong>positive</strong> finding for myocarditis. Treat the clean cath as the cue to image (MRI), admit and support — never as permission to go home.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S11 — MEDICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s11">
+  <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+  <div class="section-content">
+    <h3>💉 Acute drugs — what, why, and the traps</h3>
+    <table class="tbl">
+      <tr><th>Drug / therapy</th><th>Role tonight</th><th>Mechanism / caution</th></tr>
+      <tr><td><strong>Inotropes (dobutamine / milrinone)</strong></td><td>Temporising support of cardiac output in cardiogenic shock</td><td>A <em>bridge</em>, not the destination — they raise myocardial oxygen demand and can be arrhythmogenic in an inflamed heart. Low threshold to escalate to mechanical support.</td></tr>
+      <tr><td><strong>Vasopressor (noradrenaline)</strong></td><td>Maintain MAP / organ perfusion</td><td>Use the minimum to perfuse; excess afterload burdens the failing ventricle.</td></tr>
+      <tr><td><strong>Mechanical circulatory support (Impella / VA-ECMO)</strong></td><td>The definitive bridge-to-recovery in fulminant shock</td><td>Impella unloads the LV; VA-ECMO supports biventricular + respiratory failure (vent the LV). Escalate <strong>early</strong>, before multi-organ failure.</td></tr>
+      <tr><td><strong>Diuretic (IV furosemide)</strong></td><td>Decongestion if volume-overloaded</td><td>Titrate to filling/perfusion; careful with preload in a shocked, dilated ventricle.</td></tr>
+      <tr><td><strong>GDMT (ARNI/ACEi, beta-blocker, MRA, SGLT2i)</strong></td><td>Once <em>stabilised</em>, the heart-failure backbone supporting recovery</td><td>Introduce cautiously after shock resolves — not in the acute hypotensive phase.</td></tr>
+      <tr><td><strong>Corticosteroids ± immunosuppression</strong></td><td>For <strong>giant-cell</strong>, <strong>eosinophilic</strong> and <strong>checkpoint-inhibitor</strong> myocarditis</td><td>Biopsy-guided. Giant-cell: steroids + ciclosporin + transplant work-up. Checkpoint: high-dose steroids + STOP the drug. NOT routine for ordinary viral myocarditis.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Inotropes buy minutes; the pump buys the recovery. In fulminant myocarditis, support early and aggressively (Impella/ECMO) — and never reach for an NSAID."</div>
+
+    <div class="callout danger"><b class="ct">🚫 The 'never' list in acute myocarditis</b>❌ <strong>NSAIDs</strong> (ibuprofen/diclofenac) — worsen myocardial inflammation, retain fluid, harm the kidney · ❌ <strong>Exercise / exertion</strong> — risks ventricular arrhythmia and sudden death · ❌ Treating it as a "false-alarm STEMI" and discharging · ❌ Endless inotrope escalation as the endpoint instead of timely mechanical support · ❌ Missing giant-cell / eosinophilic / checkpoint-inhibitor myocarditis (each needs specific immunosuppression).</div>
+
+    <h3>🏠 Subtype-specific &amp; recovery therapy (this admission, not just tonight)</h3>
+    <ul>
+      <li>🦠 <strong>Lymphocytic/viral:</strong> supportive care is the cornerstone; GDMT once stable; most recover.</li>
+      <li>🧟 <strong>Giant-cell:</strong> corticosteroids + ciclosporin (± others) and <strong>early transplant evaluation</strong>; consider ICD.</li>
+      <li>🌸 <strong>Eosinophilic:</strong> corticosteroids and treat the underlying cause.</li>
+      <li>💉 <strong>Checkpoint-inhibitor:</strong> high-dose corticosteroids and <strong>permanently stop the drug</strong>; escalate immunosuppression if steroid-refractory.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S12 — MONITORING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s12">
+  <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+  <div class="section-content">
+    <h3>📡 What to watch and why</h3>
+    <ul>
+      <li>📈 <strong>Continuous telemetry</strong> with defibrillator and temporary pacing at the bedside — the inflamed heart causes ventricular arrhythmia and AV block.</li>
+      <li>🩸 <strong>Invasive arterial line + perfusion markers</strong> (MAP, lactate clearance, urine output, mottling, mentation) — these tell you whether inotropes are holding or it is time for a pump.</li>
+      <li>🫀 <strong>Serial troponin and NT-proBNP</strong> — track the inflammatory injury and wall stress; trends guide escalation and recovery.</li>
+      <li>🩻 <strong>Daily echo (EF, LV/RV recovery, effusion)</strong> — recovering function is the cue to wean mechanical support; worsening function is the cue to escalate.</li>
+      <li>🩸 <strong>If on MCS:</strong> device flows, cannula sites, anticoagulation, haemolysis (LDH/plasma-free Hb), and limb perfusion.</li>
+      <li>🧪 <strong>Eosinophil count, renal/liver function and lactate</strong> repeatedly — eosinophilia can evolve; end-organ function tracks shock severity.</li>
+      <li>🔬 <strong>Await biopsy / MRI results</strong> — they decide whether she needs immunosuppression (giant-cell/eosinophilic) or supportive care (viral).</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In fulminant myocarditis the monitor's job is to answer two questions: 'is she perfusing?' (lactate, urine, MAP) and 'is the heart recovering?' (daily echo) — those two decide escalate vs wean."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S13 — COMPLICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s13">
+  <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+  <div class="section-content">
+    <h3>💀 What can go wrong — and the mechanism</h3>
+    <ul>
+      <li>🔥 <strong>Refractory cardiogenic shock / multi-organ failure</strong> — the great fear; if support is under-dosed or delayed, hypoperfusion kills before the inflammation settles.</li>
+      <li>⚡ <strong>Ventricular arrhythmia / sudden cardiac death</strong> — inflamed, oedematous myocardium is electrically unstable; exertion increases the risk (hence strict rest).</li>
+      <li>🔌 <strong>High-grade AV block / bradyarrhythmia</strong> — conduction-system involvement; may need temporary pacing. Out-of-proportion block flags <strong>giant-cell</strong> myocarditis.</li>
+      <li>🩸 <strong>MCS complications</strong> — bleeding, limb ischaemia, haemolysis, thrombosis, cannulation injury, infection (the price of the bridge — manage proactively).</li>
+      <li>🧟 <strong>Missed giant-cell / eosinophilic / checkpoint myocarditis</strong> — treated as "just viral," it progresses to death or emergency transplant without the immunosuppression it needed.</li>
+      <li>💔 <strong>Failure to recover → chronic dilated cardiomyopathy</strong> — a minority do not regain function and progress to HFrEF, ICD/transplant pathways.</li>
+    </ul>
+
+    <!-- 🎭 M&M CONFERENCE MODULE -->
+    <div class="mm">
+      <h3>🎭 Morbidity &amp; Mortality Conference — "The Clean-Cath Discharge"</h3>
+      <div class="mm-case">
+        <strong>The case:</strong> A 26-year-old woman, well until a flu-like illness ten days earlier, arrived with chest pain and breathlessness, diffuse ST changes and a troponin of 22,000. A "STEMI" was called; the cath was <strong>clean</strong>. The tired night team, relieved, labelled it a "STEMI mimic — false alarm," reassured her and <strong>discharged her at 08:00</strong>. By midnight she returned in <strong>refractory cardiogenic shock</strong>, arrested in the ED, and the team could not cannulate VA-ECMO in time. She did not survive. At the M&amp;M, the echo from the first admission — projected for all to see — showed a <strong>globally akinetic ventricle, EF 18%</strong>. It was fulminant myocarditis that should have been admitted and bridged. (Another version of this story: a giant-cell myocarditis missed for want of a biopsy → death; or NSAIDs given that worsened it.)
+      </div>
+      <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+      <div class="swiss">
+        <div class="hole"><b>🧠 FALSE REASSURANCE</b>"Clean coronaries = false alarm" — clean coronaries with a huge troponin and dead ventricle is the diagnosis OF myocarditis.</div>
+        <div class="hole"><b>🩻 ECHO NOT HEEDED</b>A globally akinetic, EF-18% ventricle was on the screen and unread as "shock."</div>
+        <div class="hole"><b>🩸 NO MCS PLAN</b>A fulminant shock was sent home instead of bridged with Impella/ECMO.</div>
+        <div class="hole"><b>🔬 NO BIOPSY</b>Giant-cell was never excluded — the subtype that needs immunosuppression went untreated.</div>
+        <div class="hole"><b>🌙 SYSTEM</b>Night fatigue, no senior review, no "clean-cath shock = admit &amp; image" default.</div>
+      </div>
+      <p style="margin-bottom:0"><strong>🛡️ What would have saved her:</strong> apply the universal rule — <em>young + viral prodrome + acute heart failure + raised troponin + clean coronaries = myocarditis until proven otherwise</em>; admit and image (cardiac MRI), never discharge a shocked clean-cath patient; escalate early to mechanical support as a bridge-to-recovery; biopsy if giant-cell suspected; avoid NSAIDs; get senior eyes early. <strong>This is exactly why your registrar refused the discharge tonight.</strong></p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Clean coronaries, false alarm' is the sentence written on the chart of patients who then die of fulminant myocarditis overnight. A clean cath is not a discharge letter."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S14 — DIFFERENTIALS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s14">
+  <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials</h2></div>
+  <div class="section-content">
+    <h3>🧩 The "raised troponin + clean coronaries + acute heart failure" differential</h3>
+    <table class="tbl">
+      <tr><th>Diagnosis</th><th>Clues</th><th>Why it matters</th></tr>
+      <tr><td>🔥 <strong>Fulminant myocarditis</strong> (this patient)</td><td>Young, viral prodrome, global LV dysfunction, raised troponin, clean coronaries, MRI oedema/LGE, possible arrhythmia/block</td><td>Default assumption here; admit, image, support early (MCS bridge-to-recovery), biopsy if giant-cell suspected.</td></tr>
+      <tr><td>🫀 <strong>STEMI / ACS</strong></td><td>Older, risk factors, <strong>territorial</strong> ST elevation + reciprocal change, a culprit artery on angiography</td><td>The mimic to exclude — clean coronaries here redirect to myocarditis, they don't license discharge.</td></tr>
+      <tr><td>💔 <strong>Takotsubo (stress) cardiomyopathy</strong></td><td>Often post-emotional/physical stress, apical ballooning in a non-coronary distribution, modest troponin</td><td>Recovers too, but pattern (apical ballooning) and trigger differ; MRI helps distinguish.</td></tr>
+      <tr><td>🩸 <strong>Other cardiogenic shock</strong> (acute decompensated DCM, valve, tamponade)</td><td>Pre-existing cardiomyopathy, murmur, effusion with tamponade physiology</td><td>Echo separates them; tamponade needs drainage, valve needs surgery.</td></tr>
+      <tr><td>🌐 <strong>Sepsis / septic cardiomyopathy</strong></td><td>Infective source, vasodilated warm shock, fever — but here she is cold/clamped</td><td>Different shock physiology and treatment; can coexist with myocarditis.</td></tr>
+      <tr><td>🫁 <strong>Massive pulmonary embolism</strong></td><td>RV strain, hypoxia, sudden onset, raised troponin</td><td>CT-PA / echo RV findings distinguish; treatment is reperfusion/anticoagulation, not myocarditis care.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Raised troponin + clean coronaries + a globally weak heart in a young, post-viral patient → think MYOCARDITIS first, exclude takotsubo and PE, and keep your hands off the discharge button."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S15 — PLAN -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s15">
+  <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan</h2></div>
+  <div class="section-content">
+    <h3>🧭 Tonight → this week → for life</h3>
+    <ol>
+      <li>🔥 <strong>Tonight (done):</strong> cancel discharge, admit to CCU; cautious inotrope/vasopressor bridge; MCS team activated; telemetry + pacing ready; ibuprofen stopped; strict rest.</li>
+      <li>🩸 <strong>Bridge the shock:</strong> escalate early to Impella/VA-ECMO as bridge-to-recovery; daily echo to track LV recovery and time the wean.</li>
+      <li>🧲 <strong>Confirm &amp; characterise:</strong> cardiac MRI (Lake Louise) when stable; <strong>endomyocardial biopsy</strong> if heart block/ventricular arrhythmia/refractory shock raise giant-cell or eosinophilic suspicion.</li>
+      <li>💉 <strong>Subtype-specific therapy:</strong> immunosuppression for giant-cell/eosinophilic; high-dose steroids + stop the drug for checkpoint-inhibitor; supportive care for viral.</li>
+      <li>💙 <strong>As she recovers:</strong> introduce HFrEF GDMT (ARNI/ACEi, beta-blocker, MRA, SGLT2i); refer to advanced-heart-failure/transplant centre if no recovery.</li>
+      <li>👨‍👩‍👦 <strong>Counselling:</strong> exercise restriction for 3–6 months, avoid NSAIDs, what recovery looks like, and a clear safety net for recurrent symptoms.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Mechanical support treats the shock; biopsy and immunosuppression treat the dangerous subtypes; rest and follow-up protect the recovering heart. Plan all three, or she comes back in shock."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S16 — PROGRESS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s16">
+  <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+  <div class="section-content">
+    <h3>📅 Course in CCU</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Day 0, 06:00</div>Discharge cancelled. Cautious dobutamine started; lactate still 4.0; MCS team at bedside. EF 22%, mottled.</div>
+      <div class="t-item"><div class="t-time">Day 0, 09:00</div>Despite inotropes, lactate rising and urine output falling → <strong>Impella inserted</strong> (escalated to VA-ECMO overnight for RV involvement). LV unloaded, perfusion restored.</div>
+      <div class="t-item"><div class="t-time">Day 1</div>Cardiac MRI: T2 oedema + sub-epicardial LGE → <strong>Lake Louise criteria met</strong>, acute myocarditis confirmed. No heart block; biopsy deferred as giant-cell features absent.</div>
+      <div class="t-item"><div class="t-time">Day 3</div>Daily echo: EF improving to 30%; lactate normalised; ventilator and vasopressors weaning. NSAIDs remain off.</div>
+      <div class="t-item"><div class="t-time">Day 5</div>VA-ECMO/Impella <strong>weaned</strong> as EF reaches 42% — the inflamed heart is recovering, exactly the fulminant paradox. GDMT introduced.</div>
+      <div class="t-item"><div class="t-time">Day 9</div>EF 52%, off all support, mobilising. Viral PCR returns enterovirus-positive (lymphocytic myocarditis). Ready to step down.</div>
+    </div>
+
+    <!-- 👨‍👩‍👦 FAMILY & PATIENT JOURNEY MODULE -->
+    <h3>👨‍👩‍👦 Family &amp; Patient Journey</h3>
+    <div class="journey">
+      <div class="j-card"><div class="j-who">🧑 The patient — Ms. A.N.</div><p>"I just had a flu, and a week later they were putting a pump in my heart. They told me the machine wasn't replacing my heart — it was buying it time to heal. I didn't believe my heart could come back from that. It did."</p></div>
+      <div class="j-card"><div class="j-who">👩 Her mother</div><p>"Someone nearly sent her home because the arteries were 'clean.' The registrar who said 'no, she's too sick' is the reason my daughter is alive. The hardest hours were the machine days, watching the numbers."</p></div>
+      <div class="j-card"><div class="j-who">👩‍⚕️ The bedside nurse</div><p>"My job was the perfusion numbers, the device alarms — and saying 'no' to the ibuprofen. The day her EF climbed past 40% on the echo, the whole unit exhaled."</p></div>
+      <div class="j-card"><div class="j-who">🎓 The team's reflection</div><p>"This wasn't a clever diagnosis — it was a disciplined one. We treated a clean-cath young shocked heart as fulminant myocarditis, bridged it, and let the muscle recover."</p></div>
+    </div>
+
+    <div class="callout pink"><b class="ct">💗 The human thread</b>For a 24-year-old, fulminant myocarditis is a brush with death that arrives out of a common cold. Recovery is usually excellent — but the months that follow need exercise restriction, follow-up imaging, and honest counselling about what happened and what to watch for. Helping her trust her healed heart again is as much treatment as the pump that saved it.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S17 — DISCHARGE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s17">
+  <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+  <div class="section-content">
+    <h3>📋 Discharge plan &amp; safety net</h3>
+    <ul>
+      <li>💊 <strong>Medications:</strong> HFrEF GDMT as tolerated during recovery (ARNI/ACEi, beta-blocker, MRA, SGLT2i), with a clear written schedule and a plan to up-titrate. Immunosuppression weaning plan if giant-cell/eosinophilic.</li>
+      <li>🏃 <strong>Exercise restriction:</strong> NO competitive or strenuous exercise for <strong>3–6 months</strong>; return to sport guided by recovery of LV function, cardiac MRI and Holter.</li>
+      <li>🚫 <strong>Avoid NSAIDs</strong> — counsel specifically (she reached for ibuprofen at home). Paracetamol for pain instead.</li>
+      <li>🧲 <strong>Follow-up imaging:</strong> repeat echo ± cardiac MRI to confirm sustained recovery; heart-failure and (if relevant) advanced-HF/transplant clinic appointments booked before she leaves.</li>
+      <li>🚩 <strong>Red flags → seek emergency care:</strong> recurrent chest pain, breathlessness, palpitations, syncope or presyncope, or feeling faint on exertion.</li>
+      <li>📚 <strong>Education:</strong> what myocarditis is in plain language, why it followed a viral illness, why rest and avoiding NSAIDs matter, and the (usually good) prognosis with recovery.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Discharge after fulminant myocarditis is not 'shock fixed, go home' — it is recovering heart-failure therapy, months of exercise restriction, no NSAIDs, follow-up imaging and a family who knows the warning signs."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S18 — CLINICAL PEARLS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s18">
+  <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+  <div class="section-content">
+    <div class="pearl-grid">
+      <div class="pearl"><b>🔥 Myocarditis until proven otherwise</b>Young + viral prodrome + acute heart failure + raised troponin + clean coronaries = myocarditis. The asymmetry of harm makes this the safe default.</div>
+      <div class="pearl"><b>🩸 Support it, don't bury it</b>Fulminant myocarditis looks like it's dying but recovers — perfuse it through the storm with Impella/ECMO and most hearts come back.</div>
+      <div class="pearl"><b>🧟 Don't miss giant-cell</b>Young, ventricular arrhythmia/heart block → suspect giant-cell. It needs immunosuppression + a transplant conversation, and only biopsy makes the call.</div>
+      <div class="pearl"><b>🫀 Clean cath ≠ discharge</b>When the "STEMI" has clean coronaries, think myocarditis and get the cardiac MRI — never reassure-and-discharge a shocked ventricle.</div>
+      <div class="pearl"><b>🚫 No NSAIDs</b>NSAIDs worsen myocardial inflammation and harm the kidney. Use paracetamol/opioid; stop the ibuprofen.</div>
+      <div class="pearl"><b>🧲 Lake Louise nails it</b>Cardiac MRI: oedema on T2 + late gadolinium enhancement in a non-coronary (sub-epicardial/mid-wall) pattern confirms acute myocarditis.</div>
+      <div class="pearl"><b>🔬 Biopsy when it changes treatment</b>Endomyocardial biopsy is the gold standard — required when giant-cell or eosinophilic myocarditis is suspected.</div>
+      <div class="pearl"><b>💉 Ask the oncology question</b>Checkpoint-inhibitor myocarditis is lethal — high-dose steroids and STOP the drug. Always check the cancer-drug history.</div>
+      <div class="pearl"><b>🌐 Global vs territorial</b>Myocarditis = diffuse/global dysfunction + clean coronaries; STEMI = territorial wall-motion abnormality + a culprit artery.</div>
+      <div class="pearl"><b>💉 Inotropes are a bridge, not a home</b>Endless inotrope escalation raises demand on an inflamed heart. The pump unloads it — escalate early.</div>
+      <div class="pearl"><b>🏃 Rest the inflamed heart</b>Restrict exercise for 3–6 months — exertion risks ventricular arrhythmia and sudden death.</div>
+      <div class="pearl"><b>🌱 Prognosis is hopeful</b>Most fulminant lymphocytic myocarditis recovers LV function — the heart that looks dead tonight can be normal next month.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S19 — MCQs / ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s19">
+  <div class="sec-header"><span class="s-badge">S19</span><h2>🧠 MCQs / Assessment</h2></div>
+  <div class="section-content">
+    <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP and feed your dashboard. Each shows a full explanation.</em></p>
+    <div id="mcqHost"></div>
+    <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · Case c-myocarditis-028 — Fulminant Myocarditis<br>
+  ⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."
+</div>
+
+</div><!-- /#caseScroll -->
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ XP / DASHBOARD CORE ============ */
+  var XP = 0, XP_MAX = 1200;
+  var awarded = {}; // dedupe one-time awards by key
+  var xpVal = document.getElementById('xpVal');
+  var xpFill = document.getElementById('xpFill');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+  }
+  function addXP(amount, key, label){
+    if(key){ if(awarded[key]) return; awarded[key] = true; }
+    XP += amount;
+    if(XP > XP_MAX) XP = XP_MAX;
+    xpVal.textContent = XP;
+    xpFill.style.width = Math.min(100, Math.round(XP / XP_MAX * 100)) + '%';
+    showToast('+' + amount + ' XP' + (label ? ' · ' + label : ''));
+  }
+  function earnBadge(id){
+    var b = document.getElementById(id);
+    if(b && !b.classList.contains('earned')){ b.classList.add('earned'); }
+  }
+
+  /* Dashboard minimize */
+  var dash = document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){
+    dash.classList.toggle('collapsed');
+    this.textContent = dash.classList.contains('collapsed') ? '+' : '–';
+  });
+
+  /* ============ INTERNAL SCROLL SIZING ============ */
+  /* Size the scroll box to the visible window so the sticky tab bar stays in
+     view. When embedded (srcDoc iframe, same-origin), the host page stretches
+     the iframe to full content height and scrolls the OUTER page — so we size
+     this box from the parent window's height minus whatever app chrome sits
+     above the iframe, and scroll internally instead. Standalone → 100vh. */
+  var caseScroll = document.getElementById('caseScroll');
+  var topnav = document.getElementById('topnav');
+  /* The tab bar is position:fixed, so it's out of flow — reserve space at the
+     top of the scroll content (and offset anchor jumps) by its real height. */
+  function setNavOffset(){
+    var navH = topnav ? topnav.offsetHeight : 70;
+    caseScroll.style.paddingTop = navH + 'px';
+    caseScroll.style.scrollPaddingTop = (navH + 14) + 'px';
+  }
+  function sizeScroller(){
+    try {
+      var p = window.parent;
+      if(p && p !== window && window.frameElement){
+        var rectTop = window.frameElement.getBoundingClientRect().top;
+        if(rectTop < 0) rectTop = 0;          // parent scrolled past the chrome
+        var ph = p.innerHeight || 800;
+        var h = ph - rectTop - 6;             // leave the bottom edge breathing room
+        if(h < 460) h = 460;                  // sane minimum on short windows
+        caseScroll.style.height = h + 'px';
+      } else {
+        caseScroll.style.height = '100vh';
+      }
+    } catch(e){ caseScroll.style.height = '100vh'; }
+    setNavOffset();
+  }
+  sizeScroller();
+  window.addEventListener('resize', sizeScroller);
+  window.addEventListener('load', sizeScroller);
+  try { if(window.parent && window.parent !== window) window.parent.addEventListener('resize', sizeScroller); } catch(e){}
+
+  /* ============ NAV: scroll-spy active + visited ============ */
+  var navchips = Array.prototype.slice.call(document.querySelectorAll('.navchip'));
+  var sections = navchips.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited = {};
+  var visitVal = document.getElementById('visitVal');
+
+  function markVisited(idx){
+    var sec = sections[idx];
+    if(!sec) return;
+    if(!visited[sec.id]){
+      visited[sec.id] = true;
+      navchips[idx].classList.add('visited');
+      var count = Object.keys(visited).length;
+      visitVal.textContent = count + ' / 19';
+      addXP(8, 'visit-' + sec.id, 'Section read');
+      if(count >= 19){ earnBadge('bdg-explorer'); addXP(60, 'allvisited', 'Ward Explorer!'); }
+    }
+  }
+  function setActive(idx){
+    navchips.forEach(function(c){ c.classList.remove('active'); });
+    if(navchips[idx]) navchips[idx].classList.add('active');
+  }
+
+  /* True tabs: each chip shows ONLY its section, hidden via CSS otherwise.
+     No scrollIntoView and no scroll-spy — nothing can scroll the tab bar away,
+     which also sidesteps every srcDoc-iframe scrolling quirk. The hero banner
+     and vitals strip belong to the case intro, so they show on S1 only. */
+  var heroBits = [document.querySelector('.hero'), document.querySelector('.vitals-strip')]
+    .filter(function(el){ return !!el; });
+
+  function showSection(idx){
+    sections.forEach(function(s, i){ if(s) s.classList.toggle('sec-active', i === idx); });
+    heroBits.forEach(function(el){ el.style.display = (idx === 0) ? '' : 'none'; });
+    caseScroll.scrollTop = 0;
+    setActive(idx);
+    markVisited(idx);
+  }
+
+  navchips.forEach(function(chip, idx){
+    chip.addEventListener('click', function(ev){
+      ev.preventDefault();
+      showSection(idx);
+    });
+  });
+  showSection(0);
+
+  /* ============ FLAG GAME (S2) ============ */
+  var flagBtns = document.querySelectorAll('#flagGame .flag-btn');
+  var flagResult = document.getElementById('flagResult');
+  var flagsFound = 0, flagsTotal = 0, flagWrong = 0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good') === '1') flagsTotal++; });
+  flagBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.dataset.locked) return;
+      btn.dataset.locked = '1';
+      var good = btn.getAttribute('data-good') === '1';
+      if(good){
+        btn.classList.add('flag-good');
+        flagsFound++;
+        addXP(10, 'flag-' + flagsFound + '-' + Math.random(), 'Myocarditis flag spotted');
+      } else {
+        btn.classList.add('flag-bad');
+        flagWrong++;
+        showToast('❌ Not a myocarditis-specific flag');
+      }
+      if(flagsFound === flagsTotal){
+        flagResult.textContent = '✅ All ' + flagsTotal + ' myocarditis red flags found' + (flagWrong ? ' (with ' + flagWrong + ' wrong pick' + (flagWrong>1?'s':'') + ')' : ' — flawless!');
+        earnBadge('bdg-vt');
+        addXP(30, 'flags-complete', 'Myocarditis-Spotter badge');
+      } else {
+        flagResult.textContent = flagsFound + ' / ' + flagsTotal + ' myocarditis red flags found…';
+      }
+    });
+  });
+
+  /* ============ BRANCHING SCENARIO (S3) ============ */
+  var scText = document.getElementById('scText');
+  var scChoices = document.getElementById('scChoices');
+  var scFeedback = document.getElementById('scFeedback');
+  var scRestart = document.getElementById('scRestart');
+  var scStab = document.getElementById('scStab');
+  var scTime = document.getElementById('scTime');
+  var scXP = document.getElementById('scXP');
+  var pathXP = 0, scStability = 2, scElapsed = 0;
+
+  var STEPS = {
+    start: {
+      text: "The night team wants to discharge her as a 'STEMI mimic.' She is mottled, BP 85/55, lactate 4.2 and rising, EF ~22% on echo with clean coronaries. What do you do FIRST?",
+      choices: [
+        { t: "🚫 Cancel the discharge and admit her to CCU on the cardiogenic-shock pathway", good:true, ds:1, dt:10, xp:40, fb:"✅ Exactly. Clean coronaries + sky-high troponin + a globally dead ventricle in shock IS fulminant myocarditis. She gets admitted and supported, not sent home. You've bought her a future." , next:"support" },
+        { t: "🏠 Sign the discharge — 'clean cath, false alarm, she can go home'", good:false, ds:-2, dt:20, xp:0, fb:"☠️ Catastrophe. This is the M&M case in S13. A shocked, lactate-4.2 young patient with clean coronaries has fulminant myocarditis — discharge her and she arrests at home overnight. Restart and choose again.", end:true },
+        { t: "💊 Start regular ibuprofen for her pleuritic chest pain and reassess", good:false, ds:-1, dt:15, xp:5, fb:"⚠️ Wrong — NSAIDs worsen myocarditis and harm the kidney in shock, and you've ignored the shock entirely. Stop the NSAID and address the failing circulation.", next:"start2" }
+      ]
+    },
+    start2: {
+      text: "The ibuprofen helped nothing and her lactate is now 4.6, urine output dropping. She's admitted but still only on a bit of oxygen. Now what?",
+      choices: [
+        { t: "🔥 Treat the cardiogenic shock — cautious inotropes and call the team", good:true, ds:1, dt:8, xp:30, fb:"✅ Finally — the right call. Recognise the shock, support the circulation, and get senior/MCS help. Lesson banked: clean coronaries don't make a shocked heart safe.", next:"support" },
+        { t: "🕒 Observe overnight and review on the morning ward round", good:false, ds:-1, dt:20, xp:0, fb:"⚠️ Too passive for fulminant shock. Rising lactate and falling urine are end-organ failure in progress; she needs active support now, not a morning review.", next:"support" }
+      ]
+    },
+    support: {
+      text: "She's on cautious inotropes but lactate is still 4.5 and her urine has nearly stopped; EF unchanged at 22%. The MCS team are on the line. What's the move?",
+      choices: [
+        { t: "🩸 Escalate early to mechanical support (Impella/VA-ECMO) as a bridge-to-recovery", good:true, ds:1, dt:6, xp:30, fb:"✅ Ideal: inotropes are a bridge, not a destination, and they're failing her. A pump unloads the inflamed heart and perfuses her organs while the muscle recovers. Get it in.", next:"recover" },
+        { t: "💉 Keep climbing the inotrope and vasopressor doses and wait", good:false, ds:0, dt:10, xp:10, fb:"⚠️ Tempting but dangerous — ever-higher inotropes raise oxygen demand on an inflamed, arrhythmic heart and don't reverse end-organ failure. Don't make escalating drugs the endpoint; escalate to a pump.", next:"recover" }
+      ]
+    },
+    recover: {
+      text: "She's on Impella (escalated to VA-ECMO overnight); perfusion restored, lactate clearing. Cardiac MRI confirms myocarditis (oedema + LGE); no heart block. Final move of the first phase?",
+      choices: [
+        { t: "🌱 Support as bridge-to-recovery, daily echo, biopsy only if giant-cell features appear", good:true, ds:1, dt:5, xp:40, fb:"🏆 Perfect close. Fulminant lymphocytic myocarditis usually recovers if you perfuse it through the storm. Track LV recovery on daily echo and wean the device. Reserve biopsy/immunosuppression for giant-cell/eosinophilic. Case stabilized.", end:true },
+        { t: "💊 Start empirical high-dose immunosuppression for everyone now", good:false, ds:-1, dt:10, xp:0, fb:"⚠️ Premature. Routine immunosuppression isn't proven for ordinary viral/lymphocytic myocarditis — it's for biopsy-proven giant-cell/eosinophilic or checkpoint myocarditis. Support, image, and biopsy if those features appear.", end:true }
+      ]
+    }
+  };
+
+  function renderStab(){
+    var s = Math.max(0, Math.min(5, scStability + 2)); // map -2..3 → 0..5
+    var dots = '';
+    for(var i=0;i<5;i++) dots += (i < s ? '●' : '○');
+    scStab.textContent = dots;
+  }
+  function renderStep(key){
+    var step = STEPS[key];
+    scText.textContent = step.text;
+    scFeedback.className = 'feedback';
+    scFeedback.style.display = 'none';
+    scChoices.innerHTML = '';
+    step.choices.forEach(function(ch){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = ch.t;
+      b.addEventListener('click', function(){
+        pathXP += ch.xp; scXP.textContent = pathXP;
+        scElapsed += ch.dt; scTime.textContent = scElapsed + ' s';
+        scStability += ch.ds; renderStab();
+        if(ch.xp) addXP(ch.xp, null, 'Scenario choice');
+        scFeedback.textContent = ch.fb;
+        scFeedback.className = 'feedback ' + (ch.good ? 'good' : 'bad');
+        scFeedback.style.display = 'block';
+        Array.prototype.forEach.call(scChoices.children, function(c){ c.disabled = true; c.style.opacity = .6; });
+        if(ch.end){
+          scRestart.style.display = 'inline-block';
+          if(ch.good && key === 'recover'){ earnBadge('bdg-shock'); addXP(20, 'scenario-win', 'Bridged In Time!'); }
+        } else if(ch.next){
+          setTimeout(function(){ renderStep(ch.next); }, 1400);
+        }
+      });
+      scChoices.appendChild(b);
+    });
+  }
+  scRestart.addEventListener('click', function(){
+    pathXP = 0; scStability = 2; scElapsed = 0;
+    scXP.textContent = 0; scTime.textContent = '0 s'; renderStab();
+    scRestart.style.display = 'none';
+    renderStep('start');
+  });
+  renderStab();
+  renderStep('start');
+
+  /* ============ REVEAL BUTTONS ============ */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.getAttribute('data-target'));
+      if(!t) return;
+      if(t.classList.contains('reveal-shown')){
+        t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden');
+      } else {
+        t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown');
+        addXP(8, 'reveal-' + btn.getAttribute('data-target'), 'Self-test');
+      }
+    });
+  });
+
+  /* ============ SUPPORT SIM (S6) ============ */
+  var kRange = document.getElementById('kRange');
+  var kVal = document.getElementById('kVal');
+  var kNeedle = document.getElementById('kNeedle');
+  var kReadout = document.getElementById('kReadout');
+  if(kRange){
+    var simUsed = false;
+    function updateK(){
+      var k = (parseInt(kRange.value,10) / 10); // 2.0 .. 7.5
+      kVal.textContent = k.toFixed(1);
+      var pct = (parseInt(kRange.value,10) - 20) / (75 - 20) * 100;
+      kNeedle.style.left = pct + '%';
+      var msg, cls;
+      if(k < 3.0){ msg = '🔴 No / minimal support — the inflamed ventricle cannot perfuse the body; lactate climbs, organs fail. In fulminant shock this is death. Escalate.'; cls='bad'; }
+      else if(k < 3.5){ msg = '🟠 Low-dose inotropes only — a temporising bridge that buys minutes, not survival. If lactate and urine don’t turn, move to a pump.'; cls='warn-r'; }
+      else if(k <= 5.0){ msg = '🟢 Target zone — timely mechanical support (Impella/VA-ECMO) unloads the heart and perfuses the body: bridge-to-recovery. This is where most hearts come back.'; cls='good'; }
+      else if(k <= 6.0){ msg = '🟠 Over-reliance on escalating inotropes/vasopressors — rising oxygen demand on an inflamed, arrhythmic heart. This is not the goal; unload it with a pump.'; cls='warn-r'; }
+      else { msg = '🔴 Maxed-out inotropes as the endpoint — demand ischaemia and arrhythmia on a heart that needed unloading, not flogging. Escalate to MCS instead.'; cls='bad'; }
+      kReadout.innerHTML = msg;
+      kReadout.className = 'readout ' + cls;
+      if(!simUsed){ simUsed = true; addXP(15, 'ksim', 'Support Strategist'); }
+    }
+    kRange.addEventListener('input', updateK);
+    updateK();
+  }
+
+  /* ============ CHECKLISTS (S7) ============ */
+  var allChecklistsDone = 0, totalChecklists = document.querySelectorAll('.checklist').length;
+  document.querySelectorAll('.checklist').forEach(function(list){
+    var boxes = list.querySelectorAll('input[type=checkbox]');
+    var prog = list.querySelector('[data-progress]');
+    var total = boxes.length;
+    var doneAwarded = false;
+    function refresh(){
+      var done = 0;
+      boxes.forEach(function(b){
+        if(b.checked){ done++; b.closest('.ck').classList.add('done'); }
+        else { b.closest('.ck').classList.remove('done'); }
+      });
+      prog.textContent = done + ' / ' + total + ' complete';
+      if(done === total && !doneAwarded){
+        doneAwarded = true;
+        allChecklistsDone++;
+        addXP(25, 'ck-' + list.id, 'Checklist done');
+        if(allChecklistsDone >= totalChecklists){ earnBadge('bdg-ck'); addXP(20, 'allck', 'Checklist Champion'); }
+      }
+    }
+    boxes.forEach(function(b){
+      b.addEventListener('change', function(){
+        if(b.checked) addXP(4, null, 'Step checked');
+        refresh();
+      });
+    });
+  });
+
+  /* ============ MCQs (S19) ============ */
+  var MCQS = [
+    {
+      q: "A 24-year-old, well until a viral illness a week ago, presents with chest pain, breathlessness, a troponin of 18,000 and global LV hypokinesis. Angiography shows clean coronaries. The most likely diagnosis is:",
+      opts: ["Type 1 STEMI with spontaneous reperfusion","Fulminant myocarditis","Stable angina","Costochondritis"],
+      correct: 1,
+      exp: "Young patient + viral prodrome + acute heart failure + raised troponin + CLEAN coronaries + global (not territorial) dysfunction = myocarditis until proven otherwise. Clean coronaries with a sky-high troponin and a globally weak heart is the positive finding for myocarditis, not reassurance."
+    },
+    {
+      q: "Which investigations best confirm acute myocarditis and identify a subtype that changes treatment?",
+      opts: ["Coronary angiography alone","Cardiac MRI (Lake Louise criteria) and endomyocardial biopsy when giant-cell/eosinophilic is suspected","Chest X-ray and D-dimer","Exercise stress test"],
+      correct: 1,
+      exp: "Cardiac MRI shows myocardial oedema (T2) and late gadolinium enhancement in a non-coronary pattern (Lake Louise criteria). Endomyocardial biopsy is the gold standard and is required when giant-cell or eosinophilic myocarditis is suspected, because it changes treatment to immunosuppression."
+    },
+    {
+      q: "What is the prognosis of fulminant lymphocytic myocarditis if the patient is supported through the acute phase?",
+      opts: ["Almost always fatal regardless of treatment","Most patients recover left ventricular function","No different from chronic dilated cardiomyopathy","Recovery only with transplant"],
+      correct: 1,
+      exp: "The paradox of fulminant myocarditis: it presents with severe haemodynamic compromise but, if the patient is perfused through the inflammatory storm (often with mechanical circulatory support), most ventricles recover function. That is the rationale for aggressive bridge-to-recovery support."
+    },
+    {
+      q: "A young patient with biopsy-proven GIANT-CELL myocarditis presenting with ventricular arrhythmia and heart block should be managed with:",
+      opts: ["Supportive care alone","Immunosuppression (corticosteroids + ciclosporin) and early transplant evaluation","NSAIDs and discharge","Antiviral therapy only"],
+      correct: 1,
+      exp: "Giant-cell myocarditis is aggressive and fatal untreated. It requires combined immunosuppression (corticosteroids plus ciclosporin ± others) and early referral for transplant evaluation, and only biopsy makes the diagnosis. It is the subtype you must not miss."
+    },
+    {
+      q: "In fulminant myocarditis with cardiogenic shock, the mainstay of management is:",
+      opts: ["Routine immunosuppression for everyone","Supportive care plus early mechanical circulatory support (Impella/VA-ECMO) as a bridge-to-recovery","Thrombolysis","Immediate transplant for all"],
+      correct: 1,
+      exp: "Supportive care is the cornerstone, with guideline-directed heart-failure therapy once stabilised. For fulminant shock, escalate EARLY to mechanical circulatory support (Impella/VA-ECMO) as a bridge-to-recovery — endless inotrope escalation is a temporising bridge, not the goal."
+    },
+    {
+      q: "Which common medication should be AVOIDED in acute myocarditis?",
+      opts: ["Paracetamol","NSAIDs (e.g. ibuprofen)","Beta-blockers once stable","Diuretics for congestion"],
+      correct: 1,
+      exp: "NSAIDs are avoided in acute myocarditis — they worsen myocardial inflammation, promote fluid retention and harm the kidney in a patient who may be in shock. Use paracetamol/opioid for pain, and also restrict exercise to reduce arrhythmia/sudden-death risk."
+    },
+    {
+      q: "An oncology patient on an immune-checkpoint inhibitor develops myocarditis. The correct management is:",
+      opts: ["Continue the drug and observe","High-dose corticosteroids and permanently STOP the checkpoint inhibitor","NSAIDs and reassurance","Dose-reduce the checkpoint inhibitor only"],
+      correct: 1,
+      exp: "Immune-checkpoint-inhibitor myocarditis is rare but highly lethal. Management is early high-dose corticosteroids and permanent cessation of the checkpoint inhibitor, escalating immunosuppression if steroid-refractory. Always ask the oncology drug history."
+    },
+    {
+      q: "Which feature best distinguishes myocarditis from a coronary STEMI?",
+      opts: ["A culprit artery with territorial wall-motion abnormality","Global (diffuse) LV dysfunction with clean coronaries and MRI oedema/LGE in a non-coronary pattern","ST elevation with reciprocal change","Sub-endocardial late gadolinium enhancement in a coronary territory"],
+      correct: 1,
+      exp: "Myocarditis causes diffuse/global dysfunction with clean coronaries and a non-coronary (sub-epicardial/mid-wall) LGE pattern with oedema. STEMI/ACS has a culprit artery, territorial wall-motion abnormality, territorial ST elevation with reciprocal change, and a coronary sub-endocardial/transmural LGE pattern."
+    }
+  ];
+
+  var host = document.getElementById('mcqHost');
+  var mcqVal = document.getElementById('mcqVal');
+  var mcqScore = 0, mcqAnswered = 0;
+  var letters = ['A','B','C','D','E'];
+
+  MCQS.forEach(function(item, qi){
+    var box = document.createElement('div');
+    box.className = 'mcq';
+    var html = '<div class="mcq-q">QUESTION ' + (qi+1) + ' / ' + MCQS.length + '</div>';
+    html += '<div class="mcq-stem">' + item.q + '</div>';
+    item.opts.forEach(function(opt, oi){
+      html += '<label class="mcq-opt" data-oi="' + oi + '"><strong>' + letters[oi] + '.</strong> ' + opt + '</label>';
+    });
+    html += '<div class="mcq-exp"></div>';
+    box.innerHTML = html;
+    host.appendChild(box);
+
+    var opts = box.querySelectorAll('.mcq-opt');
+    var exp = box.querySelector('.mcq-exp');
+    var locked = false;
+    opts.forEach(function(label){
+      label.addEventListener('click', function(){
+        if(locked) return;
+        locked = true;
+        var oi = parseInt(label.getAttribute('data-oi'),10);
+        box.classList.add('answered');
+        var correct = item.correct;
+        if(oi === correct){
+          label.classList.add('picked-right');
+          mcqScore++;
+          addXP(25, null, 'Correct answer');
+        } else {
+          label.classList.add('picked-wrong');
+          opts[correct].classList.add('show-right');
+          showToast('❌ Correct: ' + letters[correct]);
+        }
+        exp.innerHTML = '<strong>' + (oi === correct ? '✅ Correct. ' : '📘 Explanation. ') + '</strong>' + item.exp;
+        mcqAnswered++;
+        mcqVal.textContent = mcqScore + ' / ' + MCQS.length;
+        if(mcqAnswered === MCQS.length){
+          var done = document.getElementById('mcqDone');
+          var summary = document.getElementById('mcqSummary');
+          done.style.display = 'block';
+          summary.textContent = 'You scored ' + mcqScore + ' / ' + MCQS.length + '. ' +
+            (mcqScore === MCQS.length ? 'Flawless — you treat clean-cath young shock as fulminant myocarditis every time. 🏆' :
+             mcqScore >= 6 ? 'Strong — review the misses and the contrast pairs in S6.' :
+             'Revisit S3, S5, S6 and S11 — the myocarditis-vs-STEMI logic and the bridge-to-recovery strategy are the whole case.');
+          if(mcqScore >= 7){ earnBadge('bdg-quiz'); addXP(50, 'quizace', 'Quiz Ace!'); }
+        }
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
