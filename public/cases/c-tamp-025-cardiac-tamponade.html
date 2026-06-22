@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cardiac Tamponade — Virtual Teaching Hospital</title>
+<!-- META
+id: c-tamp-025
+title: Cardiac Tamponade
+hospital: cardiology
+department: cv-ccu
+bednumber: 7
+chiefcomplaint: Dyspnea, hypotension, distended neck veins and muffled heart sounds
+system: Cardiology
+severity: critical
+tags: Cardiac tamponade, Becks triad, Pulsus paradoxus, Pericardiocentesis, Obstructive shock
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --radius:16px;
+    --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  /* Internal scroll viewport. When this case is embedded the host app stretches
+     the iframe to full content height and the OUTER page scrolls, which would
+     let a sticky bar scroll away. We instead scroll inside this box (sized to
+     the visible window by JS) so the section tab bar stays pinned at the top.
+     Standalone, it falls back to the full viewport height. */
+  #caseScroll{height:100vh; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; scroll-padding-top:92px}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:36px 24px 80px; position:relative; overflow:hidden}
+  .hero::after{content:"📈"; position:absolute; right:-20px; top:-30px; font-size:220px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{max-width:1100px; margin:0 auto; position:relative; z-index:1}
+  .hero .crumbs{font-size:13px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:10px 0 6px; font-size:clamp(26px,4vw,40px); line-height:1.15}
+  .hero .sub{font-size:16px; opacity:.95}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; backdrop-filter:blur(4px)}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== LIVE ECG STRIP IN HERO ===== */
+  .ecg-banner{max-width:1100px; margin:14px auto 0; position:relative; z-index:1}
+  .ecg-banner svg{width:100%; height:64px; display:block; background:rgba(0,0,0,.18); border-radius:12px; border:1px solid rgba(255,255,255,.25)}
+  .ecg-trace{stroke:#86efac; stroke-width:2.4; fill:none; stroke-dasharray:1600; stroke-dashoffset:1600; animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{stroke-dashoffset:0}}
+
+  /* ===== VITALS STRIP ===== */
+  .vitals-strip{max-width:1100px; margin:-52px auto 0; padding:0 24px; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:11px; font-weight:700; letter-spacing:.6px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:21px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== HORIZONTAL SECTION SIDEBAR (fixed — always visible) ===== */
+  .topnav{position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.10)}
+  .topnav .rail{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; max-width:1180px; margin:0 auto; scrollbar-width:thin}
+  .navchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink2); font-size:11px; font-weight:700; text-decoration:none; min-width:78px; text-align:center; transition:all .18s; cursor:pointer}
+  .navchip .s-id{font-size:10px; letter-spacing:1px; color:#94a3b8}
+  .navchip .s-emoji{font-size:16px}
+  .navchip:hover{border-color:var(--rose); color:var(--rose); transform:translateY(-2px)}
+  .navchip.active{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; border-color:#b91c1c}
+  .navchip.active .s-id{color:#fecaca}
+  .navchip.visited:not(.active){border-color:var(--emerald-line); background:var(--emerald-soft)}
+
+  /* ===== DASHBOARD WIDGET ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:215px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10.5px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:760px){.dash{display:none}}
+
+  /* ===== MAIN / SECTIONS (tabbed: one section visible at a time) ===== */
+  main{max-width:1100px; margin:26px auto 80px; padding:0 24px}
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:26px; overflow:hidden}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16.5px; margin:26px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14.5px; margin:18px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:24px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15.5px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:14px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px; letter-spacing:.4px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14.5px}
+
+  /* ===== INTERACTIVE BITS ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:10px 18px; font-weight:700; font-size:14px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:22px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:15px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 15px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 15px; margin-top:12px; font-size:14px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim sliders */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:14px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:14px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Heart/circuit diagram */
+  .heart-fig{display:flex; gap:18px; flex-wrap:wrap; align-items:center; background:var(--slate-soft); border-radius:16px; padding:18px; margin:14px 0}
+  .heart-fig svg{flex:0 0 auto}
+  .heart-legend{flex:1; min-width:230px; font-size:13.5px}
+  .lg{display:flex; align-items:center; gap:8px; margin:5px 0}
+  .lg .sw{width:14px; height:14px; border-radius:4px; flex:0 0 auto}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Journey cards */
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:14px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:15px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:14px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13.5px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:22px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14.5px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:13px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .footer{max-width:1100px; margin:0 auto 36px; padding:0 24px; text-align:center; color:#94a3b8; font-size:12.5px}
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="caseScroll">
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · 💗 Coronary Care Unit · 🛏️ Bed 7</div>
+    <h1>🫀 Cardiac Tamponade — "The Heart in a Vice"</h1>
+    <div class="sub">⚡ A 58-year-old woman with breast cancer is gray, gasping, with bulging neck veins and heart sounds you can barely hear. Her pressure swings with every breath. The pericardium is squeezing the heart shut.</div>
+    <div class="chips">
+      <span class="chip crit">🔴 CRITICAL</span>
+      <span class="chip">💧 Pericardial Effusion</span>
+      <span class="chip">🩸 Beck's Triad</span>
+      <span class="chip">🌬️ Pulsus Paradoxus</span>
+      <span class="chip">🎮 Interactive Case</span>
+      <span class="chip">⏱️ Decide in 60 seconds</span>
+    </div>
+    <div class="ecg-banner" title="Low-voltage ECG with electrical alternans">
+      <svg viewBox="0 0 800 64" preserveAspectRatio="none" aria-label="Low-voltage rhythm strip with electrical alternans">
+        <polyline class="ecg-trace" points="0,40 40,40 55,30 60,52 70,40 130,40 145,22 150,58 160,40 220,40 235,30 240,52 250,40 310,40 325,22 330,58 340,40 400,40 415,30 420,52 430,40 490,40 505,22 510,58 520,40 580,40 595,30 600,52 610,40 670,40 685,22 690,58 700,40 760,40 775,30 780,52 790,40 800,40"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== LIVE VITALS ===================== -->
+<div class="vitals-strip">
+  <div class="vitals-grid">
+    <div class="vital alert"><div class="v-label">💓 HR</div><div class="v-num">122</div></div>
+    <div class="vital alert"><div class="v-label">🩸 BP</div><div class="v-num">82/64</div></div>
+    <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">28</div></div>
+    <div class="vital warn"><div class="v-label">🫁 SpO₂</div><div class="v-num">92%</div></div>
+    <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">37.1°</div></div>
+    <div class="vital alert"><div class="v-label">🫧 JVP</div><div class="v-num">Raised</div></div>
+    <div class="vital alert"><div class="v-label">📉 Pulsus</div><div class="v-num">22 mmHg</div></div>
+    <div class="vital alert"><div class="v-label">😖 Distress</div><div class="v-num">High</div></div>
+  </div>
+</div>
+
+<!-- ===================== HORIZONTAL SECTION SIDEBAR ===================== -->
+<nav class="topnav" id="topnav">
+  <div class="rail">
+    <a class="navchip" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navchip" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navchip" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navchip" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navchip" href="#s5"><span class="s-emoji">🎓</span><span>Consultant Round</span><span class="s-id">S5</span></a>
+    <a class="navchip" href="#s6"><span class="s-emoji">📖</span><span>Teaching Points</span><span class="s-id">S6</span></a>
+    <a class="navchip" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navchip" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navchip" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navchip" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navchip" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navchip" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navchip" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navchip" href="#s14"><span class="s-emoji">🔀</span><span>Differentials</span><span class="s-id">S14</span></a>
+    <a class="navchip" href="#s15"><span class="s-emoji">🗺️</span><span>Plan</span><span class="s-id">S15</span></a>
+    <a class="navchip" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navchip" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navchip" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navchip" href="#s19"><span class="s-emoji">🧠</span><span>MCQs</span><span class="s-id">S19</span></a>
+  </div>
+</nav>
+
+<!-- ===================== SCORE DASHBOARD ===================== -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections visited</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-vt">🫀 Tamponade-Spotter</span>
+      <span class="badge" id="bdg-shock">🪡 Drain On Time</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champion</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Ward Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running sims, taking the right path and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- S1 — PROFILE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s1">
+  <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+  <div class="section-content">
+    <div class="callout danger">
+      <b class="ct">🚨 YOU ARE HERE — 14:42, CCU Bed 7</b>
+      She is sitting bolt upright, fighting for air, neck veins standing out like ropes. The monitor reads BP 82/64 — a narrow, whispering pulse pressure — HR 122. You put your stethoscope on the chest and the heart sounds are <strong>distant, muffled, far away</strong>. Cuff the pressure through a slow breath and the systolic <strong>drops more than 20 mmHg on inspiration</strong>. Someone wants to "tube her for respiratory distress." Stop them. This is not failing lungs — it is a heart being strangled by fluid, and the wrong move kills her on induction.
+    </div>
+
+    <h3>👤 Patient Identity</h3>
+    <table class="tbl">
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>👩 Name</td><td><strong>Mrs. P.L.</strong></td></tr>
+      <tr><td>🎂 Age / Sex</td><td>58-year-old female</td></tr>
+      <tr><td>🆔 MRN</td><td>CV-22507</td></tr>
+      <tr><td>⚖️ Weight</td><td>68 kg</td></tr>
+      <tr><td>💼 Occupation</td><td>Schoolteacher</td></tr>
+      <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+    </table>
+
+    <h3>📜 Past Medical History — every line points to the pericardium</h3>
+    <ul>
+      <li>🎗️ <strong>Metastatic breast cancer</strong> diagnosed 18 months ago, on chemotherapy — a classic cause of a <strong>malignant pericardial effusion</strong>. Tumour seeds the pericardium, weeps fluid, and the sac fills.</li>
+      <li>💧 <strong>Two weeks of progressive breathlessness</strong>, worse lying flat, with fatigue and a "full" feeling in the chest — the slow build of an effusion finally crossing the pressure threshold.</li>
+      <li>🫀 Recent echo (3 weeks ago) noted a <strong>small pericardial effusion</strong> — "watch and wait." Tonight the sac has filled past the point of no return.</li>
+      <li>🩺 No prior pericardiocentesis. No known coronary disease, no recent cardiac surgery, no chest trauma — this is malignancy until proven otherwise.</li>
+      <li>💊 No anticoagulants. No recent fever or viral prodrome. Ex-smoker, otherwise well a month ago.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Beck's triad — hypotension, raised JVP and muffled heart sounds — plus pulsus paradoxus is cardiac tamponade until proven otherwise. Get the echo and the needle."</div>
+
+    <h3>🧬 Why THIS patient? — sac + fluid + rate</h3>
+    <p>The pericardium is a stiff, non-distensible sac. Acutely it tolerates only a little fluid before pressure climbs steeply; chronically it can stretch to hold a litre or more. Mrs. P.L.'s malignant effusion built slowly enough that her pericardium stretched and she stayed compensated for weeks — until the volume reached the <strong>steep part of the pressure–volume curve</strong>. From there, even a small extra increment sends intrapericardial pressure soaring. Once that pressure <strong>exceeds the chamber filling pressures</strong>, the chambers can no longer expand in diastole. Filling fails, stroke volume collapses, and she tips into <strong>obstructive shock</strong>. Three ingredients: a non-compliant sac, accumulating fluid, and the rate at which it arrives.</p>
+
+    <div class="callout warn"><b class="ct">🔥 Causes of pericardial effusion / tamponade</b>
+    🎗️ Malignancy (breast, lung, lymphoma, melanoma) · 🧪 Uremia (renal failure) · 🦠 Viral / idiopathic pericarditis · 🔪 Trauma (penetrating or blunt) · 🩸 Aortic dissection rupturing into the pericardium · 💔 Post-MI free-wall rupture · 🏥 Post-cardiac-procedure / post-surgical · 🫁 Tuberculosis · 🧬 Connective tissue disease, hypothyroidism (myxedema)</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S2 — HANDOVER -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s2">
+  <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+  <div class="section-content">
+    <h3>📻 Ward Nurse Handover — listen for the trap</h3>
+    <div class="callout info">
+      <b class="ct">🎙️ SBAR from the CCU nurse (verbatim)</b>
+      <p><strong>S:</strong> "Bed 7 — Mrs. P.L., metastatic breast cancer, two weeks of worsening breathlessness, now acutely worse over the last hour. She's clammy, struggling, and her neck veins are huge."</p>
+      <p><strong>B:</strong> "Known small pericardial effusion three weeks ago. On chemo. No fever, no chest trauma, not anticoagulated."</p>
+      <p><strong>A:</strong> "BP 82 over 64, heart rate 122, SpO₂ 92%. Heart sounds are really quiet. The covering doctor on the phone said it sounds like a chest infection or PE and to <strong>intubate her for respiratory distress and give some furosemide</strong> for the breathlessness."</p>
+      <p><strong>R:</strong> "I've got the echo machine wheeled in and IV access. I held the furosemide and I'm worried about putting her to sleep — something about her doesn't fit a chest infection. She looks like she's being squeezed."</p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In tamponade, positive-pressure ventilation can kill — it removes the preload the heart is starving for. The phone diagnosis of 'just intubate her' is how a tamponade arrests on induction."</div>
+
+    <h3>🚩 Spot-the-Red-Flag — tap each feature that screams TAMPONADE</h3>
+    <p>🎮 <em>Interactive: click every feature that points to cardiac tamponade (not a chest infection). Each correct flag = +10 XP. Wrong picks cost you.</em></p>
+    <div id="flagGame">
+      <button class="btn ghost flag-btn" data-good="1">🩸 Beck's triad: hypotension, raised JVP, muffled heart sounds</button>
+      <button class="btn ghost flag-btn" data-good="1">🌬️ Pulsus paradoxus &gt; 10 mmHg</button>
+      <button class="btn ghost flag-btn" data-good="1">📉 Electrical alternans on ECG</button>
+      <button class="btn ghost flag-btn" data-good="1">📐 Low QRS voltage</button>
+      <button class="btn ghost flag-btn" data-good="1">🫀 RV diastolic collapse on echo</button>
+      <button class="btn ghost flag-btn" data-good="1">🫧 Plethoric non-collapsing IVC</button>
+      <button class="btn ghost flag-btn" data-good="0">🔊 Clear, loud heart sounds</button>
+      <button class="btn ghost flag-btn" data-good="0">🌡️ Fever alone</button>
+    </div>
+    <p id="flagResult" style="font-weight:700"></p>
+
+    <h3>⏱️ Timeline so far</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">13:30</div>Increasing breathlessness on the ward, unable to lie flat, looking gray.</div>
+      <div class="t-item"><div class="t-time">14:10</div>BP drifts to 88/66, HR climbs to 116, neck veins distended, heart sounds quiet.</div>
+      <div class="t-item"><div class="t-time">14:25</div>Covering doctor (by phone) says "probably chest infection or PE — intubate and give furosemide." Nurse <strong>withholds the furosemide</strong> — 🏅 instinct worth its weight in gold.</div>
+      <div class="t-item"><div class="t-time">14:42</div>You arrive. Echo at the bedside, BP 82/64 with a 22 mmHg pulsus paradoxus. The clock is the enemy: filling is failing breath by breath.</div>
+    </div>
+
+    <div class="callout ok"><b class="ct">🏅 Praise where due</b>The nurse who held the furosemide prevented a catastrophe. Diuretics empty an already underfilled heart — in tamponade the ventricles are starving for preload, and stripping volume drops the only filling they have left. Withholding it kept the pressure up while you got the echo and the needle.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S3 — INITIAL ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s3">
+  <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+  <div class="section-content">
+    <h3>🅰️🅱️🅲️ Primary Survey — what your hands, eyes and ears find</h3>
+    <table class="tbl">
+      <tr><th>Step</th><th>Finding</th><th>What it means mechanistically</th></tr>
+      <tr><td>🅰️ Airway</td><td>Patent, speaking in short sentences, sitting upright.</td><td>She splints herself upright to maximize venous return — a body fighting for preload. Short sentences signal low output and rising effort.</td></tr>
+      <tr><td>🅱️ Breathing</td><td>RR 28, SpO₂ 92% on air, chest clear, no consolidation.</td><td><strong>Clear lungs with shock and raised JVP</strong> is the giveaway: the breathlessness is cardiac (obstructive), not pulmonary. Hypoxia is from low output, not pneumonia.</td></tr>
+      <tr><td>🅲️ Circulation</td><td><strong>BP 82/64</strong> (narrow pulse pressure), cool peripheries, thready pulse, CRT 4 s. <strong>JVP markedly raised</strong> with a prominent x-descent. <strong>Muffled heart sounds.</strong> <strong>Pulsus paradoxus 22 mmHg.</strong></td><td>Beck's triad in the flesh: high venous pressure (the right heart can't empty into a compressed RA/RV), low arterial pressure (stroke volume collapsing), and muffled sounds (fluid insulating the heart). Pulsus paradoxus = ventricular interdependence across a fixed pericardial volume.</td></tr>
+      <tr><td>🅳 Disability</td><td>GCS 15 but anxious, restless, intermittently vague.</td><td>Cerebral hypoperfusion from falling output. Restlessness here is a warning, not anxiety to sedate away.</td></tr>
+      <tr><td>🅴 Exposure</td><td>No rash, no trauma, no surgical scar. Cachectic from malignancy. Mild peripheral edema.</td><td>Confirms the malignant substrate; absence of trauma/surgery points to a neoplastic effusion.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Raised JVP + clear lungs + hypotension + muffled heart sounds + pulsus paradoxus = tamponade. Your fingers, your eyes and the cuff can diagnose this before the echo probe touches the chest."</div>
+
+    <h3>🧭 The single most important question: STABLE or PERI-ARREST?</h3>
+    <p>Tamponade management forks on how close she is to collapse. Look for the adverse features: <strong>Shock</strong> (SBP falling, poor perfusion), <strong>obtundation</strong>, a <strong>large pulsus paradoxus</strong>, and echo evidence of chamber collapse. Mrs. P.L. has shock, a 22 mmHg pulsus and RV diastolic collapse — she is <strong>decompensating tamponade</strong> heading for arrest.</p>
+
+    <div class="callout danger"><b class="ct">🪡 The decision is made: DECOMPENSATING → ECHO-GUIDED PERICARDIOCENTESIS</b>Tamponade is relieved by <strong>removing fluid, not by pharmacology</strong>. Confirm with bedside echo, run <strong>IV fluid as a temporizing bridge</strong> to augment filling, and proceed to <strong>urgent echo-guided pericardiocentesis</strong> (or surgical drainage). Do not intubate her if you can avoid it, and do not waste time chasing a "respiratory" diagnosis while the heart is being crushed.</div>
+
+    <!-- 🎬 BRANCHING SCENARIO ENGINE -->
+    <div class="scenario" id="scenarioBox">
+      <h3>🎬 Choose Your Path — "The First 60 Seconds"</h3>
+      <div class="hud"><span>❤️ Stability: <b id="scStab">●●○○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 s</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+      <div class="scene-text" id="scText">The covering doctor on the phone wants her intubated "for respiratory distress" and a dose of furosemide. BP 82/64 with a 22 mmHg pulsus, neck veins bulging, heart sounds muffled. The echo machine is at the bedside. What do you do FIRST?</div>
+      <div class="choices" id="scChoices"></div>
+      <div class="feedback" id="scFeedback"></div>
+      <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+    </div>
+
+    <div class="callout info"><b class="ct">🧮 If she were STABLE instead</b>
+    A <em>stable</em> effusion with no shock and no echo chamber collapse buys you time: confirm the effusion size and tamponade physiology on echo, treat the cause, and arrange <strong>semi-elective drainage</strong> in a controlled setting (cath lab / theatre) with surgical backup. But the moment hypotension, a rising pulsus paradoxus or diastolic chamber collapse appear, the clock starts and drainage becomes urgent. When unsure: get the echo now.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S4 — RESIDENT REVIEW -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s4">
+  <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+  <div class="section-content">
+    <p><em>The cardiology resident arrives at 14:45. Her reasoning, out loud:</em></p>
+
+    <h3>🧠 Pattern recognition first, then physiology</h3>
+    <p>"Cancer. Two weeks of breathlessness. Bulging neck veins, quiet heart sounds, a pressure that falls with every breath. That is <strong>tamponade</strong> — I don't need to wait for the radiologist. The base rate alone settles it: a hypotensive cancer patient with a raised JVP and a known effusion is being tamponaded until the echo says otherwise. The dangerous instinct is to <em>call it a chest infection or a PE</em> because she's breathless — and then put her to sleep, which is exactly the move that arrests her."</p>
+
+    <h3>🎯 Immediate priorities (her actual order of operations)</h3>
+    <ol>
+      <li>🚫 <strong>Kill the wrong pathway:</strong> no intubation/positive-pressure ventilation if avoidable, no diuretics, no vasodilators. Say it out loud and cancel the furosemide.</li>
+      <li>🫀 <strong>Bedside echo NOW</strong> to confirm: effusion, RV diastolic collapse, RA systolic collapse, plethoric IVC, respirophasic inflow variation.</li>
+      <li>💧 <strong>IV fluid bolus as a bridge</strong> (250–500 mL) to lift filling pressures above the intrapericardial pressure and buy minutes — a temporizing measure, never the treatment.</li>
+      <li>🪡 <strong>Urgent echo-guided pericardiocentesis</strong> — call cardiology/EP and the cath lab; in dissection or post-MI rupture, call <strong>cardiac surgery</strong> instead.</li>
+      <li>🧍 <strong>Keep her sitting up and awake</strong> — upright posture and her own respiratory effort maintain venous return; sedation flattens both.</li>
+      <li>🩻 <strong>Hunt for the cause:</strong> is this malignant, uremic, infective, or a surgical emergency (dissection, rupture)? The cause decides whether the needle or the operating theatre comes first.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Fluids buy minutes; the needle buys her life. Bridge with volume, drain the pericardium, and keep the anaesthetist's tube away until the heart is decompressed."</div>
+
+    <h3>🤔 "But what if I'm wrong and it's really a PE or pneumonia?"</h3>
+    <p>"Then the echo tells me in ninety seconds — no chamber collapse, no plethoric IVC, and I pivot. But the cost of missing tamponade and intubating it is a <strong>PEA arrest on induction</strong>; the cost of doing an urgent echo on a PE is thirty seconds. The asymmetry of harm is why I confirm tamponade physiology before anyone reaches for an induction drug. Instability plus a raised JVP and an effusion means I assume tamponade and get the probe on the chest."</p>
+
+    <div class="callout purple"><b class="ct">🧪 Resident's self-test (answer before reading on)</b>
+    The covering doctor suggests "a quick RSI and tube to protect her airway, then we'll sort the heart out." Good idea in this patient?
+    <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+    <div class="reveal-hidden" id="rev1"><p><strong>No.</strong> She is in tamponade. Induction agents drop preload and vasodilate, and <strong>positive-pressure ventilation raises intrathoracic pressure and chokes off venous return</strong> to a heart already starved of filling — the classic recipe for a <strong>PEA arrest on induction</strong>. If an airway is unavoidable, drain the pericardium first (or have the needle in and a surgeon scrubbed), keep her spontaneously breathing as long as possible, use a preload-sparing technique (e.g. ketamine), load volume, and have vasopressors and a pericardiocentesis kit ready before anyone sedates her.</p></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S5 — CONSULTANT ROUND -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s5">
+  <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round</h2></div>
+  <div class="section-content">
+    <p><em>The on-call consultant cardiologist, by phone at 14:50, then at the bedside:</em></p>
+
+    <h3>🗂️ Name the physiology precisely — it changes the plan</h3>
+    <div class="vs">
+      <div class="side a"><h4>🔴 Tamponade (this patient)</h4>
+        <ul><li>Intrapericardial pressure exceeds chamber filling pressures → <strong>diastolic chamber collapse</strong></li><li><strong>Pulsus paradoxus</strong>, raised JVP with prominent x-descent, plethoric IVC</li><li>Cause here: malignant effusion</li><li>Treatment: <strong>drain the fluid</strong> — pericardiocentesis or surgery</li></ul></div>
+      <div class="side b"><h4>🔵 Constrictive pericarditis</h4>
+        <ul><li>A rigid, scarred pericardium limits filling in late diastole</li><li><strong>Kussmaul sign</strong> (JVP rises with inspiration), <strong>pericardial knock</strong>, "square-root sign" on pressure tracing</li><li>Cause: TB, post-radiation, post-surgical, chronic</li><li>Treatment: <strong>pericardiectomy</strong>, not a needle</li></ul></div>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Tamponade is a heart drowning in fluid you can drain tonight. Constriction is a heart trapped in scar you must surgically peel. Pulsus paradoxus points to fluid; Kussmaul and a knock point to scar."</div>
+
+    <h3>🌬️ What IS pulsus paradoxus — and why does she have it?</h3>
+    <p>Pulsus paradoxus = a fall in systolic BP of <strong>&gt; 10 mmHg on inspiration</strong>. In tamponade the heart sits inside a <em>fixed</em>, fluid-filled volume, so the two ventricles compete for the same shrinking space — <strong>ventricular interdependence</strong>. On inspiration, negative intrathoracic pressure augments venous return to the right heart; the RV fills and, with nowhere to expand outward against the tense pericardium, <strong>bows the interventricular septum into the LV</strong>. The LV cavity shrinks, LV filling and stroke volume fall, and the systolic pressure drops audibly with each breath. Hers is 22 mmHg — large and ominous. (Note: severe asthma/COPD and massive PE can also produce a pulsus; the JVP and echo separate them.)</p>
+
+    <h3>🧭 Consultant's three commandments for the next hour</h3>
+    <ol>
+      <li>🪡 "Decompensating tamponade = <strong>drain it</strong>. Echo-guided pericardiocentesis if it's a free effusion; surgical drainage if it's loculated, posterior, clotted, or surgical in origin. The fluid IS the disease tonight."</li>
+      <li>💧 "Fill her while you set up — IV volume is a <strong>bridge</strong> that raises filling pressure above the pericardial pressure. But never confuse the bridge with the destination: volume alone won't save a tamponade."</li>
+      <li>🩸 "Then ask <strong>why</strong>: malignant, uremic, infective, or a surgical bleed (dissection, free-wall rupture). If it's <strong>dissection</strong>, drain only the minimum to perfuse and get her to theatre — fully decompressing a dissection re-pressurizes the false lumen and she exsanguinates."</li>
+    </ol>
+
+    <div class="callout danger"><b class="ct">☠️ The consultant's war memory (more in S13 M&amp;M)</b>"The last tamponade I saw mismanaged was a breathless cancer patient called 'pneumonia' by a tired night team. They induced her for intubation. The moment the positive-pressure breaths started and the preload vanished, she went into <strong>PEA arrest on the table</strong>. The echo, done in the code, showed a huge effusion and a collapsing right heart. The diagnosis was a probe's-width away; nobody looked because she 'just looked like a chest infection.' Never put a tamponade to sleep before you decompress it."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S6 — TEACHING POINTS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s6">
+  <div class="sec-header"><span class="s-badge">S6</span><h2>📖 Teaching Points</h2></div>
+  <div class="section-content">
+    <h3>🔬 The mechanism — WHY fluid in the sac strangles the heart (the WHY behind the WHY)</h3>
+    <ol>
+      <li>🧱 <strong>The container:</strong> the pericardium is a tough, fibrous, <strong>non-distensible</strong> sac. It normally holds a few millilitres of lubricating fluid at near-zero pressure.</li>
+      <li>📈 <strong>The pressure–volume curve:</strong> as fluid accumulates, pressure rises along a J-shaped curve — flat at first, then suddenly <strong>steep</strong>. Past the inflection point, tiny additional volumes cause large pressure jumps.</li>
+      <li>🤏 <strong>Diastolic compression:</strong> once intrapericardial pressure <strong>exceeds the chamber filling pressures</strong>, the thin-walled, low-pressure chambers — the RA in systole and the <strong>RV in diastole</strong> — collapse inward. They can no longer expand to fill.</li>
+      <li>⏱️ <strong>Why RATE beats VOLUME:</strong> a rapid 150 mL (e.g. a stab wound or rupture) tamponades because the sac has no time to stretch; a slow 1.5 L (e.g. this malignant effusion over weeks) may be tolerated because the pericardium gradually <strong>remodels and stretches</strong>. It is not how much fluid — it is how fast.</li>
+      <li>🌬️ <strong>Ventricular interdependence → pulsus paradoxus:</strong> trapped in a fixed total volume, the ventricles share space. On inspiration the RV fills and bows the septum into the LV → LV filling and systolic BP fall &gt; 10 mmHg.</li>
+      <li>💥 <strong>Why it kills:</strong> filling fails → stroke volume collapses → <strong>obstructive shock</strong>. Compensatory tachycardia and vasoconstriction buy only minutes; untreated it ends in PEA arrest.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"It's the RATE of filling, not the volume — 150 mL acutely tamponades, 1.5 L slowly may not. Drain the fluid and the heart re-expands the instant the pressure comes off."</div>
+
+    <h3>⚖️ Contrast pair #1 — Tamponade vs the other obstructive shocks (the lethal mimics)</h3>
+    <div class="vs">
+      <div class="side a"><h4>🫀 TAMPONADE is… (assume this)</h4><ul><li>Raised JVP, muffled heart sounds, <strong>pulsus paradoxus</strong></li><li>Effusion + <strong>diastolic RV collapse</strong> + plethoric IVC on echo</li><li>Low voltage / electrical alternans on ECG</li><li>Treatment: <strong>drain the pericardium</strong></li></ul></div>
+      <div class="side b"><h4>🚨 …but raised JVP + shock is also…</h4><ul><li><strong>Tension pneumothorax:</strong> raised JVP, tracheal deviation, absent breath sounds, hyper-resonance → <strong>needle/finger decompression</strong></li><li><strong>Massive PE:</strong> raised JVP, dilated RV, clear lungs, hypoxia → <strong>thrombolysis</strong></li><li><strong>RV infarction:</strong> raised JVP, clear lungs, inferior STEMI, ECG V4R → <strong>fluids + revascularize</strong></li></ul></div>
+    </div>
+    <p>😈 <strong>The trap:</strong> all four are obstructive shock with a <em>high</em> JVP and clear-ish lungs, and all four can be mislabelled as "respiratory distress" and intubated to death. The bedside echo (and a careful chest exam) separates them in seconds. <strong>A raised JVP with shock is never a reason to reach for a diuretic.</strong></p>
+
+    <h3>⚖️ Contrast pair #2 — Tamponade vs Constrictive pericarditis</h3>
+    <div class="vs">
+      <div class="side a"><h4>💧 Tamponade (tonight)</h4><ul><li>Fluid under pressure compresses in <strong>all of diastole</strong></li><li><strong>Pulsus paradoxus</strong>; prominent x-descent; diastolic chamber collapse</li><li>Acute / subacute; an emergency</li><li>Therapy: <strong>pericardiocentesis / surgical drainage</strong></li></ul></div>
+      <div class="side b"><h4>🧱 Constrictive pericarditis</h4><ul><li>Rigid scar limits filling in <strong>late diastole</strong> only</li><li><strong>Kussmaul sign</strong>, <strong>pericardial knock</strong>, "square-root" (dip-and-plateau) tracing</li><li>Chronic; post-TB, post-radiation, post-surgical</li><li>Therapy: <strong>pericardiectomy</strong></li></ul></div>
+    </div>
+    <p>💡 <em>Why it matters:</em> reach for a needle in pure constriction and you find no drainable fluid; the heart is trapped in scar, not water. Read the JVP waveform and the echo before you choose the tool.</p>
+
+    <!-- 🎮 INTERACTIVE SIM: intrapericardial pressure / filling -->
+    <div class="sim" id="kSim">
+      <h3 style="margin-top:0">🎮 Simulation — The Pericardial Pressure Dial: how rising intrapericardial pressure chokes filling</h3>
+      <p style="font-size:13.5px">Drag the dial up the pressure–volume curve. Watch how a non-compliant sac turns rising pericardial pressure into collapsing diastolic filling and falling output. Remember: it is the RATE that drives you up the curve, more than the volume.</p>
+      <label for="kRange">🫀 Intrapericardial pressure: <b id="kVal">3.1</b> mmHg</label>
+      <input type="range" id="kRange" min="20" max="75" value="31">
+      <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+      <div class="readout bad" id="kReadout">Set the dial to explore.</div>
+      <p style="font-size:12.5px; margin-top:10px; color:var(--ink2)">🎯 Normal intrapericardial pressure is near <strong>0–5 mmHg</strong>. As it climbs toward and past the chamber filling pressures (~10–15 mmHg), the RV collapses in diastole, filling fails and output falls. The window from "compensated" to "obstructive shock" is narrow — and a fast fill rate closes it in minutes.</p>
+    </div>
+
+    <!-- 📚 EBM MODULE -->
+    <div class="ebm">
+      <h3>📚 Evidence-Based Medicine Corner</h3>
+      <table class="tbl">
+        <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+        <tr><td><span class="lvl">COHORT</span> Mayo Clinic echo-guided pericardiocentesis series</td><td>In &gt;1000 echo-guided procedures, success rates ~97% with low major-complication rates — far safer than blind needle drainage.</td><td><strong>Echo-guided</strong> pericardiocentesis is the standard of care for a drainable effusion; image the needle path and avoid the blind subxiphoid stab where possible.</td></tr>
+        <tr><td><span class="lvl">PHYSIOLOGY</span> Tamponade hemodynamics &amp; volume loading</td><td>Intrapericardial and chamber pressures equalize; IV fluid transiently raises filling pressures above pericardial pressure and improves output — but the effect is small and short-lived, especially if already volume-replete.</td><td>Use fluid as a <strong>bridge</strong>, not a cure. The definitive fix is removing fluid; volume only buys minutes.</td></tr>
+        <tr><td><span class="lvl">PHYSIOLOGY</span> Hazard of positive-pressure ventilation</td><td>PPV raises intrathoracic pressure and reduces venous return; in tamponade this further drops preload and precipitates cardiovascular collapse / arrest on induction.</td><td><strong>Avoid intubation/PPV</strong> until the pericardium is decompressed; if unavoidable, keep spontaneous breathing, spare preload, and have the needle ready.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2015 ESC Pericardial Disease Guidelines</td><td>Define tamponade as a clinical-echocardiographic emergency; recommend a triage score for timing of drainage and urgent pericardiocentesis for hemodynamic compromise.</td><td>Echo confirms, severity guides timing; decompensating tamponade is drained urgently.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> Dissection / surgical effusions</td><td>Type A aortic dissection with tamponade: controlled drainage of only the minimum, emergency surgery; full pericardiocentesis can re-pressurize the false lumen and cause fatal re-bleeding.</td><td>If the cause is a <strong>surgical bleed</strong>, the operating theatre — not the needle — is the destination; drain only enough to perfuse.</td></tr>
+      </table>
+    </div>
+
+    <!-- 🔬 ADVANCED TOPICS -->
+    <div class="callout purple">
+      <h3 style="margin-top:0">🔬 Fellowship Corner — Advanced Topics</h3>
+      <ul>
+        <li>🫀 <strong>Echo signs in depth:</strong> RA systolic collapse (sensitive), <strong>RV diastolic collapse</strong> (specific), a plethoric non-collapsing IVC (sensitive), respirophasic mitral/tricuspid inflow variation (&gt;25% mitral, &gt;40% tricuspid), and septal "bounce" — the "swinging heart" in a large effusion.</li>
+        <li>🧪 <strong>Low-pressure tamponade:</strong> in hypovolemic or dialysis patients the classic high JVP may be blunted; tamponade physiology occurs at lower intrapericardial pressures — don't be reassured by a "normal" BP after volume depletion.</li>
+        <li>🩸 <strong>Effusive-constrictive pericarditis:</strong> tamponade features persist after drainage because a visceral constricting layer remains — may need pericardiectomy after the effusion is removed.</li>
+        <li>🪡 <strong>Drainage technique &amp; access:</strong> echo-guided apical or subxiphoid approach, micro-puncture, agitated-saline contrast to confirm needle position, leave a pigtail catheter for ongoing/recurrent (especially malignant) effusions; surgical pericardial window for loculated, posterior, clotted, or recurrent malignant effusions.</li>
+        <li>🎗️ <strong>Malignant effusions:</strong> high recurrence; send fluid for cytology; options include prolonged catheter drainage, pericardial window, intrapericardial sclerosing/chemotherapeutic agents, and balloon pericardiotomy.</li>
+        <li>🔪 <strong>Traumatic / surgical tamponade:</strong> penetrating chest trauma → FAST echo, resuscitative thoracotomy if peri-arrest; post-cardiac-surgery tamponade may be localized clot needing re-exploration rather than a needle.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S7 — ORDERS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s7">
+  <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+  <div class="section-content">
+    <h3>🖊️ The order set, written as you'd actually write it (14:46)</h3>
+    <ul>
+      <li>🚨 <strong>NO diuretics, NO vasodilators (nitrates/GTN), and AVOID intubation / positive-pressure ventilation</strong> until decompressed — flag on chart and whiteboard.</li>
+      <li>🫀 <strong>Urgent bedside echocardiogram</strong> to confirm effusion, RV diastolic collapse, RA systolic collapse, plethoric IVC, and respirophasic inflow variation.</li>
+      <li>💧 <strong>IV crystalloid bolus 250–500 mL</strong> as a temporizing bridge to augment filling; reassess BP and JVP. Repeat cautiously — it buys minutes, not a cure.</li>
+      <li>🪡 <strong>Echo-guided pericardiocentesis</strong> (or surgical drainage) arranged immediately; pigtail catheter left for ongoing drainage of a malignant effusion. Call cardiology/EP ± cardiac surgery.</li>
+      <li>🧍 <strong>Keep upright, awake and spontaneously breathing;</strong> high-flow O₂ to SpO₂ ≥ 94%; avoid sedation that drops preload.</li>
+      <li>💉 <strong>Vasopressor on standby</strong> (e.g. noradrenaline) to support perfusion until fluid is removed — a holding measure only.</li>
+      <li>🩸 Two large-bore IVs, bloods: CBC, U&amp;E (uremia?), coagulation, group &amp; save, troponin; if drained, send pericardial fluid for cytology, microbiology, TB, and biochemistry.</li>
+      <li>🖼️ CXR (globular "water-bottle" heart), 12-lead ECG (low voltage, electrical alternans); if dissection suspected → CT aorta and <strong>cardiac surgery</strong>, NOT a full drain.</li>
+      <li>📟 Continuous monitoring, arterial line for beat-to-beat BP and to quantify pulsus paradoxus; NPO in case of procedure/surgery.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In decompensating tamponade there are only two priorities: get the echo and get the needle. Fluids bridge, vasopressors hold, but only drainage cures — and never give a diuretic to a heart that's starving for filling."</div>
+
+    <!-- 🩺 PROCEDURE GUIDE 1 -->
+    <div class="checklist" id="ckCV">
+      <h3 style="margin-top:0">🩺 Procedure Guide — Echo-Guided Pericardiocentesis — tick as you go</h3>
+      <label class="ck"><input type="checkbox"><span>🧑‍⚕️ Confirm tamponade physiology on echo (effusion + diastolic RV collapse + plethoric IVC) and that it is a drainable free effusion (not a surgical dissection/rupture)</span></label>
+      <label class="ck"><input type="checkbox"><span>💧 Optimize preload — IV fluid bolus as a bridge; vasopressor ready; keep the patient upright and spontaneously breathing</span></label>
+      <label class="ck"><input type="checkbox"><span>🩻 Identify the largest, closest fluid pocket on echo (apical or subxiphoid), mark the path and depth; full asepsis, local anaesthetic</span></label>
+      <label class="ck"><input type="checkbox"><span>🪡 Advance the needle under echo guidance toward the pocket; aspirate fluid; confirm position with agitated-saline contrast in the pericardial space</span></label>
+      <label class="ck"><input type="checkbox"><span>🧵 Seldinger a pigtail catheter over the wire; remove fluid slowly; watch BP, JVP and pulsus paradoxus improve in real time</span></label>
+      <label class="ck"><input type="checkbox"><span>🧪 Send fluid for cytology, microbiology/TB, biochemistry and cell count; leave the catheter for recurrent (malignant) effusions</span></label>
+      <label class="ck"><input type="checkbox"><span>📈 Re-image post-drainage for residual fluid and to exclude effusive-constrictive physiology; watch for post-drainage RV dilation / pulmonary edema</span></label>
+      <div class="ck-progress" data-progress>0 / 7 complete</div>
+    </div>
+
+    <!-- 🩺 PROCEDURE GUIDE 2 -->
+    <div class="checklist" id="ckDefib">
+      <h3 style="margin-top:0">🩺 Procedure Guide — If she arrests: PEA from tamponade</h3>
+      <p style="font-size:13px">⚠️ Tamponade is a reversible cause of PEA arrest (one of the 4 T's). CPR is poor at perfusing a heart that can't fill — <strong>emergency pericardial drainage is the resuscitation</strong>.</p>
+      <label class="ck"><input type="checkbox"><span>🚫 Confirm cardiac arrest / PEA → call arrest, start high-quality CPR (100–120/min, depth 5–6 cm, full recoil)</span></label>
+      <label class="ck"><input type="checkbox"><span>🫀 Treat the reversible cause — <strong>tamponade is a "T"</strong>: emergency echo-guided or blind subxiphoid pericardiocentesis to decompress the heart</span></label>
+      <label class="ck"><input type="checkbox"><span>💉 Adrenaline 1 mg IV every 3–5 min per ALS; aggressive IV fluids to support filling</span></label>
+      <label class="ck"><input type="checkbox"><span>🔪 Surgical / penetrating cause or failed needle → resuscitative thoracotomy and direct pericardial decompression by the appropriate team</span></label>
+      <label class="ck"><input type="checkbox"><span>🔁 Rhythm/pulse check every 2 min; minimize hands-off time; rotate compressors</span></label>
+      <label class="ck"><input type="checkbox"><span>🫀 ROSC → definitive drainage, treat the underlying cause, ICU; if dissection, theatre not full drainage</span></label>
+      <div class="ck-progress" data-progress>0 / 6 complete</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S8 — NURSING CARE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s8">
+  <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+  <div class="section-content">
+    <h3>🛏️ CCU nursing priorities — minute by minute</h3>
+    <ul>
+      <li>📟 <strong>Continuous monitoring with the pericardiocentesis kit and echo machine at the bedside.</strong> Keep everything ready so drainage happens in minutes, not after a hunt for equipment.</li>
+      <li>🧍 <strong>Keep her sitting upright and awake.</strong> Upright posture and spontaneous breathing maximize venous return — never lie a tamponade flat or sedate it without senior cover.</li>
+      <li>🩸 <strong>BP every 2–5 min (arterial line once placed)</strong> and watch the pulsus paradoxus on the waveform. A widening pulsus or falling BP means escalate now, not at the next set of obs.</li>
+      <li>💧 <strong>Run the fluid bolus as prescribed</strong> as a bridge; have the <strong>vasopressor primed</strong>. Double-check that no diuretic or vasodilator has been charted in error.</li>
+      <li>🪡 <strong>Prepare the pericardiocentesis trolley:</strong> needle/pigtail kit, sterile drapes, local anaesthetic, agitated saline, drainage bag — assist with sterile technique during the procedure.</li>
+      <li>🧠 <strong>Neuro/consciousness checks</strong> — rising restlessness or drowsiness signals falling cerebral perfusion; a patient who slumps may be arresting → check the pulse.</li>
+      <li>📋 <strong>Document JVP, heart sounds, pulsus and BP before and after drainage</strong>, the volume removed and the time — the response to drainage is the bedside proof of tamponade.</li>
+      <li>🔇 <strong>Calm the room:</strong> a frightened, thrashing patient worsens oxygen demand. A composed bedside helps the failing circulation.</li>
+      <li>👨‍👩‍👦 Keep the family updated and supported (see S16) — assign a liaison if staffing allows; this is terrifying to watch and the cancer context makes it harder.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who keeps the tamponade upright, awake, filled and one trolley away from a needle is doing half the resuscitation in the room."</div>
+    <div class="callout warn"><b class="ct">📢 Escalate IMMEDIATELY for</b>Loss of pulse (→ PEA arrest pathway + emergency drainage) · falling BP or widening pulsus paradoxus despite fluids · rising JVP · any chart entry for a diuretic, nitrate or sedation · plan to intubate before drainage · post-drainage breathlessness (re-accumulation or pulmonary edema) · drowsiness/restlessness.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S9 — INVESTIGATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s9">
+  <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+  <div class="section-content">
+    <h3>🧾 Results board (14:55, drawn during resuscitation)</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>Result</th><th>Reference</th><th>Interpretation</th></tr>
+      <tr><td>Bedside echo</td><td class="hi">Large effusion, RV diastolic collapse</td><td>—</td><td>The diagnosis. Effusion + diastolic RV collapse + plethoric IVC + respirophasic inflow variation = tamponade. This finding, not the bloods, drives the needle.</td></tr>
+      <tr><td>Pulsus paradoxus</td><td class="hi">22 mmHg ↑</td><td>&lt; 10</td><td>Large inspiratory systolic drop from ventricular interdependence — strongly supports tamponade and marks severity.</td></tr>
+      <tr><td>Lactate</td><td class="hi">3.6 mmol/L ↑</td><td>&lt; 2.0</td><td>Tissue hypoperfusion from obstructive shock — she is not "stable enough to wait."</td></tr>
+      <tr><td>Creatinine</td><td class="hi">1.5 mg/dL ↑</td><td>0.7–1.2</td><td>Cardiorenal / hypoperfusion; also check for uremia as a cause of effusion.</td></tr>
+      <tr><td>Troponin I</td><td class="ok-v">0.03 ng/mL</td><td>&lt; 0.04</td><td>Not infarcting — makes post-MI free-wall rupture less likely; supports a malignant effusion.</td></tr>
+      <tr><td>D-dimer / CT chest</td><td class="ok-v">No PE; large effusion</td><td>—</td><td>Excludes massive PE as the obstructive-shock cause; confirms the effusion. (Echo remains the key test.)</td></tr>
+      <tr><td>Pericardial fluid (post-drain)</td><td class="hi">Hemorrhagic; cytology pending</td><td>—</td><td>Hemorrhagic malignant effusions are common in breast cancer; cytology guides oncology.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In tamponade the diagnosis lives on the echo screen, not in the blood tubes. The bloods tell you the cause and the damage; the probe tells you to pick up the needle."</div>
+
+    <div class="callout info"><b class="ct">🧠 Why the bloods don't make the diagnosis — the echo does</b>Tamponade is a clinical-echocardiographic diagnosis. Bloods refine the cause (uremia, infection, malignancy on cytology) and quantify end-organ harm (lactate, creatinine), but a hypotensive patient with raised JVP, muffled sounds and a pulsus paradoxus gets a <strong>bedside echo immediately</strong> — and if it shows an effusion with chamber collapse, you drain. Don't wait for a formal study or a "complete" blood panel.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S10 — ECG / IMAGING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s10">
+  <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging</h2></div>
+  <div class="section-content">
+    <h3>🫀 The presenting ECG — read it like a detective</h3>
+    <div class="ecg-fig">
+      <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Low-voltage ECG with electrical alternans">
+        <rect width="820" height="150" fill="#0b1220"/>
+        <g stroke="#1e3a5f" stroke-width="1">
+          <line x1="0" y1="30" x2="820" y2="30"/><line x1="0" y1="60" x2="820" y2="60"/>
+          <line x1="0" y1="90" x2="820" y2="90"/><line x1="0" y1="120" x2="820" y2="120"/>
+        </g>
+        <polyline fill="none" stroke="#86efac" stroke-width="2.4" points="0,75 60,75 72,60 80,98 92,75 200,75 212,68 220,86 232,75 340,75 352,58 360,100 372,75 480,75 492,68 500,86 512,75 620,75 632,58 640,100 652,75 760,75 772,68 780,86 792,75 820,75"/>
+        <text x="330" y="22" fill="#fca5a5" font-size="12" font-weight="700">↕ tall QRS</text>
+        <text x="180" y="22" fill="#fcd34d" font-size="12" font-weight="700">↕ short QRS (alternans)</text>
+      </svg>
+      <div class="ecg-cap">Low overall QRS voltage with <span style="color:#fcd34d">beat-to-beat alternation</span> of QRS amplitude — <strong>electrical alternans</strong>. The heart is swinging back and forth within a large effusion, changing its electrical axis with every beat. Low voltage + alternans + sinus tachycardia is the ECG signature of a big pericardial effusion.</div>
+    </div>
+
+    <h3>🔎 The tamponade imaging toolkit (memorize the high-yield ones)</h3>
+    <table class="tbl">
+      <tr><th>Finding</th><th>Why it means tamponade</th></tr>
+      <tr><td>🫀 <strong>RV diastolic collapse (echo)</strong></td><td>The most specific echo sign — when intrapericardial pressure exceeds RV diastolic pressure, the thin RV free wall buckles inward in diastole. Drainable, treatable.</td></tr>
+      <tr><td>🫧 <strong>RA systolic collapse (echo)</strong></td><td>The most sensitive early sign — the low-pressure right atrium inverts in systole as pericardial pressure rises.</td></tr>
+      <tr><td>💧 <strong>Plethoric, non-collapsing IVC</strong></td><td>High right-sided filling pressures back up into a dilated IVC that fails to collapse with inspiration — a marker of raised central venous pressure.</td></tr>
+      <tr><td>🔁 <strong>Respirophasic inflow variation</strong></td><td>The echo correlate of pulsus paradoxus: mitral inflow falls &gt;25% and tricuspid inflow rises on inspiration — ventricular interdependence made visible.</td></tr>
+      <tr><td>📐 <strong>Low QRS voltage</strong></td><td>Fluid insulates and attenuates the electrical signal reaching the chest leads.</td></tr>
+      <tr><td>↕️ <strong>Electrical alternans</strong></td><td>The heart swings within the effusion, shifting its axis each beat → alternating QRS amplitude. Near-specific for a large effusion.</td></tr>
+      <tr><td>🖼️ <strong>Globular "water-bottle" heart (CXR)</strong></td><td>An enlarged, flask-shaped cardiac silhouette suggests a large effusion (≥ ~200 mL) — supportive, not diagnostic.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Low voltage and electrical alternans on the ECG, a water-bottle heart on the film, and a collapsing right ventricle on the echo — three views of one diagnosis. The echo gives the order to drain."</div>
+
+    <h3>🫀 Post-drainage echo &amp; imaging</h3>
+    <ul>
+      <li>📈 <strong>Post-drainage echo:</strong> resolution of RV diastolic collapse, IVC now collapsing, normalized inflow variation, and an immediate rise in BP — the bedside proof the diagnosis and the treatment were correct.</li>
+      <li>🩻 <strong>Residual fluid / effusive-constrictive check:</strong> persisting tamponade physiology after drainage suggests a constricting visceral layer — flag for surgical review.</li>
+      <li>🧲 <strong>CT / staging (later):</strong> characterize the malignant burden, exclude dissection if any doubt, and plan a pericardial window if the effusion recurs.</li>
+    </ul>
+
+    <div class="callout warn"><b class="ct">⚠️ The imaging's favorite lie in the breathless cancer patient</b>"The chest film looks like fluid overload / a big heart — give a diuretic." A globular heart from an effusion is not failure; diuresing it strips the preload the tamponade is starving for. <strong>The only thing that "fits" a raised JVP, muffled sounds and a pulsus is an echo of the pericardium — get the probe before the frusemide.</strong></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S11 — MEDICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s11">
+  <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+  <div class="section-content">
+    <h3>💉 Acute drugs — what, why, and the traps</h3>
+    <table class="tbl">
+      <tr><th>Drug</th><th>Role tonight</th><th>Mechanism / caution</th></tr>
+      <tr><td><strong>IV crystalloid bolus (250–500 mL)</strong></td><td>Temporizing <strong>bridge</strong> to raise filling pressure above intrapericardial pressure</td><td>Augments preload and output briefly. Effect is small and short-lived if already volume-replete — never a substitute for drainage. Reassess after each bolus.</td></tr>
+      <tr><td><strong>Noradrenaline / vasopressor</strong></td><td>Holds perfusion pressure while you set up the drain</td><td>Maintains afterload and coronary perfusion; a holding measure only. Does not relieve the obstruction — the fluid still has to come out.</td></tr>
+      <tr><td><strong>Inotrope (e.g. dobutamine)</strong></td><td>Occasionally to support a failing RV as a bridge</td><td>Limited benefit because the problem is mechanical (impaired filling), not contractility. Drainage is the fix.</td></tr>
+      <tr><td><strong>Oxygen</strong></td><td>Treats hypoxia from low output</td><td>High-flow to SpO₂ ≥ 94%; keep her spontaneously breathing — avoid the slide to intubation.</td></tr>
+      <tr><td class="hi"><strong>❌ Diuretics (furosemide)</strong></td><td>CONTRAINDICATED</td><td>Empties an already underfilled heart — drops the only preload it has, worsening the obstruction. Never give in tamponade.</td></tr>
+      <tr><td class="hi"><strong>❌ Vasodilators (nitrates/GTN)</strong></td><td>CONTRAINDICATED</td><td>Reduce venous return and afterload — collapse a preload-dependent circulation. Avoid.</td></tr>
+      <tr><td class="hi"><strong>⚠️ Sedation / induction agents</strong></td><td>Hazardous before drainage</td><td>Vasodilate and drop preload; combined with positive-pressure ventilation they precipitate PEA arrest. If unavoidable, use preload-sparing agents (ketamine) with the needle ready.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Never give diuretics or vasodilators in tamponade — you'll drain the only filling it has left. The only thing that should leave this patient is the fluid in the pericardial sac, through a needle."</div>
+
+    <div class="callout danger"><b class="ct">🚫 The 'never' list in suspected tamponade</b>❌ Diuretics · ❌ Vasodilators (nitrates) · ❌ Elective intubation / positive-pressure ventilation before drainage · ❌ Lying the patient flat · ❌ Full drainage of a dissection-related or post-rupture effusion (re-pressurizes the bleed → exsanguination). When the circulation is preload-dependent, the safest "drug" is <strong>volume as a bridge and a needle in the sac</strong>.</div>
+
+    <h3>🏠 Cause-directed therapy (this admission, not just tonight)</h3>
+    <ul>
+      <li>🎗️ <strong>Malignant effusion:</strong> oncology referral, prolonged catheter drainage, pericardial window or sclerosis for recurrence; systemic anti-cancer therapy.</li>
+      <li>🧪 <strong>Uremic effusion:</strong> intensify dialysis.</li>
+      <li>🦠 <strong>Infective / purulent or TB pericarditis:</strong> antimicrobials/anti-TB therapy + drainage; colchicine ± NSAIDs for viral/idiopathic pericarditis.</li>
+      <li>🩸 <strong>Surgical causes (dissection, free-wall rupture, post-op clot):</strong> emergency cardiac surgery — the operating theatre, not the medicine cabinet.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S12 — MONITORING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s12">
+  <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+  <div class="section-content">
+    <h3>📡 What to watch and why</h3>
+    <ul>
+      <li>📈 <strong>Continuous telemetry and SpO₂</strong> with the pericardiocentesis kit at the bedside until drained and stable; watch the rhythm during needle insertion (ventricular ectopy = needle on myocardium).</li>
+      <li>🩸 <strong>Invasive arterial line</strong> for beat-to-beat BP and to <strong>quantify pulsus paradoxus</strong> — a narrowing pulsus after drainage is the proof it worked; a widening one is a warning.</li>
+      <li>🫧 <strong>JVP / CVP trend</strong> — falling central venous pressure after drainage confirms relief; a persistently high CVP suggests residual fluid or effusive-constrictive physiology.</li>
+      <li>🫀 <strong>Serial bedside echo</strong> — track resolution of chamber collapse, IVC plethora and inflow variation, and detect re-accumulation early (especially malignant effusions).</li>
+      <li>🪡 <strong>Pigtail catheter output</strong> — volume, character (serous vs hemorrhagic), and rate; a sudden brisk bloody output suggests cardiac perforation.</li>
+      <li>🫁 <strong>Post-drainage watch</strong> — for the rare <strong>pericardial decompression syndrome</strong> (acute RV/LV dilation and pulmonary edema after rapid removal of a large effusion) → drain slowly and reassess.</li>
+      <li>🧠 <strong>Conscious level and perfusion</strong> — restoration of clear mentation and warm peripheries is the clinical endpoint.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After you drain a tamponade, the monitor's job changes from 'is the heart being crushed?' to 'is it filling again, and is it re-accumulating?' — and the two numbers that answer it are the pulsus paradoxus and the CVP."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S13 — COMPLICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s13">
+  <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+  <div class="section-content">
+    <h3>💀 What can go wrong — and the mechanism</h3>
+    <ul>
+      <li>⚡ <strong>PEA cardiac arrest</strong> — untreated obstructive shock ends in pulseless electrical activity; CPR perfuses poorly because the heart can't fill. Emergency drainage IS the resuscitation.</li>
+      <li>💉 <strong>Arrest on induction</strong> — sedation + positive-pressure ventilation strip preload from a preload-dependent circulation → collapse. The single most preventable disaster.</li>
+      <li>🪡 <strong>Procedural injury</strong> — cardiac chamber or coronary laceration, pneumothorax, arrhythmia, or a dry/loculated tap; echo guidance minimizes these.</li>
+      <li>🫁 <strong>Pericardial decompression syndrome</strong> — rapid removal of a large effusion can cause transient ventricular dilation and pulmonary edema; drain slowly.</li>
+      <li>🔁 <strong>Re-accumulation</strong> — malignant and uremic effusions recur; needs a pigtail catheter, pericardial window, or definitive cause treatment.</li>
+      <li>🩸 <strong>Exsanguination in dissection</strong> — fully draining a dissection-related effusion re-pressurizes the false lumen and the patient bleeds out; drain only the minimum and operate.</li>
+    </ul>
+
+    <!-- 🎭 M&M CONFERENCE MODULE -->
+    <div class="mm">
+      <h3>🎭 Morbidity &amp; Mortality Conference — "The Tamponade That Was Put to Sleep"</h3>
+      <div class="mm-case">
+        <strong>The case:</strong> A 64-year-old woman with lung cancer arrived to a busy ED at 03:00 breathless, hypotensive (BP 90/72) with bulging neck veins. The tired night team called it "respiratory failure — probably a chest infection" and, with falling sats, <strong>induced and intubated her</strong>. The instant positive-pressure ventilation began, her preload vanished, the pressure collapsed and she went into <strong>PEA arrest on induction</strong>. The echo, finally done during the code, showed a huge pericardial effusion with a collapsing right heart. A second, separate M&amp;M that quarter: a patient with a type A aortic dissection and tamponade whose effusion was <strong>fully drained</strong> by a well-meaning team — the false lumen re-pressurized and she exsanguinated before theatre.
+      </div>
+      <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+      <div class="swiss">
+        <div class="hole"><b>🧠 ANCHORING</b>"She's breathless, it's the lungs" — clear lungs + raised JVP + shock is obstructive, not pulmonary.</div>
+        <div class="hole"><b>🫀 NO ECHO</b>A ninety-second bedside echo would have shown the effusion before anyone induced.</div>
+        <div class="hole"><b>💨 PPV IGNORED</b>Positive-pressure ventilation strips preload from a preload-dependent heart → arrest.</div>
+        <div class="hole"><b>🩸 OVER-DRAINED</b>Fully draining a dissection effusion re-pressurized the bleed → exsanguination.</div>
+        <div class="hole"><b>🌙 SYSTEM</b>Night fatigue, no senior review, no "echo-before-intubation" default.</div>
+      </div>
+      <p style="margin-bottom:0"><strong>🛡️ What would have saved them:</strong> apply the universal rule — <em>raised JVP + muffled sounds + hypotension + pulsus paradoxus = tamponade, get the echo and the needle</em>; never intubate a suspected tamponade before decompressing it; load volume and use preload-sparing technique if an airway is truly unavoidable; and in dissection/rupture, drain only the minimum and rush to theatre. <strong>This is exactly why your nurse held the furosemide and worried about putting her to sleep tonight.</strong></p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Just a chest infection, let's tube her' is the sentence written on the chart of patients who then arrest from an undrained tamponade. Breathlessness with a raised JVP is a heart problem until the echo says otherwise."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S14 — DIFFERENTIALS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s14">
+  <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials</h2></div>
+  <div class="section-content">
+    <h3>🧩 The "raised JVP + shock" (obstructive shock) differential</h3>
+    <table class="tbl">
+      <tr><th>Diagnosis</th><th>Clues</th><th>Why it matters</th></tr>
+      <tr><td>🫀 <strong>Cardiac tamponade</strong> (this patient)</td><td>Beck's triad, pulsus paradoxus, low voltage/alternans, effusion with diastolic RV collapse, plethoric IVC</td><td>Default assumption in a hypotensive patient with raised JVP + muffled sounds + effusion. Treatment: <strong>drain it</strong>.</td></tr>
+      <tr><td>🫁 <strong>Tension pneumothorax</strong></td><td>Raised JVP, tracheal deviation away, absent breath sounds + hyper-resonance one side, after trauma/ventilation</td><td>Immediate <strong>needle/finger decompression</strong> — don't wait for a film.</td></tr>
+      <tr><td>🩸 <strong>Massive pulmonary embolism</strong></td><td>Raised JVP, dilated RV, clear lungs, hypoxia, S1Q3T3, risk factors</td><td>Obstructive shock from RV failure → consider <strong>thrombolysis</strong>; echo shows RV strain, not an effusion.</td></tr>
+      <tr><td>💔 <strong>RV infarction</strong></td><td>Raised JVP, clear lungs, hypotension, inferior STEMI, ST elevation in V4R</td><td><strong>Preload-dependent</strong> — give fluids, avoid nitrates, revascularize. Mimics tamponade's high JVP + clear lungs.</td></tr>
+      <tr><td>🧱 <strong>Constrictive pericarditis</strong></td><td>Kussmaul sign, pericardial knock, square-root sign, prior TB/radiation/surgery</td><td>Chronic; needs <strong>pericardiectomy</strong>, not a needle. No drainable fluid.</td></tr>
+      <tr><td>💧 <strong>Effusion WITHOUT tamponade</strong></td><td>Effusion on echo but no chamber collapse, normal BP, no pulsus paradoxus</td><td>Treat the cause and monitor; drainage can be semi-elective. Don't needle a non-tamponading effusion reflexively.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Raised JVP with shock and clear-ish lungs has four killers — tamponade, tension pneumothorax, massive PE and RV infarct. The bedside echo and a chest exam tell them apart in seconds; intubating blindly kills all four."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S15 — PLAN -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s15">
+  <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan</h2></div>
+  <div class="section-content">
+    <h3>🧭 Tonight → this week → for life</h3>
+    <ol>
+      <li>🪡 <strong>Tonight (done):</strong> bedside echo confirmed tamponade; IV fluid bridge; echo-guided pericardiocentesis → ~600 mL hemorrhagic fluid removed; pigtail left in situ; BP and JVP normalize; CCU admission.</li>
+      <li>🎗️ <strong>Identify &amp; treat the cause:</strong> pericardial fluid cytology and microbiology; oncology review for the malignant effusion; rule out uremia/infection; exclude dissection if any doubt.</li>
+      <li>🔁 <strong>Prevent re-accumulation:</strong> keep the pigtail draining until output falls; plan a <strong>pericardial window</strong> or sclerosis if it recurs (common in malignancy).</li>
+      <li>🫀 <strong>Surveillance echo</strong> before catheter removal and after, to detect re-accumulation or effusive-constrictive physiology early.</li>
+      <li>💙 <strong>Optimize the patient as a whole:</strong> anti-cancer therapy plan with oncology, nutrition, symptom control, and a frank discussion of goals of care given metastatic disease.</li>
+      <li>👨‍👩‍👦 <strong>Shared decision-making &amp; education</strong> — what tamponade was, why drainage worked, what symptoms mean re-accumulation, and a clear "come back immediately for breathlessness/dizziness" safety net.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Pericardiocentesis treats tonight's emergency; the window, the oncology plan and the surveillance echo treat the disease. Send her out with all three planned, or she comes back tamponaded."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S16 — PROGRESS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s16">
+  <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+  <div class="section-content">
+    <h3>📅 Course in CCU</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Day 1, 15:05</div>Echo-guided pericardiocentesis: ~600 mL hemorrhagic fluid removed. BP rises from 82/64 to 116/72 within minutes; pulsus paradoxus falls from 22 to 6 mmHg. Pigtail left in.</div>
+      <div class="t-item"><div class="t-time">Day 1, 18:00</div>Comfortable, lying flat for the first time in days, neck veins down, heart sounds audible. Catheter draining ~50 mL/h, settling.</div>
+      <div class="t-item"><div class="t-time">Day 2</div>Pericardial fluid cytology positive for malignant cells (breast primary). Oncology involved. No re-accumulation; IVC now collapsing on echo.</div>
+      <div class="t-item"><div class="t-time">Day 3</div>Pigtail output &lt; 30 mL/24 h; surveillance echo shows minimal residual fluid, no constrictive physiology. Catheter removed.</div>
+      <div class="t-item"><div class="t-time">Day 5</div>Surgical pericardial window discussed with oncology/cardiothoracics given high malignant recurrence risk; deferred in favour of close surveillance per her goals of care.</div>
+      <div class="t-item"><div class="t-time">Day 6</div>Hemodynamically stable, breathing easily, mobilizing. Plan agreed with patient and family. Ready for discharge with oncology follow-up.</div>
+    </div>
+
+    <!-- 👨‍👩‍👦 FAMILY & PATIENT JOURNEY MODULE -->
+    <h3>👨‍👩‍👦 Family &amp; Patient Journey</h3>
+    <div class="journey">
+      <div class="j-card"><div class="j-who">👩 The patient — Mrs. P.L.</div><p>"I genuinely thought I was suffocating. They said my heart was being squeezed by fluid, not my lungs failing. The moment they drained it I could breathe and lie down for the first time in a week. I'm frightened of what the cancer means, but tonight someone looked at the right thing."</p></div>
+      <div class="j-card"><div class="j-who">👨 Her husband</div><p>"They wouldn't let them put her to sleep — the doctor said that could have killed her before they fixed it. A nurse kept telling me what every number meant. When the pressure jumped up after the drain, I finally exhaled."</p></div>
+      <div class="j-card"><div class="j-who">👩‍⚕️ The bedside nurse</div><p>"My job was the echo machine, the pericardiocentesis trolley and the truth. And holding that furosemide and worrying out loud about intubating her. Sometimes good care is the drug you <em>don't</em> give and the tube you <em>don't</em> place."</p></div>
+      <div class="j-card"><div class="j-who">🎓 The team's reflection</div><p>"This wasn't a clever diagnosis — it was a disciplined one. Raised JVP, muffled sounds, hypotension and a pulsus paradoxus; we got the echo and the needle, and the physiology did the rest."</p></div>
+    </div>
+
+    <div class="callout pink"><b class="ct">💗 The human thread</b>A drained tamponade is a dramatic, life-saving rescue — but in metastatic disease it is also a marker of where the illness has reached. Honest conversation about recurrence, goals of care and what a future breathless episode might mean is as much treatment as the needle. Saving the night is not the same as curing the disease.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S17 — DISCHARGE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s17">
+  <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+  <div class="section-content">
+    <h3>📋 Discharge plan &amp; safety net</h3>
+    <ul>
+      <li>💊 <strong>Medications:</strong> continue oncology-directed therapy; <strong>no diuretics added for the effusion</strong>; clear written schedule. Symptom-control plan agreed with palliative/oncology teams.</li>
+      <li>🪡 <strong>Drain removed, wound care</strong> instructions; signs of catheter-site infection to watch for; documentation of fluid removed and cytology result for oncology.</li>
+      <li>🫀 <strong>Surveillance plan:</strong> follow-up echo to detect re-accumulation; agreed threshold for repeat drainage or a pericardial window; cardiology and oncology appointments booked before discharge.</li>
+      <li>🩺 <strong>Cause addressed:</strong> malignant effusion managed with oncology; uremia/infection excluded; dissection ruled out — documented clearly so any future team knows the substrate.</li>
+      <li>🚩 <strong>Red flags → return immediately / call emergency services:</strong> recurrent breathlessness (especially worse lying flat), dizziness or fainting, swelling of the neck veins, palpitations, or chest fullness — these may signal re-accumulating tamponade.</li>
+      <li>📚 <strong>Education:</strong> what tamponade is in plain language, why fluid was the problem (not the lungs), why drainage worked, and the importance of fast re-presentation if symptoms return given the recurrence risk.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Discharge after tamponade is not 'fluid drained, go home' — it is a surveillance echo, an oncology plan, a clear recurrence safety net, and a family who knows that breathlessness lying flat means come straight back."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S18 — CLINICAL PEARLS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s18">
+  <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+  <div class="section-content">
+    <div class="pearl-grid">
+      <div class="pearl"><b>🩸 Beck's triad</b>Hypotension + raised JVP + muffled heart sounds. Add pulsus paradoxus and it's tamponade until proven otherwise — get the echo and the needle.</div>
+      <div class="pearl"><b>🌬️ Pulsus paradoxus</b>A &gt;10 mmHg inspiratory systolic drop from ventricular interdependence across a fixed pericardial volume. The bigger it is, the sicker the heart.</div>
+      <div class="pearl"><b>⏱️ Rate &gt; volume</b>150 mL acutely tamponades; 1.5 L slowly may not. It's how fast the fluid arrives, because a chronic pericardium stretches.</div>
+      <div class="pearl"><b>🫀 RV diastolic collapse</b>The key specific echo sign. RA systolic collapse is the earliest/most sensitive; a plethoric IVC confirms high filling pressure.</div>
+      <div class="pearl"><b>🪡 Drainage cures</b>Echo-guided pericardiocentesis (or surgery) is definitive. Removing the fluid re-expands the heart instantly. Drugs don't fix mechanics.</div>
+      <div class="pearl"><b>💨 PPV can kill</b>Positive-pressure ventilation and induction strip preload from a preload-dependent heart → arrest on induction. Decompress before you intubate.</div>
+      <div class="pearl"><b>💧 Fluids are a bridge</b>IV volume raises filling pressure above pericardial pressure for minutes. It buys time to drain — it is never the treatment.</div>
+      <div class="pearl"><b>🚫 No diuretics / nitrates</b>They empty an already underfilled heart. Never offload a tamponade.</div>
+      <div class="pearl"><b>📉 Low voltage + alternans</b>The ECG signature of a big effusion — fluid insulates the signal and the heart swings within it.</div>
+      <div class="pearl"><b>🩸 Dissection = drain the minimum</b>Fully draining a dissection or rupture re-pressurizes the bleed → exsanguination. Drain just enough, then theatre.</div>
+      <div class="pearl"><b>🧱 Tamponade vs constriction</b>Pulsus paradoxus + diastolic collapse = tamponade (needle). Kussmaul + knock + square-root sign = constriction (surgery).</div>
+      <div class="pearl"><b>🔁 It recurs</b>Malignant and uremic effusions come back — pigtail catheter, pericardial window, and treat the cause.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S19 — MCQs / ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s19">
+  <div class="sec-header"><span class="s-badge">S19</span><h2>🧠 MCQs / Assessment</h2></div>
+  <div class="section-content">
+    <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP and feed your dashboard. Each shows a full explanation.</em></p>
+    <div id="mcqHost"></div>
+    <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · Case c-tamp-025 — Cardiac Tamponade<br>
+  ⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."
+</div>
+
+</div><!-- /#caseScroll -->
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ XP / DASHBOARD CORE ============ */
+  var XP = 0, XP_MAX = 1200;
+  var awarded = {}; // dedupe one-time awards by key
+  var xpVal = document.getElementById('xpVal');
+  var xpFill = document.getElementById('xpFill');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+  }
+  function addXP(amount, key, label){
+    if(key){ if(awarded[key]) return; awarded[key] = true; }
+    XP += amount;
+    if(XP > XP_MAX) XP = XP_MAX;
+    xpVal.textContent = XP;
+    xpFill.style.width = Math.min(100, Math.round(XP / XP_MAX * 100)) + '%';
+    showToast('+' + amount + ' XP' + (label ? ' · ' + label : ''));
+  }
+  function earnBadge(id){
+    var b = document.getElementById(id);
+    if(b && !b.classList.contains('earned')){ b.classList.add('earned'); }
+  }
+
+  /* Dashboard minimize */
+  var dash = document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){
+    dash.classList.toggle('collapsed');
+    this.textContent = dash.classList.contains('collapsed') ? '+' : '–';
+  });
+
+  /* ============ INTERNAL SCROLL SIZING ============ */
+  /* Size the scroll box to the visible window so the sticky tab bar stays in
+     view. When embedded (srcDoc iframe, same-origin), the host page stretches
+     the iframe to full content height and scrolls the OUTER page — so we size
+     this box from the parent window's height minus whatever app chrome sits
+     above the iframe, and scroll internally instead. Standalone → 100vh. */
+  var caseScroll = document.getElementById('caseScroll');
+  var topnav = document.getElementById('topnav');
+  /* The tab bar is position:fixed, so it's out of flow — reserve space at the
+     top of the scroll content (and offset anchor jumps) by its real height. */
+  function setNavOffset(){
+    var navH = topnav ? topnav.offsetHeight : 70;
+    caseScroll.style.paddingTop = navH + 'px';
+    caseScroll.style.scrollPaddingTop = (navH + 14) + 'px';
+  }
+  function sizeScroller(){
+    try {
+      var p = window.parent;
+      if(p && p !== window && window.frameElement){
+        var rectTop = window.frameElement.getBoundingClientRect().top;
+        if(rectTop < 0) rectTop = 0;          // parent scrolled past the chrome
+        var ph = p.innerHeight || 800;
+        var h = ph - rectTop - 6;             // leave the bottom edge breathing room
+        if(h < 460) h = 460;                  // sane minimum on short windows
+        caseScroll.style.height = h + 'px';
+      } else {
+        caseScroll.style.height = '100vh';
+      }
+    } catch(e){ caseScroll.style.height = '100vh'; }
+    setNavOffset();
+  }
+  sizeScroller();
+  window.addEventListener('resize', sizeScroller);
+  window.addEventListener('load', sizeScroller);
+  try { if(window.parent && window.parent !== window) window.parent.addEventListener('resize', sizeScroller); } catch(e){}
+
+  /* ============ NAV: scroll-spy active + visited ============ */
+  var navchips = Array.prototype.slice.call(document.querySelectorAll('.navchip'));
+  var sections = navchips.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited = {};
+  var visitVal = document.getElementById('visitVal');
+
+  function markVisited(idx){
+    var sec = sections[idx];
+    if(!sec) return;
+    if(!visited[sec.id]){
+      visited[sec.id] = true;
+      navchips[idx].classList.add('visited');
+      var count = Object.keys(visited).length;
+      visitVal.textContent = count + ' / 19';
+      addXP(8, 'visit-' + sec.id, 'Section read');
+      if(count >= 19){ earnBadge('bdg-explorer'); addXP(60, 'allvisited', 'Ward Explorer!'); }
+    }
+  }
+  function setActive(idx){
+    navchips.forEach(function(c){ c.classList.remove('active'); });
+    if(navchips[idx]) navchips[idx].classList.add('active');
+  }
+
+  /* True tabs: each chip shows ONLY its section, hidden via CSS otherwise.
+     No scrollIntoView and no scroll-spy — nothing can scroll the tab bar away,
+     which also sidesteps every srcDoc-iframe scrolling quirk. The hero banner
+     and vitals strip belong to the case intro, so they show on S1 only. */
+  var heroBits = [document.querySelector('.hero'), document.querySelector('.vitals-strip')]
+    .filter(function(el){ return !!el; });
+
+  function showSection(idx){
+    sections.forEach(function(s, i){ if(s) s.classList.toggle('sec-active', i === idx); });
+    heroBits.forEach(function(el){ el.style.display = (idx === 0) ? '' : 'none'; });
+    caseScroll.scrollTop = 0;
+    setActive(idx);
+    markVisited(idx);
+  }
+
+  navchips.forEach(function(chip, idx){
+    chip.addEventListener('click', function(ev){
+      ev.preventDefault();
+      showSection(idx);
+    });
+  });
+  showSection(0);
+
+  /* ============ FLAG GAME (S2) ============ */
+  var flagBtns = document.querySelectorAll('#flagGame .flag-btn');
+  var flagResult = document.getElementById('flagResult');
+  var flagsFound = 0, flagsTotal = 0, flagWrong = 0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good') === '1') flagsTotal++; });
+  flagBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.dataset.locked) return;
+      btn.dataset.locked = '1';
+      var good = btn.getAttribute('data-good') === '1';
+      if(good){
+        btn.classList.add('flag-good');
+        flagsFound++;
+        addXP(10, 'flag-' + flagsFound + '-' + Math.random(), 'Tamponade flag spotted');
+      } else {
+        btn.classList.add('flag-bad');
+        flagWrong++;
+        showToast('❌ Not a tamponade-specific flag');
+      }
+      if(flagsFound === flagsTotal){
+        flagResult.textContent = '✅ All ' + flagsTotal + ' tamponade red flags found' + (flagWrong ? ' (with ' + flagWrong + ' wrong pick' + (flagWrong>1?'s':'') + ')' : ' — flawless!');
+        earnBadge('bdg-vt');
+        addXP(30, 'flags-complete', 'Tamponade-Spotter badge');
+      } else {
+        flagResult.textContent = flagsFound + ' / ' + flagsTotal + ' tamponade red flags found…';
+      }
+    });
+  });
+
+  /* ============ BRANCHING SCENARIO (S3) ============ */
+  var scText = document.getElementById('scText');
+  var scChoices = document.getElementById('scChoices');
+  var scFeedback = document.getElementById('scFeedback');
+  var scRestart = document.getElementById('scRestart');
+  var scStab = document.getElementById('scStab');
+  var scTime = document.getElementById('scTime');
+  var scXP = document.getElementById('scXP');
+  var pathXP = 0, scStability = 2, scElapsed = 0;
+
+  var STEPS = {
+    start: {
+      text: "The covering doctor on the phone wants her intubated 'for respiratory distress' and a dose of furosemide. BP 82/64 with a 22 mmHg pulsus, neck veins bulging, heart sounds muffled. The echo machine is at the bedside. What do you do FIRST?",
+      choices: [
+        { t: "🫀 Put the probe on her chest — get a bedside echo before anyone sedates her", good:true, ds:1, dt:8, xp:40, fb:"✅ Exactly. Ninety seconds of echo confirms a large effusion with RV diastolic collapse — tamponade. You've stopped the lethal intubation and pointed everyone at the needle.", next:"fluids" },
+        { t: "💉 Induce and intubate her for respiratory distress as advised", good:false, ds:-2, dt:20, xp:0, fb:"☠️ Catastrophe. Sedation + positive-pressure ventilation strip preload from a preload-dependent heart → PEA arrest on induction. This is the M&M case in S13. Restart and choose again.", end:true },
+        { t: "💧 Give IV furosemide to 'offload' the breathlessness", good:false, ds:-1, dt:15, xp:0, fb:"☠️ Wrong and dangerous. A diuretic empties an already underfilled heart — you drain the only preload it has left. Never diurese a tamponade.", next:"start2" }
+      ]
+    },
+    start2: {
+      text: "Furosemide did nothing good (as feared) and her pressure dips to 76/60. The echo machine is right there. Now what?",
+      choices: [
+        { t: "🫀 Bedside echo now to confirm tamponade physiology", good:true, ds:1, dt:8, xp:30, fb:"✅ Finally — the right call. Lesson banked: in shock + raised JVP + muffled sounds, get the echo before anything else.", next:"fluids" },
+        { t: "💊 Start a nitrate infusion for 'heart strain'", good:false, ds:-1, dt:20, xp:0, fb:"⚠️ Vasodilators reduce venous return and collapse a preload-dependent circulation. Wrong drug entirely — she needs the fluid out, not her veins opened.", next:"fluids" }
+      ]
+    },
+    fluids: {
+      text: "Echo confirms a large effusion with RV diastolic collapse and a plethoric IVC — tamponade. BP 80/62, she's still upright and awake. The pericardiocentesis kit is being opened. While you set up?",
+      choices: [
+        { t: "💧 Give a 250–500 mL IV fluid bolus as a bridge and keep her upright and spontaneously breathing", good:true, ds:1, dt:6, xp:30, fb:"✅ Ideal: volume lifts filling pressure above pericardial pressure to buy minutes, and upright + spontaneous breathing protects venous return. Now drain.", next:"shock" },
+        { t: "💉 Sedate her now so the procedure is comfortable, then drain", good:false, ds:0, dt:6, xp:5, fb:"⚠️ Risky — sedation drops preload and can tip her into arrest before the fluid is out. Use local anaesthetic, keep her awake, and drain. Bridge with volume, not sedation.", next:"shock" }
+      ]
+    },
+    shock: {
+      text: "Echo-guided pericardiocentesis: the needle enters the pocket, ~600 mL of hemorrhagic fluid comes off and BP climbs to 116/72, pulsus paradoxus falls to 6 mmHg. She sighs with relief. Final move of the first few minutes?",
+      choices: [
+        { t: "🪡 Leave a pigtail catheter, send fluid for cytology, and arrange treatment of the malignant cause", good:true, ds:1, dt:5, xp:40, fb:"🏆 Perfect close. The needle bought the rescue; the pigtail and cause-directed care stop it coming back. Malignant effusions recur — you've planned for it. Case stabilized.", end:true },
+        { t: "🎉 Done — pull the needle, she's better", good:false, ds:-1, dt:10, xp:0, fb:"⚠️ Premature. A malignant effusion re-accumulates fast; without a draining catheter, fluid analysis and a cause plan she'll tamponade again. Always leave the drain and chase the cause.", end:true }
+      ]
+    }
+  };
+
+  function renderStab(){
+    var s = Math.max(0, Math.min(5, scStability + 2)); // map -2..3 → 0..5
+    var dots = '';
+    for(var i=0;i<5;i++) dots += (i < s ? '●' : '○');
+    scStab.textContent = dots;
+  }
+  function renderStep(key){
+    var step = STEPS[key];
+    scText.textContent = step.text;
+    scFeedback.className = 'feedback';
+    scFeedback.style.display = 'none';
+    scChoices.innerHTML = '';
+    step.choices.forEach(function(ch){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = ch.t;
+      b.addEventListener('click', function(){
+        pathXP += ch.xp; scXP.textContent = pathXP;
+        scElapsed += ch.dt; scTime.textContent = scElapsed + ' s';
+        scStability += ch.ds; renderStab();
+        if(ch.xp) addXP(ch.xp, null, 'Scenario choice');
+        scFeedback.textContent = ch.fb;
+        scFeedback.className = 'feedback ' + (ch.good ? 'good' : 'bad');
+        scFeedback.style.display = 'block';
+        Array.prototype.forEach.call(scChoices.children, function(c){ c.disabled = true; c.style.opacity = .6; });
+        if(ch.end){
+          scRestart.style.display = 'inline-block';
+          if(ch.good && key === 'shock'){ earnBadge('bdg-shock'); addXP(20, 'scenario-win', 'Drain On Time!'); }
+        } else if(ch.next){
+          setTimeout(function(){ renderStep(ch.next); }, 1400);
+        }
+      });
+      scChoices.appendChild(b);
+    });
+  }
+  scRestart.addEventListener('click', function(){
+    pathXP = 0; scStability = 2; scElapsed = 0;
+    scXP.textContent = 0; scTime.textContent = '0 s'; renderStab();
+    scRestart.style.display = 'none';
+    renderStep('start');
+  });
+  renderStab();
+  renderStep('start');
+
+  /* ============ REVEAL BUTTONS ============ */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.getAttribute('data-target'));
+      if(!t) return;
+      if(t.classList.contains('reveal-shown')){
+        t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden');
+      } else {
+        t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown');
+        addXP(8, 'reveal-' + btn.getAttribute('data-target'), 'Self-test');
+      }
+    });
+  });
+
+  /* ============ INTRAPERICARDIAL PRESSURE SIM (S6) ============ */
+  var kRange = document.getElementById('kRange');
+  var kVal = document.getElementById('kVal');
+  var kNeedle = document.getElementById('kNeedle');
+  var kReadout = document.getElementById('kReadout');
+  if(kRange){
+    var simUsed = false;
+    function updateK(){
+      var k = (parseInt(kRange.value,10) / 10); // 2.0 .. 7.5 → scaled pressure
+      kVal.textContent = k.toFixed(1);
+      var pct = (parseInt(kRange.value,10) - 20) / (75 - 20) * 100;
+      kNeedle.style.left = pct + '%';
+      var msg, cls;
+      if(k < 3.0){ msg = '🟢 Near-normal intrapericardial pressure (~0–3 mmHg) — chambers fill freely, output is preserved. A compensated effusion, no tamponade yet.'; cls='good'; }
+      else if(k < 4.5){ msg = '🟡 Rising pressure — climbing the steep part of the curve. RA systolic collapse appears first; filling starts to be impaired. Watch the rate of fill closely.'; cls='warn-r'; }
+      else if(k <= 5.5){ msg = '🟠 Pressure approaching chamber filling pressures — RV diastolic collapse, pulsus paradoxus widening, output beginning to fall. Tamponade physiology.'; cls='warn-r'; }
+      else if(k <= 6.5){ msg = '🔴 Intrapericardial pressure exceeds filling pressures — diastolic filling collapses, stroke volume plummets → obstructive shock. Drain NOW.'; cls='bad'; }
+      else { msg = '🔴 Critical — equalized pressures, the heart cannot fill at all → imminent PEA arrest. Emergency pericardiocentesis is the resuscitation.'; cls='bad'; }
+      kReadout.innerHTML = msg;
+      kReadout.className = 'readout ' + cls;
+      if(!simUsed){ simUsed = true; addXP(15, 'ksim', 'Pressure Master'); }
+    }
+    kRange.addEventListener('input', updateK);
+    updateK();
+  }
+
+  /* ============ CHECKLISTS (S7) ============ */
+  var allChecklistsDone = 0, totalChecklists = document.querySelectorAll('.checklist').length;
+  document.querySelectorAll('.checklist').forEach(function(list){
+    var boxes = list.querySelectorAll('input[type=checkbox]');
+    var prog = list.querySelector('[data-progress]');
+    var total = boxes.length;
+    var doneAwarded = false;
+    function refresh(){
+      var done = 0;
+      boxes.forEach(function(b){
+        if(b.checked){ done++; b.closest('.ck').classList.add('done'); }
+        else { b.closest('.ck').classList.remove('done'); }
+      });
+      prog.textContent = done + ' / ' + total + ' complete';
+      if(done === total && !doneAwarded){
+        doneAwarded = true;
+        allChecklistsDone++;
+        addXP(25, 'ck-' + list.id, 'Checklist done');
+        if(allChecklistsDone >= totalChecklists){ earnBadge('bdg-ck'); addXP(20, 'allck', 'Checklist Champion'); }
+      }
+    }
+    boxes.forEach(function(b){
+      b.addEventListener('change', function(){
+        if(b.checked) addXP(4, null, 'Step checked');
+        refresh();
+      });
+    });
+  });
+
+  /* ============ MCQs (S19) ============ */
+  var MCQS = [
+    {
+      q: "A 58-year-old with metastatic breast cancer is hypotensive (BP 82/64) with markedly distended neck veins and muffled heart sounds. This classic triad is known as:",
+      opts: ["Virchow's triad","Beck's triad","Cushing's triad","Charcot's triad"],
+      correct: 1,
+      exp: "Beck's triad — hypotension, raised JVP (distended neck veins) and muffled/distant heart sounds — is the classic clinical signature of cardiac tamponade. Combined with pulsus paradoxus it is tamponade until the echo proves otherwise."
+    },
+    {
+      q: "Pulsus paradoxus in tamponade (a >10 mmHg inspiratory fall in systolic BP) is best explained by:",
+      opts: ["Increased afterload during inspiration","Ventricular interdependence: inspiratory RV filling bows the septum into the LV, reducing LV filling","A vagally mediated drop in heart rate","Coronary spasm during inspiration"],
+      correct: 1,
+      exp: "Inside a fixed pericardial volume the ventricles compete for space. On inspiration, augmented RV filling bows the interventricular septum into the LV, reducing LV filling and stroke volume, so systolic pressure falls >10 mmHg — ventricular interdependence."
+    },
+    {
+      q: "Regarding the relationship between fluid and tamponade, which statement is correct?",
+      opts: ["Only large volumes (>1 L) ever cause tamponade","The RATE of accumulation matters more than the volume — a rapid 150 mL can tamponade while a slow 1.5 L may not","Tamponade requires at least 500 mL regardless of rate","Chronic effusions tamponade more easily than acute ones"],
+      correct: 1,
+      exp: "The pericardium is non-distensible acutely but stretches if filled slowly. A rapid 150 mL (e.g. trauma or rupture) tamponades because the sac can't accommodate it, whereas a slowly accumulating 1.5 L may be tolerated as the pericardium remodels. Rate beats volume."
+    },
+    {
+      q: "Which echocardiographic finding is the key, relatively SPECIFIC sign of tamponade?",
+      opts: ["Left ventricular hypertrophy","Diastolic collapse of the right ventricle","A hyperdynamic, small left ventricle","Mitral valve prolapse"],
+      correct: 1,
+      exp: "Diastolic collapse of the right ventricle (the thin, low-pressure RV free wall buckling inward in diastole when intrapericardial pressure exceeds RV diastolic pressure) is the relatively specific echo sign. RA systolic collapse is the most sensitive/earliest, and a plethoric IVC confirms raised filling pressure."
+    },
+    {
+      q: "The definitive treatment of decompensating cardiac tamponade is:",
+      opts: ["High-dose intravenous diuretics","Urgent pericardiocentesis or surgical drainage","Intubation and positive-pressure ventilation","A nitrate infusion to reduce preload"],
+      correct: 1,
+      exp: "Tamponade is a mechanical problem — fluid under pressure. The definitive fix is removing the fluid: echo-guided pericardiocentesis (or surgical drainage for loculated/surgical causes). Drugs do not relieve the obstruction; diuretics, nitrates and PPV are harmful."
+    },
+    {
+      q: "Why is intubation with positive-pressure ventilation particularly dangerous in tamponade?",
+      opts: ["It causes bronchospasm","It raises intrathoracic pressure and reduces venous return, stripping preload from a preload-dependent heart and precipitating arrest","It directly ruptures the pericardium","It always causes a pneumothorax"],
+      correct: 1,
+      exp: "Positive-pressure ventilation increases intrathoracic pressure and reduces venous return; in a preload-dependent tamponade this further drops filling and can precipitate PEA arrest on induction. Decompress the pericardium first; if an airway is unavoidable, spare preload and have the needle ready."
+    },
+    {
+      q: "What is the role of an intravenous fluid bolus in the initial management of tamponade?",
+      opts: ["It is the definitive treatment and replaces drainage","It is a temporizing bridge that raises filling pressure above pericardial pressure to buy minutes until drainage","It is contraindicated in all cases","It permanently reverses the chamber collapse"],
+      correct: 1,
+      exp: "IV fluid is a temporizing bridge — it transiently raises filling pressure above intrapericardial pressure to augment output and buy time. The effect is small and short-lived; it is never a substitute for drainage, which is the definitive treatment."
+    },
+    {
+      q: "A patient with a type A aortic dissection develops tamponade. The safest approach to the effusion is:",
+      opts: ["Full, rapid pericardiocentesis to completely empty the sac","Drain only the minimum needed to perfuse and proceed to emergency surgery","Give a large diuretic dose","Observe without intervention"],
+      correct: 1,
+      exp: "In a dissection- (or rupture-) related effusion, fully draining the pericardium removes the tamponade that is tamponading the bleed — re-pressurizing the false lumen and causing fatal exsanguination. Drain only the minimum to maintain perfusion and rush to emergency surgery. Common causes of effusion include malignancy, uremia, viral/idiopathic pericarditis, trauma, dissection and post-MI free-wall rupture."
+    }
+  ];
+
+  var host = document.getElementById('mcqHost');
+  var mcqVal = document.getElementById('mcqVal');
+  var mcqScore = 0, mcqAnswered = 0;
+  var letters = ['A','B','C','D','E'];
+
+  MCQS.forEach(function(item, qi){
+    var box = document.createElement('div');
+    box.className = 'mcq';
+    var html = '<div class="mcq-q">QUESTION ' + (qi+1) + ' / ' + MCQS.length + '</div>';
+    html += '<div class="mcq-stem">' + item.q + '</div>';
+    item.opts.forEach(function(opt, oi){
+      html += '<label class="mcq-opt" data-oi="' + oi + '"><strong>' + letters[oi] + '.</strong> ' + opt + '</label>';
+    });
+    html += '<div class="mcq-exp"></div>';
+    box.innerHTML = html;
+    host.appendChild(box);
+
+    var opts = box.querySelectorAll('.mcq-opt');
+    var exp = box.querySelector('.mcq-exp');
+    var locked = false;
+    opts.forEach(function(label){
+      label.addEventListener('click', function(){
+        if(locked) return;
+        locked = true;
+        var oi = parseInt(label.getAttribute('data-oi'),10);
+        box.classList.add('answered');
+        var correct = item.correct;
+        if(oi === correct){
+          label.classList.add('picked-right');
+          mcqScore++;
+          addXP(25, null, 'Correct answer');
+        } else {
+          label.classList.add('picked-wrong');
+          opts[correct].classList.add('show-right');
+          showToast('❌ Correct: ' + letters[correct]);
+        }
+        exp.innerHTML = '<strong>' + (oi === correct ? '✅ Correct. ' : '📘 Explanation. ') + '</strong>' + item.exp;
+        mcqAnswered++;
+        mcqVal.textContent = mcqScore + ' / ' + MCQS.length;
+        if(mcqAnswered === MCQS.length){
+          var done = document.getElementById('mcqDone');
+          var summary = document.getElementById('mcqSummary');
+          done.style.display = 'block';
+          summary.textContent = 'You scored ' + mcqScore + ' / ' + MCQS.length + '. ' +
+            (mcqScore === MCQS.length ? 'Flawless — you get the echo and the needle every time. 🏆' :
+             mcqScore >= 6 ? 'Strong — review the misses and the contrast pairs in S6.' :
+             'Revisit S3, S5, S6 and S11 — the tamponade physiology is the whole case.');
+          if(mcqScore >= 7){ earnBadge('bdg-quiz'); addXP(50, 'quizace', 'Quiz Ace!'); }
+        }
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
