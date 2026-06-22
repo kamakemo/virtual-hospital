@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cardiogenic Shock Complicating Acute MI — Virtual Teaching Hospital</title>
+<!-- META
+id: c-cs-022
+title: Cardiogenic Shock Complicating Acute MI
+hospital: cardiology
+department: cv-ccu
+bednumber: 4
+chiefcomplaint: Hypotension, cold clammy skin and oliguria after a large myocardial infarction
+system: Cardiology
+severity: critical
+tags: Cardiogenic shock, Revascularization, Norepinephrine, Mechanical support, SCAI, CULPRIT-SHOCK
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --radius:16px;
+    --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  /* Internal scroll viewport. When this case is embedded the host app stretches
+     the iframe to full content height and the OUTER page scrolls, which would
+     let a sticky bar scroll away. We instead scroll inside this box (sized to
+     the visible window by JS) so the section tab bar stays pinned at the top.
+     Standalone, it falls back to the full viewport height. */
+  #caseScroll{height:100vh; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; scroll-padding-top:92px}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:36px 24px 80px; position:relative; overflow:hidden}
+  .hero::after{content:"📈"; position:absolute; right:-20px; top:-30px; font-size:220px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{max-width:1100px; margin:0 auto; position:relative; z-index:1}
+  .hero .crumbs{font-size:13px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:10px 0 6px; font-size:clamp(26px,4vw,40px); line-height:1.15}
+  .hero .sub{font-size:16px; opacity:.95}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; backdrop-filter:blur(4px)}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== LIVE ECG STRIP IN HERO ===== */
+  .ecg-banner{max-width:1100px; margin:14px auto 0; position:relative; z-index:1}
+  .ecg-banner svg{width:100%; height:64px; display:block; background:rgba(0,0,0,.18); border-radius:12px; border:1px solid rgba(255,255,255,.25)}
+  .ecg-trace{stroke:#86efac; stroke-width:2.4; fill:none; stroke-dasharray:1600; stroke-dashoffset:1600; animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{stroke-dashoffset:0}}
+
+  /* ===== VITALS STRIP ===== */
+  .vitals-strip{max-width:1100px; margin:-52px auto 0; padding:0 24px; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:11px; font-weight:700; letter-spacing:.6px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:21px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== HORIZONTAL SECTION SIDEBAR (fixed — always visible) ===== */
+  .topnav{position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.10)}
+  .topnav .rail{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; max-width:1180px; margin:0 auto; scrollbar-width:thin}
+  .navchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink2); font-size:11px; font-weight:700; text-decoration:none; min-width:78px; text-align:center; transition:all .18s; cursor:pointer}
+  .navchip .s-id{font-size:10px; letter-spacing:1px; color:#94a3b8}
+  .navchip .s-emoji{font-size:16px}
+  .navchip:hover{border-color:var(--rose); color:var(--rose); transform:translateY(-2px)}
+  .navchip.active{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; border-color:#b91c1c}
+  .navchip.active .s-id{color:#fecaca}
+  .navchip.visited:not(.active){border-color:var(--emerald-line); background:var(--emerald-soft)}
+
+  /* ===== DASHBOARD WIDGET ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:215px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10.5px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:760px){.dash{display:none}}
+
+  /* ===== MAIN / SECTIONS (tabbed: one section visible at a time) ===== */
+  main{max-width:1100px; margin:26px auto 80px; padding:0 24px}
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:26px; overflow:hidden}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16.5px; margin:26px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14.5px; margin:18px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:24px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15.5px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:14px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px; letter-spacing:.4px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14.5px}
+
+  /* ===== INTERACTIVE BITS ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:10px 18px; font-weight:700; font-size:14px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:22px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:15px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 15px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 15px; margin-top:12px; font-size:14px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim sliders */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:14px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:14px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Heart/circuit diagram */
+  .heart-fig{display:flex; gap:18px; flex-wrap:wrap; align-items:center; background:var(--slate-soft); border-radius:16px; padding:18px; margin:14px 0}
+  .heart-fig svg{flex:0 0 auto}
+  .heart-legend{flex:1; min-width:230px; font-size:13.5px}
+  .lg{display:flex; align-items:center; gap:8px; margin:5px 0}
+  .lg .sw{width:14px; height:14px; border-radius:4px; flex:0 0 auto}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Journey cards */
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:14px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:15px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:14px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13.5px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:22px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14.5px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:13px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .footer{max-width:1100px; margin:0 auto 36px; padding:0 24px; text-align:center; color:#94a3b8; font-size:12.5px}
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="caseScroll">
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · 💗 CCU · 🛏️ Bed 4</div>
+    <h1>🫀 Cardiogenic Shock Complicating Acute MI — "Cold, Wet, and Sliding"</h1>
+    <div class="sub">⚡ A large anterior infarct has wrecked the pump. BP 78/50, skin cold and mottled, urine has stopped, lactate is climbing. Someone wants to flood him with fluid and slam in a balloon pump. Both instincts could kill him.</div>
+    <div class="chips">
+      <span class="chip crit">🔴 CRITICAL</span>
+      <span class="chip">💔 Pump Failure</span>
+      <span class="chip">🩹 Culprit-Only PCI</span>
+      <span class="chip">💉 Norepinephrine First</span>
+      <span class="chip">🎮 Interactive Case</span>
+      <span class="chip">⏱️ Break the spiral</span>
+    </div>
+    <div class="ecg-banner" title="Anterior STEMI rhythm strip — sinus tachycardia with ST elevation">
+      <svg viewBox="0 0 800 64" preserveAspectRatio="none" aria-label="Anterior STEMI rhythm strip">
+        <polyline class="ecg-trace" points="0,44 30,44 36,30 44,46 52,14 60,30 70,30 78,44 110,44 116,30 124,46 132,14 140,30 150,30 158,44 190,44 196,30 204,46 212,14 220,30 230,30 238,44 270,44 276,30 284,46 292,14 300,30 310,30 318,44 350,44 356,30 364,46 372,14 380,30 390,30 398,44 430,44 436,30 444,46 452,14 460,30 470,30 478,44 510,44 516,30 524,46 532,14 540,30 550,30 558,44 590,44 596,30 604,46 612,14 620,30 630,30 638,44 670,44 676,30 684,46 692,14 700,30 710,30 718,44 750,44 756,30 764,46 772,14 780,30 790,30 800,44"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== LIVE VITALS ===================== -->
+<div class="vitals-strip">
+  <div class="vitals-grid">
+    <div class="vital alert"><div class="v-label">🩸 BP</div><div class="v-num">78/50</div></div>
+    <div class="vital alert"><div class="v-label">💓 HR</div><div class="v-num">118</div></div>
+    <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">28</div></div>
+    <div class="vital alert"><div class="v-label">🫁 SpO₂</div><div class="v-num">88%</div></div>
+    <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.1°</div></div>
+    <div class="vital alert"><div class="v-label">🚽 Urine</div><div class="v-num">8 mL/h</div></div>
+    <div class="vital alert"><div class="v-label">🧪 Lactate</div><div class="v-num">4.6</div></div>
+    <div class="vital warn"><div class="v-label">🥶 Skin</div><div class="v-num">Cold/mottled</div></div>
+  </div>
+</div>
+
+<!-- ===================== HORIZONTAL SECTION SIDEBAR ===================== -->
+<nav class="topnav" id="topnav">
+  <div class="rail">
+    <a class="navchip" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navchip" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navchip" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navchip" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navchip" href="#s5"><span class="s-emoji">🎓</span><span>Consultant Round</span><span class="s-id">S5</span></a>
+    <a class="navchip" href="#s6"><span class="s-emoji">📖</span><span>Teaching Points</span><span class="s-id">S6</span></a>
+    <a class="navchip" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navchip" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navchip" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navchip" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navchip" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navchip" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navchip" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navchip" href="#s14"><span class="s-emoji">🔀</span><span>Differentials</span><span class="s-id">S14</span></a>
+    <a class="navchip" href="#s15"><span class="s-emoji">🗺️</span><span>Plan</span><span class="s-id">S15</span></a>
+    <a class="navchip" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navchip" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navchip" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navchip" href="#s19"><span class="s-emoji">🧠</span><span>MCQs</span><span class="s-id">S19</span></a>
+  </div>
+</nav>
+
+<!-- ===================== SCORE DASHBOARD ===================== -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections visited</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-vt">🫀 Shock-Spotter</span>
+      <span class="badge" id="bdg-shock">🩹 Culprit Opened</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champion</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Ward Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running sims, taking the right path and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- S1 — PROFILE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s1">
+  <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+  <div class="section-content">
+    <div class="callout danger">
+      <b class="ct">🚨 YOU ARE HERE — 04:50, CCU Bed 4</b>
+      Ninety minutes ago Mr. A.K. had his occluded LAD opened. The ST segments came down — but the pressure never came up. He is now gray, cold to the elbows, mottled at the knees, breathing fast and shallow with crackles to the scapulae. The catheter bag has barely moved in an hour. A keen intern is hanging a litre of saline "because he's hypotensive," and the on-call has asked the cath lab to put in a balloon pump "to support him." Both of those reflexes can hurt this man. You have walked into the <strong>death spiral of cardiogenic shock</strong> — and your job is to break it.
+    </div>
+
+    <h3>👤 Patient Identity</h3>
+    <table class="tbl">
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>🧔 Name</td><td><strong>Mr. A.K.</strong></td></tr>
+      <tr><td>🎂 Age / Sex</td><td>64-year-old male</td></tr>
+      <tr><td>🆔 MRN</td><td>CV-22014</td></tr>
+      <tr><td>⚖️ Weight</td><td>91 kg</td></tr>
+      <tr><td>💼 Occupation</td><td>Lorry driver</td></tr>
+      <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+    </table>
+
+    <h3>📜 Past Medical History — why this infarct became shock</h3>
+    <ul>
+      <li>🫀 <strong>Large anterior STEMI</strong> — presented late (~7 hours of chest pain), proximal LAD occlusion, plus significant disease in the circumflex and RCA. A big territory of muscle was already dying before the wire crossed.</li>
+      <li>💔 <strong>Pre-shock LV:</strong> echo on arrival showed EF ~25% with akinesis of the entire anterior wall and apex. When more than ~40% of the LV stops contracting, the pump can no longer maintain output — the classic threshold for cardiogenic shock.</li>
+      <li>🩸 <strong>Type 2 diabetes, hypertension, dyslipidemia, 30 pack-year smoker</strong> — the substrate that grew the plaque that ruptured.</li>
+      <li>⏱️ <strong>Late presentation</strong> blunted the benefit of reperfusion: he kept his coronary open, but he had already lost the muscle. Open artery, dead pump.</li>
+      <li>💧 He is <strong>"cold and wet"</strong>: low output (cold) AND congested lungs (wet) — the most common and most lethal hemodynamic profile in MI shock.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Cardiogenic shock is not 'low blood pressure after an MI' — it is hypoperfusion of every organ despite adequate filling. The cold skin, the silent kidney and the rising lactate are the diagnosis, not the cuff."</div>
+
+    <h3>🧬 Why THIS patient? — big infarct + late flow + multivessel disease</h3>
+    <p>Cardiogenic shock complicates roughly 5–10% of acute MIs and remains the <strong>leading cause of in-hospital MI death</strong>. The arithmetic is brutal: a large anterior infarct kills enough myocardium that <strong>stroke volume collapses</strong>; cardiac output falls; the body clamps down with vasoconstriction (cold periphery) and tachycardia, but the failing ventricle cannot keep up. Low output starves every organ — including the coronaries themselves, which are perfused by that same falling pressure. Ischemia begets more ischemia. Add multivessel disease and a late, low-flow presentation, and the spiral is already turning by the time he reaches your bed.</p>
+
+    <div class="callout warn"><b class="ct">🔥 Risk factors for cardiogenic shock after MI</b>
+    🫀 Large / anterior infarct · ⏱️ Late presentation, delayed reperfusion · 🩸 Multivessel coronary disease · 👴 Older age · 💔 Prior MI / low baseline EF · 🩺 Diabetes, CKD · ⚙️ Mechanical complications (VSD, papillary muscle / free-wall rupture) · 💉 Right ventricular infarction</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S2 — HANDOVER -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s2">
+  <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+  <div class="section-content">
+    <h3>📻 Cath-Lab → CCU Handover — listen for the trap</h3>
+    <div class="callout info">
+      <b class="ct">🎙️ SBAR from the cath-lab nurse (verbatim)</b>
+      <p><strong>S:</strong> "Bed 4 — Mr. A.K., 64, anterior STEMI, proximal LAD opened with a drug-eluting stent 90 minutes ago. TIMI 3 flow restored. But he has stayed hypotensive the whole time — BP 78 over 50, heart rate 118."</p>
+      <p><strong>B:</strong> "Late presenter, EF about 25%, big anterior territory. He also has tight circumflex and RCA lesions we did NOT touch. Lactate on the table was 4.6."</p>
+      <p><strong>A:</strong> "He's cold to the elbows, mottled knees, only put out about 8 mL of urine in the last hour. Lungs are wet — crackles up the back, SpO₂ 88% on a face mask. The interventional fellow wants us to fix the other arteries 'while we're in there' and the night SHO is asking for a balloon pump."</p>
+      <p><strong>R:</strong> "I've got two large-bore IVs, an arterial line, pads on, and I held the second litre of saline the intern drew up — his lungs sounded too wet for that. Something about this doesn't feel like 'just give fluid.'"</p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In MI cardiogenic shock, open the culprit artery — and ONLY the culprit. The instinct to 'fix everything while you're in there' (immediate multivessel PCI) was tested in CULPRIT-SHOCK and it lost."</div>
+
+    <h3>🚩 Spot-the-Red-Flag — tap each feature that screams CARDIOGENIC SHOCK</h3>
+    <p>🎮 <em>Interactive: click every feature that points to cardiogenic (low-output) shock — not a warm vasodilated state. Each correct flag = +10 XP. Wrong picks cost you.</em></p>
+    <div id="flagGame">
+      <button class="btn ghost flag-btn" data-good="1">🩸 Hypotension, SBP &lt; 90 mmHg</button>
+      <button class="btn ghost flag-btn" data-good="1">🥶 Cold, clammy, mottled peripheries</button>
+      <button class="btn ghost flag-btn" data-good="1">🚽 Oliguria (urine &lt; 0.5 mL/kg/h)</button>
+      <button class="btn ghost flag-btn" data-good="1">🫁 Pulmonary edema / wet lungs</button>
+      <button class="btn ghost flag-btn" data-good="1">🧪 Rising lactate (4.6 mmol/L)</button>
+      <button class="btn ghost flag-btn" data-good="1">🫀 Large anterior MI, EF 25%</button>
+      <button class="btn ghost flag-btn" data-good="0">🔥 Warm, well-perfused extremities</button>
+      <button class="btn ghost flag-btn" data-good="0">🌡️ Fever-driven vasodilation</button>
+    </div>
+    <p id="flagResult" style="font-weight:700"></p>
+
+    <h3>⏱️ Timeline so far</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">~21:30</div>Crushing chest pain at home; he kept driving, then slept on it. Late presenter.</div>
+      <div class="t-item"><div class="t-time">03:10</div>Arrived ED: anterior STEMI, already hypotensive and clammy. Lactate 4.6.</div>
+      <div class="t-item"><div class="t-time">03:20–04:50</div>Primary PCI: proximal LAD opened, drug-eluting stent, TIMI 3 flow. Circumflex/RCA disease left untouched. BP never recovered.</div>
+      <div class="t-item"><div class="t-time">04:50</div>You arrive in CCU. Open artery, failing pump. Intern hanging fluid, SHO requesting an IABP. The clock — and the lactate — are the enemy.</div>
+    </div>
+
+    <div class="callout ok"><b class="ct">🏅 Praise where due</b>The cath-lab nurse who held the second litre of saline read the patient, not the protocol. These lungs are already wet; reflex large-volume resuscitation in a congested, low-output ventricle worsens pulmonary edema and oxygenation without fixing the pump. A small, monitored fluid challenge may have a role — a flood does not.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S3 — INITIAL ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s3">
+  <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+  <div class="section-content">
+    <h3>🅰️🅱️🅲️ Primary Survey — what your hands, eyes and ears find</h3>
+    <table class="tbl">
+      <tr><th>Step</th><th>Finding</th><th>What it means mechanistically</th></tr>
+      <tr><td>🅰️ Airway</td><td>Patent but he is tiring, speaking single words.</td><td>Work of breathing is rising; pulmonary edema plus low output means he is heading toward needing ventilatory support.</td></tr>
+      <tr><td>🅱️ Breathing</td><td>RR 28, SpO₂ 88% on a mask, crackles to the scapulae, frothy secretions.</td><td>The failing LV can't move blood forward, so it backs up into the lungs → cardiogenic pulmonary edema → hypoxia. The "wet" of cold-and-wet.</td></tr>
+      <tr><td>🅲️ Circulation</td><td><strong>BP 78/50</strong> (MAP ~59), HR 118, thready pulse, CRT 5 s, knees mottled, hands cold to the wrist. JVP raised. <strong>No new murmur</strong> on careful auscultation tonight.</td><td>Cold periphery + narrow pulse pressure = low cardiac output with compensatory vasoconstriction. Raised JVP + wet lungs = high filling pressures. This is the hemodynamic signature of cardiogenic shock: low output AND high filling. (Always re-listen for a new murmur — it would mean a mechanical complication.)</td></tr>
+      <tr><td>🅳 Disability</td><td>Drowsy, GCS 13, anxious then vague.</td><td>Cerebral hypoperfusion from low output. A falling sensorium in shock is an ominous, late sign — act before it drops further.</td></tr>
+      <tr><td>🅴 Exposure</td><td>Cold mottled legs, oliguric catheter (8 mL/h), no rash, radial sheath site dry.</td><td>The kidney is the body's perfusion gauge — oliguria means the organs are not getting flow. Mottled skin maps the shock visually.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Cold skin, a silent kidney and a rising lactate diagnose cardiogenic shock at the bedside before any number prints. Perfusion is the vital sign — the blood pressure is just the headline."</div>
+
+    <h3>🧭 The single most important question: is this PUMP failure — and how deep is the spiral?</h3>
+    <p>Confirm the shock is <strong>cardiogenic</strong> (cold, congested, high filling pressures) and not septic / hypovolemic / obstructive (S14). Then <strong>stage it</strong> with the <strong>SCAI shock classification</strong>: <strong>A</strong> (at risk) → <strong>B</strong> (beginning/pre-shock: hypotensive or tachycardic but still perfusing) → <strong>C</strong> (classic: hypoperfusion needing pressors/inotropes) → <strong>D</strong> (deteriorating despite initial support) → <strong>E</strong> (extremis: refractory, arresting). Mr. A.K. is hypotensive, oliguric, cold and lactate 4.6 on no support yet — <strong>SCAI Stage C, sliding toward D</strong>.</p>
+
+    <div class="callout danger"><b class="ct">⚡ The plan is made: OPEN THE CULPRIT + SUPPORT PERFUSION — and resist two reflexes</b>The culprit LAD is already open (good). Now <strong>support perfusion with norepinephrine first-line</strong>, add an inotrope (dobutamine) for contractility, give <strong>cautious</strong> fluid only if a fluid-responsive segment exists, and treat reversible drivers. <strong>Do NOT</strong> chase the non-culprit arteries tonight (CULPRIT-SHOCK) and <strong>do NOT</strong> reflexively drop in a balloon pump (IABP-SHOCK II). Hunt actively for a mechanical complication.</div>
+
+    <!-- 🎬 BRANCHING SCENARIO ENGINE -->
+    <div class="scenario" id="scenarioBox">
+      <h3>🎬 Choose Your Path — "The First Hour of Shock"</h3>
+      <div class="hud"><span>❤️ Perfusion: <b id="scStab">●●○○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 s</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+      <div class="scene-text" id="scText">The culprit LAD is open but BP is 78/50, MAP 59, lactate 4.6, urine 8 mL/h, lungs wet. The intern is about to hang another litre of saline; the SHO is on the phone asking the cath lab for a balloon pump. The interventional fellow offers to "do the circumflex and RCA now while access is in." What is your FIRST move?</div>
+      <div class="choices" id="scChoices"></div>
+      <div class="feedback" id="scFeedback"></div>
+      <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+    </div>
+
+    <div class="callout info"><b class="ct">🧮 If he were warm and vasodilated instead</b>
+    A warm, bounding, high-output picture after an MI should make you doubt the label "cardiogenic" — think sepsis (the cannula, the catheter, aspiration) or a mechanical complication causing a hyperdynamic compensatory state. <strong>Bedside echo</strong> resolves this fast: a poorly contracting, congested LV with high filling pressures confirms cardiogenic shock; a hyperdynamic empty ventricle points elsewhere. When the diagnosis is uncertain, look at the heart and the filling, not just the cuff.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S4 — RESIDENT REVIEW -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s4">
+  <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+  <div class="section-content">
+    <p><em>The cardiology resident arrives at 04:54. Her reasoning, out loud:</em></p>
+
+    <h3>🧠 Name the physiology first, then act</h3>
+    <p>"Big anterior MI, EF 25%, cold-and-wet, lactate climbing, kidney shut. That is <strong>cardiogenic shock</strong> — the pump has failed and every organ is downstream of it. The culprit is open, which is the single most important thing we can do for mortality (SHOCK trial). So the job now is to <em>break the spiral</em>: restore enough perfusion pressure to feed the brain, kidneys and the coronaries, give the weak ventricle inotropic help, and unload the wet lungs — without flooding him and without reaching reflexively for a balloon pump that doesn't change mortality."</p>
+
+    <h3>🎯 Immediate priorities (her actual order of operations)</h3>
+    <ol>
+      <li>🩹 <strong>Confirm the culprit is open and STOP there:</strong> do NOT proceed to immediate multivessel PCI tonight. CULPRIT-SHOCK showed culprit-lesion-only PCI lowered death/renal-replacement vs immediate complete revascularization. Stage the other lesions later.</li>
+      <li>💉 <strong>Start norepinephrine first-line</strong> to a MAP target ~65 mmHg — fewer arrhythmias and lower mortality than dopamine in the shock subgroup (De Backer).</li>
+      <li>💪 <strong>Add an inotrope</strong> (dobutamine, or milrinone) once pressure is supported, to actually improve contractility and forward flow — the pressor alone just squeezes a failing pump.</li>
+      <li>💧 <strong>Be stingy with fluid:</strong> lungs are wet, JVP up. A small, monitored bolus only if there's evidence of fluid responsiveness; otherwise diurese/offload once a MAP is established.</li>
+      <li>🫁 <strong>Support oxygenation/ventilation:</strong> NIV or early intubation for the pulmonary edema and rising work of breathing — and to reduce the metabolic cost of breathing.</li>
+      <li>🔎 <strong>Hunt for a mechanical complication and RV shock:</strong> urgent echo for VSD, papillary muscle rupture, free-wall rupture/tamponade, and RV infarction — these have completely different rescue pathways.</li>
+      <li>🛟 <strong>Escalate support deliberately, not reflexively:</strong> if he deteriorates despite drugs, consider Impella or VA-ECMO in selected patients — NOT an automatic IABP.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Open the culprit, support the pressure with norepinephrine, help the pump with an inotrope, keep the lungs dry, and look for a rupture — in that order. Mechanical support is a decision, not a reflex."</div>
+
+    <h3>🤔 "But shouldn't we just fix all the arteries now and pop in a balloon pump?"</h3>
+    <p>"No — and both of those feel right, which is exactly why they're traps. Routine <em>immediate</em> multivessel PCI in shock increased death and renal failure (CULPRIT-SHOCK), so we treat only the culprit tonight and stage the rest. And the intra-aortic balloon pump, despite decades of habit, <strong>did not reduce 30-day or long-term mortality</strong> in MI shock (IABP-SHOCK II) — so it is not the answer to 'he's hypotensive, do something mechanical.' If we need mechanical support, the evidence now points to selected use of <strong>Impella</strong> (DanGer Shock) or VA-ECMO, not a default balloon."</p>
+
+    <div class="callout purple"><b class="ct">🧪 Resident's self-test (answer before reading on)</b>
+    The intern asks: "He's hypotensive — let's give dopamine, it raises the pressure and supports the heart, right?" Good first pressor here?
+    <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+    <div class="reveal-hidden" id="rev1"><p><strong>No.</strong> In the De Backer trial, dopamine caused more arrhythmias overall, and in the <em>cardiogenic shock subgroup</em> it was associated with <strong>higher mortality</strong> than norepinephrine. Norepinephrine is the first-line vasopressor in cardiogenic shock. Reach for dopamine here and you risk lighting off a tachyarrhythmia in an already ischemic, failing ventricle.</p></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S5 — CONSULTANT ROUND -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s5">
+  <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round</h2></div>
+  <div class="section-content">
+    <p><em>The on-call consultant interventional cardiologist, by phone at 05:00, then at the bedside:</em></p>
+
+    <h3>🗂️ Frame the shock precisely — it changes the rescue</h3>
+    <div class="vs">
+      <div class="side a"><h4>🔴 Pump-failure cardiogenic shock (this patient)</h4>
+        <ul><li>Large infarct → low cardiac output, high filling pressures, cold &amp; wet</li><li>Driver: dead/stunned myocardium</li><li>Open the <strong>culprit only</strong>; norepinephrine + inotrope; offload the lungs</li><li>Escalate to Impella/VA-ECMO in selected refractory cases</li></ul></div>
+      <div class="side b"><h4>🔵 Mechanical-complication shock</h4>
+        <ul><li><strong>New murmur</strong> + abrupt deterioration days post-MI</li><li>VSD, papillary-muscle rupture (acute severe MR), free-wall rupture/tamponade</li><li>Echo is the test; <strong>surgery / device</strong> is the cure, not pressors alone</li><li>IABP/MCS can bridge to the operating room</li></ul></div>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A NEW murmur in a shocked post-MI patient is a mechanical rupture until an echo proves otherwise. Pressors buy minutes; the surgeon buys the life."</div>
+
+    <h3>🌀 What is the 'death spiral' — and where is he on it?</h3>
+    <p>The spiral is a self-amplifying loop: infarct → <strong>LV pump failure</strong> → <strong>low cardiac output</strong> → systemic AND coronary hypoperfusion → <strong>worsening ischemia + neurohormonal &amp; inflammatory activation</strong> → further pump failure → deeper hypotension. Each turn makes the next turn easier. Breaking it requires <strong>restoring coronary flow</strong> (done — culprit open) and <strong>supporting perfusion</strong> (pressor + inotrope ± mechanical support) fast enough to interrupt the loop before multi-organ failure becomes irreversible. The <strong>SCAI stage</strong> is the speedometer: he is Stage C now; if the lactate keeps climbing on support he is Stage D, and the conversation turns to mechanical circulatory support.</p>
+
+    <h3>🧭 Consultant's three commandments for the next hour</h3>
+    <ol>
+      <li>🩹 "Open the culprit, and tonight, <strong>only the culprit</strong>. CULPRIT-SHOCK is unambiguous — immediate complete revascularization in shock killed more people. Stage the circumflex and RCA when he's stabilized."</li>
+      <li>💉 "<strong>Norepinephrine is my first pressor</strong>, titrated to a MAP of about 65, with dobutamine for inotropy. <strong>Not dopamine</strong> — it costs lives in this exact subgroup. And keep the lungs dry."</li>
+      <li>🛟 "If he deteriorates despite all that, I escalate to <strong>mechanical support — but I do not reflex to a balloon pump.</strong> IABP-SHOCK II showed no mortality benefit. DanGer Shock showed an Impella benefit in selected STEMI shock; VA-ECMO for the crashing biventricular patient. Pick the device for the physiology."</li>
+    </ol>
+
+    <div class="callout danger"><b class="ct">☠️ The consultant's war memory (more in S13 M&amp;M)</b>"The last MI-shock death I sat through at M&amp;M was a man whose 'pump failure' was actually a <strong>papillary muscle rupture</strong>. He developed acute severe mitral regurgitation, a soft new murmur nobody re-listened for, flash pulmonary edema, and we chased it with ever-more inotrope and a balloon pump for six hours. The echo, when we finally did it, showed a flail leaflet. By then the window for surgery had closed. The murmur was on the chart from the SHO who heard it at 2am and assumed it was 'just the MI.' It was never just the MI."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S6 — TEACHING POINTS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s6">
+  <div class="sec-header"><span class="s-badge">S6</span><h2>📖 Teaching Points</h2></div>
+  <div class="section-content">
+    <h3>🔬 The mechanism — WHY an infarct becomes a spiral (the WHY behind the WHY)</h3>
+    <ol>
+      <li>🧱 <strong>The hit:</strong> a large infarct destroys or stuns enough contractile muscle (often &gt; 40% of the LV) that <strong>stroke volume collapses</strong>. The pump can no longer generate forward flow.</li>
+      <li>📉 <strong>Output falls:</strong> cardiac output = stroke volume × heart rate. The body compensates with tachycardia and intense vasoconstriction — but a failing ventricle pumping against a clamped-down vasculature just works harder for less flow. Hence cold skin and a narrow pulse pressure.</li>
+      <li>🫀 <strong>The coronary betrayal:</strong> the coronaries are perfused by the very pressure that is now falling. Low output → low coronary perfusion → <strong>more ischemia</strong> → even weaker pump. The organ that needs flow most is starved by its own failure.</li>
+      <li>🔥 <strong>Neurohormonal &amp; inflammatory amplification:</strong> catecholamines, RAAS activation and a systemic inflammatory response (a "SIRS-like" vasoplegia) layer on, raising afterload, retaining fluid (wet lungs), and adding a vasodilatory insult — the spiral now has multiple engines.</li>
+      <li>💥 <strong>Why it kills:</strong> sustained hypoperfusion → rising lactate, acute kidney injury, hepatic and gut ischemia, multi-organ failure. Past a point the loop is self-sustaining even if the artery is open. <strong>Breaking the spiral early</strong> — flow + perfusion support — is the whole game.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Cardiogenic shock is a wheel that turns faster the longer it spins. Open the culprit to stop feeding it, support the pressure and the pump to slow it, and stage everything else once the wheel is no longer accelerating."</div>
+
+    <h3>⚖️ Contrast pair #1 — Cardiogenic vs the other shocks (don't mislabel the pump)</h3>
+    <div class="vs">
+      <div class="side a"><h4>❄️ CARDIOGENIC (assume in this patient)</h4><ul><li><strong>Cold</strong>, mottled, vasoconstricted periphery</li><li><strong>Congested</strong>: raised JVP, wet lungs, high filling pressures</li><li><strong>Low</strong> cardiac output, narrow pulse pressure</li><li>Echo: poorly contracting, often dilated LV</li><li>Fix: revascularize culprit, inotrope + pressor, ± MCS</li></ul></div>
+      <div class="side b"><h4>🔥 SEPTIC / others (NOT this)</h4><ul><li><strong>Septic</strong>: warm, vasodilated, high output, wide pulse pressure, fever source</li><li><strong>Hypovolemic</strong>: cold but <em>empty</em> — low filling, flat JVP, responds to fluid</li><li><strong>Obstructive</strong>: tamponade (muffled, pulsus paradoxus) or massive PE (RV strain)</li><li>Bedside echo + perfusion + filling pressures separate them</li></ul></div>
+    </div>
+    <p>😈 <strong>The trap:</strong> treat cardiogenic as hypovolemic and you flood the lungs; treat it as septic and you chase vasoplegia you don't have. The discriminator is <strong>filling pressure</strong>: cardiogenic is cold AND congested (high filling), hypovolemic is cold AND empty (low filling). Bedside echo and the JVP settle it in seconds. <strong>Remember LV vs RV shock too</strong> — an inferior MI with clear lungs, raised JVP and hypotension is RV shock and is fluid-and-flow dependent, the opposite of the wet LV.</p>
+
+    <h3>⚖️ Contrast pair #2 — Pump failure vs a mechanical complication</h3>
+    <div class="vs">
+      <div class="side a"><h4>🫀 Primary pump failure (tonight)</h4><ul><li>Big infarct, global LV weakness, no new murmur</li><li>Gradual, predictable hypotension after a large MI</li><li>Therapy: culprit PCI, pressor + inotrope, offload, ± MCS</li><li>Echo: large akinetic territory, low EF</li></ul></div>
+      <div class="side b"><h4>⚙️ Mechanical complication</h4><ul><li><strong>New murmur</strong> + abrupt collapse (often days 2–7)</li><li>VSD (harsh holosystolic, step-up on right heart cath), papillary-muscle rupture (acute MR, flash edema), free-wall rupture (tamponade, PEA)</li><li>Therapy: <strong>surgery/device</strong> — pressors and MCS only bridge</li><li>Echo with Doppler is diagnostic — do it for any sudden deterioration</li></ul></div>
+    </div>
+    <p>💡 <em>Why it matters:</em> pour inotrope into a ruptured papillary muscle and you treat the symptom while the patient bleeds time. Every shocked post-MI patient who deteriorates or develops a new murmur needs an <strong>echo before the next escalation</strong>.</p>
+
+    <!-- 🎮 INTERACTIVE SIM: cardiac output / MAP → organ perfusion spiral (SCAI stage) -->
+    <div class="sim" id="kSim">
+      <h3 style="margin-top:0">🎮 Simulation — The Perfusion Dial: how cardiac output / MAP sets the SCAI shock spiral</h3>
+      <p style="font-size:13.5px">Drag the dial from a near-normal output down into extremis. Watch the mean arterial pressure, organ perfusion and the SCAI stage deteriorate as the pump fails. This is the "invisible vital sign" of this case — perfusion, not the cuff number alone.</p>
+      <label for="kRange">🫀 Cardiac output / MAP index: <b id="kVal">3.1</b> (≈ MAP, mmHg ÷ 20)</label>
+      <input type="range" id="kRange" min="20" max="75" value="31">
+      <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+      <div class="readout bad" id="kReadout">Set the dial to explore.</div>
+      <p style="font-size:12.5px; margin-top:10px; color:var(--ink2)">🎯 Target for organ perfusion: <strong>MAP ≈ 65 mmHg with a perfusing cardiac index</strong>. Drive output up with revascularization + inotrope + pressor; if the dial won't rise on drugs, that's Stage D→E and the cue for mechanical support. Low end = the death spiral; you break it by restoring flow.</p>
+    </div>
+
+    <!-- 📚 EBM MODULE -->
+    <div class="ebm">
+      <h3>📚 Evidence-Based Medicine Corner</h3>
+      <table class="tbl">
+        <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+        <tr><td><span class="lvl">RCT</span> SHOCK (1999)</td><td>Early revascularization (PCI/CABG) vs initial medical stabilization in MI cardiogenic shock improved 6-month and long-term survival.</td><td>Open the infarct artery <em>early</em> — emergent revascularization is the single biggest mortality lever in MI shock.</td></tr>
+        <tr><td><span class="lvl">RCT</span> CULPRIT-SHOCK (2017)</td><td>Culprit-lesion-only PCI vs immediate multivessel PCI in shock: culprit-only reduced 30-day death or renal-replacement therapy.</td><td>In shock, treat the culprit and STOP. Stage the other lesions later — don't "fix everything while you're in there."</td></tr>
+        <tr><td><span class="lvl">RCT</span> IABP-SHOCK II (2012)</td><td>Intra-aortic balloon pump vs none in MI shock: no reduction in 30-day or long-term mortality.</td><td>Do not reflexively insert an IABP for MI shock — it is not a mortality therapy.</td></tr>
+        <tr><td><span class="lvl">RCT</span> De Backer / SOAP II (2010)</td><td>Norepinephrine vs dopamine: more arrhythmias with dopamine, and higher mortality in the cardiogenic-shock subgroup.</td><td>Norepinephrine is the first-line vasopressor in cardiogenic shock; avoid dopamine.</td></tr>
+        <tr><td><span class="lvl">RCT</span> DanGer Shock (2024)</td><td>Microaxial flow pump (Impella) vs standard care in selected STEMI cardiogenic shock improved survival (at the cost of more complications).</td><td>In selected STEMI shock patients, Impella can reduce mortality — escalate to MCS deliberately, not by default.</td></tr>
+        <tr><td><span class="lvl">CONSENSUS</span> SCAI Shock Stages (2019/2022)</td><td>A→E staging (at-risk → beginning → classic → deteriorating → extremis) standardizes severity and predicts mortality.</td><td>Stage every shock patient; the stage drives escalation and prognostic conversations (S3, S12, S15).</td></tr>
+      </table>
+    </div>
+
+    <!-- 🔬 ADVANCED TOPICS -->
+    <div class="callout purple">
+      <h3 style="margin-top:0">🔬 Fellowship Corner — Advanced Topics</h3>
+      <ul>
+        <li>🛟 <strong>Mechanical circulatory support menu:</strong> IABP (afterload reduction, modest — no mortality benefit), <strong>Impella</strong> (microaxial LV unloading, DanGer-Shock benefit in selected STEMI shock), <strong>VA-ECMO</strong> (full cardiopulmonary support for biventricular/refractory shock, but increases LV afterload → may need venting/Impella "ECPELLA"), TandemHeart, surgical VAD.</li>
+        <li>📊 <strong>Invasive hemodynamics:</strong> the pulmonary artery catheter is back in selected shock — cardiac index, PCWP, and the <strong>cardiac power output (CPO = MAP × CO / 451)</strong> and PAPi (pulmonary artery pulsatility index for RV failure) guide escalation and weaning.</li>
+        <li>🫀 <strong>RV shock &amp; biventricular failure:</strong> inferior MI with RV infarction needs preload optimization, avoidance of excessive PEEP/vasodilators, inotropy, and sometimes RV-specific support (RVAD, ProtekDuo) — the management is the mirror image of LV shock.</li>
+        <li>🏥 <strong>Shock teams &amp; hub-and-spoke systems:</strong> protocolized multidisciplinary "cardiogenic shock teams" and early transfer to MCS-capable centers are associated with improved survival in registries (e.g. NCSI).</li>
+        <li>🧪 <strong>Adjuncts &amp; the failing rescue:</strong> lactate clearance as a resuscitation target, inotrope choice (dobutamine vs milrinone — DOREMI showed no clear difference), the limited/harmful role of routine vasopressin, and the controversies around steroids and the inflammatory ("vasoplegic") phenotype.</li>
+        <li>⚙️ <strong>Mechanical complications in depth:</strong> post-MI VSD (right-heart-cath oxygen step-up, percutaneous vs surgical closure timing), acute MR from papillary-muscle rupture (emergent valve surgery), and contained free-wall rupture / pseudoaneurysm.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S7 — ORDERS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s7">
+  <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+  <div class="section-content">
+    <h3>🖊️ The order set, written as you'd actually write it (05:05)</h3>
+    <ul>
+      <li>🩹 <strong>Culprit (LAD) reperfused — do NOT proceed to non-culprit PCI tonight</strong> (CULPRIT-SHOCK); flag on chart and whiteboard. Stage circumflex/RCA later.</li>
+      <li>💉 <strong>Norepinephrine infusion</strong> first-line, titrate to MAP ≈ 65 mmHg via the arterial line. <strong>No dopamine.</strong></li>
+      <li>💪 <strong>Dobutamine 2.5–5 mcg/kg/min</strong> (or milrinone) added once pressure supported, to improve contractility — watch for tachyarrhythmia and further hypotension.</li>
+      <li>💧 <strong>Cautious fluids only:</strong> a small monitored challenge (e.g. 250 mL) ONLY if fluid-responsive; otherwise withhold/diurese — the lungs are wet.</li>
+      <li>🫁 <strong>Oxygenation/ventilation support:</strong> NIV or early intubation for pulmonary edema and rising work of breathing; target SpO₂ ≥ 94%.</li>
+      <li>🔎 <strong>Urgent bedside echo</strong>: confirm LV failure, exclude VSD / papillary-muscle rupture / tamponade / RV infarction; re-listen for a new murmur.</li>
+      <li>🧪 Bloods: serial <strong>lactate</strong>, ABG, troponin, renal/electrolytes, FBC, coagulation, LFTs; hourly urine output; continuous arterial &amp; ECG monitoring.</li>
+      <li>🛟 <strong>Mechanical circulatory support pathway primed</strong> (Impella / VA-ECMO) IF he deteriorates despite drugs — <strong>do not reflexively insert an IABP.</strong></li>
+      <li>📞 Activate the <strong>cardiogenic shock team</strong>: interventional cardiology, intensivist, CT surgery on standby; consider transfer to an MCS-capable hub if not on site.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In MI cardiogenic shock there are two anchors: an open culprit artery and a perfusing MAP on norepinephrine. Every other order exists to support those two and to catch the rupture that masquerades as pump failure."</div>
+
+    <!-- 🩺 PROCEDURE GUIDE 1 -->
+    <div class="checklist" id="ckCV">
+      <h3 style="margin-top:0">🩺 Resuscitation Bundle — Stabilizing MI Cardiogenic Shock — tick as you go</h3>
+      <label class="ck"><input type="checkbox"><span>🩹 Confirm the CULPRIT artery is reperfused; <strong>do NOT</strong> attempt non-culprit PCI in the same setting (CULPRIT-SHOCK)</span></label>
+      <label class="ck"><input type="checkbox"><span>💉 Start <strong>norepinephrine</strong> first-line, titrate to MAP ≈ 65 mmHg (arterial line); avoid dopamine</span></label>
+      <label class="ck"><input type="checkbox"><span>💪 Add an <strong>inotrope</strong> (dobutamine/milrinone) once pressure supported — improve contractility, watch for arrhythmia</span></label>
+      <label class="ck"><input type="checkbox"><span>💧 Assess fluid responsiveness; give only <strong>cautious</strong> fluid (lungs are wet) — offload if congested</span></label>
+      <label class="ck"><input type="checkbox"><span>🫁 Support oxygenation/ventilation (NIV or intubation) for pulmonary edema and work of breathing</span></label>
+      <label class="ck"><input type="checkbox"><span>🔎 <strong>Urgent echo</strong> — confirm LV failure and exclude a mechanical complication / RV shock; re-listen for a new murmur</span></label>
+      <label class="ck"><input type="checkbox"><span>🛟 Decide MCS deliberately (Impella/VA-ECMO) if deteriorating — <strong>not a reflex IABP</strong>; activate the shock team</span></label>
+      <div class="ck-progress" data-progress>0 / 7 complete</div>
+    </div>
+
+    <!-- 🩺 PROCEDURE GUIDE 2 -->
+    <div class="checklist" id="ckDefib">
+      <h3 style="margin-top:0">🩺 Escalation Guide — If he deteriorates despite drugs (SCAI D→E)</h3>
+      <p style="font-size:13px">⚠️ Rising lactate, falling MAP and oliguria despite norepinephrine + inotrope = the spiral is winning. Escalate mechanical support — and re-hunt for a missed mechanical complication.</p>
+      <label class="ck"><input type="checkbox"><span>📉 Recognize deterioration: lactate not clearing, MAP &lt; 60 on rising pressor, worsening end-organ function → SCAI Stage D/E</span></label>
+      <label class="ck"><input type="checkbox"><span>🔎 <strong>Repeat echo</strong> — exclude an evolving VSD / papillary-muscle rupture / tamponade before blaming "just the pump"</span></label>
+      <label class="ck"><input type="checkbox"><span>🛟 Escalate to <strong>Impella</strong> (selected STEMI shock, DanGer) or <strong>VA-ECMO</strong> (biventricular/refractory) — pick the device for the physiology</span></label>
+      <label class="ck"><input type="checkbox"><span>🫀 Treat reversible drivers: arrhythmia, hypoxia, acidosis, ongoing ischemia, RV failure, tamponade</span></label>
+      <label class="ck"><input type="checkbox"><span>🏥 Engage the <strong>shock team</strong> / transfer to an MCS-capable hub; involve CT surgery early if a mechanical complication is found</span></label>
+      <label class="ck"><input type="checkbox"><span>🗣️ Honest prognostic conversation with family by SCAI stage; define ceilings of care if support is futile</span></label>
+      <div class="ck-progress" data-progress>0 / 6 complete</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S8 — NURSING CARE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s8">
+  <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+  <div class="section-content">
+    <h3>🛏️ CCU nursing priorities — minute by minute</h3>
+    <ul>
+      <li>📟 <strong>Continuous arterial BP, ECG and SpO₂.</strong> Titrate the norepinephrine to the prescribed MAP target (≈ 65) — and call early if you're chasing the dose upward.</li>
+      <li>🚽 <strong>Hourly urine output is your perfusion gauge.</strong> A kidney making &lt; 0.5 mL/kg/h is telling you the organs are still starved — report a falling output as a deterioration, not a nuisance.</li>
+      <li>🧪 <strong>Serial lactate</strong> on the prescribed schedule — a clearing lactate means the resuscitation is working; a rising one means escalate.</li>
+      <li>💉 <strong>Vasoactive infusions on dedicated, clearly-labelled lines</strong> (ideally central); double-check concentrations — a norepinephrine error is itself dangerous. Never bolus or run two pressors down the same lumen unsafely.</li>
+      <li>🥶 <strong>Re-examine perfusion each round:</strong> skin temperature line up the limb, mottling score, capillary refill, mentation. Map the shock visually and trend it.</li>
+      <li>🫁 <strong>Watch the work of breathing:</strong> rising rate, frothy sputum, falling sats = pulmonary edema worsening — escalate to NIV/intubation, do not just turn up the oxygen.</li>
+      <li>🩺 <strong>Re-auscultate for a new murmur every shift</strong> and report it immediately — it can be the first sign of a mechanical complication.</li>
+      <li>💧 <strong>Be the fluid gatekeeper:</strong> question reflex large-volume boluses; these lungs are wet. Escalate any prescription that doesn't fit the cold-and-wet picture.</li>
+      <li>👨‍👩‍👦 Keep the family informed and supported (see S16) — assign a liaison if staffing allows; shock is frightening and fast-moving for relatives.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who watches the urine, the lactate and the skin is reading the perfusion in real time — those three numbers tell you the shock is breaking before the blood pressure does."</div>
+    <div class="callout warn"><b class="ct">📢 Escalate IMMEDIATELY for</b>Falling MAP despite rising norepinephrine · new or louder murmur · falling urine output / rising lactate · worsening pulmonary edema or sats · new arrhythmia · drop in conscious level · any reflex order for a large fluid bolus, dopamine, or a balloon pump without a shock-team decision.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S9 — INVESTIGATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s9">
+  <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+  <div class="section-content">
+    <h3>🧾 Results board (05:10, post-PCI)</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>Result</th><th>Reference</th><th>Interpretation</th></tr>
+      <tr><td>Lactate</td><td class="hi">4.6 mmol/L ↑</td><td>&lt; 2.0</td><td>The headline of perfusion failure. A lactate that won't clear despite an open artery and pressors signals a deepening spiral (SCAI C→D) and the need to escalate.</td></tr>
+      <tr><td>Troponin I</td><td class="hi">42 ng/mL ↑↑</td><td>&lt; 0.04</td><td>Massive — a large infarct. The size of the necrosis is why the pump failed; reperfusion preserves what's left but cannot revive what's dead.</td></tr>
+      <tr><td>Creatinine</td><td class="hi">1.9 mg/dL ↑</td><td>0.7–1.2</td><td>Acute kidney injury from renal hypoperfusion (cardiorenal). Tracks the shock and affects drug/contrast handling.</td></tr>
+      <tr><td>Bicarbonate / pH</td><td class="lo">HCO₃ 15 / pH 7.24 ↓</td><td>22–28 / 7.35–7.45</td><td>Metabolic (lactic) acidosis from anaerobic metabolism in starved tissue. Acidosis itself blunts catecholamine response — another turn of the wheel.</td></tr>
+      <tr><td>BNP / NT-proBNP</td><td class="hi">Markedly raised ↑</td><td>—</td><td>Reflects ventricular wall stress and congestion — consistent with the "wet" failing LV.</td></tr>
+      <tr><td>Mixed venous O₂ (ScvO₂)</td><td class="lo">48% ↓</td><td>&gt; 65%</td><td>Low ScvO₂ = tissues extracting more oxygen because delivery (cardiac output) is inadequate — a direct marker of low forward flow.</td></tr>
+      <tr><td>Echo (bedside)</td><td class="hi">EF 25%, large anteroapical akinesis, <strong>no VSD/MR</strong> seen</td><td>—</td><td>Confirms primary pump failure and, crucially tonight, <strong>excludes a mechanical complication</strong> — re-image if he deteriorates or a murmur appears.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Lactate and mixed-venous oxygen are the dashboard of cardiogenic shock — they tell you whether the pump is delivering oxygen to the organs, which the blood pressure alone never will."</div>
+
+    <div class="callout info"><b class="ct">🧠 Why the bedside echo is the most important 'investigation' tonight</b>An echo in the shocked post-MI patient answers three questions at once: <em>Is the LV the problem?</em> (global vs regional failure), <em>Is there a mechanical complication?</em> (VSD jet, flail leaflet with acute MR, pericardial effusion/tamponade), and <em>Is the RV failing?</em> (RV dilation/hypokinesis in inferior MI). Each answer routes him down a completely different pathway. Do not escalate drugs or devices on a shocked post-MI patient without putting the probe on the chest.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S10 — ECG / IMAGING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s10">
+  <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging</h2></div>
+  <div class="section-content">
+    <h3>🫀 The presenting ECG — read it like a detective</h3>
+    <div class="ecg-fig">
+      <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Anterior STEMI with ST elevation V1 to V4 and sinus tachycardia">
+        <rect width="820" height="150" fill="#0b1220"/>
+        <g stroke="#1e3a5f" stroke-width="1">
+          <line x1="0" y1="30" x2="820" y2="30"/><line x1="0" y1="60" x2="820" y2="60"/>
+          <line x1="0" y1="90" x2="820" y2="90"/><line x1="0" y1="120" x2="820" y2="120"/>
+        </g>
+        <polyline fill="none" stroke="#86efac" stroke-width="2.4" points="0,90 40,90 48,78 56,92 64,46 72,60 84,60 92,90 150,90 158,78 166,92 174,46 182,60 194,60 202,90 260,90 268,78 276,92 284,46 292,60 304,60 312,90 370,90 378,78 386,92 394,46 402,60 414,60 422,90 480,90 488,78 496,92 504,46 512,60 524,60 532,90 590,90 598,78 606,92 614,46 622,60 634,60 642,90 700,90 708,78 716,92 724,46 732,60 744,60 752,90 810,90 820,90"/>
+        <text x="300" y="38" fill="#fca5a5" font-size="12" font-weight="700">↑ tombstone ST elevation (anterior)</text>
+        <text x="600" y="120" fill="#fcd34d" font-size="12" font-weight="700">↑ sinus tachy ~118 (compensatory)</text>
+      </svg>
+      <div class="ecg-cap">Anterior STEMI: convex <span style="color:#fca5a5">ST elevation in V1–V4</span> with a compensatory <span style="color:#fcd34d">sinus tachycardia</span>. A large anterior territory plus shock physiology is the classic recipe for pump-failure cardiogenic shock.</div>
+    </div>
+
+    <h3>🔎 The imaging toolkit in MI cardiogenic shock (high-yield)</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>What it tells you</th></tr>
+      <tr><td>📈 <strong>12-lead ECG</strong></td><td>Territory and size of infarct (anterior = big), ongoing ischemia, arrhythmia. Add right-sided/posterior leads if inferior — RV infarction changes management.</td></tr>
+      <tr><td>🫀 <strong>Bedside echo (the key test)</strong></td><td>LV function and regional akinesis, <strong>mechanical complications</strong> (VSD jet, flail leaflet/acute MR, tamponade), RV size/function, IVC/filling status.</td></tr>
+      <tr><td>🫁 <strong>Lung ultrasound / CXR</strong></td><td>B-lines and pulmonary edema confirm the "wet" — and guide how stingy to be with fluid.</td></tr>
+      <tr><td>🩻 <strong>Coronary angiography</strong></td><td>Defines the culprit and the burden of multivessel disease; the procedure that opens the artery (and the place to resist doing the non-culprits tonight).</td></tr>
+      <tr><td>📊 <strong>Invasive hemodynamics (PA catheter)</strong></td><td>Cardiac index, PCWP, cardiac power output, PAPi — confirms low output + high filling and guides MCS escalation/weaning in selected patients.</td></tr>
+      <tr><td>🧪 <strong>Lactate &amp; ScvO₂ trend</strong></td><td>Functional readouts of whether perfusion is improving — the resuscitation targets.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The ECG tells you which muscle died; the echo tells you whether the pump alone is failing or something has ruptured. In shock, you need both before you escalate."</div>
+
+    <h3>🫀 Post-PCI imaging summary</h3>
+    <ul>
+      <li>🩻 <strong>Angiography:</strong> proximal LAD occlusion now stented, TIMI 3 flow; significant circumflex and RCA disease deliberately left for staged treatment.</li>
+      <li>🫀 <strong>Echo:</strong> EF 25%, large akinetic anteroapical wall, high filling pressures, <strong>no VSD or significant MR tonight</strong>, RV preserved — primary LV pump failure.</li>
+      <li>🫁 <strong>Lung ultrasound:</strong> diffuse B-lines (pulmonary edema) — confirms "wet," argues against large-volume fluid.</li>
+    </ul>
+
+    <div class="callout warn"><b class="ct">⚠️ The trap on the imaging side</b>"The artery is open and TIMI 3, so reperfusion is done — he should improve." An open culprit is necessary but not sufficient: the muscle was already lost, the spiral is turning, and a <strong>new mechanical complication can appear hours later</strong>. Keep echoing the deteriorating patient; an open artery does not exclude a rupture.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S11 — MEDICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s11">
+  <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+  <div class="section-content">
+    <h3>💉 Acute drugs — what, why, and the traps</h3>
+    <table class="tbl">
+      <tr><th>Drug</th><th>Role tonight</th><th>Mechanism / caution</th></tr>
+      <tr><td><strong>Norepinephrine</strong></td><td><strong>First-line vasopressor</strong>; restore MAP ≈ 65 to perfuse brain, kidney and coronaries</td><td>α1 (vasoconstriction) + modest β1. Fewer arrhythmias and lower mortality than dopamine in shock (De Backer). Titrate to MAP; excessive dose raises afterload on a failing LV.</td></tr>
+      <tr><td><strong>Dobutamine</strong></td><td><strong>Inotrope</strong> to improve contractility and forward output once pressure is supported</td><td>β1 agonist (↑ contractility). Can cause tachycardia, arrhythmia and vasodilatory hypotension — usually paired with the pressor.</td></tr>
+      <tr><td><strong>Milrinone</strong></td><td>Alternative inotrope (inodilator), useful with high afterload / chronic beta-blockade</td><td>PDE-3 inhibitor → inotropy + vasodilation. Renally cleared (caution in AKI), causes hypotension — DOREMI: no clear superiority over dobutamine.</td></tr>
+      <tr><td><strong>Diuretic (furosemide)</strong></td><td>Offload pulmonary congestion once a MAP is established</td><td>Treats the "wet"; only useful once perfusion pressure is restored — diuresing a hypotensive patient first worsens output.</td></tr>
+      <tr><td><strong>Dopamine</strong></td><td><span class="hi">Avoid as first pressor here</span></td><td>More arrhythmias and higher mortality in the cardiogenic-shock subgroup (De Backer). The classic wrong reflex.</td></tr>
+      <tr><td><strong>Dual antiplatelet + anticoagulation</strong></td><td>Aspirin + P2Y12 inhibitor and procedural anticoagulation for the stented culprit</td><td>Standard post-PCI; balance against bleeding, especially if heading toward MCS/surgery.</td></tr>
+      <tr><td><strong>Cautious / withheld therapies</strong></td><td>Beta-blockers, ACE inhibitors, large fluid boluses</td><td>Negative inotropes and afterload manipulation are <strong>deferred</strong> in acute shock; start GDMT only once perfusion is restored.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Norepinephrine, not dopamine, is the first pressor in cardiogenic shock — then add an inotrope to make the failing pump actually move blood. Squeezing without inotropy just raises the wall a weak ventricle must climb."</div>
+
+    <div class="callout danger"><b class="ct">🚫 The 'avoid / defer' list in acute MI cardiogenic shock</b>❌ Dopamine as first-line pressor (arrhythmia, mortality) · ❌ reflex large-volume fluid in the wet patient · ❌ negative inotropes (beta-blockers) and afterload-lowering agents until perfused · ❌ reflexive IABP as the "mechanical support" answer (IABP-SHOCK II) · ❌ immediate multivessel PCI (CULPRIT-SHOCK). When in doubt, the priorities are an <strong>open culprit, a perfusing MAP, and an echo to exclude a rupture</strong>.</div>
+
+    <h3>🏠 Therapy once the shock is broken (this admission, not just tonight)</h3>
+    <ul>
+      <li>💙 <strong>Initiate/uptitrate HFrEF GDMT</strong> (ARNI/ACEi, beta-blocker, MRA, SGLT2i) — but only once off pressors and perfusing; this large infarct will leave him with chronic HFrEF.</li>
+      <li>🩹 <strong>Stage revascularization</strong> of the circumflex/RCA when stable.</li>
+      <li>🔌 <strong>Reassess for an ICD / device therapy</strong> after recovery and re-evaluation of EF (post-MI waiting period applies).</li>
+      <li>🛟 <strong>Wean mechanical support</strong> (if used) as cardiac power output and lactate recover; plan device removal and rehab.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S12 — MONITORING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s12">
+  <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+  <div class="section-content">
+    <h3>📡 What to watch and why</h3>
+    <ul>
+      <li>🩸 <strong>Invasive arterial MAP</strong> continuously — titrate norepinephrine to ≈ 65 mmHg; a falling MAP on a rising dose is a deterioration alarm.</li>
+      <li>🚽 <strong>Hourly urine output</strong> — the simplest, most honest perfusion monitor; trending up means the kidney is being fed again.</li>
+      <li>🧪 <strong>Serial lactate and ScvO₂</strong> — clearance = resuscitation working; a stuck or rising lactate = SCAI stage progressing, escalate.</li>
+      <li>🫁 <strong>SpO₂, work of breathing, lung ultrasound</strong> — track the pulmonary edema and the response to offloading/ventilation.</li>
+      <li>📊 <strong>Cardiac index / PCWP / cardiac power output</strong> (if a PA catheter is placed) — objective forward-flow and filling data to guide inotrope and MCS decisions.</li>
+      <li>🩺 <strong>Serial exam for a new murmur</strong> and <strong>repeat echo</strong> on any deterioration — to catch an evolving mechanical complication early.</li>
+      <li>📐 <strong>Re-stage SCAI (A→E) regularly</strong> — the stage drives escalation, MCS timing and prognostic conversations with the family.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After you start the pressor, the monitor's question changes from 'is he hypotensive?' to 'is he perfusing?' — and the two numbers that answer it are the urine output and the lactate."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S13 — COMPLICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s13">
+  <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+  <div class="section-content">
+    <h3>💀 What can go wrong — and the mechanism</h3>
+    <ul>
+      <li>📉 <strong>Refractory shock / multi-organ failure</strong> — the spiral wins despite an open artery and drugs; lactate climbs, kidneys and liver fail. Cue for mechanical support or, if futile, ceilings of care.</li>
+      <li>⚙️ <strong>Mechanical complications</strong> — VSD (new harsh murmur, oxygen step-up), papillary-muscle rupture (acute severe MR, flash edema, new murmur), free-wall rupture (tamponade, PEA arrest). Surgical/device emergencies hiding inside "pump failure."</li>
+      <li>💔 <strong>Right ventricular shock</strong> — inferior MI with RV infarction: hypotension with clear lungs and a raised JVP; mismanaged by treating it like the wet LV.</li>
+      <li>⚡ <strong>Malignant arrhythmias</strong> — VT/VF on ischemic, catecholamine-soaked myocardium (worsened by dopamine); and bradyarrhythmia/AV block in inferior MI.</li>
+      <li>🩸 <strong>Device/procedural complications</strong> — limb ischemia, bleeding, hemolysis and access-site problems from Impella/VA-ECMO; the price of mechanical support.</li>
+      <li>🧠 <strong>Hypoperfusion injury</strong> — acute kidney injury, ischemic hepatitis, gut ischemia, anoxic brain injury after arrest — the downstream toll of the spiral.</li>
+    </ul>
+
+    <!-- 🎭 M&M CONFERENCE MODULE -->
+    <div class="mm">
+      <h3>🎭 Morbidity &amp; Mortality Conference — "Everything While We're In There"</h3>
+      <div class="mm-case">
+        <strong>The case:</strong> A 66-year-old man with an anterior STEMI and cardiogenic shock reached the cath lab. The culprit LAD was opened — and then, "to be complete," the team went on to <strong>stent the circumflex and RCA in the same sitting</strong>. The procedure was long, contrast-heavy, and his pressure sagged throughout. To prop him up someone chose <strong>dopamine</strong> as the first pressor, and he ran a burst of fast VT mid-case. An <strong>intra-aortic balloon pump</strong> was inserted reflexively "for support." He left the lab in deeper shock than he arrived, developed acute kidney injury requiring dialysis, and died on day 3 of refractory multi-organ failure. The M&amp;M reviewed three avoidable choices.
+      </div>
+      <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+      <div class="swiss">
+        <div class="hole"><b>🩹 OVER-PCI</b>Immediate multivessel PCI in shock — exactly what CULPRIT-SHOCK showed harms.</div>
+        <div class="hole"><b>💉 WRONG PRESSOR</b>Dopamine first → tachyarrhythmia and higher mortality (De Backer).</div>
+        <div class="hole"><b>🎈 REFLEX IABP</b>Balloon pump inserted by habit — no mortality benefit (IABP-SHOCK II).</div>
+        <div class="hole"><b>🔎 NO ECHO</b>No bedside echo to stage the pump or exclude a mechanical complication.</div>
+        <div class="hole"><b>🏥 NO SHOCK TEAM</b>No protocolized escalation or early MCS-hub decision.</div>
+      </div>
+      <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> open the <em>culprit only</em> and stage the rest (CULPRIT-SHOCK); <strong>norepinephrine</strong> first, not dopamine; an early <strong>echo</strong> to confirm the physiology and exclude a rupture; and deliberate, device-matched mechanical support (Impella/VA-ECMO) through a <strong>shock team</strong> — not a reflex balloon. <strong>This is exactly why your nurse held the extra fluid and why you stopped at the culprit tonight.</strong></p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Do everything while we're in there' is the sentence written on the chart of patients pushed deeper into shock. In MI shock, less in the lab (culprit only) and the right drug (norepinephrine) save more lives than more hardware."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S14 — DIFFERENTIALS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s14">
+  <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials</h2></div>
+  <div class="section-content">
+    <h3>🧩 The shock-after-MI differential</h3>
+    <table class="tbl">
+      <tr><th>Diagnosis</th><th>Clues</th><th>Why it matters</th></tr>
+      <tr><td>💔 <strong>Primary LV pump failure</strong> (this patient)</td><td>Large infarct, cold &amp; wet, low output + high filling, no new murmur, EF 25% on echo</td><td>Default after a big MI; treat with culprit PCI, norepinephrine + inotrope, offload, ± MCS.</td></tr>
+      <tr><td>⚙️ <strong>Mechanical complication</strong> (VSD / papillary-muscle / free-wall rupture)</td><td><strong>New murmur</strong>, abrupt deterioration, flash edema (MR) or tamponade/PEA (rupture)</td><td>Surgery/device, not drugs alone — echo every deteriorating patient. A different disease wearing the same hypotension.</td></tr>
+      <tr><td>🫀 <strong>Right ventricular shock</strong> (RV infarction)</td><td>Inferior MI, hypotension with <strong>clear lungs</strong>, raised JVP, Kussmaul; right-sided ST elevation</td><td>Preload-dependent — needs careful fluid + inotropy, NOT diuresis/vasodilators. The mirror image of LV shock.</td></tr>
+      <tr><td>🔥 <strong>Septic / distributive shock</strong></td><td><strong>Warm</strong>, vasodilated, high output, wide pulse pressure, fever/source (line, aspiration)</td><td>Antibiotics + fluids + vasopressor for vasoplegia — the opposite hemodynamic profile; don't mislabel.</td></tr>
+      <tr><td>💧 <strong>Hypovolemic / hemorrhagic</strong></td><td>Cold but <strong>empty</strong>: flat JVP, low filling, fluid-responsive; bleeding (access site, GI, retroperitoneal post-PCI)</td><td>Treat with volume / control bleeding — flooding a cardiogenic patient instead is harmful.</td></tr>
+      <tr><td>🚧 <strong>Obstructive shock</strong></td><td>Tamponade (muffled, pulsus paradoxus) or massive PE (RV strain, hypoxia)</td><td>Relieve the obstruction (pericardiocentesis / reperfusion) — pressors only buy time.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"COLD + CONGESTED (high filling) → cardiogenic. COLD + EMPTY → hypovolemic. WARM + vasodilated → septic. A NEW murmur → mechanical complication. The echo and the JVP, not the cuff, tell them apart."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S15 — PLAN -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s15">
+  <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan</h2></div>
+  <div class="section-content">
+    <h3>🧭 Tonight → this week → for life</h3>
+    <ol>
+      <li>⚡ <strong>Tonight (done/doing):</strong> culprit LAD reperfused; norepinephrine to MAP ≈ 65; dobutamine added; cautious fluid/offload the wet lungs; ventilatory support; bedside echo excluding a mechanical complication; shock team engaged; SCAI stage tracked.</li>
+      <li>🛟 <strong>If deteriorating:</strong> escalate deliberately to <strong>Impella</strong> (selected STEMI shock) or <strong>VA-ECMO</strong> — NOT a reflex IABP — and re-echo to exclude an evolving rupture.</li>
+      <li>🩹 <strong>Stage the non-culprit lesions</strong> (circumflex/RCA) once stabilized — never in the same acute sitting (CULPRIT-SHOCK).</li>
+      <li>💙 <strong>Initiate HFrEF GDMT</strong> (ARNI/ACEi, beta-blocker, MRA, SGLT2i) once off pressors and perfusing; cardiac rehab and secondary prevention.</li>
+      <li>🔌 <strong>Re-evaluate EF and device candidacy</strong> after recovery (post-MI ICD waiting period) — this large infarct may leave a chronically low EF.</li>
+      <li>👨‍👩‍👦 <strong>Shared decision-making &amp; prognosis by SCAI stage</strong> — honest conversations about likely recovery, the role and limits of mechanical support, and ceilings of care if the shock is refractory.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Tonight you break the spiral; this admission you stage the arteries and start the heart-failure drugs; for life you protect the muscle that survived. Open culprit, perfuse, then rebuild."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S16 — PROGRESS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s16">
+  <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+  <div class="section-content">
+    <h3>📅 Course in CCU</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Night 1, 05:10</div>Norepinephrine started to MAP 65; dobutamine added; NIV for pulmonary edema. Echo confirms LV pump failure, no mechanical complication. IABP declined; Impella pathway primed.</div>
+      <div class="t-item"><div class="t-time">Night 1, 07:30</div>Lactate not clearing (4.6 → 5.1), MAP 58 on rising norepinephrine, urine 5 mL/h — SCAI Stage D. Shock team places an <strong>Impella</strong>; he is intubated.</div>
+      <div class="t-item"><div class="t-time">Day 1</div>On Impella + low-dose inotrope, lactate falls (5.1 → 2.4), urine returns, MAP stable off escalating pressor. Spiral broken.</div>
+      <div class="t-item"><div class="t-time">Day 3</div>Lactate normalized, kidneys recovering, weaned to minimal support. Repeat echo: EF 30%, still no mechanical complication. Begin cautious GDMT.</div>
+      <div class="t-item"><div class="t-time">Day 4</div>Impella removed; extubated. Staged PCI of the circumflex performed electively; RCA planned next session.</div>
+      <div class="t-item"><div class="t-time">Day 8</div>Off all inotropes/pressors, mobilizing, GDMT uptitrated. EF 32%; ICD reassessment deferred to outpatient post-MI window. Planning step-down.</div>
+    </div>
+
+    <!-- 👨‍👩‍👦 FAMILY & PATIENT JOURNEY MODULE -->
+    <h3>👨‍👩‍👦 Family &amp; Patient Journey</h3>
+    <div class="journey">
+      <div class="j-card"><div class="j-who">🧔 The patient — Mr. A.K.</div><p>"I don't remember much — the cold, the mask, being so tired I couldn't talk. They told me my heart attack was so big the pump nearly stopped, and a little machine in my groin did the heart's work until it caught up. I'm here because they didn't panic and do everything at once."</p></div>
+      <div class="j-card"><div class="j-who">👩 His wife</div><p>"His hands were grey and freezing and the bag for the catheter just stopped filling — that frightened me more than the monitors. A nurse explained that the urine coming back meant his organs were getting blood again. When it started dripping, I knew he was turning a corner."</p></div>
+      <div class="j-card"><div class="j-who">👩‍⚕️ The bedside nurse</div><p>"My job was the lactate, the urine and the norepinephrine line — and being the gatekeeper on fluid and on dopamine. Sometimes good care is the litre you don't hang and the drug you don't give."</p></div>
+      <div class="j-card"><div class="j-who">🎓 The team's reflection</div><p>"We resisted three reflexes — multivessel PCI, dopamine, and a balloon pump — and did the evidence-based, unglamorous things: open the culprit, norepinephrine, echo, and a deliberate Impella through the shock team. The spiral broke."</p></div>
+    </div>
+
+    <div class="callout pink"><b class="ct">💗 The human thread</b>Cardiogenic shock is survived in hours but processed for months: the near-death, the ICU delirium, the fear of the next chest pain, and a heart that will never be quite as strong. Preparing the patient and family for life with HFrEF — the medications, the warning signs, the rehab, the emotional aftermath — is as much treatment as the pressor was.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S17 — DISCHARGE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s17">
+  <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+  <div class="section-content">
+    <h3>📋 Discharge plan &amp; safety net</h3>
+    <ul>
+      <li>💊 <strong>Medications:</strong> dual antiplatelet therapy (duration per stent/bleeding risk), high-intensity statin, and uptitrated HFrEF GDMT (ARNI/ACEi, beta-blocker, MRA, SGLT2i) with a clear written schedule and follow-up bloods (renal function, potassium).</li>
+      <li>🩹 <strong>Staged revascularization:</strong> remaining RCA lesion booked; cardiology follow-up to complete the plan.</li>
+      <li>🔌 <strong>Device reassessment:</strong> repeat echo at ~6–12 weeks; if EF remains ≤ 35% on optimal therapy, reassess for a primary-prevention ICD after the post-MI waiting period.</li>
+      <li>💙 <strong>Cardiac rehabilitation</strong> referral, smoking cessation, diabetes and blood-pressure optimization, dietary and fluid/salt education for heart failure.</li>
+      <li>🚩 <strong>Red flags → call emergency services:</strong> recurrent chest pain, breathlessness at rest or lying flat, rapid weight gain/swelling, fainting or palpitations, or feeling cold, clammy and "wrung out" again.</li>
+      <li>📚 <strong>Education:</strong> what cardiogenic shock and HFrEF mean in plain language, why every medication matters, daily weights, and a clear "what to do if symptoms return" plan; CPR/AED awareness offered to the family.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Surviving cardiogenic shock is the start, not the end — discharge means staged revascularization, optimized heart-failure drugs, an EF reassessment for a device, rehab, and a family who knows the warning signs of the next decompensation."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S18 — CLINICAL PEARLS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s18">
+  <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+  <div class="section-content">
+    <div class="pearl-grid">
+      <div class="pearl"><b>🩹 Culprit only</b>In MI cardiogenic shock, open the culprit artery — and ONLY the culprit. Immediate multivessel PCI harmed patients (CULPRIT-SHOCK). Stage the rest.</div>
+      <div class="pearl"><b>💉 Norepinephrine first</b>Norepinephrine, not dopamine, is the first pressor in cardiogenic shock — fewer arrhythmias, lower mortality (De Backer).</div>
+      <div class="pearl"><b>🎈 No reflex balloon</b>The IABP does not save lives in MI shock (IABP-SHOCK II) — don't reach for it reflexively.</div>
+      <div class="pearl"><b>🫀 Open the artery early</b>Emergent revascularization is the single biggest mortality lever (SHOCK trial). Reperfuse fast.</div>
+      <div class="pearl"><b>🩺 New murmur = rupture</b>A new murmur in a shocked post-MI patient is a mechanical rupture until an echo proves otherwise.</div>
+      <div class="pearl"><b>📐 Stage it (SCAI)</b>A→E (at-risk → beginning → classic → deteriorating → extremis). The stage drives escalation and prognosis.</div>
+      <div class="pearl"><b>❄️ Cold &amp; wet</b>Low output (cold) + congestion (wet) is the classic, lethal MI-shock profile. Perfusion is the diagnosis, not the cuff.</div>
+      <div class="pearl"><b>🔀 Know the shock type</b>Cold+congested = cardiogenic; cold+empty = hypovolemic; warm = septic. Echo + JVP + perfusion separate them.</div>
+      <div class="pearl"><b>💪 Pressor + inotrope</b>Squeezing alone just raises afterload on a weak pump — add an inotrope to actually move blood forward.</div>
+      <div class="pearl"><b>💧 Stingy with fluid</b>The lungs are wet — reflex large-volume resuscitation worsens edema. Small, monitored challenges only.</div>
+      <div class="pearl"><b>🛟 MCS by physiology</b>If escalating: Impella (selected STEMI shock, DanGer) or VA-ECMO for biventricular failure — match the device to the patient.</div>
+      <div class="pearl"><b>🚽 Watch perfusion</b>Urine output and lactate clearance tell you the spiral is breaking before the blood pressure does.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S19 — MCQs / ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s19">
+  <div class="sec-header"><span class="s-badge">S19</span><h2>🧠 MCQs / Assessment</h2></div>
+  <div class="section-content">
+    <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP and feed your dashboard. Each shows a full explanation.</em></p>
+    <div id="mcqHost"></div>
+    <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · Case c-cs-022 — Cardiogenic Shock Complicating Acute MI<br>
+  ⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."
+</div>
+
+</div><!-- /#caseScroll -->
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ XP / DASHBOARD CORE ============ */
+  var XP = 0, XP_MAX = 1200;
+  var awarded = {}; // dedupe one-time awards by key
+  var xpVal = document.getElementById('xpVal');
+  var xpFill = document.getElementById('xpFill');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+  }
+  function addXP(amount, key, label){
+    if(key){ if(awarded[key]) return; awarded[key] = true; }
+    XP += amount;
+    if(XP > XP_MAX) XP = XP_MAX;
+    xpVal.textContent = XP;
+    xpFill.style.width = Math.min(100, Math.round(XP / XP_MAX * 100)) + '%';
+    showToast('+' + amount + ' XP' + (label ? ' · ' + label : ''));
+  }
+  function earnBadge(id){
+    var b = document.getElementById(id);
+    if(b && !b.classList.contains('earned')){ b.classList.add('earned'); }
+  }
+
+  /* Dashboard minimize */
+  var dash = document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){
+    dash.classList.toggle('collapsed');
+    this.textContent = dash.classList.contains('collapsed') ? '+' : '–';
+  });
+
+  /* ============ INTERNAL SCROLL SIZING ============ */
+  /* Size the scroll box to the visible window so the sticky tab bar stays in
+     view. When embedded (srcDoc iframe, same-origin), the host page stretches
+     the iframe to full content height and scrolls the OUTER page — so we size
+     this box from the parent window's height minus whatever app chrome sits
+     above the iframe, and scroll internally instead. Standalone → 100vh. */
+  var caseScroll = document.getElementById('caseScroll');
+  var topnav = document.getElementById('topnav');
+  /* The tab bar is position:fixed, so it's out of flow — reserve space at the
+     top of the scroll content (and offset anchor jumps) by its real height. */
+  function setNavOffset(){
+    var navH = topnav ? topnav.offsetHeight : 70;
+    caseScroll.style.paddingTop = navH + 'px';
+    caseScroll.style.scrollPaddingTop = (navH + 14) + 'px';
+  }
+  function sizeScroller(){
+    try {
+      var p = window.parent;
+      if(p && p !== window && window.frameElement){
+        var rectTop = window.frameElement.getBoundingClientRect().top;
+        if(rectTop < 0) rectTop = 0;          // parent scrolled past the chrome
+        var ph = p.innerHeight || 800;
+        var h = ph - rectTop - 6;             // leave the bottom edge breathing room
+        if(h < 460) h = 460;                  // sane minimum on short windows
+        caseScroll.style.height = h + 'px';
+      } else {
+        caseScroll.style.height = '100vh';
+      }
+    } catch(e){ caseScroll.style.height = '100vh'; }
+    setNavOffset();
+  }
+  sizeScroller();
+  window.addEventListener('resize', sizeScroller);
+  window.addEventListener('load', sizeScroller);
+  try { if(window.parent && window.parent !== window) window.parent.addEventListener('resize', sizeScroller); } catch(e){}
+
+  /* ============ NAV: scroll-spy active + visited ============ */
+  var navchips = Array.prototype.slice.call(document.querySelectorAll('.navchip'));
+  var sections = navchips.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited = {};
+  var visitVal = document.getElementById('visitVal');
+
+  function markVisited(idx){
+    var sec = sections[idx];
+    if(!sec) return;
+    if(!visited[sec.id]){
+      visited[sec.id] = true;
+      navchips[idx].classList.add('visited');
+      var count = Object.keys(visited).length;
+      visitVal.textContent = count + ' / 19';
+      addXP(8, 'visit-' + sec.id, 'Section read');
+      if(count >= 19){ earnBadge('bdg-explorer'); addXP(60, 'allvisited', 'Ward Explorer!'); }
+    }
+  }
+  function setActive(idx){
+    navchips.forEach(function(c){ c.classList.remove('active'); });
+    if(navchips[idx]) navchips[idx].classList.add('active');
+  }
+
+  /* True tabs: each chip shows ONLY its section, hidden via CSS otherwise.
+     No scrollIntoView and no scroll-spy — nothing can scroll the tab bar away,
+     which also sidesteps every srcDoc-iframe scrolling quirk. The hero banner
+     and vitals strip belong to the case intro, so they show on S1 only. */
+  var heroBits = [document.querySelector('.hero'), document.querySelector('.vitals-strip')]
+    .filter(function(el){ return !!el; });
+
+  function showSection(idx){
+    sections.forEach(function(s, i){ if(s) s.classList.toggle('sec-active', i === idx); });
+    heroBits.forEach(function(el){ el.style.display = (idx === 0) ? '' : 'none'; });
+    caseScroll.scrollTop = 0;
+    setActive(idx);
+    markVisited(idx);
+  }
+
+  navchips.forEach(function(chip, idx){
+    chip.addEventListener('click', function(ev){
+      ev.preventDefault();
+      showSection(idx);
+    });
+  });
+  showSection(0);
+
+  /* ============ FLAG GAME (S2) ============ */
+  var flagBtns = document.querySelectorAll('#flagGame .flag-btn');
+  var flagResult = document.getElementById('flagResult');
+  var flagsFound = 0, flagsTotal = 0, flagWrong = 0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good') === '1') flagsTotal++; });
+  flagBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.dataset.locked) return;
+      btn.dataset.locked = '1';
+      var good = btn.getAttribute('data-good') === '1';
+      if(good){
+        btn.classList.add('flag-good');
+        flagsFound++;
+        addXP(10, 'flag-' + flagsFound + '-' + Math.random(), 'Shock flag spotted');
+      } else {
+        btn.classList.add('flag-bad');
+        flagWrong++;
+        showToast('❌ Not a cardiogenic-shock flag');
+      }
+      if(flagsFound === flagsTotal){
+        flagResult.textContent = '✅ All ' + flagsTotal + ' cardiogenic-shock red flags found' + (flagWrong ? ' (with ' + flagWrong + ' wrong pick' + (flagWrong>1?'s':'') + ')' : ' — flawless!');
+        earnBadge('bdg-vt');
+        addXP(30, 'flags-complete', 'Shock-Spotter badge');
+      } else {
+        flagResult.textContent = flagsFound + ' / ' + flagsTotal + ' cardiogenic-shock red flags found…';
+      }
+    });
+  });
+
+  /* ============ BRANCHING SCENARIO (S3) ============ */
+  var scText = document.getElementById('scText');
+  var scChoices = document.getElementById('scChoices');
+  var scFeedback = document.getElementById('scFeedback');
+  var scRestart = document.getElementById('scRestart');
+  var scStab = document.getElementById('scStab');
+  var scTime = document.getElementById('scTime');
+  var scXP = document.getElementById('scXP');
+  var pathXP = 0, scStability = 2, scElapsed = 0;
+
+  var STEPS = {
+    start: {
+      text: "The culprit LAD is open but BP is 78/50, MAP 59, lactate 4.6, urine 8 mL/h, lungs wet. The intern is about to hang another litre of saline; the SHO is on the phone asking the cath lab for a balloon pump. The interventional fellow offers to 'do the circumflex and RCA now while access is in.' What is your FIRST move?",
+      choices: [
+        { t: "💉 Start norepinephrine to a MAP ~65 and stop the extra fluid — the culprit is already open", good:true, ds:1, dt:10, xp:40, fb:"✅ Exactly. The culprit is reperfused (the big mortality lever). Now restore perfusion pressure with norepinephrine first-line and don't flood the wet lungs. You've started breaking the spiral.", next:"inotrope" },
+        { t: "🩹 Tell the fellow to PCI the circumflex and RCA now 'while we're in there'", good:false, ds:-2, dt:25, xp:0, fb:"☠️ Wrong — this is the CULPRIT-SHOCK error. Immediate multivessel PCI in shock increased death and renal-replacement therapy. Treat the culprit and STOP; stage the rest. Restart and choose again.", end:true },
+        { t: "💉 Start dopamine — 'it raises the pressure and supports the heart'", good:false, ds:-1, dt:15, xp:5, fb:"⚠️ Wrong first pressor. Dopamine causes more arrhythmias and higher mortality than norepinephrine in cardiogenic shock (De Backer). Switch your thinking to norepinephrine.", next:"start2" }
+      ]
+    },
+    start2: {
+      text: "Dopamine pushed his heart rate to 140 with a run of VT (as the evidence warns). BP still 76/48. The defibrillator is at the bedside. Now what?",
+      choices: [
+        { t: "💉 Stop the dopamine, switch to norepinephrine to MAP ~65", good:true, ds:1, dt:8, xp:30, fb:"✅ The right correction. Norepinephrine is first-line in cardiogenic shock — fewer arrhythmias, lower mortality. Lesson banked.", next:"inotrope" },
+        { t: "🎈 Insert an intra-aortic balloon pump for 'support'", good:false, ds:-1, dt:20, xp:0, fb:"⚠️ Reflex IABP — no mortality benefit in MI shock (IABP-SHOCK II). It's not the answer to 'do something mechanical.' Fix the pressor first.", next:"inotrope" }
+      ]
+    },
+    inotrope: {
+      text: "Norepinephrine is running, MAP now 66, but the cardiac output is still low — he's cold and the lactate hasn't moved. What do you add?",
+      choices: [
+        { t: "💪 Add dobutamine (an inotrope) to improve contractility and forward flow — and get an urgent echo", good:true, ds:1, dt:6, xp:30, fb:"✅ Ideal: the pressor restored pressure, but a failing pump needs inotropy to actually move blood. And the echo confirms LV failure and excludes a rupture before you escalate further.", next:"escalate" },
+        { t: "💧 Give two more litres of saline to 'fill him up'", good:false, ds:-1, dt:10, xp:0, fb:"⚠️ He's cold and WET — high filling pressures, edematous lungs. Flooding him worsens oxygenation without fixing output. Add an inotrope and offload instead.", next:"escalate" }
+      ]
+    },
+    escalate: {
+      text: "Despite norepinephrine + dobutamine, the lactate climbs (4.6 → 5.1), MAP drifts to 58 and urine is 5 mL/h. Echo shows LV failure, no VSD or MR. He's SCAI Stage D. Final move?",
+      choices: [
+        { t: "🛟 Escalate to Impella via the shock team (selected STEMI shock); intubate as needed", good:true, ds:1, dt:5, xp:40, fb:"🏆 Perfect close. The spiral is winning on drugs alone — escalate deliberately to device-matched mechanical support. DanGer Shock supports Impella in selected STEMI shock. The shock team makes this a decision, not a reflex.", end:true },
+        { t: "🎈 Just put in a balloon pump — it's quicker", good:false, ds:-1, dt:10, xp:0, fb:"⚠️ Reflex IABP again — no mortality benefit (IABP-SHOCK II). Match the device to the physiology (Impella/VA-ECMO), don't default to the balloon.", end:true }
+      ]
+    }
+  };
+
+  function renderStab(){
+    var s = Math.max(0, Math.min(5, scStability + 2)); // map -2..3 → 0..5
+    var dots = '';
+    for(var i=0;i<5;i++) dots += (i < s ? '●' : '○');
+    scStab.textContent = dots;
+  }
+  function renderStep(key){
+    var step = STEPS[key];
+    scText.textContent = step.text;
+    scFeedback.className = 'feedback';
+    scFeedback.style.display = 'none';
+    scChoices.innerHTML = '';
+    step.choices.forEach(function(ch){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = ch.t;
+      b.addEventListener('click', function(){
+        pathXP += ch.xp; scXP.textContent = pathXP;
+        scElapsed += ch.dt; scTime.textContent = scElapsed + ' s';
+        scStability += ch.ds; renderStab();
+        if(ch.xp) addXP(ch.xp, null, 'Scenario choice');
+        scFeedback.textContent = ch.fb;
+        scFeedback.className = 'feedback ' + (ch.good ? 'good' : 'bad');
+        scFeedback.style.display = 'block';
+        Array.prototype.forEach.call(scChoices.children, function(c){ c.disabled = true; c.style.opacity = .6; });
+        if(ch.end){
+          scRestart.style.display = 'inline-block';
+          if(ch.good && key === 'escalate'){ earnBadge('bdg-shock'); addXP(20, 'scenario-win', 'Culprit Opened!'); }
+        } else if(ch.next){
+          setTimeout(function(){ renderStep(ch.next); }, 1400);
+        }
+      });
+      scChoices.appendChild(b);
+    });
+  }
+  scRestart.addEventListener('click', function(){
+    pathXP = 0; scStability = 2; scElapsed = 0;
+    scXP.textContent = 0; scTime.textContent = '0 s'; renderStab();
+    scRestart.style.display = 'none';
+    renderStep('start');
+  });
+  renderStab();
+  renderStep('start');
+
+  /* ============ REVEAL BUTTONS ============ */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.getAttribute('data-target'));
+      if(!t) return;
+      if(t.classList.contains('reveal-shown')){
+        t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden');
+      } else {
+        t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown');
+        addXP(8, 'reveal-' + btn.getAttribute('data-target'), 'Self-test');
+      }
+    });
+  });
+
+  /* ============ PERFUSION / SCAI SIM (S6) ============ */
+  var kRange = document.getElementById('kRange');
+  var kVal = document.getElementById('kVal');
+  var kNeedle = document.getElementById('kNeedle');
+  var kReadout = document.getElementById('kReadout');
+  if(kRange){
+    var simUsed = false;
+    function updateK(){
+      var k = (parseInt(kRange.value,10) / 10); // 2.0 .. 7.5
+      kVal.textContent = k.toFixed(1);
+      var pct = (parseInt(kRange.value,10) - 20) / (75 - 20) * 100;
+      kNeedle.style.left = pct + '%';
+      var msg, cls;
+      if(k < 3.0){ msg = '🔴 SCAI Stage E — extremis. MAP collapsed, no forward flow: refractory hypotension, soaring lactate, organs dying. This is the bottom of the death spiral — mechanical support or it is fatal.'; cls='bad'; }
+      else if(k < 3.5){ msg = '🟠 SCAI Stage D — deteriorating. Low output despite pressor + inotrope, lactate not clearing, oliguria. Escalate to device-matched mechanical support (Impella/VA-ECMO).'; cls='warn-r'; }
+      else if(k <= 5.0){ msg = '🟢 SCAI Stage C / target — perfusing on support. MAP ≈ 65, lactate clearing, urine returning. Keep the culprit open and the pump supported; this is where you want him.'; cls='good'; }
+      else if(k <= 6.0){ msg = '🟠 SCAI Stage B — beginning / pre-shock. Hypotensive or tachycardic but still perfusing. Act now (revascularize, support) to stop the spiral before it accelerates.'; cls='warn-r'; }
+      else { msg = '🔴 SCAI Stage A — at risk. Normal perfusion now, but a large MI can tip into shock fast. Recognize early; the spiral spins faster the longer you wait.'; cls='bad'; }
+      kReadout.innerHTML = msg;
+      kReadout.className = 'readout ' + cls;
+      if(!simUsed){ simUsed = true; addXP(15, 'ksim', 'Perfusion Master'); }
+    }
+    kRange.addEventListener('input', updateK);
+    updateK();
+  }
+
+  /* ============ CHECKLISTS (S7) ============ */
+  var allChecklistsDone = 0, totalChecklists = document.querySelectorAll('.checklist').length;
+  document.querySelectorAll('.checklist').forEach(function(list){
+    var boxes = list.querySelectorAll('input[type=checkbox]');
+    var prog = list.querySelector('[data-progress]');
+    var total = boxes.length;
+    var doneAwarded = false;
+    function refresh(){
+      var done = 0;
+      boxes.forEach(function(b){
+        if(b.checked){ done++; b.closest('.ck').classList.add('done'); }
+        else { b.closest('.ck').classList.remove('done'); }
+      });
+      prog.textContent = done + ' / ' + total + ' complete';
+      if(done === total && !doneAwarded){
+        doneAwarded = true;
+        allChecklistsDone++;
+        addXP(25, 'ck-' + list.id, 'Checklist done');
+        if(allChecklistsDone >= totalChecklists){ earnBadge('bdg-ck'); addXP(20, 'allck', 'Checklist Champion'); }
+      }
+    }
+    boxes.forEach(function(b){
+      b.addEventListener('change', function(){
+        if(b.checked) addXP(4, null, 'Step checked');
+        refresh();
+      });
+    });
+  });
+
+  /* ============ MCQs (S19) ============ */
+  var MCQS = [
+    {
+      q: "A 64-year-old with a large anterior STEMI has an open culprit LAD but remains hypotensive (BP 78/50), cold, oliguric, with lactate 4.6. The recommended FIRST-line vasopressor is:",
+      opts: ["Dopamine","Norepinephrine","Phenylephrine","Vasopressin"],
+      correct: 1,
+      exp: "Norepinephrine is first-line in cardiogenic shock. In the De Backer (SOAP II) trial, dopamine caused more arrhythmias overall and was associated with higher mortality in the cardiogenic-shock subgroup. Titrate norepinephrine to a MAP of about 65 mmHg and add an inotrope for contractility."
+    },
+    {
+      q: "During primary PCI for STEMI complicated by cardiogenic shock, the culprit lesion is stented. There are additional significant circumflex and RCA lesions. Based on CULPRIT-SHOCK, you should:",
+      opts: ["Immediately PCI all the non-culprit lesions in the same sitting","Treat the culprit lesion only and stage the others later","Defer all PCI and manage medically","Proceed to emergency CABG of all vessels"],
+      correct: 1,
+      exp: "CULPRIT-SHOCK showed culprit-lesion-only PCI reduced 30-day death or renal-replacement therapy compared with immediate multivessel PCI in shock. Open the culprit and STOP; stage the remaining lesions once stabilized."
+    },
+    {
+      q: "The night team wants to insert an intra-aortic balloon pump (IABP) reflexively for this patient's MI cardiogenic shock. The best evidence-based statement is:",
+      opts: ["IABP reduces 30-day mortality and should be standard","IABP did not reduce mortality in MI shock (IABP-SHOCK II); don't insert it reflexively","IABP is contraindicated in all cardiogenic shock","IABP is superior to all other mechanical support"],
+      correct: 1,
+      exp: "IABP-SHOCK II found no reduction in 30-day or long-term mortality with an IABP in MI cardiogenic shock. It is not a default mortality therapy; if mechanical support is needed, match the device to the physiology (e.g. Impella, VA-ECMO)."
+    },
+    {
+      q: "Which intervention has the single largest mortality benefit in acute MI complicated by cardiogenic shock?",
+      opts: ["Early revascularization of the culprit artery (SHOCK trial)","High-dose loop diuretics","Routine corticosteroids","Prophylactic antibiotics"],
+      correct: 0,
+      exp: "The SHOCK trial established that early revascularization (PCI or CABG) improves survival in MI cardiogenic shock — the biggest mortality lever. Restoring coronary flow is the cornerstone that the pharmacological and mechanical support measures are built around."
+    },
+    {
+      q: "Three days after an inferior MI, a patient in 'pump failure' shock develops a NEW harsh holosystolic murmur and flash pulmonary edema. The most important next step is:",
+      opts: ["Increase the inotrope dose and observe","Urgent echocardiography to evaluate for a mechanical complication","Start broad-spectrum antibiotics","Give a large fluid bolus"],
+      correct: 1,
+      exp: "A new murmur in a shocked post-MI patient is a mechanical complication (papillary-muscle rupture with acute MR, or a post-MI VSD) until an echo proves otherwise. These require surgery/device, not escalating inotropes; echo every deteriorating patient before escalating drugs."
+    },
+    {
+      q: "A patient with MI is hypotensive, oliguric and has a lactate of 5 despite a vasopressor and an inotrope. Using the SCAI shock classification, this is best described as:",
+      opts: ["Stage A (at risk)","Stage B (beginning / pre-shock)","Stage D (deteriorating)","Stage A regardless of lactate"],
+      correct: 2,
+      exp: "SCAI stages run A (at risk) → B (beginning) → C (classic, needs support) → D (deteriorating despite initial support) → E (extremis). Failure to improve — rising lactate and oliguria despite pressor + inotrope — defines Stage D and is the cue to escalate to mechanical support."
+    },
+    {
+      q: "A post-MI patient is hypotensive but WARM with bounding pulses, a wide pulse pressure, and a high cardiac output. This pattern should make you suspect:",
+      opts: ["Classic cardiogenic shock","A distributive (e.g. septic) process rather than pure pump failure","Hypovolemic shock","Right ventricular infarction"],
+      correct: 1,
+      exp: "Cardiogenic shock is COLD and congested with low output. A warm, vasodilated, high-output picture points to a distributive process (sepsis from a line/aspiration) or another cause. Bedside echo, filling pressures and perfusion distinguish cardiogenic (cold/congested) from septic (warm), hypovolemic (cold/empty) and obstructive shock."
+    },
+    {
+      q: "In cardiogenic shock from pump failure, the role of inotropes and mechanical support is best summarized as:",
+      opts: ["A vasopressor alone is always sufficient","Add an inotrope to improve contractility once pressure is supported, and escalate to device-matched MCS (e.g. Impella, DanGer Shock) if deteriorating","Mechanical support should always be a reflex IABP","Inotropes are contraindicated in all cardiogenic shock"],
+      correct: 1,
+      exp: "A vasopressor restores perfusion pressure but a failing pump also needs inotropic support to generate forward flow; norepinephrine is typically paired with dobutamine (or milrinone). If the patient deteriorates despite drugs, escalate deliberately to device-matched mechanical support — Impella showed a survival benefit in selected STEMI shock (DanGer Shock), or VA-ECMO for biventricular failure — not a reflex IABP."
+    }
+  ];
+
+  var host = document.getElementById('mcqHost');
+  var mcqVal = document.getElementById('mcqVal');
+  var mcqScore = 0, mcqAnswered = 0;
+  var letters = ['A','B','C','D','E'];
+
+  MCQS.forEach(function(item, qi){
+    var box = document.createElement('div');
+    box.className = 'mcq';
+    var html = '<div class="mcq-q">QUESTION ' + (qi+1) + ' / ' + MCQS.length + '</div>';
+    html += '<div class="mcq-stem">' + item.q + '</div>';
+    item.opts.forEach(function(opt, oi){
+      html += '<label class="mcq-opt" data-oi="' + oi + '"><strong>' + letters[oi] + '.</strong> ' + opt + '</label>';
+    });
+    html += '<div class="mcq-exp"></div>';
+    box.innerHTML = html;
+    host.appendChild(box);
+
+    var opts = box.querySelectorAll('.mcq-opt');
+    var exp = box.querySelector('.mcq-exp');
+    var locked = false;
+    opts.forEach(function(label){
+      label.addEventListener('click', function(){
+        if(locked) return;
+        locked = true;
+        var oi = parseInt(label.getAttribute('data-oi'),10);
+        box.classList.add('answered');
+        var correct = item.correct;
+        if(oi === correct){
+          label.classList.add('picked-right');
+          mcqScore++;
+          addXP(25, null, 'Correct answer');
+        } else {
+          label.classList.add('picked-wrong');
+          opts[correct].classList.add('show-right');
+          showToast('❌ Correct: ' + letters[correct]);
+        }
+        exp.innerHTML = '<strong>' + (oi === correct ? '✅ Correct. ' : '📘 Explanation. ') + '</strong>' + item.exp;
+        mcqAnswered++;
+        mcqVal.textContent = mcqScore + ' / ' + MCQS.length;
+        if(mcqAnswered === MCQS.length){
+          var done = document.getElementById('mcqDone');
+          var summary = document.getElementById('mcqSummary');
+          done.style.display = 'block';
+          summary.textContent = 'You scored ' + mcqScore + ' / ' + MCQS.length + '. ' +
+            (mcqScore === MCQS.length ? 'Flawless — culprit only, norepinephrine first, no reflex balloon. 🏆' :
+             mcqScore >= 6 ? 'Strong — review the misses and the contrast pairs in S6.' :
+             'Revisit S3, S5, S6 and S11 — the culprit-only / norepinephrine / no-reflex-IABP logic is the whole case.');
+          if(mcqScore >= 7){ earnBadge('bdg-quiz'); addXP(50, 'quizace', 'Quiz Ace!'); }
+        }
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
