@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mechanical Complications of Acute MI — Virtual Teaching Hospital</title>
+<!-- META
+id: c-mech-024
+title: Mechanical Complications of Acute MI
+hospital: cardiology
+department: cv-ccu
+bednumber: 6
+chiefcomplaint: Sudden shock and a new harsh murmur five days after a myocardial infarction
+system: Cardiology
+severity: critical
+tags: VSD, Papillary muscle rupture, Free wall rupture, Acute MR, Post-MI, Emergency surgery
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --radius:16px;
+    --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  /* Internal scroll viewport. When this case is embedded the host app stretches
+     the iframe to full content height and the OUTER page scrolls, which would
+     let a sticky bar scroll away. We instead scroll inside this box (sized to
+     the visible window by JS) so the section tab bar stays pinned at the top.
+     Standalone, it falls back to the full viewport height. */
+  #caseScroll{height:100vh; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; scroll-padding-top:92px}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:36px 24px 80px; position:relative; overflow:hidden}
+  .hero::after{content:"📈"; position:absolute; right:-20px; top:-30px; font-size:220px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{max-width:1100px; margin:0 auto; position:relative; z-index:1}
+  .hero .crumbs{font-size:13px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:10px 0 6px; font-size:clamp(26px,4vw,40px); line-height:1.15}
+  .hero .sub{font-size:16px; opacity:.95}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; backdrop-filter:blur(4px)}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== LIVE ECG STRIP IN HERO ===== */
+  .ecg-banner{max-width:1100px; margin:14px auto 0; position:relative; z-index:1}
+  .ecg-banner svg{width:100%; height:64px; display:block; background:rgba(0,0,0,.18); border-radius:12px; border:1px solid rgba(255,255,255,.25)}
+  .ecg-trace{stroke:#86efac; stroke-width:2.4; fill:none; stroke-dasharray:1600; stroke-dashoffset:1600; animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{stroke-dashoffset:0}}
+
+  /* ===== VITALS STRIP ===== */
+  .vitals-strip{max-width:1100px; margin:-52px auto 0; padding:0 24px; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:11px; font-weight:700; letter-spacing:.6px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:21px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== HORIZONTAL SECTION SIDEBAR (fixed — always visible) ===== */
+  .topnav{position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.10)}
+  .topnav .rail{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; max-width:1180px; margin:0 auto; scrollbar-width:thin}
+  .navchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink2); font-size:11px; font-weight:700; text-decoration:none; min-width:78px; text-align:center; transition:all .18s; cursor:pointer}
+  .navchip .s-id{font-size:10px; letter-spacing:1px; color:#94a3b8}
+  .navchip .s-emoji{font-size:16px}
+  .navchip:hover{border-color:var(--rose); color:var(--rose); transform:translateY(-2px)}
+  .navchip.active{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; border-color:#b91c1c}
+  .navchip.active .s-id{color:#fecaca}
+  .navchip.visited:not(.active){border-color:var(--emerald-line); background:var(--emerald-soft)}
+
+  /* ===== DASHBOARD WIDGET ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:215px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10.5px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:760px){.dash{display:none}}
+
+  /* ===== MAIN / SECTIONS (tabbed: one section visible at a time) ===== */
+  main{max-width:1100px; margin:26px auto 80px; padding:0 24px}
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:26px; overflow:hidden}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16.5px; margin:26px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14.5px; margin:18px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:24px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15.5px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:14px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px; letter-spacing:.4px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14.5px}
+
+  /* ===== INTERACTIVE BITS ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:10px 18px; font-weight:700; font-size:14px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:22px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:15px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 15px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 15px; margin-top:12px; font-size:14px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim sliders */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:14px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:14px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Heart/circuit diagram */
+  .heart-fig{display:flex; gap:18px; flex-wrap:wrap; align-items:center; background:var(--slate-soft); border-radius:16px; padding:18px; margin:14px 0}
+  .heart-fig svg{flex:0 0 auto}
+  .heart-legend{flex:1; min-width:230px; font-size:13.5px}
+  .lg{display:flex; align-items:center; gap:8px; margin:5px 0}
+  .lg .sw{width:14px; height:14px; border-radius:4px; flex:0 0 auto}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Journey cards */
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:14px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:15px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:14px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13.5px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:22px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14.5px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:13px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .footer{max-width:1100px; margin:0 auto 36px; padding:0 24px; text-align:center; color:#94a3b8; font-size:12.5px}
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="caseScroll">
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · 💗 CCU · 🛏️ Bed 6</div>
+    <h1>🫀 Mechanical Complications of Acute MI — "The Wall That Tears on Day Five"</h1>
+    <div class="sub">⚡ A 66-year-old man who refused hospital during his chest pain six days ago crashes on the ward — sudden shock, a new harsh murmur, and a thrill you can feel through your palm. Someone is reaching for more diuretic. This is not heart failure. This is a rupture.</div>
+    <div class="chips">
+      <span class="chip crit">🔴 CRITICAL</span>
+      <span class="chip">🕳️ Ventricular Septal Rupture</span>
+      <span class="chip">💔 Papillary Muscle Rupture</span>
+      <span class="chip">🩸 Free Wall Rupture</span>
+      <span class="chip">🎮 Interactive Case</span>
+      <span class="chip">🔪 Call the Surgeon</span>
+    </div>
+    <div class="ecg-banner" title="Sinus tachycardia with old anterior infarct rhythm strip">
+      <svg viewBox="0 0 800 64" preserveAspectRatio="none" aria-label="Sinus tachycardia rhythm strip in a recent infarct">
+        <polyline class="ecg-trace" points="0,40 40,40 55,12 70,58 85,40 130,40 145,12 160,58 175,40 220,40 235,12 250,58 265,40 310,40 325,12 340,58 355,40 400,40 415,12 430,58 445,40 490,40 505,12 520,58 535,40 580,40 595,12 610,58 625,40 670,40 685,12 700,58 715,40 760,40 775,12 790,58 800,40"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== LIVE VITALS ===================== -->
+<div class="vitals-strip">
+  <div class="vitals-grid">
+    <div class="vital alert"><div class="v-label">💓 HR</div><div class="v-num">122</div></div>
+    <div class="vital alert"><div class="v-label">🩸 BP</div><div class="v-num">80/55</div></div>
+    <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">32</div></div>
+    <div class="vital alert"><div class="v-label">🫁 SpO₂</div><div class="v-num">86%</div></div>
+    <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">37.1°</div></div>
+    <div class="vital warn"><div class="v-label">🧠 GCS</div><div class="v-num">13</div></div>
+    <div class="vital alert"><div class="v-label">🔊 Murmur</div><div class="v-num">NEW</div></div>
+    <div class="vital alert"><div class="v-label">😖 Distress</div><div class="v-num">High</div></div>
+  </div>
+</div>
+
+<!-- ===================== HORIZONTAL SECTION SIDEBAR ===================== -->
+<nav class="topnav" id="topnav">
+  <div class="rail">
+    <a class="navchip" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navchip" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navchip" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navchip" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navchip" href="#s5"><span class="s-emoji">🎓</span><span>Consultant Round</span><span class="s-id">S5</span></a>
+    <a class="navchip" href="#s6"><span class="s-emoji">📖</span><span>Teaching Points</span><span class="s-id">S6</span></a>
+    <a class="navchip" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navchip" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navchip" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navchip" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navchip" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navchip" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navchip" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navchip" href="#s14"><span class="s-emoji">🔀</span><span>Differentials</span><span class="s-id">S14</span></a>
+    <a class="navchip" href="#s15"><span class="s-emoji">🗺️</span><span>Plan</span><span class="s-id">S15</span></a>
+    <a class="navchip" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navchip" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navchip" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navchip" href="#s19"><span class="s-emoji">🧠</span><span>MCQs</span><span class="s-id">S19</span></a>
+  </div>
+</nav>
+
+<!-- ===================== SCORE DASHBOARD ===================== -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections visited</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-vt">🫀 Rupture-Spotter</span>
+      <span class="badge" id="bdg-shock">🔪 Surgeon Called</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champion</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Ward Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running sims, taking the right path and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- S1 — PROFILE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s1">
+  <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+  <div class="section-content">
+    <div class="callout danger">
+      <b class="ct">🚨 YOU ARE HERE — Day 5 post-MI, 14:40, CCU Bed 6</b>
+      Mr. T.A. was admitted two days ago with a large, late-presenting inferior infarct — he sat at home through 18 hours of chest pain before his daughter dragged him in, far too late for primary PCI. He was improving. Then, ninety seconds ago, he gripped his chest, went gray, and his pressure fell off the table. There is a <strong>new harsh murmur</strong> at the lower-left sternal edge and a <strong>palpable thrill</strong> under your hand. A junior is charting more furosemide for "flash pulmonary oedema." Stop them. The wall has torn.
+    </div>
+
+    <h3>👤 Patient Identity</h3>
+    <table class="tbl">
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>🧔 Name</td><td><strong>Mr. T.A.</strong></td></tr>
+      <tr><td>🎂 Age / Sex</td><td>66-year-old male</td></tr>
+      <tr><td>🆔 MRN</td><td>CV-10624</td></tr>
+      <tr><td>⚖️ Weight</td><td>79 kg</td></tr>
+      <tr><td>💼 Occupation</td><td>Retired long-haul driver</td></tr>
+      <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+    </table>
+
+    <h3>📜 Past Medical History — every line is the substrate</h3>
+    <ul>
+      <li>🫀 <strong>Acute inferior STEMI, presented at ~18 hours</strong>, no reperfusion (no PCI, lysis contraindicated by the delay/late window) — a <strong>transmural, unreperfused infarct</strong>. This is the single most dangerous setup for mechanical rupture: full-thickness necrosis with no salvaged subepicardium and no collaterals to share the load.</li>
+      <li>❌ <strong>First infarct, no prior cardiac history</strong> — a never-before-infarcted ventricle has no protective fibrous scar, no preconditioned collaterals; the necrotic wall thins and tears rather than holding.</li>
+      <li>💊 <strong>Poorly controlled hypertension</strong> for years, never on regular treatment — high wall stress on a softening wall.</li>
+      <li>🚬 Smoker, 45 pack-years; type 2 diabetes; lives alone, presents late to everything.</li>
+      <li>👵 <strong>Older age, late presentation, single-vessel disease without collaterals</strong> — the classic risk profile for free-wall and septal rupture.</li>
+      <li>🩺 Until 90 seconds ago he was sitting up, eating lunch, "feeling much better." Mechanical complications strike the patient who looks like they are recovering.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A new murmur + sudden shock 3–7 days after an MI is a mechanical rupture until echo proves otherwise — call the surgeon, not just the cardiologist."</div>
+
+    <h3>🧬 Why THIS patient? — transmural necrosis + day-5 weakness + no reperfusion</h3>
+    <p>Mechanical complications are a failure of <strong>tissue tensile strength</strong>, not of electricity or pump function per se. After a transmural infarct the dead myocardium does not simply sit there — it is actively <strong>digested</strong>. By <strong>days 3–7</strong>, neutrophils and macrophages have softened and removed necrotic myocytes (a "yellow softening" wall), but <strong>collagen-laying fibroblasts have not yet replaced them</strong>. The wall is at its mechanical nadir: maximally necrotic, infiltrated, enzymatically weakened, and not yet fibrosed. Add the shear of every systolic contraction and the high afterload of untreated hypertension, and a microscopic tear propagates — through the septum (VSD), through a papillary muscle (acute MR), or through the free wall (tamponade). <strong>Reperfusion changes this story</strong>: a salvaged subepicardial rim and earlier scar formation make the wall far less likely to tear — which is exactly what this late, unreperfused patient never got.</p>
+
+    <div class="callout warn"><b class="ct">🔥 Risk factors for mechanical complications of MI</b>
+    🫀 First (no prior protective scar) MI · ⏰ Late presentation / <strong>no reperfusion</strong> · 🧱 Transmural / large infarct · 👵 Older age · 🚺 Female sex · 💊 Persistent hypertension (high wall stress) · 🧬 Single-vessel disease without collaterals · 💉 Late or failed thrombolysis</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S2 — HANDOVER -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s2">
+  <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+  <div class="section-content">
+    <h3>📻 Ward Nurse Handover — listen for the trap</h3>
+    <div class="callout info">
+      <b class="ct">🎙️ SBAR from the CCU nurse (verbatim)</b>
+      <p><strong>S:</strong> "Bed 6 — Mr. T.A., day 5 of a big inferior MI that never got opened up. He was fine, then suddenly clutched his chest, went gray and clammy. BP crashed to 80 over 55, heart rate 122, sats 86 and dropping. There's a loud new murmur that wasn't there this morning — and I can feel it buzzing under my hand."</p>
+      <p><strong>B:</strong> "First heart attack, presented 18 hours late, no PCI, no lysis. Bad hypertension, diabetes, smoker."</p>
+      <p><strong>A:</strong> "The covering doctor on the phone said it's <strong>flash pulmonary oedema — push more furosemide and a GTN infusion and watch him</strong>."</p>
+      <p><strong>R:</strong> "I held it. He's not just wet — he's <em>shocked</em>, and that murmur and thrill are brand new. Something tore. I want an echo and a senior, now."</p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The phone diagnosis of 'just flash pulmonary oedema, give more diuretic' is how a ruptured post-MI ventricle gets managed to death. A NEW murmur + sudden shock after an MI is a surgical emergency, not a fluid-balance problem."</div>
+
+    <h3>🚩 Spot-the-Red-Flag — tap each feature that screams MECHANICAL RUPTURE</h3>
+    <p>🎮 <em>Interactive: click every feature that points to a mechanical complication of MI (not simple heart failure). Each correct flag = +10 XP. Wrong picks cost you.</em></p>
+    <div id="flagGame">
+      <button class="btn ghost flag-btn" data-good="1">📅 Sudden deterioration 3–7 days after MI</button>
+      <button class="btn ghost flag-btn" data-good="1">🔊 NEW harsh holosystolic murmur</button>
+      <button class="btn ghost flag-btn" data-good="1">🤚 Palpable thrill at lower-left sternal border</button>
+      <button class="btn ghost flag-btn" data-good="1">💥 Sudden shock / flash pulmonary oedema</button>
+      <button class="btn ghost flag-btn" data-good="1">🫀 First, unreperfused / late-presenting MI</button>
+      <button class="btn ghost flag-btn" data-good="0">📈 Gradual, stable recovery over days</button>
+      <button class="btn ghost flag-btn" data-good="0">🌡️ Low-grade fever and raised CRP</button>
+      <button class="btn ghost flag-btn" data-good="0">😴 He slept well last night</button>
+    </div>
+    <p id="flagResult" style="font-weight:700"></p>
+
+    <h3>⏱️ Timeline so far</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Day 5, 14:38</div>Sudden chest grip while eating lunch; instant pallor, sweating, breathlessness.</div>
+      <div class="t-item"><div class="t-time">Day 5, 14:39</div>Monitor: sinus tachy 122. BP 80/55. New loud murmur + thrill at the lower-left sternal edge. SpO₂ 86%, crackles to the apices.</div>
+      <div class="t-item"><div class="t-time">Day 5, 14:40</div>Covering doctor (by phone) says "flash oedema — more furosemide and GTN." Nurse <strong>withholds it and calls for help</strong> — 🏅 instinct worth its weight in gold.</div>
+      <div class="t-item"><div class="t-time">Day 5, 14:41</div>You arrive. The clock is the enemy: a ruptured wall does not wait, and a left-to-right shunt or torrential MR floods the lungs by the minute.</div>
+    </div>
+
+    <div class="callout ok"><b class="ct">🏅 Praise where due</b>The nurse who recognised that a <em>shocked</em> patient with a <em>new murmur and thrill</em> is not "just wet" — and called for an echo and a surgeon rather than reaching for diuretic — may have bought this man the only thing that saves him: time to theatre. Loudness and "flash oedema" are not the diagnosis; the new murmur in a recent-MI patient is.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S3 — INITIAL ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s3">
+  <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+  <div class="section-content">
+    <h3>🅰️🅱️🅲️ Primary Survey — what your hands, eyes and ears find</h3>
+    <table class="tbl">
+      <tr><th>Step</th><th>Finding</th><th>What it means mechanistically</th></tr>
+      <tr><td>🅰️ Airway</td><td>Patent, talking in short gasps, pink froth at the lips.</td><td>Frothy sputum = alveolar flooding from acutely raised left atrial pressure — the lungs are taking the hit of a sudden left-to-right shunt or torrential acute MR.</td></tr>
+      <tr><td>🅱️ Breathing</td><td>RR 32, SpO₂ 86% on air, crackles to the apices.</td><td>Acute MR / VSD raises pulmonary venous pressure instantly. A small, stiff (non-compliant) left atrium cannot buffer the volume → flash pulmonary oedema.</td></tr>
+      <tr><td>🅲️ Circulation</td><td><strong>BP 80/55</strong>, cool clammy peripheries, thready pulse, CRT 4 s. A <strong>new harsh holosystolic murmur</strong> at the <strong>lower-left sternal border</strong> with a <strong>palpable thrill</strong>.</td><td>Murmur + thrill at the LLSB = a high-velocity left-to-right jet across a fresh <strong>ventricular septal rupture</strong> — until the echo distinguishes it from acute MR. Shock = the heart can no longer support the systemic circuit against the leak.</td></tr>
+      <tr><td>🅳 Disability</td><td>GCS 13, anxious, intermittently vague.</td><td>Cerebral hypoperfusion from collapsing forward output. A falling GCS = imminent arrest — do not wait.</td></tr>
+      <tr><td>🅴 Exposure</td><td>No rash. Raised JVP, possibly muffled heart sounds if effusion. Cool, mottled knees.</td><td>Raised JVP + hypotension + (if free-wall rupture) muffled sounds = think <strong>tamponade</strong>. Mottling = profound low output / cardiogenic shock.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A new harsh holosystolic murmur with a thrill at the lower-left sternal border in a recent-MI patient is a ventricular septal rupture until echo proves otherwise — your hand on the chest can suspect it before the probe arrives."</div>
+
+    <h3>🧭 The single most important question: is this a RUPTURE, and which one?</h3>
+    <p>Three lesions present as "sudden post-MI shock," and your job in the first minute is to suspect rupture <em>at all</em> — the exact subtype is settled by urgent echo. <strong>VSD:</strong> loud murmur + thrill at LLSB, biventricular failure, oxygen step-up RA→RV. <strong>Papillary muscle rupture (acute severe MR):</strong> flash pulmonary oedema and shock, murmur often <strong>soft/short</strong> because LA and LV pressures equalise fast. <strong>Free-wall rupture:</strong> sudden tamponade and PEA arrest. Mr. T.A. has shock, flash oedema, a new murmur and a thrill — <strong>a mechanical rupture, very likely VSD</strong> on the bedside signs, to be confirmed in minutes.</p>
+
+    <div class="callout danger"><b class="ct">🔪 The decision is made: SUSPECTED MECHANICAL RUPTURE → URGENT ECHO + CALL SURGERY NOW</b>A post-MI rupture is a <strong>surgical</strong> diagnosis. While you stabilise (afterload reduction if BP tolerates, IABP/mechanical support, inotropes/pressors), you simultaneously get a bedside echo and <strong>activate cardiac surgery</strong>. Definitive therapy is <strong>urgent operative repair</strong>. Do not manage it as medical heart failure and do not "wait to stabilise" a tearing ventricle.</div>
+
+    <!-- 🎬 BRANCHING SCENARIO ENGINE -->
+    <div class="scenario" id="scenarioBox">
+      <h3>🎬 Choose Your Path — "The First 60 Seconds"</h3>
+      <div class="hud"><span>❤️ Stability: <b id="scStab">●●○○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 s</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+      <div class="scene-text" id="scText">Day 5 post-MI. BP 80/55 and falling, sats 86%, a new harsh murmur with a thrill at the lower-left sternal border. The junior is drawing up more furosemide for "flash pulmonary oedema." The patient is awake but gray. What do you do FIRST?</div>
+      <div class="choices" id="scChoices"></div>
+      <div class="feedback" id="scFeedback"></div>
+      <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+    </div>
+
+    <div class="callout info"><b class="ct">🧮 If the echo showed free-wall rupture instead</b>
+    A patient who suddenly arrests in <strong>PEA</strong> with a distended neck and muffled sounds days after an MI has a <strong>free-wall rupture and tamponade</strong> until proven otherwise. The bridge is emergency <strong>pericardiocentesis</strong> to relieve tamponade — but it only buys minutes; the patient must go straight to theatre. And critically: <strong>do not anticoagulate</strong> a suspected free-wall rupture — you will convert a contained tamponade into an unsurvivable haemorrhage.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S4 — RESIDENT REVIEW -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s4">
+  <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+  <div class="section-content">
+    <p><em>The cardiology resident arrives at 14:42. Her reasoning, out loud:</em></p>
+
+    <h3>🧠 Pattern recognition first, then physiology</h3>
+    <p>"Day 5 of a transmural, unreperfused infarct. New harsh murmur. Palpable thrill. Sudden shock and flooding lungs. That is a <strong>mechanical complication</strong> — I don't need to wait for a number to bet on it. The base rate alone settles it: a recent-MI patient who suddenly develops a new murmur and crashes has ruptured something. The dangerous instinct is to call it 'flash pulmonary oedema' and reach for diuretic, because the chest sounds wet. He <em>is</em> wet — because his septum or his mitral valve just gave way."</p>
+
+    <h3>🎯 Immediate priorities (her actual order of operations)</h3>
+    <ol>
+      <li>🚫 <strong>Kill the 'just treat as heart failure' pathway:</strong> diuretic and GTN alone will not fix a ruptured septum and may drop his pressure further. Say it out loud and stop the furosemide push.</li>
+      <li>🫀 <strong>Bedside echo NOW</strong> — colour-flow Doppler across the septum and mitral valve answers VSD vs acute MR vs effusion/tamponade in seconds.</li>
+      <li>🔪 <strong>Activate cardiac surgery in parallel</strong> — the phone call to theatre goes out the moment rupture is suspected, not after the full workup.</li>
+      <li>🎈 <strong>Afterload reduction + mechanical bridge:</strong> if BP tolerates, vasodilators and/or an <strong>intra-aortic balloon pump</strong> cut the shunt fraction / regurgitant fraction and improve forward flow; add inotropes/pressors and consider Impella/VA-ECMO.</li>
+      <li>🩻 <strong>Right-heart catheter if VSD suspected:</strong> an <strong>oxygen step-up from RA to RV</strong> confirms a left-to-right shunt at ventricular level.</li>
+      <li>🧪 <strong>Bloods and lines:</strong> arterial line, group-and-save/crossmatch, repeat troponin, lactate — but nothing delays the echo or the surgical call.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Suspect the rupture first; image it second; call the surgeon third — but make all three almost simultaneous, because the only thing that saves these patients is getting to theatre before the heart empties into the wrong chamber."</div>
+
+    <h3>🤔 "But what if I'm wrong and it really is just heart failure?"</h3>
+    <p>"Then I've ordered an urgent echo and asked a surgeon to glance at a sick post-MI patient — both reasonable, both reversible. The asymmetry of harm is enormous: calling a rupture 'heart failure' and managing it with diuretic costs a life; calling heart failure a 'possible rupture' costs an echo and a phone call. When a recent-MI patient suddenly shocks with a new murmur, <strong>the default is rupture</strong>."</p>
+
+    <div class="callout purple"><b class="ct">🧪 Resident's self-test (answer before reading on)</b>
+    The murmur is actually quite <em>soft and short</em>, not the loud holosystolic murmur you expected. Does a quiet murmur reassure you that the lesion is mild?
+    <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+    <div class="reveal-hidden" id="rev1"><p><strong>No — a quiet murmur can be the worst lesion.</strong> In acute severe MR from papillary-muscle rupture, the left atrial and left ventricular pressures <em>equalise rapidly</em> across the torrential leak, so the murmur becomes <strong>soft and short</strong> (or even inaudible) despite catastrophic regurgitation. <strong>Loudness does NOT track severity.</strong> A shocked, flooding patient with a soft murmur after an inferior MI is papillary-muscle rupture until echo proves otherwise — image, don't be reassured.</p></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S5 — CONSULTANT ROUND -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s5">
+  <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round</h2></div>
+  <div class="section-content">
+    <p><em>The on-call consultant cardiologist and the cardiac surgeon, at the bedside at 14:48:</em></p>
+
+    <h3>🗂️ Name the lesion precisely — it changes the operation</h3>
+    <div class="vs">
+      <div class="side a"><h4>🔴 Ventricular septal rupture (this patient's likely lesion)</h4>
+        <ul><li><strong>Loud</strong> harsh holosystolic murmur + <strong>thrill</strong> at the lower-left sternal border</li><li>Left-to-right shunt → biventricular failure / shock</li><li>Right-heart cath: <strong>oxygen step-up RA→RV</strong></li><li>Anterior MI → apical septum; <strong>inferior MI → basal septum (worse, harder repair)</strong></li></ul></div>
+      <div class="side b"><h4>🔵 Papillary muscle rupture → acute severe MR</h4>
+        <ul><li><strong>Posteromedial</strong> papillary muscle (single PDA supply) in an <strong>inferior MI</strong></li><li>Flash pulmonary oedema + shock; murmur often <strong>soft/short</strong></li><li>No oxygen step-up (regurgitation, not a shunt)</li><li>Echo: flail leaflet, torn muscle head, severe MR jet</li></ul></div>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"VSD is a loud murmur with a thrill and an oxygen step-up; papillary-muscle rupture is a quiet murmur with flash pulmonary oedema. Free-wall rupture has no murmur at all — just sudden tamponade and PEA. Same day-5 timeline, three different deaths."</div>
+
+    <h3>🩸 The third killer — free-wall rupture</h3>
+    <p>Free-wall rupture is the most lethal of the three: blood escapes into the pericardium, causing sudden <strong>tamponade</strong> and <strong>pulseless electrical activity (PEA)</strong> arrest — often before anyone reaches the bedside. Suspect it in <strong>any sudden post-MI arrest</strong> with a rhythm on the monitor but no pulse. <strong>Pericardiocentesis is only a bridge</strong> — it relieves tamponade for minutes; survival demands emergency surgical repair. A <em>contained</em> free-wall rupture walled off by pericardium and thrombus is a <strong>pseudoaneurysm</strong> — it can rupture catastrophically at any moment and also needs urgent surgery, unlike a true LV aneurysm.</p>
+
+    <h3>🧭 Consultant's three commandments for the next hour</h3>
+    <ol>
+      <li>🔪 "A suspected post-MI rupture is a <strong>surgical</strong> diagnosis. Echo confirms it, but the surgeon is called in parallel. <strong>Urgent operative repair</strong> is the only definitive therapy — medical management alone has a near-uniformly fatal outcome."</li>
+      <li>🎈 "Temporise to get him to theatre: <strong>afterload reduction</strong> (vasodilators if pressure allows) and an <strong>IABP</strong> reduce the shunt/regurgitant fraction and improve forward flow; inotropes/pressors and mechanical support (Impella/ECMO) bridge a crashing patient. But temporising is a bridge, never the destination."</li>
+      <li>🩸 "If you even suspect <strong>free-wall rupture</strong>, do <strong>not anticoagulate</strong> and go straight for pericardiocentesis-as-bridge then theatre. Anticoagulating a contained rupture turns a survivable tamponade into an exsanguination."</li>
+    </ol>
+
+    <div class="callout danger"><b class="ct">☠️ The consultant's war memory (more in S13 M&amp;M)</b>"The last patient I lost to this was a 72-year-old re-admitted day 5 after an untreated inferior MI, labelled 'pneumonia, maybe a bit of heart failure.' The new murmur was charted but dismissed as 'longstanding.' We gave diuretic and started a heparin infusion for 'possible NSTEMI.' He arrested in PEA an hour later — free-wall rupture, a pericardium full of blood, made worse by the heparin. He died before we could open the chest. The murmur and the timeline told the truth; nobody read them as a rupture because he 'wasn't that unwell-looking.'"</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S6 — TEACHING POINTS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s6">
+  <div class="sec-header"><span class="s-badge">S6</span><h2>📖 Teaching Points</h2></div>
+  <div class="section-content">
+    <h3>🔬 The mechanism — WHY day 5 is the danger zone (the WHY behind the WHY)</h3>
+    <ol>
+      <li>🧱 <strong>The substrate:</strong> a transmural infarct kills the full thickness of the wall. With <strong>no reperfusion</strong> there is no salvaged subepicardial rim and no collateral supply — the dead zone is large and homogeneous.</li>
+      <li>🦠 <strong>Days 1–3 — coagulative necrosis:</strong> the wall is dead but still mechanically intact-ish; neutrophils begin to arrive.</li>
+      <li>💛 <strong>Days 3–7 — the mechanical nadir:</strong> neutrophils and macrophages <strong>digest and remove</strong> the necrotic myocytes ("yellow softening"). The wall is maximally infiltrated, enzymatically weakened, and <strong>fibroblasts have not yet laid down collagen</strong>. Tensile strength bottoms out. This is when septum, papillary muscle and free wall tear.</li>
+      <li>🧵 <strong>After ~1–2 weeks — fibrosis strengthens it:</strong> granulation tissue and collagen replace the necrotic core; the wall regains strength (eventually a firm scar). Rupture risk falls sharply once a fibrous scar forms.</li>
+      <li>💥 <strong>Why it kills:</strong> a sudden left-to-right shunt (VSD) or torrential regurgitation (papillary rupture) overwhelms a small, stiff left atrium and floods the lungs while forward output collapses; free-wall rupture fills the pericardium and stops the heart. The shear of each systole on a softened wall propagates the tear.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Necrotic myocardium is weakest on days 3–7 — digested by neutrophils but not yet rebuilt by collagen. Reperfusion and an old scar protect the wall; a first, late, unreperfused transmural MI is the wall that tears."</div>
+
+    <h3>⚖️ Contrast pair #1 — VSD vs papillary-muscle rupture vs free-wall rupture (the three killers)</h3>
+    <div class="vs">
+      <div class="side a"><h4>🕳️ VSD — LOUD + thrill + step-up</h4><ul><li>New <strong>loud</strong> harsh holosystolic murmur at the LLSB</li><li><strong>Palpable thrill</strong></li><li>Right-heart cath: <strong>O₂ step-up RA→RV</strong> (left-to-right shunt)</li><li>Anterior MI (apical) or inferior MI (basal — worse)</li></ul></div>
+      <div class="side b"><h4>💔 Papillary rupture — QUIET + flooding lungs</h4><ul><li>Acute severe MR, <strong>flash pulmonary oedema</strong>, shock</li><li>Murmur often <strong>soft/short</strong> (pressures equalise fast)</li><li><strong>No</strong> oxygen step-up</li><li><strong>Posteromedial</strong> muscle (single PDA supply), <strong>inferior MI</strong></li></ul></div>
+    </div>
+    <p>😈 <strong>The trap:</strong> the brain anchors on "flash pulmonary oedema = give diuretic" and on murmur loudness as a marker of severity. But the <em>worst</em> lesions (severe acute MR) can be <em>quiet</em>, and free-wall rupture has <em>no murmur at all</em> — just sudden PEA/tamponade. The cost of missing a rupture (death) vastly exceeds the cost of an echo and a surgical call. <strong>The asymmetry of harm is why the rule is "rupture until echo proves otherwise."</strong></p>
+
+    <h3>⚖️ Contrast pair #2 — Acute MR vs chronic MR (why the timeline changes the murmur)</h3>
+    <div class="vs">
+      <div class="side a"><h4>⚡ Acute MR (papillary rupture)</h4><ul><li><strong>Small, non-compliant</strong> left atrium → pressure spikes instantly → <strong>pulmonary oedema</strong></li><li>Murmur <strong>short/soft</strong>, may be early-systolic (pressures equalise)</li><li>Sudden shock, surgical emergency</li></ul></div>
+      <div class="side b"><h4>🌀 Chronic MR</h4><ul><li><strong>Dilated, compliant</strong> left atrium buffers the volume</li><li>Murmur <strong>long, loud, holosystolic</strong>, well tolerated for years</li><li>Gradual symptoms, elective management</li></ul></div>
+    </div>
+    <p>💡 <em>Why it matters:</em> the same valve lesion sounds completely different depending on chamber compliance. <strong>Don't equate a loud, long murmur with danger and a soft murmur with safety</strong> — in the acute setting the reverse is often true.</p>
+
+    <h3>⚖️ Contrast pair #3 — Pseudoaneurysm vs true LV aneurysm</h3>
+    <div class="vs">
+      <div class="side a"><h4>🩹 Pseudoaneurysm (contained rupture)</h4><ul><li>A <strong>free-wall rupture walled off</strong> by pericardium + thrombus</li><li>Narrow neck; <strong>high risk of catastrophic rupture</strong></li><li><strong>Needs urgent surgery</strong></li></ul></div>
+      <div class="side b"><h4>🎈 True LV aneurysm</h4><ul><li>All myocardial layers present, thinned and dyskinetic</li><li><strong>Persistent ST elevation</strong> weeks after MI; <strong>mural thrombus</strong> risk</li><li>Wide neck; rarely ruptures; managed medically ± elective surgery</li></ul></div>
+    </div>
+    <p>💡 <em>Why it matters:</em> a pseudoaneurysm is a time bomb that must go to theatre; a true aneurysm is usually a chronic, lower-acuity problem (heart failure, arrhythmia, thrombus). Echo/MRI distinguishes the narrow neck of a pseudoaneurysm from the wide-mouthed true aneurysm.</p>
+
+    <!-- 🎮 INTERACTIVE SIM: wall tensile strength / rupture risk over time -->
+    <div class="sim" id="kSim">
+      <h3 style="margin-top:0">🎮 Simulation — The Rupture Clock: how days after MI tune wall tensile strength &amp; rupture risk</h3>
+      <p style="font-size:13.5px">Drag the dial through the days after a transmural, unreperfused infarct. Watch the necrotic wall soften, hit its mechanical nadir, then re-strengthen as collagen is laid down. This is the single most important "invisible vital sign" in this case.</p>
+      <label for="kRange">📅 Days after MI: <b id="kVal">5</b></label>
+      <input type="range" id="kRange" min="20" max="75" value="50">
+      <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+      <div class="readout bad" id="kReadout">Set the dial to explore.</div>
+      <p style="font-size:12.5px; margin-top:10px; color:var(--ink2)">🎯 Peak danger sits in the <strong>middle (days 3–7)</strong>: the wall is maximally necrotic and neutrophil-digested but not yet fibrosed. Earlier the wall is still intact; later, collagen has rebuilt it. The window of weakness is narrow and central on purpose.</p>
+    </div>
+
+    <!-- 📚 EBM MODULE -->
+    <div class="ebm">
+      <h3>📚 Evidence-Based Medicine Corner</h3>
+      <table class="tbl">
+        <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+        <tr><td><span class="lvl">REGISTRY</span> GUSTO-I / APEX-AMI era</td><td>The incidence of mechanical complications (VSD, free-wall rupture) <strong>fell dramatically with timely reperfusion</strong> (lysis/PCI) — now &lt;1% of STEMIs.</td><td>Opening the artery early is the best prevention; the unreperfused, late-presenting patient remains the high-risk group.</td></tr>
+        <tr><td><span class="lvl">REGISTRY</span> STS / surgical series (post-MI VSD)</td><td>Operative repair carries high mortality but is the <strong>only therapy with meaningful survival</strong>; medical management alone is near-uniformly fatal. Timing is debated (early repair on sicker tissue vs delay risking death).</td><td>Refer immediately; the surgeon weighs operating on friable day-5 tissue against the risk of waiting — bridge with mechanical support.</td></tr>
+        <tr><td><span class="lvl">RCT</span> IABP-SHOCK II / mechanical support</td><td>IABP did not reduce mortality in general cardiogenic shock, but remains a useful <strong>bridge in mechanical complications</strong> by cutting afterload/shunt fraction; Impella/VA-ECMO increasingly used.</td><td>Use IABP/mechanical support to buy time to theatre, not as definitive therapy.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> Echo + O₂ step-up for diagnosis</td><td>Bedside <strong>transthoracic/transoesophageal echo</strong> is the key diagnostic test; right-heart catheter <strong>oxygen step-up RA→RV</strong> confirms VSD.</td><td>Echo first and fast; a step-up nails a ventricular-level shunt at the bedside.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2017 ESC STEMI / 2013 ACC/AHA</td><td>Mechanical complications → <strong>emergency surgical consultation and repair</strong>; afterload reduction/IABP as a bridge; reperfusion to prevent them.</td><td>Exactly the algorithm driving S3, S7 and S11.</td></tr>
+      </table>
+    </div>
+
+    <!-- 🔬 ADVANCED TOPICS -->
+    <div class="callout purple">
+      <h3 style="margin-top:0">🔬 Fellowship Corner — Advanced Topics</h3>
+      <ul>
+        <li>🕳️ <strong>VSD location &amp; repair technique:</strong> anterior MI → apical septal defect (easier to access); inferior MI → basal/posterior defect (worse prognosis, technically harder, often involves the inferobasal septum). Repair via infarct-exclusion (David) technique or patch; <strong>transcatheter device closure</strong> in selected high-risk or residual defects.</li>
+        <li>💔 <strong>Papillary-muscle anatomy:</strong> the <strong>posteromedial</strong> papillary muscle has a <strong>single</strong> blood supply (PDA, from RCA or dominant Cx) — so an inferior MI infarcts it; the anterolateral muscle has <strong>dual</strong> supply (LAD + Cx) and is rarely ruptured. Partial vs complete head rupture changes acuity; mitral valve replacement usually required.</li>
+        <li>🩸 <strong>Free-wall rupture phenotypes:</strong> acute (blowout) → instant PEA/death; subacute (oozing) → recurrent pain, hypotension, pericardial effusion — a chance to catch it before catastrophe. Contained rupture = <strong>pseudoaneurysm</strong> (narrow neck, surgical) vs true aneurysm (wide neck, often medical).</li>
+        <li>🎈 <strong>Mechanical circulatory support escalation:</strong> IABP (afterload/shunt reduction) → Impella (LV unloading) → <strong>VA-ECMO</strong> for biventricular failure as a bridge to surgery; right-ventricular support if RV failure dominates a VSD shunt.</li>
+        <li>🩻 <strong>Diagnostics beyond echo:</strong> right-heart catheter O₂ step-up quantifies Qp:Qs; large V-waves on PCWP tracing suggest acute MR; cardiac CT/MRI for pseudoaneurysm vs aneurysm and for surgical planning.</li>
+        <li>⏱️ <strong>Timing controversy:</strong> early surgery operates on friable, oedematous tissue with high suture-dehiscence risk; delaying allows tissue to firm up but risks death in the interval — mechanical support and individualized timing are the modern compromise.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S7 — ORDERS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s7">
+  <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+  <div class="section-content">
+    <h3>🖊️ The order set, written as you'd actually write it (14:45)</h3>
+    <ul>
+      <li>🚨 <strong>STOP the diuretic-only plan</strong> — do NOT manage as simple heart failure. Flag on chart and whiteboard: "suspected post-MI mechanical complication."</li>
+      <li>🫀 <strong>Urgent bedside echocardiogram NOW</strong> — colour Doppler across septum and mitral valve; assess for VSD, acute MR, pericardial effusion/tamponade.</li>
+      <li>🔪 <strong>Activate cardiac surgery immediately</strong> — emergency surgical consultation for definitive repair; alert theatre and perfusion.</li>
+      <li>🎈 <strong>Afterload reduction if BP tolerates</strong> (e.g. IV nitroprusside/nitroglycerin titrated) and <strong>intra-aortic balloon pump</strong> insertion to reduce shunt/regurgitant fraction and improve forward flow.</li>
+      <li>💉 <strong>Inotropes/pressors for shock</strong> (e.g. noradrenaline ± dobutamine) titrated to perfusion; consider Impella/VA-ECMO as a bridge if crashing.</li>
+      <li>🩻 <strong>Right-heart catheter</strong> (if VSD suspected): look for an <strong>oxygen step-up RA→RV</strong>; PA catheter to guide support.</li>
+      <li>🧪 Bloods: repeat troponin, lactate, FBC, U&amp;E, coagulation, <strong>group-and-save / crossmatch</strong> for theatre.</li>
+      <li>🫁 High-flow O₂ / non-invasive or invasive ventilation as needed for pulmonary oedema; secure two large-bore IVs and an arterial line; NPO for theatre.</li>
+      <li>🩸 <strong>Hold/avoid anticoagulation if free-wall rupture is suspected</strong> — do not turn a contained tamponade into a haemorrhage.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In suspected post-MI rupture there are only two real priorities: image it with echo and get the surgeon — everything else (afterload reduction, IABP, pressors) exists to keep him alive long enough to reach theatre."</div>
+
+    <!-- 🩺 PROCEDURE GUIDE 1 -->
+    <div class="checklist" id="ckCV">
+      <h3 style="margin-top:0">🩺 Procedure Guide — Recognise &amp; Bridge a Post-MI Rupture — tick as you go</h3>
+      <label class="ck"><input type="checkbox"><span>🩺 Recognise the trigger: sudden shock + NEW murmur/thrill 3–7 days after MI = mechanical rupture until echo proves otherwise</span></label>
+      <label class="ck"><input type="checkbox"><span>🫀 Get an <strong>urgent bedside echo</strong> — colour Doppler across septum (VSD) and mitral valve (acute MR); look for effusion/tamponade</span></label>
+      <label class="ck"><input type="checkbox"><span>🔪 <strong>Call cardiac surgery in parallel</strong> — do not wait for the full workup before activating theatre</span></label>
+      <label class="ck"><input type="checkbox"><span>🎈 Reduce afterload if BP tolerates (vasodilators) and insert an <strong>IABP</strong> to cut the shunt/regurgitant fraction</span></label>
+      <label class="ck"><input type="checkbox"><span>💉 Support the circulation: inotropes/pressors; escalate to Impella/VA-ECMO as a bridge if crashing</span></label>
+      <label class="ck"><input type="checkbox"><span>🩻 If VSD suspected, confirm with right-heart cath <strong>O₂ step-up RA→RV</strong>; crossmatch and prepare for theatre</span></label>
+      <label class="ck"><input type="checkbox"><span>🩸 If free-wall rupture suspected: <strong>do NOT anticoagulate</strong>; pericardiocentesis only as a bridge → emergency surgery</span></label>
+      <div class="ck-progress" data-progress>0 / 7 complete</div>
+    </div>
+
+    <!-- 🩺 PROCEDURE GUIDE 2 -->
+    <div class="checklist" id="ckDefib">
+      <h3 style="margin-top:0">🩺 Procedure Guide — If he arrests: PEA / Tamponade from free-wall rupture</h3>
+      <p style="font-size:13px">⚠️ Sudden post-MI arrest with an organised rhythm but no pulse (PEA) → suspect <strong>free-wall rupture and tamponade</strong>. Pericardiocentesis is a bridge, not a cure — he needs the chest opened.</p>
+      <label class="ck"><input type="checkbox"><span>🚫 Confirm no pulse → call arrest, start high-quality CPR (100–120/min, depth 5–6 cm, full recoil)</span></label>
+      <label class="ck"><input type="checkbox"><span>🫁 Treat reversible causes — focus on <strong>cardiac Tamponade</strong> (one of the 4 T's) in a recent-MI patient</span></label>
+      <label class="ck"><input type="checkbox"><span>🪡 <strong>Emergency pericardiocentesis</strong> (echo-guided) to relieve tamponade as a temporising bridge</span></label>
+      <label class="ck"><input type="checkbox"><span>🔪 <strong>Activate emergency cardiac surgery</strong> — definitive repair of the free-wall rupture; consider VA-ECMO bridge</span></label>
+      <label class="ck"><input type="checkbox"><span>🩸 <strong>Do NOT give anticoagulation/thrombolysis</strong> — it worsens the pericardial haemorrhage</span></label>
+      <label class="ck"><input type="checkbox"><span>🫀 ROSC → straight to theatre / cath-surgery hybrid; massive transfusion protocol ready</span></label>
+      <div class="ck-progress" data-progress>0 / 6 complete</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S8 — NURSING CARE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s8">
+  <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+  <div class="section-content">
+    <h3>🛏️ CCU nursing priorities — minute by minute</h3>
+    <ul>
+      <li>👂 <strong>Auscultate and document any NEW murmur or thrill</strong> on every set of obs in a recent-MI patient — you may be the first to hear the rupture. A new murmur + deterioration goes straight to the senior.</li>
+      <li>🩸 <strong>BP every 2–5 min</strong> (cycle the NIBP, or read the arterial line once placed). A falling pressure in a post-MI patient with a new murmur means escalate now, not at the next set of obs.</li>
+      <li>🎈 <strong>Know the bridge devices:</strong> assist with IABP insertion and monitor balloon timing/augmentation; manage pressor/vasodilator infusions carefully against the BP.</li>
+      <li>🫁 <strong>Manage acute pulmonary oedema:</strong> high-flow O₂, sit upright, prepare for NIV/intubation; the lungs flood fast in acute MR/VSD.</li>
+      <li>🔪 <strong>Prepare the patient for emergency theatre:</strong> NPO, consent support, crossmatched blood available, lines and bloods sent, surgical and anaesthetic teams alerted.</li>
+      <li>🩸 <strong>Flag any anticoagulation order</strong> in a patient with suspected free-wall rupture — query it before it is given.</li>
+      <li>📋 <strong>Document the timeline and the murmur precisely</strong> — when it appeared, character, thrill — this is gold for the surgical and echo teams.</li>
+      <li>🧠 <strong>Neuro/perfusion checks</strong> — a patient who stops talking or whose knees mottle is losing forward output → check the pulse, don't assume.</li>
+      <li>👨‍👩‍👦 Keep the family updated and supported (see S16) — assign a liaison if staffing allows; a sudden crash days into "recovery" is terrifying to watch.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who hears a new murmur in a recovering MI patient and refuses to call it 'just heart failure' is doing half the diagnostic work in the room."</div>
+    <div class="callout warn"><b class="ct">📢 Escalate IMMEDIATELY for</b>A new murmur or thrill · sudden hypotension/shock · sudden hypoxia/pink frothy sputum · loss of pulse with a rhythm on the monitor (→ PEA/tamponade) · muffled heart sounds + raised JVP · any anticoagulation prescribed when free-wall rupture is suspected · any plan to "just give more diuretic and watch."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S9 — INVESTIGATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s9">
+  <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+  <div class="section-content">
+    <h3>🧾 Results board (15:05, drawn during resuscitation)</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>Result</th><th>Reference</th><th>Interpretation</th></tr>
+      <tr><td>Bedside echo</td><td class="hi">VSD confirmed</td><td>—</td><td>Colour Doppler shows a high-velocity <strong>left-to-right jet across the basal septum</strong> with right-ventricular volume overload. This is the diagnosis. Surgery is now activated.</td></tr>
+      <tr><td>O₂ step-up (RHC)</td><td class="hi">RA 62% → RV 84% ↑</td><td>No step-up</td><td>A >7% oxygen <strong>step-up from RA to RV</strong> confirms a ventricular-level left-to-right shunt — pathognomonic of post-MI VSD.</td></tr>
+      <tr><td>Lactate</td><td class="hi">4.6 mmol/L ↑</td><td>&lt; 2.0</td><td>Tissue hypoperfusion from cardiogenic shock — he is unstable, not "stable enough to wait."</td></tr>
+      <tr><td>Troponin I</td><td class="hi">42 ng/mL ↑↑</td><td>&lt; 0.04</td><td>Very high — large transmural infarct, consistent with the substrate for rupture (does not change the surgical urgency).</td></tr>
+      <tr><td>Creatinine</td><td class="hi">1.9 mg/dL ↑</td><td>0.7–1.2</td><td>Cardiorenal / hypoperfusion. Relevant to contrast use and perioperative risk.</td></tr>
+      <tr><td>Hb</td><td class="ok-v">11.8 g/dL</td><td>13–17</td><td>Baseline for crossmatch; expect transfusion needs in theatre.</td></tr>
+      <tr><td>Coag / group-and-save</td><td class="ok-v">Sent, crossmatch underway</td><td>—</td><td>Essential before emergency cardiac surgery; also screens before any (avoidable) anticoagulation decision.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Echo makes the diagnosis; the oxygen step-up from RA to RV nails the VSD at the bedside. You do not need to wait for either to call the surgeon — the new murmur and the timeline already did."</div>
+
+    <div class="callout info"><b class="ct">🧠 Why the very high troponin does NOT mean "just give more antiplatelets/heparin and re-cath"</b>A large transmural infarct produces a huge troponin and is exactly the substrate that ruptures. The danger is reflexively treating the high troponin as an ongoing ACS needing anticoagulation — in a patient who may have a <em>free-wall rupture</em>, that anticoagulation can be fatal. The mechanical complication, not the enzyme, drives management: image, support, operate.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S10 — ECG / IMAGING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s10">
+  <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging</h2></div>
+  <div class="section-content">
+    <h3>🫀 The substrate on the monitor — read it like a detective</h3>
+    <div class="ecg-fig">
+      <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Evolved inferior infarct with Q waves in the inferior leads and sinus tachycardia">
+        <rect width="820" height="150" fill="#0b1220"/>
+        <g stroke="#1e3a5f" stroke-width="1">
+          <line x1="0" y1="30" x2="820" y2="30"/><line x1="0" y1="60" x2="820" y2="60"/>
+          <line x1="0" y1="90" x2="820" y2="90"/><line x1="0" y1="120" x2="820" y2="120"/>
+        </g>
+        <polyline fill="none" stroke="#86efac" stroke-width="2.4" points="0,90 30,90 40,88 55,118 70,60 80,96 92,90 150,90 160,88 175,118 190,60 200,96 212,90 270,90 280,88 295,118 310,60 320,96 332,90 390,90 400,88 415,118 430,60 440,96 452,90 510,90 520,88 535,118 550,60 560,96 572,90 630,90 640,88 655,118 670,60 680,96 692,90 750,90 760,88 775,118 790,60 800,96 815,90"/>
+        <text x="120" y="22" fill="#fca5a5" font-size="12" font-weight="700">↑ pathological Q waves (inferior)</text>
+        <text x="560" y="22" fill="#fcd34d" font-size="12" font-weight="700">↑ sinus tachycardia ~122</text>
+      </svg>
+      <div class="ecg-cap">Evolved <span style="color:#fca5a5">inferior infarct</span> — deep Q waves and T-wave inversion in II, III, aVF — with <span style="color:#fcd34d">sinus tachycardia</span>. The ECG shows the <strong>substrate</strong> (a transmural inferior MI), not the rupture itself. <strong>The diagnosis of the mechanical complication is made by ECHO, not the ECG.</strong></div>
+    </div>
+
+    <h3>🔎 The bedside toolkit (memorize the high-yield ones)</h3>
+    <table class="tbl">
+      <tr><th>Modality</th><th>Why it matters in mechanical complications</th></tr>
+      <tr><td>🫀 <strong>Transthoracic / transoesophageal echo</strong></td><td><strong>The key test.</strong> Colour Doppler localises the VSD jet, demonstrates the flail leaflet/torn papillary head of acute MR, and reveals pericardial effusion/tamponade of free-wall rupture. Fast, bedside, diagnostic.</td></tr>
+      <tr><td>🩻 <strong>Right-heart catheter (O₂ step-up)</strong></td><td>An <strong>oxygen step-up from RA to RV</strong> confirms a ventricular-level left-to-right shunt (VSD). Large V-waves on the PCWP trace suggest acute MR.</td></tr>
+      <tr><td>📈 <strong>12-lead ECG</strong></td><td>Shows the infarct territory (inferior → posteromedial papillary muscle / basal septum at risk) but <strong>does not diagnose the rupture</strong>. Persistent ST elevation weeks later hints at true aneurysm.</td></tr>
+      <tr><td>🫁 <strong>Chest X-ray</strong></td><td>Pulmonary oedema from acute MR/VSD; an enlarging cardiac silhouette may suggest effusion.</td></tr>
+      <tr><td>🧲 <strong>Cardiac CT / MRI</strong></td><td>Distinguishes <strong>pseudoaneurysm (narrow neck, surgical)</strong> from true aneurysm (wide neck); aids surgical planning. Not for the crashing patient.</td></tr>
+      <tr><td>🪡 <strong>Pericardiocentesis (diagnostic + therapeutic)</strong></td><td>Frank blood in the pericardium of an arresting post-MI patient confirms free-wall rupture; relieving tamponade is a bridge to theatre.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The ECG tells you which wall is at risk; the ECHO tells you which wall tore. In a recent-MI patient with a new murmur and shock, get the probe on the chest — and the surgeon on the phone."</div>
+
+    <h3>🫀 The confirmatory echo &amp; surgical imaging</h3>
+    <ul>
+      <li>🫀 <strong>This patient's echo:</strong> a left-to-right colour jet across the <strong>basal inferoseptum</strong> (an inferior-MI VSD — the harder, worse-prognosis location), RV volume overload, and a hyperdynamic but failing circulation.</li>
+      <li>💔 <strong>If it had been papillary rupture:</strong> a flail mitral leaflet, a mobile torn muscle head in the LV cavity, and a severe eccentric MR jet — often with a deceptively <em>soft</em> murmur.</li>
+      <li>🩸 <strong>If it had been free-wall rupture:</strong> a pericardial effusion with tamponade physiology (RV/RA diastolic collapse), or a contained pseudoaneurysm with a narrow neck.</li>
+    </ul>
+
+    <div class="callout warn"><b class="ct">⚠️ The favorite lie in post-MI deterioration</b>"The chest is wet and the lungs are crackly, so it's just heart failure — give diuretic." A torrential acute MR or a fresh VSD floods the lungs <em>because</em> of a mechanical rupture. The only way to be sure it is "just heart failure" is an echo that shows no shunt, no flail valve and no effusion. Absent that, <strong>assume rupture</strong>.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S11 — MEDICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s11">
+  <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+  <div class="section-content">
+    <h3>💉 Acute drugs &amp; bridges — what, why, and the traps</h3>
+    <table class="tbl">
+      <tr><th>Intervention</th><th>Role now</th><th>Mechanism / caution</th></tr>
+      <tr><td><strong>IV vasodilator (nitroprusside / nitroglycerin)</strong></td><td>Afterload reduction — cuts the shunt/regurgitant fraction, improves forward output</td><td>Lowering systemic resistance sends more blood forward and less across the leak. <strong>Only if BP tolerates</strong> — it can worsen hypotension; titrate carefully, ideally with an IABP.</td></tr>
+      <tr><td><strong>Intra-aortic balloon pump (IABP)</strong></td><td>Mechanical bridge — diastolic augmentation + systolic afterload reduction</td><td>Reduces the left-to-right shunt / regurgitant fraction and improves coronary and forward flow. A bridge to surgery, not definitive therapy.</td></tr>
+      <tr><td><strong>Inotropes / vasopressors (noradrenaline, dobutamine)</strong></td><td>Support perfusion in cardiogenic shock</td><td>Maintain organ perfusion to theatre. Pure vasoconstriction raises afterload and the shunt — balance with vasodilation/IABP.</td></tr>
+      <tr><td><strong>Impella / VA-ECMO</strong></td><td>Advanced mechanical support for the crashing patient</td><td>Unloads the LV / supports both ventricles as a bridge to emergency repair. Needs an experienced team.</td></tr>
+      <tr><td><strong>Diuretic (furosemide)</strong></td><td>Adjunct for pulmonary oedema — <strong>NOT</strong> the treatment</td><td>Helps the wet lungs but does <em>nothing</em> for the hole/torn valve. Relying on diuretic alone is the lethal error in this case.</td></tr>
+      <tr><td><strong>Anticoagulation</strong></td><td>Generally <strong>avoid</strong> until rupture type is clarified</td><td>In suspected/possible <strong>free-wall rupture</strong>, anticoagulation can convert a contained tamponade into fatal haemorrhage. Reassess once the lesion is defined and surgery planned.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Vasodilators and an IABP cut the leak; surgery closes it. Diuretic only dries the lungs while the hole stays open. In a suspected rupture, the only definitive 'drug' is the operating theatre."</div>
+
+    <div class="callout danger"><b class="ct">🚫 The 'never/avoid' list in suspected post-MI rupture</b>❌ Managing as simple heart failure with diuretic alone · ❌ Anticoagulating/thrombolysing a suspected free-wall rupture · ❌ Delaying surgical referral "to stabilise first" · ❌ Pure vasoconstriction without afterload management (raises the shunt). When unsure and the patient is crashing, the safest move is <strong>echo + surgeon + mechanical support</strong>.</div>
+
+    <h3>🏠 Definitive &amp; longer-term therapy (this admission, not just now)</h3>
+    <ul>
+      <li>🔪 <strong>Urgent surgical repair</strong> — patch/exclusion of the VSD, mitral valve replacement for papillary rupture, or repair of the free-wall rupture / pseudoaneurysm. The only therapy with meaningful survival.</li>
+      <li>🎈 <strong>Mechanical support bridge</strong> (IABP/Impella/VA-ECMO) while awaiting or recovering from surgery.</li>
+      <li>🩹 <strong>Transcatheter device closure</strong> of selected VSDs (high surgical risk or residual post-surgical defect).</li>
+      <li>💙 <strong>Post-repair GDMT and secondary prevention</strong> — once mechanically fixed, optimize heart-failure therapy, antiplatelets/statin, and cardiac rehab.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S12 — MONITORING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s12">
+  <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+  <div class="section-content">
+    <h3>📡 What to watch and why</h3>
+    <ul>
+      <li>🩸 <strong>Invasive arterial line</strong> for beat-to-beat BP through afterload reduction, IABP and the trip to theatre.</li>
+      <li>👂 <strong>Serial auscultation for a NEW or changing murmur</strong> in every recent-MI patient — the earliest sign of rupture, and a changing murmur may signal extension.</li>
+      <li>📟 <strong>Continuous telemetry &amp; SpO₂</strong> — watch for sudden PEA (free-wall rupture/tamponade) and worsening hypoxia (flooding lungs).</li>
+      <li>🎈 <strong>IABP timing/augmentation and pressor/vasodilator response</strong> — titrate to perfusion (lactate, urine output, mentation), not just to a number.</li>
+      <li>🫁 <strong>Respiratory status</strong> — anticipate NIV/intubation for acute pulmonary oedema in acute MR/VSD.</li>
+      <li>🧪 <strong>Serial lactate, urine output, creatinine</strong> — markers of whether the bridge is buying enough perfusion to reach theatre.</li>
+      <li>🩻 <strong>PA catheter / repeat echo</strong> — track the shunt (Qp:Qs), RV function and any pericardial collection.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After you suspect a rupture, the monitor's job is to tell you whether your bridge is holding — and the two things that answer it are the blood pressure trend and the lactate."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S13 — COMPLICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s13">
+  <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+  <div class="section-content">
+    <h3>💀 What can go wrong — and the mechanism</h3>
+    <ul>
+      <li>🩸 <strong>Free-wall rupture → tamponade → PEA arrest</strong> — the most lethal; blood fills the pericardium and stops the heart. Often fatal before theatre; pericardiocentesis only buys minutes.</li>
+      <li>🕳️ <strong>VSD extension / cardiogenic shock</strong> — the left-to-right shunt enlarges biventricular failure; without repair, mortality is near-uniform.</li>
+      <li>💔 <strong>Refractory pulmonary oedema from acute MR</strong> — torrential regurgitation floods a non-compliant left atrium and lungs; needs the valve fixed, not just diuretic.</li>
+      <li>🧠 <strong>Multi-organ hypoperfusion</strong> — prolonged cardiogenic shock causes renal, hepatic and cerebral injury before and after surgery.</li>
+      <li>🪡 <strong>Surgical complications</strong> — suture dehiscence through friable day-5 tissue, residual shunt/MR, bleeding, RV failure.</li>
+      <li>🩹 <strong>Pseudoaneurysm rupture</strong> — a contained rupture can blow out at any moment; it is a surgical emergency masquerading as a stable finding.</li>
+    </ul>
+
+    <!-- 🎭 M&M CONFERENCE MODULE -->
+    <div class="mm">
+      <h3>🎭 Morbidity &amp; Mortality Conference — "The Murmur That Was Called Pneumonia"</h3>
+      <div class="mm-case">
+        <strong>The case:</strong> A 72-year-old man re-presented on <strong>day 5</strong> after an untreated inferior MI he had sat at home through. He was breathless and hypotensive; the busy team labelled him <strong>"pneumonia, maybe a touch of heart failure,"</strong> started antibiotics, gave <strong>furosemide</strong>, and — worried about an "ongoing NSTEMI" from his sky-high troponin — started a <strong>heparin infusion</strong>. A new murmur was charted by a student but annotated "longstanding?" and ignored. An hour later he arrested in <strong>PEA</strong>. At post-mortem: a <strong>free-wall rupture</strong>, a pericardium full of blood, the haemorrhage worsened by the heparin. The murmur and the day-5 timeline, reviewed at the M&amp;M, screamed mechanical complication.
+      </div>
+      <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+      <div class="swiss">
+        <div class="hole"><b>🧠 ANCHORING</b>"Breathless + crackles = pneumonia/heart failure" — the day-5 post-MI timeline was never connected.</div>
+        <div class="hole"><b>🔊 MURMUR DISMISSED</b>A new murmur was charted and written off as "longstanding" without comparison.</div>
+        <div class="hole"><b>📅 TIMELINE IGNORED</b>Sudden deterioration 3–7 days post-MI = rupture window, regardless of how he "looked."</div>
+        <div class="hole"><b>🩸 LETHAL DRUG</b>Heparin into a free-wall rupture → uncontrolled pericardial haemorrhage.</div>
+        <div class="hole"><b>🌙 SYSTEM</b>Busy take, no echo, no senior review, no "new murmur = surgeon" default.</div>
+      </div>
+      <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> apply the universal rule — <em>new murmur + sudden shock 3–7 days post-MI = mechanical rupture until echo proves otherwise</em>; get an urgent echo and call the surgeon; never anticoagulate a suspected free-wall rupture; compare every "longstanding" murmur to the chart. <strong>This is exactly why your nurse refused to call today's patient "just flash oedema."</strong></p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'It's just heart failure/pneumonia' is the sentence written on the chart of patients who then die of a post-MI rupture. A new murmur after an MI is not a footnote — it is the diagnosis."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S14 — DIFFERENTIALS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s14">
+  <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials</h2></div>
+  <div class="section-content">
+    <h3>🧩 The sudden post-MI deterioration differential</h3>
+    <table class="tbl">
+      <tr><th>Diagnosis</th><th>Clues</th><th>Why it matters</th></tr>
+      <tr><td>🕳️ <strong>Ventricular septal rupture</strong> (this patient)</td><td>New <strong>loud</strong> harsh holosystolic murmur + <strong>thrill</strong> at LLSB, biventricular failure, <strong>O₂ step-up RA→RV</strong></td><td>Surgical emergency — echo + surgeon now; afterload reduction/IABP bridge to repair.</td></tr>
+      <tr><td>💔 <strong>Papillary muscle rupture (acute MR)</strong></td><td>Inferior MI, <strong>flash pulmonary oedema</strong> + shock, murmur often <strong>soft/short</strong>, posteromedial muscle single PDA supply</td><td>Equally surgical; murmur loudness does NOT track severity — image, don't be reassured.</td></tr>
+      <tr><td>🩸 <strong>Free-wall rupture / tamponade</strong></td><td>Sudden <strong>PEA/tamponade</strong>, raised JVP, muffled sounds, NO murmur</td><td>Most lethal; pericardiocentesis bridge → emergency surgery; <strong>do not anticoagulate</strong>.</td></tr>
+      <tr><td>🫀 <strong>Re-infarction / stent thrombosis / cardiogenic shock</strong></td><td>New ischaemic ECG changes, recurrent pain, pump failure <em>without</em> a new murmur</td><td>May need re-cath; but a new murmur/thrill points away from "just" re-infarction toward rupture.</td></tr>
+      <tr><td>🌀 <strong>Acute pulmonary oedema / decompensated HF</strong></td><td>Wet lungs, hypoxia — but <em>no</em> new murmur, no thrill, no shunt on echo</td><td>The trap: treating a rupture as simple heart failure with diuretic alone is fatal. Echo excludes the mechanical lesions.</td></tr>
+      <tr><td>🧪 <strong>Pulmonary embolism / sepsis</strong></td><td>Hypoxia + shock from other causes; risk factors, fever, clear chest on echo</td><td>Consider, but the new murmur + day-5 timeline make a rupture the priority to exclude first.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A new murmur points to VSD or acute MR; no murmur with sudden PEA points to free-wall rupture. All three share one timeline (days 3–7) and one answer (echo + surgeon)."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S15 — PLAN -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s15">
+  <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan</h2></div>
+  <div class="section-content">
+    <h3>🧭 Now → this admission → for life</h3>
+    <ol>
+      <li>🔪 <strong>Now (done):</strong> bedside echo confirmed an inferior-MI basal VSD; cardiac surgery activated; afterload reduction + IABP inserted; inotropes/pressors titrated; crossmatched and to emergency theatre for patch/exclusion repair.</li>
+      <li>🎈 <strong>Bridge &amp; support:</strong> mechanical support (IABP ± Impella/VA-ECMO) to perfuse organs to theatre and through the perioperative period; manage pulmonary oedema and shock.</li>
+      <li>🫀 <strong>Define and treat the lesion:</strong> surgical repair of the VSD (or MVR for papillary rupture, repair for free-wall rupture); transcatheter closure for selected residual/high-risk defects.</li>
+      <li>💙 <strong>Post-repair recovery:</strong> ICU care, watch for residual shunt/MR, RV failure, bleeding; optimize HFrEF GDMT and secondary prevention once stable.</li>
+      <li>🩺 <strong>Address the root cause:</strong> this happened because of a <strong>late, unreperfused</strong> infarct — reinforce that the prevention of mechanical complications is <strong>timely reperfusion</strong>; treat the hypertension, diabetes and smoking.</li>
+      <li>👨‍👩‍👦 <strong>Shared decision-making &amp; education</strong> — honest conversation about the high operative risk, what repair involves, and a clear "call 911 for chest pain — don't sit on it" safety net.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Stabilising treats the minute; surgery treats the rupture; reperfusion-on-time would have prevented it. Get him to theatre, then make sure the next infarct is opened early."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S16 — PROGRESS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s16">
+  <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+  <div class="section-content">
+    <h3>📅 Course in CCU &amp; theatre</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Day 5, 15:10</div>Echo confirms basal-inferoseptal VSD with O₂ step-up RA→RV. IABP inserted; afterload reduction started; noradrenaline titrated. Surgery and theatre activated.</div>
+      <div class="t-item"><div class="t-time">Day 5, 17:30</div>Emergency surgical repair (infarct-exclusion patch) on cardiopulmonary bypass. Tissue friable; repair achieved with a small residual shunt.</div>
+      <div class="t-item"><div class="t-time">Day 6</div>ICU: low-output state supported by IABP and inotropes; lactate clearing; lungs improving. Small residual shunt monitored on echo.</div>
+      <div class="t-item"><div class="t-time">Day 8</div>IABP weaned; extubated. RV function recovering. No tamponade, no new murmur change.</div>
+      <div class="t-item"><div class="t-time">Day 12</div>Residual shunt small and stable; HFrEF GDMT introduced; mobilising slowly with physiotherapy.</div>
+      <div class="t-item"><div class="t-time">Day 18</div>Stable, off support, plan for cardiac rehab and close follow-up. Survived a complication that is usually fatal — because the rupture was named early and he reached theatre.</div>
+    </div>
+
+    <!-- 👨‍👩‍👦 FAMILY & PATIENT JOURNEY MODULE -->
+    <h3>👨‍👩‍👦 Family &amp; Patient Journey</h3>
+    <div class="journey">
+      <div class="j-card"><div class="j-who">🧔 The patient — Mr. T.A.</div><p>"I sat at home for nearly a day with that pain because I didn't want to bother anyone. They told me my heart wall had a hole in it from the heart attack. If I'd come in straight away, maybe none of this would have happened. I'll never sit on chest pain again."</p></div>
+      <div class="j-card"><div class="j-who">👩 His daughter</div><p>"He was getting better — then suddenly he went gray and everyone ran. A nurse told me she'd heard a new murmur and wouldn't let them just give more water tablets. That insistence is the reason he made it to the operating theatre."</p></div>
+      <div class="j-card"><div class="j-who">👩‍⚕️ The bedside nurse</div><p>"My job was to hear the murmur, refuse to call it 'just flash oedema,' and get the echo and the surgeon. Sometimes good care is the diuretic you <em>don't</em> give and the phone call you <em>do</em> make."</p></div>
+      <div class="j-card"><div class="j-who">🎓 The team's reflection</div><p>"This wasn't a clever diagnosis — it was a disciplined one. New murmur + sudden shock on day 5 = rupture. We imaged it, called the surgeon, and the algorithm did the rest."</p></div>
+    </div>
+
+    <div class="callout pink"><b class="ct">💗 The human thread</b>A post-MI rupture is one of the few cardiology emergencies where the difference between life and death is measured in how fast a clinician <em>believes</em> a new murmur and picks up the phone to a surgeon. Surviving it is a team achievement — and the patient's lived lesson, "never sit on chest pain," may save him the next time.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S17 — DISCHARGE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s17">
+  <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+  <div class="section-content">
+    <h3>📋 Discharge plan &amp; safety net</h3>
+    <ul>
+      <li>💊 <strong>Medications:</strong> optimized HFrEF GDMT (ACEi/ARNI, beta-blocker, MRA, SGLT2i as tolerated post-repair), antiplatelet/statin, blood-pressure and diabetes control, and a clear written schedule.</li>
+      <li>🔪 <strong>Post-surgical care:</strong> sternotomy/wound care, surgical and cardiology follow-up, surveillance echo for residual shunt/MR and ventricular function.</li>
+      <li>🩺 <strong>Risk-factor modification:</strong> smoking cessation, tight BP and glycaemic control — the same factors that drove the late, large infarct.</li>
+      <li>🏃 <strong>Cardiac rehabilitation</strong> referral; graded activity; psychological support after a near-fatal event.</li>
+      <li>🚩 <strong>Red flags → call emergency services:</strong> recurrent chest pain, sudden breathlessness, new or changing murmur symptoms, fainting, swelling — and above all, <strong>never delay for chest pain</strong>.</li>
+      <li>📚 <strong>Education:</strong> what happened in plain language (a hole/tear in the heart from the heart attack), why getting to hospital fast for chest pain prevents this, and CPR/AED awareness for the family.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Discharge after a repaired rupture is not 'hole fixed, go home' — it is surveillance echo, optimized heart-failure drugs, aggressive risk-factor control, and a patient who will never again sit at home through chest pain."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S18 — CLINICAL PEARLS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s18">
+  <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+  <div class="section-content">
+    <div class="pearl-grid">
+      <div class="pearl"><b>📅 Day 3–7 is the danger zone</b>Necrotic wall is weakest on days 3–7 — neutrophil-digested but not yet fibrosed. Sudden post-MI deterioration in this window = rupture.</div>
+      <div class="pearl"><b>🔊 New murmur + shock = rupture</b>A new murmur + sudden shock after an MI is a mechanical rupture until echo proves otherwise — call the surgeon, not just the cardiologist.</div>
+      <div class="pearl"><b>🕳️ VSD = loud + thrill + step-up</b>Loud holosystolic murmur with a thrill at the LLSB and an O₂ step-up RA→RV is a ventricular septal rupture.</div>
+      <div class="pearl"><b>💔 Papillary rupture rides with inferior MI</b>The posteromedial muscle has a single PDA supply → inferior MI; flash pulmonary oedema and a QUIET murmur.</div>
+      <div class="pearl"><b>🔇 Loudness ≠ severity</b>In acute MR and VSD, equalizing pressures silence the worst lesions. A soft murmur can be the catastrophic one.</div>
+      <div class="pearl"><b>🩸 Free-wall rupture = sudden PEA</b>Free-wall rupture is sudden PEA/tamponade — suspect it in any post-MI arrest; pericardiocentesis is only a bridge.</div>
+      <div class="pearl"><b>🚫 Don't anticoagulate a free-wall rupture</b>Anticoagulating a suspected free-wall rupture turns a contained tamponade into a fatal haemorrhage.</div>
+      <div class="pearl"><b>🫀 Echo is the key test</b>Bedside echo localises the VSD jet, the flail valve, or the effusion. Image first and fast.</div>
+      <div class="pearl"><b>🔪 Surgery is definitive</b>Urgent operative repair is the only therapy with meaningful survival; medical management alone is near-uniformly fatal.</div>
+      <div class="pearl"><b>🎈 IABP/afterload reduction is a bridge</b>Vasodilators and an IABP cut the shunt/regurgitant fraction to buy time to theatre — never the destination.</div>
+      <div class="pearl"><b>🩹 Pseudoaneurysm ≠ true aneurysm</b>A contained rupture (narrow neck) needs surgery; a true aneurysm (persistent ST elevation, thrombus risk) is usually medical.</div>
+      <div class="pearl"><b>🛡️ Reperfusion prevents it</b>Timely lysis/PCI dramatically lowers rupture risk. The first, late, unreperfused transmural MI is the one that tears.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S19 — MCQs / ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s19">
+  <div class="sec-header"><span class="s-badge">S19</span><h2>🧠 MCQs / Assessment</h2></div>
+  <div class="section-content">
+    <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP and feed your dashboard. Each shows a full explanation.</em></p>
+    <div id="mcqHost"></div>
+    <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · Case c-mech-024 — Mechanical Complications of Acute MI<br>
+  ⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."
+</div>
+
+</div><!-- /#caseScroll -->
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ XP / DASHBOARD CORE ============ */
+  var XP = 0, XP_MAX = 1200;
+  var awarded = {}; // dedupe one-time awards by key
+  var xpVal = document.getElementById('xpVal');
+  var xpFill = document.getElementById('xpFill');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+  }
+  function addXP(amount, key, label){
+    if(key){ if(awarded[key]) return; awarded[key] = true; }
+    XP += amount;
+    if(XP > XP_MAX) XP = XP_MAX;
+    xpVal.textContent = XP;
+    xpFill.style.width = Math.min(100, Math.round(XP / XP_MAX * 100)) + '%';
+    showToast('+' + amount + ' XP' + (label ? ' · ' + label : ''));
+  }
+  function earnBadge(id){
+    var b = document.getElementById(id);
+    if(b && !b.classList.contains('earned')){ b.classList.add('earned'); }
+  }
+
+  /* Dashboard minimize */
+  var dash = document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){
+    dash.classList.toggle('collapsed');
+    this.textContent = dash.classList.contains('collapsed') ? '+' : '–';
+  });
+
+  /* ============ INTERNAL SCROLL SIZING ============ */
+  /* Size the scroll box to the visible window so the sticky tab bar stays in
+     view. When embedded (srcDoc iframe, same-origin), the host page stretches
+     the iframe to full content height and scrolls the OUTER page — so we size
+     this box from the parent window's height minus whatever app chrome sits
+     above the iframe, and scroll internally instead. Standalone → 100vh. */
+  var caseScroll = document.getElementById('caseScroll');
+  var topnav = document.getElementById('topnav');
+  /* The tab bar is position:fixed, so it's out of flow — reserve space at the
+     top of the scroll content (and offset anchor jumps) by its real height. */
+  function setNavOffset(){
+    var navH = topnav ? topnav.offsetHeight : 70;
+    caseScroll.style.paddingTop = navH + 'px';
+    caseScroll.style.scrollPaddingTop = (navH + 14) + 'px';
+  }
+  function sizeScroller(){
+    try {
+      var p = window.parent;
+      if(p && p !== window && window.frameElement){
+        var rectTop = window.frameElement.getBoundingClientRect().top;
+        if(rectTop < 0) rectTop = 0;          // parent scrolled past the chrome
+        var ph = p.innerHeight || 800;
+        var h = ph - rectTop - 6;             // leave the bottom edge breathing room
+        if(h < 460) h = 460;                  // sane minimum on short windows
+        caseScroll.style.height = h + 'px';
+      } else {
+        caseScroll.style.height = '100vh';
+      }
+    } catch(e){ caseScroll.style.height = '100vh'; }
+    setNavOffset();
+  }
+  sizeScroller();
+  window.addEventListener('resize', sizeScroller);
+  window.addEventListener('load', sizeScroller);
+  try { if(window.parent && window.parent !== window) window.parent.addEventListener('resize', sizeScroller); } catch(e){}
+
+  /* ============ NAV: scroll-spy active + visited ============ */
+  var navchips = Array.prototype.slice.call(document.querySelectorAll('.navchip'));
+  var sections = navchips.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited = {};
+  var visitVal = document.getElementById('visitVal');
+
+  function markVisited(idx){
+    var sec = sections[idx];
+    if(!sec) return;
+    if(!visited[sec.id]){
+      visited[sec.id] = true;
+      navchips[idx].classList.add('visited');
+      var count = Object.keys(visited).length;
+      visitVal.textContent = count + ' / 19';
+      addXP(8, 'visit-' + sec.id, 'Section read');
+      if(count >= 19){ earnBadge('bdg-explorer'); addXP(60, 'allvisited', 'Ward Explorer!'); }
+    }
+  }
+  function setActive(idx){
+    navchips.forEach(function(c){ c.classList.remove('active'); });
+    if(navchips[idx]) navchips[idx].classList.add('active');
+  }
+
+  /* True tabs: each chip shows ONLY its section, hidden via CSS otherwise.
+     No scrollIntoView and no scroll-spy — nothing can scroll the tab bar away,
+     which also sidesteps every srcDoc-iframe scrolling quirk. The hero banner
+     and vitals strip belong to the case intro, so they show on S1 only. */
+  var heroBits = [document.querySelector('.hero'), document.querySelector('.vitals-strip')]
+    .filter(function(el){ return !!el; });
+
+  function showSection(idx){
+    sections.forEach(function(s, i){ if(s) s.classList.toggle('sec-active', i === idx); });
+    heroBits.forEach(function(el){ el.style.display = (idx === 0) ? '' : 'none'; });
+    caseScroll.scrollTop = 0;
+    setActive(idx);
+    markVisited(idx);
+  }
+
+  navchips.forEach(function(chip, idx){
+    chip.addEventListener('click', function(ev){
+      ev.preventDefault();
+      showSection(idx);
+    });
+  });
+  showSection(0);
+
+  /* ============ FLAG GAME (S2) ============ */
+  var flagBtns = document.querySelectorAll('#flagGame .flag-btn');
+  var flagResult = document.getElementById('flagResult');
+  var flagsFound = 0, flagsTotal = 0, flagWrong = 0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good') === '1') flagsTotal++; });
+  flagBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.dataset.locked) return;
+      btn.dataset.locked = '1';
+      var good = btn.getAttribute('data-good') === '1';
+      if(good){
+        btn.classList.add('flag-good');
+        flagsFound++;
+        addXP(10, 'flag-' + flagsFound + '-' + Math.random(), 'Rupture flag spotted');
+      } else {
+        btn.classList.add('flag-bad');
+        flagWrong++;
+        showToast('❌ Not a rupture-specific flag');
+      }
+      if(flagsFound === flagsTotal){
+        flagResult.textContent = '✅ All ' + flagsTotal + ' rupture red flags found' + (flagWrong ? ' (with ' + flagWrong + ' wrong pick' + (flagWrong>1?'s':'') + ')' : ' — flawless!');
+        earnBadge('bdg-vt');
+        addXP(30, 'flags-complete', 'Rupture-Spotter badge');
+      } else {
+        flagResult.textContent = flagsFound + ' / ' + flagsTotal + ' rupture red flags found…';
+      }
+    });
+  });
+
+  /* ============ BRANCHING SCENARIO (S3) ============ */
+  var scText = document.getElementById('scText');
+  var scChoices = document.getElementById('scChoices');
+  var scFeedback = document.getElementById('scFeedback');
+  var scRestart = document.getElementById('scRestart');
+  var scStab = document.getElementById('scStab');
+  var scTime = document.getElementById('scTime');
+  var scXP = document.getElementById('scXP');
+  var pathXP = 0, scStability = 2, scElapsed = 0;
+
+  var STEPS = {
+    start: {
+      text: "Day 5 post-MI. BP 80/55 and falling, sats 86%, a new harsh murmur with a thrill at the lower-left sternal border. The junior is drawing up more furosemide for 'flash pulmonary oedema.' The patient is awake but gray. What do you do FIRST?",
+      choices: [
+        { t: "🫀 Stop the diuretic-only plan, get an urgent bedside echo and call cardiac surgery", good:true, ds:1, dt:10, xp:40, fb:"✅ Exactly. A new murmur + sudden shock 3–7 days post-MI is a mechanical rupture until echo proves otherwise. Image it and call the surgeon in parallel — you've started the only pathway that saves him." , next:"image" },
+        { t: "💧 Push more furosemide and start GTN — manage it as flash pulmonary oedema", good:false, ds:-2, dt:20, xp:0, fb:"☠️ Catastrophe. Diuretic does nothing for a ruptured septum or torn valve and can drop his pressure further. This is the M&M case in S13 — managing a rupture as simple heart failure kills. Restart and choose again.", end:true },
+        { t: "🩸 Start a heparin infusion for 'ongoing NSTEMI' given the huge troponin", good:false, ds:-2, dt:18, xp:0, fb:"☠️ Dangerous. If this is a free-wall rupture, anticoagulation turns a contained tamponade into fatal haemorrhage — exactly what killed the M&M patient. Never anticoagulate a suspected post-MI rupture. Restart.", end:true }
+      ]
+    },
+    image: {
+      text: "Bedside echo shows a high-velocity left-to-right jet across the basal septum — a VSD. BP 78/52, lactate rising. The surgeon is on the way. How do you bridge him to theatre?",
+      choices: [
+        { t: "🎈 Afterload reduction (if BP tolerates) + insert an IABP to cut the shunt fraction", good:true, ds:1, dt:8, xp:35, fb:"✅ Right. Reducing afterload and an IABP cut the left-to-right shunt and improve forward flow — a bridge to surgery. Add pressors/inotropes to perfuse organs to theatre.", next:"surg" },
+        { t: "⏳ Hold off on everything and 'stabilise him medically for a few days first'", good:false, ds:-2, dt:25, xp:0, fb:"☠️ Delaying surgery to 'stabilise' a ruptured septum lets him die in the interval. Bridge with support and get him to theatre — don't sit on a rupture.", next:"surg" }
+      ]
+    },
+    surg: {
+      text: "IABP is in, pressure holding at 92/58 with support. The surgeon asks for one more confirmation of the shunt before theatre. What seals the VSD diagnosis at the bedside?",
+      choices: [
+        { t: "🩻 Right-heart catheter showing an oxygen step-up from RA to RV", good:true, ds:1, dt:6, xp:30, fb:"✅ Perfect. An O₂ step-up RA→RV confirms a ventricular-level left-to-right shunt — pathognomonic of post-MI VSD. Crossmatch is back; to theatre.", next:"theatre" },
+        { t: "📈 A repeat 12-lead ECG looking for the VSD", good:false, ds:0, dt:8, xp:5, fb:"⚠️ The ECG shows the infarct substrate but does NOT diagnose the rupture — echo and the O₂ step-up do. Don't lean on the ECG here.", next:"theatre" }
+      ]
+    },
+    theatre: {
+      text: "He's crossmatched, supported on IABP, and the surgeon is scrubbing. The junior asks whether to start therapeutic heparin 'while we wait, for the big troponin.' Final call?",
+      choices: [
+        { t: "🚫 No anticoagulation — straight to emergency surgical repair", good:true, ds:1, dt:5, xp:40, fb:"🏆 Perfect close. Definitive therapy is urgent operative repair; avoid anticoagulation given rupture physiology. You named the rupture, imaged it, bridged it and got him to the surgeon. Case stabilised.", end:true },
+        { t: "🩸 Start therapeutic heparin while waiting for theatre", good:false, ds:-1, dt:10, xp:0, fb:"⚠️ Risky and unnecessary — in any post-MI rupture, anticoagulation can be catastrophic (free-wall haemorrhage) and adds bleeding risk for surgery. The fix is the operation, not heparin.", end:true }
+      ]
+    }
+  };
+
+  function renderStab(){
+    var s = Math.max(0, Math.min(5, scStability + 2)); // map -2..3 → 0..5
+    var dots = '';
+    for(var i=0;i<5;i++) dots += (i < s ? '●' : '○');
+    scStab.textContent = dots;
+  }
+  function renderStep(key){
+    var step = STEPS[key];
+    scText.textContent = step.text;
+    scFeedback.className = 'feedback';
+    scFeedback.style.display = 'none';
+    scChoices.innerHTML = '';
+    step.choices.forEach(function(ch){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = ch.t;
+      b.addEventListener('click', function(){
+        pathXP += ch.xp; scXP.textContent = pathXP;
+        scElapsed += ch.dt; scTime.textContent = scElapsed + ' s';
+        scStability += ch.ds; renderStab();
+        if(ch.xp) addXP(ch.xp, null, 'Scenario choice');
+        scFeedback.textContent = ch.fb;
+        scFeedback.className = 'feedback ' + (ch.good ? 'good' : 'bad');
+        scFeedback.style.display = 'block';
+        Array.prototype.forEach.call(scChoices.children, function(c){ c.disabled = true; c.style.opacity = .6; });
+        if(ch.end){
+          scRestart.style.display = 'inline-block';
+          if(ch.good && key === 'theatre'){ earnBadge('bdg-shock'); addXP(20, 'scenario-win', 'Surgeon Called!'); }
+        } else if(ch.next){
+          setTimeout(function(){ renderStep(ch.next); }, 1400);
+        }
+      });
+      scChoices.appendChild(b);
+    });
+  }
+  scRestart.addEventListener('click', function(){
+    pathXP = 0; scStability = 2; scElapsed = 0;
+    scXP.textContent = 0; scTime.textContent = '0 s'; renderStab();
+    scRestart.style.display = 'none';
+    renderStep('start');
+  });
+  renderStab();
+  renderStep('start');
+
+  /* ============ REVEAL BUTTONS ============ */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.getAttribute('data-target'));
+      if(!t) return;
+      if(t.classList.contains('reveal-shown')){
+        t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden');
+      } else {
+        t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown');
+        addXP(8, 'reveal-' + btn.getAttribute('data-target'), 'Self-test');
+      }
+    });
+  });
+
+  /* ============ RUPTURE-RISK SIM (S6) ============ */
+  var kRange = document.getElementById('kRange');
+  var kVal = document.getElementById('kVal');
+  var kNeedle = document.getElementById('kNeedle');
+  var kReadout = document.getElementById('kReadout');
+  if(kRange){
+    var simUsed = false;
+    function updateK(){
+      var k = (parseInt(kRange.value,10) / 10); // 2.0 .. 7.5 → days post-MI
+      kVal.textContent = Math.round(k);
+      var pct = (parseInt(kRange.value,10) - 20) / (75 - 20) * 100;
+      kNeedle.style.left = pct + '%';
+      var msg, cls;
+      if(k < 3.0){ msg = '🟢 Days 0–2 — coagulative necrosis. The wall is dead but still mechanically intact; rupture is uncommon this early. Reperfusion now still salvages a protective rim.'; cls='good'; }
+      else if(k < 3.5){ msg = '🟠 Day ~3 — neutrophils arriving, the wall is beginning to soften. Rupture risk is climbing into the danger window.'; cls='warn-r'; }
+      else if(k <= 5.5){ msg = '🔴 Days 3–7 — PEAK DANGER. Necrotic myocardium is maximally digested by neutrophils but not yet fibrosed. Tensile strength bottoms out → VSD, papillary muscle and free-wall rupture. This is tonight’s window.'; cls='bad'; }
+      else if(k <= 6.5){ msg = '🟠 Days ~7–10 — granulation tissue and early collagen begin to reinforce the wall. Rupture risk is falling but not gone.'; cls='warn-r'; }
+      else { msg = '🟢 After ~2 weeks — a firm fibrous scar has formed. The wall has regained strength and rupture risk is low (late risk shifts to true aneurysm).'; cls='good'; }
+      kReadout.innerHTML = msg;
+      kReadout.className = 'readout ' + cls;
+      if(!simUsed){ simUsed = true; addXP(15, 'ksim', 'Rupture-Clock Master'); }
+    }
+    kRange.addEventListener('input', updateK);
+    updateK();
+  }
+
+  /* ============ CHECKLISTS (S7) ============ */
+  var allChecklistsDone = 0, totalChecklists = document.querySelectorAll('.checklist').length;
+  document.querySelectorAll('.checklist').forEach(function(list){
+    var boxes = list.querySelectorAll('input[type=checkbox]');
+    var prog = list.querySelector('[data-progress]');
+    var total = boxes.length;
+    var doneAwarded = false;
+    function refresh(){
+      var done = 0;
+      boxes.forEach(function(b){
+        if(b.checked){ done++; b.closest('.ck').classList.add('done'); }
+        else { b.closest('.ck').classList.remove('done'); }
+      });
+      prog.textContent = done + ' / ' + total + ' complete';
+      if(done === total && !doneAwarded){
+        doneAwarded = true;
+        allChecklistsDone++;
+        addXP(25, 'ck-' + list.id, 'Checklist done');
+        if(allChecklistsDone >= totalChecklists){ earnBadge('bdg-ck'); addXP(20, 'allck', 'Checklist Champion'); }
+      }
+    }
+    boxes.forEach(function(b){
+      b.addEventListener('change', function(){
+        if(b.checked) addXP(4, null, 'Step checked');
+        refresh();
+      });
+    });
+  });
+
+  /* ============ MCQs (S19) ============ */
+  var MCQS = [
+    {
+      q: "Mechanical complications of acute MI (VSD, papillary muscle rupture, free-wall rupture) classically occur at which point after the infarct?",
+      opts: ["Within the first 6 hours","Days 3–7, when the necrotic wall is weakest","After 6 weeks, once a scar has formed","Only beyond 3 months"],
+      correct: 1,
+      exp: "Rupture risk peaks on days 3–7. By then neutrophils and macrophages have digested and softened the necrotic myocardium, but fibroblasts have not yet laid down strengthening collagen — the wall is at its mechanical nadir. After ~2 weeks a fibrous scar re-strengthens it."
+    },
+    {
+      q: "A patient 5 days post-MI develops a new LOUD harsh holosystolic murmur with a palpable thrill at the lower-left sternal border and biventricular failure. Right-heart catheter shows an oxygen step-up from RA to RV. The diagnosis is:",
+      opts: ["Acute mitral regurgitation","Post-MI ventricular septal rupture (VSD)","Free-wall rupture","Pericarditis"],
+      correct: 1,
+      exp: "A loud murmur + thrill at the LLSB with an oxygen step-up from RA to RV is a post-MI ventricular septal rupture — a left-to-right shunt at the ventricular level. Acute MR causes no oxygen step-up; free-wall rupture causes tamponade with no murmur."
+    },
+    {
+      q: "Papillary muscle rupture causing acute severe mitral regurgitation classically involves which muscle, and with which infarct?",
+      opts: ["Anterolateral muscle (dual supply), anterior MI","Posteromedial muscle (single PDA supply), inferior MI","Either muscle equally, any MI","Septal papillary muscle, lateral MI"],
+      correct: 1,
+      exp: "The posteromedial papillary muscle has a single blood supply (the PDA, from the dominant coronary), so it is vulnerable in an inferior MI. The anterolateral muscle has dual supply (LAD + circumflex) and rarely ruptures. The result is sudden severe MR with flash pulmonary oedema and shock."
+    },
+    {
+      q: "A patient suddenly arrests 4 days post-MI with an organised rhythm on the monitor but no pulse (PEA), a distended JVP and muffled heart sounds. The most likely mechanical complication is:",
+      opts: ["Ventricular septal rupture","Papillary muscle rupture","Free-wall rupture with tamponade","Re-infarction"],
+      correct: 2,
+      exp: "Sudden PEA with tamponade physiology (raised JVP, muffled sounds) days after an MI is free-wall rupture until proven otherwise — blood fills the pericardium and stops the heart. Pericardiocentesis is only a bridge; definitive treatment is emergency surgery, and anticoagulation must be avoided."
+    },
+    {
+      q: "What is the definitive treatment of a post-MI ventricular septal rupture causing cardiogenic shock?",
+      opts: ["High-dose diuretics","Urgent surgical repair","Long-term beta-blockade","Anticoagulation"],
+      correct: 1,
+      exp: "Urgent surgical repair is the only therapy with meaningful survival; medical management alone is near-uniformly fatal. Afterload reduction and mechanical support (IABP/Impella/ECMO) are bridges to the operating theatre, not substitutes for it."
+    },
+    {
+      q: "Which is the single most useful bedside test to diagnose a suspected mechanical complication of MI?",
+      opts: ["Chest X-ray","Echocardiography","Serial troponin","12-lead ECG"],
+      correct: 1,
+      exp: "Echocardiography is the key test: colour Doppler localises the VSD jet, shows the flail leaflet/torn papillary head of acute MR, and reveals pericardial effusion/tamponade of free-wall rupture. The ECG shows the infarct substrate but does not diagnose the rupture."
+    },
+    {
+      q: "While arranging surgery for a post-MI VSD with shock, how do afterload reduction and an intra-aortic balloon pump (IABP) help?",
+      opts: ["They permanently close the defect","They reduce the left-to-right shunt fraction and improve forward flow as a bridge to surgery","They are contraindicated in VSD","They replace the need for surgery"],
+      correct: 1,
+      exp: "Vasodilators (if BP tolerates) and an IABP lower systemic afterload, reducing the left-to-right shunt (or regurgitant) fraction and improving forward output. They are a temporising bridge that keeps the patient alive to reach definitive surgical repair — not a cure."
+    },
+    {
+      q: "In acute severe mitral regurgitation from papillary muscle rupture, the murmur may be soft or short. Why does loudness NOT track severity?",
+      opts: ["The murmur is always loud in severe MR","Rapid equalization of left atrial and left ventricular pressures shortens and softens the murmur despite torrential regurgitation","Soft murmurs always mean mild disease","Loudness depends only on heart rate"],
+      correct: 1,
+      exp: "In acute MR the small, non-compliant left atrium sees a sudden pressure rise; left atrial and ventricular pressures equalize quickly across the torrential leak, so the murmur becomes soft and short — sometimes inaudible — even though the regurgitation is catastrophic. A quiet murmur in a shocked, flooding post-MI patient must not be falsely reassuring."
+    }
+  ];
+
+  var host = document.getElementById('mcqHost');
+  var mcqVal = document.getElementById('mcqVal');
+  var mcqScore = 0, mcqAnswered = 0;
+  var letters = ['A','B','C','D','E'];
+
+  MCQS.forEach(function(item, qi){
+    var box = document.createElement('div');
+    box.className = 'mcq';
+    var html = '<div class="mcq-q">QUESTION ' + (qi+1) + ' / ' + MCQS.length + '</div>';
+    html += '<div class="mcq-stem">' + item.q + '</div>';
+    item.opts.forEach(function(opt, oi){
+      html += '<label class="mcq-opt" data-oi="' + oi + '"><strong>' + letters[oi] + '.</strong> ' + opt + '</label>';
+    });
+    html += '<div class="mcq-exp"></div>';
+    box.innerHTML = html;
+    host.appendChild(box);
+
+    var opts = box.querySelectorAll('.mcq-opt');
+    var exp = box.querySelector('.mcq-exp');
+    var locked = false;
+    opts.forEach(function(label){
+      label.addEventListener('click', function(){
+        if(locked) return;
+        locked = true;
+        var oi = parseInt(label.getAttribute('data-oi'),10);
+        box.classList.add('answered');
+        var correct = item.correct;
+        if(oi === correct){
+          label.classList.add('picked-right');
+          mcqScore++;
+          addXP(25, null, 'Correct answer');
+        } else {
+          label.classList.add('picked-wrong');
+          opts[correct].classList.add('show-right');
+          showToast('❌ Correct: ' + letters[correct]);
+        }
+        exp.innerHTML = '<strong>' + (oi === correct ? '✅ Correct. ' : '📘 Explanation. ') + '</strong>' + item.exp;
+        mcqAnswered++;
+        mcqVal.textContent = mcqScore + ' / ' + MCQS.length;
+        if(mcqAnswered === MCQS.length){
+          var done = document.getElementById('mcqDone');
+          var summary = document.getElementById('mcqSummary');
+          done.style.display = 'block';
+          summary.textContent = 'You scored ' + mcqScore + ' / ' + MCQS.length + '. ' +
+            (mcqScore === MCQS.length ? 'Flawless — you treat a new murmur + shock after MI as a rupture every time. 🏆' :
+             mcqScore >= 6 ? 'Strong — review the misses and the contrast pairs in S6.' :
+             'Revisit S3, S5, S6 and S11 — the rupture-vs-heart-failure logic is the whole case.');
+          if(mcqScore >= 7){ earnBadge('bdg-quiz'); addXP(50, 'quizace', 'Quiz Ace!'); }
+        }
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
