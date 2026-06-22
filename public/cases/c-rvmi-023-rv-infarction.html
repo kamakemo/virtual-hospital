@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inferior STEMI with Right Ventricular Infarction — Virtual Teaching Hospital</title>
+<!-- META
+id: c-rvmi-023
+title: Inferior STEMI with Right Ventricular Infarction
+hospital: cardiology
+department: cv-ccu
+bednumber: 5
+chiefcomplaint: Inferior STEMI with hypotension, clear lungs and a raised JVP
+system: Cardiology
+severity: critical
+tags: RV infarction, Inferior STEMI, RCA, V4R, Preload-dependent, Avoid nitrates
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --radius:16px;
+    --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  /* Internal scroll viewport. When this case is embedded the host app stretches
+     the iframe to full content height and the OUTER page scrolls, which would
+     let a sticky bar scroll away. We instead scroll inside this box (sized to
+     the visible window by JS) so the section tab bar stays pinned at the top.
+     Standalone, it falls back to the full viewport height. */
+  #caseScroll{height:100vh; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; scroll-padding-top:92px}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:36px 24px 80px; position:relative; overflow:hidden}
+  .hero::after{content:"📈"; position:absolute; right:-20px; top:-30px; font-size:220px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{max-width:1100px; margin:0 auto; position:relative; z-index:1}
+  .hero .crumbs{font-size:13px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:10px 0 6px; font-size:clamp(26px,4vw,40px); line-height:1.15}
+  .hero .sub{font-size:16px; opacity:.95}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; backdrop-filter:blur(4px)}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== LIVE ECG STRIP IN HERO ===== */
+  .ecg-banner{max-width:1100px; margin:14px auto 0; position:relative; z-index:1}
+  .ecg-banner svg{width:100%; height:64px; display:block; background:rgba(0,0,0,.18); border-radius:12px; border:1px solid rgba(255,255,255,.25)}
+  .ecg-trace{stroke:#86efac; stroke-width:2.4; fill:none; stroke-dasharray:1600; stroke-dashoffset:1600; animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{stroke-dashoffset:0}}
+
+  /* ===== VITALS STRIP ===== */
+  .vitals-strip{max-width:1100px; margin:-52px auto 0; padding:0 24px; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:11px; font-weight:700; letter-spacing:.6px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:21px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== HORIZONTAL SECTION SIDEBAR (fixed — always visible) ===== */
+  .topnav{position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.10)}
+  .topnav .rail{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; max-width:1180px; margin:0 auto; scrollbar-width:thin}
+  .navchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink2); font-size:11px; font-weight:700; text-decoration:none; min-width:78px; text-align:center; transition:all .18s; cursor:pointer}
+  .navchip .s-id{font-size:10px; letter-spacing:1px; color:#94a3b8}
+  .navchip .s-emoji{font-size:16px}
+  .navchip:hover{border-color:var(--rose); color:var(--rose); transform:translateY(-2px)}
+  .navchip.active{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; border-color:#b91c1c}
+  .navchip.active .s-id{color:#fecaca}
+  .navchip.visited:not(.active){border-color:var(--emerald-line); background:var(--emerald-soft)}
+
+  /* ===== DASHBOARD WIDGET ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:215px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10.5px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:760px){.dash{display:none}}
+
+  /* ===== MAIN / SECTIONS (tabbed: one section visible at a time) ===== */
+  main{max-width:1100px; margin:26px auto 80px; padding:0 24px}
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:26px; overflow:hidden}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16.5px; margin:26px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14.5px; margin:18px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:24px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15.5px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:14px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px; letter-spacing:.4px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14.5px}
+
+  /* ===== INTERACTIVE BITS ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:10px 18px; font-weight:700; font-size:14px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:22px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:15px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 15px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 15px; margin-top:12px; font-size:14px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim sliders */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:14px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:14px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Heart/circuit diagram */
+  .heart-fig{display:flex; gap:18px; flex-wrap:wrap; align-items:center; background:var(--slate-soft); border-radius:16px; padding:18px; margin:14px 0}
+  .heart-fig svg{flex:0 0 auto}
+  .heart-legend{flex:1; min-width:230px; font-size:13.5px}
+  .lg{display:flex; align-items:center; gap:8px; margin:5px 0}
+  .lg .sw{width:14px; height:14px; border-radius:4px; flex:0 0 auto}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Journey cards */
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:14px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:15px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:14px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13.5px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:22px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14.5px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:13px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .footer{max-width:1100px; margin:0 auto 36px; padding:0 24px; text-align:center; color:#94a3b8; font-size:12.5px}
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="caseScroll">
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · 💗 CCU · 🛏️ Bed 5</div>
+    <h1>📈 Inferior STEMI with Right Ventricular Infarction — "The Heart That Begs for Fluid"</h1>
+    <div class="sub">⚡ A 61-year-old man with an inferior STEMI is hypotensive — but his lungs are crystal clear and his neck veins are bulging. Someone is reaching for nitroglycerin. Stop them.</div>
+    <div class="chips">
+      <span class="chip crit">🔴 CRITICAL</span>
+      <span class="chip">🫀 Inferior STEMI</span>
+      <span class="chip">➡️ V4R = the diagnosis</span>
+      <span class="chip">💧 Preload-Dependent</span>
+      <span class="chip">🚫 No Nitrates</span>
+      <span class="chip">🎮 Interactive Case</span>
+    </div>
+    <div class="ecg-banner" title="Inferior ST-elevation rhythm strip with bradycardia">
+      <svg viewBox="0 0 800 64" preserveAspectRatio="none" aria-label="Inferior STEMI rhythm strip">
+        <polyline class="ecg-trace" points="0,40 30,40 38,34 46,40 60,40 72,14 82,54 92,28 110,28 150,28 158,34 166,40 180,40 192,14 202,54 212,28 230,28 320,28 328,34 336,40 350,40 362,14 372,54 382,28 400,28 500,28 508,34 516,40 530,40 542,14 552,54 562,28 580,28 690,28 698,34 706,40 720,40 732,14 742,54 752,28 770,28 800,28"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== LIVE VITALS ===================== -->
+<div class="vitals-strip">
+  <div class="vitals-grid">
+    <div class="vital alert"><div class="v-label">💓 HR</div><div class="v-num">52</div></div>
+    <div class="vital alert"><div class="v-label">🩸 BP</div><div class="v-num">84/56</div></div>
+    <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">20</div></div>
+    <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">96%</div></div>
+    <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.6°</div></div>
+    <div class="vital"><div class="v-label">🧠 GCS</div><div class="v-num">15</div></div>
+    <div class="vital alert"><div class="v-label">📐 JVP</div><div class="v-num">↑ Raised</div></div>
+    <div class="vital ok-v"><div class="v-label">🫁 Lungs</div><div class="v-num">Clear</div></div>
+  </div>
+</div>
+
+<!-- ===================== HORIZONTAL SECTION SIDEBAR ===================== -->
+<nav class="topnav" id="topnav">
+  <div class="rail">
+    <a class="navchip" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navchip" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navchip" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navchip" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navchip" href="#s5"><span class="s-emoji">🎓</span><span>Consultant Round</span><span class="s-id">S5</span></a>
+    <a class="navchip" href="#s6"><span class="s-emoji">📖</span><span>Teaching Points</span><span class="s-id">S6</span></a>
+    <a class="navchip" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navchip" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navchip" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navchip" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navchip" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navchip" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navchip" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navchip" href="#s14"><span class="s-emoji">🔀</span><span>Differentials</span><span class="s-id">S14</span></a>
+    <a class="navchip" href="#s15"><span class="s-emoji">🗺️</span><span>Plan</span><span class="s-id">S15</span></a>
+    <a class="navchip" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navchip" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navchip" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navchip" href="#s19"><span class="s-emoji">🧠</span><span>MCQs</span><span class="s-id">S19</span></a>
+  </div>
+</nav>
+
+<!-- ===================== SCORE DASHBOARD ===================== -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections visited</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-vt">➡️ V4R-Spotter</span>
+      <span class="badge" id="bdg-shock">💧 Fluid First</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champion</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Ward Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running sims, taking the right path and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- S1 — PROFILE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s1">
+  <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+  <div class="section-content">
+    <div class="callout danger">
+      <b class="ct">🚨 YOU ARE HERE — 14:22, CCU Bed 5</b>
+      The monitor shows an inferior STEMI: ST elevation marching across II, III and aVF, the rhythm bradycardic at 52. He is pale and diaphoretic, BP <strong>84/56</strong>. A junior doctor, seeing chest pain and a falling pressure, is drawing up <strong>sublingual nitroglycerin</strong> "for the ischemia." But the lungs are <strong>completely clear</strong> and the neck veins are <strong>standing up to the jaw</strong>. Your hand reaches the trolley first. This is not a case to read about — it is a triad you must name and a drug you must <strong>refuse</strong> right now.
+    </div>
+
+    <h3>👤 Patient Identity</h3>
+    <table class="tbl">
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>🧔 Name</td><td><strong>Mr. R.V.</strong></td></tr>
+      <tr><td>🎂 Age / Sex</td><td>61-year-old male</td></tr>
+      <tr><td>🆔 MRN</td><td>CV-10523</td></tr>
+      <tr><td>⚖️ Weight</td><td>88 kg</td></tr>
+      <tr><td>💼 Occupation</td><td>Long-haul truck driver</td></tr>
+      <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+    </table>
+
+    <h3>📜 Past Medical History — every line points to the RCA</h3>
+    <ul>
+      <li>🚬 <strong>Current smoker, 35 pack-years</strong>, hypertension, dyslipidemia, type 2 diabetes — textbook atherosclerotic risk for a proximal coronary occlusion.</li>
+      <li>💥 <strong>2 hours of crushing central/inferior chest pain</strong> radiating to the jaw, with sweating and nausea — a classic inferior infarct presentation.</li>
+      <li>🩸 <strong>No prior heart failure, no orthopnea, exercise-tolerant until today</strong> — so the hypotension and raised JVP today are <em>new and acute</em>, not chronic congestion.</li>
+      <li>💊 On amlodipine + atorvastatin + metformin. <strong>No regular nitrates</strong> — important, because the first nitrate he receives today could be the one that crashes him.</li>
+      <li>🫀 <strong>Family history of early coronary disease</strong> (father MI at 58).</li>
+      <li>🍺 Occasional alcohol. No recreational drugs. No prior cardiac surgery.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Inferior STEMI + hypotension + clear lungs + raised JVP = right ventricular infarction — give fluids, NOT nitrates."</div>
+
+    <h3>🧬 Why THIS patient? — a proximal RCA occlusion that took the right ventricle with it</h3>
+    <p>An inferior STEMI is usually a right coronary artery (RCA) story. When the occlusion is <strong>proximal — above the right ventricular (acute) marginal branches</strong> — the clot starves not only the inferior wall of the left ventricle but the entire <strong>right ventricle</strong> as well. The stunned, acutely non-compliant RV cannot push enough blood across the lungs to fill the left heart. The left ventricle is therefore <strong>underfilled</strong>: stroke volume falls, the blood pressure falls — but because the failing chamber sits <em>upstream</em> of the lungs, the lungs stay dry while systemic venous pressure backs up and the <strong>JVP rises</strong>. The same RCA also feeds the SA and AV nodes and triggers the Bezold–Jarisch reflex, so <strong>bradycardia and AV block</strong> ride along with the infarct. One artery, four findings.</p>
+
+    <div class="callout warn"><b class="ct">🔥 Who gets RV infarction?</b>
+    🫀 Up to ~40% of inferior STEMIs have some RV involvement (clinically significant in a smaller subset) · ➡️ Driven by <strong>proximal RCA</strong> occlusion · 💧 Manifests as preload-dependent hypotension · 🫁 With <strong>clear lung fields</strong> · 📐 And a <strong>raised JVP / Kussmaul's sign</strong> · 🐢 Frequently with <strong>bradyarrhythmia or AV block</strong>.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S2 — HANDOVER -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s2">
+  <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+  <div class="section-content">
+    <h3>📻 Paramedic Handover — listen for the trap</h3>
+    <div class="callout info">
+      <b class="ct">🎙️ SBAR from the ambulance crew (verbatim)</b>
+      <p><strong>S:</strong> "Bed 5 — Mr. R.V., 61, two hours of crushing chest pain. Pre-hospital 12-lead: ST elevation in II, III and aVF — an inferior STEMI. Cath lab pre-alerted."</p>
+      <p><strong>B:</strong> "Smoker, diabetic, hypertensive. No previous heart failure. He was fine this morning."</p>
+      <p><strong>A:</strong> "Here's what's odd — his pressure dropped to 80s when we sat him up, but his chest is <strong>clear as a bell</strong> and his neck veins are <strong>up to his ears</strong>. Heart rate's slow, low 50s. We gave him aspirin. We <em>nearly</em> gave him a GTN spray for the pain but his pressure was already low so we held off."</p>
+      <p><strong>R:</strong> "Pads on, two IV lines, fluids primed but not running. Something about giving nitrates to this one didn't sit right with me."</p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Never give nitroglycerin to an RV infarct — you remove the only thing filling the heart. A hypotensive inferior STEMI with clear lungs is RV infarction until V4R proves otherwise."</div>
+
+    <h3>🚩 Spot-the-Red-Flag — tap each feature that points to RV infarction</h3>
+    <p>🎮 <em>Interactive: click every feature that points to right ventricular infarction (not LV pump-failure shock or another cause). Each correct flag = +10 XP. Wrong picks cost you.</em></p>
+    <div id="flagGame">
+      <button class="btn ghost flag-btn" data-good="1">🫀 Inferior ST elevation (II / III / aVF)</button>
+      <button class="btn ghost flag-btn" data-good="1">🩸 Hypotension (BP 84/56)</button>
+      <button class="btn ghost flag-btn" data-good="1">🫁 CLEAR lung fields on auscultation</button>
+      <button class="btn ghost flag-btn" data-good="1">📐 Raised JVP / Kussmaul's sign</button>
+      <button class="btn ghost flag-btn" data-good="1">🐢 Bradycardia / AV block</button>
+      <button class="btn ghost flag-btn" data-good="1">➡️ ST elevation in V4R</button>
+      <button class="btn ghost flag-btn" data-good="0">💦 Bibasal crackles / pulmonary edema</button>
+      <button class="btn ghost flag-btn" data-good="0">🌡️ Fever 38.5°C</button>
+    </div>
+    <p id="flagResult" style="font-weight:700"></p>
+
+    <h3>⏱️ Timeline so far</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">12:15</div>Sudden crushing inferior chest pain at the wheel; pulls over and calls for help.</div>
+      <div class="t-item"><div class="t-time">12:40</div>Paramedic 12-lead: inferior STEMI (II/III/aVF). Aspirin given. HR 54, BP 110/70 supine.</div>
+      <div class="t-item"><div class="t-time">12:55</div>Sat upright → BP drops to 82/55. Lungs clear, JVP raised. Crew <strong>withholds the GTN spray</strong> — 🏅 instinct worth its weight in gold.</div>
+      <div class="t-item"><div class="t-time">14:22</div>You arrive in CCU. Pads on, fluids primed. The clock is the enemy: the longer the RCA stays shut, the more right ventricle is lost.</div>
+    </div>
+
+    <div class="callout ok"><b class="ct">🏅 Praise where due</b>The crew who held the GTN prevented a catastrophe. A nitrate dumps venous capacitance and slashes preload — and in an RV infarct preload is the <em>only</em> thing filling the underfilled left heart. Withholding it kept his pressure on the right side of survivable.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S3 — INITIAL ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s3">
+  <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+  <div class="section-content">
+    <h3>🅰️🅱️🅲️ Primary Survey — what your hands, eyes and ears find</h3>
+    <table class="tbl">
+      <tr><th>Step</th><th>Finding</th><th>What it means mechanistically</th></tr>
+      <tr><td>🅰️ Airway</td><td>Patent, speaking full sentences, distressed by pain.</td><td>Airway intact — his problem is circulation, not ventilation. The lungs are not the bottleneck here.</td></tr>
+      <tr><td>🅱️ Breathing</td><td>RR 20, SpO₂ 96% on air, <strong>lungs CLEAR to bases bilaterally</strong>, no crackles.</td><td>The killer clue. The failing chamber (RV) sits <em>upstream</em> of the lungs, so the lungs stay dry. Clear lungs in cardiogenic hypotension should make you think RIGHT heart, not left.</td></tr>
+      <tr><td>🅲️ Circulation</td><td><strong>BP 84/56</strong>, cool peripheries, HR 52 with first-degree then intermittent Mobitz I AV block. <strong>JVP raised to the angle of the jaw with Kussmaul's sign</strong> (rises on inspiration). Quiet right-sided S3/S4.</td><td>Raised JVP + hypotension + clear lungs = the RV-infarct triad. A stiff, infarcted RV cannot accept venous return → systemic congestion (high JVP) while the LV is starved of inflow (low BP). Kussmaul's = the rigid RV cannot accommodate the inspiratory rise in venous return.</td></tr>
+      <tr><td>🅳 Disability</td><td>GCS 15, anxious but lucid.</td><td>Cerebral perfusion preserved for now — but a preload-dependent circulation can collapse fast if you remove preload (a nitrate, an opioid, a diuretic).</td></tr>
+      <tr><td>🅴 Exposure</td><td>Diaphoretic, no rash, no leg swelling, no calf tenderness. Pads on.</td><td>No chronic congestion (no edema) confirms this is an acute, RV-mechanism hypotension, not decompensated chronic heart failure.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Raised JVP + clear lungs + hypotension in an inferior STEMI = right ventricular infarction. Your eyes on the neck and your stethoscope on the chest diagnose this before V4R prints."</div>
+
+    <h3>🧭 The single most important move: GET RIGHT-SIDED LEADS</h3>
+    <p>The bedside triad strongly suggests RV infarction, but the one investigation that nails it takes thirty seconds: a <strong>right-sided 12-lead, looking at V4R</strong>. <strong>ST elevation ≥ 1 mm in V4R is the single most useful sign of RV infarction.</strong> Posterior leads (V7–V9) round out the picture. The mantra: <strong>every inferior STEMI deserves a V4R</strong>.</p>
+
+    <div class="callout danger"><b class="ct">💧 The decision is made: RV INFARCT → FLUIDS + REPERFUSE, NOT NITRATES</b>This is a <strong>preload-dependent</strong> circulation. Give a <strong>cautious IV fluid bolus</strong> to fill the right heart, get him to <strong>primary PCI of the RCA</strong>, and treat the bradycardia/AV block. <strong>Withhold every preload reducer</strong> — no nitroglycerin, no morphine, no diuretic. Do not "treat the chest pain" with the very drug that will empty his heart.</p></div>
+
+    <!-- 🎬 BRANCHING SCENARIO ENGINE -->
+    <div class="scenario" id="scenarioBox">
+      <h3>🎬 Choose Your Path — "The First 60 Seconds"</h3>
+      <div class="hud"><span>❤️ Stability: <b id="scStab">●●○○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 s</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+      <div class="scene-text" id="scText">The junior doctor holds a GTN spray in one hand and a furosemide ampoule in the other, eyeing the chest pain and falling pressure. BP 84/56. Inferior ST elevation on the monitor, HR 52. Lungs clear, JVP up to the jaw. What do you do FIRST?</div>
+      <div class="choices" id="scChoices"></div>
+      <div class="feedback" id="scFeedback"></div>
+      <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+    </div>
+
+    <div class="callout info"><b class="ct">🧮 If his lungs were WET instead</b>
+    A hypotensive STEMI with <em>crackles and pulmonary edema</em> tells the opposite story — <strong>LV pump-failure</strong> (cardiogenic shock). There, pouring in fluid drowns the patient; the levers are inotropes/vasopressors, careful diuresis once perfused, and mechanical support. <strong>The lungs are the fork in the road:</strong> clear lungs → fill the RV; wet lungs → do not. Read the chest before you reach for the fluid OR the nitrate.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S4 — RESIDENT REVIEW -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s4">
+  <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+  <div class="section-content">
+    <p><em>The cardiology resident arrives at 14:24. Her reasoning, out loud:</em></p>
+
+    <h3>🧠 Pattern recognition first, then physiology</h3>
+    <p>"Inferior ST elevation, hypotensive, clear lungs, neck veins up, and he's slow. That pentad <em>is</em> right ventricular infarction — I don't need to wait for the troponin. The dangerous instinct is to see 'STEMI + chest pain + low pressure' and reflexively reach for a nitrate and an opioid. In this patient that is <strong>removing the preload that is keeping him alive</strong>. The right ventricle is stunned and stiff; it runs on filling pressure. Take that away and the left heart has nothing to pump."</p>
+
+    <h3>🎯 Immediate priorities (her actual order of operations)</h3>
+    <ol>
+      <li>🚫 <strong>Stop the preload reducers:</strong> no nitroglycerin, no morphine, no diuretic. Say it out loud and take the GTN and furosemide off the trolley.</li>
+      <li>➡️ <strong>Record V4R (right-sided leads) NOW</strong> — confirm the diagnosis with the single most useful sign, ST elevation in V4R, plus posterior leads.</li>
+      <li>💧 <strong>Cautious IV fluid bolus</strong> (250–500 mL crystalloid) to fill the RV, reassessing pressure and lungs after each — the RV is preload-dependent.</li>
+      <li>🫀 <strong>Reperfuse:</strong> activate primary PCI of the RCA without delay — opening the artery is the definitive treatment for the RV too.</li>
+      <li>🐢 <strong>Treat the bradycardia/AV block:</strong> atropine for symptomatic bradycardia; have transcutaneous/temporary pacing ready. <strong>Preserve AV synchrony</strong> — the stiff RV depends on the atrial kick.</li>
+      <li>💪 <strong>If still hypotensive despite filling →</strong> inotropic support (dobutamine) rather than more and more fluid; over-filling overloads the RV.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In RV infarction the order is: refuse the nitrate, get the V4R, give fluid, open the artery, and keep him in sinus rhythm — because the atrial kick is half his cardiac output."</div>
+
+    <h3>🤔 "But he has chest pain — surely he needs a nitrate?"</h3>
+    <p>"His pain will be treated by <em>opening the artery</em>, not by a venodilator that empties his ventricle. Nitrates relieve ischemic pain by reducing preload and wall stress — exactly the physiology that an RV infarct cannot survive. If you must give analgesia, give it cautiously and watch the pressure like a hawk; morphine is itself a venodilator. The chest pain is a symptom of an occluded RCA — reperfusion is the analgesic that doesn't kill him."</p>
+
+    <div class="callout purple"><b class="ct">🧪 Resident's self-test (answer before reading on)</b>
+    Someone suggests "a small dose of IV furosemide because the JVP is so high — he's clearly congested." Good idea in this patient?
+    <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+    <div class="reveal-hidden" id="rev1"><p><strong>No — dangerously wrong.</strong> The raised JVP here is <em>not</em> volume overload of the lungs; it is venous return backing up behind a stiff, infarcted RV that the underfilled LV needs <em>more</em> preload, not less. Diuresing him strips the very filling pressure keeping the left heart full and will collapse his blood pressure. The high JVP with clear lungs is the signature of RV infarction, not a reason to offload. Fluids, not furosemide.</p></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S5 — CONSULTANT ROUND -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s5">
+  <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round</h2></div>
+  <div class="section-content">
+    <p><em>The on-call interventional cardiology consultant, by phone at 14:28, then at the bedside:</em></p>
+
+    <h3>🗂️ Name the shock precisely — it changes the lever you pull</h3>
+    <div class="vs">
+      <div class="side a"><h4>🔴 RV-infarct hypotension (this patient)</h4>
+        <ul><li><strong>Preload-dependent</strong> — the LV is underfilled because the RV can't deliver</li><li><strong>CLEAR lungs</strong>, raised JVP / Kussmaul's sign</li><li>Often bradycardic / AV block (RCA feeds the nodes)</li><li>Treatment: <strong>FLUIDS</strong>, reperfuse RCA, maintain AV synchrony, AVOID nitrates/morphine/diuretics; inotrope if filling fails</li></ul></div>
+      <div class="side b"><h4>🔵 LV pump-failure shock</h4>
+        <ul><li>The left ventricle itself fails to pump forward</li><li><strong>WET lungs</strong> — crackles, pulmonary edema, hypoxia</li><li>Usually large anterior (LAD) infarct</li><li>Treatment: <strong>avoid fluid bolus</strong>, support/offload — inotropes, vasopressors, careful diuresis, mechanical support (IABP/Impella)</li></ul></div>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"RV-infarct shock you FILL; LV pump-failure shock you SUPPORT and OFFLOAD. The lungs tell you which: clear → fluids, wet → no fluids. Same low pressure, opposite treatment."</div>
+
+    <h3>🐢 "Inferior MI loves to block" — watch the conduction system</h3>
+    <p>The RCA supplies the SA node in ~60% of people and the AV node in ~90%, and an inferior infarct also fires the <strong>Bezold–Jarisch reflex</strong> (vagally mediated bradycardia and hypotension). So sinus bradycardia, first-degree and Mobitz I (Wenckebach) AV block, and even complete heart block are common — and usually at the <em>nodal</em> level, so they are atropine-responsive and often transient with reperfusion. Because the stiff RV leans on the <strong>atrial kick</strong>, losing AV synchrony (e.g. junctional rhythm or complete block) can drop the pressure dramatically — restore synchrony (atropine, AV-sequential temporary pacing) and the pressure often follows.</p>
+
+    <h3>🧭 Consultant's three commandments for the next hour</h3>
+    <ol>
+      <li>➡️ "Get the <strong>V4R</strong> on the chart before anyone touches a syringe. ST elevation in V4R is the diagnosis. Every inferior STEMI in this unit gets right-sided and posterior leads — no exceptions."</li>
+      <li>💧 "<strong>Fill, then reperfuse.</strong> Cautious boluses to support the RV, then the artery open as fast as possible. If he's still hypotensive after sensible filling, add <strong>dobutamine</strong> — do not chase the pressure with endless saline and overload the RV."</li>
+      <li>🚫 "<strong>Ban the preload reducers</strong> on the drug chart — nitroglycerin, morphine, diuretics — and keep him in sinus rhythm. The single commonest way to kill an RV infarct is a 'routine' nitrate for chest pain."</li>
+    </ol>
+
+    <div class="callout danger"><b class="ct">☠️ The consultant's war memory (more in S13 M&amp;M)</b>"The last RV infarct I saw mistreated was a 64-year-old with an inferior STEMI and ongoing pain, given sublingual then IV nitroglycerin by a busy team. His pressure vanished within a minute and he arrested. At the M&amp;M we found no one had recorded a V4R — the right-sided leads, done retrospectively from the cath-lab strip, showed textbook ST elevation. The clue was there to be seen; nobody looked right-sided because the standard 12-lead 'only' showed an inferior STEMI. He didn't survive a problem that a 30-second tracing and a bag of fluid would have prevented."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S6 — TEACHING POINTS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s6">
+  <div class="sec-header"><span class="s-badge">S6</span><h2>📖 Teaching Points</h2></div>
+  <div class="section-content">
+    <h3>🔬 The mechanism — WHY the RV infarct makes a preload-dependent, clear-lunged shock (the WHY behind the WHY)</h3>
+    <ol>
+      <li>🩸 <strong>The artery:</strong> a <strong>proximal RCA</strong> occlusion (above the RV marginal branches) infarcts the inferior LV <em>and</em> the right ventricle. A distal RCA or a dominant circumflex lesion spares the RV — location is everything.</li>
+      <li>🧱 <strong>The stunned RV:</strong> the acutely infarcted right ventricle becomes <strong>dilated, hypocontractile and stiff</strong>. It can neither contract well nor relax to accept venous return.</li>
+      <li>⬇️ <strong>Underfilled left heart:</strong> if the RV can't push blood through the lungs, the left atrium and LV receive less inflow. <strong>LV preload falls → stroke volume falls → blood pressure falls.</strong> The problem is delivery <em>to</em> the LV, not the LV itself.</li>
+      <li>🫁 <strong>Why the lungs stay clear:</strong> the bottleneck sits <em>upstream</em> of the pulmonary capillaries. Pressure backs up into the systemic veins (high JVP), not the lungs — so no crackles, no pulmonary edema. That dissociation (hypotension with clear lungs) is the fingerprint.</li>
+      <li>💧 <strong>Why fluids help and nitrates kill:</strong> a stiff RV sits on the steep part of its filling curve — a little extra volume meaningfully raises RV output and thus LV filling. A nitrate (or morphine, or a diuretic) <em>removes</em> venous return, drops RV preload, and the underfilled LV has even less to pump → profound hypotension/arrest.</li>
+      <li>🐢 <strong>Why it blocks and why AV synchrony matters:</strong> the RCA feeds the SA/AV nodes and the Bezold–Jarisch reflex adds vagal tone → bradycardia/AV block. The stiff RV depends heavily on a timed atrial contraction (the atrial kick) to fill — lose AV synchrony and output falls sharply.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The RV infarct is a heart begging for volume: fill it, open its artery, keep it in sinus rhythm — and never take away the preload it is living on."</div>
+
+    <h3>⚖️ Contrast pair #1 — RV-infarct hypotension vs LV pump-failure shock (the lethal mimic)</h3>
+    <div class="vs">
+      <div class="side a"><h4>💧 RV infarct → FILL</h4><ul><li>Inferior STEMI, proximal RCA</li><li><strong>CLEAR lungs</strong>, raised JVP, Kussmaul's sign</li><li>Preload-DEPENDENT — fluids raise the pressure</li><li>Bradycardia/AV block common</li><li>AVOID nitrates, morphine, diuretics</li></ul></div>
+      <div class="side b"><h4>💦 LV pump failure → DON'T FILL</h4><ul><li>Usually large anterior (LAD) STEMI</li><li><strong>WET lungs</strong> — crackles, edema, hypoxia</li><li>Forward failure of the LV itself</li><li>Fluid bolus worsens the edema</li><li>Inotropes/pressors, careful diuresis, mechanical support</li></ul></div>
+    </div>
+    <p>😈 <strong>The trap:</strong> both present as a hypotensive STEMI. The brain pattern-matches "low pressure in an MI = cardiogenic shock = avoid fluid / give a nitrate for pain" and does exactly the wrong thing. <strong>The lungs break the tie:</strong> clear lungs with a high JVP send you toward fluids; wet lungs send you away from them.</p>
+
+    <h3>⚖️ Contrast pair #2 — Nitrate-helps vs Nitrate-harms</h3>
+    <div class="vs">
+      <div class="side a"><h4>✅ Nitrate HELPS</h4><ul><li>Anterior STEMI/ACS with <strong>pulmonary edema</strong> and adequate/high BP</li><li>Reducing preload &amp; afterload unloads a congested LV</li><li>Relieves ischemic pain and breathlessness</li></ul></div>
+      <div class="side b"><h4>🚫 Nitrate HARMS</h4><ul><li><strong>RV infarction</strong> (and any preload-dependent state)</li><li>Removing preload empties the underfilled LV → collapse</li><li>Also avoid in hypotension and recent PDE5-inhibitor use</li></ul></div>
+    </div>
+    <p>💡 <em>Why it matters:</em> the same little spray that rescues a wet, hypertensive anterior STEMI can arrest a dry, hypotensive RV infarct. <strong>Check the lungs and the JVP before you reach for the GTN.</strong></p>
+
+    <!-- 🎮 INTERACTIVE SIM: RV preload → cardiac output -->
+    <div class="sim" id="kSim">
+      <h3 style="margin-top:0">🎮 Simulation — The Preload Dial: how RV filling tunes cardiac output</h3>
+      <p style="font-size:13.5px">Drag the dial. Watch what too little and too much preload do to the stunned right ventricle and to the blood pressure. In an RV infarct, volume is the single most important "invisible vital sign."</p>
+      <label for="kRange">💧 RV preload / volume status: <b id="kVal">3.1</b> (relative units)</label>
+      <input type="range" id="kRange" min="20" max="75" value="31">
+      <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+      <div class="readout bad" id="kReadout">Set the dial to explore.</div>
+      <p style="font-size:12.5px; margin-top:10px; color:var(--ink2)">🎯 Sweet spot is in the <strong>middle</strong>: enough volume to fill the stiff RV, not so much that you overload it. Too low (nitrates/diuretics/morphine drop it) → underfilled LV → hypotension. Too high (over-aggressive fluids) → RV overload → septal bowing &amp; falling output. The window is narrow on purpose.</p>
+    </div>
+
+    <!-- 📚 EBM MODULE -->
+    <div class="ebm">
+      <h3>📚 Evidence-Based Medicine Corner</h3>
+      <table class="tbl">
+        <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+        <tr><td><span class="lvl">CLASSIC</span> Right-sided lead recording (V4R)</td><td>ST elevation ≥ 1 mm in V4R is the most sensitive and specific single ECG sign of RV infarction in inferior STEMI; it identifies higher-risk patients.</td><td>Record a V4R (and posterior leads) on <em>every</em> inferior STEMI — it changes management and predicts complications.</td></tr>
+        <tr><td><span class="lvl">PHYSIOL</span> Hemodynamics &amp; volume loading</td><td>RV infarction produces preload-dependent hypotension with disproportionately raised right-sided filling pressures and clear lungs; volume loading (then inotropes) restores output.</td><td>Cautious fluids first; add dobutamine if filling alone fails; do not over-fill — excess volume overloads the RV.</td></tr>
+        <tr><td><span class="lvl">RCT</span> Reperfusion benefit (PCI/lysis)</td><td>Early reperfusion of the RCA recovers RV function and reduces mortality; RV function often improves markedly once flow is restored.</td><td>Primary PCI of the culprit RCA is the definitive treatment — open the artery fast.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> AV block / temporary pacing</td><td>Inferior-MI AV block is usually nodal, atropine-responsive and transient; symptomatic/high-grade block or loss of AV synchrony warrants temporary (ideally AV-sequential) pacing.</td><td>Have atropine and pacing ready; preserve the atrial kick the stiff RV depends on.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> ESC / ACC STEMI guidance on RV infarction</td><td>Identify RV involvement in inferior STEMI; maintain RV preload, avoid nitrates/diuretics/opioids that reduce preload, reperfuse, and support with fluids ± inotropes.</td><td>Exactly the algorithm driving S3, S7 and S11 of this case.</td></tr>
+      </table>
+    </div>
+
+    <!-- 🔬 ADVANCED TOPICS -->
+    <div class="callout purple">
+      <h3 style="margin-top:0">🔬 Fellowship Corner — Advanced Topics</h3>
+      <ul>
+        <li>🫀 <strong>Coronary anatomy &amp; dominance:</strong> the RV marginal (acute marginal) branches arise from the proximal-to-mid RCA; occlusion proximal to them defines RV-involving infarcts. Left dominance (circumflex-supplied PDA) makes isolated RV infarction far less likely.</li>
+        <li>📈 <strong>The full right-sided/posterior workup:</strong> V4R is the headline; V3R–V6R and posterior leads V7–V9 detect posterolateral extension. ST elevation III &gt; II and ST depression in I/aVL also point to an RCA culprit.</li>
+        <li>🩻 <strong>Echo/hemodynamic signatures:</strong> dilated hypokinetic RV, tricuspid regurgitation, right-to-left interatrial shunt through a stretched PFO (refractory hypoxemia), equalization of diastolic pressures, and a noncompliant RV mimicking constriction (Kussmaul's sign).</li>
+        <li>💉 <strong>When fluids aren't enough:</strong> add <strong>dobutamine</strong> for RV inotropy; consider pulmonary vasodilators to offload the RV; refractory cases may need an RV assist device or VA-ECMO. Avoid over-resuscitation — RV overdistension bows the septum left and chokes LV filling.</li>
+        <li>🐢 <strong>Bradyarrhythmia nuances:</strong> inferior-MI complete heart block is usually high (nodal) with a stable junctional escape and good prognosis once reperfused — contrast with the unstable infranodal block of anterior MI. AV-sequential pacing beats ventricular-only pacing because it preserves the atrial kick.</li>
+        <li>🫁 <strong>The PFO trap:</strong> rising right atrial pressure can open a PFO and cause right-to-left shunting → hypoxemia that worsens with the very PEEP/pressors used to treat it — a classic RV-infarct gotcha.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S7 — ORDERS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s7">
+  <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+  <div class="section-content">
+    <h3>🖊️ The order set, written as you'd actually write it (14:30)</h3>
+    <ul>
+      <li>🚨 <strong>NO nitroglycerin, NO morphine, NO diuretic</strong> while preload-dependent/hypotensive — flag on chart and whiteboard.</li>
+      <li>➡️ <strong>Right-sided 12-lead (V4R) + posterior leads (V7–V9)</strong> NOW — document ST elevation in V4R.</li>
+      <li>💧 <strong>IV fluid bolus 250–500 mL crystalloid</strong>, reassess BP, JVP and lungs after each; repeat cautiously to support the RV (avoid over-filling).</li>
+      <li>🫀 <strong>Activate primary PCI</strong> of the culprit RCA immediately; dual antiplatelet (aspirin + a P2Y₁₂ inhibitor) + anticoagulation per protocol.</li>
+      <li>🐢 <strong>Atropine 0.5–1 mg IV</strong> for symptomatic bradycardia/AV block; set up <strong>transcutaneous pacing</strong> and prepare AV-sequential temporary pacing if high-grade block.</li>
+      <li>💪 <strong>Dobutamine infusion</strong> if hypotension persists despite adequate filling (RV inotropic support) — not endless saline.</li>
+      <li>🫁 O₂ only if SpO₂ &lt; 94%; continuous monitoring; second large-bore IV; serial 12-leads.</li>
+      <li>🩸 Bloods: troponin, U&amp;E, glucose, CBC, coagulation; cautious analgesia (small titrated dose) if pain severe, watching the pressure closely.</li>
+      <li>🔌 Keep <strong>defibrillator and pacing pads</strong> attached — anticipate brady-/tachyarrhythmia and reperfusion arrhythmia.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In RV infarction there are only two early priorities: keep the right ventricle FULL and get the RCA OPEN. Every other order exists to protect preload and AV synchrony while you do those two."</div>
+
+    <!-- 🩺 PROCEDURE GUIDE 1 -->
+    <div class="checklist" id="ckCV">
+      <h3 style="margin-top:0">🩺 Procedure Guide — Recognise &amp; Stabilise the RV Infarct — tick as you go</h3>
+      <label class="ck"><input type="checkbox"><span>🫀 Confirm inferior STEMI (II/III/aVF) with hypotension, CLEAR lungs and a raised JVP — the RV-infarct triad</span></label>
+      <label class="ck"><input type="checkbox"><span>➡️ Record a right-sided 12-lead and look for <strong>ST elevation in V4R</strong> (plus posterior leads V7–V9)</span></label>
+      <label class="ck"><input type="checkbox"><span>🚫 Cross off the chart: <strong>no nitroglycerin, no morphine, no diuretic</strong> — protect preload</span></label>
+      <label class="ck"><input type="checkbox"><span>💧 Give a cautious fluid bolus (250–500 mL), then reassess BP, JVP and lungs before repeating</span></label>
+      <label class="ck"><input type="checkbox"><span>🐢 Treat bradycardia/AV block (atropine; pacing ready) and keep him in sinus rhythm to preserve the atrial kick</span></label>
+      <label class="ck"><input type="checkbox"><span>🫀 Activate primary PCI of the RCA — reperfusion is the definitive treatment for the RV</span></label>
+      <label class="ck"><input type="checkbox"><span>💪 If still hypotensive after sensible filling → add dobutamine rather than more fluid (avoid RV overload)</span></label>
+      <div class="ck-progress" data-progress>0 / 7 complete</div>
+    </div>
+
+    <!-- 🩺 PROCEDURE GUIDE 2 -->
+    <div class="checklist" id="ckDefib">
+      <h3 style="margin-top:0">🩺 Procedure Guide — If he develops complete heart block / profound bradycardia</h3>
+      <p style="font-size:13px">⚠️ Inferior-MI AV block is usually nodal and atropine-responsive, but high-grade block or loss of AV synchrony can crash a preload-dependent RV. Act early.</p>
+      <label class="ck"><input type="checkbox"><span>🐢 Recognise symptomatic bradycardia / AV block on the monitor; check BP and perfusion</span></label>
+      <label class="ck"><input type="checkbox"><span>💉 Atropine 0.5–1 mg IV (repeat to 3 mg) for nodal block; this is often enough in inferior MI</span></label>
+      <label class="ck"><input type="checkbox"><span>🔌 Set up transcutaneous pacing pads; sedate/analgese for capture if used</span></label>
+      <label class="ck"><input type="checkbox"><span>📟 Arrange temporary transvenous pacing — prefer <strong>AV-sequential</strong> to preserve the atrial kick the stiff RV needs</span></label>
+      <label class="ck"><input type="checkbox"><span>🫀 Reperfuse the RCA urgently — block and bradycardia often resolve once flow is restored</span></label>
+      <label class="ck"><input type="checkbox"><span>💧 Keep filling pressures up and avoid preload reducers throughout — the pacing supports rate, fluid supports volume</span></label>
+      <div class="ck-progress" data-progress>0 / 6 complete</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S8 — NURSING CARE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s8">
+  <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+  <div class="section-content">
+    <h3>🛏️ CCU nursing priorities — minute by minute</h3>
+    <ul>
+      <li>🚫 <strong>Guard the drug chart.</strong> Know that this patient must NOT receive nitroglycerin, morphine or a diuretic while preload-dependent — query any such prescription before giving it.</li>
+      <li>💧 <strong>Run fluid boluses as prescribed and reassess in between</strong> — BP, JVP and lung sounds after each bolus. Tell the doctor if the lungs start to crackle (sign you are reaching the RV's ceiling).</li>
+      <li>🩸 <strong>BP every 2–5 min</strong> (cycle the NIBP, or read the arterial line once placed). A falling pressure means escalate now, not at the next set of obs.</li>
+      <li>🐢 <strong>Watch the rhythm for bradycardia and AV block</strong> — have atropine drawn and the pacing pads attached; a sudden junctional rhythm or complete block can drop the pressure fast.</li>
+      <li>📟 <strong>Keep continuous telemetry with defibrillator/pacing ready</strong> at the bedside; pads on.</li>
+      <li>🫀 <strong>Prepare for emergent PCI:</strong> consent support, groin/radial prep, antiplatelet/anticoagulant administration, transfer readiness.</li>
+      <li>🧠 <strong>Neuro/perfusion checks</strong> — a patient who becomes confused or cold is losing output; recheck the pressure and the rhythm.</li>
+      <li>📋 <strong>Document the V4R strip and every bolus/response</strong>, the rate and any pacing — gold for the cath-lab and CCU team.</li>
+      <li>👨‍👩‍👦 Keep the family updated and supported (see S16) — assign a liaison if staffing allows; a low pressure with a "normal chest X-ray" is confusing and frightening to relatives.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who refuses the routine nitrate and keeps the right ventricle full is doing half the resuscitation in the room."</div>
+    <div class="callout warn"><b class="ct">📢 Escalate IMMEDIATELY for</b>BP falling despite fluids · new crackles/desaturation (RV ceiling reached — stop the bolus) · symptomatic bradycardia or new AV block · loss of AV synchrony (junctional rhythm) · any prescription for nitroglycerin, morphine or a diuretic in this patient · refractory hypoxemia (think right-to-left PFO shunt).</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S9 — INVESTIGATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s9">
+  <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+  <div class="section-content">
+    <h3>🧾 Results board (14:40, drawn during resuscitation)</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>Result</th><th>Reference</th><th>Interpretation</th></tr>
+      <tr><td>Troponin I</td><td class="hi">3.8 ng/mL ↑</td><td>&lt; 0.04</td><td>Acute myocardial infarction confirmed. Magnitude and trend track infarct size; the ECG, not the troponin, localizes the RV.</td></tr>
+      <tr><td>ECG — V4R</td><td class="hi">ST elevation ≥ 1 mm ↑</td><td>Isoelectric</td><td>The diagnosis. ST elevation in V4R is the most useful single sign of right ventricular infarction in an inferior STEMI.</td></tr>
+      <tr><td>Lactate</td><td class="hi">2.6 mmol/L ↑</td><td>&lt; 2.0</td><td>Mild tissue hypoperfusion from low output — marks him as genuinely hypotensive, not "soft pressure," and should improve with filling + reperfusion.</td></tr>
+      <tr><td>Creatinine</td><td class="hi">1.4 mg/dL ↑</td><td>0.7–1.2</td><td>Cardiorenal / hypoperfusion. Influences contrast and drug dosing for PCI.</td></tr>
+      <tr><td>Potassium</td><td class="ok-v">4.3 mmol/L</td><td>3.5–5.0</td><td>Normal — but keep it in range; arrhythmia risk is highest peri-infarct and peri-reperfusion.</td></tr>
+      <tr><td>Chest X-ray</td><td class="ok-v">Clear lung fields</td><td>—</td><td>Crucially CLEAR despite hypotension — supports RV-infarct (right heart) physiology over LV pump failure (which would show pulmonary edema).</td></tr>
+      <tr><td>Bedside echo</td><td class="hi">Dilated, hypokinetic RV ↑</td><td>—</td><td>Confirms RV involvement: dilated poorly-contracting right ventricle, TR, preserved-ish LV. Supports filling, not offloading.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A hypotensive STEMI with a CLEAR chest X-ray is right-heart physiology until proven otherwise — get the V4R and reach for fluid, not furosemide."</div>
+
+    <div class="callout info"><b class="ct">🧠 Why the clear chest film is doing so much diagnostic work</b>In LV pump-failure shock the film is wet — pulmonary congestion, upper-lobe diversion, edema. Here it is dry despite a low pressure, because the failing chamber (the RV) backs pressure into the systemic veins, not the lungs. That single dissociation — low BP, raised JVP, clear lungs — is the clinical signature that turns "cardiogenic shock, avoid fluids" into "RV infarct, give fluids."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S10 — ECG / IMAGING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s10">
+  <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging</h2></div>
+  <div class="section-content">
+    <h3>🫀 The presenting ECG — read it like a detective</h3>
+    <div class="ecg-fig">
+      <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Inferior STEMI with reciprocal change and a V4R lead showing ST elevation">
+        <rect width="820" height="150" fill="#0b1220"/>
+        <g stroke="#1e3a5f" stroke-width="1">
+          <line x1="0" y1="30" x2="820" y2="30"/><line x1="0" y1="60" x2="820" y2="60"/>
+          <line x1="0" y1="90" x2="820" y2="90"/><line x1="0" y1="120" x2="820" y2="120"/>
+        </g>
+        <polyline fill="none" stroke="#86efac" stroke-width="2.4" points="0,90 40,90 52,82 64,90 90,90 104,55 116,118 128,72 150,72 230,72 244,82 256,90 280,90 294,55 306,118 318,72 340,72 420,72 434,82 446,90 470,90 484,55 496,118 508,72 530,72 610,72 624,82 636,90 660,90 674,55 686,118 698,72 720,72 800,72 815,72"/>
+        <text x="92" y="22" fill="#fca5a5" font-size="12" font-weight="700">↑ inferior ST elevation (II/III/aVF)</text>
+        <text x="560" y="135" fill="#fcd34d" font-size="12" font-weight="700">↑ V4R: ST elevation = RV infarct</text>
+      </svg>
+      <div class="ecg-cap"><span style="color:#fca5a5">Inferior ST elevation</span> (II/III/aVF) with ST elevation in <span style="color:#fcd34d">V4R</span> from the right-sided leads. The V4R change is the most useful single sign of <strong>right ventricular infarction</strong> — every inferior STEMI deserves a V4R.</div>
+    </div>
+
+    <h3>🔎 The "is the RV involved?" toolkit (memorize the high-yield ones)</h3>
+    <table class="tbl">
+      <tr><th>Feature</th><th>Why it points to RV infarction / RCA culprit</th></tr>
+      <tr><td>➡️ <strong>ST elevation in V4R</strong></td><td>The single most useful sign of RV infarction. Record right-sided leads on every inferior STEMI — the standard 12-lead does not look at the RV.</td></tr>
+      <tr><td>🫀 <strong>Inferior ST elevation (II/III/aVF)</strong></td><td>Localizes the inferior LV; the RCA is the usual culprit and may have taken the RV with it if the lesion is proximal.</td></tr>
+      <tr><td>📊 <strong>ST elevation III &gt; II</strong></td><td>Favors an RCA (rather than circumflex) culprit — the artery that supplies the RV.</td></tr>
+      <tr><td>↕️ <strong>Reciprocal ST depression in I and aVL</strong></td><td>Mirror change of an inferior STEMI; supports a proximal RCA occlusion.</td></tr>
+      <tr><td>🔄 <strong>Posterior leads (V7–V9)</strong></td><td>Detect posterolateral extension (ST depression V1–V3 on the standard ECG is the reciprocal hint).</td></tr>
+      <tr><td>🐢 <strong>Bradycardia / AV block on the strip</strong></td><td>The RCA feeds the SA/AV nodes; conduction disease accompanies inferior/RV infarction and is usually nodal and atropine-responsive.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Find ST elevation in V4R and the argument is over — it's an RV infarct. But you must look right-sided to see it: every inferior STEMI gets a V4R."</div>
+
+    <h3>🫀 Post-reperfusion ECG &amp; echo</h3>
+    <ul>
+      <li>📈 <strong>Post-PCI 12-lead:</strong> resolving inferior ST elevation, recovering rate as nodal block lifts with reperfusion; the V4R elevation settles as the RV is reperfused.</li>
+      <li>🩻 <strong>Echo:</strong> dilated, hypokinetic RV with tricuspid regurgitation and preserved LV systolic function; look for a right-to-left interatrial shunt (PFO) if hypoxemia is out of proportion to clear lungs.</li>
+      <li>🧲 <strong>Cardiac MRI (later):</strong> confirms and quantifies RV infarction/edema and excludes other RV pathology; informs prognosis.</li>
+    </ul>
+
+    <div class="callout warn"><b class="ct">⚠️ The ECG's favorite lie in inferior STEMI</b>"The standard 12-lead only shows an inferior STEMI, so the RV is fine." The conventional leads <strong>do not face the right ventricle</strong> — RV infarction is silent on a normal 12-lead. The only way to see it is a right-sided tracing. Skip the V4R and you can miss the very thing that makes a nitrate lethal.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S11 — MEDICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s11">
+  <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+  <div class="section-content">
+    <h3>💉 Acute drugs — what, why, and the traps</h3>
+    <table class="tbl">
+      <tr><th>Drug</th><th>Role tonight</th><th>Mechanism / caution</th></tr>
+      <tr><td><strong>IV crystalloid fluid bolus</strong></td><td>First-line for RV-infarct hypotension — fills the preload-dependent right ventricle</td><td>Give 250–500 mL and reassess BP, JVP and lungs. Stop and reconsider (add inotrope) once filling no longer helps or the lungs wet — don't over-fill and overload the RV.</td></tr>
+      <tr><td><strong>Aspirin + P2Y₁₂ inhibitor + anticoagulant</strong></td><td>Antithrombotic backbone for primary PCI of the RCA</td><td>Per ACS protocol; reperfusion is the definitive treatment for the infarcting RV.</td></tr>
+      <tr><td><strong>Atropine</strong></td><td>For symptomatic bradycardia / nodal AV block</td><td>0.5–1 mg IV (to 3 mg). Inferior-MI block is usually nodal and responds; have pacing as backup.</td></tr>
+      <tr><td><strong>Dobutamine</strong></td><td>Inotropic RV support if hypotension persists despite adequate filling</td><td>β₁ inotrope improves RV contractility and output. Use after sensible volume, not instead of it; watch for tachyarrhythmia.</td></tr>
+      <tr><td class="hi"><strong>Nitroglycerin (AVOID)</strong></td><td class="hi">❌ Contraindicated here</td><td>Venodilator slashes preload — the underfilled LV loses its only filling and the pressure collapses/arrests. The classic lethal error in RV infarction.</td></tr>
+      <tr><td class="hi"><strong>Morphine / opioids (AVOID early)</strong></td><td class="hi">❌ Use only with extreme caution</td><td>Also a venodilator (and vagotonic) — reduces preload and can worsen hypotension and bradycardia. Treat the pain by opening the artery.</td></tr>
+      <tr><td class="hi"><strong>Diuretics (AVOID)</strong></td><td class="hi">❌ Wrong physiology here</td><td>The raised JVP is not lung overload — it is the RV's filling. Diuresing strips preload the LV needs and crashes the pressure.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Nitrates, morphine and diuretics all empty the heart. Give any of them to an RV infarct and you remove the only thing filling the left ventricle. In RV infarction the treatment is volume, not venodilation."</div>
+
+    <div class="callout danger"><b class="ct">🚫 The 'never' list in right ventricular infarction</b>❌ Nitroglycerin (sublingual or IV) · ❌ routine morphine/opioids early · ❌ diuretics · ❌ aggressive over-diuresis or "treating" the high JVP · ❌ losing AV synchrony without correcting it. When the pressure is low and the lungs are clear, the safest "drug" is <strong>a cautious bag of fluid and an open RCA</strong>.</div>
+
+    <h3>🏠 Secondary-prevention therapy (this admission, not just today)</h3>
+    <ul>
+      <li>💙 <strong>Standard post-MI therapy</strong> once stable and reperfused: dual antiplatelet, high-intensity statin, ACE inhibitor and beta-blocker (introduced <em>carefully</em> — beta-blockers can worsen the bradycardia/AV block early in RV infarction, so start once rate and pressure allow).</li>
+      <li>🫀 <strong>Reperfusion follow-through</strong> — complete revascularization as indicated, cardiac rehab.</li>
+      <li>🚭 <strong>Risk-factor modification</strong> — smoking cessation, diabetes and lipid control, blood-pressure management.</li>
+      <li>📈 <strong>Re-image RV function</strong> — RV stunning often recovers substantially over days to weeks after reperfusion.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S12 — MONITORING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s12">
+  <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+  <div class="section-content">
+    <h3>📡 What to watch and why</h3>
+    <ul>
+      <li>🩸 <strong>Invasive arterial line</strong> for beat-to-beat BP through fluid boluses, PCI and any inotrope titration — a preload-dependent circulation can change fast.</li>
+      <li>💧 <strong>Volume response after every bolus</strong> — track BP, JVP and lung sounds; the appearance of crackles signals you have reached the RV's filling ceiling.</li>
+      <li>📈 <strong>Continuous telemetry</strong> with defibrillator/pacing at the bedside — for bradycardia, AV block, loss of AV synchrony and reperfusion arrhythmias.</li>
+      <li>🐢 <strong>Rate and rhythm</strong> — a new junctional rhythm or complete block in a stiff RV can drop the pressure; be ready to pace AV-sequentially.</li>
+      <li>🫁 <strong>SpO₂ and work of breathing</strong> — sudden refractory hypoxemia with clear lungs suggests right-to-left shunting across a PFO.</li>
+      <li>🫀 <strong>Serial 12-leads and V4R</strong> — track ST resolution after reperfusion; recovering rate often signals the nodal block lifting.</li>
+      <li>🧪 <strong>Serial troponin, lactate, renal function</strong> — trend infarct size, perfusion and contrast effect on the kidneys.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After you reperfuse the RV, the monitor's job changes from 'is he filled enough?' to 'have I over-filled him?' — and the two numbers that answer it are the blood pressure and the lung exam."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S13 — COMPLICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s13">
+  <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+  <div class="section-content">
+    <h3>💀 What can go wrong — and the mechanism</h3>
+    <ul>
+      <li>💉 <strong>Preload-reducer–induced collapse</strong> — the great fear; a nitrate, opioid or diuretic strips the preload keeping the LV filled → profound hypotension/arrest.</li>
+      <li>🐢 <strong>Bradycardia / high-grade AV block</strong> — RCA feeds the nodes; loss of rate or AV synchrony crashes a stiff, preload-dependent RV.</li>
+      <li>🧠 <strong>Cardiogenic shock from RV failure</strong> — refractory low output despite filling; needs inotropes, sometimes RV mechanical support/VA-ECMO.</li>
+      <li>🫁 <strong>Refractory hypoxemia via right-to-left PFO shunt</strong> — high right atrial pressure opens a PFO; hypoxemia paradoxically worsens with pressors/PEEP.</li>
+      <li>💧 <strong>Iatrogenic RV overload</strong> — over-aggressive fluids distend the RV, bow the septum into the LV and reduce output (the opposite error).</li>
+      <li>🫀 <strong>Mechanical &amp; arrhythmic complications</strong> — reperfusion arrhythmias, tricuspid regurgitation, and (in extensive infarcts) RV free-wall issues; recurrence if the artery re-occludes.</li>
+    </ul>
+
+    <!-- 🎭 M&M CONFERENCE MODULE -->
+    <div class="mm">
+      <h3>🎭 Morbidity &amp; Mortality Conference — "The Nitrate That Emptied the Heart"</h3>
+      <div class="mm-case">
+        <strong>The case:</strong> A 64-year-old man arrived with two hours of inferior chest pain; the 12-lead showed an inferior STEMI and his BP was 96/60. He had ongoing pain, so the busy team gave <strong>sublingual then IV nitroglycerin</strong> "to settle the ischemia." Within ninety seconds his pressure collapsed to unrecordable and he arrested. He had clear lungs and a raised JVP that no one had connected. <strong>A V4R was never recorded.</strong> The retrospective right-sided strip, projected at the M&amp;M, showed unmistakable <strong>ST elevation in V4R</strong> — a right ventricular infarction whose only therapy he could not survive was the one he was given.
+      </div>
+      <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+      <div class="swiss">
+        <div class="hole"><b>➡️ NO V4R</b>Right-sided leads were never recorded — the RV infarct was invisible on the standard 12-lead.</div>
+        <div class="hole"><b>🫁 CLUES IGNORED</b>Clear lungs + raised JVP + hypotension is the RV-infarct triad, unread at the bedside.</div>
+        <div class="hole"><b>💉 LETHAL DRUG</b>Nitroglycerin removed the preload the underfilled LV depended on → collapse.</div>
+        <div class="hole"><b>🧠 REFLEX</b>"STEMI + pain = give a nitrate" applied without checking the physiology.</div>
+        <div class="hole"><b>🌙 SYSTEM</b>Busy department, no "every inferior STEMI gets a V4R" default.</div>
+      </div>
+      <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> apply the universal rule — <em>inferior STEMI + hypotension + clear lungs + raised JVP = RV infarction</em>; record a V4R on every inferior STEMI; never give nitrates/morphine/diuretics to a preload-dependent RV; treat with cautious fluids and reperfusion. <strong>This is exactly why your paramedic crew held the GTN today.</strong></p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'STEMI with chest pain, give a nitrate' is the sentence written on the chart of patients who then arrest from an unrecognised RV infarct. Check the lungs and the V4R first."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S14 — DIFFERENTIALS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s14">
+  <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials</h2></div>
+  <div class="section-content">
+    <h3>🧩 The hypotensive STEMI / raised-JVP differential</h3>
+    <table class="tbl">
+      <tr><th>Diagnosis</th><th>Clues</th><th>Why it matters</th></tr>
+      <tr><td>💧 <strong>Right ventricular infarction</strong> (this patient)</td><td>Inferior STEMI, hypotension, CLEAR lungs, raised JVP/Kussmaul's, bradycardia, ST elevation in V4R</td><td>Default for a hypotensive inferior STEMI with clear lungs; treat with fluids + reperfusion, AVOID nitrates.</td></tr>
+      <tr><td>💦 <strong>LV pump-failure / cardiogenic shock</strong></td><td>WET lungs — crackles, pulmonary edema, hypoxia; usually large anterior (LAD) infarct</td><td>Opposite treatment — avoid fluid bolus; inotropes/pressors, careful diuresis, mechanical support.</td></tr>
+      <tr><td>🩸 <strong>Cardiac tamponade</strong></td><td>Raised JVP, hypotension, muffled heart sounds, pulsus paradoxus; effusion on echo</td><td>Also a clear-lunged obstructive shock — but the fix is pericardiocentesis. Echo distinguishes it; consider free-wall rupture post-MI.</td></tr>
+      <tr><td>🫁 <strong>Massive pulmonary embolism</strong></td><td>Raised JVP, clear-ish lungs, hypoxia, RV strain on ECG/echo, risk factors</td><td>Another acute RV-overload, clear-lung shock — but the artery to open is pulmonary, not coronary; needs CTPA/echo and reperfusion of the PE.</td></tr>
+      <tr><td>🐢 <strong>Bradycardia-mediated hypotension</strong></td><td>Profound sinus brady or complete heart block driving the low output</td><td>Treat the rate (atropine/pacing) — but in inferior MI it usually coexists with RV infarct; do both.</td></tr>
+      <tr><td>🧪 <strong>Hypovolemia / vasovagal</strong></td><td>Dry mucous membranes, blood loss, low JVP (not raised)</td><td>Distinguished by a LOW JVP — the raised JVP here points firmly away from simple hypovolemia toward a right-heart problem.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Hypotension + raised JVP + CLEAR lungs → think right-heart obstruction: RV infarct, tamponade or massive PE. Hypotension + WET lungs → think LV pump failure (and keep the fluid away)."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S15 — PLAN -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s15">
+  <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan</h2></div>
+  <div class="section-content">
+    <h3>🧭 Now → this week → for life</h3>
+    <ol>
+      <li>💧 <strong>Now (done):</strong> V4R confirmed RV infarction → cautious fluid boluses restored BP to the 100s; preload reducers banned; bradycardia treated with atropine; defibrillator/pacing kept ready.</li>
+      <li>🫀 <strong>Reperfuse:</strong> primary PCI of the proximal RCA — the definitive treatment that recovers the stunned RV and lifts the nodal block.</li>
+      <li>💪 <strong>Support if needed:</strong> add dobutamine for persistent hypotension after sensible filling; AV-sequential temporary pacing if high-grade block; consider RV mechanical support only if refractory.</li>
+      <li>📈 <strong>Reassess RV recovery:</strong> serial echo — RV stunning typically improves markedly over days to weeks once flow is restored.</li>
+      <li>💙 <strong>Standard post-MI therapy:</strong> dual antiplatelet, high-intensity statin, ACE inhibitor, and a beta-blocker introduced carefully once rate and pressure allow.</li>
+      <li>👨‍👩‍👦 <strong>Education &amp; secondary prevention:</strong> smoking cessation, diabetes/lipid/BP control, cardiac rehab, and a clear "call 911 for chest pain" safety net.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Fluids and an open RCA treat the episode; risk-factor control and recovery of RV function treat the disease. Open the artery, fill the right heart, and the stunned RV usually comes back."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S16 — PROGRESS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s16">
+  <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+  <div class="section-content">
+    <h3>📅 Course in CCU</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Day 0, 14:35</div>V4R confirms RV infarction. 500 mL fluid bolus → BP rises from 84/56 to 102/64; atropine corrects the bradycardia. No nitrate, no morphine, no diuretic.</div>
+      <div class="t-item"><div class="t-time">Day 0, 15:10</div>Primary PCI: proximal RCA occlusion stented, TIMI 3 flow restored. Inferior and V4R ST elevation begin to resolve; rate recovers as nodal block lifts.</div>
+      <div class="t-item"><div class="t-time">Day 0, evening</div>Brief transient Mobitz I AV block, atropine-responsive; AV-sequential pacing prepared but not needed. BP stable on a low-dose dobutamine wean.</div>
+      <div class="t-item"><div class="t-time">Day 1</div>Off inotropes; euvolemic and normotensive without fluids. Echo: RV still dilated/hypokinetic but improving; LV preserved.</div>
+      <div class="t-item"><div class="t-time">Day 3</div>RV function recovering on repeat echo; beta-blocker and ACE inhibitor introduced carefully. Mobilizing well.</div>
+      <div class="t-item"><div class="t-time">Day 5</div>Haemodynamically stable, conduction normal, secondary prevention in place. Ready for discharge with rehab booked.</div>
+    </div>
+
+    <!-- 👨‍👩‍👦 FAMILY & PATIENT JOURNEY MODULE -->
+    <h3>👨‍👩‍👦 Family &amp; Patient Journey</h3>
+    <div class="journey">
+      <div class="j-card"><div class="j-who">🧔 The patient — Mr. R.V.</div><p>"They told me my blood pressure was low but my lungs were fine, and instead of the spray under my tongue I got a bag of fluid and they opened the blocked artery. I didn't understand it then — I do now. The thing that felt obvious to give me was the thing that would have hurt me."</p></div>
+      <div class="j-card"><div class="j-who">👩 His wife</div><p>"What frightened me was how calm everyone was about <em>not</em> giving him something. A nurse explained that with his kind of heart attack the heart needed filling up, not draining. When his pressure climbed I finally exhaled."</p></div>
+      <div class="j-card"><div class="j-who">🚑 The paramedic</div><p>"His pressure was already low and his lungs were clear, so I held the GTN even though he was in pain. They told me afterwards that holding it was the right call. Sometimes the best treatment is the drug you don't give."</p></div>
+      <div class="j-card"><div class="j-who">🎓 The team's reflection</div><p>"This wasn't a clever diagnosis — it was a disciplined one. We recorded a V4R on an inferior STEMI, read the clear lungs and raised JVP, gave fluid not nitrate, and opened the RCA. The algorithm did the rest."</p></div>
+    </div>
+
+    <div class="callout pink"><b class="ct">💗 The human thread</b>The stunned right ventricle is not dead muscle — it is muscle holding its breath. Reperfuse it and support it through a few hard days, and it usually wakes up. Explaining to a frightened family why we are <em>filling</em> a man whose neck veins are bulging — and why we are refusing the obvious painkiller — is as much treatment as the fluid itself.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S17 — DISCHARGE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s17">
+  <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+  <div class="section-content">
+    <h3>📋 Discharge plan &amp; safety net</h3>
+    <ul>
+      <li>💊 <strong>Medications:</strong> dual antiplatelet (duration per stent/protocol), high-intensity statin, ACE inhibitor, and a beta-blocker (introduced once rate/pressure tolerated), with a clear written schedule and the rationale explained.</li>
+      <li>🚭 <strong>Risk-factor plan:</strong> structured smoking cessation, diabetes and lipid optimization, blood-pressure control — this was a preventable atherosclerotic event.</li>
+      <li>🏃 <strong>Cardiac rehabilitation</strong> referral; graded return to activity; driving advice per local rules after STEMI (relevant — he drives for a living).</li>
+      <li>📈 <strong>Cardiology follow-up</strong> with repeat echo to document RV recovery; medication up-titration in clinic.</li>
+      <li>🚩 <strong>Red flags → call emergency services:</strong> recurrent chest pain, breathlessness, fainting or near-fainting, palpitations, or feeling profoundly unwell — do not "wait it out."</li>
+      <li>📚 <strong>Education:</strong> what a heart attack involving the right ventricle means in plain language, why he was given fluids rather than the usual sprays, the importance of medication adherence, and CPR/AED awareness offered to his wife.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Discharge after an RV infarct is not 'artery opened, go home' — it is secondary prevention, smoking cessation, rehab, documented RV recovery and a family who understands why fluids beat nitrates that day."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S18 — CLINICAL PEARLS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s18">
+  <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+  <div class="section-content">
+    <div class="pearl-grid">
+      <div class="pearl"><b>💧 Fluids, not nitrates</b>Inferior STEMI + hypotension + clear lungs + raised JVP = RV infarction. Give fluids, NOT nitrates. The triad is the diagnosis.</div>
+      <div class="pearl"><b>🚫 Never nitrate an RV infarct</b>Nitroglycerin removes the only thing filling the heart. The same is true of morphine and diuretics — all empty the preload-dependent LV.</div>
+      <div class="pearl"><b>➡️ Every inferior STEMI gets a V4R</b>ST elevation in V4R is the most useful single sign of RV infarction — and the standard 12-lead can't see the RV.</div>
+      <div class="pearl"><b>🫁 The lungs break the tie</b>Hypotension with CLEAR lungs → fill the RV. Hypotension with WET lungs → LV pump failure, don't fill. Same low BP, opposite treatment.</div>
+      <div class="pearl"><b>🐢 Inferior MI loves to block</b>The RCA feeds the AV node — watch for bradycardia and heart block. Usually nodal and atropine-responsive.</div>
+      <div class="pearl"><b>💓 Atrial kick matters</b>The stiff RV depends on AV synchrony. Lose it (junctional/complete block) and the pressure drops — pace AV-sequentially.</div>
+      <div class="pearl"><b>🫀 Open the artery</b>Primary PCI of the proximal RCA is the definitive treatment — reperfusion recovers the stunned RV and lifts the block.</div>
+      <div class="pearl"><b>💪 Fill, then inotrope</b>If sensible fluids don't lift the pressure, add dobutamine — don't chase the pressure with endless saline and overload the RV.</div>
+      <div class="pearl"><b>📐 Raised JVP ≠ wet lungs</b>The high JVP is venous return behind a stiff RV, not pulmonary congestion. Don't reach for furosemide.</div>
+      <div class="pearl"><b>🩸 Proximal RCA is the culprit</b>The lesion must be proximal to the RV marginal branches to take the right ventricle with it.</div>
+      <div class="pearl"><b>🫁 Beware the PFO shunt</b>High right atrial pressure can open a PFO → refractory hypoxemia that worsens with pressors/PEEP.</div>
+      <div class="pearl"><b>📈 The RV recovers</b>RV stunning usually improves substantially over days to weeks once the artery is open — support it through the storm.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S19 — MCQs / ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s19">
+  <div class="sec-header"><span class="s-badge">S19</span><h2>🧠 MCQs / Assessment</h2></div>
+  <div class="section-content">
+    <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP and feed your dashboard. Each shows a full explanation.</em></p>
+    <div id="mcqHost"></div>
+    <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · Case c-rvmi-023 — Inferior STEMI with Right Ventricular Infarction<br>
+  ⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."
+</div>
+
+</div><!-- /#caseScroll -->
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ XP / DASHBOARD CORE ============ */
+  var XP = 0, XP_MAX = 1200;
+  var awarded = {}; // dedupe one-time awards by key
+  var xpVal = document.getElementById('xpVal');
+  var xpFill = document.getElementById('xpFill');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+  }
+  function addXP(amount, key, label){
+    if(key){ if(awarded[key]) return; awarded[key] = true; }
+    XP += amount;
+    if(XP > XP_MAX) XP = XP_MAX;
+    xpVal.textContent = XP;
+    xpFill.style.width = Math.min(100, Math.round(XP / XP_MAX * 100)) + '%';
+    showToast('+' + amount + ' XP' + (label ? ' · ' + label : ''));
+  }
+  function earnBadge(id){
+    var b = document.getElementById(id);
+    if(b && !b.classList.contains('earned')){ b.classList.add('earned'); }
+  }
+
+  /* Dashboard minimize */
+  var dash = document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){
+    dash.classList.toggle('collapsed');
+    this.textContent = dash.classList.contains('collapsed') ? '+' : '–';
+  });
+
+  /* ============ INTERNAL SCROLL SIZING ============ */
+  /* Size the scroll box to the visible window so the sticky tab bar stays in
+     view. When embedded (srcDoc iframe, same-origin), the host page stretches
+     the iframe to full content height and scrolls the OUTER page — so we size
+     this box from the parent window's height minus whatever app chrome sits
+     above the iframe, and scroll internally instead. Standalone → 100vh. */
+  var caseScroll = document.getElementById('caseScroll');
+  var topnav = document.getElementById('topnav');
+  /* The tab bar is position:fixed, so it's out of flow — reserve space at the
+     top of the scroll content (and offset anchor jumps) by its real height. */
+  function setNavOffset(){
+    var navH = topnav ? topnav.offsetHeight : 70;
+    caseScroll.style.paddingTop = navH + 'px';
+    caseScroll.style.scrollPaddingTop = (navH + 14) + 'px';
+  }
+  function sizeScroller(){
+    try {
+      var p = window.parent;
+      if(p && p !== window && window.frameElement){
+        var rectTop = window.frameElement.getBoundingClientRect().top;
+        if(rectTop < 0) rectTop = 0;          // parent scrolled past the chrome
+        var ph = p.innerHeight || 800;
+        var h = ph - rectTop - 6;             // leave the bottom edge breathing room
+        if(h < 460) h = 460;                  // sane minimum on short windows
+        caseScroll.style.height = h + 'px';
+      } else {
+        caseScroll.style.height = '100vh';
+      }
+    } catch(e){ caseScroll.style.height = '100vh'; }
+    setNavOffset();
+  }
+  sizeScroller();
+  window.addEventListener('resize', sizeScroller);
+  window.addEventListener('load', sizeScroller);
+  try { if(window.parent && window.parent !== window) window.parent.addEventListener('resize', sizeScroller); } catch(e){}
+
+  /* ============ NAV: scroll-spy active + visited ============ */
+  var navchips = Array.prototype.slice.call(document.querySelectorAll('.navchip'));
+  var sections = navchips.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited = {};
+  var visitVal = document.getElementById('visitVal');
+
+  function markVisited(idx){
+    var sec = sections[idx];
+    if(!sec) return;
+    if(!visited[sec.id]){
+      visited[sec.id] = true;
+      navchips[idx].classList.add('visited');
+      var count = Object.keys(visited).length;
+      visitVal.textContent = count + ' / 19';
+      addXP(8, 'visit-' + sec.id, 'Section read');
+      if(count >= 19){ earnBadge('bdg-explorer'); addXP(60, 'allvisited', 'Ward Explorer!'); }
+    }
+  }
+  function setActive(idx){
+    navchips.forEach(function(c){ c.classList.remove('active'); });
+    if(navchips[idx]) navchips[idx].classList.add('active');
+  }
+
+  /* True tabs: each chip shows ONLY its section, hidden via CSS otherwise.
+     No scrollIntoView and no scroll-spy — nothing can scroll the tab bar away,
+     which also sidesteps every srcDoc-iframe scrolling quirk. The hero banner
+     and vitals strip belong to the case intro, so they show on S1 only. */
+  var heroBits = [document.querySelector('.hero'), document.querySelector('.vitals-strip')]
+    .filter(function(el){ return !!el; });
+
+  function showSection(idx){
+    sections.forEach(function(s, i){ if(s) s.classList.toggle('sec-active', i === idx); });
+    heroBits.forEach(function(el){ el.style.display = (idx === 0) ? '' : 'none'; });
+    caseScroll.scrollTop = 0;
+    setActive(idx);
+    markVisited(idx);
+  }
+
+  navchips.forEach(function(chip, idx){
+    chip.addEventListener('click', function(ev){
+      ev.preventDefault();
+      showSection(idx);
+    });
+  });
+  showSection(0);
+
+  /* ============ FLAG GAME (S2) ============ */
+  var flagBtns = document.querySelectorAll('#flagGame .flag-btn');
+  var flagResult = document.getElementById('flagResult');
+  var flagsFound = 0, flagsTotal = 0, flagWrong = 0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good') === '1') flagsTotal++; });
+  flagBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.dataset.locked) return;
+      btn.dataset.locked = '1';
+      var good = btn.getAttribute('data-good') === '1';
+      if(good){
+        btn.classList.add('flag-good');
+        flagsFound++;
+        addXP(10, 'flag-' + flagsFound + '-' + Math.random(), 'RV-infarct flag spotted');
+      } else {
+        btn.classList.add('flag-bad');
+        flagWrong++;
+        showToast('❌ Not an RV-infarct flag');
+      }
+      if(flagsFound === flagsTotal){
+        flagResult.textContent = '✅ All ' + flagsTotal + ' RV-infarct red flags found' + (flagWrong ? ' (with ' + flagWrong + ' wrong pick' + (flagWrong>1?'s':'') + ')' : ' — flawless!');
+        earnBadge('bdg-vt');
+        addXP(30, 'flags-complete', 'V4R-Spotter badge');
+      } else {
+        flagResult.textContent = flagsFound + ' / ' + flagsTotal + ' RV-infarct red flags found…';
+      }
+    });
+  });
+
+  /* ============ BRANCHING SCENARIO (S3) ============ */
+  var scText = document.getElementById('scText');
+  var scChoices = document.getElementById('scChoices');
+  var scFeedback = document.getElementById('scFeedback');
+  var scRestart = document.getElementById('scRestart');
+  var scStab = document.getElementById('scStab');
+  var scTime = document.getElementById('scTime');
+  var scXP = document.getElementById('scXP');
+  var pathXP = 0, scStability = 2, scElapsed = 0;
+
+  var STEPS = {
+    start: {
+      text: "The junior doctor holds a GTN spray in one hand and a furosemide ampoule in the other, eyeing the chest pain and falling pressure. BP 84/56. Inferior ST elevation on the monitor, HR 52. Lungs clear, JVP up to the jaw. What do you do FIRST?",
+      choices: [
+        { t: "➡️ Stop the nitrate/diuretic, record a V4R and give a cautious fluid bolus", good:true, ds:1, dt:10, xp:40, fb:"✅ Exactly. Clear lungs + raised JVP + hypotension in an inferior STEMI is RV infarction. Confirm with V4R, protect preload, and FILL the right heart. You've bought him a future." , next:"reperfuse" },
+        { t: "💉 Give the GTN spray — 'he has chest pain, treat the ischemia'", good:false, ds:-2, dt:20, xp:0, fb:"☠️ Catastrophe. Nitroglycerin slashes preload — the underfilled LV loses its only filling and his pressure collapses toward arrest. This is the M&M case in S13. Restart and choose again.", end:true },
+        { t: "💧 Give IV furosemide because the JVP is so high", good:false, ds:-2, dt:18, xp:0, fb:"☠️ Wrong physiology. The raised JVP is RV filling backing up, NOT lung overload — diuresing strips the preload the LV needs and crashes the pressure. Fluids, not furosemide.", end:true }
+      ]
+    },
+    reperfuse: {
+      text: "The V4R shows ST elevation — RV infarction confirmed. A 500 mL bolus lifts the BP to 96/60. HR still 50 with first-degree block. He's en route to the cath lab. Next move?",
+      choices: [
+        { t: "🫀 Activate primary PCI of the RCA and treat the bradycardia (atropine, pacing ready)", good:true, ds:1, dt:8, xp:30, fb:"✅ Right call. Opening the RCA recovers the stunned RV and lifts the nodal block; atropine and pacing-readiness cover the rate. Reperfusion is the definitive treatment.", next:"support" },
+        { t: "💉 Give morphine for the ongoing pain to keep him comfortable", good:false, ds:-1, dt:15, xp:0, fb:"⚠️ Careful — morphine is a venodilator (and vagotonic) and reduces preload in a patient who can't spare it. Treat the pain by opening the artery, not by emptying the heart.", next:"support" }
+      ]
+    },
+    support: {
+      text: "RCA stented, TIMI 3 flow. BP holding at 100/62 but drifting whenever the rate dips. He's still slightly hypotensive after sensible filling. What now?",
+      choices: [
+        { t: "💪 Add dobutamine for RV inotropic support and keep him in sinus/AV synchrony", good:true, ds:1, dt:6, xp:30, fb:"✅ Ideal: once filling alone no longer lifts the pressure, support RV contractility with dobutamine and preserve the atrial kick the stiff RV depends on.", next:"close" },
+        { t: "💧 Pour in another 2 litres of saline rapidly", good:false, ds:-1, dt:8, xp:10, fb:"⚠️ Over-filling overloads the RV — it distends, bows the septum into the LV and output FALLS. Past the sweet spot, more fluid hurts. Use an inotrope, not endless saline.", next:"close" }
+      ]
+    },
+    close: {
+      text: "He stabilises: BP 108/66, rate recovered as the nodal block lifts post-reperfusion, lungs still clear. The team asks for the one-line teaching point. Your final move of the first hour?",
+      choices: [
+        { t: "🚫 Keep nitrates/morphine/diuretics OFF the chart and document the RV-infarct plan", good:true, ds:1, dt:5, xp:40, fb:"🏆 Perfect close. The fluid and the open artery bought the rhythm; banning preload reducers and preserving AV synchrony keep it. Case stabilized — RV infarction managed by physiology, not reflex.", end:true },
+        { t: "🎉 Done — he's reperfused, prescribe routine GTN PRN for chest pain", good:false, ds:-1, dt:10, xp:0, fb:"⚠️ Premature and dangerous. A PRN nitrate in a still-preload-dependent RV infarct is exactly the trap. Keep preload reducers off the chart until the RV recovers.", end:true }
+      ]
+    }
+  };
+
+  function renderStab(){
+    var s = Math.max(0, Math.min(5, scStability + 2)); // map -2..3 → 0..5
+    var dots = '';
+    for(var i=0;i<5;i++) dots += (i < s ? '●' : '○');
+    scStab.textContent = dots;
+  }
+  function renderStep(key){
+    var step = STEPS[key];
+    scText.textContent = step.text;
+    scFeedback.className = 'feedback';
+    scFeedback.style.display = 'none';
+    scChoices.innerHTML = '';
+    step.choices.forEach(function(ch){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = ch.t;
+      b.addEventListener('click', function(){
+        pathXP += ch.xp; scXP.textContent = pathXP;
+        scElapsed += ch.dt; scTime.textContent = scElapsed + ' s';
+        scStability += ch.ds; renderStab();
+        if(ch.xp) addXP(ch.xp, null, 'Scenario choice');
+        scFeedback.textContent = ch.fb;
+        scFeedback.className = 'feedback ' + (ch.good ? 'good' : 'bad');
+        scFeedback.style.display = 'block';
+        Array.prototype.forEach.call(scChoices.children, function(c){ c.disabled = true; c.style.opacity = .6; });
+        if(ch.end){
+          scRestart.style.display = 'inline-block';
+          if(ch.good && key === 'close'){ earnBadge('bdg-shock'); addXP(20, 'scenario-win', 'Fluid First!'); }
+        } else if(ch.next){
+          setTimeout(function(){ renderStep(ch.next); }, 1400);
+        }
+      });
+      scChoices.appendChild(b);
+    });
+  }
+  scRestart.addEventListener('click', function(){
+    pathXP = 0; scStability = 2; scElapsed = 0;
+    scXP.textContent = 0; scTime.textContent = '0 s'; renderStab();
+    scRestart.style.display = 'none';
+    renderStep('start');
+  });
+  renderStab();
+  renderStep('start');
+
+  /* ============ REVEAL BUTTONS ============ */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.getAttribute('data-target'));
+      if(!t) return;
+      if(t.classList.contains('reveal-shown')){
+        t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden');
+      } else {
+        t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown');
+        addXP(8, 'reveal-' + btn.getAttribute('data-target'), 'Self-test');
+      }
+    });
+  });
+
+  /* ============ PRELOAD SIM (S6) ============ */
+  var kRange = document.getElementById('kRange');
+  var kVal = document.getElementById('kVal');
+  var kNeedle = document.getElementById('kNeedle');
+  var kReadout = document.getElementById('kReadout');
+  if(kRange){
+    var simUsed = false;
+    function updateK(){
+      var k = (parseInt(kRange.value,10) / 10); // 2.0 .. 7.5
+      kVal.textContent = k.toFixed(1);
+      var pct = (parseInt(kRange.value,10) - 20) / (75 - 20) * 100;
+      kNeedle.style.left = pct + '%';
+      var msg, cls;
+      if(k < 3.0){ msg = '🔴 Severely underfilled — nitrates/morphine/diuretics have stripped preload; the stunned RV cannot fill the LV → profound hypotension/arrest. This is the lethal error.'; cls='bad'; }
+      else if(k < 3.5){ msg = '🟠 Underfilled — preload-dependent RV is running dry; the LV is starved of inflow. Give a cautious fluid bolus to bring him into the sweet spot.'; cls='warn-r'; }
+      else if(k <= 5.0){ msg = '🟢 Sweet spot — enough volume to fill the stiff RV without overloading it. Best LV filling and cardiac output. This is where you want him.'; cls='good'; }
+      else if(k <= 6.0){ msg = '🟠 Over-filled — the RV is distending; the septum starts to bow into the LV and output begins to fall. Stop the fluid, consider an inotrope.'; cls='warn-r'; }
+      else { msg = '🔴 RV overload — gross distension bows the septum left and chokes LV filling; output collapses. Too much fluid is its own danger — support with inotropy, not more saline.'; cls='bad'; }
+      kReadout.innerHTML = msg;
+      kReadout.className = 'readout ' + cls;
+      if(!simUsed){ simUsed = true; addXP(15, 'ksim', 'Preload Master'); }
+    }
+    kRange.addEventListener('input', updateK);
+    updateK();
+  }
+
+  /* ============ CHECKLISTS (S7) ============ */
+  var allChecklistsDone = 0, totalChecklists = document.querySelectorAll('.checklist').length;
+  document.querySelectorAll('.checklist').forEach(function(list){
+    var boxes = list.querySelectorAll('input[type=checkbox]');
+    var prog = list.querySelector('[data-progress]');
+    var total = boxes.length;
+    var doneAwarded = false;
+    function refresh(){
+      var done = 0;
+      boxes.forEach(function(b){
+        if(b.checked){ done++; b.closest('.ck').classList.add('done'); }
+        else { b.closest('.ck').classList.remove('done'); }
+      });
+      prog.textContent = done + ' / ' + total + ' complete';
+      if(done === total && !doneAwarded){
+        doneAwarded = true;
+        allChecklistsDone++;
+        addXP(25, 'ck-' + list.id, 'Checklist done');
+        if(allChecklistsDone >= totalChecklists){ earnBadge('bdg-ck'); addXP(20, 'allck', 'Checklist Champion'); }
+      }
+    }
+    boxes.forEach(function(b){
+      b.addEventListener('change', function(){
+        if(b.checked) addXP(4, null, 'Step checked');
+        refresh();
+      });
+    });
+  });
+
+  /* ============ MCQs (S19) ============ */
+  var MCQS = [
+    {
+      q: "Which additional ECG lead is most useful for diagnosing right ventricular infarction in a patient with an inferior STEMI?",
+      opts: ["Lead aVL","V4R (right-sided lead)","Lead V2","Lead I"],
+      correct: 1,
+      exp: "ST elevation ≥ 1 mm in V4R is the single most useful sign of right ventricular infarction. The standard 12-lead does not face the RV, so every inferior STEMI deserves right-sided (V4R) and posterior leads."
+    },
+    {
+      q: "A 61-year-old with an inferior STEMI is hypotensive. Which combination of findings most strongly suggests right ventricular infarction?",
+      opts: ["Hypotension with bibasal crackles and pulmonary edema","Hypotension with CLEAR lungs and a raised JVP","Hypotension with a low JVP and dry mucous membranes","Hypotension with a fever and a new murmur"],
+      correct: 1,
+      exp: "The RV-infarct triad is hypotension + clear lungs + raised JVP. The failing right ventricle sits upstream of the lungs, so pressure backs up into the systemic veins (high JVP) while the lungs stay dry — the opposite of LV pump-failure shock, which gives wet lungs."
+    },
+    {
+      q: "Why is nitroglycerin contraindicated in right ventricular infarction?",
+      opts: ["It prolongs the QT interval and causes arrhythmia","It reduces preload, and the underfilled LV depends on that preload — causing profound hypotension","It blocks the AV node and causes asystole","It has no effect on a right ventricular infarct"],
+      correct: 1,
+      exp: "Nitrates are venodilators that slash preload. In RV infarction the left ventricle is already underfilled and depends entirely on preload; removing it collapses the blood pressure and can precipitate arrest. The same caution applies to morphine and diuretics."
+    },
+    {
+      q: "A patient with confirmed RV infarction is hypotensive (BP 84/56) with clear lungs. The best first-line treatment for the hypotension is:",
+      opts: ["IV furosemide","A cautious IV fluid bolus","Sublingual nitroglycerin","High-dose IV morphine"],
+      correct: 1,
+      exp: "The RV is preload-dependent, so cautious IV fluid loading is first-line to restore RV filling and LV inflow. Reassess BP, JVP and lungs after each bolus; add an inotrope (dobutamine) if filling alone fails. Diuretics, nitrates and morphine all reduce preload and are harmful."
+    },
+    {
+      q: "Right ventricular infarction is most commonly caused by occlusion of which coronary artery?",
+      opts: ["Proximal right coronary artery (proximal to the RV marginal branches)","Left anterior descending artery","Distal left circumflex artery","Left main coronary artery"],
+      correct: 0,
+      exp: "RV infarction results from occlusion of the proximal RCA, above the right ventricular (acute) marginal branches that supply the RV. A more distal RCA lesion, or a left-dominant circulation, typically spares the right ventricle."
+    },
+    {
+      q: "Which arrhythmia/conduction problem is characteristically associated with inferior/RV infarction?",
+      opts: ["Bradycardia and AV block","Torsades de pointes","Wolff-Parkinson-White","Atrial flutter with 2:1 block only"],
+      correct: 0,
+      exp: "The RCA supplies the SA and AV nodes, and the Bezold-Jarisch reflex adds vagal tone, so inferior/RV infarction commonly causes sinus bradycardia and AV block. These are usually nodal, atropine-responsive and transient with reperfusion. 'Inferior MI loves to block.'"
+    },
+    {
+      q: "Why is maintaining AV synchrony (e.g. with AV-sequential pacing) particularly important in RV infarction?",
+      opts: ["Because the stiff, infarcted RV relies heavily on the atrial kick to fill, so losing it sharply reduces output","Because it prevents QT prolongation","Because it lowers the JVP","Because it reduces the risk of stent thrombosis"],
+      correct: 0,
+      exp: "The non-compliant, stunned RV depends on a timed atrial contraction (the atrial kick) for adequate filling. Loss of AV synchrony — junctional rhythm or complete heart block — can drop the pressure dramatically, so atropine and AV-sequential pacing that restore synchrony often restore the blood pressure."
+    },
+    {
+      q: "What is the definitive treatment for the infarcting right ventricle in this patient?",
+      opts: ["Long-term diuretic therapy","Prophylactic amiodarone","Early reperfusion — primary PCI of the culprit RCA","Permanent pacemaker insertion"],
+      correct: 2,
+      exp: "Opening the occluded RCA with primary PCI is the definitive treatment: reperfusion recovers the stunned right ventricle and usually lifts the associated nodal AV block. Fluids and inotropes support the patient meanwhile, but reperfusion treats the cause — and RV stunning typically recovers over days to weeks."
+    }
+  ];
+
+  var host = document.getElementById('mcqHost');
+  var mcqVal = document.getElementById('mcqVal');
+  var mcqScore = 0, mcqAnswered = 0;
+  var letters = ['A','B','C','D','E'];
+
+  MCQS.forEach(function(item, qi){
+    var box = document.createElement('div');
+    box.className = 'mcq';
+    var html = '<div class="mcq-q">QUESTION ' + (qi+1) + ' / ' + MCQS.length + '</div>';
+    html += '<div class="mcq-stem">' + item.q + '</div>';
+    item.opts.forEach(function(opt, oi){
+      html += '<label class="mcq-opt" data-oi="' + oi + '"><strong>' + letters[oi] + '.</strong> ' + opt + '</label>';
+    });
+    html += '<div class="mcq-exp"></div>';
+    box.innerHTML = html;
+    host.appendChild(box);
+
+    var opts = box.querySelectorAll('.mcq-opt');
+    var exp = box.querySelector('.mcq-exp');
+    var locked = false;
+    opts.forEach(function(label){
+      label.addEventListener('click', function(){
+        if(locked) return;
+        locked = true;
+        var oi = parseInt(label.getAttribute('data-oi'),10);
+        box.classList.add('answered');
+        var correct = item.correct;
+        if(oi === correct){
+          label.classList.add('picked-right');
+          mcqScore++;
+          addXP(25, null, 'Correct answer');
+        } else {
+          label.classList.add('picked-wrong');
+          opts[correct].classList.add('show-right');
+          showToast('❌ Correct: ' + letters[correct]);
+        }
+        exp.innerHTML = '<strong>' + (oi === correct ? '✅ Correct. ' : '📘 Explanation. ') + '</strong>' + item.exp;
+        mcqAnswered++;
+        mcqVal.textContent = mcqScore + ' / ' + MCQS.length;
+        if(mcqAnswered === MCQS.length){
+          var done = document.getElementById('mcqDone');
+          var summary = document.getElementById('mcqSummary');
+          done.style.display = 'block';
+          summary.textContent = 'You scored ' + mcqScore + ' / ' + MCQS.length + '. ' +
+            (mcqScore === MCQS.length ? 'Flawless — you give fluids not nitrates every time. 🏆' :
+             mcqScore >= 6 ? 'Strong — review the misses and the contrast pairs in S6.' :
+             'Revisit S3, S5, S6 and S11 — the fluids-not-nitrates logic is the whole case.');
+          if(mcqScore >= 7){ earnBadge('bdg-quiz'); addXP(50, 'quizace', 'Quiz Ace!'); }
+        }
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
