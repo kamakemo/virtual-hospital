@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acute Pericarditis — The Great STEMI Mimic — Virtual Teaching Hospital</title>
+<!-- META
+id: c-pericarditis-030
+title: Acute Pericarditis — The Great STEMI Mimic
+hospital: cardiology
+department: cv-ccu
+bednumber: 12
+chiefcomplaint: Sharp pleuritic chest pain relieved by sitting forward, with diffuse ST elevation and PR depression
+system: Cardiology
+severity: urgent
+tags: Acute pericarditis, Pleuritic chest pain, Friction rub, Colchicine, PR depression, STEMI mimic
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --radius:16px;
+    --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  /* Internal scroll viewport. When this case is embedded the host app stretches
+     the iframe to full content height and the OUTER page scrolls, which would
+     let a sticky bar scroll away. We instead scroll inside this box (sized to
+     the visible window by JS) so the section tab bar stays pinned at the top.
+     Standalone, it falls back to the full viewport height. */
+  #caseScroll{height:100vh; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; scroll-padding-top:92px}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:36px 24px 80px; position:relative; overflow:hidden}
+  .hero::after{content:"📈"; position:absolute; right:-20px; top:-30px; font-size:220px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{max-width:1100px; margin:0 auto; position:relative; z-index:1}
+  .hero .crumbs{font-size:13px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:10px 0 6px; font-size:clamp(26px,4vw,40px); line-height:1.15}
+  .hero .sub{font-size:16px; opacity:.95}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; backdrop-filter:blur(4px)}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== LIVE ECG STRIP IN HERO ===== */
+  .ecg-banner{max-width:1100px; margin:14px auto 0; position:relative; z-index:1}
+  .ecg-banner svg{width:100%; height:64px; display:block; background:rgba(0,0,0,.18); border-radius:12px; border:1px solid rgba(255,255,255,.25)}
+  .ecg-trace{stroke:#86efac; stroke-width:2.4; fill:none; stroke-dasharray:1600; stroke-dashoffset:1600; animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{stroke-dashoffset:0}}
+
+  /* ===== VITALS STRIP ===== */
+  .vitals-strip{max-width:1100px; margin:-52px auto 0; padding:0 24px; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:11px; font-weight:700; letter-spacing:.6px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:21px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== HORIZONTAL SECTION SIDEBAR (fixed — always visible) ===== */
+  .topnav{position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.10)}
+  .topnav .rail{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; max-width:1180px; margin:0 auto; scrollbar-width:thin}
+  .navchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink2); font-size:11px; font-weight:700; text-decoration:none; min-width:78px; text-align:center; transition:all .18s; cursor:pointer}
+  .navchip .s-id{font-size:10px; letter-spacing:1px; color:#94a3b8}
+  .navchip .s-emoji{font-size:16px}
+  .navchip:hover{border-color:var(--rose); color:var(--rose); transform:translateY(-2px)}
+  .navchip.active{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; border-color:#b91c1c}
+  .navchip.active .s-id{color:#fecaca}
+  .navchip.visited:not(.active){border-color:var(--emerald-line); background:var(--emerald-soft)}
+
+  /* ===== DASHBOARD WIDGET ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:215px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10.5px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:760px){.dash{display:none}}
+
+  /* ===== MAIN / SECTIONS (tabbed: one section visible at a time) ===== */
+  main{max-width:1100px; margin:26px auto 80px; padding:0 24px}
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:26px; overflow:hidden}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16.5px; margin:26px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14.5px; margin:18px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:24px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15.5px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:14px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px; letter-spacing:.4px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14.5px}
+
+  /* ===== INTERACTIVE BITS ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:10px 18px; font-weight:700; font-size:14px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:22px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:15px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 15px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 15px; margin-top:12px; font-size:14px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim sliders */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:14px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:14px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Heart/circuit diagram */
+  .heart-fig{display:flex; gap:18px; flex-wrap:wrap; align-items:center; background:var(--slate-soft); border-radius:16px; padding:18px; margin:14px 0}
+  .heart-fig svg{flex:0 0 auto}
+  .heart-legend{flex:1; min-width:230px; font-size:13.5px}
+  .lg{display:flex; align-items:center; gap:8px; margin:5px 0}
+  .lg .sw{width:14px; height:14px; border-radius:4px; flex:0 0 auto}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Journey cards */
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:14px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:15px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:14px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13.5px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:22px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14.5px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:13px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .footer{max-width:1100px; margin:0 auto 36px; padding:0 24px; text-align:center; color:#94a3b8; font-size:12.5px}
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="caseScroll">
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · 💗 CCU · 🛏️ Bed 12</div>
+    <h1>📈 Acute Pericarditis — "The Great STEMI Mimic"</h1>
+    <div class="sub">⚡ A 29-year-old, two weeks after a flu-like illness, with sharp chest pain that stabs when he lies flat and eases when he sits forward. The ECG shows ST elevation everywhere — and someone is paging the cath lab. Read the strip first.</div>
+    <div class="chips">
+      <span class="chip crit">🟠 URGENT</span>
+      <span class="chip">📐 Diffuse ST Elevation + PR Depression</span>
+      <span class="chip">🎻 Friction Rub</span>
+      <span class="chip">💊 NSAID + Colchicine</span>
+      <span class="chip">🎮 Interactive Case</span>
+      <span class="chip">🕵️ Don't miss the mimic</span>
+    </div>
+    <div class="ecg-banner" title="Diffuse concave ST elevation rhythm strip">
+      <svg viewBox="0 0 800 64" preserveAspectRatio="none" aria-label="Diffuse concave ST elevation with PR depression">
+        <polyline class="ecg-trace" points="0,40 40,40 55,12 70,58 85,40 130,40 145,12 160,58 175,40 220,40 235,12 250,58 265,40 310,40 325,12 340,58 355,40 400,40 415,12 430,58 445,40 490,40 505,12 520,58 535,40 580,40 595,12 610,58 625,40 670,40 685,12 700,58 715,40 760,40 775,12 790,58 800,40"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== LIVE VITALS ===================== -->
+<div class="vitals-strip">
+  <div class="vitals-grid">
+    <div class="vital warn"><div class="v-label">💓 HR</div><div class="v-num">102</div></div>
+    <div class="vital"><div class="v-label">🩸 BP</div><div class="v-num">124/76</div></div>
+    <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">20</div></div>
+    <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">98%</div></div>
+    <div class="vital warn"><div class="v-label">🌡️ Temp</div><div class="v-num">37.8°</div></div>
+    <div class="vital"><div class="v-label">🧠 GCS</div><div class="v-num">15</div></div>
+    <div class="vital warn"><div class="v-label">📐 ST</div><div class="v-num">Diffuse ↑</div></div>
+    <div class="vital warn"><div class="v-label">😖 Pain</div><div class="v-num">Pleuritic</div></div>
+  </div>
+</div>
+
+<!-- ===================== HORIZONTAL SECTION SIDEBAR ===================== -->
+<nav class="topnav" id="topnav">
+  <div class="rail">
+    <a class="navchip" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navchip" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navchip" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navchip" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navchip" href="#s5"><span class="s-emoji">🎓</span><span>Consultant Round</span><span class="s-id">S5</span></a>
+    <a class="navchip" href="#s6"><span class="s-emoji">📖</span><span>Teaching Points</span><span class="s-id">S6</span></a>
+    <a class="navchip" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navchip" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navchip" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navchip" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navchip" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navchip" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navchip" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navchip" href="#s14"><span class="s-emoji">🔀</span><span>Differentials</span><span class="s-id">S14</span></a>
+    <a class="navchip" href="#s15"><span class="s-emoji">🗺️</span><span>Plan</span><span class="s-id">S15</span></a>
+    <a class="navchip" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navchip" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navchip" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navchip" href="#s19"><span class="s-emoji">🧠</span><span>MCQs</span><span class="s-id">S19</span></a>
+  </div>
+</nav>
+
+<!-- ===================== SCORE DASHBOARD ===================== -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections visited</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-vt">🕵️ Mimic-Spotter</span>
+      <span class="badge" id="bdg-shock">💊 Right First Drug</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champion</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Ward Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running sims, taking the right path and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- S1 — PROFILE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s1">
+  <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+  <div class="section-content">
+    <div class="callout danger">
+      <b class="ct">🚨 YOU ARE HERE — 14:40, CCU Bed 12</b>
+      A 29-year-old man sits bolt upright on the trolley, leaning forward over a pillow, grimacing. <em>"It's like a knife… worse when I lie back… better when I sit up like this."</em> The triage ECG shows ST elevation in nearly every lead, and the registrar has just said the words <strong>"this is a STEMI, activate the lab."</strong> Your job is to decide — in the next minute — whether this young man needs the cath lab and thrombolysis, or an NSAID, colchicine and a careful look for a friction rub. Get this wrong in either direction and you do harm.
+    </div>
+
+    <h3>👤 Patient Identity</h3>
+    <table class="tbl">
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>🧑 Name</td><td><strong>Mr. T.O.</strong></td></tr>
+      <tr><td>🎂 Age / Sex</td><td>29-year-old male</td></tr>
+      <tr><td>🆔 MRN</td><td>CV-30012</td></tr>
+      <tr><td>⚖️ Weight</td><td>78 kg</td></tr>
+      <tr><td>💼 Occupation</td><td>Secondary-school teacher</td></tr>
+      <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+    </table>
+
+    <h3>📜 History of presenting complaint — every line points away from STEMI</h3>
+    <ul>
+      <li>🤒 <strong>Viral prodrome 10–14 days ago:</strong> coryza, sore throat, low-grade fevers and myalgia that the whole staffroom shared. The commonest pericarditis is <strong>viral/idiopathic</strong> — the inflammation follows the infection.</li>
+      <li>🔪 <strong>Sharp, "stabbing" retrosternal pain</strong> radiating to the left trapezius ridge (phrenic-nerve referral, classic for pericardial pain) — <em>not</em> the dull, crushing, exertional pressure of ischaemia.</li>
+      <li>🛏️ <strong>Worse lying flat, eased by sitting forward</strong> — and worse on deep inspiration, coughing or swallowing. This positional/pleuritic quality is the single most useful bedside clue.</li>
+      <li>🏃 No exertional component, no diaphoresis at onset, no risk-factor burden — no diabetes, no hypertension, non-smoker, no family history of premature coronary disease.</li>
+      <li>💊 Takes nothing regularly; no recent cardiac surgery, no recent MI, no dialysis, not immunosuppressed, on no anticoagulant.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Pleuritic chest pain that eases when the patient sits forward, after a viral illness, with DIFFUSE concave ST elevation and PR depression and NO reciprocal changes = pericarditis, not STEMI."</div>
+
+    <h3>🧬 Why THIS patient? — virus, pericardium, a diffuse inflammatory burn</h3>
+    <p>The pericardium is a two-layered sac wrapped around the heart. A virus (or an autoimmune, uraemic, post-MI or other trigger) inflames it, and a thin fibrinous <strong>exudate</strong> forms between the layers. Three things follow directly from that. First, the roughened, inflamed surfaces grate over one another with each beat — the <strong>friction rub</strong>. Second, the <em>parietal</em> pericardium carries somatic pain fibres, and they are exquisitely positional and pleuritic — hence pain worse lying flat, eased sitting forward. Third, because the inflammation coats the <em>whole</em> heart rather than the territory of one blocked artery, the ECG changes are <strong>diffuse and concave</strong>, not territorial and convex — and there are <strong>no reciprocal changes</strong>. The same diffuse inflammation explains why this is the great STEMI mimic and why it is treated with anti-inflammatories, not the cath lab.</p>
+
+    <div class="callout warn"><b class="ct">🔥 Causes of acute pericarditis (one mnemonic-worthy list)</b>
+    🦠 <strong>Viral / idiopathic</strong> (most common) · 🧬 Autoimmune (SLE, RA, scleroderma) · 🫘 Uraemic (advanced renal failure) · 🫀 Post-MI: early <em>epistenocardiac</em> (days) &amp; late <strong>Dressler syndrome</strong> (weeks, immune-mediated) · 🔪 Post-cardiotomy / post-procedure · 🦠 Bacterial (purulent — sick, septic) · 🫁 Tuberculous (subacute, effusive-constrictive) · 🎗️ Malignant infiltration · 💊 Drug-induced &amp; radiation</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S2 — HANDOVER -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s2">
+  <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+  <div class="section-content">
+    <h3>📻 Triage Handover — listen for the trap</h3>
+    <div class="callout info">
+      <b class="ct">🎙️ SBAR from the triage nurse (verbatim)</b>
+      <p><strong>S:</strong> "Bed 12 — Mr. T.O., 29, sharp central chest pain for a day, worse lying down. The machine printed 'ACUTE MI — see physician' and the ST segments are up in lots of leads."</p>
+      <p><strong>B:</strong> "Fit and well. Had a flu-y illness a couple of weeks ago. No cardiac risk factors. Takes nothing. He's leaning forward on the pillow the whole time."</p>
+      <p><strong>A:</strong> "He's comfortable when he sits up, HR about 100, BP 124/76, sats fine, temp 37.8. The registrar glanced at the ECG and said <strong>'classic STEMI — activate the cath lab and give thrombolysis.'</strong>"</p>
+      <p><strong>R:</strong> "I put him on the monitor and got pads on… but the ST elevation is in nearly every lead and there's something about it that didn't look like the STEMIs I've seen. I wanted a doctor to actually <strong>read</strong> the strip before we lyse him."</p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The machine's 'ACUTE MI' read and a glance from across the room is how a young pericarditis patient gets thrombolysed into a haemorrhagic effusion. Read the strip — diffuse, concave, PR-depressed, no reciprocal change — before you commit."</div>
+
+    <h3>🚩 Spot-the-Red-Flag — tap each feature that points to PERICARDITIS (not STEMI)</h3>
+    <p>🎮 <em>Interactive: click every feature that supports acute pericarditis over a STEMI. Each correct flag = +10 XP. Wrong picks cost you.</em></p>
+    <div id="flagGame">
+      <button class="btn ghost flag-btn" data-good="1">🔪 Pleuritic pain worse lying flat, eased sitting forward</button>
+      <button class="btn ghost flag-btn" data-good="1">🎻 Pericardial friction rub at the left sternal edge</button>
+      <button class="btn ghost flag-btn" data-good="1">📐 DIFFUSE concave ST elevation (not one territory)</button>
+      <button class="btn ghost flag-btn" data-good="1">📉 PR depression (with PR elevation in aVR)</button>
+      <button class="btn ghost flag-btn" data-good="1">🚫 NO reciprocal ST depression (except aVR/V1)</button>
+      <button class="btn ghost flag-btn" data-good="1">🤒 Recent viral prodrome in a young patient</button>
+      <button class="btn ghost flag-btn" data-good="0">🎯 Territorial ST elevation WITH reciprocal depression</button>
+      <button class="btn ghost flag-btn" data-good="0">👆 Chest-wall tenderness on palpation alone</button>
+    </div>
+    <p id="flagResult" style="font-weight:700"></p>
+
+    <h3>⏱️ Timeline so far</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Yesterday</div>Sharp central chest pain begins; worse lying in bed, better sitting up at the edge.</div>
+      <div class="t-item"><div class="t-time">14:20</div>Presents to ED. Triage ECG auto-flagged "ACUTE MI"; pads applied, monitor on.</div>
+      <div class="t-item"><div class="t-time">14:30</div>Registrar (in passing) says "classic STEMI — activate the lab, give thrombolysis." Nurse <strong>withholds thrombolysis</strong> pending a proper read — 🏅 instinct worth its weight in gold.</div>
+      <div class="t-item"><div class="t-time">14:40</div>You arrive. You have time — he is haemodynamically stable. Read the ECG properly, examine for a rub, and look for any high-risk feature before committing to a pathway.</div>
+    </div>
+
+    <div class="callout ok"><b class="ct">🏅 Praise where due</b>The nurse who held the thrombolysis prevented a potential catastrophe. Giving a fibrinolytic to pericarditis mislabelled as STEMI can turn a small inflammatory effusion into a <strong>haemorrhagic effusion and tamponade</strong>. A few minutes spent actually reading the ECG — diffuse vs territorial, concave vs convex, PR depression, no reciprocal change — is the whole case.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S3 — INITIAL ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s3">
+  <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+  <div class="section-content">
+    <h3>🅰️🅱️🅲️ Primary Survey — what your hands, eyes and ears find</h3>
+    <table class="tbl">
+      <tr><th>Step</th><th>Finding</th><th>What it means mechanistically</th></tr>
+      <tr><td>🅰️ Airway</td><td>Patent, speaking in full sentences.</td><td>No airway compromise; he is not peri-arrest. You have time to think — unlike a true crashing STEMI.</td></tr>
+      <tr><td>🅱️ Breathing</td><td>RR 20, SpO₂ 98% on air. Pain worse on deep inspiration and coughing.</td><td>The pleuritic quality reflects somatic pain fibres in the parietal pericardium and adjacent pleura — it moves with respiration, unlike steady ischaemic pressure.</td></tr>
+      <tr><td>🅲️ Circulation</td><td>BP 124/76, HR 102 regular, warm peripheries. <strong>Pericardial friction rub</strong> at the left sternal edge, leaning forward, in held expiration — scratchy, triphasic. No pulsus paradoxus, JVP normal.</td><td>The rub is the inflamed pericardial layers grating with each beat — the <strong>most specific</strong> physical sign. Normal JVP and no pulsus paradoxus argue against a significant effusion/tamponade <em>today</em>.</td></tr>
+      <tr><td>🅳 Disability</td><td>GCS 15, alert, anxious but composed when sitting forward.</td><td>No cerebral hypoperfusion; the position-dependence of his comfort is itself a clue.</td></tr>
+      <tr><td>🅴 Exposure</td><td>Low-grade fever 37.8°C, no rash, chest wall non-tender to a degree that reproduces the pain. No leg swelling/DVT signs.</td><td>Low-grade fever fits viral pericarditis; fever &gt;38°C would be a high-risk feature. Reproducible chest-wall tenderness would suggest a musculoskeletal cause instead.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A scratchy triphasic friction rub at the left sternal edge — leaning forward, in held expiration — clinches pericarditis. It is the most specific sign; go looking for it before you reach for any drug."</div>
+
+    <h3>🧭 The single most important question: is this STEMI, or pericarditis — and is there a high-risk feature?</h3>
+    <p>This case forks on reading the ECG and the patient correctly. Apply the diagnostic criteria — you need <strong>≥ 2 of 4</strong>: (1) typical <strong>pleuritic/positional chest pain</strong>; (2) a <strong>pericardial friction rub</strong>; (3) <strong>widespread ST elevation OR PR depression</strong>; (4) a <strong>new/worsening pericardial effusion</strong>. Mr. T.O. already meets three. Then screen for <strong>high-risk features</strong> that change disposition (admission/work-up): fever &gt;38°C, subacute onset, large effusion or tamponade, immunosuppression, oral anticoagulant use, trauma, raised troponin (myopericarditis), or failure to respond to NSAIDs.</p>
+
+    <div class="callout danger"><b class="ct">⚖️ The decision: read the ECG → pericarditis → NSAID + COLCHICINE, NOT the cath lab</b>A stable patient with DIFFUSE concave ST elevation, PR depression and NO reciprocal change does <strong>not</strong> get thrombolysis or emergent PCI. He gets a high-dose NSAID PLUS <strong>colchicine</strong>, activity restriction and gastroprotection — and a deliberate look for effusion/tamponade and any high-risk feature. Do not let an auto-read "ACUTE MI" stampede you into harming him.</div>
+
+    <!-- 🎬 BRANCHING SCENARIO ENGINE -->
+    <div class="scenario" id="scenarioBox">
+      <h3>🎬 Choose Your Path — "The First 60 Seconds"</h3>
+      <div class="hud"><span>❤️ Stability: <b id="scStab">●●○○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 s</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+      <div class="scene-text" id="scText">The registrar is on the phone to the cath lab. The triage ECG shows ST elevation in I, II, III, aVF, V2–V6 — but it looks oddly uniform, and you notice PR depression. The young man is stable, leaning forward, eased by the position. What do you do FIRST?</div>
+      <div class="choices" id="scChoices"></div>
+      <div class="feedback" id="scFeedback"></div>
+      <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+    </div>
+
+    <div class="callout info"><b class="ct">🧮 If it really were a STEMI instead</b>
+    A <em>territorial</em> convex ("tombstone") ST elevation <strong>with reciprocal depression</strong> in the opposite leads, evolving Q waves and ischaemic-type pain in an at-risk patient is a STEMI — that one goes to <strong>primary PCI</strong> (or thrombolysis if PCI is unavailable) <em>now</em>. The skill is telling them apart: diffuse vs territorial, concave vs convex, PR depression vs none, reciprocal change vs none. When the ECG is genuinely ambiguous and the patient is at coronary risk, treat as the dangerous diagnosis (STEMI) and get urgent cardiology/echo — but do not lyse a textbook pericarditis.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S4 — RESIDENT REVIEW -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s4">
+  <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+  <div class="section-content">
+    <p><em>The cardiology resident arrives at 14:46. Her reasoning, out loud:</em></p>
+
+    <h3>🧠 Pattern recognition first, then physiology</h3>
+    <p>"Young, viral prodrome, sharp pleuritic pain that eases sitting forward, a friction rub I can hear, and an ECG with <strong>diffuse concave ST elevation and PR depression and no reciprocal change</strong>. That is <strong>acute pericarditis</strong> — and he already meets three of the four diagnostic criteria. The dangerous instinct here is the opposite of a STEMI miss: it's to be <em>stampeded into the cath lab</em> by an auto-read 'ACUTE MI' and a glance. I'll commit to pericarditis — but I will not relax until I've excluded the things that mimic it the other way and the high-risk features that change disposition."</p>
+
+    <h3>🎯 Immediate priorities (her actual order of operations)</h3>
+    <ol>
+      <li>🛑 <strong>Stop the thrombolysis / stand down the lab</strong> for now: a stable patient with a textbook pericarditis ECG must not be lysed. Say it out loud and document the reasoning.</li>
+      <li>📐 <strong>Re-read the 12-lead deliberately:</strong> diffuse vs territorial, concave vs convex, PR depression (and PR elevation in aVR), reciprocal changes (absent except aVR/V1), Spodick sign.</li>
+      <li>🎻 <strong>Examine for the rub</strong> properly — left sternal edge, leaning forward, held expiration — and for any sign of tamponade (raised JVP, pulsus paradoxus, muffled sounds, hypotension).</li>
+      <li>🧪 <strong>Bloods + troponin:</strong> CRP/ESR (supportive, and to track), troponin (a rise means <strong>myopericarditis</strong>), U&amp;E (uraemic cause), FBC, and tailored tests for autoimmune/TB if the story fits.</li>
+      <li>🫀 <strong>Echocardiogram:</strong> look for a new/worsening effusion (the 4th criterion) and, crucially, for tamponade physiology — RA/RV diastolic collapse, IVC plethora.</li>
+      <li>💊 <strong>Start treatment:</strong> high-dose NSAID (ibuprofen or aspirin) <strong>PLUS colchicine</strong>, with gastroprotection and activity restriction — and treat any specific identified cause.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Confirm pericarditis with ≥2 of 4 criteria; start an NSAID AND colchicine together; then hunt the high-risk features (fever &gt;38°, big effusion/tamponade, raised troponin, immunosuppression, anticoagulant, failure to respond) that decide whether he goes home or gets admitted."</div>
+
+    <h3>🤔 "But what if I'm wrong and it IS a STEMI I'm refusing to lyse?"</h3>
+    <p>"Then I'd be making the mirror-image error — and it would be just as lethal. That is exactly why I don't rely on vibes: I apply the ECG discriminators (diffuse concave with PR depression and NO reciprocal change vs territorial convex WITH reciprocal depression and evolving Q waves), get an immediate echo for regional wall-motion abnormality, and keep cardiology in the loop. If anything is genuinely ambiguous in a patient with coronary risk, the dangerous diagnosis wins and we treat as STEMI. But a young man with a viral prodrome, a rub, and a textbook diffuse pattern is pericarditis — and lysing him is the harm."</p>
+
+    <div class="callout purple"><b class="ct">🧪 Resident's self-test (answer before reading on)</b>
+    Someone suggests starting <strong>corticosteroids</strong> straight away "because they're a powerful anti-inflammatory and he'll feel better fast." Good idea first-line?
+    <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+    <div class="reveal-hidden" id="rev1"><p><strong>No.</strong> First-line is an <strong>NSAID plus colchicine</strong>. Corticosteroids are <strong>second-line</strong> — they feel good acutely but are associated with <em>more recurrences</em>, and they breed relapsing recurrent pericarditis. Reserve steroids for a specific indication: NSAID contraindication, an autoimmune or uraemic cause, pregnancy, or genuinely refractory disease — and even then add colchicine. Starting steroids first is one of the classic mistakes in this disease.</p></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S5 — CONSULTANT ROUND -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s5">
+  <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round</h2></div>
+  <div class="section-content">
+    <p><em>The on-call consultant cardiologist, at the bedside at 15:05:</em></p>
+
+    <h3>🗂️ Name the disease precisely — it changes the management</h3>
+    <div class="vs">
+      <div class="side a"><h4>🔴 Acute pericarditis (this patient)</h4>
+        <ul><li>Diffuse concave ST elevation + PR depression, <strong>no reciprocal change</strong> (except aVR/V1)</li><li>Pleuritic, positional pain; friction rub; viral/idiopathic most common</li><li>Diagnose with <strong>≥ 2 of 4</strong> criteria; CRP/ESR supportive</li><li>Treat: <strong>NSAID + colchicine</strong>, activity restriction, gastroprotection</li></ul></div>
+      <div class="side b"><h4>🔵 Myopericarditis / myocarditis</h4>
+        <ul><li><strong>Troponin rises</strong> when the myocardium is involved (myopericarditis)</li><li>Myopericarditis: troponin up but <strong>LV function preserved</strong></li><li>Myocarditis: troponin up <strong>with LV dysfunction</strong> ± arrhythmia/heart failure</li><li>More cautious: telemetry, restrict exercise (~3–6 months), cardiac MRI; avoid high-dose NSAIDs if significant myocardial involvement</li></ul></div>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Check a troponin in every pericarditis. Normal = pure pericarditis; raised with good LV = myopericarditis; raised with poor LV = myocarditis. Same pain, escalating seriousness — the troponin and the echo tell you which."</div>
+
+    <h3>🌀 Is he high-risk — and could he tamponade?</h3>
+    <p>Most viral/idiopathic pericarditis is benign and managed as an outpatient. The consultant's job is to find the patients who are <em>not</em>. <strong>High-risk features (2015 ESC)</strong> warranting admission/work-up: <strong>fever &gt;38°C, subacute onset, large effusion or tamponade, immunosuppression, oral anticoagulant use, trauma, troponin rise (myopericarditis), or failure to respond to NSAIDs.</strong> The feared acute complication is <strong>cardiac tamponade</strong> — a tense effusion that throttles diastolic filling. Watch for Beck's triad (hypotension, raised JVP, muffled sounds), pulsus paradoxus, and on echo RA/RV diastolic collapse with IVC plethora. The feared late complication is <strong>constrictive pericarditis</strong> — a stiff, scarred sac (think TB, post-cardiac-surgery, radiation).</p>
+
+    <h3>🧭 Consultant's three commandments for this admission</h3>
+    <ol>
+      <li>📐 "<strong>Read the ECG, don't trust the auto-read.</strong> Diffuse concave ST elevation with PR depression and no reciprocal change is pericarditis. Lysing or cathing this young man because a machine printed 'ACUTE MI' is the harm we are here to prevent."</li>
+      <li>💊 "<strong>NSAID PLUS colchicine — together, not optional.</strong> Colchicine roughly <em>halves</em> recurrence (ICAP, CORP). Steroids feel good and breed recurrence — they are second-line. And after an MI, treat pericarditis with <strong>aspirin</strong> and colchicine, because other NSAIDs impair infarct healing."</li>
+      <li>🫀 "Then ask <strong>why</strong>: viral/idiopathic by default, but exclude uraemia, autoimmune disease, TB, malignancy and post-MI causes. And before he leaves, make sure I've excluded tamponade and a significant effusion on echo."</li>
+    </ol>
+
+    <div class="callout danger"><b class="ct">☠️ The consultant's war memory (more in S13 M&amp;M)</b>"The last young person I saw harmed by this was thrombolysed for a 'STEMI' that was textbook pericarditis — diffuse concave elevation, PR depression, not a single reciprocal change. His small inflammatory effusion bled, became <strong>haemorrhagic</strong>, and he tamponaded within the hour. We drained the blood and he survived, but it was a self-inflicted near-miss. The ECG told the truth; nobody read it because the machine had already said 'ACUTE MI.'"</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S6 — TEACHING POINTS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s6">
+  <div class="sec-header"><span class="s-badge">S6</span><h2>📖 Teaching Points</h2></div>
+  <div class="section-content">
+    <h3>🔬 The mechanism — WHY pericarditis looks like a STEMI but isn't (the WHY behind the WHY)</h3>
+    <ol>
+      <li>🦠 <strong>The trigger:</strong> a virus (most commonly), or an autoimmune, uraemic, post-MI, post-surgical, TB or malignant process inflames the pericardium. Inflammation, not coronary occlusion, is the engine.</li>
+      <li>🧫 <strong>The exudate &amp; the rub:</strong> a fibrinous exudate roughens the visceral and parietal layers; they grate over each other each beat → the <strong>pericardial friction rub</strong>, the most specific sign.</li>
+      <li>🔪 <strong>The pain:</strong> the parietal pericardium carries somatic pain fibres (and shares the phrenic nerve), so pain is sharp, <strong>pleuritic and positional</strong> — worse lying flat, eased sitting forward, worse on inspiration. This is unlike the steady, exertional pressure of ischaemia.</li>
+      <li>📐 <strong>The ECG:</strong> because the inflammation coats the <em>whole</em> epicardial surface rather than one arterial territory, the injury current is <strong>diffuse and concave</strong> (ST elevation in most leads) with <strong>PR depression</strong> (atrial injury) — and there are <strong>no reciprocal changes</strong> except in aVR/V1 (which show PR elevation / ST depression). A STEMI is territorial, convex, with reciprocal depression.</li>
+      <li>💧 <strong>Why it can still kill:</strong> if fluid accumulates faster than the sac can stretch, intrapericardial pressure rises and throttles diastolic filling → <strong>tamponade</strong>. And a stiff scarred sac later → <strong>constriction</strong>. The inflammation is usually benign — but the effusion is what you must not miss.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Pericarditis is a diffuse inflammatory burn of the whole heart's wrapper — so its ST elevation is everywhere and concave with PR depression and no reciprocal change. A STEMI is one blocked artery — territorial, convex, with reciprocal depression. Diffuse vs territorial is the whole game."</div>
+
+    <h3>⚖️ Contrast pair #1 — Pericarditis vs STEMI (the lethal mimic, both ways)</h3>
+    <div class="vs">
+      <div class="side a"><h4>📐 Pericarditis IS…</h4><ul><li><strong>DIFFUSE</strong> concave ("saddle") ST elevation across many leads</li><li><strong>PR depression</strong> (and PR elevation / ST depression in aVR &amp; V1)</li><li><strong>NO reciprocal ST depression</strong> (except aVR/V1)</li><li>No evolving Q waves; Spodick sign (down-sloping TP segment)</li><li>Sharp pleuritic positional pain, friction rub, viral prodrome</li></ul></div>
+      <div class="side b"><h4>🎯 STEMI is NOT that…</h4><ul><li><strong>TERRITORIAL</strong> convex ("tombstone") ST elevation in one artery's leads</li><li><strong>Reciprocal ST depression</strong> in the opposite leads</li><li>Evolving Q waves and loss of R wave over hours</li><li>Steady, crushing, exertional pain; diaphoresis; at-risk patient</li><li>Goes to <strong>primary PCI</strong> (or thrombolysis) — not anti-inflammatories</li></ul></div>
+    </div>
+    <p>😈 <strong>The trap runs both ways:</strong> mislabel pericarditis as STEMI → thrombolysis → a small effusion becomes a <strong>haemorrhagic effusion and tamponade</strong>. Mislabel STEMI as pericarditis → you withhold reperfusion and watch myocardium die. The discriminators — diffuse vs territorial, concave vs convex, PR depression, reciprocal change, evolving Q waves, and the clinical story — are how you avoid both.</p>
+
+    <h3>⚖️ Contrast pair #2 — Acute vs recurrent vs constrictive pericarditis</h3>
+    <div class="vs">
+      <div class="side a"><h4>🆕 Acute (tonight)</h4><ul><li>First episode, &lt; 4–6 weeks; usually viral/idiopathic</li><li>Diffuse ST elevation + PR depression; CRP up</li><li>Treat: NSAID + colchicine; most resolve fully</li><li><strong>Benign in most</strong> — but exclude effusion/tamponade</li></ul></div>
+      <div class="side b"><h4>🔁 Recurrent / Constrictive</h4><ul><li><strong>Recurrent:</strong> relapse after a symptom-free interval; colchicine reduces it; <strong>steroids drive it</strong></li><li><strong>Constrictive:</strong> stiff scarred sac (TB, post-surgery, radiation)</li><li>Right heart failure, raised JVP with <strong>Kussmaul sign</strong>, pericardial knock, calcification</li><li>Definitive treatment may be <strong>pericardiectomy</strong></li></ul></div>
+    </div>
+    <p>💡 <em>Why it matters:</em> the colchicine you add today, and the steroids you withhold, are precisely the levers that decide whether this becomes a single self-limiting illness or a relapsing one. Get the first prescription right and you change the natural history.</p>
+
+    <!-- 🎮 INTERACTIVE SIM: effusion size & rate of accumulation → tamponade risk -->
+    <div class="sim" id="kSim">
+      <h3 style="margin-top:0">🎮 Simulation — The Effusion Dial: size &amp; rate of accumulation → tamponade risk</h3>
+      <p style="font-size:13.5px">Drag the dial along the spectrum from a tiny, slowly-accumulating rim of fluid to a large, rapidly-building effusion. Watch how the pericardial pressure–volume curve turns a manageable effusion into <strong>tamponade</strong>. It is not the volume alone — it is the volume <em>and how fast it arrived</em>.</p>
+      <label for="kRange">💧 Effusion size &amp; rate (small/slow → large/rapid): <b id="kVal">small</b></label>
+      <input type="range" id="kRange" min="20" max="75" value="31">
+      <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+      <div class="readout bad" id="kReadout">Set the dial to explore.</div>
+      <p style="font-size:12.5px; margin-top:10px; color:var(--ink2)">🎯 Key idea: a <strong>rapidly</strong> accumulating effusion (even ~150–200 mL) can tamponade on the steep part of the pericardial pressure–volume curve, while a <strong>slow</strong> chronic effusion can hold a litre or more as the sac stretches. Rate beats absolute size.</p>
+    </div>
+
+    <!-- 📚 EBM MODULE -->
+    <div class="ebm">
+      <h3>📚 Evidence-Based Medicine Corner</h3>
+      <table class="tbl">
+        <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+        <tr><td><span class="lvl">RCT</span> ICAP (2013)</td><td>Colchicine added to conventional anti-inflammatory therapy in a first episode of acute pericarditis roughly <strong>halved</strong> recurrent/persistent pericarditis and improved remission.</td><td>Colchicine + NSAID is the first-line standard — colchicine is not an optional add-on; it is the recurrence-prevention drug.</td></tr>
+        <tr><td><span class="lvl">RCT</span> CORP / CORP-2 (2011/2014)</td><td>Colchicine reduced <strong>recurrent</strong> pericarditis (single and multiple recurrences) versus placebo on top of standard therapy.</td><td>Colchicine works for recurrence too — extend/continue it in patients who relapse.</td></tr>
+        <tr><td><span class="lvl">DATA</span> Steroids &amp; recurrence</td><td>Observational/RCT data link early <strong>corticosteroid</strong> use (especially high-dose) to a higher rate of recurrent pericarditis.</td><td>Steroids feel good but breed recurrence — keep them second-line, use the lowest effective dose, and always co-prescribe colchicine.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2015 ESC pericardial diseases</td><td>Formalised the <strong>≥ 2 of 4</strong> diagnostic criteria and the <strong>high-risk features</strong> guiding admission; recommends NSAID + colchicine first-line.</td><td>Exactly the framework driving S3, S5 and S7 — diagnosis, disposition and therapy.</td></tr>
+        <tr><td><span class="lvl">PRINCIPLE</span> Post-MI / Dressler</td><td>After MI, non-aspirin NSAIDs may impair infarct healing; <strong>aspirin</strong> (± colchicine) is preferred for post-infarction and Dressler pericarditis.</td><td>In the post-MI patient, reach for aspirin and colchicine — not ibuprofen or indometacin.</td></tr>
+      </table>
+    </div>
+
+    <!-- 🔬 ADVANCED TOPICS -->
+    <div class="callout purple">
+      <h3 style="margin-top:0">🔬 Fellowship Corner — Advanced Topics</h3>
+      <ul>
+        <li>🧬 <strong>Recurrent/refractory pericarditis &amp; IL-1:</strong> a subset is autoinflammatory and IL-1 driven; <strong>anakinra</strong> and <strong>rilonacept</strong> (RHAPSODY) reduce recurrences in colchicine-resistant, steroid-dependent disease — a steroid-sparing escalation.</li>
+        <li>🫁 <strong>Tuberculous &amp; effusive-constrictive pericarditis:</strong> subacute, often with large effusions; needs anti-TB therapy, and adjunctive steroids are debated (IMPI trial). Effusive-constrictive = effusion plus constrictive physiology persisting after drainage.</li>
+        <li>🧲 <strong>Cardiac MRI:</strong> late gadolinium enhancement of the pericardium and pericardial oedema confirm active inflammation, distinguish myopericarditis, and guide tapering of therapy in recurrent disease.</li>
+        <li>💧 <strong>Tamponade physiology:</strong> exaggerated ventricular interdependence on a non-compliant sac → <strong>pulsus paradoxus</strong> (inspiratory SBP fall &gt; 10 mmHg), RA/RV diastolic collapse, IVC plethora — treat with <strong>pericardiocentesis</strong>, never aggressive diuresis.</li>
+        <li>🔪 <strong>Constrictive pericarditis:</strong> Kussmaul sign, pericardial knock, septal bounce, discordant LV/RV pressures on simultaneous catheterisation; transient constriction may resolve with anti-inflammatories, chronic calcific constriction needs <strong>pericardiectomy</strong>.</li>
+        <li>🫀 <strong>Post-cardiac-injury syndromes:</strong> Dressler (post-MI), post-pericardiotomy and post-traumatic pericarditis share an immune-mediated mechanism; colchicine (COPPS) reduces post-pericardiotomy syndrome.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S7 — ORDERS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s7">
+  <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+  <div class="section-content">
+    <h3>🖊️ The order set, written as you'd actually write it (15:10)</h3>
+    <ul>
+      <li>🛑 <strong>DO NOT thrombolyse / stand down emergent PCI</strong> for this textbook pericarditis ECG in a stable patient — flag the reasoning on the chart.</li>
+      <li>💊 <strong>NSAID first-line:</strong> high-dose ibuprofen 600–800 mg PO TDS (or aspirin 750–1000 mg TDS, especially if post-MI) until symptom resolution and CRP normalises, then taper. Add a <strong>PPI</strong> for gastroprotection.</li>
+      <li>💊 <strong>Colchicine 0.5 mg PO once or twice daily for 3 months</strong> (weight/renal-adjusted) — halves recurrence (ICAP/CORP). Counsel re: diarrhoea; check renal/hepatic function and interactions.</li>
+      <li>🚫 <strong>NO first-line corticosteroids</strong> — reserve for NSAID contraindication, autoimmune/uraemic cause, pregnancy, or refractory disease (and add colchicine if used).</li>
+      <li>🛋️ <strong>Activity restriction</strong> until symptom-free and CRP normal (longer, ~3–6 months, if myopericarditis on troponin/echo).</li>
+      <li>🧪 <strong>Bloods:</strong> troponin (myopericarditis?), CRP/ESR (track response), U&amp;E (uraemia), FBC, and targeted autoimmune/TB/HIV testing if the story fits.</li>
+      <li>🫀 <strong>Echocardiogram</strong> to assess for effusion and tamponade; 12-lead and observation; repeat echo if any deterioration.</li>
+      <li>🩻 <strong>Treat any specific cause</strong> identified (e.g. dialysis for uraemic, anti-TB therapy, autoimmune control); for post-MI/Dressler use <strong>aspirin + colchicine</strong>, not other NSAIDs.</li>
+      <li>📞 Cardiology review; admit if any high-risk feature (fever &gt;38°C, subacute onset, large effusion/tamponade, immunosuppression, anticoagulant use, trauma, raised troponin, failure to respond) — otherwise outpatient management with safety-net advice.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In acute pericarditis there are only two prescriptions that matter: an NSAID AND colchicine, together. Activity restriction and gastroprotection make them safer; steroids withheld keep recurrence away; the echo makes sure you haven't missed an effusion."</div>
+
+    <!-- 🩺 PROCEDURE GUIDE 1 -->
+    <div class="checklist" id="ckCV">
+      <h3 style="margin-top:0">🩺 Procedure Guide — Confirming &amp; treating acute pericarditis — tick as you go</h3>
+      <label class="ck"><input type="checkbox"><span>📐 Read the 12-lead deliberately: DIFFUSE concave ST elevation, PR depression, PR elevation/ST depression in aVR, NO reciprocal change — not a territorial STEMI</span></label>
+      <label class="ck"><input type="checkbox"><span>✅ Confirm ≥ 2 of 4 criteria (pleuritic/positional pain · friction rub · widespread ST elevation or PR depression · new/worsening effusion)</span></label>
+      <label class="ck"><input type="checkbox"><span>🎻 Auscultate for a friction rub — left sternal edge, leaning forward, in held expiration</span></label>
+      <label class="ck"><input type="checkbox"><span>🧪 Send troponin (myopericarditis?), CRP/ESR, U&amp;E and targeted cause work-up</span></label>
+      <label class="ck"><input type="checkbox"><span>🫀 Echo to look for effusion and tamponade physiology (RA/RV collapse, IVC plethora)</span></label>
+      <label class="ck"><input type="checkbox"><span>💊 Start NSAID (or aspirin if post-MI) + colchicine + PPI + activity restriction</span></label>
+      <label class="ck"><input type="checkbox"><span>🚩 Screen for high-risk features → admit if present; otherwise outpatient with safety-net advice</span></label>
+      <div class="ck-progress" data-progress>0 / 7 complete</div>
+    </div>
+
+    <!-- 🩺 PROCEDURE GUIDE 2 -->
+    <div class="checklist" id="ckDefib">
+      <h3 style="margin-top:0">🩺 Procedure Guide — If he tamponades: emergency pericardiocentesis</h3>
+      <p style="font-size:13px">⚠️ Tense effusion with hypotension, raised JVP, muffled sounds, pulsus paradoxus and echo RA/RV diastolic collapse → <strong>cardiac tamponade</strong>. This is an obstructive shock that fluid and time will not fix — drain it.</p>
+      <label class="ck"><input type="checkbox"><span>🚨 Recognise tamponade: Beck's triad, pulsus paradoxus &gt; 10 mmHg, echo diastolic collapse + IVC plethora</span></label>
+      <label class="ck"><input type="checkbox"><span>💧 IV fluid bolus as a temporising bridge (preload) while preparing — avoid aggressive diuresis/vasodilators</span></label>
+      <label class="ck"><input type="checkbox"><span>🫀 Call cardiology/cardiac surgery; prepare <strong>echo-guided pericardiocentesis</strong> (subxiphoid/apical) under monitoring</span></label>
+      <label class="ck"><input type="checkbox"><span>🪡 Aspirate pericardial fluid; send for cytology, microbiology/TB, and protein/LDH; leave a pigtail drain if large/recurrent</span></label>
+      <label class="ck"><input type="checkbox"><span>🩸 Note haemorrhagic fluid → think iatrogenic (post-thrombolysis), trauma, malignancy or TB; involve surgery early</span></label>
+      <label class="ck"><input type="checkbox"><span>📈 Reassess haemodynamics and echo post-drainage; treat the underlying cause; consider pericardial window if it recurs</span></label>
+      <div class="ck-progress" data-progress>0 / 6 complete</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S8 — NURSING CARE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s8">
+  <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+  <div class="section-content">
+    <h3>🛏️ CCU / ward nursing priorities</h3>
+    <ul>
+      <li>📟 <strong>Continuous monitoring with serial obs.</strong> A stable pericarditis can develop an effusion — watch BP, HR, JVP and any breathlessness for the drift toward tamponade.</li>
+      <li>🩸 <strong>Know the tamponade alarm signs cold:</strong> falling BP, rising HR, raised JVP, muffled heart sounds and <strong>pulsus paradoxus</strong> — escalate immediately if they appear.</li>
+      <li>💊 <strong>Give the NSAID and colchicine as prescribed</strong>, with the PPI; reinforce that <strong>both</strong> drugs matter and that the course is taken to completion to prevent recurrence.</li>
+      <li>🚽 Warn about and monitor for <strong>colchicine diarrhoea</strong>; check it is renally/hepatically dose-adjusted; review interacting drugs (e.g. macrolides, statins).</li>
+      <li>🛋️ <strong>Reinforce activity restriction</strong> — no strenuous exercise until symptom-free and CRP normal; longer if myopericarditis.</li>
+      <li>🪑 <strong>Position for comfort:</strong> sitting forward eases pericardial pain. Help him find and hold that position; document pain scores and response to analgesia.</li>
+      <li>📋 <strong>Document the ECG and any rub before and after treatment</strong>; record troponin/CRP trends — they guide tapering and disposition.</li>
+      <li>🧠 <strong>Reassure and educate:</strong> a young patient told "we thought it was a heart attack" is frightened — explain clearly that this is an inflamed sac, usually benign, and treatable.</li>
+      <li>👨‍👩‍👦 Keep the family updated and supported (see S16); a near-miss with thrombolysis is unsettling for everyone.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who watches the JVP and the pulse for tamponade, and who makes sure BOTH the NSAID and the colchicine actually go in, is doing half the work of preventing the two things that hurt these patients."</div>
+    <div class="callout warn"><b class="ct">📢 Escalate IMMEDIATELY for</b>Falling BP with rising JVP and muffled sounds (→ tamponade, get echo + cardiology) · new breathlessness or pulsus paradoxus · syncope · a fresh troponin rise or new arrhythmia (→ myopericarditis) · fever &gt;38°C or failure to improve on NSAIDs · any plan to give first-line steroids or to thrombolyse this patient.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S9 — INVESTIGATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s9">
+  <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+  <div class="section-content">
+    <h3>🧾 Results board (15:20)</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>Result</th><th>Reference</th><th>Interpretation</th></tr>
+      <tr><td>CRP</td><td class="hi">68 mg/L ↑</td><td>&lt; 5</td><td>Supports active pericardial inflammation and gives you a number to track — treat until pain resolves AND CRP normalises, then taper.</td></tr>
+      <tr><td>ESR</td><td class="hi">42 mm/hr ↑</td><td>&lt; 15</td><td>Corroborates the inflammatory picture; non-specific but supportive of the diagnosis.</td></tr>
+      <tr><td>Troponin I</td><td class="ok-v">0.03 ng/mL (normal)</td><td>&lt; 0.04</td><td>Normal here → pure pericarditis, not myopericarditis. A rise would relabel this as <strong>myopericarditis</strong> and mandate telemetry, longer exercise restriction and an echo for LV function.</td></tr>
+      <tr><td>Creatinine / Urea</td><td class="ok-v">Normal</td><td>0.7–1.2</td><td>Excludes <strong>uraemic</strong> pericarditis — relevant because that cause is treated with dialysis, not just NSAIDs.</td></tr>
+      <tr><td>White cell count</td><td class="hi">11.8 ×10⁹/L ↑</td><td>4–11</td><td>Mild leucocytosis consistent with a viral/inflammatory process; a markedly septic picture would raise concern for purulent bacterial pericarditis.</td></tr>
+      <tr><td>Echocardiogram</td><td class="ok-v">Trivial effusion, no tamponade</td><td>—</td><td>Small rim of fluid, normal LV function, no RA/RV diastolic collapse — reassuring; provides the 4th diagnostic criterion and excludes tamponade today.</td></tr>
+      <tr><td>Chest X-ray</td><td class="ok-v">Normal heart size</td><td>—</td><td>A normal cardiac silhouette fits a small effusion; a "water-bottle" globular heart would suggest a large chronic effusion (&gt; ~200 mL).</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In pericarditis, three numbers do the heavy lifting: the troponin (myopericarditis?), the CRP (how active, and your target for taper), and the echo (effusion and tamponade?). Get all three before you call it benign."</div>
+
+    <div class="callout info"><b class="ct">🧠 Why a normal troponin here is genuinely reassuring</b>Pure pericarditis does not raise troponin; the myocardium is uninvolved. A normal troponin lets you treat this as benign pericarditis with outpatient NSAID + colchicine. Had the troponin risen with a preserved LV, it would be <strong>myopericarditis</strong> — manage more cautiously (telemetry, longer exercise restriction, cardiac MRI). A rise with LV dysfunction would be <strong>myocarditis</strong> — a different, more serious disease.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S10 — ECG / IMAGING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s10">
+  <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging</h2></div>
+  <div class="section-content">
+    <h3>🫀 The presenting ECG — read it like a detective</h3>
+    <div class="ecg-fig">
+      <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Diffuse concave ST elevation with PR depression of pericarditis">
+        <rect width="820" height="150" fill="#0b1220"/>
+        <g stroke="#1e3a5f" stroke-width="1">
+          <line x1="0" y1="30" x2="820" y2="30"/><line x1="0" y1="60" x2="820" y2="60"/>
+          <line x1="0" y1="90" x2="820" y2="90"/><line x1="0" y1="120" x2="820" y2="120"/>
+        </g>
+        <polyline fill="none" stroke="#86efac" stroke-width="2.4" points="0,80 28,80 40,84 60,84 70,55 80,40 92,46 110,74 122,68 150,68 162,72 182,72 192,46 202,32 214,38 232,66 244,60 272,60 284,64 304,64 314,40 324,26 336,32 354,60 366,54 394,54 406,58 426,58 436,36 446,22 458,28 476,56 488,50 516,50 528,54 548,54 558,32 568,18 580,24 598,52 610,46 638,46 650,50 670,50 680,28 690,14 702,20 720,48 732,42 760,42 772,46 792,46 802,26 814,16"/>
+        <text x="60" y="22" fill="#fca5a5" font-size="12" font-weight="700">↑ concave ST elevation (diffuse)</text>
+        <text x="300" y="118" fill="#fcd34d" font-size="12" font-weight="700">↑ PR depression</text>
+      </svg>
+      <div class="ecg-cap">Widespread <span style="color:#fca5a5">concave ("saddle") ST elevation</span> across the limb and precordial leads, with <span style="color:#fcd34d">PR-segment depression</span> and no reciprocal depression (except aVR/V1). The diffuse, concave, PR-depressed pattern — not territorial, not convex — is the signature of pericarditis.</div>
+    </div>
+
+    <h3>🔎 The pericarditis-vs-STEMI ECG toolkit (memorize the high-yield ones)</h3>
+    <table class="tbl">
+      <tr><th>Feature</th><th>Why it means pericarditis (not STEMI)</th></tr>
+      <tr><td>📐 <strong>Diffuse concave ST elevation</strong></td><td>Inflammation coats the whole epicardium, so the injury current is widespread and "saddle-shaped," not the convex "tombstone" of a single occluded artery.</td></tr>
+      <tr><td>📉 <strong>PR depression</strong></td><td>Atrial-layer injury depresses the PR segment in most leads — a near-specific pericarditis sign; the reciprocal <strong>PR elevation</strong> appears in aVR.</td></tr>
+      <tr><td>🚫 <strong>No reciprocal ST depression</strong></td><td>STEMI produces reciprocal depression in the opposite territory; diffuse pericarditis does not (except aVR/V1). Reciprocal change should make you think STEMI.</td></tr>
+      <tr><td>🧭 <strong>Spodick sign</strong></td><td>A down-sloping TP segment supports pericarditis — a subtle but high-yield clue.</td></tr>
+      <tr><td>📏 <strong>ST/T ratio in V6</strong></td><td>An ST-to-T-wave amplitude ratio &gt; 0.25 in V6 favours pericarditis over <strong>benign early repolarisation</strong>, the other diffuse-ST-elevation mimic.</td></tr>
+      <tr><td>🔁 <strong>Four-stage evolution</strong></td><td>Stage I diffuse ST elevation + PR depression → II normalisation → III diffuse T-wave inversion → IV normalisation. Evolving Q waves and territorial change belong to STEMI, not pericarditis.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"PR depression with diffuse concave ST elevation and no reciprocal change closes the argument — it's pericarditis. But the cost of being wrong toward STEMI is huge, so when truly ambiguous in an at-risk patient, image (echo) and treat the dangerous diagnosis."</div>
+
+    <h3>🫀 Imaging &amp; staging</h3>
+    <ul>
+      <li>📈 <strong>The four ECG stages:</strong> I — diffuse concave ST elevation with PR depression (PR elevation/ST depression in aVR); II — ST and PR normalise; III — diffuse T-wave inversion; IV — normalisation. Recognise that ongoing T-inversion is part of the natural course, not a new event.</li>
+      <li>🩻 <strong>Echocardiogram:</strong> the key bedside imaging — quantify any effusion and look for tamponade physiology (RA/RV diastolic collapse, IVC plethora, respiratory mitral inflow variation).</li>
+      <li>🧲 <strong>Cardiac MRI (selected):</strong> pericardial late gadolinium enhancement and oedema confirm active inflammation, identify myopericarditis, and help guide treatment duration in recurrent disease.</li>
+    </ul>
+
+    <div class="callout warn"><b class="ct">⚠️ The ECG's favorite lie in diffuse ST elevation</b>"ST elevation everywhere, so it must be a huge STEMI." A territorial STEMI does <em>not</em> elevate every lead with reciprocal sparing — diffuse, concave, PR-depressed elevation without reciprocal change is pericarditis. The other diffuse mimic is <strong>benign early repolarisation</strong>; use the V6 ST/T ratio and the clinical story to separate them. The dangerous reverse error — calling a true STEMI "pericarditis" — is avoided by hunting for territory, convexity, reciprocal change and a regional wall-motion abnormality on echo.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S11 — MEDICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s11">
+  <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+  <div class="section-content">
+    <h3>💉 The drugs — what, why, and the traps</h3>
+    <table class="tbl">
+      <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+      <tr><td><strong>Ibuprofen (high dose)</strong></td><td>First-line NSAID — analgesia + anti-inflammatory</td><td>e.g. 600–800 mg TDS until symptoms resolve and CRP normalises, then taper. Add a <strong>PPI</strong>; caution in renal impairment, GI risk, heart failure. Avoid post-MI (impairs infarct healing).</td></tr>
+      <tr><td><strong>Aspirin (high dose)</strong></td><td>Preferred NSAID in <strong>post-MI / Dressler</strong> pericarditis</td><td>e.g. 750–1000 mg TDS. Chosen post-infarction because other NSAIDs impair infarct healing; also reasonable first-line generally. PPI cover.</td></tr>
+      <tr><td><strong>Colchicine</strong></td><td>Co-first-line — <strong>halves recurrence</strong> (ICAP/CORP)</td><td>0.5 mg OD–BD for ~3 months (weight/renal-adjusted). <strong>Not optional.</strong> Diarrhoea common; caution in renal/hepatic impairment; interacts with macrolides, statins, CYP3A4/P-gp inhibitors.</td></tr>
+      <tr><td><strong>Corticosteroids</strong></td><td><strong>Second-line only</strong> — NSAID contraindication, autoimmune/uraemic cause, pregnancy, refractory disease</td><td>Associated with <strong>more recurrences</strong>; if used, low-to-moderate dose with a slow taper and <strong>add colchicine</strong>. Avoid first-line.</td></tr>
+      <tr><td><strong>PPI (e.g. omeprazole)</strong></td><td>Gastroprotection during high-dose NSAID/aspirin</td><td>Reduces GI bleeding risk — co-prescribe routinely with the NSAID.</td></tr>
+      <tr><td><strong>Anakinra / rilonacept</strong></td><td>IL-1 blockade for colchicine-resistant, steroid-dependent <strong>recurrent</strong> pericarditis</td><td>Specialist, steroid-sparing escalation (RHAPSODY) — not for the first acute episode.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"NSAID PLUS colchicine, every time, for the first episode — colchicine halves recurrence and is not optional. Steroids feel good and breed recurrence, so they are second-line. After an MI, use aspirin, not ibuprofen."</div>
+
+    <div class="callout danger"><b class="ct">🚫 The 'never' list in acute pericarditis</b>❌ <strong>Thrombolysis / emergent PCI</strong> for a textbook pericarditis ECG in a stable patient (can cause haemorrhagic effusion → tamponade) · ❌ <strong>Anticoagulation</strong> reflexively in a patient with an effusion (bleeding risk) · ❌ <strong>First-line corticosteroids</strong> (recurrence) · ❌ <strong>NSAID monotherapy without colchicine</strong> (misses the recurrence-halving benefit) · ❌ non-aspirin NSAIDs <strong>post-MI</strong> (impair infarct healing).</div>
+
+    <h3>🏠 Treating the cause (not just the inflammation)</h3>
+    <ul>
+      <li>🦠 <strong>Viral/idiopathic</strong> (most): supportive — NSAID + colchicine, no antivirals routinely.</li>
+      <li>🫘 <strong>Uraemic:</strong> intensify <strong>dialysis</strong> — the pericarditis tracks the uraemia.</li>
+      <li>🧬 <strong>Autoimmune:</strong> treat the underlying disease (and here steroids/immunosuppression are appropriately used).</li>
+      <li>🫁 <strong>Tuberculous / bacterial / malignant:</strong> specific anti-TB therapy, antibiotics + drainage, or oncological management — and drain significant effusions.</li>
+      <li>🫀 <strong>Post-MI / Dressler / post-pericardiotomy:</strong> <strong>aspirin</strong> + colchicine (colchicine also prevents post-pericardiotomy syndrome — COPPS).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S12 — MONITORING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s12">
+  <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+  <div class="section-content">
+    <h3>📡 What to watch and why</h3>
+    <ul>
+      <li>🩸 <strong>Haemodynamics &amp; tamponade screen:</strong> serial BP, HR, JVP, heart sounds and <strong>pulsus paradoxus</strong> — the small effusion today can grow into tamponade; a falling BP with a rising JVP is the alarm.</li>
+      <li>🫀 <strong>Repeat echo</strong> if symptoms worsen, the patient becomes breathless, or there is any haemodynamic drift — to re-quantify the effusion and look for diastolic collapse.</li>
+      <li>📈 <strong>Telemetry if myopericarditis</strong> (troponin rise) — myocardial involvement carries an arrhythmia risk that pure pericarditis does not.</li>
+      <li>🧪 <strong>Serial CRP</strong> — your objective marker of activity and the target for tapering therapy; treat until pain resolves AND CRP normalises.</li>
+      <li>🌡️ <strong>Temperature</strong> — a new fever &gt;38°C is a high-risk feature and may signal a bacterial/purulent or evolving course.</li>
+      <li>📐 <strong>Serial ECGs</strong> — recognise the four-stage evolution (especially the later diffuse T-inversion) so it isn't misread as a new ischaemic event.</li>
+      <li>🚽 <strong>Colchicine tolerance &amp; renal/hepatic function</strong> — watch for diarrhoea and adjust dose; review interacting drugs.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After you diagnose pericarditis, the monitor's job changes from 'is this a STEMI?' to 'is an effusion building toward tamponade, and is the myocardium involved?' — and the answers live in the JVP, the echo and the troponin."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S13 — COMPLICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s13">
+  <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+  <div class="section-content">
+    <h3>💀 What can go wrong — and the mechanism</h3>
+    <ul>
+      <li>💧 <strong>Pericardial effusion → cardiac tamponade</strong> — the great acute fear; fluid (or blood) accumulates faster than the sac can stretch, throttling diastolic filling → obstructive shock. Treat with <strong>pericardiocentesis</strong>.</li>
+      <li>🩸 <strong>Iatrogenic haemorrhagic effusion</strong> — thrombolysing or anticoagulating a mislabelled "STEMI" can bleed a small effusion into a tamponading one (the M&M story below).</li>
+      <li>🫀 <strong>Myopericarditis / myocarditis</strong> — myocardial involvement (troponin rise) brings arrhythmia risk and, if LV function falls, heart failure.</li>
+      <li>🔁 <strong>Recurrent pericarditis</strong> — relapse after a symptom-free interval; far more likely if colchicine is omitted or steroids are used first-line.</li>
+      <li>🔪 <strong>Constrictive pericarditis</strong> — a stiff, scarred (sometimes calcified) sac later restricts filling: right heart failure, Kussmaul sign, pericardial knock; may need <strong>pericardiectomy</strong>. Think TB, post-surgery, radiation.</li>
+      <li>🦠 <strong>Purulent / specific-cause progression</strong> — a missed bacterial, TB or malignant cause can deteriorate without targeted treatment and drainage.</li>
+    </ul>
+
+    <!-- 🎭 M&M CONFERENCE MODULE -->
+    <div class="mm">
+      <h3>🎭 Morbidity &amp; Mortality Conference — "The STEMI That Wasn't"</h3>
+      <div class="mm-case">
+        <strong>The case:</strong> A 34-year-old man, fit and well, arrived at a busy ED with sharp chest pain after a flu-like week. The triage ECG auto-read "ACUTE MI" with ST elevation in many leads. A tired night team, anchored on that read and on "young man, chest pain, ST up — don't miss the STEMI," gave <strong>thrombolysis</strong> without anyone reading the strip for diffuse concave elevation, PR depression or reciprocal change. There were none — it was textbook pericarditis. Within the hour his small inflammatory effusion turned <strong>haemorrhagic</strong>; he became hypotensive with a rising JVP and muffled sounds and <strong>tamponaded</strong>. An emergency pericardiocentesis drained frank blood and saved him — but it was an entirely self-inflicted near-death.
+      </div>
+      <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+      <div class="swiss">
+        <div class="hole"><b>🤖 AUTO-READ TRUSTED</b>The machine's "ACUTE MI" was acted on without a human reading the ECG.</div>
+        <div class="hole"><b>📐 ECG NOT READ</b>Diffuse concave elevation, PR depression and absent reciprocal change were all there, unread.</div>
+        <div class="hole"><b>🧠 ANCHORING</b>"Don't miss the STEMI" overrode the obvious pericarditis pattern and the viral story.</div>
+        <div class="hole"><b>💉 LETHAL THERAPY</b>Thrombolysis into pericarditis → haemorrhagic effusion → tamponade.</div>
+        <div class="hole"><b>🌙 SYSTEM</b>Night fatigue, no senior ECG review, no "read-before-you-lyse" default.</div>
+      </div>
+      <p style="margin-bottom:0"><strong>🛡️ What would have saved the time and the blood:</strong> read the ECG for diffuse vs territorial, concave vs convex, PR depression and reciprocal change; apply the ≥2-of-4 criteria; listen for a rub; get an echo before committing; and never lyse a textbook pericarditis. <strong>This is exactly why your nurse held the thrombolysis today.</strong> (The mirror-image error — calling a true STEMI "pericarditis" and withholding reperfusion — is just as lethal; the discriminators protect against both.)</p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'The machine said ACUTE MI' is written on the chart of patients thrombolysed into tamponade. The auto-read is a prompt, not a diagnosis — read the strip yourself."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S14 — DIFFERENTIALS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s14">
+  <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials</h2></div>
+  <div class="section-content">
+    <h3>🧩 The "ST elevation / chest pain" differential</h3>
+    <table class="tbl">
+      <tr><th>Diagnosis</th><th>Clues</th><th>Why it matters</th></tr>
+      <tr><td>📐 <strong>Acute pericarditis</strong> (this patient)</td><td>Pleuritic positional pain, friction rub, viral prodrome, DIFFUSE concave ST elevation + PR depression, no reciprocal change</td><td>Treat with NSAID + colchicine, not the cath lab; find and drain any tamponading effusion.</td></tr>
+      <tr><td>🎯 <strong>STEMI</strong></td><td>Territorial convex ST elevation WITH reciprocal depression, evolving Q waves, crushing exertional pain, risk factors, regional wall-motion abnormality</td><td>The dangerous mimic — needs <strong>urgent reperfusion</strong>. When genuinely ambiguous in an at-risk patient, treat as STEMI.</td></tr>
+      <tr><td>📈 <strong>Benign early repolarisation</strong></td><td>Young, asymptomatic or atypical, diffuse concave ST elevation but <strong>no PR depression</strong>; ST/T ratio in V6 &lt; 0.25; stable over time</td><td>A normal-variant mimic of pericarditis — the V6 ST/T ratio and PR segment separate them.</td></tr>
+      <tr><td>🫀 <strong>Myopericarditis / myocarditis</strong></td><td>Pericarditic features PLUS a troponin rise; myocarditis adds LV dysfunction ± arrhythmia/heart failure</td><td>More cautious management — telemetry, longer exercise restriction, cardiac MRI; avoid high-dose NSAIDs with significant myocardial involvement.</td></tr>
+      <tr><td>🫁 <strong>Pulmonary embolism / pleurisy / pneumonia</strong></td><td>Pleuritic pain too, but with dyspnoea, hypoxia, tachycardia, PE risk factors or focal chest findings</td><td>Other causes of pleuritic chest pain — exclude with the history, exam, D-dimer/CTPA or CXR as appropriate.</td></tr>
+      <tr><td>🫀 <strong>Aortic dissection</strong></td><td>Tearing pain to the back, pulse/BP differential, widened mediastinum</td><td>A can't-miss cause of severe chest pain — anticoagulation/thrombolysis would be catastrophic, so keep it on the radar.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"DIFFUSE concave ST elevation with PR depression and no reciprocal change → think pericarditis. TERRITORIAL convex ST elevation with reciprocal depression → think STEMI (and reperfuse)."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S15 — PLAN -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s15">
+  <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan</h2></div>
+  <div class="section-content">
+    <h3>🧭 Today → this month → preventing recurrence</h3>
+    <ol>
+      <li>📐 <strong>Today (done):</strong> ECG read as diffuse concave ST elevation + PR depression, no reciprocal change → pericarditis confirmed (≥2 of 4 criteria); thrombolysis stood down; echo excludes tamponade; NSAID + colchicine + PPI started; activity restriction advised.</li>
+      <li>🫀 <strong>Identify &amp; treat the cause:</strong> viral/idiopathic by default; troponin (myopericarditis), U&amp;E (uraemia), and targeted autoimmune/TB testing as indicated; treat any specific cause directly.</li>
+      <li>🚩 <strong>Disposition:</strong> no high-risk feature → outpatient management with safety-net advice; admit if fever &gt;38°C, subacute onset, large effusion/tamponade, immunosuppression, anticoagulant use, trauma, raised troponin, or failure to respond.</li>
+      <li>💊 <strong>Complete the course:</strong> NSAID tapered against symptoms and CRP; <strong>colchicine for ~3 months</strong> to prevent recurrence; avoid first-line steroids.</li>
+      <li>🔁 <strong>Plan for recurrence:</strong> if it relapses, extend colchicine, consider why (under-treatment, premature steroid use), and escalate to IL-1 blockade in refractory, steroid-dependent disease.</li>
+      <li>👨‍👩‍👦 <strong>Education &amp; safety net:</strong> explain this is an inflamed sac (usually benign), why both drugs and the activity restriction matter, and the red flags (breathlessness, syncope, worsening pain) that mean return immediately.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"NSAID + colchicine treat the episode and prevent the relapse; the echo and the high-risk screen catch the effusion; completing the colchicine course is what keeps him from coming back. Send him out with all three."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S16 — PROGRESS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s16">
+  <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+  <div class="section-content">
+    <h3>📅 Course</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Day 0, 15:10</div>ECG read deliberately → diffuse concave ST elevation + PR depression, no reciprocal change. Thrombolysis stood down. NSAID + colchicine + PPI started; echo shows trivial effusion, no tamponade.</div>
+      <div class="t-item"><div class="t-time">Day 0, evening</div>Pain markedly better sitting forward and after the first ibuprofen doses; troponin normal → pure pericarditis. Observed; no high-risk feature found.</div>
+      <div class="t-item"><div class="t-time">Day 1</div>CRP 68 → 41; pain improving; friction rub fading. Discharged for outpatient management with clear safety-net advice.</div>
+      <div class="t-item"><div class="t-time">Week 1</div>Clinic review: pain resolved, CRP normalising; ECG showing stage-III diffuse T-inversion (recognised as expected evolution, not a new event). Continue colchicine.</div>
+      <div class="t-item"><div class="t-time">Week 3</div>Asymptomatic, CRP normal, NSAID tapered off; colchicine continued to complete ~3 months for recurrence prevention.</div>
+      <div class="t-item"><div class="t-time">Month 3</div>No recurrence; ECG normalised (stage IV). Colchicine stopped. Counselled to return early if symptoms recur.</div>
+    </div>
+
+    <!-- 👨‍👩‍👦 FAMILY & PATIENT JOURNEY MODULE -->
+    <h3>👨‍👩‍👦 Family &amp; Patient Journey</h3>
+    <div class="journey">
+      <div class="j-card"><div class="j-who">🧑 The patient — Mr. T.O.</div><p>"The machine said heart attack and I thought my life was over at 29. Then a doctor actually read the tracing, listened to my chest, and said it was the sac around the heart, not the arteries. They gave me tablets, not a procedure. I'm so glad someone slowed down."</p></div>
+      <div class="j-card"><div class="j-who">👩 His partner</div><p>"Hearing 'we're activating the cath lab' and then 'actually, hold on, let me read this properly' was the most frightening five minutes of my life — but it was the right five minutes. They explained everything and the relief when they said 'not a heart attack' was enormous."</p></div>
+      <div class="j-card"><div class="j-who">👩‍⚕️ The triage nurse</div><p>"My job was to put him on the monitor, get the ECG, and say out loud that this didn't look like the STEMIs I'd seen — and to hold the thrombolysis until a doctor read it. Sometimes good care is the treatment you <em>pause</em>."</p></div>
+      <div class="j-card"><div class="j-who">🎓 The team's reflection</div><p>"This wasn't a clever diagnosis — it was a disciplined one. We refused to let an auto-read stampede us, read the strip, applied the criteria, and gave the NSAID and the colchicine. The patient went home, not to the lab."</p></div>
+    </div>
+
+    <div class="callout pink"><b class="ct">💗 The human thread</b>A young person told "we thought it was a heart attack" carries that fear for a long time. As much treatment as the colchicine is the clear explanation — this is an inflamed sac, usually benign, you'll likely make a full recovery — and the safety net that tells him exactly when to come back. Reassurance, done properly, is part of the prescription.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S17 — DISCHARGE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s17">
+  <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+  <div class="section-content">
+    <h3>📋 Discharge plan &amp; safety net</h3>
+    <ul>
+      <li>💊 <strong>Medications:</strong> high-dose NSAID (ibuprofen, or aspirin if post-MI) tapered against symptoms and CRP, with a <strong>PPI</strong>; <strong>colchicine for ~3 months</strong> to prevent recurrence — emphasise that BOTH matter and the course is completed.</li>
+      <li>🛋️ <strong>Activity restriction:</strong> avoid strenuous exercise until symptom-free and CRP normal (longer, ~3–6 months, if myopericarditis); return-to-play guidance for athletes.</li>
+      <li>🧪 <strong>Follow-up:</strong> clinic review with repeat CRP and ECG; recognise the expected stage-III T-inversion so it isn't mistaken for a new event.</li>
+      <li>🚽 <strong>Colchicine counselling:</strong> diarrhoea common; renal/hepatic dose adjustment; avoid interacting drugs (macrolides, certain statins) and grapefruit.</li>
+      <li>🚩 <strong>Red flags → return / call emergency services:</strong> worsening or different chest pain, breathlessness, fainting or near-fainting, palpitations, swelling, or fever — any of which may signal effusion/tamponade, myopericarditis or a recurrence.</li>
+      <li>📚 <strong>Education:</strong> what pericarditis is in plain language, why the colchicine and activity restriction matter, why steroids were avoided, and that recurrence is possible but reduced by completing treatment.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Discharge after pericarditis is not 'pain better, go home' — it is an NSAID taper, a full colchicine course, activity restriction, an excluded effusion, and a patient who knows the red flags that mean come straight back."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S18 — CLINICAL PEARLS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s18">
+  <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+  <div class="section-content">
+    <div class="pearl-grid">
+      <div class="pearl"><b>📐 Diffuse vs territorial</b>DIFFUSE concave ST elevation + PR depression + NO reciprocal change = pericarditis. Territorial convex elevation with reciprocal depression = STEMI.</div>
+      <div class="pearl"><b>🔪 Positional pleuritic pain</b>Sharp pain worse lying flat, eased sitting forward, worse on inspiration — the single most useful bedside clue.</div>
+      <div class="pearl"><b>🎻 The rub is most specific</b>Listen at the left sternal edge, leaning forward, in held expiration. A scratchy triphasic rub clinches it.</div>
+      <div class="pearl"><b>✅ ≥ 2 of 4 criteria</b>Pleuritic/positional pain · friction rub · widespread ST elevation or PR depression · new/worsening effusion. Two of four diagnoses it.</div>
+      <div class="pearl"><b>💊 NSAID + colchicine</b>First-line is BOTH. Colchicine halves recurrence (ICAP/CORP) — it is not optional.</div>
+      <div class="pearl"><b>🚫 Steroids breed recurrence</b>Corticosteroids feel good but are associated with more recurrences — they are second-line, not first.</div>
+      <div class="pearl"><b>🫀 Always check a troponin</b>Normal = pure pericarditis; raised with good LV = myopericarditis; raised with poor LV = myocarditis.</div>
+      <div class="pearl"><b>💧 Mind the effusion</b>Watch for tamponade (Beck's triad, pulsus paradoxus, echo diastolic collapse). Rapid accumulation matters more than absolute size.</div>
+      <div class="pearl"><b>🩸 Don't lyse the mimic</b>Thrombolysing a pericarditis mislabelled STEMI can cause a haemorrhagic effusion and tamponade. Read the strip first.</div>
+      <div class="pearl"><b>🫀 Post-MI → aspirin</b>For post-MI and Dressler pericarditis, use aspirin + colchicine — other NSAIDs impair infarct healing.</div>
+      <div class="pearl"><b>📈 Know the four stages</b>I diffuse ST↑ + PR↓ → II normalise → III diffuse T-inversion → IV normalise. Don't misread stage III as new ischaemia.</div>
+      <div class="pearl"><b>🩻 Find the cause</b>Viral/idiopathic by default — but exclude uraemia, autoimmune, TB, malignancy and post-MI causes, each with specific treatment.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S19 — MCQs / ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s19">
+  <div class="sec-header"><span class="s-badge">S19</span><h2>🧠 MCQs / Assessment</h2></div>
+  <div class="section-content">
+    <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP and feed your dashboard. Each shows a full explanation.</em></p>
+    <div id="mcqHost"></div>
+    <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · Case c-pericarditis-030 — Acute Pericarditis: The Great STEMI Mimic<br>
+  ⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."
+</div>
+
+</div><!-- /#caseScroll -->
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ XP / DASHBOARD CORE ============ */
+  var XP = 0, XP_MAX = 1200;
+  var awarded = {}; // dedupe one-time awards by key
+  var xpVal = document.getElementById('xpVal');
+  var xpFill = document.getElementById('xpFill');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+  }
+  function addXP(amount, key, label){
+    if(key){ if(awarded[key]) return; awarded[key] = true; }
+    XP += amount;
+    if(XP > XP_MAX) XP = XP_MAX;
+    xpVal.textContent = XP;
+    xpFill.style.width = Math.min(100, Math.round(XP / XP_MAX * 100)) + '%';
+    showToast('+' + amount + ' XP' + (label ? ' · ' + label : ''));
+  }
+  function earnBadge(id){
+    var b = document.getElementById(id);
+    if(b && !b.classList.contains('earned')){ b.classList.add('earned'); }
+  }
+
+  /* Dashboard minimize */
+  var dash = document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){
+    dash.classList.toggle('collapsed');
+    this.textContent = dash.classList.contains('collapsed') ? '+' : '–';
+  });
+
+  /* ============ INTERNAL SCROLL SIZING ============ */
+  /* Size the scroll box to the visible window so the sticky tab bar stays in
+     view. When embedded (srcDoc iframe, same-origin), the host page stretches
+     the iframe to full content height and scrolls the OUTER page — so we size
+     this box from the parent window's height minus whatever app chrome sits
+     above the iframe, and scroll internally instead. Standalone → 100vh. */
+  var caseScroll = document.getElementById('caseScroll');
+  var topnav = document.getElementById('topnav');
+  /* The tab bar is position:fixed, so it's out of flow — reserve space at the
+     top of the scroll content (and offset anchor jumps) by its real height. */
+  function setNavOffset(){
+    var navH = topnav ? topnav.offsetHeight : 70;
+    caseScroll.style.paddingTop = navH + 'px';
+    caseScroll.style.scrollPaddingTop = (navH + 14) + 'px';
+  }
+  function sizeScroller(){
+    try {
+      var p = window.parent;
+      if(p && p !== window && window.frameElement){
+        var rectTop = window.frameElement.getBoundingClientRect().top;
+        if(rectTop < 0) rectTop = 0;          // parent scrolled past the chrome
+        var ph = p.innerHeight || 800;
+        var h = ph - rectTop - 6;             // leave the bottom edge breathing room
+        if(h < 460) h = 460;                  // sane minimum on short windows
+        caseScroll.style.height = h + 'px';
+      } else {
+        caseScroll.style.height = '100vh';
+      }
+    } catch(e){ caseScroll.style.height = '100vh'; }
+    setNavOffset();
+  }
+  sizeScroller();
+  window.addEventListener('resize', sizeScroller);
+  window.addEventListener('load', sizeScroller);
+  try { if(window.parent && window.parent !== window) window.parent.addEventListener('resize', sizeScroller); } catch(e){}
+
+  /* ============ NAV: scroll-spy active + visited ============ */
+  var navchips = Array.prototype.slice.call(document.querySelectorAll('.navchip'));
+  var sections = navchips.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited = {};
+  var visitVal = document.getElementById('visitVal');
+
+  function markVisited(idx){
+    var sec = sections[idx];
+    if(!sec) return;
+    if(!visited[sec.id]){
+      visited[sec.id] = true;
+      navchips[idx].classList.add('visited');
+      var count = Object.keys(visited).length;
+      visitVal.textContent = count + ' / 19';
+      addXP(8, 'visit-' + sec.id, 'Section read');
+      if(count >= 19){ earnBadge('bdg-explorer'); addXP(60, 'allvisited', 'Ward Explorer!'); }
+    }
+  }
+  function setActive(idx){
+    navchips.forEach(function(c){ c.classList.remove('active'); });
+    if(navchips[idx]) navchips[idx].classList.add('active');
+  }
+
+  /* True tabs: each chip shows ONLY its section, hidden via CSS otherwise.
+     No scrollIntoView and no scroll-spy — nothing can scroll the tab bar away,
+     which also sidesteps every srcDoc-iframe scrolling quirk. The hero banner
+     and vitals strip belong to the case intro, so they show on S1 only. */
+  var heroBits = [document.querySelector('.hero'), document.querySelector('.vitals-strip')]
+    .filter(function(el){ return !!el; });
+
+  function showSection(idx){
+    sections.forEach(function(s, i){ if(s) s.classList.toggle('sec-active', i === idx); });
+    heroBits.forEach(function(el){ el.style.display = (idx === 0) ? '' : 'none'; });
+    caseScroll.scrollTop = 0;
+    setActive(idx);
+    markVisited(idx);
+  }
+
+  navchips.forEach(function(chip, idx){
+    chip.addEventListener('click', function(ev){
+      ev.preventDefault();
+      showSection(idx);
+    });
+  });
+  showSection(0);
+
+  /* ============ FLAG GAME (S2) ============ */
+  var flagBtns = document.querySelectorAll('#flagGame .flag-btn');
+  var flagResult = document.getElementById('flagResult');
+  var flagsFound = 0, flagsTotal = 0, flagWrong = 0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good') === '1') flagsTotal++; });
+  flagBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.dataset.locked) return;
+      btn.dataset.locked = '1';
+      var good = btn.getAttribute('data-good') === '1';
+      if(good){
+        btn.classList.add('flag-good');
+        flagsFound++;
+        addXP(10, 'flag-' + flagsFound + '-' + Math.random(), 'Pericarditis flag spotted');
+      } else {
+        btn.classList.add('flag-bad');
+        flagWrong++;
+        showToast('❌ Not a pericarditis-specific flag');
+      }
+      if(flagsFound === flagsTotal){
+        flagResult.textContent = '✅ All ' + flagsTotal + ' pericarditis red flags found' + (flagWrong ? ' (with ' + flagWrong + ' wrong pick' + (flagWrong>1?'s':'') + ')' : ' — flawless!');
+        earnBadge('bdg-vt');
+        addXP(30, 'flags-complete', 'Mimic-Spotter badge');
+      } else {
+        flagResult.textContent = flagsFound + ' / ' + flagsTotal + ' pericarditis red flags found…';
+      }
+    });
+  });
+
+  /* ============ BRANCHING SCENARIO (S3) ============ */
+  var scText = document.getElementById('scText');
+  var scChoices = document.getElementById('scChoices');
+  var scFeedback = document.getElementById('scFeedback');
+  var scRestart = document.getElementById('scRestart');
+  var scStab = document.getElementById('scStab');
+  var scTime = document.getElementById('scTime');
+  var scXP = document.getElementById('scXP');
+  var pathXP = 0, scStability = 2, scElapsed = 0;
+
+  var STEPS = {
+    start: {
+      text: "The registrar is on the phone to the cath lab. The triage ECG shows ST elevation in I, II, III, aVF, V2–V6 — but it looks oddly uniform, and you notice PR depression. The young man is stable, leaning forward, eased by the position. What do you do FIRST?",
+      choices: [
+        { t: "📐 Read the ECG properly — diffuse concave ST elevation + PR depression, no reciprocal change → pericarditis; stand down thrombolysis", good:true, ds:1, dt:10, xp:40, fb:"✅ Exactly. This is the diffuse, concave, PR-depressed pattern with no reciprocal change — pericarditis, not a territorial STEMI. Standing down the cath lab and thrombolysis is the safe, correct first move." , next:"confirm" },
+        { t: "💉 Give thrombolysis now — 'the machine said ACUTE MI, don't miss the STEMI'", good:false, ds:-2, dt:20, xp:0, fb:"☠️ Catastrophe. Lysing a textbook pericarditis can bleed the small effusion into a HAEMORRHAGIC effusion and tamponade — the M&M case in S13. Read the strip before you commit. Restart and choose again.", end:true },
+        { t: "🚨 Activate the cath lab for emergent PCI without reading the ECG yourself", good:false, ds:-1, dt:15, xp:5, fb:"⚠️ You're trusting an auto-read over your own eyes. He's stable — take the seconds to read diffuse vs territorial and PR depression before committing to an invasive pathway.", next:"start2" }
+      ]
+    },
+    start2: {
+      text: "You stop and actually read the 12-lead: ST elevation is concave and present in nearly every lead, there's PR depression, and there is NO reciprocal ST depression. The pain eases when he sits forward. Now what?",
+      choices: [
+        { t: "📐 Recognise pericarditis and stand down the cath lab / thrombolysis", good:true, ds:1, dt:8, xp:30, fb:"✅ Finally — the right call. Diffuse concave elevation + PR depression + no reciprocal change = pericarditis. No reperfusion therapy for this.", next:"confirm" },
+        { t: "🤷 Lyse anyway 'just to be safe'", good:false, ds:-1, dt:20, xp:0, fb:"⚠️ 'Just to be safe' is exactly how the haemorrhagic-effusion disaster happens. The ECG is textbook pericarditis — don't thrombolyse it.", next:"confirm" }
+      ]
+    },
+    confirm: {
+      text: "Pericarditis it is. He's stable, friction rub audible, viral prodrome, three of four diagnostic criteria met. Before you write the first drug?",
+      choices: [
+        { t: "🎻 Examine for a rub, send troponin, get an echo and screen for high-risk features", good:true, ds:1, dt:6, xp:30, fb:"✅ Ideal. Confirm the rub, check the troponin (myopericarditis?), echo for effusion/tamponade, and screen for high-risk features (fever >38°, big effusion, immunosuppression, anticoagulant, raised troponin, failure to respond) — that's what decides disposition.", next:"treat" },
+        { t: "💊 Skip the work-up and start steroids — fastest relief", good:false, ds:0, dt:3, xp:10, fb:"⚠️ Steroids are second-line and breed recurrence, and you've skipped the echo/troponin that catch effusion and myopericarditis. Work it up first, then give the right first-line drugs.", next:"treat" }
+      ]
+    },
+    treat: {
+      text: "Troponin normal, echo shows a trivial effusion with no tamponade, no high-risk feature. He's ready for treatment. Final move of the first few minutes?",
+      choices: [
+        { t: "💊 Start a high-dose NSAID PLUS colchicine, with a PPI and activity restriction", good:true, ds:1, dt:5, xp:40, fb:"🏆 Perfect close. NSAID + colchicine together is first-line — colchicine halves recurrence (ICAP/CORP). PPI for gastroprotection, activity restriction, outpatient follow-up. You treated the disease, not the auto-read.", end:true },
+        { t: "💊 Start corticosteroids first-line for a fast, powerful anti-inflammatory effect", good:false, ds:-1, dt:10, xp:0, fb:"⚠️ Wrong first-line. Steroids feel good but are associated with MORE recurrences — they are second-line, reserved for NSAID contraindication, autoimmune/uraemic cause or refractory disease. First-line is NSAID + colchicine.", end:true }
+      ]
+    }
+  };
+
+  function renderStab(){
+    var s = Math.max(0, Math.min(5, scStability + 2)); // map -2..3 → 0..5
+    var dots = '';
+    for(var i=0;i<5;i++) dots += (i < s ? '●' : '○');
+    scStab.textContent = dots;
+  }
+  function renderStep(key){
+    var step = STEPS[key];
+    scText.textContent = step.text;
+    scFeedback.className = 'feedback';
+    scFeedback.style.display = 'none';
+    scChoices.innerHTML = '';
+    step.choices.forEach(function(ch){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = ch.t;
+      b.addEventListener('click', function(){
+        pathXP += ch.xp; scXP.textContent = pathXP;
+        scElapsed += ch.dt; scTime.textContent = scElapsed + ' s';
+        scStability += ch.ds; renderStab();
+        if(ch.xp) addXP(ch.xp, null, 'Scenario choice');
+        scFeedback.textContent = ch.fb;
+        scFeedback.className = 'feedback ' + (ch.good ? 'good' : 'bad');
+        scFeedback.style.display = 'block';
+        Array.prototype.forEach.call(scChoices.children, function(c){ c.disabled = true; c.style.opacity = .6; });
+        if(ch.end){
+          scRestart.style.display = 'inline-block';
+          if(ch.good && key === 'treat'){ earnBadge('bdg-shock'); addXP(20, 'scenario-win', 'Right First Drug!'); }
+        } else if(ch.next){
+          setTimeout(function(){ renderStep(ch.next); }, 1400);
+        }
+      });
+      scChoices.appendChild(b);
+    });
+  }
+  scRestart.addEventListener('click', function(){
+    pathXP = 0; scStability = 2; scElapsed = 0;
+    scXP.textContent = 0; scTime.textContent = '0 s'; renderStab();
+    scRestart.style.display = 'none';
+    renderStep('start');
+  });
+  renderStab();
+  renderStep('start');
+
+  /* ============ REVEAL BUTTONS ============ */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.getAttribute('data-target'));
+      if(!t) return;
+      if(t.classList.contains('reveal-shown')){
+        t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden');
+      } else {
+        t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown');
+        addXP(8, 'reveal-' + btn.getAttribute('data-target'), 'Self-test');
+      }
+    });
+  });
+
+  /* ============ EFFUSION / TAMPONADE SIM (S6) ============ */
+  var kRange = document.getElementById('kRange');
+  var kVal = document.getElementById('kVal');
+  var kNeedle = document.getElementById('kNeedle');
+  var kReadout = document.getElementById('kReadout');
+  if(kRange){
+    var simUsed = false;
+    function updateK(){
+      var raw = parseInt(kRange.value,10); // 20 .. 75 maps small/slow .. large/rapid
+      var pct = (raw - 20) / (75 - 20) * 100;
+      kNeedle.style.left = pct + '%';
+      var label, msg, cls;
+      if(raw < 32){ label='small / slow'; msg = '🟢 Small, slowly-accumulating effusion — the sac stretches to accommodate it. Low tamponade risk; manage the inflammation and monitor.'; cls='good'; }
+      else if(raw < 48){ label='moderate'; msg = '🟢 Moderate effusion accumulating slowly — usually tolerated as the pericardium adapts. Watch for symptoms; echo to track size.'; cls='good'; }
+      else if(raw < 60){ label='growing'; msg = '🟠 Larger or quicker-filling effusion — approaching the steep part of the pressure–volume curve. Watch closely for early tamponade (rising JVP, pulsus paradoxus).'; cls='warn-r'; }
+      else if(raw < 68){ label='rapid / large'; msg = '🟠 Rapidly accumulating effusion — even a modest volume now throttles filling. High tamponade risk; prepare for pericardiocentesis.'; cls='warn-r'; }
+      else { label='tamponade'; msg = '🔴 Tense, rapidly-built effusion — obstructive shock: hypotension, raised JVP, muffled sounds, pulsus paradoxus, echo diastolic collapse. Drain it NOW (pericardiocentesis).'; cls='bad'; }
+      kVal.textContent = label;
+      kReadout.innerHTML = msg;
+      kReadout.className = 'readout ' + cls;
+      if(!simUsed){ simUsed = true; addXP(15, 'ksim', 'Effusion Master'); }
+    }
+    kRange.addEventListener('input', updateK);
+    updateK();
+  }
+
+  /* ============ CHECKLISTS (S7) ============ */
+  var allChecklistsDone = 0, totalChecklists = document.querySelectorAll('.checklist').length;
+  document.querySelectorAll('.checklist').forEach(function(list){
+    var boxes = list.querySelectorAll('input[type=checkbox]');
+    var prog = list.querySelector('[data-progress]');
+    var total = boxes.length;
+    var doneAwarded = false;
+    function refresh(){
+      var done = 0;
+      boxes.forEach(function(b){
+        if(b.checked){ done++; b.closest('.ck').classList.add('done'); }
+        else { b.closest('.ck').classList.remove('done'); }
+      });
+      prog.textContent = done + ' / ' + total + ' complete';
+      if(done === total && !doneAwarded){
+        doneAwarded = true;
+        allChecklistsDone++;
+        addXP(25, 'ck-' + list.id, 'Checklist done');
+        if(allChecklistsDone >= totalChecklists){ earnBadge('bdg-ck'); addXP(20, 'allck', 'Checklist Champion'); }
+      }
+    }
+    boxes.forEach(function(b){
+      b.addEventListener('change', function(){
+        if(b.checked) addXP(4, null, 'Step checked');
+        refresh();
+      });
+    });
+  });
+
+  /* ============ MCQs (S19) ============ */
+  var MCQS = [
+    {
+      q: "Acute pericarditis is diagnosed when at least how many of the following four features are present: typical pleuritic/positional chest pain, a pericardial friction rub, widespread ST elevation or PR depression, and a new/worsening pericardial effusion?",
+      opts: ["Any 1 of the 4","At least 2 of the 4","At least 3 of the 4","All 4 are required"],
+      correct: 1,
+      exp: "The 2015 ESC criteria require ≥ 2 of 4: typical pleuritic/positional chest pain, pericardial friction rub, widespread ST elevation or PR depression, and a new/worsening pericardial effusion. CRP/ESR are supportive; a troponin rise suggests myopericarditis."
+    },
+    {
+      q: "Which ECG pattern is most characteristic of acute pericarditis rather than STEMI?",
+      opts: ["Territorial convex ST elevation with reciprocal depression","Diffuse concave ST elevation with PR depression and no reciprocal change","Deep symmetrical T-wave inversion confined to one territory","Pathological Q waves with poor R-wave progression"],
+      correct: 1,
+      exp: "Pericarditis produces DIFFUSE concave ST elevation with PR depression (and PR elevation/ST depression in aVR) and NO reciprocal ST depression, because the inflammation coats the whole epicardium. Territorial convex elevation with reciprocal depression and evolving Q waves indicates a STEMI."
+    },
+    {
+      q: "What is the first-line treatment for a first episode of idiopathic/viral acute pericarditis?",
+      opts: ["A corticosteroid alone","A high-dose NSAID PLUS colchicine","Colchicine alone","Therapeutic anticoagulation"],
+      correct: 1,
+      exp: "First-line is a high-dose NSAID (ibuprofen or aspirin) PLUS colchicine, with gastroprotection and activity restriction. Colchicine is co-first-line, not an optional add-on. Steroids alone are second-line, and anticoagulation is avoided (bleeding into an effusion)."
+    },
+    {
+      q: "Adding colchicine to an NSAID in acute pericarditis (ICAP/CORP trials) primarily:",
+      opts: ["Speeds resolution of the effusion within 24 hours","Roughly halves the rate of recurrent/persistent pericarditis","Eliminates the need for any NSAID","Prevents progression to myocardial infarction"],
+      correct: 1,
+      exp: "The ICAP and CORP/CORP-2 trials showed colchicine roughly halves recurrent and persistent pericarditis when added to standard anti-inflammatory therapy — which is why it is co-first-line and given for about 3 months."
+    },
+    {
+      q: "Why are corticosteroids NOT first-line in acute pericarditis?",
+      opts: ["They have no anti-inflammatory effect on the pericardium","They are associated with a higher rate of recurrent pericarditis","They cause immediate tamponade","They are contraindicated with any NSAID"],
+      correct: 1,
+      exp: "Early corticosteroid use, especially high-dose, is associated with MORE recurrences and can lead to relapsing recurrent pericarditis. They are reserved for second-line indications (NSAID contraindication, autoimmune/uraemic cause, pregnancy, refractory disease) and should be combined with colchicine when used."
+    },
+    {
+      q: "A stable 29-year-old with a viral prodrome has diffuse concave ST elevation, PR depression and no reciprocal change. The team is about to give thrombolysis. The correct action is to:",
+      opts: ["Proceed with thrombolysis because the machine read 'ACUTE MI'","Stand down thrombolysis — this is pericarditis; treat with NSAID + colchicine and assess for effusion","Give an AV-nodal blocker","Anticoagulate fully and admit to the cath lab"],
+      correct: 1,
+      exp: "This is the diffuse, concave, PR-depressed, no-reciprocal-change pattern of pericarditis, not a territorial STEMI. Thrombolysing it risks a haemorrhagic effusion and tamponade. Treat with NSAID + colchicine, get an echo for effusion/tamponade, and screen for high-risk features."
+    },
+    {
+      q: "Which of the following is a high-risk feature mandating admission/work-up rather than outpatient management of acute pericarditis?",
+      opts: ["A trivial pericardial effusion on echo","Fever > 38°C, a large effusion/tamponade, raised troponin, immunosuppression or failure to respond to NSAIDs","A scratchy friction rub","Pain eased by sitting forward"],
+      correct: 1,
+      exp: "High-risk features (2015 ESC) include fever >38°C, subacute onset, large effusion or tamponade, immunosuppression, oral anticoagulant use, trauma, troponin rise (myopericarditis), and failure to respond to NSAIDs. A trivial effusion, a rub, and positional pain are typical of benign disease."
+    },
+    {
+      q: "A patient develops pericarditis several weeks after a myocardial infarction (Dressler syndrome). Which anti-inflammatory is preferred?",
+      opts: ["High-dose ibuprofen","Indometacin","Aspirin (with colchicine)","A corticosteroid as first-line"],
+      correct: 2,
+      exp: "After an MI, non-aspirin NSAIDs may impair infarct healing, so ASPIRIN (with colchicine) is preferred for post-infarction and Dressler pericarditis. Dressler is a late, immune-mediated post-cardiac-injury pericarditis occurring weeks after the MI."
+    }
+  ];
+
+  var host = document.getElementById('mcqHost');
+  var mcqVal = document.getElementById('mcqVal');
+  var mcqScore = 0, mcqAnswered = 0;
+  var letters = ['A','B','C','D','E'];
+
+  MCQS.forEach(function(item, qi){
+    var box = document.createElement('div');
+    box.className = 'mcq';
+    var html = '<div class="mcq-q">QUESTION ' + (qi+1) + ' / ' + MCQS.length + '</div>';
+    html += '<div class="mcq-stem">' + item.q + '</div>';
+    item.opts.forEach(function(opt, oi){
+      html += '<label class="mcq-opt" data-oi="' + oi + '"><strong>' + letters[oi] + '.</strong> ' + opt + '</label>';
+    });
+    html += '<div class="mcq-exp"></div>';
+    box.innerHTML = html;
+    host.appendChild(box);
+
+    var opts = box.querySelectorAll('.mcq-opt');
+    var exp = box.querySelector('.mcq-exp');
+    var locked = false;
+    opts.forEach(function(label){
+      label.addEventListener('click', function(){
+        if(locked) return;
+        locked = true;
+        var oi = parseInt(label.getAttribute('data-oi'),10);
+        box.classList.add('answered');
+        var correct = item.correct;
+        if(oi === correct){
+          label.classList.add('picked-right');
+          mcqScore++;
+          addXP(25, null, 'Correct answer');
+        } else {
+          label.classList.add('picked-wrong');
+          opts[correct].classList.add('show-right');
+          showToast('❌ Correct: ' + letters[correct]);
+        }
+        exp.innerHTML = '<strong>' + (oi === correct ? '✅ Correct. ' : '📘 Explanation. ') + '</strong>' + item.exp;
+        mcqAnswered++;
+        mcqVal.textContent = mcqScore + ' / ' + MCQS.length;
+        if(mcqAnswered === MCQS.length){
+          var done = document.getElementById('mcqDone');
+          var summary = document.getElementById('mcqSummary');
+          done.style.display = 'block';
+          summary.textContent = 'You scored ' + mcqScore + ' / ' + MCQS.length + '. ' +
+            (mcqScore === MCQS.length ? 'Flawless — you read the strip and treat with NSAID + colchicine every time. 🏆' :
+             mcqScore >= 6 ? 'Strong — review the misses and the contrast pairs in S6.' :
+             'Revisit S3, S5, S6 and S11 — the pericarditis-vs-STEMI logic is the whole case.');
+          if(mcqScore >= 7){ earnBadge('bdg-quiz'); addXP(50, 'quizace', 'Quiz Ace!'); }
+        }
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
