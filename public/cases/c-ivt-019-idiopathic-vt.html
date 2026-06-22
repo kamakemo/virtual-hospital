@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Idiopathic VT — RVOT & Fascicular (the Verapamil-Sensitive Exception) — Virtual Teaching Hospital</title>
+<!-- META
+id: c-ivt-019
+title: Idiopathic VT — RVOT & Fascicular (the Verapamil-Sensitive Exception)
+hospital: cardiology
+department: cv-ep
+bednumber: 12
+chiefcomplaint: Palpitations with a wide-complex tachycardia in a structurally normal heart
+system: Cardiology
+severity: urgent
+tags: Idiopathic VT, RVOT VT, Fascicular VT, Verapamil-sensitive, Adenosine, Ablation
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --radius:16px;
+    --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  /* Internal scroll viewport. When this case is embedded the host app stretches
+     the iframe to full content height and the OUTER page scrolls, which would
+     let a sticky bar scroll away. We instead scroll inside this box (sized to
+     the visible window by JS) so the section tab bar stays pinned at the top.
+     Standalone, it falls back to the full viewport height. */
+  #caseScroll{height:100vh; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; scroll-padding-top:92px}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:36px 24px 80px; position:relative; overflow:hidden}
+  .hero::after{content:"📈"; position:absolute; right:-20px; top:-30px; font-size:220px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{max-width:1100px; margin:0 auto; position:relative; z-index:1}
+  .hero .crumbs{font-size:13px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:10px 0 6px; font-size:clamp(26px,4vw,40px); line-height:1.15}
+  .hero .sub{font-size:16px; opacity:.95}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; backdrop-filter:blur(4px)}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== LIVE ECG STRIP IN HERO ===== */
+  .ecg-banner{max-width:1100px; margin:14px auto 0; position:relative; z-index:1}
+  .ecg-banner svg{width:100%; height:64px; display:block; background:rgba(0,0,0,.18); border-radius:12px; border:1px solid rgba(255,255,255,.25)}
+  .ecg-trace{stroke:#86efac; stroke-width:2.4; fill:none; stroke-dasharray:1600; stroke-dashoffset:1600; animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{stroke-dashoffset:0}}
+
+  /* ===== VITALS STRIP ===== */
+  .vitals-strip{max-width:1100px; margin:-52px auto 0; padding:0 24px; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:11px; font-weight:700; letter-spacing:.6px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:21px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== HORIZONTAL SECTION SIDEBAR (fixed — always visible) ===== */
+  .topnav{position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.10)}
+  .topnav .rail{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; max-width:1180px; margin:0 auto; scrollbar-width:thin}
+  .navchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink2); font-size:11px; font-weight:700; text-decoration:none; min-width:78px; text-align:center; transition:all .18s; cursor:pointer}
+  .navchip .s-id{font-size:10px; letter-spacing:1px; color:#94a3b8}
+  .navchip .s-emoji{font-size:16px}
+  .navchip:hover{border-color:var(--rose); color:var(--rose); transform:translateY(-2px)}
+  .navchip.active{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; border-color:#b91c1c}
+  .navchip.active .s-id{color:#fecaca}
+  .navchip.visited:not(.active){border-color:var(--emerald-line); background:var(--emerald-soft)}
+
+  /* ===== DASHBOARD WIDGET ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:215px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10.5px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:760px){.dash{display:none}}
+
+  /* ===== MAIN / SECTIONS (tabbed: one section visible at a time) ===== */
+  main{max-width:1100px; margin:26px auto 80px; padding:0 24px}
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:26px; overflow:hidden}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16.5px; margin:26px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14.5px; margin:18px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:24px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15.5px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:14px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px; letter-spacing:.4px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14.5px}
+
+  /* ===== INTERACTIVE BITS ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:10px 18px; font-weight:700; font-size:14px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:22px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:15px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 15px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 15px; margin-top:12px; font-size:14px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim sliders */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:14px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:14px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Heart/circuit diagram */
+  .heart-fig{display:flex; gap:18px; flex-wrap:wrap; align-items:center; background:var(--slate-soft); border-radius:16px; padding:18px; margin:14px 0}
+  .heart-fig svg{flex:0 0 auto}
+  .heart-legend{flex:1; min-width:230px; font-size:13.5px}
+  .lg{display:flex; align-items:center; gap:8px; margin:5px 0}
+  .lg .sw{width:14px; height:14px; border-radius:4px; flex:0 0 auto}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Journey cards */
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:14px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:15px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:14px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13.5px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:22px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14.5px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:13px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .footer{max-width:1100px; margin:0 auto 36px; padding:0 24px; text-align:center; color:#94a3b8; font-size:12.5px}
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="caseScroll">
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · ⚡ EP Lab · 🛏️ Bed 12</div>
+    <h1>📈 Idiopathic VT — RVOT &amp; Fascicular: "The One VT That Loves Verapamil"</h1>
+    <div class="sub">⚡ A 30-year-old with a structurally normal heart is running a broad, regular tachycardia at 180 — and she's tolerating it. Someone wants to call it benign and push verapamil. First, earn the word "idiopathic."</div>
+    <div class="chips">
+      <span class="chip crit">🟠 URGENT</span>
+      <span class="chip">⚡ Wide-Complex Tachycardia</span>
+      <span class="chip">💚 Structurally Normal Heart</span>
+      <span class="chip">💊 Verapamil-Sensitive</span>
+      <span class="chip">🎮 Interactive Case</span>
+      <span class="chip">🔎 Diagnosis of Exclusion</span>
+    </div>
+    <div class="ecg-banner" title="Idiopathic VT rhythm strip">
+      <svg viewBox="0 0 800 64" preserveAspectRatio="none" aria-label="Wide-complex tachycardia rhythm strip">
+        <polyline class="ecg-trace" points="0,40 40,40 55,12 70,58 85,40 130,40 145,12 160,58 175,40 220,40 235,12 250,58 265,40 310,40 325,12 340,58 355,40 400,40 415,12 430,58 445,40 490,40 505,12 520,58 535,40 580,40 595,12 610,58 625,40 670,40 685,12 700,58 715,40 760,40 775,12 790,58 800,40"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== LIVE VITALS ===================== -->
+<div class="vitals-strip">
+  <div class="vitals-grid">
+    <div class="vital alert"><div class="v-label">💓 HR</div><div class="v-num">180</div></div>
+    <div class="vital"><div class="v-label">🩸 BP</div><div class="v-num">118/74</div></div>
+    <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">20</div></div>
+    <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">98%</div></div>
+    <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.8°</div></div>
+    <div class="vital"><div class="v-label">🧠 GCS</div><div class="v-num">15</div></div>
+    <div class="vital alert"><div class="v-label">📐 QRS</div><div class="v-num">142 ms</div></div>
+    <div class="vital warn"><div class="v-label">😖 Distress</div><div class="v-num">Anxious</div></div>
+  </div>
+</div>
+
+<!-- ===================== HORIZONTAL SECTION SIDEBAR ===================== -->
+<nav class="topnav" id="topnav">
+  <div class="rail">
+    <a class="navchip" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navchip" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navchip" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navchip" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navchip" href="#s5"><span class="s-emoji">🎓</span><span>Consultant Round</span><span class="s-id">S5</span></a>
+    <a class="navchip" href="#s6"><span class="s-emoji">📖</span><span>Teaching Points</span><span class="s-id">S6</span></a>
+    <a class="navchip" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navchip" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navchip" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navchip" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navchip" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navchip" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navchip" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navchip" href="#s14"><span class="s-emoji">🔀</span><span>Differentials</span><span class="s-id">S14</span></a>
+    <a class="navchip" href="#s15"><span class="s-emoji">🗺️</span><span>Plan</span><span class="s-id">S15</span></a>
+    <a class="navchip" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navchip" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navchip" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navchip" href="#s19"><span class="s-emoji">🧠</span><span>MCQs</span><span class="s-id">S19</span></a>
+  </div>
+</nav>
+
+<!-- ===================== SCORE DASHBOARD ===================== -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections visited</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-vt">⚡ VT-Spotter</span>
+      <span class="badge" id="bdg-shock">🔌 Shock On Time</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champion</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Ward Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running sims, taking the right path and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- S1 — PROFILE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s1">
+  <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+  <div class="section-content">
+    <div class="callout warn">
+      <b class="ct">🟠 YOU ARE HERE — 14:40, EP Lab Assessment Bay, Bed 12</b>
+      The monitor shows a regular, broad, marching complex at 180. But the patient — a young woman — is sitting up, talking in full sentences, more frightened than sick: <em>"My heart's been pounding since the gym. It does this sometimes."</em> Her pressure is fine. A junior reaches for the verapamil and says "looks like one of those benign outflow-tract VTs." Maybe. But you have not yet earned the word <strong>idiopathic</strong> — and the wrong heart underneath this rhythm makes verapamil lethal.
+    </div>
+
+    <h3>👤 Patient Identity</h3>
+    <table class="tbl">
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>👩 Name</td><td><strong>Ms. L.A.</strong></td></tr>
+      <tr><td>🎂 Age / Sex</td><td>30-year-old female</td></tr>
+      <tr><td>🆔 MRN</td><td>EP-20419</td></tr>
+      <tr><td>⚖️ Weight</td><td>62 kg</td></tr>
+      <tr><td>💼 Occupation</td><td>Schoolteacher, recreational runner</td></tr>
+      <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+    </table>
+
+    <h3>📜 Past Medical History — and the conspicuous ABSENCE of substrate</h3>
+    <ul>
+      <li>💚 <strong>No prior MI, no cardiomyopathy, no heart failure.</strong> A previous echo (for a murmur years ago) was normal. This <em>absence</em> is the whole story — but it must be re-proven tonight, not assumed.</li>
+      <li>🏃 <strong>Recurrent palpitations for 2 years</strong>, often <strong>provoked by exercise, caffeine or emotional stress</strong> and sometimes by the recovery period afterwards. Self-terminate after seconds to minutes; today's run is longer.</li>
+      <li>😵 Two episodes of <strong>presyncope</strong> ("nearly greyed out") but never frank collapse; no exertional chest pain.</li>
+      <li>👪 <strong>No family history</strong> of sudden cardiac death, drowning, unexplained car accidents, pacemakers or young arrhythmic death — a deliberate, targeted question (it screens for inherited arrhythmia/ARVC/LQTS/CPVT).</li>
+      <li>💊 Takes no regular medications; drinks 3–4 coffees on teaching days; no recreational stimulants.</li>
+      <li>🚭 Non-smoker, no hypertension, no diabetes, normal lipids. The "boring" history is exactly what idiopathic VT looks like.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Idiopathic VT is the ONE VT that loves verapamil — but only after echo and MRI swear the heart is normal. You EARN the word 'idiopathic'; you never assume it."</div>
+
+    <h3>🧬 Why THIS patient? — two benign circuits in a normal heart</h3>
+    <p>Most sustained VT is scar-related re-entry in a damaged ventricle. <strong>Idiopathic VT is the exception:</strong> it arises in a structurally normal heart from one of two stereotyped sources. <strong>RVOT VT</strong> (right ventricular outflow tract) is <strong>triggered activity</strong> — cyclic-AMP-mediated delayed afterdepolarizations, made worse by catecholamines (hence the exercise/stress provocation) and quenched by adenosine. <strong>Fascicular VT</strong> (idiopathic left VT) is a small <strong>re-entry</strong> circuit in the left posterior fascicle / Purkinje network, classically <strong>verapamil-sensitive</strong>. Both have an excellent prognosis and both are highly curable by ablation — but only once you have excluded the malignant mimics (ischemic scar, ARVC, sarcoid) that wear the same wide-complex disguise.</p>
+
+    <div class="callout info"><b class="ct">💡 Features that point TOWARD idiopathic VT</b>
+    🧑 Young, structurally normal heart · 🏃 Exercise / stress / catecholamine provocation · 🩸 Hemodynamically tolerated · 📐 LBBB + inferior axis (RVOT) or RBBB + left/superior axis (fascicular) · 💊 Terminates with adenosine (RVOT) or verapamil (fascicular) · 👪 No family history of sudden death · 🟢 Normal echo and cardiac MRI (the permission slip).</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S2 — HANDOVER -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s2">
+  <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+  <div class="section-content">
+    <h3>📻 Triage Handover — listen for the assumption</h3>
+    <div class="callout info">
+      <b class="ct">🎙️ SBAR from the assessment-bay nurse (verbatim)</b>
+      <p><strong>S:</strong> "Bed 12 — Ms. L.A., 30, palpitations that started after a run an hour ago. Monitor shows a fast, wide, regular rhythm at 180. She's pink, talking, scared but stable."</p>
+      <p><strong>B:</strong> "Healthy, no cardiac history, normal echo years ago, two years of exercise-triggered palpitations. No meds, lots of coffee."</p>
+      <p><strong>A:</strong> "BP 118 over 74, sats 98%, completely alert. The covering doctor glanced at the strip and said 'young, normal heart, that'll be a benign RVOT VT — just give verapamil.'"</p>
+      <p><strong>R:</strong> "I've got pads on and an IV in. I held the verapamil — she's never had an echo HERE and nobody's looked for scar. I wanted you to see her first."</p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Young, normal heart, must be benign' is a guess, not a diagnosis. The label 'idiopathic VT' — and the verapamil that goes with it — is only safe AFTER you exclude structural disease."</div>
+
+    <h3>🚩 Spot-the-Feature — tap each finding that supports IDIOPATHIC VT</h3>
+    <p>🎮 <em>Interactive: click every feature that points to a benign idiopathic VT in a normal heart. Each correct flag = +10 XP. Distractors that actually argue for SCAR VT cost you.</em></p>
+    <div id="flagGame">
+      <button class="btn ghost flag-btn" data-good="1">💚 Young patient, structurally normal heart</button>
+      <button class="btn ghost flag-btn" data-good="1">⬇️ LBBB morphology + inferior axis (RVOT)</button>
+      <button class="btn ghost flag-btn" data-good="1">↗️ RBBB morphology + left/superior axis (fascicular)</button>
+      <button class="btn ghost flag-btn" data-good="1">🏃 Exercise / stress-induced</button>
+      <button class="btn ghost flag-btn" data-good="1">🩸 Hemodynamically tolerated</button>
+      <button class="btn ghost flag-btn" data-good="1">💊 Terminates with adenosine (RVOT) or verapamil (fascicular)</button>
+      <button class="btn ghost flag-btn" data-good="0">🫀 Prior MI / myocardial scar</button>
+      <button class="btn ghost flag-btn" data-good="0">💔 Low ejection fraction (EF 30%)</button>
+    </div>
+    <p id="flagResult" style="font-weight:700"></p>
+
+    <h3>⏱️ Timeline so far</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">13:30</div>Palpitations begin during the cool-down after a 5 km run; she felt light-headed briefly but kept walking.</div>
+      <div class="t-item"><div class="t-time">14:10</div>Self-presents; monitor shows wide regular tachycardia 180/min. BP 118/74, fully alert, anxious.</div>
+      <div class="t-item"><div class="t-time">14:25</div>Covering doctor (passing) says "benign RVOT VT — just give verapamil." Nurse <strong>withholds verapamil</strong> pending a real structural workup — 🏅 the safe instinct.</div>
+      <div class="t-item"><div class="t-time">14:40</div>You arrive. She is stable. You have TIME — and time is exactly what lets you exclude scar before you commit to a verapamil-sensitive label.</div>
+    </div>
+
+    <div class="callout ok"><b class="ct">🏅 Praise where due</b>The nurse who held the verapamil understood the asymmetry: in a <em>true</em> idiopathic VT, a brief delay costs nothing (the patient is stable and the rhythm is benign). But if this is really scar VT or ARVC masquerading as "benign," verapamil's vasodilation and negative inotropy could collapse her. When stable, you lose nothing by proving the heart is normal first.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S3 — INITIAL ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s3">
+  <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+  <div class="section-content">
+    <h3>🅰️🅱️🅲️ Primary Survey — what your hands, eyes and ears find</h3>
+    <table class="tbl">
+      <tr><th>Step</th><th>Finding</th><th>What it means mechanistically</th></tr>
+      <tr><td>🅰️ Airway</td><td>Patent, speaking in full sentences.</td><td>Full sentences = preserved cardiac output. She is tolerating the tachycardia — a feature, not a guarantee.</td></tr>
+      <tr><td>🅱️ Breathing</td><td>RR 20, SpO₂ 98% on air, chest clear.</td><td>No pulmonary congestion. A young, compliant, normal ventricle copes with 180/min far better than a scarred one would.</td></tr>
+      <tr><td>🅲️ Circulation</td><td><strong>BP 118/74</strong>, warm well-perfused peripheries, CRT &lt; 2 s. JVP shows occasional <strong>cannon A waves</strong>; S1 varies subtly beat to beat.</td><td>Cannon A waves / variable S1 = <strong>AV dissociation</strong> — still the hallmark of VT (idiopathic VT is genuine ventricular tachycardia, not SVT). Good perfusion means she is STABLE, which buys diagnostic time.</td></tr>
+      <tr><td>🅳 Disability</td><td>GCS 15, anxious but oriented.</td><td>Normal cerebration confirms adequate perfusion — no adverse "syncope" feature right now.</td></tr>
+      <tr><td>🅴 Exposure</td><td>No rash, no oedema, no scars, normal habitus. Pads on as a precaution.</td><td>No external clue to structural disease — but "no clue" is not "excluded." Imaging does the excluding.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Stable does NOT mean benign — it means you have TIME. Use the time to exclude structural disease, then choose your drug. Unstable would have meant electricity, no matter how 'benign' the label."</div>
+
+    <h3>🧭 The single most important question: STABLE or UNSTABLE?</h3>
+    <p>Tachyarrhythmia management forks on one decision. Look for the <strong>adverse features</strong> (the "4 S's"): <strong>Shock</strong> (SBP &lt; 90, poor perfusion), <strong>Syncope</strong>/presyncope, <strong>Severe ischemia</strong> (chest pain, ST changes), <strong>Severe heart failure</strong> (pulmonary edema). Ms. L.A. has <strong>none</strong> right now — she is <strong>STABLE</strong>. That does not lower the stakes; it changes the order of operations.</p>
+
+    <div class="callout ok"><b class="ct">🧭 The decision: STABLE → diagnose BEFORE you treat</b>Because she is stable, you may take the diagnostic path: confirm a normal heart (echo, and usually cardiac MRI), define the morphology (RVOT vs fascicular), and only then reach for the targeted drug — adenosine/beta-blocker/verapamil for RVOT, verapamil for fascicular. <strong>But the safety net never moves:</strong> if at any moment she decompensates, the answer is immediate synchronized cardioversion, "benign" label or not.</div>
+
+    <!-- 🎬 BRANCHING SCENARIO ENGINE -->
+    <div class="scenario" id="scenarioBox">
+      <h3>🎬 Choose Your Path — "Earning the Word Idiopathic"</h3>
+      <div class="hud"><span>❤️ Stability: <b id="scStab">●●○○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 s</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+      <div class="scene-text" id="scText">Ms. L.A., 30, structurally normal heart on her last echo, BP 118/74, alert. Monitor: regular wide-complex tachycardia at 180, LBBB morphology with a tall inferior-axis R in II/III/aVF. A colleague says "classic RVOT VT — just give verapamil." What do you do FIRST?</div>
+      <div class="choices" id="scChoices"></div>
+      <div class="feedback" id="scFeedback"></div>
+      <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+    </div>
+
+    <div class="callout danger"><b class="ct">☠️ If she were UNSTABLE instead</b>
+    Forget the label entirely. An <em>unstable</em> wide-complex tachycardia — even a "benign-looking" idiopathic one — gets <strong>synchronized DC cardioversion</strong>, electricity not chemistry. Drugs are too slow and too negatively inotropic for a crashing patient. "Unstable is unstable, even benign idiopathic VT gets cardioverted if the pressure drops."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S4 — RESIDENT REVIEW -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s4">
+  <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+  <div class="section-content">
+    <p><em>The cardiology resident arrives at 14:46. Her reasoning, out loud:</em></p>
+
+    <h3>🧠 Pattern recognition first, then discipline</h3>
+    <p>"Wide. Regular. Fast. Young, no cardiac history, exercise-triggered, hemodynamically fine, LBBB with an inferior axis. Every cell in my brain says <strong>RVOT VT</strong> — and it probably is. But the most dangerous instinct here is the opposite of the one we usually warn about: it's not 'talk yourself out of VT,' it's <em>talk yourself INTO benign idiopathic VT</em> and reach for verapamil before the heart has been cleared. The base rate still says most wide-complex tachycardia is scar VT. I only get to downgrade that with imaging."</p>
+
+    <h3>🎯 Immediate priorities (her actual order of operations)</h3>
+    <ol>
+      <li>🩸 <strong>Confirm she is stable</strong> (she is) — this is what unlocks the diagnostic path instead of straight to electricity.</li>
+      <li>🛑 <strong>Do NOT give verapamil yet.</strong> Say it out loud: "no verapamil until echo and ideally MRI exclude structural disease." Move the syringe away.</li>
+      <li>🖨️ <strong>12-lead now</strong> — define morphology/axis (RVOT = LBBB + inferior axis; fascicular = RBBB + left/superior axis, relatively narrow) and hunt for AV dissociation, capture and fusion beats.</li>
+      <li>🩻 <strong>Bedside echo</strong> — RV size/function (ARVC?), LV function and wall motion (old scar?), valves. First gate of the exclusion.</li>
+      <li>💊 <strong>Treat the rhythm by morphology, conservatively:</strong> RVOT → vagal manoeuvre or adenosine (also diagnostic); fascicular → verapamil is appropriate, but only once a normal heart is reasonably established.</li>
+      <li>🧲 <strong>Arrange cardiac MRI</strong> this admission to formally exclude scar/ARVC/sarcoid before labelling her "idiopathic" and planning long-term verapamil/ablation.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In the stable patient, image before you medicate: the echo and MRI are not paperwork — they are the consent form that makes verapamil safe."</div>
+
+    <h3>🤔 "But she's young and stable — why not just give verapamil now?"</h3>
+    <p>"Because 'young and stable' is exactly how an ARVC patient or someone with a clinically silent old myocarditis scar can also look. If I'm right, verapamil/adenosine will gently terminate a benign rhythm. If I'm wrong and there's scar, verapamil's vasodilation and negative inotropy can drop her pressure off a cliff and tip a tolerated rhythm into VF. When she's stable, the cost of waiting to image is essentially zero; the cost of guessing wrong is her life. The asymmetry decides it."</p>
+
+    <div class="callout purple"><b class="ct">🧪 Resident's self-test (answer before reading on)</b>
+    The colleague says "give adenosine — if it breaks the tachycardia, that proves it's benign RVOT VT and I can use verapamil freely." Sound logic?
+    <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+    <div class="reveal-hidden" id="rev1"><p><strong>Partly — but don't over-read it.</strong> Adenosine terminating the rhythm is supportive of cAMP-mediated RVOT VT (and adenosine is safe and useful diagnostically in a stable, regular, monomorphic VT). But a response to adenosine does <em>not</em> image the myocardium — it doesn't exclude an ARVC substrate in the RVOT region. Echo and cardiac MRI, not a drug response, are what license the word "idiopathic" and long-term verapamil. Use adenosine to help name the rhythm; use imaging to clear the heart.</p></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S5 — CONSULTANT ROUND -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s5">
+  <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round</h2></div>
+  <div class="section-content">
+    <p><em>The on-call consultant electrophysiologist, at the bedside at 15:05:</em></p>
+
+    <h3>🗂️ Name the rhythm precisely — it changes the drug</h3>
+    <div class="vs">
+      <div class="side a"><h4>⬇️ RVOT VT (outflow-tract)</h4>
+        <ul><li>Origin: <strong>right ventricular outflow tract</strong></li><li>ECG: <strong>LBBB morphology + INFERIOR axis</strong> (tall R in II/III/aVF), transition usually late (V3–V4)</li><li>Mechanism: <strong>cAMP-mediated triggered activity</strong> (delayed afterdepolarizations); catecholamine/exercise-provoked</li><li>Breaks with: <strong>vagal manoeuvres, ADENOSINE</strong>, beta-blockers, verapamil</li></ul></div>
+      <div class="side b"><h4>↗️ Fascicular VT (idiopathic left VT)</h4>
+        <ul><li>Origin: <strong>left posterior fascicle / Purkinje network</strong></li><li>ECG: <strong>RBBB morphology + LEFT/SUPERIOR axis</strong>, relatively <strong>narrow</strong> QRS</li><li>Mechanism: <strong>re-entry</strong> involving Purkinje fibres</li><li>Breaks with: <strong>VERAPAMIL</strong> (first-line); adenosine usually does NOT terminate it</li></ul></div>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"RVOT VT points DOWN (inferior axis) and breaks with adenosine; fascicular VT points UP-and-RIGHT (left/superior axis) and breaks with verapamil. Two circuits, two switches."</div>
+
+    <h3>🔎 Why "idiopathic" is a DIAGNOSIS OF EXCLUSION</h3>
+    <p>"Idiopathic VT is defined by what it is <strong>not</strong>: it is VT in the absence of structural heart disease, ischemia, electrolyte derangement, channelopathy or drug effect. You cannot diagnose an absence by looking at the ECG alone — many scar VTs and ARVC VTs mimic outflow-tract or fascicular patterns. So the diagnosis is only complete when <strong>echo and (usually) cardiac MRI are normal</strong>, ischemia is excluded where relevant, and there is no inherited-arrhythmia red flag. Until then, she is 'wide-complex tachycardia, probably idiopathic' — and you treat her with that humility."</p>
+
+    <h3>🧭 Consultant's three commandments for this patient</h3>
+    <ol>
+      <li>🛑 "Never give verapamil to a wide-complex tachycardia <strong>until I've excluded scar</strong>. In a structurally normal heart it's elegant therapy; in a scarred or ARVC heart it's a vasodilating, negatively inotropic disaster that ends in VF."</li>
+      <li>🧲 "<strong>Echo first, MRI before I commit.</strong> The MRI is what converts 'looks benign' into 'is benign.' Sarcoid and ARVC are the famous wolves in idiopathic clothing."</li>
+      <li>🗺️ "Then offer her the cure: <strong>catheter ablation</strong> in a normal heart is highly effective, frequently curative and low-risk. Idiopathic VT has an excellent prognosis — I can tell her that honestly once the imaging backs me up."</li>
+    </ol>
+
+    <div class="callout danger"><b class="ct">☠️ The consultant's war memory (more in S13 M&amp;M)</b>"The worst wide-complex tachycardia I've seen mismanaged was a fit 34-year-old called 'benign RVOT VT' on sight. He got IV verapamil before anyone imaged him. His pressure vanished and the rhythm degenerated to VF — he had clinically silent ARVC, fibrofatty RV the MRI would have shown. The ECG <em>looked</em> idiopathic. The heart underneath was not. He'd 'earned' verapamil in nobody's mind but the prescriber's."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S6 — TEACHING POINTS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s6">
+  <div class="sec-header"><span class="s-badge">S6</span><h2>📖 Teaching Points</h2></div>
+  <div class="section-content">
+    <h3>🔬 The mechanism — WHY these two VTs exist in a normal heart</h3>
+    <ol>
+      <li>⚡ <strong>RVOT VT = triggered activity:</strong> outflow-tract myocytes accumulate intracellular calcium under catecholamine drive. Raised <strong>cyclic AMP</strong> generates <strong>delayed afterdepolarizations (DADs)</strong> — small late depolarizations that, when they reach threshold, fire an extra beat. A run of them is VT. This is why it is <strong>exercise/stress-provoked</strong> and why <strong>adenosine</strong> (which lowers cAMP via the A1 receptor) and beta-blockers switch it off.</li>
+      <li>🔁 <strong>Fascicular VT = re-entry:</strong> a small circuit using the <strong>left posterior fascicle / Purkinje fibres</strong> with a partially calcium-dependent, verapamil-sensitive limb. Because the exit is near the conduction system, the QRS is <strong>relatively narrow</strong> with an <strong>RBBB + left/superior axis</strong> pattern. <strong>Verapamil</strong> blocks the calcium-dependent slow zone and terminates it; adenosine usually doesn't.</li>
+      <li>🟢 <strong>Why prognosis is good:</strong> there is no scar to anchor a malignant macro-re-entrant circuit and no failing ventricle to collapse. The heart is normal; the arrhythmia is an electrical quirk, not a structural disease.</li>
+      <li>🛑 <strong>Why the label is dangerous to assume:</strong> the SAME ECG patterns can be produced by ARVC (RVOT region), old myocarditis/ischemic scar, or sarcoid. Calling it idiopathic without imaging means you may unknowingly be treating malignant scar VT with a benign-VT drug.</li>
+      <li>💉 <strong>Why verapamil can kill the wrong patient:</strong> in a scarred/failing ventricle, verapamil's <strong>vasodilation + negative inotropy</strong> drops the pressure and the rhythm degenerates to VF. In a normal heart, the same drug is well tolerated and curative for the slow zone. The drug isn't the danger — the unexamined heart is.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"When in doubt it's still scar VT — you EARN the word 'idiopathic' by excluding structural disease, you don't assume it. The imaging is the permission slip for verapamil."</div>
+
+    <h3>⚖️ Contrast pair #1 — IDIOPATHIC VT vs SCAR-related VT (the central teaching point)</h3>
+    <div class="vs">
+      <div class="side a"><h4>🫀 SCAR-related VT (the malignant default)</h4><ul><li>Structural heart disease: prior MI, cardiomyopathy, ARVC, sarcoid</li><li>Low EF, abnormal echo/MRI (scar, fibrofatty RV)</li><li>Malignant — high risk of degeneration to VF / sudden death</li><li><strong>NEVER verapamil</strong> — it collapses the pressure</li><li>Therapy: cardiovert if unstable, amiodarone/procainamide, ICD ± ablation</li></ul></div>
+      <div class="side b"><h4>💚 IDIOPATHIC VT (the benign exception)</h4><ul><li>Structurally <strong>normal heart</strong>, normal echo AND MRI</li><li>Young, exercise/stress-provoked, hemodynamically tolerated</li><li>Good prognosis; rarely degenerates</li><li><strong>Verapamil/adenosine-sensitive</strong> — but only after exclusion</li><li>Therapy: BB/CCB, and <strong>ablation is frequently curative</strong></li></ul></div>
+    </div>
+    <p>😈 <strong>The trap:</strong> the comforting story is "young patient, benign VT, give verapamil." The asymmetry of harm is the opposite of most VT teaching — here the danger is <em>under</em>-diagnosing scar. Treating idiopathic VT as scar VT (cardiovert, image) wastes a little time; treating scar VT as idiopathic (verapamil, no imaging) can be fatal. <strong>So you exclude structural disease first, every time.</strong></p>
+
+    <h3>⚖️ Contrast pair #2 — RVOT VT vs FASCICULAR VT</h3>
+    <div class="vs">
+      <div class="side a"><h4>⬇️ RVOT VT</h4><ul><li><strong>LBBB + inferior axis</strong> (tall R in II/III/aVF)</li><li>Origin: RV outflow tract</li><li>Mechanism: cAMP-mediated <strong>triggered activity</strong></li><li><strong>Adenosine-sensitive</strong>; also vagal/BB/verapamil; exercise-provoked</li></ul></div>
+      <div class="side b"><h4>↗️ Fascicular VT</h4><ul><li><strong>RBBB + left/superior axis</strong>, relatively narrow QRS</li><li>Origin: left posterior fascicle / Purkinje</li><li>Mechanism: <strong>re-entry</strong> (calcium-dependent slow zone)</li><li><strong>Verapamil-sensitive</strong>; adenosine usually does NOT terminate</li></ul></div>
+    </div>
+    <p>💡 <em>Why it matters:</em> the two idiopathic VTs respond to different switches. Reach for adenosine in fascicular VT and it usually won't break; reach for verapamil in either is reasonable <em>once the heart is cleared</em>, but verapamil is the named first-line for fascicular VT.</p>
+
+    <!-- 🎮 INTERACTIVE SIM: structural workup → verapamil safety -->
+    <div class="sim" id="kSim">
+      <h3 style="margin-top:0">🎮 Simulation — The Exclusion Dial: how much structural workup makes verapamil SAFE</h3>
+      <p style="font-size:13.5px">Drag the dial from "no workup / unknown heart" toward "echo + cardiac MRI normal." Watch how the confidence that this is truly idiopathic — and therefore the safety of verapamil — rises only as you actually exclude structural disease.</p>
+      <label for="kRange">🧲 Structural workup completed: <b id="kVal">0</b> %</label>
+      <input type="range" id="kRange" min="20" max="75" value="20">
+      <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+      <div class="readout bad" id="kReadout">Set the dial to explore.</div>
+      <p style="font-size:12.5px; margin-top:10px; color:var(--ink2)">🎯 The rule: <strong>verapamil is only safe once echo AND cardiac MRI are normal</strong> (and ischemia/ARVC/sarcoid excluded). Low end = assume scar VT, NO verapamil. High end = idiopathic confirmed, verapamil/adenosine appropriate.</p>
+    </div>
+
+    <!-- 📚 EBM MODULE -->
+    <div class="ebm">
+      <h3>📚 Evidence-Based Medicine Corner</h3>
+      <table class="tbl">
+        <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+        <tr><td><span class="lvl">PHYS</span> Verapamil-sensitivity of fascicular VT</td><td>Idiopathic left fascicular VT terminates reliably with IV verapamil via its calcium-dependent slow zone; adenosine usually fails.</td><td>For a stable fascicular VT in a proven-normal heart, IV verapamil is the named first-line acute therapy.</td></tr>
+        <tr><td><span class="lvl">PHYS</span> Adenosine-sensitivity of RVOT VT</td><td>cAMP-mediated triggered RVOT VT is terminated by adenosine (and vagal manoeuvres, beta-blockers) — a useful diagnostic-therapeutic response.</td><td>In stable RVOT VT, vagal/adenosine can both treat and support the mechanism — but never replaces imaging.</td></tr>
+        <tr><td><span class="lvl">REGISTRY</span> Catheter ablation of idiopathic VT</td><td>Ablation of RVOT and fascicular VT in normal hearts has high acute success and low complication rates; frequently curative.</td><td>Ablation is not a last resort — for symptomatic or recurrent idiopathic VT it is an early, definitive option.</td></tr>
+        <tr><td><span class="lvl">IMAGING</span> Cardiac MRI to unmask substrate</td><td>Late-gadolinium MRI detects scar, fibrofatty ARVC and sarcoid that echo and ECG can miss — substrate that contraindicates the "idiopathic" label.</td><td>MRI is the key gate: a "benign-looking" outflow-tract VT with abnormal MRI is NOT idiopathic and NOT a verapamil case.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2019 ESC SVT · 2022 ESC VA · 2017 AHA/ACC/HRS VA</td><td>Idiopathic VT is an exclusion diagnosis; verapamil/adenosine by morphology in normal hearts; ablation as effective therapy; cardiovert if unstable.</td><td>Exactly the algorithm driving S3, S7 and S11 — exclude structure, treat by morphology, ablate the curable circuit.</td></tr>
+      </table>
+    </div>
+
+    <!-- 🔬 ADVANCED TOPICS -->
+    <div class="callout purple">
+      <h3 style="margin-top:0">🔬 Fellowship Corner — Advanced Topics</h3>
+      <ul>
+        <li>🗺️ <strong>Mapping idiopathic VT:</strong> RVOT foci are mapped by pace-mapping and earliest activation at the outflow tract (watch the aortic cusps / LV summit and pulmonary sinuses for "near-RVOT" sites). Fascicular VT is targeted at the <strong>Purkinje potential / diastolic potential</strong> of the posterior fascicle.</li>
+        <li>🧬 <strong>The great mimic — ARVC:</strong> RVOT VT and ARVC both originate from the RV; epsilon waves, T-wave inversion V1–V3, fibrofatty RV on MRI and a family history distinguish the malignant disease from benign RVOT VT. This is why MRI is non-negotiable before "idiopathic."</li>
+        <li>🫀 <strong>Other substrates to exclude:</strong> cardiac sarcoid (patchy scar + AV block — PET/MRI), prior myocarditis scar, and ischemic scar in older patients. Each can wear an "idiopathic-looking" ECG.</li>
+        <li>📍 <strong>Outflow-tract anatomy:</strong> idiopathic VTs also arise from the LV outflow tract, aortic sinuses of Valsalva, the LV summit and papillary muscles — morphology localizes the focus and predicts ablation difficulty.</li>
+        <li>🏃 <strong>The exercise paradox:</strong> RVOT VT is catecholamine-driven (worse with exertion) — beta-blockade is rational long-term therapy; provocative testing can aid diagnosis when the resting ECG is silent.</li>
+        <li>⚠️ <strong>When "idiopathic" turns malignant:</strong> a small subset of outflow-tract VTs with very short coupling intervals can trigger polymorphic VT/VF — a reminder that even the benign family has rare dangerous members.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S7 — ORDERS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s7">
+  <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+  <div class="section-content">
+    <h3>🖊️ The order set, written as you'd actually write it (14:50)</h3>
+    <ul>
+      <li>🛑 <strong>NO verapamil / NO diltiazem until structural disease is excluded</strong> (echo + cardiac MRI) — flag on chart and whiteboard. This is the safety rule of the whole case.</li>
+      <li>🔌 <strong>Pads on, defibrillator at bedside</strong> — she is stable, but the plan flips to <strong>synchronized cardioversion instantly</strong> if she becomes unstable.</li>
+      <li>🖨️ <strong>12-lead ECG</strong> to define morphology: RVOT (LBBB + inferior axis) vs fascicular (RBBB + left/superior axis); look for AV dissociation, capture &amp; fusion beats; save the strip for EP.</li>
+      <li>🩻 <strong>Urgent transthoracic echo</strong> — LV/RV size and function, wall motion (scar?), RV for ARVC, valves. First gate of exclusion.</li>
+      <li>💊 <strong>Treat by morphology, conservatively, once stable:</strong> RVOT → <strong>vagal manoeuvre, then adenosine</strong> (diagnostic + therapeutic), or a beta-blocker; fascicular → <strong>IV verapamil</strong> (first-line) — given only after echo is reassuring and no scar suspected.</li>
+      <li>🧲 <strong>Cardiac MRI</strong> this admission to exclude scar/ARVC/sarcoid before confirming "idiopathic" and planning long-term therapy.</li>
+      <li>🧪 Bloods: U&amp;E, Mg²⁺, Ca²⁺, TSH, troponin (to exclude an ischemic/metabolic driver), CBC.</li>
+      <li>📞 Refer Electrophysiology — discuss acute management and <strong>catheter ablation</strong> as definitive, frequently curative therapy.</li>
+      <li>🫁 Continuous monitoring, large-bore IV, reassurance (anxiety and catecholamines feed RVOT VT — a calm room is therapeutic).</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In the stable patient there are two orders that matter most: exclude structural disease, and pick the drug by morphology. Everything else makes those two safe — and the defibrillator stays in the room just in case."</div>
+
+    <!-- 🩺 PROCEDURE GUIDE 1 -->
+    <div class="checklist" id="ckCV">
+      <h3 style="margin-top:0">🩺 Procedure Guide — Stable Idiopathic VT: the exclusion-then-treat pathway — tick as you go</h3>
+      <label class="ck"><input type="checkbox"><span>🩸 Confirm the patient is STABLE (no shock/syncope/ischemia/heart failure) — if UNSTABLE, abandon this pathway and cardiovert</span></label>
+      <label class="ck"><input type="checkbox"><span>🔌 Apply pads, keep the defibrillator at the bedside ready in SYNC, in case of deterioration</span></label>
+      <label class="ck"><input type="checkbox"><span>🖨️ 12-lead: define morphology/axis (RVOT = LBBB + inferior; fascicular = RBBB + left/superior) and look for AV dissociation / capture / fusion</span></label>
+      <label class="ck"><input type="checkbox"><span>🩻 Bedside echo: exclude obvious structural disease (LV scar, low EF, RV dilatation/ARVC, valves)</span></label>
+      <label class="ck"><input type="checkbox"><span>💊 RVOT → vagal manoeuvre / adenosine (or beta-blocker); Fascicular → IV verapamil — chosen by morphology, given only with a reassuring heart</span></label>
+      <label class="ck"><input type="checkbox"><span>🧲 Arrange cardiac MRI to formally exclude scar / ARVC / sarcoid BEFORE labelling "idiopathic"</span></label>
+      <label class="ck"><input type="checkbox"><span>🗺️ Refer EP for catheter ablation as definitive, frequently curative therapy</span></label>
+      <div class="ck-progress" data-progress>0 / 7 complete</div>
+    </div>
+
+    <!-- 🩺 PROCEDURE GUIDE 2 -->
+    <div class="checklist" id="ckDefib">
+      <h3 style="margin-top:0">🩺 Procedure Guide — If she decompensates: Synchronized Cardioversion (label-independent)</h3>
+      <p style="font-size:13px">⚠️ Even a "benign" idiopathic VT that turns unstable (falling BP, syncope, ischemia, pulmonary edema) gets <strong>synchronized cardioversion</strong> — the label stops mattering the moment the pressure drops.</p>
+      <label class="ck"><input type="checkbox"><span>🧑‍⚕️ Confirm UNSTABLE wide-complex tachycardia WITH a pulse (not pulseless VT/VF — that needs unsynchronized defibrillation)</span></label>
+      <label class="ck"><input type="checkbox"><span>🔋 Apply pads, attach ECG to the defibrillator, press <strong>SYNC</strong> — verify a marker sits on each R wave</span></label>
+      <label class="ck"><input type="checkbox"><span>💤 Sedate/analgese if conscious and time permits (ketamine or midazolam + fentanyl); pre-oxygenate; airway ready</span></label>
+      <label class="ck"><input type="checkbox"><span>⚡ Select energy (≈100–150 J biphasic for monomorphic VT), charge, announce "STAND CLEAR," ensure no one touches the patient</span></label>
+      <label class="ck"><input type="checkbox"><span>🖲️ Deliver shock — HOLD discharge until the machine fires on the next R wave; re-check SYNC (it often defaults OFF) before any repeat</span></label>
+      <label class="ck"><input type="checkbox"><span>🧪 Post-conversion: 12-lead, exclude reversible drivers, and still complete the structural workup before labelling idiopathic</span></label>
+      <div class="ck-progress" data-progress>0 / 6 complete</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S8 — NURSING CARE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s8">
+  <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+  <div class="section-content">
+    <h3>🛏️ Assessment-bay nursing priorities — minute by minute</h3>
+    <ul>
+      <li>📟 <strong>Continuous telemetry with the defibrillator at the bedside, pads attached.</strong> She is stable now, but keep the machine ready in SYNC in case she decompensates.</li>
+      <li>🛑 <strong>Guard the "no verapamil yet" rule:</strong> if a verapamil or diltiazem order appears before the heart has been imaged, question it — this is the single most important safety catch in the case.</li>
+      <li>🩸 <strong>BP every 3–5 min</strong> and with every intervention. A falling pressure flips the whole plan from "diagnose then treat" to "cardiovert now."</li>
+      <li>💊 <strong>Prepare drugs by morphology as ordered:</strong> adenosine (large-bore IV, rapid push + flush, continuous ECG capture) for RVOT; IV verapamil slowly with BP monitoring for fascicular — and only once cleared.</li>
+      <li>🖨️ <strong>Capture rhythm strips before and after every drug</strong> — the response to adenosine vs verapamil is diagnostic gold for the EP team.</li>
+      <li>🧘 <strong>Calm the room:</strong> she is young and frightened; anxiety drives catecholamines that feed RVOT triggered activity. Reassurance is genuinely antiarrhythmic here.</li>
+      <li>🧠 <strong>Neuro/consciousness checks</strong> — any new presyncope, confusion or chest pain is an adverse feature → escalate immediately.</li>
+      <li>👨‍👩‍👦 Keep the patient and any family informed — explain that the wait for the echo/MRI is the safe thing, not a delay in care.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who keeps the defibrillator ready AND holds verapamil until the heart is imaged is doing the two most important safety jobs in the room."</div>
+    <div class="callout warn"><b class="ct">📢 Escalate IMMEDIATELY for</b>New hypotension / presyncope / syncope · chest pain or ST changes · breathlessness → these adverse features convert her to UNSTABLE → synchronized cardioversion regardless of the "benign" label · any verapamil/diltiazem order placed before structural imaging · loss of pulse (→ UNSYNC defib + CPR).</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S9 — INVESTIGATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s9">
+  <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+  <div class="section-content">
+    <h3>🧾 Results board (15:15)</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>Result</th><th>Reference</th><th>Interpretation</th></tr>
+      <tr><td>Potassium</td><td class="ok-v">4.3 mmol/L</td><td>3.5–5.0</td><td>Normal — argues against an electrolyte-triggered scar/Torsades picture and supports a primary electrical arrhythmia.</td></tr>
+      <tr><td>Magnesium</td><td class="ok-v">0.85 mmol/L</td><td>0.7–1.0</td><td>Normal — no metabolic driver.</td></tr>
+      <tr><td>Troponin I</td><td class="ok-v">&lt; 0.04 ng/mL</td><td>&lt; 0.04</td><td>Not raised — no evidence of acute ischemia/infarction as the cause. Helps exclude an ischemic substrate.</td></tr>
+      <tr><td>TSH</td><td class="ok-v">1.8 mIU/L</td><td>0.4–4.0</td><td>Normal — excludes thyrotoxic provocation of arrhythmia.</td></tr>
+      <tr><td>Echocardiogram</td><td class="ok-v">EF 60%, structurally normal</td><td>—</td><td>Normal LV, <strong>normal RV size/function (no ARVC features)</strong>, normal valves. First exclusion gate PASSED — but not the last.</td></tr>
+      <tr><td>Cardiac MRI</td><td class="ok-v">No scar / no LGE</td><td>—</td><td><strong>No late gadolinium enhancement, no fibrofatty RV, no sarcoid.</strong> This is the result that EARNS the word "idiopathic" and licenses verapamil long-term.</td></tr>
+      <tr><td>Electrolyte/tox screen</td><td class="ok-v">Unremarkable</td><td>—</td><td>No digoxin, no stimulant toxicity, no QT-prolonging culprit.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A normal echo opens the door; a normal cardiac MRI lets you walk through it. Only with both can you write 'idiopathic VT' and reach for verapamil without flinching."</div>
+
+    <div class="callout info"><b class="ct">🧠 Why the NEGATIVE results are the whole point</b>In most VT cases the abnormal results make the diagnosis. Here it is the <em>normal</em> ones — normal echo, normal MRI, normal troponin and electrolytes — that do the work. Idiopathic VT is diagnosed by the absence of disease, so a clean structural and metabolic workup is not reassurance you can skip; it IS the diagnosis.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S10 — ECG / IMAGING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s10">
+  <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging</h2></div>
+  <div class="section-content">
+    <h3>🫀 The presenting rhythm — read it like a detective</h3>
+    <div class="ecg-fig">
+      <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Monomorphic VT with AV dissociation, a capture beat and a fusion beat">
+        <rect width="820" height="150" fill="#0b1220"/>
+        <g stroke="#1e3a5f" stroke-width="1">
+          <line x1="0" y1="30" x2="820" y2="30"/><line x1="0" y1="60" x2="820" y2="60"/>
+          <line x1="0" y1="90" x2="820" y2="90"/><line x1="0" y1="120" x2="820" y2="120"/>
+        </g>
+        <polyline fill="none" stroke="#86efac" stroke-width="2.4" points="0,75 30,75 45,40 60,110 75,75 120,75 135,40 150,110 165,75 210,75 225,40 240,110 255,75 300,75 312,55 322,30 332,118 342,70 352,75 400,75 415,40 430,110 445,75 490,75 505,40 520,110 535,75 580,75 588,58 598,42 612,100 624,66 634,75 680,75 695,40 710,110 725,75 770,75 785,40 800,110 815,75"/>
+        <text x="305" y="22" fill="#fca5a5" font-size="12" font-weight="700">↑ capture beat</text>
+        <text x="585" y="22" fill="#fcd34d" font-size="12" font-weight="700">↑ fusion beat</text>
+      </svg>
+      <div class="ecg-cap">Wide, regular, monomorphic tachycardia (LBBB morphology, tall inferior-axis R in II/III/aVF → RVOT). A narrow <span style="color:#fca5a5">capture beat</span> and an intermediate <span style="color:#fcd34d">fusion beat</span> reveal <strong>AV dissociation</strong> — confirming this is genuine VT, not SVT with aberrancy.</div>
+    </div>
+
+    <h3>🔎 Reading the morphology — RVOT vs fascicular (the localizing signature)</h3>
+    <table class="tbl">
+      <tr><th>Feature</th><th>What it tells you</th></tr>
+      <tr><td>⬇️ <strong>LBBB + INFERIOR axis</strong></td><td>Tall, dominant R in II/III/aVF with a deep QS in aVL → an <strong>RVOT origin</strong> (impulse leaving the outflow tract and travelling down). The classic idiopathic RVOT VT signature.</td></tr>
+      <tr><td>↗️ <strong>RBBB + LEFT/SUPERIOR axis</strong></td><td>Relatively narrow QRS with an RBBB pattern and left-axis deviation → <strong>fascicular VT</strong> from the left posterior fascicle.</td></tr>
+      <tr><td>🔀 <strong>AV dissociation</strong></td><td>Confirms ventricular origin (true VT) — present in idiopathic VT too; idiopathic does NOT mean "SVT."</td></tr>
+      <tr><td>🎯 <strong>Capture / fusion beats</strong></td><td>Near-diagnostic of VT; an independently firing atrium briefly captures the ventricle.</td></tr>
+      <tr><td>📐 <strong>Relatively narrow QRS</strong> (fascicular)</td><td>Because the exit is near the conduction system, fascicular VT can be only mildly broad — a clue to its Purkinje origin.</td></tr>
+      <tr><td>⚠️ <strong>Epsilon wave / TWI V1–V3</strong></td><td><strong>Red flag for ARVC</strong>, NOT benign RVOT VT — sends you straight to MRI and away from the "idiopathic" label.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Morphology localizes the focus (RVOT vs fascicular), but it never clears the heart. The ECG can name the circuit; only echo and MRI can grant the word 'idiopathic.'"</div>
+
+    <h3>🩻 Structural imaging — the diagnosis-of-exclusion gate</h3>
+    <ul>
+      <li>🩻 <strong>Echo:</strong> EF 60%, normal LV wall motion, <strong>normal RV size and function with no ARVC features</strong>, normal valves — the first reassuring gate.</li>
+      <li>🧲 <strong>Cardiac MRI:</strong> no late gadolinium enhancement, no fibrofatty RV infiltration, no sarcoid pattern — the definitive exclusion of scar/ARVC/sarcoid. <em>This</em> is what makes her "idiopathic."</li>
+      <li>📈 <strong>Resting 12-lead in sinus:</strong> normal, no epsilon waves, no anterior T-wave inversion, normal QT — no inherited-arrhythmia red flags.</li>
+    </ul>
+
+    <div class="callout warn"><b class="ct">⚠️ The ECG's favorite lie in young wide-complex tachycardia</b>"Young, normal-looking, must be benign RVOT VT." A clinically silent ARVC produces an RVOT-region VT that looks identical on the surface ECG. The reassuring features (LBBB + inferior axis) localize the circuit but do NOT exclude the substrate. <strong>Absent a normal MRI, do not commit to the benign label or to verapamil.</strong></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S11 — MEDICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s11">
+  <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+  <div class="section-content">
+    <h3>💉 Acute drugs — what, why, and the traps</h3>
+    <table class="tbl">
+      <tr><th>Drug</th><th>Role here</th><th>Mechanism / caution</th></tr>
+      <tr><td><strong>Vagal manoeuvres</strong></td><td>First, free, safe attempt at terminating RVOT VT</td><td>Increase vagal tone / lower cAMP drive on triggered activity. Try before drugs in stable RVOT VT.</td></tr>
+      <tr><td><strong>Adenosine 6–12 mg IV</strong></td><td>Terminates (and helps confirm) <strong>RVOT VT</strong></td><td>Lowers cAMP via A1 receptor → abolishes the DAD-driven trigger. Rapid push + flush, continuous ECG. Usually does NOT terminate fascicular VT.</td></tr>
+      <tr><td><strong>Verapamil IV (slow)</strong></td><td><strong>First-line for fascicular VT</strong>; also an option in RVOT VT</td><td>Blocks the calcium-dependent slow zone. <strong>ONLY after structural disease is excluded</strong> — in a scarred/failing heart its vasodilation + negative inotropy can cause collapse/VF. Give slowly with BP monitoring.</td></tr>
+      <tr><td><strong>Beta-blocker</strong></td><td>RVOT VT (acute and long-term) — counters catecholamine drive</td><td>Reduces cAMP/triggered activity; good for exercise-provoked RVOT VT. Avoid IV bolus into hypotension.</td></tr>
+      <tr><td><strong>Synchronized cardioversion</strong></td><td>The answer if she becomes UNSTABLE — label-independent</td><td>Electricity resets any organized VT. Always trumps "benign" reassurance when the pressure falls.</td></tr>
+      <tr><td><strong>Amiodarone</strong></td><td>Rarely needed; reserve for refractory or uncertain cases</td><td>Broad antiarrhythmic; not first-line for benign idiopathic VT given its toxicity in young patients with a curable arrhythmia.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Verapamil is the ONE friend of idiopathic VT — and a killer of scar VT. Same syringe, opposite outcome, decided entirely by whether you imaged the heart first."</div>
+
+    <div class="callout danger"><b class="ct">🚫 The 'never until you've imaged' rule</b>❌ <strong>No verapamil / diltiazem in any wide-complex tachycardia until echo (and ideally cardiac MRI) exclude structural disease.</strong> In a scarred or ARVC heart it causes vasodilation + negative inotropy → hypotension → VF. The benign idiopathic VT is the <em>only</em> VT that welcomes it — and you must prove "benign" before you trust it. ❌ Also avoid AV-nodal blockers in <em>irregular</em> wide tachycardia (pre-excited AF).</div>
+
+    <h3>🏠 Definitive &amp; long-term therapy</h3>
+    <ul>
+      <li>🗺️ <strong>Catheter ablation</strong> — highly effective, frequently <strong>curative</strong> and low-risk in a structurally normal heart; first-line definitive therapy for symptomatic/recurrent RVOT or fascicular VT.</li>
+      <li>💊 <strong>Beta-blockers / calcium-channel blockers</strong> for ongoing suppression — beta-blocker leaning for RVOT (catecholamine-driven), verapamil for fascicular.</li>
+      <li>🟢 <strong>Reassurance &amp; prognosis:</strong> excellent overall; counsel on the small risk of exercise-induced RVOT episodes and the rare degeneration scenario.</li>
+      <li>🚫 <strong>No ICD</strong> for typical idiopathic VT — there is no malignant substrate, unlike scar VT where the ICD is the headline.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S12 — MONITORING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s12">
+  <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+  <div class="section-content">
+    <h3>📡 What to watch and why</h3>
+    <ul>
+      <li>📈 <strong>Continuous telemetry</strong> with the defibrillator at the bedside until the rhythm is controlled and the structural workup is complete.</li>
+      <li>🩸 <strong>Frequent BP</strong> — the moment perfusion fails, she converts from "stable, diagnose first" to "unstable, cardiovert now."</li>
+      <li>🖨️ <strong>Document the drug responses:</strong> did adenosine terminate it (supports RVOT)? did verapamil terminate it (supports fascicular)? These responses guide the EP plan.</li>
+      <li>📐 <strong>QTc and rhythm in sinus</strong> — re-check for any inherited-arrhythmia clue (epsilon waves, anterior TWI) that would reopen the structural question.</li>
+      <li>🧲 <strong>Track the workup to completion</strong> — echo done, MRI booked/done. Do NOT sign her off as "idiopathic" until the imaging is back.</li>
+      <li>🏃 <strong>Watch for recurrence with catecholamine surges</strong> (anxiety, ambulation) — RVOT VT loves them; a calm, monitored environment is part of therapy.</li>
+      <li>🗺️ <strong>If ablation is planned:</strong> monitor for arrhythmia frequency to time the procedure and document inducibility for the EP study.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In stable idiopathic VT the monitor answers two questions: 'is she still stable?' (or do I cardiovert) and 'have I actually excluded scar yet?' (or I can't say idiopathic)."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S13 — COMPLICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s13">
+  <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+  <div class="section-content">
+    <h3>💀 What can go wrong — and the mechanism</h3>
+    <ul>
+      <li>☠️ <strong>Misdiagnosis as benign when it's scar VT</strong> — the central danger; verapamil given to an unexamined ARVC/scar heart → vasodilation + negative inotropy → hypotension → VF. The whole case exists to prevent this.</li>
+      <li>🩸 <strong>Decompensation of a "tolerated" rhythm</strong> — even idiopathic VT can become unstable if it runs fast and long; the answer is synchronized cardioversion, label aside.</li>
+      <li>⚡ <strong>Rare degeneration to polymorphic VT/VF</strong> — a small subset of outflow-tract VTs with very short coupling intervals can trigger malignant rhythms.</li>
+      <li>🗺️ <strong>Ablation-related complications</strong> — low but real (vascular access, rarely tamponade or, for some LV/cusp foci, coronary/conduction injury); still favourable risk:benefit in a normal heart.</li>
+      <li>💊 <strong>Over-treatment</strong> — committing a young patient to lifelong amiodarone or an unnecessary ICD when ablation would cure her.</li>
+      <li>😟 <strong>Under-recognition of ARVC</strong> — missing fibrofatty RV disease means missing a familial, potentially lethal condition (screen the family).</li>
+    </ul>
+
+    <!-- 🎭 M&M CONFERENCE MODULE -->
+    <div class="mm">
+      <h3>🎭 Morbidity &amp; Mortality Conference — "The Benign VT That Wasn't"</h3>
+      <div class="mm-case">
+        <strong>The case:</strong> A 34-year-old amateur footballer arrived with palpitations and a regular wide-complex tachycardia at 175, BP 110/70, fully alert. The ECG showed an LBBB, inferior-axis pattern. A clinician said "young, normal heart, textbook benign RVOT VT" and gave <strong>IV verapamil</strong> — without an echo or any structural imaging. Within two minutes his blood pressure collapsed, the rhythm accelerated and degenerated into <strong>VF</strong>. A prolonged resuscitation followed. At post-mortem (and on the cardiac MRI nobody had ordered) he had <strong>ARVC</strong> — fibrofatty replacement of the right ventricle. His "idiopathic RVOT VT" had been malignant scar VT in disguise.
+      </div>
+      <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+      <div class="swiss">
+        <div class="hole"><b>🧠 ANCHORING</b>"Young + normal-looking ECG = benign" — assumed, never proven.</div>
+        <div class="hole"><b>🧲 NO IMAGING</b>No echo, no MRI — the ARVC substrate was never sought.</div>
+        <div class="hole"><b>📈 RED FLAGS UNREAD</b>Subtle anterior T-wave inversion on the strip pointed to ARVC.</div>
+        <div class="hole"><b>💊 LETHAL DRUG</b>Verapamil into scar VT → vasodilation, negative inotropy → VF.</div>
+        <div class="hole"><b>🔤 LABEL FIRST</b>"Idiopathic" was written before it was earned by exclusion.</div>
+      </div>
+      <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> treat "idiopathic VT" as a diagnosis of <em>exclusion</em> — image the heart (echo + cardiac MRI) BEFORE labelling it benign or giving verapamil; read the ECG for ARVC red flags; if unstable, cardiovert (correct regardless of the label). <strong>This is exactly why your nurse held the verapamil until Ms. L.A.'s heart was imaged.</strong></p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Benign idiopathic VT' written before the MRI is the sentence on the chart of patients who then arrest from verapamil. The label is the conclusion of the workup, not its starting assumption."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S14 — DIFFERENTIALS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s14">
+  <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials</h2></div>
+  <div class="section-content">
+    <h3>🧩 The young wide-complex tachycardia differential</h3>
+    <table class="tbl">
+      <tr><th>Diagnosis</th><th>Clues</th><th>Why it matters</th></tr>
+      <tr><td>⬇️ <strong>RVOT VT</strong> (idiopathic)</td><td>Normal heart, LBBB + inferior axis, exercise-provoked, adenosine-sensitive</td><td>Benign once structure excluded; adenosine/BB/verapamil, ablation curative.</td></tr>
+      <tr><td>↗️ <strong>Fascicular VT</strong> (idiopathic left VT)</td><td>Normal heart, RBBB + left/superior axis, relatively narrow QRS, verapamil-sensitive</td><td>Benign once structure excluded; <strong>verapamil first-line</strong>, ablation curative.</td></tr>
+      <tr><td>🫀 <strong>Scar-related VT (ARVC, ischemic, sarcoid, DCM)</strong></td><td>Structural disease, low EF, abnormal echo/MRI, epsilon waves/TWI (ARVC), family history</td><td>The malignant mimic — <strong>NEVER verapamil</strong>; ICD ± ablation. The reason to image first.</td></tr>
+      <tr><td>🔁 <strong>SVT with aberrancy / pre-existing BBB</strong></td><td>QRS matches a known bundle pattern; no AV dissociation; breaks with vagal/adenosine</td><td>Genuinely benign — but never assume it to justify AV-nodal blockers in undifferentiated wide tachy.</td></tr>
+      <tr><td>🌀 <strong>Pre-excited AF (WPW + AF)</strong></td><td><strong>Irregular</strong>, very fast, varying QRS width, delta-wave history</td><td>AV-nodal blockers (adenosine, verapamil) can precipitate VF → procainamide or cardiovert.</td></tr>
+      <tr><td>🌪️ <strong>Polymorphic VT / Torsades, CPVT</strong></td><td>Changing QRS; long QT (Torsades) or exercise-induced bidirectional VT (CPVT)</td><td>Different therapy — magnesium/fix QT, or beta-blockade/genetic workup for CPVT.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In a young wide-complex tachycardia, the first question is not 'which idiopathic VT?' but 'is the heart actually normal?' — exclude scar before you celebrate benignity."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S15 — PLAN -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s15">
+  <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan</h2></div>
+  <div class="section-content">
+    <h3>🧭 Today → this admission → for life</h3>
+    <ol>
+      <li>🩸 <strong>Today (done):</strong> confirmed stable; withheld verapamil pending imaging; defined morphology (RVOT, LBBB + inferior axis); terminated with vagal/adenosine; defibrillator kept ready.</li>
+      <li>🧲 <strong>Exclude structural disease:</strong> echo normal, <strong>cardiac MRI normal (no scar/ARVC/sarcoid)</strong>, troponin/electrolytes/TSH normal → the diagnosis of <em>idiopathic RVOT VT</em> is now EARNED.</li>
+      <li>💊 <strong>Acute &amp; short-term control:</strong> beta-blocker (RVOT, catecholamine-driven); verapamil now safe to use given a proven-normal heart.</li>
+      <li>🗺️ <strong>Electrophysiology referral for catheter ablation</strong> — highly effective and frequently curative in a normal heart; offer as definitive therapy for a young, symptomatic patient.</li>
+      <li>👪 <strong>Family screening if any ARVC/inherited-arrhythmia doubt</strong> — none here given the clean MRI and absent family history, but keep the threshold low.</li>
+      <li>📚 <strong>Education &amp; reassurance:</strong> excellent prognosis, exercise/caffeine as triggers, what to do if palpitations recur, and a clear "seek help for syncope/chest pain" safety net.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The plan for idiopathic VT is: prove the heart is normal, control the rhythm by morphology, and offer ablation — the cure that a benign, structurally normal heart makes safe."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S16 — PROGRESS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s16">
+  <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+  <div class="section-content">
+    <h3>📅 Course on the ward</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Day 0, 15:20</div>Vagal manoeuvre then adenosine 6 mg → tachycardia terminates abruptly to sinus at 78 (supports cAMP-mediated RVOT VT). BP stays 116/72 throughout.</div>
+      <div class="t-item"><div class="t-time">Day 0, 16:30</div>Echo: EF 60%, normal RV, no ARVC features. Pads removed from active use but telemetry continued. Started on a beta-blocker.</div>
+      <div class="t-item"><div class="t-time">Day 1</div>Cardiac MRI: <strong>no scar, no fibrofatty RV, no sarcoid</strong>. Diagnosis confirmed: <em>idiopathic RVOT VT</em>. Verapamil now formally "safe" should it be needed.</div>
+      <div class="t-item"><div class="t-time">Day 1</div>One short, self-terminating run of NSVT during anxious ambulation — reinforces the catecholamine-triggered mechanism; reassurance and beta-blockade.</div>
+      <div class="t-item"><div class="t-time">Day 2</div>EP consultation: offered catheter ablation as definitive, frequently curative therapy. She elects to proceed electively.</div>
+      <div class="t-item"><div class="t-time">Week 3</div>Elective RVOT VT ablation — successful, non-inducible at end of study. Off antiarrhythmics, well, back to running.</div>
+    </div>
+
+    <!-- 👨‍👩‍👦 FAMILY & PATIENT JOURNEY MODULE -->
+    <h3>👨‍👩‍👦 Family &amp; Patient Journey</h3>
+    <div class="journey">
+      <div class="j-card"><div class="j-who">👩 The patient — Ms. L.A.</div><p>"I'd convinced myself something was deeply wrong with my heart. They explained it was an electrical short-circuit in a perfectly normal heart, and that a small procedure could fix it for good. The scariest part was being told they would NOT just give a quick drug — but I get it now: they checked first."</p></div>
+      <div class="j-card"><div class="j-who">🧑 Her partner</div><p>"What stuck with me was how careful they were. Someone wanted to give a drug fast, and the nurse and doctor said 'not until we've scanned her heart.' That pause is what kept her safe."</p></div>
+      <div class="j-card"><div class="j-who">👩‍⚕️ The bedside nurse</div><p>"My job was the telemetry, the truth, and holding that verapamil until the MRI was back. In this case good care was the drug we waited to give — not the one we rushed."</p></div>
+      <div class="j-card"><div class="j-who">🎓 The team's reflection</div><p>"This wasn't about being clever — it was about discipline. We refused to write 'idiopathic' until we'd excluded scar, and only then did we use the verapamil-friendly playbook."</p></div>
+    </div>
+
+    <div class="callout pink"><b class="ct">💗 The human thread</b>For a young person, hearing "your heart is normal and we can cure this" is transformative — but it is only honest if the workup actually proves it. The reassurance of idiopathic VT is earned by the same exclusion that keeps the patient safe; the two are inseparable.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S17 — DISCHARGE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s17">
+  <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+  <div class="section-content">
+    <h3>📋 Discharge plan &amp; safety net</h3>
+    <ul>
+      <li>💊 <strong>Medications:</strong> beta-blocker for RVOT suppression (or verapamil, now proven safe) while awaiting/after ablation; clear written instructions and triggers to avoid (excess caffeine, stimulants).</li>
+      <li>🗺️ <strong>EP follow-up for catheter ablation</strong> (or post-ablation review if already done) — the definitive, frequently curative therapy; appointment booked before discharge.</li>
+      <li>🧲 <strong>Diagnosis documented as a true exclusion:</strong> normal echo AND cardiac MRI recorded in the notes so any future clinician knows verapamil is safe and an ICD is not indicated.</li>
+      <li>🟢 <strong>Reassurance with honesty:</strong> excellent prognosis; explain the small risk of recurrence and the rare exercise-induced events, and that ablation greatly reduces both.</li>
+      <li>🚩 <strong>Red flags → seek urgent care:</strong> palpitations with <strong>syncope or presyncope</strong>, chest pain, breathlessness, or palpitations that don't self-terminate — these change the risk picture and warrant review.</li>
+      <li>📚 <strong>Education:</strong> what idiopathic VT is in plain language, why the imaging mattered, why this is NOT the malignant kind of VT, and family screening only if any inherited-arrhythmia doubt arises.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Discharge after idiopathic VT is 'normal heart proven, rhythm controlled, ablation offered' — and a note loud enough that no future doctor ever gives her verapamil without knowing the heart was cleared."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S18 — CLINICAL PEARLS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s18">
+  <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+  <div class="section-content">
+    <div class="pearl-grid">
+      <div class="pearl"><b>🔎 Exclusion diagnosis</b>You EARN the word "idiopathic" by excluding structural disease (echo + cardiac MRI). You never assume it — when in doubt it's still scar VT.</div>
+      <div class="pearl"><b>💊 The verapamil exception</b>Idiopathic VT is the ONE VT that loves verapamil — but only after imaging swears the heart is normal.</div>
+      <div class="pearl"><b>⬇️ RVOT points DOWN</b>LBBB + inferior axis (tall R in II/III/aVF), cAMP-triggered, exercise-provoked, breaks with ADENOSINE.</div>
+      <div class="pearl"><b>↗️ Fascicular points UP-and-RIGHT</b>RBBB + left/superior axis, relatively narrow, re-entrant, VERAPAMIL-sensitive (adenosine usually fails).</div>
+      <div class="pearl"><b>☠️ Wrong heart, lethal drug</b>Verapamil in scar/ARVC VT → vasodilation + negative inotropy → collapse/VF. The drug isn't the danger; the unexamined heart is.</div>
+      <div class="pearl"><b>⚡ Unstable is unstable</b>Even benign idiopathic VT gets synchronized cardioversion if the pressure drops. The label stops mattering.</div>
+      <div class="pearl"><b>🗺️ Ablation cures</b>In a structurally normal heart, catheter ablation of RVOT/fascicular VT is highly effective, low-risk and frequently curative.</div>
+      <div class="pearl"><b>🧲 MRI unmasks the wolf</b>ARVC, sarcoid and silent scar mimic idiopathic VT — cardiac MRI is the gate before the benign label.</div>
+      <div class="pearl"><b>🟢 Good prognosis</b>Idiopathic VT generally has an excellent outlook; no malignant substrate, no routine ICD.</div>
+      <div class="pearl"><b>🔀 Still real VT</b>Idiopathic VT shows AV dissociation, capture and fusion beats — it is ventricular, not "just SVT."</div>
+      <div class="pearl"><b>🏃 Catecholamine clue</b>Exercise/stress provocation points to cAMP-mediated RVOT VT; beta-blockade is rational therapy.</div>
+      <div class="pearl"><b>📝 Document the exclusion</b>Record normal echo AND MRI so future clinicians know verapamil is safe and no ICD is needed.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S19 — MCQs / ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s19">
+  <div class="sec-header"><span class="s-badge">S19</span><h2>🧠 MCQs / Assessment</h2></div>
+  <div class="section-content">
+    <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP and feed your dashboard. Each shows a full explanation.</em></p>
+    <div id="mcqHost"></div>
+    <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · Case c-ivt-019 — Idiopathic VT (RVOT &amp; Fascicular)<br>
+  ⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."
+</div>
+
+</div><!-- /#caseScroll -->
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ XP / DASHBOARD CORE ============ */
+  var XP = 0, XP_MAX = 1200;
+  var awarded = {}; // dedupe one-time awards by key
+  var xpVal = document.getElementById('xpVal');
+  var xpFill = document.getElementById('xpFill');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+  }
+  function addXP(amount, key, label){
+    if(key){ if(awarded[key]) return; awarded[key] = true; }
+    XP += amount;
+    if(XP > XP_MAX) XP = XP_MAX;
+    xpVal.textContent = XP;
+    xpFill.style.width = Math.min(100, Math.round(XP / XP_MAX * 100)) + '%';
+    showToast('+' + amount + ' XP' + (label ? ' · ' + label : ''));
+  }
+  function earnBadge(id){
+    var b = document.getElementById(id);
+    if(b && !b.classList.contains('earned')){ b.classList.add('earned'); }
+  }
+
+  /* Dashboard minimize */
+  var dash = document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){
+    dash.classList.toggle('collapsed');
+    this.textContent = dash.classList.contains('collapsed') ? '+' : '–';
+  });
+
+  /* ============ INTERNAL SCROLL SIZING ============ */
+  /* Size the scroll box to the visible window so the sticky tab bar stays in
+     view. When embedded (srcDoc iframe, same-origin), the host page stretches
+     the iframe to full content height and scrolls the OUTER page — so we size
+     this box from the parent window's height minus whatever app chrome sits
+     above the iframe, and scroll internally instead. Standalone → 100vh. */
+  var caseScroll = document.getElementById('caseScroll');
+  var topnav = document.getElementById('topnav');
+  /* The tab bar is position:fixed, so it's out of flow — reserve space at the
+     top of the scroll content (and offset anchor jumps) by its real height. */
+  function setNavOffset(){
+    var navH = topnav ? topnav.offsetHeight : 70;
+    caseScroll.style.paddingTop = navH + 'px';
+    caseScroll.style.scrollPaddingTop = (navH + 14) + 'px';
+  }
+  function sizeScroller(){
+    try {
+      var p = window.parent;
+      if(p && p !== window && window.frameElement){
+        var rectTop = window.frameElement.getBoundingClientRect().top;
+        if(rectTop < 0) rectTop = 0;          // parent scrolled past the chrome
+        var ph = p.innerHeight || 800;
+        var h = ph - rectTop - 6;             // leave the bottom edge breathing room
+        if(h < 460) h = 460;                  // sane minimum on short windows
+        caseScroll.style.height = h + 'px';
+      } else {
+        caseScroll.style.height = '100vh';
+      }
+    } catch(e){ caseScroll.style.height = '100vh'; }
+    setNavOffset();
+  }
+  sizeScroller();
+  window.addEventListener('resize', sizeScroller);
+  window.addEventListener('load', sizeScroller);
+  try { if(window.parent && window.parent !== window) window.parent.addEventListener('resize', sizeScroller); } catch(e){}
+
+  /* ============ NAV: scroll-spy active + visited ============ */
+  var navchips = Array.prototype.slice.call(document.querySelectorAll('.navchip'));
+  var sections = navchips.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited = {};
+  var visitVal = document.getElementById('visitVal');
+
+  function markVisited(idx){
+    var sec = sections[idx];
+    if(!sec) return;
+    if(!visited[sec.id]){
+      visited[sec.id] = true;
+      navchips[idx].classList.add('visited');
+      var count = Object.keys(visited).length;
+      visitVal.textContent = count + ' / 19';
+      addXP(8, 'visit-' + sec.id, 'Section read');
+      if(count >= 19){ earnBadge('bdg-explorer'); addXP(60, 'allvisited', 'Ward Explorer!'); }
+    }
+  }
+  function setActive(idx){
+    navchips.forEach(function(c){ c.classList.remove('active'); });
+    if(navchips[idx]) navchips[idx].classList.add('active');
+  }
+
+  /* True tabs: each chip shows ONLY its section, hidden via CSS otherwise.
+     No scrollIntoView and no scroll-spy — nothing can scroll the tab bar away,
+     which also sidesteps every srcDoc-iframe scrolling quirk. The hero banner
+     and vitals strip belong to the case intro, so they show on S1 only. */
+  var heroBits = [document.querySelector('.hero'), document.querySelector('.vitals-strip')]
+    .filter(function(el){ return !!el; });
+
+  function showSection(idx){
+    sections.forEach(function(s, i){ if(s) s.classList.toggle('sec-active', i === idx); });
+    heroBits.forEach(function(el){ el.style.display = (idx === 0) ? '' : 'none'; });
+    caseScroll.scrollTop = 0;
+    setActive(idx);
+    markVisited(idx);
+  }
+
+  navchips.forEach(function(chip, idx){
+    chip.addEventListener('click', function(ev){
+      ev.preventDefault();
+      showSection(idx);
+    });
+  });
+  showSection(0);
+
+  /* ============ FLAG GAME (S2) ============ */
+  var flagBtns = document.querySelectorAll('#flagGame .flag-btn');
+  var flagResult = document.getElementById('flagResult');
+  var flagsFound = 0, flagsTotal = 0, flagWrong = 0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good') === '1') flagsTotal++; });
+  flagBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.dataset.locked) return;
+      btn.dataset.locked = '1';
+      var good = btn.getAttribute('data-good') === '1';
+      if(good){
+        btn.classList.add('flag-good');
+        flagsFound++;
+        addXP(10, 'flag-' + flagsFound + '-' + Math.random(), 'VT flag spotted');
+      } else {
+        btn.classList.add('flag-bad');
+        flagWrong++;
+        showToast('❌ Not a VT-specific flag');
+      }
+      if(flagsFound === flagsTotal){
+        flagResult.textContent = '✅ All ' + flagsTotal + ' VT red flags found' + (flagWrong ? ' (with ' + flagWrong + ' wrong pick' + (flagWrong>1?'s':'') + ')' : ' — flawless!');
+        earnBadge('bdg-vt');
+        addXP(30, 'flags-complete', 'VT-Spotter badge');
+      } else {
+        flagResult.textContent = flagsFound + ' / ' + flagsTotal + ' VT red flags found…';
+      }
+    });
+  });
+
+  /* ============ BRANCHING SCENARIO (S3) ============ */
+  var scText = document.getElementById('scText');
+  var scChoices = document.getElementById('scChoices');
+  var scFeedback = document.getElementById('scFeedback');
+  var scRestart = document.getElementById('scRestart');
+  var scStab = document.getElementById('scStab');
+  var scTime = document.getElementById('scTime');
+  var scXP = document.getElementById('scXP');
+  var pathXP = 0, scStability = 2, scElapsed = 0;
+
+  var STEPS = {
+    start: {
+      text: "Ms. L.A., 30, structurally normal heart on her last echo, BP 118/74, alert. Monitor: regular wide-complex tachycardia at 180, LBBB morphology with a tall inferior-axis R in II/III/aVF. A colleague says \"classic RVOT VT — just give verapamil.\" What do you do FIRST?",
+      choices: [
+        { t: "🩻 Confirm she's stable and exclude structural disease (12-lead + echo) BEFORE any verapamil", good:true, ds:1, dt:10, xp:40, fb:"✅ Exactly. She's STABLE, so you have time — and 'idiopathic' is a diagnosis of EXCLUSION. Image the heart first; only a normal echo (and later MRI) makes verapamil safe." , next:"morph" },
+        { t: "💉 Give IV verapamil now — 'it's benign RVOT VT, that's the textbook drug'", good:false, ds:-2, dt:20, xp:0, fb:"☠️ Catastrophe if the heart isn't normal. You haven't excluded scar/ARVC. Verapamil into a scarred heart → vasodilation + negative inotropy → collapse/VF. This is the M&M case in S13. Restart and earn the label first.", end:true },
+        { t: "🔌 Synchronized cardioversion immediately", good:false, ds:-1, dt:15, xp:5, fb:"⚠️ Overkill for a STABLE patient. Cardioversion is the right move only if she's UNSTABLE. While stable, diagnose first — image, then treat by morphology.", next:"morph" }
+      ]
+    },
+    morph: {
+      text: "12-lead confirms LBBB + inferior axis (RVOT pattern) with AV dissociation. Bedside echo shows a normal LV and RV, no ARVC features. She's still stable. How do you terminate it now?",
+      choices: [
+        { t: "💊 Vagal manoeuvre, then adenosine (diagnostic + therapeutic for RVOT)", good:true, ds:1, dt:8, xp:30, fb:"✅ Right for an RVOT pattern: cAMP-mediated triggered activity is adenosine-sensitive. It both terminates and supports the mechanism — and you've already imaged. Now finish the exclusion.", next:"clear" },
+        { t: "💉 Push verapamil — fascicular VT's first-line drug", good:false, ds:-1, dt:20, xp:0, fb:"⚠️ Wrong switch for this morphology. This is RVOT (LBBB + inferior axis), best broken with adenosine/vagal. Verapamil is first-line for FASCICULAR VT (RBBB + left axis). Match the drug to the circuit.", next:"clear" }
+      ]
+    },
+    clear: {
+      text: "Adenosine terminates it to sinus; BP holds at 116/72. Echo was normal. Before you label her 'idiopathic RVOT VT' and plan long-term verapamil, what's the final step?",
+      choices: [
+        { t: "🧲 Cardiac MRI to exclude scar / ARVC / sarcoid", good:true, ds:1, dt:6, xp:30, fb:"✅ Ideal: the MRI is what converts 'looks benign' into 'is benign.' A clean MRI EARNS the word idiopathic and makes verapamil safe long-term.", next:"done" },
+        { t: "📝 Write 'idiopathic RVOT VT' now — echo was normal, that's enough", good:false, ds:0, dt:5, xp:10, fb:"⚠️ Premature. Echo can miss ARVC/sarcoid/silent scar; cardiac MRI is the definitive gate. Don't label idiopathic until imaging fully excludes structural disease.", next:"done" }
+      ]
+    },
+    done: {
+      text: "Cardiac MRI: no scar, no fibrofatty RV, no sarcoid. Diagnosis EARNED: idiopathic RVOT VT in a structurally normal heart. Final move for this young, symptomatic patient?",
+      choices: [
+        { t: "🗺️ Beta-blocker now and refer EP for catheter ablation (frequently curative)", good:true, ds:1, dt:5, xp:40, fb:"🏆 Perfect close. Structural disease excluded, rhythm controlled, and ablation offered — highly effective and low-risk in a normal heart. Verapamil is now genuinely safe too. Case complete.", end:true },
+        { t: "🔋 Implant an ICD for sudden-death prevention", good:false, ds:-1, dt:10, xp:0, fb:"⚠️ Not indicated. Typical idiopathic VT in a structurally normal heart has an excellent prognosis and no malignant substrate — ablation, not an ICD, is the definitive therapy.", end:true }
+      ]
+    }
+  };
+
+  function renderStab(){
+    var s = Math.max(0, Math.min(5, scStability + 2)); // map -2..3 → 0..5
+    var dots = '';
+    for(var i=0;i<5;i++) dots += (i < s ? '●' : '○');
+    scStab.textContent = dots;
+  }
+  function renderStep(key){
+    var step = STEPS[key];
+    scText.textContent = step.text;
+    scFeedback.className = 'feedback';
+    scFeedback.style.display = 'none';
+    scChoices.innerHTML = '';
+    step.choices.forEach(function(ch){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = ch.t;
+      b.addEventListener('click', function(){
+        pathXP += ch.xp; scXP.textContent = pathXP;
+        scElapsed += ch.dt; scTime.textContent = scElapsed + ' s';
+        scStability += ch.ds; renderStab();
+        if(ch.xp) addXP(ch.xp, null, 'Scenario choice');
+        scFeedback.textContent = ch.fb;
+        scFeedback.className = 'feedback ' + (ch.good ? 'good' : 'bad');
+        scFeedback.style.display = 'block';
+        Array.prototype.forEach.call(scChoices.children, function(c){ c.disabled = true; c.style.opacity = .6; });
+        if(ch.end){
+          scRestart.style.display = 'inline-block';
+          if(ch.good && key === 'done'){ earnBadge('bdg-shock'); addXP(20, 'scenario-win', 'Shock On Time!'); }
+        } else if(ch.next){
+          setTimeout(function(){ renderStep(ch.next); }, 1400);
+        }
+      });
+      scChoices.appendChild(b);
+    });
+  }
+  scRestart.addEventListener('click', function(){
+    pathXP = 0; scStability = 2; scElapsed = 0;
+    scXP.textContent = 0; scTime.textContent = '0 s'; renderStab();
+    scRestart.style.display = 'none';
+    renderStep('start');
+  });
+  renderStab();
+  renderStep('start');
+
+  /* ============ REVEAL BUTTONS ============ */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.getAttribute('data-target'));
+      if(!t) return;
+      if(t.classList.contains('reveal-shown')){
+        t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden');
+      } else {
+        t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown');
+        addXP(8, 'reveal-' + btn.getAttribute('data-target'), 'Self-test');
+      }
+    });
+  });
+
+  /* ============ POTASSIUM SIM (S6) ============ */
+  var kRange = document.getElementById('kRange');
+  var kVal = document.getElementById('kVal');
+  var kNeedle = document.getElementById('kNeedle');
+  var kReadout = document.getElementById('kReadout');
+  if(kRange){
+    var simUsed = false;
+    function updateK(){
+      var k = Math.round((parseInt(kRange.value,10) - 20) / (75 - 20) * 100); // 0 .. 100 % workup done
+      kVal.textContent = k;
+      var pct = (parseInt(kRange.value,10) - 20) / (75 - 20) * 100;
+      kNeedle.style.left = pct + '%';
+      var msg, cls;
+      if(k < 20){ msg = '🔴 No workup / unknown heart — you must ASSUME scar VT. NO verapamil: in a scarred or ARVC heart it causes collapse/VF. Treat as malignant until proven otherwise.'; cls='bad'; }
+      else if(k < 55){ msg = '🟠 Echo done but MRI pending — partial exclusion. Structural disease not yet ruled out (ARVC/sarcoid can be MRI-only). Hold verapamil; the label is not earned.'; cls='warn-r'; }
+      else if(k < 85){ msg = '🟠 Echo + early MRI reassuring — confidence rising but not complete. Finish the exclusion before committing to long-term verapamil/ablation.'; cls='warn-r'; }
+      else { msg = '🟢 Echo AND cardiac MRI normal — idiopathic VT CONFIRMED. Verapamil and adenosine are now safe and appropriate by morphology; ablation is curative.'; cls='good'; }
+      kReadout.innerHTML = msg;
+      kReadout.className = 'readout ' + cls;
+      if(!simUsed){ simUsed = true; addXP(15, 'ksim', 'Exclusion Master'); }
+    }
+    kRange.addEventListener('input', updateK);
+    updateK();
+  }
+
+  /* ============ CHECKLISTS (S7) ============ */
+  var allChecklistsDone = 0, totalChecklists = document.querySelectorAll('.checklist').length;
+  document.querySelectorAll('.checklist').forEach(function(list){
+    var boxes = list.querySelectorAll('input[type=checkbox]');
+    var prog = list.querySelector('[data-progress]');
+    var total = boxes.length;
+    var doneAwarded = false;
+    function refresh(){
+      var done = 0;
+      boxes.forEach(function(b){
+        if(b.checked){ done++; b.closest('.ck').classList.add('done'); }
+        else { b.closest('.ck').classList.remove('done'); }
+      });
+      prog.textContent = done + ' / ' + total + ' complete';
+      if(done === total && !doneAwarded){
+        doneAwarded = true;
+        allChecklistsDone++;
+        addXP(25, 'ck-' + list.id, 'Checklist done');
+        if(allChecklistsDone >= totalChecklists){ earnBadge('bdg-ck'); addXP(20, 'allck', 'Checklist Champion'); }
+      }
+    }
+    boxes.forEach(function(b){
+      b.addEventListener('change', function(){
+        if(b.checked) addXP(4, null, 'Step checked');
+        refresh();
+      });
+    });
+  });
+
+  /* ============ MCQs (S19) ============ */
+  var MCQS = [
+    {
+      q: "A 30-year-old with a structurally normal heart has a regular wide-complex tachycardia at 180 with an LBBB morphology and a tall inferior-axis R in II/III/aVF, provoked by exercise. The most likely diagnosis and a drug that classically terminates it are:",
+      opts: ["Fascicular VT — verapamil","RVOT VT — adenosine","Scar-related VT — amiodarone","Torsades de pointes — magnesium"],
+      correct: 1,
+      exp: "LBBB + inferior axis, exercise-provoked, in a normal heart is the classic RVOT VT pattern — cAMP-mediated triggered activity that is adenosine-sensitive (also responds to vagal manoeuvres, beta-blockers and verapamil). Fascicular VT is RBBB + left/superior axis and verapamil-sensitive."
+    },
+    {
+      q: "Idiopathic fascicular VT (idiopathic left VT) characteristically shows which ECG pattern and responds to which drug?",
+      opts: ["LBBB + inferior axis; adenosine","RBBB + left/superior axis; verapamil","LBBB + left axis; amiodarone","RBBB + right axis; digoxin"],
+      correct: 1,
+      exp: "Fascicular VT is a re-entrant circuit in the left posterior fascicle/Purkinje network producing an RBBB morphology with left/superior axis and a relatively narrow QRS. It is classically verapamil-sensitive; adenosine usually does not terminate it."
+    },
+    {
+      q: "Why is idiopathic VT described as a 'diagnosis of exclusion'?",
+      opts: ["Because it only occurs in elderly patients","Because it can only be confirmed after structural heart disease and ischemia are excluded with echo and usually cardiac MRI","Because it never causes symptoms","Because it is diagnosed solely from the response to adenosine"],
+      correct: 1,
+      exp: "Idiopathic VT is defined by the absence of structural heart disease. ARVC, ischemic/myocarditic scar and sarcoid can mimic its ECG patterns, so the label is only earned once echo and (usually) cardiac MRI are normal — you cannot diagnose it from the ECG alone."
+    },
+    {
+      q: "A clinician gives IV verapamil to a young patient with a wide-complex tachycardia, assuming benign idiopathic VT, without imaging the heart. The patient turns out to have ARVC. The most likely consequence is:",
+      opts: ["Prompt, safe termination of the rhythm","Hemodynamic collapse and degeneration to VF from vasodilation and negative inotropy","Conversion to atrial fibrillation","No effect because verapamil is inert in VT"],
+      correct: 1,
+      exp: "In a scarred or ARVC heart, verapamil's vasodilation and negative inotropy can collapse the blood pressure and degenerate the rhythm into VF. This is the lethal error of assuming 'idiopathic' before excluding structural disease — verapamil is safe ONLY in a proven-normal heart."
+    },
+    {
+      q: "A patient with presumed idiopathic VT at 180/min suddenly becomes hypotensive, presyncopal and develops pulmonary edema. The correct immediate management is:",
+      opts: ["IV verapamil because it is 'benign' idiopathic VT","Synchronized DC cardioversion regardless of the benign label","Observe and recheck in 15 minutes","Oral beta-blocker and reassurance"],
+      correct: 1,
+      exp: "Unstable is unstable. Adverse features (shock, syncope, ischemia, heart failure) mandate synchronized cardioversion regardless of how 'benign' the underlying VT is thought to be. The label stops mattering the moment perfusion fails."
+    },
+    {
+      q: "For a young patient with confirmed idiopathic RVOT or fascicular VT in a structurally normal heart, the definitive therapy that is frequently curative is:",
+      opts: ["Lifelong amiodarone","Implantable cardioverter-defibrillator (ICD)","Catheter ablation","Permanent pacemaker"],
+      correct: 2,
+      exp: "Catheter ablation of RVOT and fascicular VT in a structurally normal heart is highly effective, low-risk and frequently curative. An ICD is not indicated for typical idiopathic VT because there is no malignant substrate and the prognosis is excellent."
+    },
+    {
+      q: "Which pairing of mechanism is correct for the two classic idiopathic VTs?",
+      opts: ["RVOT = re-entry; Fascicular = triggered activity","RVOT = cAMP-mediated triggered activity; Fascicular = re-entry","Both are caused by scar re-entry","Both are caused by digoxin toxicity"],
+      correct: 1,
+      exp: "RVOT VT is due to cyclic-AMP-mediated triggered activity (delayed afterdepolarizations), which is why it is catecholamine-provoked and adenosine-sensitive. Fascicular VT is a re-entrant circuit in the left posterior fascicle/Purkinje system with a calcium-dependent, verapamil-sensitive limb."
+    },
+    {
+      q: "Verapamil is APPROPRIATE in which of the following, and LETHAL in which?",
+      opts: ["Appropriate in scar VT; lethal in idiopathic VT","Appropriate in idiopathic VT with a proven-normal heart; lethal in undifferentiated/scar-related VT","Appropriate in all wide-complex tachycardias","Lethal in all VT without exception"],
+      correct: 1,
+      exp: "Verapamil is the named exception that is appropriate (even first-line for fascicular) in idiopathic VT once a structurally normal heart is proven — but it is lethal in scar-related/undifferentiated wide-complex tachycardia, where it causes vasodilation, negative inotropy and degeneration to VF. The heart, not the rhythm name, decides safety."
+    }
+  ];
+
+  var host = document.getElementById('mcqHost');
+  var mcqVal = document.getElementById('mcqVal');
+  var mcqScore = 0, mcqAnswered = 0;
+  var letters = ['A','B','C','D','E'];
+
+  MCQS.forEach(function(item, qi){
+    var box = document.createElement('div');
+    box.className = 'mcq';
+    var html = '<div class="mcq-q">QUESTION ' + (qi+1) + ' / ' + MCQS.length + '</div>';
+    html += '<div class="mcq-stem">' + item.q + '</div>';
+    item.opts.forEach(function(opt, oi){
+      html += '<label class="mcq-opt" data-oi="' + oi + '"><strong>' + letters[oi] + '.</strong> ' + opt + '</label>';
+    });
+    html += '<div class="mcq-exp"></div>';
+    box.innerHTML = html;
+    host.appendChild(box);
+
+    var opts = box.querySelectorAll('.mcq-opt');
+    var exp = box.querySelector('.mcq-exp');
+    var locked = false;
+    opts.forEach(function(label){
+      label.addEventListener('click', function(){
+        if(locked) return;
+        locked = true;
+        var oi = parseInt(label.getAttribute('data-oi'),10);
+        box.classList.add('answered');
+        var correct = item.correct;
+        if(oi === correct){
+          label.classList.add('picked-right');
+          mcqScore++;
+          addXP(25, null, 'Correct answer');
+        } else {
+          label.classList.add('picked-wrong');
+          opts[correct].classList.add('show-right');
+          showToast('❌ Correct: ' + letters[correct]);
+        }
+        exp.innerHTML = '<strong>' + (oi === correct ? '✅ Correct. ' : '📘 Explanation. ') + '</strong>' + item.exp;
+        mcqAnswered++;
+        mcqVal.textContent = mcqScore + ' / ' + MCQS.length;
+        if(mcqAnswered === MCQS.length){
+          var done = document.getElementById('mcqDone');
+          var summary = document.getElementById('mcqSummary');
+          done.style.display = 'block';
+          summary.textContent = 'You scored ' + mcqScore + ' / ' + MCQS.length + '. ' +
+            (mcqScore === MCQS.length ? 'Flawless — you earn the word "idiopathic" by excluding structural disease every time. 🏆' :
+             mcqScore >= 6 ? 'Strong — review the misses and the contrast pairs in S6.' :
+             'Revisit S3, S5, S6 and S11 — the idiopathic-vs-scar logic and the verapamil rule are the whole case.');
+          if(mcqScore >= 7){ earnBadge('bdg-quiz'); addXP(50, 'quizace', 'Quiz Ace!'); }
+        }
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
