@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Takotsubo (Stress) Cardiomyopathy — Virtual Teaching Hospital</title>
+<!-- META
+id: c-takotsubo-029
+title: Takotsubo (Stress) Cardiomyopathy
+hospital: cardiology
+department: cv-ccu
+bednumber: 11
+chiefcomplaint: Chest pain and ST elevation after intense emotional stress, with apical ballooning and clean coronaries
+system: Cardiology
+severity: urgent
+tags: Takotsubo, Stress cardiomyopathy, Apical ballooning, Catecholamines, LVOT obstruction, STEMI mimic
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --radius:16px;
+    --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  /* Internal scroll viewport. When this case is embedded the host app stretches
+     the iframe to full content height and the OUTER page scrolls, which would
+     let a sticky bar scroll away. We instead scroll inside this box (sized to
+     the visible window by JS) so the section tab bar stays pinned at the top.
+     Standalone, it falls back to the full viewport height. */
+  #caseScroll{height:100vh; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; scroll-padding-top:92px}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:36px 24px 80px; position:relative; overflow:hidden}
+  .hero::after{content:"📈"; position:absolute; right:-20px; top:-30px; font-size:220px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{max-width:1100px; margin:0 auto; position:relative; z-index:1}
+  .hero .crumbs{font-size:13px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:10px 0 6px; font-size:clamp(26px,4vw,40px); line-height:1.15}
+  .hero .sub{font-size:16px; opacity:.95}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; backdrop-filter:blur(4px)}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== LIVE ECG STRIP IN HERO ===== */
+  .ecg-banner{max-width:1100px; margin:14px auto 0; position:relative; z-index:1}
+  .ecg-banner svg{width:100%; height:64px; display:block; background:rgba(0,0,0,.18); border-radius:12px; border:1px solid rgba(255,255,255,.25)}
+  .ecg-trace{stroke:#86efac; stroke-width:2.4; fill:none; stroke-dasharray:1600; stroke-dashoffset:1600; animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{stroke-dashoffset:0}}
+
+  /* ===== VITALS STRIP ===== */
+  .vitals-strip{max-width:1100px; margin:-52px auto 0; padding:0 24px; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:11px; font-weight:700; letter-spacing:.6px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:21px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== HORIZONTAL SECTION SIDEBAR (fixed — always visible) ===== */
+  .topnav{position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.10)}
+  .topnav .rail{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; max-width:1180px; margin:0 auto; scrollbar-width:thin}
+  .navchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink2); font-size:11px; font-weight:700; text-decoration:none; min-width:78px; text-align:center; transition:all .18s; cursor:pointer}
+  .navchip .s-id{font-size:10px; letter-spacing:1px; color:#94a3b8}
+  .navchip .s-emoji{font-size:16px}
+  .navchip:hover{border-color:var(--rose); color:var(--rose); transform:translateY(-2px)}
+  .navchip.active{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; border-color:#b91c1c}
+  .navchip.active .s-id{color:#fecaca}
+  .navchip.visited:not(.active){border-color:var(--emerald-line); background:var(--emerald-soft)}
+
+  /* ===== DASHBOARD WIDGET ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:215px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10.5px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:760px){.dash{display:none}}
+
+  /* ===== MAIN / SECTIONS (tabbed: one section visible at a time) ===== */
+  main{max-width:1100px; margin:26px auto 80px; padding:0 24px}
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:26px; overflow:hidden}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16.5px; margin:26px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14.5px; margin:18px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:24px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15.5px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:14px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px; letter-spacing:.4px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14.5px}
+
+  /* ===== INTERACTIVE BITS ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:10px 18px; font-weight:700; font-size:14px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:22px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:15px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 15px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 15px; margin-top:12px; font-size:14px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim sliders */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:14px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:14px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Heart/circuit diagram */
+  .heart-fig{display:flex; gap:18px; flex-wrap:wrap; align-items:center; background:var(--slate-soft); border-radius:16px; padding:18px; margin:14px 0}
+  .heart-fig svg{flex:0 0 auto}
+  .heart-legend{flex:1; min-width:230px; font-size:13.5px}
+  .lg{display:flex; align-items:center; gap:8px; margin:5px 0}
+  .lg .sw{width:14px; height:14px; border-radius:4px; flex:0 0 auto}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Journey cards */
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:14px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:15px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:14px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13.5px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:22px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14.5px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:13px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .footer{max-width:1100px; margin:0 auto 36px; padding:0 24px; text-align:center; color:#94a3b8; font-size:12.5px}
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="caseScroll">
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · 💗 Coronary Care Unit · 🛏️ Bed 11</div>
+    <h1>💔 Takotsubo (Stress) Cardiomyopathy — "The Broken-Heart STEMI With Clean Arteries"</h1>
+    <div class="sub">⚡ A 64-year-old woman, hours after burying her husband, with crushing chest pain and anterior ST elevation. The cath lab is activated — and her coronaries are pristine. The apex is ballooning. Someone wants to start dobutamine. Stop them.</div>
+    <div class="chips">
+      <span class="chip crit">🟠 URGENT</span>
+      <span class="chip">💔 Apical Ballooning</span>
+      <span class="chip">🫀 STEMI Mimic</span>
+      <span class="chip">🌊 Catecholamine Surge</span>
+      <span class="chip">🎮 Interactive Case</span>
+      <span class="chip">⏱️ Don't pour in inotropes</span>
+    </div>
+    <div class="ecg-banner" title="Anterior ST elevation mimicking STEMI">
+      <svg viewBox="0 0 800 64" preserveAspectRatio="none" aria-label="ST-elevation rhythm strip mimicking anterior STEMI">
+        <polyline class="ecg-trace" points="0,40 30,40 38,24 46,40 60,40 60,28 110,26 120,40 130,40 138,24 146,40 160,40 160,28 210,26 220,40 230,40 238,24 246,40 260,40 260,28 310,26 320,40 330,40 338,24 346,40 360,40 360,28 410,26 420,40 430,40 438,24 446,40 460,40 460,28 510,26 520,40 530,40 538,24 546,40 560,40 560,28 610,26 620,40 630,40 638,24 646,40 660,40 660,28 710,26 720,40 730,40 738,24 746,40 760,40 760,28 800,26"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== LIVE VITALS ===================== -->
+<div class="vitals-strip">
+  <div class="vitals-grid">
+    <div class="vital warn"><div class="v-label">💓 HR</div><div class="v-num">104</div></div>
+    <div class="vital warn"><div class="v-label">🩸 BP</div><div class="v-num">96/68</div></div>
+    <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">24</div></div>
+    <div class="vital warn"><div class="v-label">🫁 SpO₂</div><div class="v-num">93%</div></div>
+    <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.7°</div></div>
+    <div class="vital"><div class="v-label">🧠 GCS</div><div class="v-num">15</div></div>
+    <div class="vital alert"><div class="v-label">📐 QTc</div><div class="v-num">512 ms</div></div>
+    <div class="vital warn"><div class="v-label">😖 Distress</div><div class="v-num">High</div></div>
+  </div>
+</div>
+
+<!-- ===================== HORIZONTAL SECTION SIDEBAR ===================== -->
+<nav class="topnav" id="topnav">
+  <div class="rail">
+    <a class="navchip" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navchip" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navchip" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navchip" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navchip" href="#s5"><span class="s-emoji">🎓</span><span>Consultant Round</span><span class="s-id">S5</span></a>
+    <a class="navchip" href="#s6"><span class="s-emoji">📖</span><span>Teaching Points</span><span class="s-id">S6</span></a>
+    <a class="navchip" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navchip" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navchip" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navchip" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navchip" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navchip" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navchip" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navchip" href="#s14"><span class="s-emoji">🔀</span><span>Differentials</span><span class="s-id">S14</span></a>
+    <a class="navchip" href="#s15"><span class="s-emoji">🗺️</span><span>Plan</span><span class="s-id">S15</span></a>
+    <a class="navchip" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navchip" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navchip" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navchip" href="#s19"><span class="s-emoji">🧠</span><span>MCQs</span><span class="s-id">S19</span></a>
+  </div>
+</nav>
+
+<!-- ===================== SCORE DASHBOARD ===================== -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections visited</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-vt">💔 Takotsubo-Spotter</span>
+      <span class="badge" id="bdg-shock">🚫 Inotrope Restraint</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champion</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Ward Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running sims, taking the right path and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- S1 — PROFILE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s1">
+  <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+  <div class="section-content">
+    <div class="callout danger">
+      <b class="ct">🚨 YOU ARE HERE — 16:40, CCU Bed 11 (post-cath)</b>
+      The cath lab was activated for an anterior STEMI. The angiogram is up on the screen and the coronaries are <strong>pristine — no culprit, no thrombus, no significant disease</strong>. Yet the left ventriculogram shows the apex <em>ballooning</em> out, akinetic, while the base squeezes furiously. She is a 64-year-old woman who buried her husband of 40 years this morning. Her BP is soft, there is a new systolic murmur, and a colleague is reaching for <strong>dobutamine</strong> "for the low output." Your hand reaches the pump first. This is not the heart attack everyone assumed — name it now and you will not poison her.
+    </div>
+
+    <h3>👤 Patient Identity</h3>
+    <table class="tbl">
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>👩 Name</td><td><strong>Mrs. H.A.</strong></td></tr>
+      <tr><td>🎂 Age / Sex</td><td>64-year-old female (post-menopausal)</td></tr>
+      <tr><td>🆔 MRN</td><td>CV-20911</td></tr>
+      <tr><td>⚖️ Weight</td><td>62 kg</td></tr>
+      <tr><td>💼 Occupation</td><td>Retired schoolteacher</td></tr>
+      <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+    </table>
+
+    <h3>📜 Past Medical History — and the trigger that matters most</h3>
+    <ul>
+      <li>💔 <strong>Acute severe emotional stressor today:</strong> her husband died this morning; she collapsed with chest pain at the funeral home. The "broken heart" is not a metaphor here — it is the diagnosis.</li>
+      <li>🫀 <strong>No prior cardiac history, no angina, no diabetes.</strong> Mild hypertension, treated. This is a structurally normal heart until a few hours ago.</li>
+      <li>🧠 <strong>Anxiety, recently treated;</strong> long history of migraines (vasospastic tendency). Catecholamine-sensitive vasculature is part of the Takotsubo phenotype.</li>
+      <li>🚬 Never smoked. Cholesterol normal. Low pre-test probability for atherosclerotic STEMI — which makes the clean coronaries unsurprising in hindsight.</li>
+      <li>♀️ <strong>Post-menopausal</strong> — the dominant demographic (~90% of Takotsubo). Oestrogen withdrawal is thought to leave the myocardium more vulnerable to catecholamine toxicity.</li>
+      <li>📐 ECG on arrival: anterior ST elevation V2–V4 evolving to deep T-wave inversion with a <strong>markedly prolonged QTc (512 ms)</strong>.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Post-menopausal woman + intense emotional stressor + a 'STEMI' with CLEAN coronaries + apical ballooning = Takotsubo cardiomyopathy until proven otherwise."</div>
+
+    <h3>🧬 Why THIS patient? — catecholamines, an apex, and a stunned ventricle</h3>
+    <p>Takotsubo is a <strong>catecholamine storm hitting a vulnerable heart</strong>. An overwhelming emotional or physical stressor releases a flood of adrenaline and noradrenaline. The cardiac <strong>apex has a higher density of beta-adrenoceptors</strong> and is exquisitely sensitive to this surge — direct catecholamine toxicity (with a switch from contraction-promoting to negative-inotropic signalling) plus microvascular spasm <strong>stuns the apex</strong>, while the catecholamine-driven base contracts even harder. The result is the classic <strong>apical ballooning</strong>: an akinetic, bulging apex with hyperkinetic base — the shape of the Japanese <em>takotsubo</em> octopus-trap. Crucially the muscle is <em>stunned, not dead</em>: the coronaries are clean and the dysfunction <strong>recovers fully over days to weeks</strong>. Tonight's task is to keep her alive through the stunned interval — and to not make the catecholamine problem worse.</p>
+
+    <div class="callout warn"><b class="ct">🔥 Triggers / risk factors for Takotsubo</b>
+    💔 Intense emotional stress (bereavement, fear, assault, bad news) · 🏥 Acute physical illness (sepsis, surgery, exacerbations) · 🧠 Neurological catastrophe (subarachnoid haemorrhage, seizures) · 🧪 Phaeochromocytoma / exogenous catecholamines · ♀️ Post-menopausal female sex · 😟 Anxiety/depression · 🌀 Migraine / Raynaud (vasospastic phenotype)</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S2 — HANDOVER -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s2">
+  <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+  <div class="section-content">
+    <h3>📻 Cath-lab Handover — listen for the disproportion</h3>
+    <div class="callout info">
+      <b class="ct">🎙️ SBAR from the interventional team (verbatim)</b>
+      <p><strong>S:</strong> "Bed 11 — Mrs. H.A., 64, post-menopausal. Activated as an anterior STEMI: chest pain and ST elevation V2–V4. We took her straight to the lab."</p>
+      <p><strong>B:</strong> "Her husband died this morning; she collapsed at the funeral home. No prior cardiac history, no risk factors to speak of."</p>
+      <p><strong>A:</strong> "Coronaries are <strong>completely clean</strong>. The ventriculogram shows <strong>apical ballooning</strong> — akinetic apex, hyperdynamic base. Troponin is only mildly up — way too small for that much ST elevation and that much wall-motion abnormality. BP is soft at 96/68 and there's a new ejection murmur."</p>
+      <p><strong>R:</strong> "This is Takotsubo, not an occlusion. I've held the heparin and the inotropes. The covering doctor on the phone wants to <strong>start dobutamine</strong> for the low output — I didn't like it. She looks stressed and her QT is long."</p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The troponin is too small for the ECG — that disproportion points to Takotsubo, not a big anterior STEMI. Read it before you treat it as an occlusion."</div>
+
+    <h3>🚩 Spot-the-Red-Flag — tap each feature that screams TAKOTSUBO</h3>
+    <p>🎮 <em>Interactive: click every feature that points to Takotsubo (not a true anterior STEMI). Each correct flag = +10 XP. Wrong picks cost you.</em></p>
+    <div id="flagGame">
+      <button class="btn ghost flag-btn" data-good="1">♀️ Post-menopausal woman</button>
+      <button class="btn ghost flag-btn" data-good="1">💔 Intense emotional / physical stressor</button>
+      <button class="btn ghost flag-btn" data-good="1">🫀 ST elevation with CLEAN coronaries</button>
+      <button class="btn ghost flag-btn" data-good="1">🎈 Apical ballooning on ventriculogram</button>
+      <button class="btn ghost flag-btn" data-good="1">🧪 Troponin LOW relative to ECG / wall-motion extent</button>
+      <button class="btn ghost flag-btn" data-good="1">📐 Marked QT prolongation</button>
+      <button class="btn ghost flag-btn" data-good="0">🩹 A clear LAD culprit lesion on angiography</button>
+      <button class="btn ghost flag-btn" data-good="0">🤚 Reproducible chest-wall tenderness</button>
+    </div>
+    <p id="flagResult" style="font-weight:700"></p>
+
+    <h3>⏱️ Timeline so far</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">09:50</div>Collapse with crushing central chest pain and breathlessness at her husband's funeral, hours after his death.</div>
+      <div class="t-item"><div class="t-time">10:20</div>ED ECG: anterior ST elevation V2–V4 → STEMI pathway activated. Troponin only mildly raised.</div>
+      <div class="t-item"><div class="t-time">11:05</div>Angiography: <strong>clean coronaries</strong>; ventriculogram shows apical ballooning. Diagnosis revised to Takotsubo. Heparin and inotropes <strong>withheld</strong> — 🏅 sound restraint.</div>
+      <div class="t-item"><div class="t-time">16:40</div>You arrive in CCU. BP soft, new murmur, QTc 512 ms. Someone wants dobutamine. The next decision is whether to pour catecholamines into a catecholamine disease.</div>
+    </div>
+
+    <div class="callout ok"><b class="ct">🏅 Praise where due</b>The team who held the heparin and the inotropes prevented two errors. Anticoagulating/thrombolysing a "STEMI" that is actually Takotsubo with clean arteries adds bleeding risk for no benefit; and dobutamine in a catecholamine-driven, apically-ballooning ventricle can <strong>worsen dynamic LVOT obstruction</strong> and tip her into shock. Restraint here is treatment.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S3 — INITIAL ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s3">
+  <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+  <div class="section-content">
+    <h3>🅰️🅱️🅲️ Primary Survey — what your hands, eyes and ears find</h3>
+    <table class="tbl">
+      <tr><th>Step</th><th>Finding</th><th>What it means mechanistically</th></tr>
+      <tr><td>🅰️ Airway</td><td>Patent, anxious, speaking in full but tense sentences.</td><td>Distress itself drives more catecholamine release — a self-feeding loop in Takotsubo. A calm bedside is therapeutic.</td></tr>
+      <tr><td>🅱️ Breathing</td><td>RR 24, SpO₂ 93% on air, bibasal crackles.</td><td>The stunned apex drops stroke volume → pulmonary congestion. Acute heart failure is the commonest Takotsubo complication.</td></tr>
+      <tr><td>🅲️ Circulation</td><td><strong>BP 96/68</strong> and labile, HR 104, cool peripheries. A <strong>new harsh systolic murmur</strong> at the apex/LLSB, louder on standing/Valsalva.</td><td>The murmur is the alarm: basal hyperkinesis + systolic anterior motion of the mitral valve can create <strong>dynamic LVOT obstruction</strong> — a murmur that worsens with anything that empties or stimulates the ventricle (inotropes!).</td></tr>
+      <tr><td>🅳 Disability</td><td>GCS 15, frightened, grieving.</td><td>Cerebral perfusion preserved for now; psychological state is part of the pathophysiology, not separate from it.</td></tr>
+      <tr><td>🅴 Exposure</td><td>No rash, no calf swelling. No chest-wall tenderness. Recent profound bereavement.</td><td>Confirms the stress trigger and argues against musculoskeletal pain or a competing diagnosis.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A new systolic murmur that gets LOUDER on standing in a ballooning Takotsubo heart = dynamic LVOT obstruction. The very inotropes you reach for are the ones that make it worse."</div>
+
+    <h3>🧭 The single most important question: is there LVOT OBSTRUCTION / SHOCK?</h3>
+    <p>Takotsubo management forks on one decision. Most patients need only <strong>supportive care while the apex recovers</strong>. But a subset develop <strong>haemodynamic compromise</strong>, and you must ask <em>why</em>: is it (a) pump failure from the stunned apex, or (b) <strong>dynamic LVOT obstruction</strong> from the hyperkinetic base + systolic anterior motion? The answer flips the treatment. Mrs. H.A. has a soft, labile BP, a murmur that augments on Valsalva, and an echo gradient — this is <strong>LVOT-obstruction physiology</strong>.</p>
+
+    <div class="callout danger"><b class="ct">⚡ The decision is made: LVOT OBSTRUCTION → AVOID CATECHOLAMINES / INOTROPES</b>In Takotsubo shock <strong>with dynamic LVOT obstruction</strong>, inotropes and catecholamines are the wrong instinct — they intensify basal hyperkinesis and systolic anterior motion, <strong>worsening the obstruction</strong> and dropping output further. Instead: <strong>fluids to fill the ventricle, cautious beta-blockade to slow and calm the base, and mechanical support (Impella) rather than dobutamine</strong> if support is truly needed. Do not pour catecholamines into a catecholamine disease.</div>
+
+    <!-- 🎬 BRANCHING SCENARIO ENGINE -->
+    <div class="scenario" id="scenarioBox">
+      <h3>🎬 Choose Your Path — "The First 60 Seconds"</h3>
+      <div class="hud"><span>❤️ Stability: <b id="scStab">●●○○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 s</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+      <div class="scene-text" id="scText">The angiogram is clean, the apex is ballooning, and the covering doctor on the phone is insisting on dobutamine for "the low output." BP 96/68 and labile, a new murmur louder on Valsalva, QTc 512 ms. What do you do FIRST?</div>
+      <div class="choices" id="scChoices"></div>
+      <div class="feedback" id="scFeedback"></div>
+      <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+    </div>
+
+    <div class="callout info"><b class="ct">🧮 If she were stable, uncomplicated Takotsubo instead</b>
+    Most Takotsubo is treated <em>supportively</em>: confirm clean coronaries at angiography, monitor on telemetry, treat any heart failure with <strong>standard therapy</strong> (cautious diuresis, ACE-inhibitor/beta-blocker as tolerated), correct electrolytes, watch the <strong>QT</strong> for Torsades, and reassure that the apex recovers in days to weeks. The aggressive "AVOID inotropes / Impella-not-dobutamine" logic applies specifically when there is <strong>LVOT-obstruction physiology or shock</strong>.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S4 — RESIDENT REVIEW -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s4">
+  <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+  <div class="section-content">
+    <p><em>The cardiology resident reviews at 16:45. Her reasoning, out loud:</em></p>
+
+    <h3>🧠 Pattern recognition first, then physiology</h3>
+    <p>"Post-menopausal woman, a devastating bereavement this morning, a 'STEMI' that turned out to have <strong>clean coronaries</strong>, and an apex ballooning out on the ventriculogram. That is <strong>Takotsubo</strong>. The clue that should have flagged it even before the cath was the <strong>troponin–ECG disproportion</strong>: a true anterior STEMI with that much ST elevation and that much akinetic muscle would have a far higher troponin. A small troponin with a huge ECG and a huge wall-motion abnormality is the signature of stunning, not infarction."</p>
+
+    <h3>🎯 Immediate priorities (her actual order of operations)</h3>
+    <ol>
+      <li>🚫 <strong>Do NOT start dobutamine/adrenaline:</strong> she has LVOT-obstruction physiology — catecholamines are very likely the cause and they worsen the obstruction. Say it out loud and take the syringe off the trolley.</li>
+      <li>💧 <strong>Fill the ventricle:</strong> a cautious fluid bolus increases LV cavity size and reduces the dynamic gradient — the opposite of what inotropes do.</li>
+      <li>🐢 <strong>Cautious beta-blockade:</strong> a short-acting agent slows the hyperkinetic base and reduces systolic anterior motion / the gradient — provided she is not frankly hypotensive from pump failure.</li>
+      <li>🔧 <strong>Mechanical support over inotropes:</strong> if she truly needs circulatory support, the answer is an <strong>Impella / IABP</strong>, not catecholamines.</li>
+      <li>📐 <strong>Mind the QT:</strong> QTc 512 ms — put her on Torsades watch, correct K⁺/Mg²⁺, and avoid QT-prolonging drugs.</li>
+      <li>🩸 <strong>Reconsider every "STEMI" reflex:</strong> the heparin and any thrombolytic plan are off — clean coronaries mean no clot to treat. Anticoagulate only if there is apical akinesis/thrombus.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In Takotsubo shock, do NOT pour in catecholamines — they may be the cause and they worsen LVOT obstruction. Reach for fluids, gentle beta-blockade and an Impella, not dobutamine."</div>
+
+    <h3>🤔 "But the BP is low — surely she needs an inotrope?"</h3>
+    <p>"Only if the low output is <em>pump failure</em>. Here the murmur augments on Valsalva and the echo shows a dynamic gradient — the low output is largely <strong>obstructive</strong>. Inotropes squeeze the hyperkinetic base harder, deepen the systolic anterior motion, and <strong>tighten the obstruction</strong> — the pressure falls further. The correct levers are to <em>fill</em> and <em>slow</em> the ventricle, and to support mechanically. Treating obstructive shock like pump-failure shock is exactly the trap that kills these patients."</p>
+
+    <div class="callout purple"><b class="ct">🧪 Resident's self-test (answer before reading on)</b>
+    Someone says "the troponin is up and there's ST elevation — let's just thrombolyse before we lose myocardium." Good idea in this patient?
+    <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+    <div class="reveal-hidden" id="rev1"><p><strong>No.</strong> The coronaries are <em>clean</em> — there is no thrombus to lyse and no occluded artery to open. Thrombolysis offers zero benefit and adds significant bleeding risk (and disaster if there is a complication like apical rupture). The ST elevation is from catecholamine-mediated stunning, and the small troponin reflects stunning rather than a large infarct. Confirm the diagnosis at angiography and treat <em>supportively</em>; reserve anticoagulation for documented apical thrombus.</p></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S5 — CONSULTANT ROUND -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s5">
+  <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round</h2></div>
+  <div class="section-content">
+    <p><em>The on-call consultant cardiologist, by phone at 17:00, then at the bedside:</em></p>
+
+    <h3>🗂️ Name the physiology precisely — it changes the drug</h3>
+    <div class="vs">
+      <div class="side a"><h4>🔴 LVOT-obstruction shock (this patient)</h4>
+        <ul><li>Hyperkinetic base + systolic anterior motion → <strong>dynamic LVOT gradient</strong></li><li>Murmur louder on standing/Valsalva; gradient on echo</li><li><strong>AVOID inotropes/catecholamines</strong> — they worsen it</li><li>Fix with <strong>fluids, cautious beta-blockade, Impella</strong> over inotropes</li></ul></div>
+      <div class="side b"><h4>🔵 Pump-failure shock</h4>
+        <ul><li>Low output from the stunned, akinetic apex itself</li><li>No dynamic gradient; murmur not obstruction-type</li><li>Inotropes <em>may</em> help — but used very cautiously in a catecholamine disease</li><li>Mechanical support (IABP/Impella/ECMO) preferred for true cardiogenic shock</li></ul></div>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"LVOT-obstruction shock and pump-failure shock look alike at the bedside but want opposite drugs. Echo the gradient before you reach for an inotrope — in Takotsubo, assume obstruction until you've excluded it."</div>
+
+    <h3>🌀 Is Takotsubo really benign? — no.</h3>
+    <p>"People hear 'reversible' and 'recovers in weeks' and relax. Don't. <strong>In-hospital mortality is comparable to STEMI</strong>, and the acute phase is dangerous: <strong>acute heart failure/pulmonary oedema, dynamic LVOT obstruction, cardiogenic shock, mitral regurgitation, apical LV thrombus</strong> (an akinetic apex is a clot factory), <strong>QT-prolongation → Torsades</strong>, and rarely <strong>free-wall rupture</strong>. And it can <strong>recur</strong>. Treat it like the serious illness it is for the days it takes the apex to wake up."</p>
+
+    <h3>🧭 Consultant's three commandments for the next hours</h3>
+    <ol>
+      <li>🚫 "<strong>No catecholamines into a catecholamine disease.</strong> If she's obstructed, inotropes worsen the gradient and the shock. Fill, gently beta-block, and if you need support reach for an <strong>Impella</strong>, not dobutamine."</li>
+      <li>📐 "<strong>Respect the QT.</strong> QTc 512 ms with a stunned heart is Torsades-prone — correct potassium and magnesium, telemetry, and avoid QT-prolonging drugs."</li>
+      <li>🫀 "<strong>Watch the apex for clot.</strong> An akinetic apex harbours thrombus; image it and anticoagulate if there is apical akinesis/thrombus — that is the one place anticoagulation belongs here."</li>
+    </ol>
+
+    <div class="callout danger"><b class="ct">☠️ The consultant's war memory (more in S13 M&amp;M)</b>"The last Takotsubo I saw mismanaged was a woman in 'cardiogenic shock' after a clean angiogram. A night team started <strong>adrenaline and then dobutamine</strong> for the falling pressure. Each dose tightened her LVOT obstruction; the gradient climbed, the murmur got louder, and she arrested. At the M&amp;M the echo loops showed a textbook hyperdynamic base obliterating the outflow tract with every beat. We treated a catecholamine disease with catecholamines. She didn't need an inotrope — she needed us to stop feeding the fire and put in an Impella."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S6 — TEACHING POINTS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s6">
+  <div class="sec-header"><span class="s-badge">S6</span><h2>📖 Teaching Points</h2></div>
+  <div class="section-content">
+    <h3>🔬 The mechanism — WHY the apex balloons (the WHY behind the WHY)</h3>
+    <ol>
+      <li>🌊 <strong>The catecholamine surge:</strong> an overwhelming emotional or physical stressor floods the circulation with adrenaline and noradrenaline (or, in phaeochromocytoma, the tumour does). The heart is bathed in catecholamine.</li>
+      <li>🎯 <strong>The apex is the target:</strong> the LV apex has a <strong>higher density of beta-adrenoceptors</strong> and greater catecholamine sensitivity than the base. So the apex bears the brunt of the toxic surge.</li>
+      <li>🔄 <strong>Stunning, not infarction:</strong> at very high catecholamine levels, beta-adrenoceptor signalling switches from contraction-promoting to <strong>negative-inotropic</strong>, and direct catecholamine toxicity ± microvascular spasm stuns the apical myocardium. The coronaries stay clean — this is why troponin is only modestly raised.</li>
+      <li>🎈 <strong>Apical ballooning:</strong> the stunned apex goes akinetic and bulges outward in systole, while the spared, catecholamine-stimulated <strong>base becomes hyperkinetic</strong> — the takotsubo (octopus-trap) shape. Variants: mid-ventricular, basal (inverted), and focal.</li>
+      <li>💔 <strong>Why it's dangerous yet reversible:</strong> the ballooning apex can fail (pulmonary oedema), throw clot (apical thrombus), or — with the hyperkinetic base — obstruct the LVOT (systolic anterior motion). But because the muscle is stunned not dead, it <strong>recovers fully over days to weeks</strong>.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Takotsubo is a catecholamine burn to a beta-receptor-rich apex: the apex balloons, the base over-works, the troponin barely moves, and the whole thing recovers — unless you feed it more catecholamines."</div>
+
+    <h3>⚖️ Contrast pair #1 — Takotsubo vs anterior STEMI (the lethal mimic)</h3>
+    <div class="vs">
+      <div class="side a"><h4>💔 TAKOTSUBO IS… (this patient)</h4><ul><li>Post-menopausal woman + acute emotional/physical stressor</li><li><strong>Clean coronaries</strong> at angiography</li><li><strong>Apical ballooning</strong>: akinesis crosses arterial territories, hyperkinetic base</li><li>Troponin <strong>disproportionately low</strong> for the ST elevation / wall-motion extent</li><li>Marked QT prolongation; recovers in days–weeks</li><li>Catecholamine-mediated stunning</li></ul></div>
+      <div class="side b"><h4>🫀 ANTERIOR STEMI is NOT that…</h4><ul><li>Atherosclerotic risk factors; either sex</li><li><strong>LAD culprit lesion / occlusion</strong> on angiography</li><li>Wall-motion abnormality <strong>matches the artery</strong> territory</li><li>Troponin <strong>proportionate</strong> (often very high) to the infarct</li><li>Needs reperfusion (PCI), antiplatelets, anticoagulation</li><li>Necrosis — myocardium is lost, not stunned</li></ul></div>
+    </div>
+    <p>😈 <strong>The trap:</strong> Takotsubo <em>presents</em> as an anterior STEMI and the STEMI pathway (correctly) takes her to angiography. The error is treating the "STEMI" reflexively <em>before</em> the angiogram — anticoagulating or thrombolysing a clean-coronary heart, or pouring in catecholamines for the soft pressure. <strong>Angiography is what separates the two; the troponin–ECG disproportion is the clue that predicts it.</strong></p>
+
+    <h3>⚖️ Contrast pair #2 — LVOT-obstruction shock vs pump-failure shock</h3>
+    <div class="vs">
+      <div class="side a"><h4>🚫 LVOT-obstruction shock (tonight)</h4><ul><li>Hyperkinetic base + systolic anterior motion → dynamic gradient</li><li>Murmur louder on standing/Valsalva</li><li>Therapy: <strong>fluids, cautious beta-blockade, Impella</strong></li><li><strong>Inotropes WORSEN it</strong> — avoid catecholamines</li></ul></div>
+      <div class="side b"><h4>🔵 Pump-failure shock</h4><ul><li>Low output from the akinetic, stunned apex</li><li>No dynamic outflow gradient</li><li>Therapy: mechanical support preferred (IABP/Impella/ECMO)</li><li>Inotropes <em>may</em> help — but cautiously, given the catecholamine basis</li></ul></div>
+    </div>
+    <p>💡 <em>Why it matters:</em> give a catecholamine to obstructive Takotsubo shock and you <strong>tighten the obstruction</strong> and worsen the very thing you are trying to fix. Echo the gradient before you reach for an inotrope — in Takotsubo, assume obstruction until excluded.</p>
+
+    <!-- 🎮 INTERACTIVE SIM: catecholamine / inotrope exposure -->
+    <div class="sim" id="kSim">
+      <h3 style="margin-top:0">🎮 Simulation — The Catecholamine Dial: how inotrope exposure drives the LVOT gradient &amp; outcome</h3>
+      <p style="font-size:13.5px">Drag the dial. Watch what adding catecholamine/inotrope does to a Takotsubo heart with dynamic LVOT obstruction. This is the single most important "do-no-harm" lever in this case.</p>
+      <label for="kRange">💉 Catecholamine / inotrope exposure: <b id="kVal">7.0</b> /10</label>
+      <input type="range" id="kRange" min="20" max="75" value="70">
+      <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+      <div class="readout bad" id="kReadout">Set the dial to explore.</div>
+      <p style="font-size:12.5px; margin-top:10px; color:var(--ink2)">🎯 Safe zone for obstructive Takotsubo shock: <strong>LOW / NONE</strong> — fluids + cautious beta-blockade + mechanical support (Impella). More catecholamine = a tighter LVOT obstruction and worse output. The safe end of this dial is the LOW end.</p>
+    </div>
+
+    <!-- 📚 EBM MODULE -->
+    <div class="ebm">
+      <h3>📚 Evidence-Based Medicine Corner</h3>
+      <table class="tbl">
+        <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+        <tr><td><span class="lvl">REGISTRY</span> InterTAK Registry (Templin, NEJM 2015)</td><td>Largest Takotsubo cohort: ~90% post-menopausal women, frequent emotional/physical triggers, and <strong>in-hospital and longer-term mortality comparable to ACS</strong>; complications common.</td><td>Takotsubo is NOT benign — treat the acute phase as seriously as a STEMI; watch for shock, HF and arrhythmia.</td></tr>
+        <tr><td><span class="lvl">CRITERIA</span> Mayo Clinic diagnostic criteria</td><td>Transient apical/mid LV dysfunction beyond a single coronary territory, absence of obstructive CAD/plaque rupture, new ECG changes/modest troponin rise, no phaeochromocytoma/myocarditis.</td><td>A practical bedside checklist to confirm Takotsubo after a clean angiogram.</td></tr>
+        <tr><td><span class="lvl">SCORE</span> InterTAK Diagnostic Score</td><td>Weighted score (female sex, emotional/physical trigger, no ST depression, psychiatric/neurological disorder, QT prolongation) estimates probability of Takotsubo vs ACS.</td><td>Helps risk-stratify who is likely Takotsubo before/around angiography.</td></tr>
+        <tr><td><span class="lvl">PHYSIOLOGY</span> Harm of inotropes in LVOT obstruction</td><td>Case series/position statements: catecholamines and inotropes <strong>worsen dynamic LVOT obstruction</strong> and can precipitate collapse; mechanical support (Impella) is preferred for shock.</td><td>In obstructive Takotsubo shock, avoid inotropes; use fluids, cautious beta-blockade and mechanical support.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2018 ESC Position Statement on Takotsubo</td><td>Consensus on diagnosis (InterTAK), variants, complications and management, emphasising supportive care and caution with catecholamines.</td><td>The framework driving S3, S7 and S11 of this case.</td></tr>
+      </table>
+    </div>
+
+    <!-- 🔬 ADVANCED TOPICS -->
+    <div class="callout purple">
+      <h3 style="margin-top:0">🔬 Fellowship Corner — Advanced Topics</h3>
+      <ul>
+        <li>🎈 <strong>Anatomical variants:</strong> apical ballooning (classic, ~80%), <strong>mid-ventricular</strong>, <strong>basal/inverted</strong> (more often catecholamine-excess/phaeochromocytoma or younger patients), and <strong>focal</strong>. Right-ventricular involvement worsens prognosis.</li>
+        <li>🧲 <strong>Imaging confirmation:</strong> echo shows the regional wall-motion abnormality and any LVOT gradient/SAM; <strong>cardiac MRI</strong> shows oedema in the affected segments with <strong>absence of late gadolinium enhancement</strong> (no necrosis/scar) — distinguishing it from infarction and myocarditis.</li>
+        <li>🩸 <strong>Apical thrombus &amp; embolism:</strong> the akinetic apex is thrombogenic; consider anticoagulation when apical akinesis/thrombus is present, balancing stroke vs bleeding, until apical function recovers.</li>
+        <li>⚡ <strong>Arrhythmia risk:</strong> marked QT prolongation predisposes to <strong>Torsades</strong>; also brady-arrhythmia and (rarely) complete heart block. Aggressively correct K⁺/Mg²⁺ and avoid QT-prolonging agents.</li>
+        <li>🧬 <strong>Secondary Takotsubo &amp; mimics:</strong> phaeochromocytoma, subarachnoid haemorrhage ("neurogenic stunned myocardium"), exogenous catecholamines/beta-agonists, and sepsis — always hunt for a secondary cause.</li>
+        <li>💔 <strong>Recurrence &amp; prognosis:</strong> recovery of LV function in days–weeks is the rule, but recurrence occurs (a few percent per year) and long-term outcomes are worse than once believed — hence follow-up echo and addressing the trigger.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S7 — ORDERS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s7">
+  <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+  <div class="section-content">
+    <h3>🖊️ The order set, written as you'd actually write it (16:50)</h3>
+    <ul>
+      <li>🚨 <strong>NO dobutamine, NO adrenaline/noradrenaline, NO other inotrope</strong> while LVOT-obstruction physiology is present — flag on chart and whiteboard ("catecholamines WORSEN this").</li>
+      <li>💧 <strong>Cautious IV fluid bolus</strong> (e.g. 250 mL crystalloid, reassess) to increase LV cavity size and reduce the dynamic LVOT gradient.</li>
+      <li>🐢 <strong>Cautious short-acting beta-blockade</strong> (e.g. low-dose IV metoprolol/esmolol) to slow the hyperkinetic base and reduce SAM/gradient — <em>only if</em> not in frank pump-failure hypotension.</li>
+      <li>🔧 <strong>Mechanical circulatory support (Impella / IABP)</strong> rather than inotropes if circulatory support is genuinely required for shock.</li>
+      <li>📐 <strong>Correct K⁺ and Mg²⁺</strong> and put on <strong>Torsades watch</strong> (QTc 512 ms); avoid QT-prolonging drugs.</li>
+      <li>🩸 <strong>Stop the "STEMI" reflexes:</strong> no thrombolysis, hold heparin (clean coronaries). Anticoagulate <em>only</em> if echo/MRI shows apical akinesis/thrombus.</li>
+      <li>🫀 Echo now (LVOT gradient, SAM, MR, apical thrombus, EF); serial troponin (expect a small, settling rise); ECG to track ST/T and QTc evolution.</li>
+      <li>🫁 O₂ to SpO₂ ≥ 94%, treat pulmonary oedema with cautious diuresis if congested, continuous monitoring, calm environment, NPO if procedures likely.</li>
+      <li>📞 Refer cardiology; plan confirmatory imaging (cardiac MRI) and repeat echo in days to document recovery of apical function.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In obstructive Takotsubo shock there are only two priorities: take the catecholamines away, and fill + gently slow the ventricle. Every other order exists to support the apex while it wakes up — and to catch the QT and the apical clot."</div>
+
+    <!-- 🩺 PROCEDURE GUIDE 1 -->
+    <div class="checklist" id="ckCV">
+      <h3 style="margin-top:0">🩺 Procedure Guide — Managing Takotsubo with LVOT obstruction — tick as you go</h3>
+      <label class="ck"><input type="checkbox"><span>🫀 Confirm Takotsubo: clean coronaries at angiography + apical ballooning on ventriculogram/echo, troponin disproportionately low</span></label>
+      <label class="ck"><input type="checkbox"><span>🩺 Identify LVOT-obstruction physiology: new systolic murmur louder on Valsalva, echo gradient + systolic anterior motion of the mitral valve</span></label>
+      <label class="ck"><input type="checkbox"><span>🚫 STOP / withhold all catecholamines and inotropes — they worsen the dynamic obstruction; flag clearly on the chart</span></label>
+      <label class="ck"><input type="checkbox"><span>💧 Give a cautious fluid bolus to enlarge the LV cavity and reduce the gradient; reassess BP and murmur</span></label>
+      <label class="ck"><input type="checkbox"><span>🐢 Add cautious short-acting beta-blockade to slow the hyperkinetic base (only if not frankly pump-failure hypotensive)</span></label>
+      <label class="ck"><input type="checkbox"><span>🔧 If support still needed → mechanical support (Impella/IABP), NOT an inotrope; correct K⁺/Mg²⁺ and watch the QT</span></label>
+      <label class="ck"><input type="checkbox"><span>🩸 Image the apex for thrombus; anticoagulate only if apical akinesis/thrombus; plan repeat echo to confirm recovery</span></label>
+      <div class="ck-progress" data-progress>0 / 7 complete</div>
+    </div>
+
+    <!-- 🩺 PROCEDURE GUIDE 2 -->
+    <div class="checklist" id="ckDefib">
+      <h3 style="margin-top:0">🩺 Procedure Guide — If she develops Torsades / arrests (long QT)</h3>
+      <p style="font-size:13px">⚠️ QTc 512 ms in a stunned heart is Torsades-prone. Polymorphic VT degenerating to a pulseless rhythm → UNSYNCHRONIZED defibrillation + ACLS, and treat the QT.</p>
+      <label class="ck"><input type="checkbox"><span>🧪 Pre-empt: correct K⁺ toward 4.5–5.0 and Mg²⁺ &gt; 1.0; stop all QT-prolonging drugs; continuous telemetry on QTc</span></label>
+      <label class="ck"><input type="checkbox"><span>💉 For Torsades with a pulse: IV magnesium sulfate 2 g; correct potassium; consider overdrive pacing / isoprenaline if pause-dependent</span></label>
+      <label class="ck"><input type="checkbox"><span>🚫 If pulseless polymorphic VT/VF → UNSYNCHRONIZED defibrillation, max energy, minimal interruption to CPR</span></label>
+      <label class="ck"><input type="checkbox"><span>🧠 Treat reversible causes — here especially the long QT and electrolytes; avoid adding catecholamines that worsen obstruction</span></label>
+      <label class="ck"><input type="checkbox"><span>🔁 Rhythm/pulse check every 2 min; minimize hands-off time; rotate compressors</span></label>
+      <label class="ck"><input type="checkbox"><span>🫀 ROSC → post-arrest care, mechanical support over inotropes if shocked, cardiology/ICU</span></label>
+      <div class="ck-progress" data-progress>0 / 6 complete</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S8 — NURSING CARE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s8">
+  <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+  <div class="section-content">
+    <h3>🛏️ CCU nursing priorities — minute by minute</h3>
+    <ul>
+      <li>📟 <strong>Continuous telemetry with the QTc tracked</strong> — a lengthening QT changes the risk to Torsades. Print strips of any ectopy or runs; defibrillator at the bedside.</li>
+      <li>🚫 <strong>Know the danger drug:</strong> in obstructive Takotsubo, catecholamines/inotropes (dobutamine, adrenaline, noradrenaline) <strong>worsen the LVOT obstruction</strong> — question any such prescription and escalate before giving it.</li>
+      <li>🩸 <strong>BP every 2–5 min</strong> and listen for the murmur — a murmur getting louder with a falling pressure suggests worsening dynamic obstruction, not "needs an inotrope."</li>
+      <li>💧 <strong>Run fluids and beta-blockade exactly as prescribed</strong> on a monitored line; recheck K⁺/Mg²⁺ and keep them in the safe band to protect the QT.</li>
+      <li>🫁 Watch for <strong>pulmonary oedema</strong> (rising RR, crackles, falling SpO₂) from the stunned apex — escalate for cautious diuresis, not for inotropes.</li>
+      <li>🧠 <strong>Neuro/consciousness checks</strong> — a patient who becomes drowsy or syncopal may be obstructing or arrhythmic → check pulse, get a 12-lead.</li>
+      <li>📋 <strong>Document echo gradients, the murmur, the QTc and ST/T evolution</strong> over time — recovery of apical function is part of confirming the diagnosis.</li>
+      <li>🔇 <strong>Calm the room and the patient:</strong> fear and pain drive more catecholamine release, which feeds the disease. A composed, gentle bedside is genuinely therapeutic here.</li>
+      <li>👨‍👩‍👦 Support a grieving patient and family (see S16) — this illness began with a bereavement; compassion is part of the treatment.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who questions the dobutamine, keeps the potassium in band and calms a frightened, grieving heart is doing half the work of treating Takotsubo."</div>
+    <div class="callout warn"><b class="ct">📢 Escalate IMMEDIATELY for</b>Any prescription for an inotrope/catecholamine in this obstructed patient · falling BP with a louder murmur (worsening LVOT obstruction) · new/worsening pulmonary oedema · syncope or polymorphic VT (long-QT Torsades) · new neurological signs (apical-thrombus embolism) · severe chest pain raising rupture concern.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S9 — INVESTIGATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s9">
+  <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+  <div class="section-content">
+    <h3>🧾 Results board (17:10)</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>Result</th><th>Reference</th><th>Interpretation</th></tr>
+      <tr><td>Troponin I</td><td class="hi">0.38 ng/mL ↑</td><td>&lt; 0.04</td><td><strong>The key clue.</strong> Only modestly raised — far too small for the extent of ST elevation and the large akinetic apex. This <strong>disproportion</strong> points to stunning (Takotsubo), not a big anterior infarct.</td></tr>
+      <tr><td>BNP / NT-proBNP</td><td class="hi">Markedly elevated ↑↑</td><td>—</td><td>Classically <strong>very high and out of proportion to the troponin</strong> in Takotsubo — reflects acute wall stress in the ballooning ventricle.</td></tr>
+      <tr><td>Potassium</td><td class="lo">3.4 mmol/L ↓</td><td>3.5–5.0</td><td>Mildly low — with a QTc of 512 ms this is Torsades fuel. Replace toward 4.5–5.0.</td></tr>
+      <tr><td>Magnesium</td><td class="lo">0.62 mmol/L ↓</td><td>0.7–1.0</td><td>Low Mg²⁺ worsens QT prolongation and hypokalemia. Give 2 g IV; protect the QT.</td></tr>
+      <tr><td>Coronary angiography</td><td class="ok-v">Clean — no obstructive CAD</td><td>—</td><td>The decisive test: <strong>no culprit lesion, no thrombus</strong>. Excludes STEMI and confirms the Takotsubo pathway.</td></tr>
+      <tr><td>Ventriculogram / Echo</td><td class="hi">Apical ballooning, EF ~35% ↓</td><td>—</td><td>Akinetic ballooning apex with hyperkinetic base; dynamic LVOT gradient with systolic anterior motion of the mitral valve. The anatomy of the disease.</td></tr>
+      <tr><td>Plasma/urine metanephrines</td><td class="ok-v">Pending</td><td>—</td><td>Exclude phaeochromocytoma as a secondary catecholamine source, especially with a basal/atypical pattern.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A small troponin with a huge ECG, a huge wall-motion abnormality and a sky-high BNP is the laboratory fingerprint of Takotsubo — the numbers are deliberately out of proportion."</div>
+
+    <div class="callout info"><b class="ct">🧠 Why the clean angiogram does NOT mean 'nothing serious'</b>Clean coronaries rule <em>out</em> an occlusion but rule <em>in</em> a heart that can still fail, obstruct, throw clot from its akinetic apex and run a Torsades-prone QT. The clean angiogram changes the <em>treatment</em> (supportive, no anticoagulation/thrombolysis, no inotropes) — it does not downgrade the <em>seriousness</em>. In-hospital mortality is comparable to STEMI.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S10 — ECG / IMAGING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s10">
+  <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging</h2></div>
+  <div class="section-content">
+    <h3>🫀 The presenting ECG &amp; the ballooning ventricle — read it like a detective</h3>
+    <div class="ecg-fig">
+      <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Anterior ST elevation evolving to deep T-wave inversion with long QT, mimicking STEMI">
+        <rect width="820" height="150" fill="#0b1220"/>
+        <g stroke="#1e3a5f" stroke-width="1">
+          <line x1="0" y1="30" x2="820" y2="30"/><line x1="0" y1="60" x2="820" y2="60"/>
+          <line x1="0" y1="90" x2="820" y2="90"/><line x1="0" y1="120" x2="820" y2="120"/>
+        </g>
+        <polyline fill="none" stroke="#86efac" stroke-width="2.4" points="0,75 40,75 48,50 56,75 70,75 70,58 150,52 175,95 200,95 200,75 250,75 258,50 266,75 280,75 280,58 360,52 385,95 410,95 410,75 470,75 478,50 486,75 500,75 500,58 580,52 605,108 640,108 640,75 700,75 708,50 716,75 730,75 730,58 800,54"/>
+        <text x="120" y="22" fill="#fca5a5" font-size="12" font-weight="700">↑ ST elevation (early)</text>
+        <text x="560" y="135" fill="#fcd34d" font-size="12" font-weight="700">↑ deep T inversion + long QT (evolving)</text>
+      </svg>
+      <div class="ecg-cap">Anterior <span style="color:#fca5a5">ST elevation</span> V2–V4 mimicking STEMI, evolving over hours into <span style="color:#fcd34d">deep, widespread T-wave inversion with marked QT prolongation</span>. The akinesis crosses arterial territories — a clue that this is not a single-vessel occlusion.</div>
+    </div>
+
+    <h3>🔎 The Takotsubo-vs-STEMI toolkit (memorize the high-yield ones)</h3>
+    <table class="tbl">
+      <tr><th>Feature</th><th>Why it means Takotsubo (not occlusive STEMI)</th></tr>
+      <tr><td>🧪 <strong>Troponin–ECG disproportion</strong></td><td>A small troponin with a large ST elevation and a large akinetic apex — infarction of that much muscle would release far more troponin. Disproportion = stunning.</td></tr>
+      <tr><td>🎈 <strong>Apical ballooning beyond one artery</strong></td><td>Wall-motion abnormality crosses LAD/RCA/Cx territories and spares the base — not the pattern of a single occluded vessel.</td></tr>
+      <tr><td>🩸 <strong>Clean coronaries</strong></td><td>No culprit lesion or thrombus at angiography — the decisive test that separates it from STEMI.</td></tr>
+      <tr><td>📐 <strong>Marked QT prolongation</strong></td><td>Deep T-wave inversion with a strikingly long QTc develops over hours — characteristic of the recovering stunned myocardium (and a Torsades risk).</td></tr>
+      <tr><td>♀️ <strong>Demographic &amp; trigger</strong></td><td>Post-menopausal woman with a clear emotional/physical stressor — the classic Takotsubo setting (InterTAK score features).</td></tr>
+      <tr><td>📈 <strong>Reversibility</strong></td><td>Serial imaging shows the apex recovering over days–weeks — confirmation that the muscle was stunned, not infarcted.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Apical ballooning + clean coronaries + a troponin too small for the ECG = Takotsubo. The angiogram proves it; the troponin–ECG disproportion predicts it."</div>
+
+    <h3>🫀 Echo &amp; advanced imaging</h3>
+    <ul>
+      <li>🩻 <strong>Echo:</strong> akinetic, ballooning apex with hyperkinetic base; EF ~35%; <strong>dynamic LVOT gradient with systolic anterior motion</strong> of the mitral valve and functional MR; inspect the apex for thrombus (re-image — the akinetic apex harbours clot).</li>
+      <li>🧲 <strong>Cardiac MRI:</strong> oedema in the affected (apical) segments with <strong>absence of late gadolinium enhancement</strong> — distinguishes Takotsubo (no necrosis/scar) from infarction and myocarditis.</li>
+      <li>📈 <strong>Serial ECG/echo:</strong> the ST changes settle, the deep T-inversions and long QT evolve, and the apical wall motion <strong>recovers over days to weeks</strong> — documenting reversibility clinches the diagnosis.</li>
+    </ul>
+
+    <div class="callout warn"><b class="ct">⚠️ The ECG's favorite lie in Takotsubo</b>"There's anterior ST elevation, so it must be an LAD occlusion — thrombolyse / anticoagulate now." Takotsubo perfectly mimics anterior STEMI on the surface ECG. The only reassurance is the <strong>angiogram</strong> (clean) plus the <strong>troponin–ECG disproportion</strong> and the apical ballooning pattern. Resist STEMI-reflex treatment until the coronaries are seen.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S11 — MEDICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s11">
+  <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+  <div class="section-content">
+    <h3>💉 Acute drugs — what, why, and the traps</h3>
+    <table class="tbl">
+      <tr><th>Drug</th><th>Role tonight</th><th>Mechanism / caution</th></tr>
+      <tr><td><strong>IV fluids (cautious bolus)</strong></td><td>First-line for LVOT-obstruction physiology — enlarge the LV cavity</td><td>Increases preload and cavity size → reduces the dynamic gradient. Titrate carefully against pulmonary oedema from the stunned apex.</td></tr>
+      <tr><td><strong>Beta-blocker (esmolol/metoprolol, cautious)</strong></td><td>Slow the hyperkinetic base; reduce SAM and the LVOT gradient</td><td>Reduces dynamic obstruction and may blunt catecholamine effect. Use cautiously — avoid in frank pump-failure hypotension or marked bradycardia.</td></tr>
+      <tr><td><strong>Magnesium sulfate 2 g IV</strong></td><td>Protect the QT; drug of choice for Torsades</td><td>Stabilizes membranes and treats Torsades; enables potassium repletion. Watch for hypotension if pushed fast.</td></tr>
+      <tr><td><strong>Potassium (IV, monitored)</strong></td><td>Refill toward 4.5–5.0 to protect the long QT</td><td>Restores repolarization reserve; respect maximum peripheral infusion rates and recheck frequently.</td></tr>
+      <tr><td><strong>ACE-inhibitor / ARB &amp; diuretic</strong></td><td>Standard heart-failure therapy for the ballooning, congested ventricle</td><td>Cautious diuresis for pulmonary oedema; ACEi/ARB supports recovery. Avoid over-diuresis that worsens an LVOT gradient.</td></tr>
+      <tr><td><strong>Anticoagulation</strong></td><td>ONLY if apical akinesis/thrombus is present</td><td>The akinetic apex is thrombogenic. Anticoagulate for documented thrombus/severe apical akinesis, balancing stroke vs bleeding — NOT as a STEMI reflex.</td></tr>
+      <tr><td><strong>Mechanical support (Impella/IABP)</strong></td><td>Circulatory support for shock — preferred over inotropes</td><td>Provides output without the catecholamine penalty; the answer when support is truly needed in obstructive/cardiogenic Takotsubo shock.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In Takotsubo, the drug you DON'T give is the treatment: no catecholamine, no inotrope, no reflexive heparin or thrombolytic. Fill, gently slow, protect the QT — and if you need support, reach for an Impella, not dobutamine."</div>
+
+    <div class="callout danger"><b class="ct">🚫 The 'never' list in Takotsubo with LVOT obstruction</b>❌ Dobutamine / dopamine · ❌ Adrenaline / noradrenaline / any catecholamine inotrope · ❌ Reflexive thrombolysis (clean coronaries — no clot to lyse) · ❌ Reflexive anticoagulation without apical thrombus · ❌ QT-prolonging drugs while QTc is dangerously long. When the pressure is soft and the ventricle is obstructed, the safe "drug" is <strong>fluid + cautious beta-blockade + mechanical support</strong>.</div>
+
+    <h3>🏠 Recovery-phase therapy (this admission and beyond)</h3>
+    <ul>
+      <li>💙 <strong>Heart-failure therapy</strong> (ACEi/ARB ± beta-blocker, cautious diuretic) while the apex is stunned; uptitrate as it recovers.</li>
+      <li>📐 <strong>QT surveillance</strong> until repolarization normalizes; avoid QT-prolonging agents.</li>
+      <li>🩸 <strong>Anticoagulation</strong> continued only while significant apical akinesis/thrombus persists, then reassessed once apical function recovers.</li>
+      <li>🧠 <strong>Address the trigger:</strong> bereavement support, treat anxiety/depression, and screen for a secondary cause (e.g. phaeochromocytoma) where the pattern fits.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S12 — MONITORING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s12">
+  <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+  <div class="section-content">
+    <h3>📡 What to watch and why</h3>
+    <ul>
+      <li>📐 <strong>QTc on every 12-lead</strong> — a lengthening QT moves the risk toward <strong>Torsades</strong>; keep K⁺ 4.5–5.0 and Mg²⁺ &gt; 1.0 and avoid QT-prolonging drugs.</li>
+      <li>📈 <strong>Continuous telemetry</strong> with the defibrillator at the bedside until the QT normalizes and she is arrhythmia-free; print any ectopy or runs.</li>
+      <li>🩺 <strong>Serial echo for the LVOT gradient and apical function</strong> — a rising gradient or louder murmur means worsening dynamic obstruction (treat by filling/slowing, NOT inotropes); recovering apical motion confirms the diagnosis.</li>
+      <li>🩸 <strong>Beat-to-beat BP (arterial line)</strong> if she is haemodynamically labile through fluid/beta-blocker titration or mechanical support.</li>
+      <li>🫁 <strong>Respiratory status &amp; SpO₂</strong> — the stunned apex can flood the lungs; escalate for cautious diuresis, not inotropes.</li>
+      <li>🩻 <strong>Re-image the apex for thrombus</strong> — an akinetic apex is a clot factory; new neurological signs = possible embolism.</li>
+      <li>🧪 <strong>Serial troponin and BNP</strong> — expect a small, settling troponin and a high BNP; a large rising troponin should make you re-question the diagnosis.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After you diagnose Takotsubo, the monitor's job is to answer three questions: is the QT about to twist, is the apex obstructing, and is the apex throwing clot? Watch the QTc, the gradient and the apex."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S13 — COMPLICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s13">
+  <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+  <div class="section-content">
+    <h3>💀 What can go wrong — and the mechanism (it is NOT benign)</h3>
+    <ul>
+      <li>🫁 <strong>Acute heart failure / pulmonary oedema</strong> — the commonest complication; the stunned, ballooning apex drops stroke volume and congests the lungs.</li>
+      <li>🚫 <strong>Dynamic LVOT obstruction</strong> — hyperkinetic base + systolic anterior motion → an outflow gradient; <strong>catecholamines/inotropes worsen it</strong> and can precipitate shock.</li>
+      <li>🧠 <strong>Cardiogenic shock</strong> — from pump failure, obstruction, or both; mechanical support (Impella) is preferred over inotropes.</li>
+      <li>💧 <strong>Mitral regurgitation</strong> — from systolic anterior motion and apical tethering; contributes to congestion and shock.</li>
+      <li>🩸 <strong>Apical LV thrombus &amp; embolism</strong> — the akinetic apex is thrombogenic → stroke/systemic embolism; image and anticoagulate when present.</li>
+      <li>⚡ <strong>Arrhythmias incl. QT-prolongation → Torsades</strong> — and rarely brady-arrhythmia/heart block; aggressive electrolyte correction and QT vigilance.</li>
+      <li>💥 <strong>Free-wall rupture (rare)</strong> — of the thinned, ballooning apex; sudden deterioration/tamponade.</li>
+      <li>🔁 <strong>Recurrence</strong> — Takotsubo can come back, especially if the trigger (stress, secondary cause) is not addressed.</li>
+    </ul>
+
+    <!-- 🎭 M&M CONFERENCE MODULE -->
+    <div class="mm">
+      <h3>🎭 Morbidity &amp; Mortality Conference — "The Catecholamine We Should Not Have Given"</h3>
+      <div class="mm-case">
+        <strong>The case:</strong> A 68-year-old woman presented with chest pain and anterior ST elevation after a frightening home invasion. Angiography was <strong>clean</strong>; the ventriculogram showed <strong>apical ballooning</strong> — clearly Takotsubo. Overnight her BP drifted to 88/60 with a new harsh systolic murmur. The night team labelled it "cardiogenic shock" and started <strong>dobutamine, then added adrenaline</strong>. Each escalation made the murmur louder and the pressure lower; the echo (reviewed later) showed the hyperdynamic base obliterating the LVOT with every beat. Within an hour she arrested and could not be resuscitated. The catecholamines they gave were feeding the very disease.
+      </div>
+      <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+      <div class="swiss">
+        <div class="hole"><b>🧠 WRONG MODEL OF SHOCK</b>Treated obstructive shock as pump-failure shock — opposite therapy.</div>
+        <div class="hole"><b>💉 CATECHOLAMINE INTO A CATECHOLAMINE DISEASE</b>Inotropes worsened LVOT obstruction beat by beat.</div>
+        <div class="hole"><b>🩺 MURMUR NOT INTERPRETED</b>A louder murmur with each dose was the alarm — read as "needs more inotrope."</div>
+        <div class="hole"><b>🔧 NO MECHANICAL SUPPORT</b>Impella, not dobutamine, was the right tool for support.</div>
+        <div class="hole"><b>🌙 SYSTEM</b>Night, no echo gradient checked, no "avoid inotropes in Takotsubo" default.</div>
+      </div>
+      <p style="margin-bottom:0"><strong>🛡️ What would have saved her:</strong> recognise LVOT-obstruction physiology (murmur louder on Valsalva, echo gradient + SAM); <em>stop</em> the catecholamines; <strong>fill the ventricle and gently beta-block</strong>; and if support was truly needed, place an <strong>Impella</strong> — not an inotrope. <strong>This is exactly why your team held the dobutamine tonight.</strong></p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'It looks benign because it recovers' is the sentence written on the chart of Takotsubo patients who then die of LVOT obstruction, shock, Torsades or apical thrombus. Reversible is not the same as safe."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S14 — DIFFERENTIALS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s14">
+  <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials</h2></div>
+  <div class="section-content">
+    <h3>🧩 The 'STEMI with ST elevation and chest pain' differential</h3>
+    <table class="tbl">
+      <tr><th>Diagnosis</th><th>Clues</th><th>Why it matters</th></tr>
+      <tr><td>💔 <strong>Takotsubo cardiomyopathy</strong> (this patient)</td><td>Post-menopausal woman, stressor, clean coronaries, apical ballooning, troponin–ECG disproportion, long QT</td><td>Default once angiography is clean; treat supportively, avoid inotropes/anticoagulation reflexes.</td></tr>
+      <tr><td>🫀 <strong>Anterior STEMI (LAD occlusion)</strong></td><td>Atherosclerotic risk factors, <strong>LAD culprit lesion</strong>, wall-motion matches the artery, troponin proportionate (often very high)</td><td>Needs urgent reperfusion + antithrombotics — the diagnosis you must exclude at angiography.</td></tr>
+      <tr><td>🔥 <strong>Myocarditis</strong></td><td>Viral prodrome, raised troponin, patchy non-territorial wall motion; MRI shows sub-epicardial LGE</td><td>Different cause and imaging signature; supportive ± immunomodulation in specific forms.</td></tr>
+      <tr><td>🧪 <strong>Phaeochromocytoma / catecholamine excess</strong></td><td>Paroxysmal hypertension, headaches, sweating; often <strong>basal/atypical</strong> Takotsubo pattern; raised metanephrines</td><td>A secondary, treatable catecholamine source — block alpha before beta; tumour management.</td></tr>
+      <tr><td>🧠 <strong>Neurogenic stunned myocardium</strong></td><td>Subarachnoid haemorrhage / acute neuro catastrophe with Takotsubo-like LV dysfunction and ECG changes</td><td>Treat the brain; the cardiac picture is secondary to the catecholamine surge.</td></tr>
+      <tr><td>🫁 <strong>Acute pulmonary embolism</strong></td><td>Pleuritic pain, hypoxia, RV strain (S1Q3T3), raised D-dimer; RV not apical LV ballooning</td><td>Different therapy (anticoagulation/thrombolysis) — distinguish by imaging.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"ST elevation + clean coronaries + apical ballooning → think Takotsubo. ST elevation + an LAD culprit → it's a true STEMI. The angiogram is the fork in the road."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S15 — PLAN -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s15">
+  <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan</h2></div>
+  <div class="section-content">
+    <h3>🧭 Tonight → this week → recovery</h3>
+    <ol>
+      <li>🚫 <strong>Tonight (done):</strong> confirmed Takotsubo at angiography; <strong>withheld inotropes/heparin/thrombolysis</strong>; cautious fluids + gentle beta-blockade for LVOT obstruction; corrected K⁺/Mg²⁺ and put on Torsades watch; CCU admission.</li>
+      <li>🫀 <strong>Define the physiology &amp; complications:</strong> echo for LVOT gradient/SAM/MR/EF and apical thrombus; serial troponin/BNP; cardiac MRI to confirm oedema without LGE.</li>
+      <li>🔧 <strong>Escalation plan for shock:</strong> if circulatory support is needed → <strong>Impella/IABP, not catecholamines</strong>; clear bedside guidance that inotropes are to be avoided while obstructed.</li>
+      <li>🩸 <strong>Anticoagulation decision:</strong> only if apical akinesis/thrombus is present; reassess as apical function recovers.</li>
+      <li>💙 <strong>Heart-failure therapy &amp; recovery:</strong> ACEi/ARB ± beta-blocker, cautious diuresis; repeat echo in days–weeks to document recovery of the apex.</li>
+      <li>👨‍👩‍👦 <strong>Address the trigger &amp; the person:</strong> bereavement support, treat anxiety/depression, screen for secondary causes (e.g. metanephrines), and counsel on the (small) recurrence risk.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Treat the episode by supporting the apex and avoiding catecholamines; treat the disease by addressing the stressor and confirming recovery. Send her home with a normalising echo and a plan for her grief."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S16 — PROGRESS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s16">
+  <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+  <div class="section-content">
+    <h3>📅 Course in CCU</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Day 0, 17:30</div>Cautious 250 mL fluid bolus + low-dose esmolol → the murmur softens, BP rises to 108/70, LVOT gradient falls. No inotropes given.</div>
+      <div class="t-item"><div class="t-time">Day 0, 22:00</div>K⁺ replaced to 4.6, Mg²⁺ to 1.0; QTc improving on serial ECG. No Torsades. Telemetry quiet.</div>
+      <div class="t-item"><div class="t-time">Day 1</div>Echo: persistent apical ballooning, EF ~35%, mild functional MR, <strong>no apical thrombus</strong>. Cardiac MRI shows apical oedema with <strong>no late gadolinium enhancement</strong> — confirms stunning, not infarction.</div>
+      <div class="t-item"><div class="t-time">Day 3</div>Apical wall motion beginning to recover; LVOT gradient resolved; pulmonary congestion clears with gentle diuresis. ACEi started.</div>
+      <div class="t-item"><div class="t-time">Day 5</div>Echo: EF up to ~50%, apex moving again. QTc near normal. Mobilising; bereavement and psychology input engaged.</div>
+      <div class="t-item"><div class="t-time">Day 6</div>Haemodynamically stable, arrhythmia-free, apex recovering. Ready for discharge with follow-up echo planned.</div>
+    </div>
+
+    <!-- 👨‍👩‍👦 FAMILY & PATIENT JOURNEY MODULE -->
+    <h3>👨‍👩‍👦 Family &amp; Patient Journey</h3>
+    <div class="journey">
+      <div class="j-card"><div class="j-who">👩 The patient — Mrs. H.A.</div><p>"I buried my husband and then my own heart broke — they told me that's almost literally what happened. I was terrified it was a heart attack. They said my arteries were clean and that the muscle would heal. It did. The kindness mattered as much as the medicine."</p></div>
+      <div class="j-card"><div class="j-who">🧑 Her son</div><p>"On the same day we lost Dad, Mum collapsed. Someone wanted to start a strong drug for her blood pressure and the cardiologist said no — that drug would have made her worse. I didn't understand it then. I understand it saved her now."</p></div>
+      <div class="j-card"><div class="j-who">👩‍⚕️ The bedside nurse</div><p>"My job was the QT, the potassium, and the truth — and questioning the dobutamine. Sometimes the best care is the drug you <em>don't</em> give and the hand you do hold."</p></div>
+      <div class="j-card"><div class="j-who">🎓 The team's reflection</div><p>"This wasn't a clever diagnosis — it was a disciplined one. Clean coronaries, a ballooning apex and a small troponin said Takotsubo; we supported the apex, avoided catecholamines, and let it recover."</p></div>
+    </div>
+
+    <div class="callout pink"><b class="ct">💗 The human thread</b>Takotsubo is the one cardiac diagnosis whose name nods to the heart's connection to the mind. Treating it well means treating the grief as well as the gradient — bereavement support, gentle reassurance that the muscle recovers, and a plan for the anxiety that can trigger recurrence. The cardiology and the compassion are the same prescription.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S17 — DISCHARGE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s17">
+  <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+  <div class="section-content">
+    <h3>📋 Discharge plan &amp; safety net</h3>
+    <ul>
+      <li>💊 <strong>Medications:</strong> ACE-inhibitor/ARB ± beta-blocker while the apex recovers, with a clear written schedule; anticoagulation only if apical thrombus was present (review with follow-up imaging). No need for STEMI-style dual antiplatelets — the coronaries are clean.</li>
+      <li>🩻 <strong>Follow-up echo</strong> in a few weeks to confirm full recovery of apical function (the diagnostic clincher) and to reassess any residual gradient/MR.</li>
+      <li>📐 <strong>QT plan:</strong> avoid QT-prolonging drugs until repolarization fully normalizes; provide a list and counsel about over-the-counter agents.</li>
+      <li>🧠 <strong>Address the trigger:</strong> bereavement counselling, treat anxiety/depression, and complete the secondary-cause screen (e.g. metanephrines) if indicated.</li>
+      <li>🚩 <strong>Red flags → call emergency services:</strong> recurrent chest pain, breathlessness, fainting/palpitations, or new neurological symptoms (possible apical-thrombus embolism).</li>
+      <li>📚 <strong>Education:</strong> what Takotsubo is in plain language ("a stress-related stunning of the heart muscle that recovers"), that it can recur with severe stress, why inotropes were avoided, and the importance of follow-up.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Discharge after Takotsubo is not 'clean arteries, go home' — it is a recovering apex confirmed on follow-up echo, a QT watched until normal, the trigger addressed, and a patient who understands her broken heart will mend."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S18 — CLINICAL PEARLS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s18">
+  <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+  <div class="section-content">
+    <div class="pearl-grid">
+      <div class="pearl"><b>💔 The Takotsubo recipe</b>Post-menopausal woman + emotional/physical stressor + a 'STEMI' with CLEAN coronaries + apical ballooning = Takotsubo until proven otherwise.</div>
+      <div class="pearl"><b>🧪 Troponin too small</b>A modest troponin with a huge ECG and a huge wall-motion abnormality is the fingerprint of stunning, not infarction. Disproportion = Takotsubo.</div>
+      <div class="pearl"><b>🎯 Apex = beta-receptor rich</b>The apex has higher beta-adrenoceptor density, so the catecholamine surge stuns it while the base over-works → apical ballooning.</div>
+      <div class="pearl"><b>🚫 No catecholamines</b>In LVOT-obstruction shock, inotropes/catecholamines worsen the obstruction. Reach for an Impella, not dobutamine.</div>
+      <div class="pearl"><b>💧 Fill and slow</b>Treat the dynamic gradient with fluids + cautious beta-blockade — the opposite of what inotropes do.</div>
+      <div class="pearl"><b>🩸 No reflex anticoagulation</b>Clean coronaries mean no clot to lyse; anticoagulate ONLY for apical akinesis/thrombus.</div>
+      <div class="pearl"><b>📐 Mind the QT</b>Marked QT prolongation → Torsades risk. Correct K⁺/Mg²⁺ and avoid QT-prolonging drugs.</div>
+      <div class="pearl"><b>🩻 The akinetic apex clots</b>Image the apex — an akinetic apex is a thrombus factory that can throw a stroke.</div>
+      <div class="pearl"><b>⚠️ Not benign</b>In-hospital mortality is comparable to STEMI; LVOT obstruction, shock, Torsades and rupture all happen.</div>
+      <div class="pearl"><b>🔄 It recovers — and recurs</b>The apex recovers in days–weeks (confirm on follow-up echo), but Takotsubo can recur with severe stress.</div>
+      <div class="pearl"><b>🧬 Hunt the secondary cause</b>Phaeochromocytoma, subarachnoid haemorrhage, sepsis — especially with basal/atypical patterns.</div>
+      <div class="pearl"><b>🫀 The angiogram is the fork</b>Clean coronaries → Takotsubo; an LAD culprit → true STEMI. Don't STEMI-treat before you've seen the arteries.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S19 — MCQs / ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s19">
+  <div class="sec-header"><span class="s-badge">S19</span><h2>🧠 MCQs / Assessment</h2></div>
+  <div class="section-content">
+    <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP and feed your dashboard. Each shows a full explanation.</em></p>
+    <div id="mcqHost"></div>
+    <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · Case c-takotsubo-029 — Takotsubo (Stress) Cardiomyopathy<br>
+  ⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."
+</div>
+
+</div><!-- /#caseScroll -->
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ XP / DASHBOARD CORE ============ */
+  var XP = 0, XP_MAX = 1200;
+  var awarded = {}; // dedupe one-time awards by key
+  var xpVal = document.getElementById('xpVal');
+  var xpFill = document.getElementById('xpFill');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+  }
+  function addXP(amount, key, label){
+    if(key){ if(awarded[key]) return; awarded[key] = true; }
+    XP += amount;
+    if(XP > XP_MAX) XP = XP_MAX;
+    xpVal.textContent = XP;
+    xpFill.style.width = Math.min(100, Math.round(XP / XP_MAX * 100)) + '%';
+    showToast('+' + amount + ' XP' + (label ? ' · ' + label : ''));
+  }
+  function earnBadge(id){
+    var b = document.getElementById(id);
+    if(b && !b.classList.contains('earned')){ b.classList.add('earned'); }
+  }
+
+  /* Dashboard minimize */
+  var dash = document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){
+    dash.classList.toggle('collapsed');
+    this.textContent = dash.classList.contains('collapsed') ? '+' : '–';
+  });
+
+  /* ============ INTERNAL SCROLL SIZING ============ */
+  /* Size the scroll box to the visible window so the sticky tab bar stays in
+     view. When embedded (srcDoc iframe, same-origin), the host page stretches
+     the iframe to full content height and scrolls the OUTER page — so we size
+     this box from the parent window's height minus whatever app chrome sits
+     above the iframe, and scroll internally instead. Standalone → 100vh. */
+  var caseScroll = document.getElementById('caseScroll');
+  var topnav = document.getElementById('topnav');
+  /* The tab bar is position:fixed, so it's out of flow — reserve space at the
+     top of the scroll content (and offset anchor jumps) by its real height. */
+  function setNavOffset(){
+    var navH = topnav ? topnav.offsetHeight : 70;
+    caseScroll.style.paddingTop = navH + 'px';
+    caseScroll.style.scrollPaddingTop = (navH + 14) + 'px';
+  }
+  function sizeScroller(){
+    try {
+      var p = window.parent;
+      if(p && p !== window && window.frameElement){
+        var rectTop = window.frameElement.getBoundingClientRect().top;
+        if(rectTop < 0) rectTop = 0;          // parent scrolled past the chrome
+        var ph = p.innerHeight || 800;
+        var h = ph - rectTop - 6;             // leave the bottom edge breathing room
+        if(h < 460) h = 460;                  // sane minimum on short windows
+        caseScroll.style.height = h + 'px';
+      } else {
+        caseScroll.style.height = '100vh';
+      }
+    } catch(e){ caseScroll.style.height = '100vh'; }
+    setNavOffset();
+  }
+  sizeScroller();
+  window.addEventListener('resize', sizeScroller);
+  window.addEventListener('load', sizeScroller);
+  try { if(window.parent && window.parent !== window) window.parent.addEventListener('resize', sizeScroller); } catch(e){}
+
+  /* ============ NAV: scroll-spy active + visited ============ */
+  var navchips = Array.prototype.slice.call(document.querySelectorAll('.navchip'));
+  var sections = navchips.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited = {};
+  var visitVal = document.getElementById('visitVal');
+
+  function markVisited(idx){
+    var sec = sections[idx];
+    if(!sec) return;
+    if(!visited[sec.id]){
+      visited[sec.id] = true;
+      navchips[idx].classList.add('visited');
+      var count = Object.keys(visited).length;
+      visitVal.textContent = count + ' / 19';
+      addXP(8, 'visit-' + sec.id, 'Section read');
+      if(count >= 19){ earnBadge('bdg-explorer'); addXP(60, 'allvisited', 'Ward Explorer!'); }
+    }
+  }
+  function setActive(idx){
+    navchips.forEach(function(c){ c.classList.remove('active'); });
+    if(navchips[idx]) navchips[idx].classList.add('active');
+  }
+
+  /* True tabs: each chip shows ONLY its section, hidden via CSS otherwise.
+     No scrollIntoView and no scroll-spy — nothing can scroll the tab bar away,
+     which also sidesteps every srcDoc-iframe scrolling quirk. The hero banner
+     and vitals strip belong to the case intro, so they show on S1 only. */
+  var heroBits = [document.querySelector('.hero'), document.querySelector('.vitals-strip')]
+    .filter(function(el){ return !!el; });
+
+  function showSection(idx){
+    sections.forEach(function(s, i){ if(s) s.classList.toggle('sec-active', i === idx); });
+    heroBits.forEach(function(el){ el.style.display = (idx === 0) ? '' : 'none'; });
+    caseScroll.scrollTop = 0;
+    setActive(idx);
+    markVisited(idx);
+  }
+
+  navchips.forEach(function(chip, idx){
+    chip.addEventListener('click', function(ev){
+      ev.preventDefault();
+      showSection(idx);
+    });
+  });
+  showSection(0);
+
+  /* ============ FLAG GAME (S2) ============ */
+  var flagBtns = document.querySelectorAll('#flagGame .flag-btn');
+  var flagResult = document.getElementById('flagResult');
+  var flagsFound = 0, flagsTotal = 0, flagWrong = 0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good') === '1') flagsTotal++; });
+  flagBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.dataset.locked) return;
+      btn.dataset.locked = '1';
+      var good = btn.getAttribute('data-good') === '1';
+      if(good){
+        btn.classList.add('flag-good');
+        flagsFound++;
+        addXP(10, 'flag-' + flagsFound + '-' + Math.random(), 'Takotsubo flag spotted');
+      } else {
+        btn.classList.add('flag-bad');
+        flagWrong++;
+        showToast('❌ Not a Takotsubo-specific flag');
+      }
+      if(flagsFound === flagsTotal){
+        flagResult.textContent = '✅ All ' + flagsTotal + ' Takotsubo red flags found' + (flagWrong ? ' (with ' + flagWrong + ' wrong pick' + (flagWrong>1?'s':'') + ')' : ' — flawless!');
+        earnBadge('bdg-vt');
+        addXP(30, 'flags-complete', 'Takotsubo-Spotter badge');
+      } else {
+        flagResult.textContent = flagsFound + ' / ' + flagsTotal + ' Takotsubo red flags found…';
+      }
+    });
+  });
+
+  /* ============ BRANCHING SCENARIO (S3) ============ */
+  var scText = document.getElementById('scText');
+  var scChoices = document.getElementById('scChoices');
+  var scFeedback = document.getElementById('scFeedback');
+  var scRestart = document.getElementById('scRestart');
+  var scStab = document.getElementById('scStab');
+  var scTime = document.getElementById('scTime');
+  var scXP = document.getElementById('scXP');
+  var pathXP = 0, scStability = 2, scElapsed = 0;
+
+  var STEPS = {
+    start: {
+      text: "The angiogram is clean, the apex is ballooning, and the covering doctor on the phone insists on dobutamine for 'the low output.' BP 96/68 and labile, a new murmur louder on Valsalva, QTc 512 ms. What do you do FIRST?",
+      choices: [
+        { t: "🚫 Refuse the dobutamine — recognise LVOT obstruction and prepare fluids + cautious beta-blockade", good:true, ds:1, dt:10, xp:40, fb:"✅ Exactly. This is Takotsubo with dynamic LVOT obstruction — catecholamines worsen it. Fill the ventricle and gently slow the hyperdynamic base. You've avoided the lethal error." , next:"betablock" },
+        { t: "💉 Start dobutamine — 'the pressure is low, she needs an inotrope'", good:false, ds:-2, dt:20, xp:0, fb:"☠️ Catastrophe. Dobutamine intensifies basal hyperkinesis and systolic anterior motion → the LVOT obstruction tightens, the murmur gets louder and the pressure collapses. This is the M&M case in S13. Restart and choose again.", end:true },
+        { t: "🩸 Thrombolyse / heparinise the 'anterior STEMI' before you lose myocardium", good:false, ds:-1, dt:15, xp:5, fb:"⚠️ Wrong — the coronaries are CLEAN. There is no clot to lyse; you only add bleeding risk. The ST elevation is catecholamine stunning, not occlusion.", next:"start2" }
+      ]
+    },
+    start2: {
+      text: "There is no clot to treat (clean coronaries) and bleeding risk is now higher. BP still soft at 92/64, murmur louder on Valsalva. Now what?",
+      choices: [
+        { t: "💧 Give a cautious fluid bolus and avoid all inotropes", good:true, ds:1, dt:8, xp:30, fb:"✅ Right. Filling the ventricle enlarges the cavity and reduces the dynamic LVOT gradient — the opposite of what inotropes do.", next:"betablock" },
+        { t: "💉 Add noradrenaline to prop up the pressure", good:false, ds:-1, dt:20, xp:0, fb:"⚠️ Wrong — another catecholamine into a catecholamine disease. It tightens the obstruction. Fill and slow the ventricle instead.", next:"betablock" }
+      ]
+    },
+    betablock: {
+      text: "Fluids are running; she is not frankly pump-failure hypotensive. The murmur and a measured LVOT gradient persist. Next move to relieve the obstruction?",
+      choices: [
+        { t: "🐢 Cautious short-acting beta-blockade to slow the hyperkinetic base and reduce SAM", good:true, ds:1, dt:6, xp:30, fb:"✅ Ideal: gentle beta-blockade calms the over-working base and reduces systolic anterior motion → the gradient falls. Keep watching the BP and QT.", next:"support" },
+        { t: "💉 Reach for adrenaline 'to be safe'", good:false, ds:0, dt:3, xp:0, fb:"⚠️ No — adrenaline worsens the very obstruction you are trying to relieve. The lever here is to slow and fill, not stimulate.", next:"support" }
+      ]
+    },
+    support: {
+      text: "The gradient eases but she still needs some circulatory support, and her QTc is 512 ms with K⁺ 3.4, Mg²⁺ 0.62. Final move of the first hour?",
+      choices: [
+        { t: "🔧 Mechanical support (Impella) over inotropes, and correct K⁺/Mg²⁺ to protect the QT", good:true, ds:1, dt:5, xp:40, fb:"🏆 Perfect close. Mechanical support gives output without the catecholamine penalty, and correcting K⁺/Mg²⁺ guards against Torsades. Case stabilized without a single inotrope.", end:true },
+        { t: "💉 Start dobutamine after all — 'just a low dose'", good:false, ds:-1, dt:10, xp:0, fb:"⚠️ Even a low dose worsens the dynamic obstruction. In obstructive Takotsubo shock the answer is an Impella, not an inotrope. Always avoid catecholamines here.", end:true }
+      ]
+    }
+  };
+
+  function renderStab(){
+    var s = Math.max(0, Math.min(5, scStability + 2)); // map -2..3 → 0..5
+    var dots = '';
+    for(var i=0;i<5;i++) dots += (i < s ? '●' : '○');
+    scStab.textContent = dots;
+  }
+  function renderStep(key){
+    var step = STEPS[key];
+    scText.textContent = step.text;
+    scFeedback.className = 'feedback';
+    scFeedback.style.display = 'none';
+    scChoices.innerHTML = '';
+    step.choices.forEach(function(ch){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = ch.t;
+      b.addEventListener('click', function(){
+        pathXP += ch.xp; scXP.textContent = pathXP;
+        scElapsed += ch.dt; scTime.textContent = scElapsed + ' s';
+        scStability += ch.ds; renderStab();
+        if(ch.xp) addXP(ch.xp, null, 'Scenario choice');
+        scFeedback.textContent = ch.fb;
+        scFeedback.className = 'feedback ' + (ch.good ? 'good' : 'bad');
+        scFeedback.style.display = 'block';
+        Array.prototype.forEach.call(scChoices.children, function(c){ c.disabled = true; c.style.opacity = .6; });
+        if(ch.end){
+          scRestart.style.display = 'inline-block';
+          if(ch.good && key === 'support'){ earnBadge('bdg-shock'); addXP(20, 'scenario-win', 'Inotrope Restraint!'); }
+        } else if(ch.next){
+          setTimeout(function(){ renderStep(ch.next); }, 1400);
+        }
+      });
+      scChoices.appendChild(b);
+    });
+  }
+  scRestart.addEventListener('click', function(){
+    pathXP = 0; scStability = 2; scElapsed = 0;
+    scXP.textContent = 0; scTime.textContent = '0 s'; renderStab();
+    scRestart.style.display = 'none';
+    renderStep('start');
+  });
+  renderStab();
+  renderStep('start');
+
+  /* ============ REVEAL BUTTONS ============ */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.getAttribute('data-target'));
+      if(!t) return;
+      if(t.classList.contains('reveal-shown')){
+        t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden');
+      } else {
+        t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown');
+        addXP(8, 'reveal-' + btn.getAttribute('data-target'), 'Self-test');
+      }
+    });
+  });
+
+  /* ============ CATECHOLAMINE / INOTROPE SIM (S6) ============ */
+  var kRange = document.getElementById('kRange');
+  var kVal = document.getElementById('kVal');
+  var kNeedle = document.getElementById('kNeedle');
+  var kReadout = document.getElementById('kReadout');
+  if(kRange){
+    var simUsed = false;
+    function updateK(){
+      var k = (parseInt(kRange.value,10) / 10); // 2.0 .. 7.5 (catecholamine exposure /10)
+      kVal.textContent = k.toFixed(1);
+      var pct = (parseInt(kRange.value,10) - 20) / (75 - 20) * 100;
+      kNeedle.style.left = pct + '%';
+      var msg, cls;
+      if(k < 3.0){ msg = '🟢 None / minimal catecholamine — basal hyperkinesis is calmest, LVOT gradient lowest. This is the SAFE zone: fluids + cautious beta-blockade + support, no inotropes.'; cls='good'; }
+      else if(k < 4.5){ msg = '🟢 Low exposure — obstruction still controllable. Keep catecholamines off; fill and gently slow the ventricle.'; cls='good'; }
+      else if(k <= 5.5){ msg = '🟠 Rising inotrope/catecholamine — basal hyperkinesis and systolic anterior motion increasing → the LVOT gradient is climbing. Back off.'; cls='warn-r'; }
+      else if(k <= 6.5){ msg = '🟠 High exposure — murmur louder, gradient tightening, output falling. You are feeding the disease. Stop the catecholamine.'; cls='warn-r'; }
+      else { msg = '🔴 Maximal catecholamine/inotrope — severe dynamic LVOT obstruction, collapsing output, arrest risk. This is the M&amp;M error: reach for an Impella, NOT dobutamine.'; cls='bad'; }
+      kReadout.innerHTML = msg;
+      kReadout.className = 'readout ' + cls;
+      if(!simUsed){ simUsed = true; addXP(15, 'ksim', 'Do-No-Harm Master'); }
+    }
+    kRange.addEventListener('input', updateK);
+    updateK();
+  }
+
+  /* ============ CHECKLISTS (S7) ============ */
+  var allChecklistsDone = 0, totalChecklists = document.querySelectorAll('.checklist').length;
+  document.querySelectorAll('.checklist').forEach(function(list){
+    var boxes = list.querySelectorAll('input[type=checkbox]');
+    var prog = list.querySelector('[data-progress]');
+    var total = boxes.length;
+    var doneAwarded = false;
+    function refresh(){
+      var done = 0;
+      boxes.forEach(function(b){
+        if(b.checked){ done++; b.closest('.ck').classList.add('done'); }
+        else { b.closest('.ck').classList.remove('done'); }
+      });
+      prog.textContent = done + ' / ' + total + ' complete';
+      if(done === total && !doneAwarded){
+        doneAwarded = true;
+        allChecklistsDone++;
+        addXP(25, 'ck-' + list.id, 'Checklist done');
+        if(allChecklistsDone >= totalChecklists){ earnBadge('bdg-ck'); addXP(20, 'allck', 'Checklist Champion'); }
+      }
+    }
+    boxes.forEach(function(b){
+      b.addEventListener('change', function(){
+        if(b.checked) addXP(4, null, 'Step checked');
+        refresh();
+      });
+    });
+  });
+
+  /* ============ MCQs (S19) ============ */
+  var MCQS = [
+    {
+      q: "A 64-year-old post-menopausal woman develops chest pain and anterior ST elevation within hours of her husband's death. The most likely trigger/diagnosis is:",
+      opts: ["Spontaneous coronary dissection from exertion","Takotsubo cardiomyopathy precipitated by acute emotional stress","Pericarditis from a viral illness","Aortic dissection extending to the coronaries"],
+      correct: 1,
+      exp: "A post-menopausal woman with an intense emotional stressor and a STEMI-like presentation is the classic Takotsubo setting (~90% post-menopausal women, emotional or physical triggers). Angiography typically shows clean coronaries with apical ballooning."
+    },
+    {
+      q: "Why does the LV apex balloon while the base is hyperkinetic in Takotsubo?",
+      opts: ["The apex has the poorest coronary blood supply at baseline","The apex has a higher density of beta-adrenoceptors / catecholamine sensitivity, so the surge stuns it","The base is infarcted and the apex compensates","The apex is fibrotic from previous infarction"],
+      correct: 1,
+      exp: "Takotsubo is catecholamine-mediated stunning. The apex has higher beta-adrenoceptor density and catecholamine sensitivity, so the catecholamine surge (with a switch to negative-inotropic signalling ± microvascular spasm) stuns the apex while the catecholamine-stimulated base contracts harder."
+    },
+    {
+      q: "Which finding most strongly suggests Takotsubo rather than a true anterior STEMI before angiography?",
+      opts: ["A very high troponin matching the ST elevation","A troponin that is disproportionately LOW for the extent of ST elevation and wall-motion abnormality","Reciprocal ST depression in the inferior leads","A QRS that matches a prior bundle branch block"],
+      correct: 1,
+      exp: "The troponin–ECG disproportion is a key clue: in Takotsubo the troponin is only modestly raised despite marked ST elevation and a large akinetic apex, because the muscle is stunned, not infarcted. A true large anterior STEMI releases far more troponin."
+    },
+    {
+      q: "What investigation confirms the diagnosis of Takotsubo in this patient?",
+      opts: ["A high BNP alone","Coronary angiography showing clean coronaries plus a ventriculogram/echo showing apical ballooning (Mayo / InterTAK criteria)","Exercise stress test","CT pulmonary angiogram"],
+      correct: 1,
+      exp: "Diagnosis rests on absence of obstructive CAD/plaque rupture at angiography together with the characteristic transient apical (or mid/basal) ballooning, supported by Mayo Clinic criteria and the InterTAK score. The wall-motion abnormality extends beyond a single coronary territory."
+    },
+    {
+      q: "A Takotsubo patient develops hypotension with a new murmur that is LOUDER on Valsalva and a dynamic LVOT gradient on echo. The correct management is:",
+      opts: ["Start dobutamine to improve output","Avoid inotropes/catecholamines; give fluids, cautious beta-blockade, and use mechanical support (Impella) if needed","Start high-dose adrenaline","Immediate thrombolysis"],
+      correct: 1,
+      exp: "This is dynamic LVOT-obstruction physiology. Catecholamines/inotropes worsen the obstruction by intensifying basal hyperkinesis and systolic anterior motion. Treat by filling the ventricle, cautious beta-blockade, and mechanical support (Impella) rather than inotropes."
+    },
+    {
+      q: "Which best distinguishes Takotsubo from an anterior STEMI?",
+      opts: ["Takotsubo always has higher troponin","Takotsubo has clean coronaries with wall motion crossing arterial territories and recovers, whereas STEMI has an LAD culprit with territory-matched necrosis","STEMI never causes ST elevation","Takotsubo is irreversible"],
+      correct: 1,
+      exp: "Takotsubo: clean coronaries, apical ballooning beyond one artery, catecholamine-mediated stunning, troponin disproportionately low, recovers in days–weeks. Anterior STEMI: LAD culprit lesion, wall-motion matches the artery, proportionate (often high) troponin, irreversible necrosis."
+    },
+    {
+      q: "Which complication of Takotsubo is correctly paired with its mechanism?",
+      opts: ["Apical thrombus — from the akinetic, stagnant apex","Torsades de Pointes — from a short QT","Free-wall rupture — only in the basal variant","Mitral regurgitation — from a hyperkinetic apex"],
+      correct: 0,
+      exp: "The akinetic apex is thrombogenic and can throw clot (stroke/embolism) — anticoagulate when present. Torsades arises from the markedly PROLONGED (not short) QT; MR is from systolic anterior motion/apical tethering. Takotsubo is NOT benign — shock, Torsades and thrombus all occur."
+    },
+    {
+      q: "Regarding the prognosis of Takotsubo, which statement is correct?",
+      opts: ["It is always benign with no mortality","LV function usually recovers over days to weeks, but the acute phase carries STEMI-comparable mortality and it can recur","It causes permanent apical scarring like an infarct","It never recurs once resolved"],
+      correct: 1,
+      exp: "The stunned myocardium typically recovers fully over days to weeks (no scar on MRI — no late gadolinium enhancement), but it is NOT benign: in-hospital mortality is comparable to STEMI due to heart failure, LVOT obstruction, shock and arrhythmia, and recurrence occurs."
+    }
+  ];
+
+  var host = document.getElementById('mcqHost');
+  var mcqVal = document.getElementById('mcqVal');
+  var mcqScore = 0, mcqAnswered = 0;
+  var letters = ['A','B','C','D','E'];
+
+  MCQS.forEach(function(item, qi){
+    var box = document.createElement('div');
+    box.className = 'mcq';
+    var html = '<div class="mcq-q">QUESTION ' + (qi+1) + ' / ' + MCQS.length + '</div>';
+    html += '<div class="mcq-stem">' + item.q + '</div>';
+    item.opts.forEach(function(opt, oi){
+      html += '<label class="mcq-opt" data-oi="' + oi + '"><strong>' + letters[oi] + '.</strong> ' + opt + '</label>';
+    });
+    html += '<div class="mcq-exp"></div>';
+    box.innerHTML = html;
+    host.appendChild(box);
+
+    var opts = box.querySelectorAll('.mcq-opt');
+    var exp = box.querySelector('.mcq-exp');
+    var locked = false;
+    opts.forEach(function(label){
+      label.addEventListener('click', function(){
+        if(locked) return;
+        locked = true;
+        var oi = parseInt(label.getAttribute('data-oi'),10);
+        box.classList.add('answered');
+        var correct = item.correct;
+        if(oi === correct){
+          label.classList.add('picked-right');
+          mcqScore++;
+          addXP(25, null, 'Correct answer');
+        } else {
+          label.classList.add('picked-wrong');
+          opts[correct].classList.add('show-right');
+          showToast('❌ Correct: ' + letters[correct]);
+        }
+        exp.innerHTML = '<strong>' + (oi === correct ? '✅ Correct. ' : '📘 Explanation. ') + '</strong>' + item.exp;
+        mcqAnswered++;
+        mcqVal.textContent = mcqScore + ' / ' + MCQS.length;
+        if(mcqAnswered === MCQS.length){
+          var done = document.getElementById('mcqDone');
+          var summary = document.getElementById('mcqSummary');
+          done.style.display = 'block';
+          summary.textContent = 'You scored ' + mcqScore + ' / ' + MCQS.length + '. ' +
+            (mcqScore === MCQS.length ? 'Flawless — you treat clean-coronary apical ballooning as Takotsubo and never pour in catecholamines. 🏆' :
+             mcqScore >= 6 ? 'Strong — review the misses and the contrast pairs in S6.' :
+             'Revisit S3, S5, S6 and S11 — the Takotsubo-vs-STEMI and avoid-inotropes logic is the whole case.');
+          if(mcqScore >= 7){ earnBadge('bdg-quiz'); addXP(50, 'quizace', 'Quiz Ace!'); }
+        }
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
