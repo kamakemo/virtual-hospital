@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acute Anterior STEMI — Primary PCI — Virtual Teaching Hospital</title>
+<!-- META
+id: c-stemi-020
+title: Acute Anterior STEMI — Primary PCI
+hospital: cardiology
+department: cv-ccu
+bednumber: 1
+chiefcomplaint: Crushing retrosternal chest pain with ST elevation in V1-V4
+system: Cardiology
+severity: critical
+tags: STEMI, ACS, Primary PCI, Door-to-balloon, Dual antiplatelet, LAD
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --radius:16px;
+    --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  /* Internal scroll viewport. When this case is embedded the host app stretches
+     the iframe to full content height and the OUTER page scrolls, which would
+     let a sticky bar scroll away. We instead scroll inside this box (sized to
+     the visible window by JS) so the section tab bar stays pinned at the top.
+     Standalone, it falls back to the full viewport height. */
+  #caseScroll{height:100vh; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; scroll-padding-top:92px}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:36px 24px 80px; position:relative; overflow:hidden}
+  .hero::after{content:"📈"; position:absolute; right:-20px; top:-30px; font-size:220px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{max-width:1100px; margin:0 auto; position:relative; z-index:1}
+  .hero .crumbs{font-size:13px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:10px 0 6px; font-size:clamp(26px,4vw,40px); line-height:1.15}
+  .hero .sub{font-size:16px; opacity:.95}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; backdrop-filter:blur(4px)}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== LIVE ECG STRIP IN HERO ===== */
+  .ecg-banner{max-width:1100px; margin:14px auto 0; position:relative; z-index:1}
+  .ecg-banner svg{width:100%; height:64px; display:block; background:rgba(0,0,0,.18); border-radius:12px; border:1px solid rgba(255,255,255,.25)}
+  .ecg-trace{stroke:#86efac; stroke-width:2.4; fill:none; stroke-dasharray:1600; stroke-dashoffset:1600; animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{stroke-dashoffset:0}}
+
+  /* ===== VITALS STRIP ===== */
+  .vitals-strip{max-width:1100px; margin:-52px auto 0; padding:0 24px; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:11px; font-weight:700; letter-spacing:.6px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:21px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== HORIZONTAL SECTION SIDEBAR (fixed — always visible) ===== */
+  .topnav{position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(15,23,42,.10)}
+  .topnav .rail{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; max-width:1180px; margin:0 auto; scrollbar-width:thin}
+  .navchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink2); font-size:11px; font-weight:700; text-decoration:none; min-width:78px; text-align:center; transition:all .18s; cursor:pointer}
+  .navchip .s-id{font-size:10px; letter-spacing:1px; color:#94a3b8}
+  .navchip .s-emoji{font-size:16px}
+  .navchip:hover{border-color:var(--rose); color:var(--rose); transform:translateY(-2px)}
+  .navchip.active{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; border-color:#b91c1c}
+  .navchip.active .s-id{color:#fecaca}
+  .navchip.visited:not(.active){border-color:var(--emerald-line); background:var(--emerald-soft)}
+
+  /* ===== DASHBOARD WIDGET ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:215px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10.5px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:760px){.dash{display:none}}
+
+  /* ===== MAIN / SECTIONS (tabbed: one section visible at a time) ===== */
+  main{max-width:1100px; margin:26px auto 80px; padding:0 24px}
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:26px; overflow:hidden}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16.5px; margin:26px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14.5px; margin:18px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:24px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15.5px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:14px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px; letter-spacing:.4px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14.5px}
+
+  /* ===== INTERACTIVE BITS ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:10px 18px; font-weight:700; font-size:14px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:22px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:15px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 15px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 15px; margin-top:12px; font-size:14px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim sliders */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:14px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:14px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Heart/circuit diagram */
+  .heart-fig{display:flex; gap:18px; flex-wrap:wrap; align-items:center; background:var(--slate-soft); border-radius:16px; padding:18px; margin:14px 0}
+  .heart-fig svg{flex:0 0 auto}
+  .heart-legend{flex:1; min-width:230px; font-size:13.5px}
+  .lg{display:flex; align-items:center; gap:8px; margin:5px 0}
+  .lg .sw{width:14px; height:14px; border-radius:4px; flex:0 0 auto}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Journey cards */
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:14px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:15px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:14px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13.5px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:22px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14.5px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:13px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .footer{max-width:1100px; margin:0 auto 36px; padding:0 24px; text-align:center; color:#94a3b8; font-size:12.5px}
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="caseScroll">
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · 💗 CCU · 🛏️ Bed 1</div>
+    <h1>📈 Acute Anterior STEMI — "Time Is Muscle"</h1>
+    <div class="sub">⚡ A 58-year-old man is crushed by central chest pain radiating to his left arm and jaw, drenched in sweat. The 12-lead shows tombstone ST elevation in V1–V4. The LAD is occluded right now. Start the clock to the balloon.</div>
+    <div class="chips">
+      <span class="chip crit">🔴 CRITICAL</span>
+      <span class="chip">🫀 ST-Elevation MI</span>
+      <span class="chip">🎈 Primary PCI</span>
+      <span class="chip">⏱️ Door-to-Balloon</span>
+      <span class="chip">🎮 Interactive Case</span>
+      <span class="chip">🩸 Proximal LAD</span>
+    </div>
+    <div class="ecg-banner" title="Anterior STEMI rhythm strip with ST elevation">
+      <svg viewBox="0 0 800 64" preserveAspectRatio="none" aria-label="ST elevation anterior STEMI strip">
+        <polyline class="ecg-trace" points="0,40 40,40 55,12 70,58 85,40 130,40 145,12 160,58 175,40 220,40 235,12 250,58 265,40 310,40 325,12 340,58 355,40 400,40 415,12 430,58 445,40 490,40 505,12 520,58 535,40 580,40 595,12 610,58 625,40 670,40 685,12 700,58 715,40 760,40 775,12 790,58 800,40"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== LIVE VITALS ===================== -->
+<div class="vitals-strip">
+  <div class="vitals-grid">
+    <div class="vital warn"><div class="v-label">💓 HR</div><div class="v-num">110</div></div>
+    <div class="vital warn"><div class="v-label">🩸 BP</div><div class="v-num">150/90</div></div>
+    <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">22</div></div>
+    <div class="vital warn"><div class="v-label">🫁 SpO₂</div><div class="v-num">94%</div></div>
+    <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.7°</div></div>
+    <div class="vital"><div class="v-label">🧠 GCS</div><div class="v-num">15</div></div>
+    <div class="vital alert"><div class="v-label">😖 Pain</div><div class="v-num">9/10</div></div>
+    <div class="vital alert"><div class="v-label">📈 ST↑</div><div class="v-num">V1–V4</div></div>
+  </div>
+</div>
+
+<!-- ===================== HORIZONTAL SECTION SIDEBAR ===================== -->
+<nav class="topnav" id="topnav">
+  <div class="rail">
+    <a class="navchip" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navchip" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navchip" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navchip" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navchip" href="#s5"><span class="s-emoji">🎓</span><span>Consultant Round</span><span class="s-id">S5</span></a>
+    <a class="navchip" href="#s6"><span class="s-emoji">📖</span><span>Teaching Points</span><span class="s-id">S6</span></a>
+    <a class="navchip" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navchip" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navchip" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navchip" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navchip" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navchip" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navchip" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navchip" href="#s14"><span class="s-emoji">🔀</span><span>Differentials</span><span class="s-id">S14</span></a>
+    <a class="navchip" href="#s15"><span class="s-emoji">🗺️</span><span>Plan</span><span class="s-id">S15</span></a>
+    <a class="navchip" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navchip" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navchip" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navchip" href="#s19"><span class="s-emoji">🧠</span><span>MCQs</span><span class="s-id">S19</span></a>
+  </div>
+</nav>
+
+<!-- ===================== SCORE DASHBOARD ===================== -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections visited</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-vt">🫀 STEMI-Spotter</span>
+      <span class="badge" id="bdg-shock">🎈 Reperfused On Time</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champion</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Ward Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running sims, taking the right path and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- S1 — PROFILE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s1">
+  <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+  <div class="section-content">
+    <div class="callout danger">
+      <b class="ct">🚨 YOU ARE HERE — 08:42, CCU Bed 1</b>
+      A 58-year-old man is clutching his chest, gray and pouring sweat, saying <em>"It feels like… an elephant… sitting on me."</em> The pain bores into his left arm and jaw. The 12-lead just printed: <strong>broad ST elevation across V1–V4 with reciprocal ST depression inferiorly</strong>. This is a <strong>proximal LAD occlusion</strong> — an artery that is shut <em>right now</em>. Every minute you spend reading is muscle dying. The only question that matters: how fast can you open it?
+    </div>
+
+    <h3>👤 Patient Identity</h3>
+    <table class="tbl">
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>🧔 Name</td><td><strong>Mr. A.K.</strong></td></tr>
+      <tr><td>🎂 Age / Sex</td><td>58-year-old male</td></tr>
+      <tr><td>🆔 MRN</td><td>CV-20088</td></tr>
+      <tr><td>⚖️ Weight</td><td>92 kg</td></tr>
+      <tr><td>💼 Occupation</td><td>Long-haul lorry driver</td></tr>
+      <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+    </table>
+
+    <h3>📜 Past Medical History — the risk ledger</h3>
+    <ul>
+      <li>🚬 <strong>Current smoker, 35 pack-years</strong> — the single most modifiable driver of plaque rupture in a man this age.</li>
+      <li>🩸 <strong>Hypertension</strong>, poorly controlled, "doesn't like taking tablets."</li>
+      <li>🍔 <strong>Dyslipidemia</strong> — never been on a statin; LDL last checked at 4.6 mmol/L two years ago.</li>
+      <li>🍩 <strong>Impaired fasting glucose / pre-diabetes</strong> and central obesity (the metabolic backdrop of accelerated atherosclerosis).</li>
+      <li>👨‍👦 <strong>Family history:</strong> father had a fatal MI at 55. Premature coronary disease runs in the family.</li>
+      <li>🕗 Symptoms began <strong>40 minutes ago</strong> while loading his lorry — sudden, severe, persistent. This is an early presenter — maximal myocardium is still salvageable.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Persistent ST elevation in two contiguous leads with chest pain is an acute coronary occlusion. The diagnosis is the ECG — do not wait for the troponin to act."</div>
+
+    <h3>🧬 Why THIS patient? — plaque rupture meets a closed pipe</h3>
+    <p>An atherosclerotic plaque in his <strong>proximal LAD</strong> — built over decades by smoking, hypertension and high LDL — developed a thin, inflamed fibrous cap. This morning that cap <strong>ruptured</strong>, exposing the lipid core and tissue factor to flowing blood. Platelets swarmed, aggregated, and a <strong>platelet-rich thrombus</strong> grew until it acutely and totally occluded the vessel. Downstream, the entire anterior wall is now without blood. Necrosis begins at the <strong>endocardium</strong> (furthest from epicardial flow) and marches outward toward the epicardium as a <strong>wavefront</strong> over the next several hours. The ST elevation on the monitor is the electrical signature of that transmural injury. The clock that started 40 minutes ago is counting down living muscle.</p>
+
+    <div class="callout warn"><b class="ct">🔥 Risk factors for acute STEMI / plaque rupture</b>
+    🚬 Smoking · 🩸 Hypertension · 🍔 High LDL / dyslipidemia · 🍩 Diabetes / metabolic syndrome · 👨‍👦 Premature family history · 🧓 Age &amp; male sex · 🧪 Inflammation · 🥶 Cocaine / sympathetic surge (a separate trigger to ask about)</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S2 — HANDOVER -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s2">
+  <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+  <div class="section-content">
+    <h3>📻 Paramedic Handover — the clock is already running</h3>
+    <div class="callout info">
+      <b class="ct">🎙️ SBAR from the ambulance crew (verbatim)</b>
+      <p><strong>S:</strong> "This is Mr. A.K., 58, sudden crushing central chest pain radiating to the left arm and jaw, started 40 minutes ago, drenched in sweat. Pain 9 out of 10, not eased by the GTN we gave."</p>
+      <p><strong>B:</strong> "Heavy smoker, hypertension, dad died of a heart attack at 55. No previous cardiac history that he knows of."</p>
+      <p><strong>A:</strong> "<strong>Pre-hospital 12-lead shows ST elevation V1 to V4</strong> with ST depression in the inferior leads. HR 110, BP 150/90. We transmitted the ECG and called a <strong>STEMI alert</strong> from the truck."</p>
+      <p><strong>R:</strong> "We've given aspirin 300 mg chewed, IV access, oxygen as his sats dipped to 92. The cath lab has been pre-activated. He's all yours — please don't let him sit in a waiting queue."</p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A pre-hospital STEMI alert exists to bypass the queue. The moment the diagnosis is made, the only acceptable destination is the cath lab table — not a bed, not a second opinion, not a CT."</div>
+
+    <h3>🚩 Spot-the-Red-Flag — tap each feature that screams ACUTE STEMI</h3>
+    <p>🎮 <em>Interactive: click every feature that points to an acute anterior STEMI (not a benign mimic). Each correct flag = +10 XP. Wrong picks cost you.</em></p>
+    <div id="flagGame">
+      <button class="btn ghost flag-btn" data-good="1">🫀 Crushing / pressure-like retrosternal pain</button>
+      <button class="btn ghost flag-btn" data-good="1">💧 Profuse diaphoresis</button>
+      <button class="btn ghost flag-btn" data-good="1">📈 ST elevation in V1–V4</button>
+      <button class="btn ghost flag-btn" data-good="1">🪞 Reciprocal inferior ST depression</button>
+      <button class="btn ghost flag-btn" data-good="1">💪 Radiation to the left arm / jaw</button>
+      <button class="btn ghost flag-btn" data-good="0">👉 Sharp pain reproduced by pressing on the chest wall</button>
+      <button class="btn ghost flag-btn" data-good="0">🌡️ Fever 39°C</button>
+      <button class="btn ghost flag-btn" data-good="0">🫁 Pain that worsens only on deep inspiration (pleuritic)</button>
+    </div>
+    <p id="flagResult" style="font-weight:700"></p>
+
+    <h3>⏱️ Timeline so far</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">08:02</div>Sudden crushing chest pain while loading the lorry. Wife calls emergency services.</div>
+      <div class="t-item"><div class="t-time">08:20</div>Paramedics on scene: pre-hospital 12-lead shows anterior ST elevation. Aspirin 300 mg given, STEMI alert transmitted.</div>
+      <div class="t-item"><div class="t-time">08:42</div>Arrival in CCU resus. Cath lab pre-activated. You take over — 🏅 the system has bought him minutes; don't waste them.</div>
+      <div class="t-item"><div class="t-time">Goal</div>First-medical-contact-to-device &lt; 120 min; door-to-balloon &lt; 90 min. The countdown is live.</div>
+    </div>
+
+    <div class="callout ok"><b class="ct">🏅 Praise where due</b>The paramedics did three things that save anterior walls: a 12-lead in the field, aspirin early, and a <strong>pre-hospital activation</strong> that woke the cath lab before the patient arrived. Field activation shortens ischemic time and reduces mortality. Your job now is not to re-diagnose — it is to keep the chain moving.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S3 — INITIAL ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s3">
+  <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+  <div class="section-content">
+    <h3>🅰️🅱️🅲️ Primary Survey — what your hands, eyes and ears find</h3>
+    <table class="tbl">
+      <tr><th>Step</th><th>Finding</th><th>What it means mechanistically</th></tr>
+      <tr><td>🅰️ Airway</td><td>Patent, speaking in full but anxious sentences.</td><td>Protecting his own airway — reassuring, but the picture can change fast if he arrests or develops pulmonary edema.</td></tr>
+      <tr><td>🅱️ Breathing</td><td>RR 22, SpO₂ 94% on air, fine bibasal crackles.</td><td>Early left-heart dysfunction from a large area of stunned/ischemic anterior myocardium → rising LV filling pressure → pulmonary congestion. A warning of pump failure.</td></tr>
+      <tr><td>🅲️ Circulation</td><td>HR 110, <strong>BP 150/90</strong>, peripheries warm for now. Soft S4, no murmur yet. Pulses equal in both arms.</td><td>Sympathetic surge (pain, catecholamines) drives the tachycardia and hypertension. <strong>Equal arm pulses and no inter-arm BP difference help argue against aortic dissection</strong> — a critical check before anticoagulating.</td></tr>
+      <tr><td>🅳 Disability</td><td>GCS 15, in obvious distress, frightened.</td><td>Cerebral perfusion preserved so far. Pain itself increases myocardial oxygen demand — treating it is therapeutic, not just kind.</td></tr>
+      <tr><td>🅴 Exposure</td><td>Diaphoretic, cool clammy hands, no rash, no calf swelling, no tearing back pain.</td><td>Diaphoresis = massive autonomic activation typical of large MI. The deliberate absence of tearing/back pain and unequal pulses keeps dissection low — but you asked, and that matters.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Before you give a single anticoagulant or lytic to a 'STEMI', feel both radial pulses and ask about tearing pain to the back. A missed aortic dissection that you anticoagulate is a death you caused."</div>
+
+    <h3>🧭 The single most important decision: HOW will you reperfuse — and how fast?</h3>
+    <p>STEMI management forks on one question: <strong>can you get a wire across that occlusion fast enough?</strong> <strong>Primary PCI</strong> is the reperfusion standard if it can be delivered within <strong>120 minutes of first medical contact</strong> (target door-to-balloon &lt; 90 minutes). If timely PCI is genuinely unavailable, <strong>fibrinolysis</strong> is the fallback — but only after excluding contraindications (and dissection). For Mr. A.K., the cath lab is activated and minutes away: this is a <strong>primary PCI</strong> case.</p>
+
+    <div class="callout danger"><b class="ct">🎈 The decision is made: PRIMARY PCI NOW</b>Give <strong>aspirin + a P2Y12 inhibitor + an anticoagulant</strong>, keep the <strong>cath lab activated</strong>, and move him to the table. Do <strong>not</strong> wait for the troponin to "confirm" the diagnosis — the ECG already made it. Do <strong>not</strong> give fibrinolytics when PCI is available and timely. Treat pain and hypoxia, then go.</div>
+
+    <!-- 🎬 BRANCHING SCENARIO ENGINE -->
+    <div class="scenario" id="scenarioBox">
+      <h3>🎬 Choose Your Path — "The First 10 Minutes"</h3>
+      <div class="hud"><span>❤️ Stability: <b id="scStab">●●○○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 s</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+      <div class="scene-text" id="scText">The 12-lead confirms anterior STEMI. Aspirin was given pre-hospital. BP 150/90, HR 110, pain 9/10, SpO₂ 94%. The cath lab is activated and the interventionalist is scrubbing. What is your FIRST priority?</div>
+      <div class="choices" id="scChoices"></div>
+      <div class="feedback" id="scFeedback"></div>
+      <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+    </div>
+
+    <div class="callout info"><b class="ct">🧮 If timely PCI were NOT available</b>
+    In a centre &gt; 120 minutes from a cath lab, the right answer flips to <strong>fibrinolysis</strong> (e.g. tenecteplase) given as fast as possible — <em>after</em> a deliberate contraindication check and exclusion of aortic dissection — followed by transfer to a PCI centre (pharmaco-invasive strategy). But "PCI is unavailable" must be true: never choose lysis over a cath lab that can open the artery in time.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S4 — RESIDENT REVIEW -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s4">
+  <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+  <div class="section-content">
+    <p><em>The cardiology resident arrives at 08:44. Her reasoning, out loud:</em></p>
+
+    <h3>🧠 Pattern recognition first, then physiology</h3>
+    <p>"Crushing pain, diaphoresis, ST elevation V1–V4 with reciprocal inferior depression in a man with every coronary risk factor going. That is an <strong>acute proximal LAD occlusion</strong> — I don't need the troponin to act, and waiting for it would be malpractice. The reciprocal changes aren't noise; they <em>raise</em> my confidence that this is a true coronary occlusion and not pericarditis or early repolarization. The dangerous instinct here is delay — for a CT, for a second ECG, for bloods. The artery is shut now."</p>
+
+    <h3>🎯 Immediate priorities (her actual order of operations)</h3>
+    <ol>
+      <li>🎈 <strong>Confirm cath lab is activated and rolling.</strong> Reperfusion is the whole game; everything else is adjunctive. Say the door-to-balloon clock out loud.</li>
+      <li>💊 <strong>Dual antiplatelet:</strong> aspirin (already 300 mg) <em>plus</em> a potent P2Y12 inhibitor — <strong>ticagrelor or prasugrel</strong>, preferred over clopidogrel.</li>
+      <li>🩸 <strong>Anticoagulation:</strong> unfractionated heparin (or bivalirudin) per the cath lab's protocol.</li>
+      <li>🩻 <strong>Exclude aortic dissection in 20 seconds:</strong> both arm pulses, inter-arm BP, tearing/back pain, mediastinum on any prior imaging — <em>before</em> heparin.</li>
+      <li>😖 <strong>Treat pain and hypoxia:</strong> IV opioid for ongoing pain (which lowers oxygen demand), oxygen only if SpO₂ &lt; 90%. High-intensity statin started from day 1.</li>
+      <li>🚫 <strong>Hold the reflexes that harm:</strong> no routine oxygen if sats are fine, and <strong>no IV beta-blocker</strong> while there are any signs of early failure or shock (the COMMIT lesson).</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Open the artery first; load the antiplatelets and anticoagulant on the way; rule out dissection before the heparin — and keep the beta-blocker in your pocket until you are sure he isn't failing."</div>
+
+    <h3>🤔 "But shouldn't we wait for the troponin to be sure?"</h3>
+    <p>"No. STEMI is an <strong>electrocardiographic and clinical diagnosis</strong>. The troponin will be normal or barely up this early — necrosis takes hours to leak detectable enzyme. If I wait for a positive troponin, I am waiting for muscle to die before I act. The ECG plus the story <em>is</em> the diagnosis. Troponin is for risk stratification and for the NSTEMI/unstable-angina branch — not for licensing reperfusion in an obvious STEMI."</p>
+
+    <div class="callout purple"><b class="ct">🧪 Resident's self-test (answer before reading on)</b>
+    A colleague wants to push IV metoprolol now "to slow the heart and rest the myocardium." Good idea in this patient?
+    <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+    <div class="reveal-hidden" id="rev1"><p><strong>Not yet — and be careful.</strong> He has a tachycardia of 110 and crackles at the bases — early pump dysfunction. <strong>COMMIT</strong> showed that <em>early routine IV beta-blockade</em> in unstable STEMI <strong>increased cardiogenic shock</strong>. Beta-blockers are valuable in STEMI, but give them <strong>oral, once hemodynamically stable</strong>, and <strong>avoid them in acute heart failure or shock</strong>. In a patient with signs of failing, an IV beta-blocker bolus can tip him into shock.</p></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S5 — CONSULTANT ROUND -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s5">
+  <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round</h2></div>
+  <div class="section-content">
+    <p><em>The on-call interventional cardiologist, by phone at 08:46, then at the bedside:</em></p>
+
+    <h3>🗂️ Localize the infarct precisely — it changes what you fear next</h3>
+    <div class="vs">
+      <div class="side a"><h4>🔴 Anterior STEMI (this patient)</h4>
+        <ul><li><strong>ST elevation V1–V4</strong> → <strong>LAD</strong> (proximal if aVR/V1 elevation, RBBB or LAFB appear)</li><li>Largest territory → most muscle at risk → highest risk of pump failure, cardiogenic shock, VT/VF</li><li>Watch for: cardiogenic shock, anterior wall rupture, LV thrombus/aneurysm later</li><li>Reperfusion: <strong>primary PCI</strong> of the LAD</li></ul></div>
+      <div class="side b"><h4>🔵 Other territories (for contrast)</h4>
+        <ul><li><strong>Inferior (II/III/aVF) → RCA</strong> (or LCx). Always get <strong>V4R</strong> for RV involvement — nitrates can crash a preload-dependent RV infarct</li><li><strong>Lateral (I/aVL/V5–V6) → LCx</strong></li><li><strong>Posterior:</strong> tall R + ST depression V1–V3 = a <em>mirror</em> image — get posterior leads</li><li>Each territory has its own complication profile</li></ul></div>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"V1–V4 is the LAD and the anterior wall — the biggest, most dangerous infarct. In any inferior STEMI, get a right-sided V4R before you reach for a nitrate, or you may drop a preload-dependent RV off a cliff."</div>
+
+    <h3>🧭 Consultant's three commandments for the next 90 minutes</h3>
+    <ol>
+      <li>🎈 "<strong>Door-to-balloon under 90 minutes; first-medical-contact-to-device under 120.</strong> Every 30-minute delay to reperfusion adds roughly 8% to one-year mortality. The interventional team, the antiplatelets and the heparin all exist to serve that one number."</li>
+      <li>💊 "Load <strong>ticagrelor or prasugrel</strong> — they beat clopidogrel in STEMI (PLATO, TRITON-TIMI 38). Clopidogrel is the fallback when the potent agents are contraindicated (e.g. prior stroke for prasugrel)."</li>
+      <li>🩸 "Before any heparin or — heaven forbid — any lytic, <strong>rule out aortic dissection</strong>. Tearing-to-the-back pain or unequal pulses? Stop and image. The 'STEMI' that is actually a dissection involving the coronary ostium is the catastrophe we replay at M&amp;M."</li>
+    </ol>
+
+    <h3>🫀 What if the cath lab were 3 hours away?</h3>
+    <p>"Then I treat time as the enemy and give <strong>fibrinolysis</strong> immediately — once contraindications and dissection are excluded — and arrange transfer for rescue/early PCI (pharmaco-invasive). But here the lab is hot and ten minutes away, so lysis would be the <em>wrong</em> choice: it is less effective than PCI for a proximal LAD and carries bleeding risk I don't need to take."</p>
+
+    <div class="callout danger"><b class="ct">☠️ The consultant's war memory (more in S13 M&amp;M)</b>"The worst night of my training was a 'STEMI' that a tired team thrombolysed without feeling the pulses. It was an <strong>aortic dissection</strong> that had peeled into the right coronary ostium and mimicked an inferior MI. The lytic turned a contained dissection into a <strong>hemopericardium with tamponade</strong>. He arrested on the trolley and we lost him. The inter-arm BP difference was in the nursing notes, unread. Now I feel both wrists on every chest-pain patient before I anticoagulate. Always."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S6 — TEACHING POINTS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s6">
+  <div class="sec-header"><span class="s-badge">S6</span><h2>📖 Teaching Points</h2></div>
+  <div class="section-content">
+    <h3>🔬 The mechanism — WHY a ruptured plaque kills muscle (the WHY behind the WHY)</h3>
+    <ol>
+      <li>🧱 <strong>The substrate:</strong> decades of smoking, hypertension and high LDL build a lipid-laden atheroma in the LAD with a thin, inflamed fibrous cap.</li>
+      <li>💥 <strong>The trigger — plaque RUPTURE:</strong> the cap tears (often a modest stenosis, not the tightest one), exposing the thrombogenic lipid core and tissue factor to flowing blood.</li>
+      <li>🩸 <strong>Thrombosis:</strong> platelets adhere, activate and aggregate into a <strong>platelet-rich thrombus</strong>; the coagulation cascade locks it in with fibrin until the LAD is <strong>acutely and totally occluded</strong>.</li>
+      <li>🌊 <strong>The wavefront of necrosis:</strong> downstream myocardium loses all flow. Necrosis starts at the <strong>endocardium</strong> (last to receive epicardial perfusion, highest wall stress) and advances outward to become <strong>transmural</strong> over hours — hence "time is muscle." ST <em>elevation</em> reflects this transmural injury current.</li>
+      <li>💀 <strong>Why it kills:</strong> a large anterior infarct destroys pump function → cardiogenic shock; the ischemic, electrically unstable border zone spawns <strong>VT/VF</strong>; days later the necrotic wall can <strong>rupture</strong>. Open the artery early and you abort the wavefront, salvaging muscle, pump and rhythm.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"STEMI is a clot stopping a wavefront of death from the inside out. Reperfusion reverses the wavefront — and every 30 minutes you save is muscle, pump and life you keep."</div>
+
+    <h3>⚖️ Contrast pair #1 — STEMI vs PERICARDITIS (the benign mimic that must not be lysed)</h3>
+    <div class="vs">
+      <div class="side a"><h4>🫀 STEMI IS… (act on this)</h4><ul><li>Crushing, pressure pain ± radiation to arm/jaw, diaphoresis</li><li><strong>Regional</strong> ST elevation matching a coronary territory (e.g. V1–V4)</li><li><strong>Reciprocal ST depression</strong> in opposite leads</li><li>Convex ("tombstone") ST morphology, evolving Q waves</li><li>Rising troponin over hours; reperfuse urgently</li></ul></div>
+      <div class="side b"><h4>🩹 Pericarditis is NOT that…</h4><ul><li>Sharp, <strong>pleuritic/positional</strong> pain, better leaning forward</li><li><strong>Diffuse, concave</strong> ST elevation across many territories</li><li><strong>PR depression</strong>; <strong>NO reciprocal changes</strong> (except aVR/V1)</li><li>Often a friction rub; viral prodrome</li><li>Do NOT thrombolyse — anticoagulation risks hemorrhagic effusion</li></ul></div>
+    </div>
+    <p>😈 <strong>The trap:</strong> diffuse concave ST elevation gets mistaken for STEMI (over-treatment), or a true STEMI with subtle elevation gets dismissed as "pericarditis" (catastrophic under-treatment). <strong>Reciprocal change and a regional, convex pattern point to occlusion; PR depression with diffuse concave elevation and no reciprocal change point to pericarditis.</strong></p>
+
+    <h3>⚖️ Contrast pair #2 — TYPE 1 MI vs TYPE 2 MI</h3>
+    <div class="vs">
+      <div class="side a"><h4>🩸 Type 1 MI (tonight)</h4><ul><li>Primary <strong>plaque rupture</strong> + thrombus → coronary occlusion</li><li>Treat the clot: antiplatelets, anticoagulant, <strong>reperfusion</strong></li><li>The classic STEMI pathway</li></ul></div>
+      <div class="side b"><h4>⚖️ Type 2 MI</h4><ul><li><strong>Supply–demand mismatch</strong> — tachyarrhythmia, anemia, hypotension, sepsis, severe hypertension</li><li>No acute plaque event; ischemia from imbalance</li><li><strong>Treat the trigger</strong> (rate, blood, BP, sepsis); reperfusion is usually not the answer</li></ul></div>
+    </div>
+    <p>💡 <em>Why it matters:</em> reflexively cath-and-stent a Type 2 troponin rise and you expose a patient to procedural and bleeding risk for a problem that needed a transfusion or rate control. Read the whole picture — but a convincing STEMI ECG with the right story is Type 1 until proven otherwise.</p>
+
+    <!-- 🎮 INTERACTIVE SIM: door-to-balloon time -->
+    <div class="sim" id="kSim">
+      <h3 style="margin-top:0">🎮 Simulation — The Reperfusion Clock: how door-to-balloon time tunes salvage and mortality</h3>
+      <p style="font-size:13.5px">Drag the dial. Watch what minutes-to-reperfusion do to the muscle you save and to his survival. This is the single most important "invisible vital sign" in this case: the clock.</p>
+      <label for="kRange">⏱️ Minutes to reperfusion (door-to-balloon): <b id="kVal">31</b> min</label>
+      <input type="range" id="kRange" min="20" max="75" value="31">
+      <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+      <div class="readout bad" id="kReadout">Set the dial to explore.</div>
+      <p style="font-size:12.5px; margin-top:10px; color:var(--ink2)">🎯 Target for primary PCI: <strong>door-to-balloon &lt; 90 min</strong> (system target FMC-to-device &lt; 120 min). Under 90 → maximal salvage. 90–120 → borderline, salvage falling. Over 120 → large infarct, mortality climbing — every 30-minute delay adds roughly 8% to one-year mortality.</p>
+    </div>
+
+    <!-- 📚 EBM MODULE -->
+    <div class="ebm">
+      <h3>📚 Evidence-Based Medicine Corner</h3>
+      <table class="tbl">
+        <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+        <tr><td><span class="lvl">RCT</span> PLATO (2009)</td><td>Ticagrelor vs clopidogrel in ACS reduced cardiovascular death/MI/stroke and cardiovascular mortality.</td><td>Ticagrelor is a preferred P2Y12 inhibitor over clopidogrel in STEMI managed with PCI.</td></tr>
+        <tr><td><span class="lvl">RCT</span> TRITON-TIMI 38 (2007)</td><td>Prasugrel vs clopidogrel in ACS undergoing PCI reduced ischemic events (more bleeding; avoid with prior stroke/TIA).</td><td>Prasugrel is a potent alternative in PCI-treated STEMI; respect its bleeding contraindications.</td></tr>
+        <tr><td><span class="lvl">RCT</span> COMMIT (2005)</td><td>Early routine IV then oral metoprolol in acute MI: fewer reinfarctions/VF but <strong>more cardiogenic shock</strong>, especially in hemodynamically unstable patients.</td><td>Don't give an early IV beta-blocker to a failing/shocked STEMI; use oral once stable.</td></tr>
+        <tr><td><span class="lvl">RCT</span> DANAMI-2 (2003)</td><td>Primary PCI superior to fibrinolysis for STEMI, even with transfer, driven by less reinfarction.</td><td>Primary PCI is the reperfusion standard when it can be delivered in time.</td></tr>
+        <tr><td><span class="lvl">RCT</span> CULPRIT-SHOCK (2017)</td><td>In MI with cardiogenic shock and multivessel disease, <strong>culprit-only PCI</strong> beat immediate complete revascularization.</td><td>In shock, fix the culprit first; stage the rest. Don't do everything at once.</td></tr>
+        <tr><td><span class="lvl">GUIDELINE</span> 2023 ESC ACS Guideline</td><td>Unified ACS pathway: immediate reperfusion for STEMI, potent DAPT, door-to-balloon &lt; 90 min / FMC-device &lt; 120 min, lysis only if PCI not timely.</td><td>Exactly the algorithm driving S3, S7 and S11.</td></tr>
+      </table>
+    </div>
+
+    <!-- 🔬 ADVANCED TOPICS -->
+    <div class="callout purple">
+      <h3 style="margin-top:0">🔬 Fellowship Corner — Advanced Topics</h3>
+      <ul>
+        <li>🩻 <strong>Subtle/occlusion-MI ECG patterns:</strong> de Winter T waves (upsloping ST depression + tall T in precordials = LAD occlusion equivalent), Wellens' syndrome (biphasic/deep T in V2–V3 = critical proximal LAD stenosis), hyperacute T waves, and posterior MI (tall R + ST depression V1–V3). Sgarbossa/modified-Sgarbossa criteria for STEMI in LBBB or paced rhythm.</li>
+        <li>🎈 <strong>PCI technicalities:</strong> radial-first access, aspiration thrombectomy (no longer routine — TOTAL/TASTE), drug-eluting stents, intracoronary imaging (IVUS/OCT) for stent optimization, and physiology (FFR/iFR) for non-culprit lesions.</li>
+        <li>💔 <strong>Cardiogenic shock pathway:</strong> CULPRIT-SHOCK culprit-only strategy, vasopressors/inotropes, mechanical support (IABP — neutral in IABP-SHOCK II; Impella; VA-ECMO), and early shock-team activation.</li>
+        <li>🧨 <strong>Mechanical complications (days 3–7):</strong> free-wall rupture (tamponade), ventricular septal rupture (new harsh murmur + shock), papillary muscle rupture (acute severe MR, flash pulmonary edema) — surgical emergencies.</li>
+        <li>🩸 <strong>MINOCA &amp; mimics:</strong> myocardial infarction with non-obstructive coronaries — plaque erosion, coronary spasm, embolism, SCAD (especially younger women), Takotsubo. The angiogram doesn't always show a classic culprit.</li>
+        <li>💉 <strong>Antithrombotic nuances:</strong> bivalirudin vs heparin, cangrelor for the P2Y12-naïve/vomiting patient, GP IIb/IIIa bailout for large thrombus burden, and DAPT-duration tailoring by bleeding/ischemic risk.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S7 — ORDERS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s7">
+  <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+  <div class="section-content">
+    <h3>🖊️ The order set, written as you'd actually write it (08:45)</h3>
+    <ul>
+      <li>🎈 <strong>ACTIVATE / CONFIRM CATH LAB — PRIMARY PCI.</strong> Door-to-balloon target &lt; 90 min. This order outranks all others.</li>
+      <li>💊 <strong>Aspirin 300 mg chewed</strong> (given pre-hospital — confirm) then 75–100 mg daily.</li>
+      <li>💊 <strong>P2Y12 inhibitor:</strong> <strong>ticagrelor 180 mg</strong> load (or prasugrel 60 mg if PCI planned and no prior stroke/TIA, age/weight appropriate). Clopidogrel 600 mg only if the potent agents are contraindicated.</li>
+      <li>🩸 <strong>Anticoagulation:</strong> unfractionated heparin IV bolus per cath-lab protocol (or bivalirudin) — <strong>only after</strong> dissection is excluded.</li>
+      <li>🩻 <strong>Dissection check FIRST:</strong> both arm BPs/pulses, tearing/back pain, review CXR mediastinum — document before heparin.</li>
+      <li>😖 <strong>Analgesia:</strong> IV opioid (e.g. morphine 2–4 mg) titrated for ongoing pain; antiemetic as needed.</li>
+      <li>🫁 <strong>Oxygen ONLY if SpO₂ &lt; 90%</strong> — routine oxygen in normoxic MI is not beneficial (and may harm). Target ≥ 90–94%.</li>
+      <li>💉 <strong>High-intensity statin from day 1</strong> (e.g. atorvastatin 80 mg) regardless of baseline LDL.</li>
+      <li>🚫 <strong>NO routine IV beta-blocker</strong> while there are signs of failure/shock (COMMIT); oral beta-blocker once stable. Avoid nitrates if hypotensive or RV involvement suspected.</li>
+      <li>🧪 Bloods: troponin (for trend, not to license reperfusion), U&amp;E, glucose/HbA1c, lipids, CBC, coagulation; continuous ECG monitoring; serial 12-leads. NPO for the lab.</li>
+      <li>🔌 Defibrillator at the bedside — anterior STEMI is the highest-risk territory for VT/VF.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In STEMI there is one priority — open the artery in time — and a short list of drugs that make it safer: aspirin, a potent P2Y12, an anticoagulant, analgesia and a statin. Everything else waits."</div>
+
+    <!-- 🩺 PROCEDURE GUIDE 1 -->
+    <div class="checklist" id="ckCV">
+      <h3 style="margin-top:0">🩺 Procedure Guide — Primary PCI Activation Pathway — tick as you go</h3>
+      <label class="ck"><input type="checkbox"><span>🫀 Confirm STEMI on 12-lead (ST elevation ≥ 2 contiguous leads; here V1–V4) and note time of first medical contact</span></label>
+      <label class="ck"><input type="checkbox"><span>🩻 Exclude aortic dissection: both arm pulses/BP, tearing/back pain, mediastinum — document <strong>before</strong> anticoagulating</span></label>
+      <label class="ck"><input type="checkbox"><span>💊 Give dual antiplatelet: aspirin 300 mg + ticagrelor/prasugrel load</span></label>
+      <label class="ck"><input type="checkbox"><span>🩸 Give anticoagulation (UFH or bivalirudin) per cath-lab protocol</span></label>
+      <label class="ck"><input type="checkbox"><span>🎈 Confirm cath lab activated; transfer to table — keep door-to-balloon &lt; 90 min; FMC-to-device &lt; 120 min</span></label>
+      <label class="ck"><input type="checkbox"><span>😖 Treat pain/hypoxia (opioid; O₂ only if SpO₂ &lt; 90%); start high-intensity statin</span></label>
+      <label class="ck"><input type="checkbox"><span>🔌 Defibrillator at bedside; continuous monitoring; consent and brief the patient en route</span></label>
+      <div class="ck-progress" data-progress>0 / 7 complete</div>
+    </div>
+
+    <!-- 🩺 PROCEDURE GUIDE 2 -->
+    <div class="checklist" id="ckDefib">
+      <h3 style="margin-top:0">🩺 Procedure Guide — If timely PCI is NOT available: Fibrinolysis pathway</h3>
+      <p style="font-size:13px">⚠️ Only when primary PCI cannot be delivered within 120 minutes of first medical contact. Lysis is time-critical but contraindication- and dissection-dependent.</p>
+      <label class="ck"><input type="checkbox"><span>⏱️ Confirm PCI genuinely unavailable in time (transfer &gt; 120 min) — lysis is the fallback, not the default</span></label>
+      <label class="ck"><input type="checkbox"><span>🩻 <strong>Rule out aortic dissection</strong> and screen absolute contraindications (recent bleed, stroke, surgery, severe uncontrolled HTN)</span></label>
+      <label class="ck"><input type="checkbox"><span>💉 Give a fibrinolytic (e.g. tenecteplase, weight-adjusted) as fast as possible — door-to-needle &lt; 30 min</span></label>
+      <label class="ck"><input type="checkbox"><span>💊 Add antiplatelet + anticoagulant per lytic protocol (clopidogrel preferred with lysis)</span></label>
+      <label class="ck"><input type="checkbox"><span>📈 Assess reperfusion at 60–90 min (≥ 50% ST resolution, pain relief); arrange transfer for rescue/early PCI</span></label>
+      <label class="ck"><input type="checkbox"><span>🚨 Watch for bleeding, especially intracranial; neuro checks; have reversal ready</span></label>
+      <div class="ck-progress" data-progress>0 / 6 complete</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S8 — NURSING CARE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s8">
+  <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+  <div class="section-content">
+    <h3>🛏️ CCU nursing priorities — minute by minute</h3>
+    <ul>
+      <li>📟 <strong>Continuous cardiac monitoring with the defibrillator at the bedside, pads ready.</strong> Anterior STEMI is the highest-risk territory for VT/VF — be one button from defibrillation.</li>
+      <li>⏱️ <strong>Own the clock:</strong> note and call out first-medical-contact time and the door-to-balloon target; every avoidable minute on the ward erodes salvage.</li>
+      <li>🩸 <strong>BP every 5 min</strong> in <strong>both arms initially</strong> (a real inter-arm difference is a dissection flag) and continuous once the arterial line is in.</li>
+      <li>💊 <strong>Give the dual antiplatelet and anticoagulant promptly and accurately</strong> — confirm the P2Y12 choice and that aspirin was truly given; document times.</li>
+      <li>😖 <strong>Titrate analgesia and reassess pain</strong> — ongoing pain means ongoing ischemia; report a pain that won't settle.</li>
+      <li>🫁 <strong>Oxygen only if SpO₂ &lt; 90%</strong> — don't reflexively mask a normoxic patient.</li>
+      <li>🩻 <strong>Prep for the cath lab:</strong> consent support, shave/clean access sites, remove metal, IV access patent, NPO, weight for drug dosing.</li>
+      <li>🧠 <strong>Watch for deterioration:</strong> falling BP, rising HR, new breathlessness/crackles, a new murmur, or sudden collapse → escalate immediately.</li>
+      <li>👨‍👩‍👦 Keep the patient and family informed and calm (see S16) — fear drives catecholamines and oxygen demand. A composed bedside is therapeutic.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who guards the door-to-balloon clock, keeps the defibrillator within arm's reach and checks both arm pressures is doing half the reperfusion work in the room."</div>
+    <div class="callout warn"><b class="ct">📢 Escalate IMMEDIATELY for</b>VT/VF on the monitor (→ defibrillate) · falling BP / rising HR (cardiogenic shock) · new breathlessness or pink frothy sputum (pulmonary edema) · a new harsh murmur (VSD / papillary rupture) · ongoing or recurrent pain · an inter-arm BP difference or tearing back pain (dissection) · any plan for an IV beta-blocker in a failing patient.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S9 — INVESTIGATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s9">
+  <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+  <div class="section-content">
+    <h3>🧾 Results board (08:50, drawn on arrival)</h3>
+    <table class="tbl">
+      <tr><th>Test</th><th>Result</th><th>Reference</th><th>Interpretation</th></tr>
+      <tr><td>Troponin I (initial)</td><td class="ok-v">0.03 ng/mL</td><td>&lt; 0.04</td><td>Normal/barely up — necrosis is too early to leak. <strong>This does NOT exclude STEMI and must not delay reperfusion.</strong> Trend it for the curve, not the green light.</td></tr>
+      <tr><td>Troponin I (3 h)</td><td class="hi">8.4 ng/mL ↑↑</td><td>&lt; 0.04</td><td>Now markedly elevated — confirms large infarct in retrospect. By the time it rose, the ECG had already made the call.</td></tr>
+      <tr><td>Glucose</td><td class="hi">11.2 mmol/L ↑</td><td>4–7.8</td><td>Stress hyperglycemia ± undiagnosed diabetes — associated with worse outcomes; check HbA1c.</td></tr>
+      <tr><td>Creatinine</td><td class="hi">1.4 mg/dL ↑</td><td>0.7–1.2</td><td>Mild impairment — relevant to contrast load at PCI and to drug dosing. Hydrate, minimize contrast.</td></tr>
+      <tr><td>Potassium</td><td class="ok-v">4.2 mmol/L</td><td>3.5–5.0</td><td>Normal — keep it 4.0–4.5 in acute MI to reduce arrhythmia risk.</td></tr>
+      <tr><td>LDL cholesterol</td><td class="hi">4.4 mmol/L ↑</td><td>&lt; 1.8 (target)</td><td>High — start high-intensity statin from day 1 regardless; the acute event resets the target much lower.</td></tr>
+      <tr><td>CXR</td><td class="ok-v">Normal mediastinum</td><td>—</td><td>No widened mediastinum — supportive (not definitive) against dissection; mild upper-lobe diversion fits early failure.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A normal early troponin in an obvious STEMI is a trap, not reassurance. The ECG diagnoses; the troponin merely confirms later. Never let a pending enzyme delay the balloon."</div>
+
+    <div class="callout info"><b class="ct">🧠 Why we still send bloods we won't wait for</b>Troponin, renal function, glucose, lipids and coagulation shape <em>downstream</em> care — contrast strategy, drug dosing, secondary prevention, bleeding risk. They are essential for the next 24 hours. They are <strong>irrelevant to the decision to reperfuse</strong>, which the 12-lead already settled. Send them, then move to the lab.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S10 — ECG / IMAGING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s10">
+  <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging</h2></div>
+  <div class="section-content">
+    <h3>🫀 The presenting ECG — read it like a detective</h3>
+    <div class="ecg-fig">
+      <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Anterior STEMI: ST elevation V1-V4 with reciprocal inferior ST depression">
+        <rect width="820" height="150" fill="#0b1220"/>
+        <g stroke="#1e3a5f" stroke-width="1">
+          <line x1="0" y1="30" x2="820" y2="30"/><line x1="0" y1="60" x2="820" y2="60"/>
+          <line x1="0" y1="90" x2="820" y2="90"/><line x1="0" y1="120" x2="820" y2="120"/>
+        </g>
+        <polyline fill="none" stroke="#86efac" stroke-width="2.4" points="0,70 30,70 40,70 48,40 56,18 70,18 80,70 95,70 110,70 122,40 134,18 150,18 160,70 175,70 195,70 207,42 219,18 235,18 245,70 260,70 280,70 292,42 304,20 320,20 330,70 350,70 380,70 392,70 404,86 416,92 430,86 442,70 470,70 500,70 512,70 524,88 536,94 550,88 562,70 600,70 640,70 652,70 664,88 676,94 690,88 702,70 760,70 800,70"/>
+        <text x="120" y="14" fill="#fca5a5" font-size="12" font-weight="700">↑ ST elevation V1–V4 (LAD)</text>
+        <text x="470" y="120" fill="#fcd34d" font-size="12" font-weight="700">↓ reciprocal inferior ST depression</text>
+      </svg>
+      <div class="ecg-cap">Convex ("tombstone") <span style="color:#fca5a5">ST elevation across V1–V4</span> from a proximal LAD occlusion, with <span style="color:#fcd34d">reciprocal ST depression</span> in the inferior leads. The regional, convex pattern plus reciprocal change is near-diagnostic of acute coronary occlusion.</div>
+    </div>
+
+    <h3>🔎 The STEMI-localization toolkit (memorize the high-yield map)</h3>
+    <table class="tbl">
+      <tr><th>Leads</th><th>Territory / artery — and what to fear</th></tr>
+      <tr><td>📈 <strong>V1–V4</strong></td><td><strong>Anterior — LAD.</strong> The biggest infarct; proximal occlusion (aVR/V1 elevation, new RBBB/LAFB) means the largest territory and highest shock/arrhythmia risk.</td></tr>
+      <tr><td>↘️ <strong>II, III, aVF</strong></td><td><strong>Inferior — RCA</strong> (or LCx). Always add <strong>V4R</strong>: RV involvement makes the patient preload-dependent — nitrates can crash the BP.</td></tr>
+      <tr><td>↔️ <strong>I, aVL, V5–V6</strong></td><td><strong>Lateral — circumflex (LCx)</strong>, often electrically "silent."</td></tr>
+      <tr><td>🪞 <strong>V1–V3 ST depression + tall R</strong></td><td><strong>Posterior MI</strong> — a mirror image; confirm with posterior leads (V7–V9). Easily missed.</td></tr>
+      <tr><td>🔄 <strong>Reciprocal changes</strong></td><td>ST depression in leads opposite the infarct — they <strong>strengthen</strong> the diagnosis of true occlusion and argue against pericarditis/early repolarization.</td></tr>
+      <tr><td>🧩 <strong>STEMI equivalents</strong></td><td>de Winter T waves, Wellens', hyperacute T waves, posterior MI, and STEMI in LBBB/paced rhythm (Sgarbossa) — occlusions hiding without classic elevation.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Regional convex ST elevation WITH reciprocal change is an occluded artery. Diffuse concave elevation with PR depression and no reciprocal change is pericarditis. The reciprocal lead is your lie-detector."</div>
+
+    <h3>🫀 Adjunctive imaging</h3>
+    <ul>
+      <li>📈 <strong>Coronary angiography (the definitive test &amp; the treatment):</strong> expected <strong>100% proximal LAD occlusion</strong> with a fresh thrombus — proceed straight to primary PCI of the culprit.</li>
+      <li>🩻 <strong>Echo (peri-/post-procedure):</strong> anterior/apical regional wall-motion abnormality; estimate EF; screen for mechanical complications (VSD, MR, free-wall rupture) and later LV thrombus in an akinetic apex.</li>
+      <li>🖥️ <strong>CXR:</strong> assess for pulmonary congestion and — importantly — mediastinal width as a dissection screen before anticoagulation.</li>
+    </ul>
+
+    <div class="callout warn"><b class="ct">⚠️ The ECG's favorite lie in chest pain</b>"It's diffuse, so it's just pericarditis" — said over a true STEMI. Or the opposite: a normal-<em>looking</em> trace hiding a de Winter or posterior occlusion. <strong>The reassuring signs are a clearly regional pattern, reciprocal change, and an evolving troponin — and a prior ECG to compare.</strong> When the story is classic and the ECG shows territorial elevation, treat as occlusion.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S11 — MEDICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s11">
+  <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+  <div class="section-content">
+    <h3>💉 Acute drugs — what, why, and the traps</h3>
+    <table class="tbl">
+      <tr><th>Drug</th><th>Role tonight</th><th>Mechanism / caution</th></tr>
+      <tr><td><strong>Aspirin 300 mg chewed</strong></td><td>Immediate antiplatelet — give to every suspected ACS</td><td>Irreversibly inhibits COX-1 → blocks thromboxane A2 → less platelet aggregation. Chew for speed. Then 75–100 mg daily lifelong.</td></tr>
+      <tr><td><strong>Ticagrelor 180 mg</strong> (or prasugrel 60 mg)</td><td>Potent P2Y12 inhibitor — second antiplatelet for PCI-treated STEMI</td><td><strong>Preferred over clopidogrel</strong> (PLATO/TRITON). Prasugrel: avoid with prior stroke/TIA, caution &gt; 75 y / &lt; 60 kg. Ticagrelor: dyspnea, twice-daily, avoid with high-dose aspirin.</td></tr>
+      <tr><td><strong>Clopidogrel</strong></td><td>P2Y12 fallback when potent agents contraindicated, or with fibrinolysis</td><td>Prodrug, slower/weaker, variable response. The default companion when lysis is used.</td></tr>
+      <tr><td><strong>Heparin (UFH) / bivalirudin</strong></td><td>Periprocedural anticoagulation for PCI</td><td>Prevents catheter/thrombus propagation. <strong>Exclude dissection first.</strong> Bivalirudin a direct thrombin inhibitor alternative.</td></tr>
+      <tr><td><strong>Opioid (morphine)</strong></td><td>Analgesia for ongoing ischemic pain</td><td>Lowers pain-driven oxygen demand. Caution: may slow P2Y12 absorption and mask ongoing ischemia; titrate small doses.</td></tr>
+      <tr><td><strong>High-intensity statin (atorvastatin 80 mg)</strong></td><td>Plaque stabilization &amp; secondary prevention — from day 1</td><td>Start regardless of baseline LDL; pleiotropic and lipid-lowering benefit begins early.</td></tr>
+      <tr><td><strong>Beta-blocker (oral, once stable)</strong></td><td>Reduces reinfarction, arrhythmia, remodeling</td><td><strong>AVOID IV/early in acute heart failure or shock (COMMIT).</strong> Start oral once hemodynamically stable, no failure signs.</td></tr>
+      <tr><td><strong>ACEi (within 24 h) ± MRA (if EF &lt; 40%)</strong></td><td>Limit remodeling; mortality benefit in anterior MI / low EF</td><td>Start ACEi within 24 h if no hypotension/AKI. Add an MRA (eplerenone) for EF &lt; 40% with HF/diabetes.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Ticagrelor or prasugrel beat clopidogrel in most STEMI. Statin from day 1. ACEi within 24 hours. Beta-blocker only once he isn't failing — and never IV into early shock."</div>
+
+    <div class="callout danger"><b class="ct">🚫 The 'never / not-yet' list in acute STEMI</b>❌ Fibrinolysis when timely PCI is available · ❌ any anticoagulant/lytic before excluding aortic dissection · ❌ early IV beta-blocker in heart failure/shock (COMMIT) · ❌ nitrates in hypotension or suspected RV infarct · ❌ waiting for the troponin to "confirm" before reperfusing. When in doubt, the priority is always <strong>open the artery in time</strong>.</div>
+
+    <h3>🏠 Secondary-prevention therapy (this admission, then for life)</h3>
+    <ul>
+      <li>💊 <strong>DAPT for ≥ 12 months</strong> (aspirin + ticagrelor/prasugrel), then aspirin lifelong — tailor by bleeding/ischemic risk.</li>
+      <li>💙 <strong>High-intensity statin</strong> ± ezetimibe/PCSK9 to drive LDL well below 1.8 (often &lt; 1.4) mmol/L.</li>
+      <li>🫀 <strong>ACEi/ARB, beta-blocker, and MRA if EF &lt; 40%</strong> — the post-MI remodeling-prevention quartet; add SGLT2i where indicated.</li>
+      <li>🚭 <strong>Smoking cessation, cardiac rehab, BP and glucose control</strong> — the interventions that change his next decade.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S12 — MONITORING -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s12">
+  <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+  <div class="section-content">
+    <h3>📡 What to watch and why</h3>
+    <ul>
+      <li>📈 <strong>Continuous telemetry</strong> with the defibrillator at the bedside for ≥ 24–48 h — anterior STEMI carries the highest VT/VF and AV-block risk; print any ectopy.</li>
+      <li>📉 <strong>Serial 12-leads and ST-segment monitoring</strong> — track ST resolution (≥ 50% by 60–90 min signals reperfusion), and catch re-occlusion or new territory.</li>
+      <li>🩸 <strong>Beat-to-beat BP (arterial line)</strong> through PCI and the early hours — a falling pressure heralds cardiogenic shock; rising suggests pain/anxiety.</li>
+      <li>🫁 <strong>Respiratory status &amp; SpO₂</strong> — new crackles, breathlessness or frothy sputum = developing pulmonary edema/pump failure.</li>
+      <li>🩺 <strong>Daily exam for mechanical complications (days 3–7):</strong> a new harsh murmur (VSD or papillary rupture), muffled sounds/pulsus paradoxus (rupture/tamponade).</li>
+      <li>🧪 <strong>Serial troponin, renal function and glucose</strong> — infarct size, contrast nephropathy, and stress hyperglycemia/diabetes management.</li>
+      <li>🩻 <strong>Post-procedure echo</strong> for EF and wall motion — drives ACEi/MRA, ICD timing (reassess EF ≥ 40 days later), and LV-thrombus surveillance in an akinetic apex.</li>
+    </ul>
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After you open the artery, the monitor's job changes from 'is it still occluded?' to 'is the pump failing or the rhythm turning?' — and the two readouts that answer it are the blood pressure and the ST segments."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S13 — COMPLICATIONS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s13">
+  <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+  <div class="section-content">
+    <h3>💀 What can go wrong — and the mechanism</h3>
+    <ul>
+      <li>⚡ <strong>Ventricular arrhythmia (VT/VF) / cardiac arrest</strong> — the ischemic anterior border zone is electrically unstable; the leading early killer. Defibrillator at the bedside.</li>
+      <li>💔 <strong>Cardiogenic shock / acute pump failure</strong> — a large anterior infarct destroys contractile mass; rising filling pressures → pulmonary edema → shock. Culprit-only PCI, support devices.</li>
+      <li>🧨 <strong>Mechanical complications (days 3–7):</strong> free-wall rupture (tamponade), ventricular septal rupture (new murmur + shock), papillary muscle rupture (acute severe MR, flash edema) — surgical emergencies.</li>
+      <li>🚧 <strong>Conduction block</strong> — anterior MI can cause infranodal/bundle-branch block and complete heart block (a bad-prognosis sign from a large infarct); have pacing available.</li>
+      <li>🩸 <strong>Bleeding / stent thrombosis</strong> — the price of antithrombotics; and re-occlusion if antiplatelets are interrupted early.</li>
+      <li>🫀 <strong>LV thrombus, aneurysm, pericarditis, and later remodeling/heart failure</strong> — the akinetic apex breeds clot and, weeks on, Dressler's pericarditis or chronic HFrEF.</li>
+    </ul>
+
+    <!-- 🎭 M&M CONFERENCE MODULE -->
+    <div class="mm">
+      <h3>🎭 Morbidity &amp; Mortality Conference — "The STEMI That Was a Dissection"</h3>
+      <div class="mm-case">
+        <strong>The case:</strong> A 64-year-old man arrived with severe chest pain and inferior ST changes. A busy night team read "inferior STEMI," and with the cath lab 30 minutes away the senior chose <strong>thrombolysis</strong> to "save time." Nobody felt both radial pulses; nobody asked about the pain radiating to the back. It was an <strong>aortic dissection</strong> that had sheared into the right coronary ostium and mimicked an MI. The lytic converted a contained dissection into a <strong>hemopericardium with tamponade</strong>. He arrested within twenty minutes and could not be saved. The nursing observations recorded a <strong>20 mmHg inter-arm BP difference</strong> — unread.
+      </div>
+      <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+      <div class="swiss">
+        <div class="hole"><b>🧠 ANCHORING</b>"Chest pain + ST changes = STEMI" — the diagnosis closed before dissection was considered.</div>
+        <div class="hole"><b>🩻 PULSES NOT FELT</b>Both radials and inter-arm BP were never compared at the bedside.</div>
+        <div class="hole"><b>📋 SIGN UNREAD</b>A 20 mmHg inter-arm difference sat in the notes, never acted on.</div>
+        <div class="hole"><b>💉 LETHAL DRUG</b>Fibrinolysis into a dissection → hemopericardium → tamponade → arrest.</div>
+        <div class="hole"><b>🌙 SYSTEM</b>Night fatigue, time pressure, no "rule-out-dissection-before-lysis" default.</div>
+      </div>
+      <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> a 20-second dissection screen <em>before</em> any anticoagulant or lytic — feel both radial pulses, compare arm BPs, ask about tearing/back pain, glance at the mediastinum; favor <strong>primary PCI</strong> (where the angiogram reveals the truth) over blind lysis; and never anchor on "STEMI" without the bedside exam. <strong>This is exactly why your consultant feels both wrists on every chest-pain patient tonight.</strong></p>
+    </div>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'It's obviously a STEMI, just lyse it' is the sentence on the chart of patients who die of dissection. Tearing pain or unequal pulses must be excluded before any lytic or anticoagulant."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S14 — DIFFERENTIALS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s14">
+  <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials</h2></div>
+  <div class="section-content">
+    <h3>🧩 The ST-elevation / acute chest pain differential</h3>
+    <table class="tbl">
+      <tr><th>Diagnosis</th><th>Clues</th><th>Why it matters</th></tr>
+      <tr><td>🫀 <strong>Acute STEMI</strong> (this patient)</td><td>Crushing pain, diaphoresis, regional convex ST elevation (V1–V4) with reciprocal change, rising troponin</td><td>Default assumption with this picture; reperfuse urgently — primary PCI within 120 min of FMC.</td></tr>
+      <tr><td>🩹 <strong>Pericarditis / myocarditis</strong></td><td>Pleuritic, positional pain; diffuse <strong>concave</strong> ST elevation + PR depression; <strong>no reciprocal change</strong>; rub</td><td>Do NOT thrombolyse; anticoagulation risks hemorrhagic effusion. NSAIDs/colchicine for pericarditis.</td></tr>
+      <tr><td>🆘 <strong>Aortic dissection</strong></td><td><strong>Tearing</strong> pain to the back, <strong>unequal pulses / inter-arm BP difference</strong>, widened mediastinum; can mimic inferior MI</td><td>Anticoagulation/lysis is lethal. <strong>Must be excluded before treating as STEMI.</strong> CT aorta, surgery.</td></tr>
+      <tr><td>📈 <strong>Early repolarization / LVH / BER</strong></td><td>Concave ST elevation, notched J-point, stable over time, no reciprocal change, asymptomatic</td><td>A benign over-call risk; compare to a prior ECG. Don't activate the lab for a normal variant.</td></tr>
+      <tr><td>🫁 <strong>Pulmonary embolism</strong></td><td>Pleuritic pain, dyspnea, hypoxia, sinus tachycardia, S1Q3T3, RV strain</td><td>Different anticoagulation/thrombolysis pathway; CTPA. Anterior T-wave changes can mislead.</td></tr>
+      <tr><td>🌀 <strong>Takotsubo / coronary spasm / MINOCA</strong></td><td>Often emotional/physical trigger, apical ballooning, non-obstructive coronaries at angiography</td><td>STEMI mimic; the angiogram clarifies. Management diverges from culprit-stenting.</td></tr>
+    </table>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"REGIONAL ST elevation with reciprocal change → treat as STEMI. DIFFUSE concave elevation with PR depression → think pericarditis. TEARING pain with unequal pulses → think dissection and keep the lytic in the cupboard."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S15 — PLAN -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s15">
+  <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan</h2></div>
+  <div class="section-content">
+    <h3>🧭 Now → this week → for life</h3>
+    <ol>
+      <li>🎈 <strong>Now (done):</strong> primary PCI of the proximal LAD with a drug-eluting stent → TIMI-3 flow restored; dual antiplatelet + heparin given; dissection excluded; pain controlled; CCU admission.</li>
+      <li>🫀 <strong>Stabilize &amp; surveil:</strong> serial ECG/troponin, echo for EF and complications, monitor for arrhythmia, pump failure and mechanical complications over the first week.</li>
+      <li>💊 <strong>Optimize secondary prevention:</strong> DAPT ≥ 12 months, high-intensity statin (± ezetimibe/PCSK9), ACEi within 24 h, beta-blocker once stable, MRA if EF &lt; 40%, SGLT2i where indicated.</li>
+      <li>🩺 <strong>Reassess LV function later:</strong> if EF remains ≤ 35% after ≥ 40 days of optimal therapy, consider a primary-prevention ICD.</li>
+      <li>🚭 <strong>Risk-factor blitz:</strong> intensive smoking cessation, BP and glucose/HbA1c control, weight and diet, and enrollment in <strong>cardiac rehabilitation</strong>.</li>
+      <li>👨‍👩‍👦 <strong>Shared decision-making &amp; education:</strong> what a stent is, why DAPT must not be stopped, recognizing recurrent symptoms, and a clear "call 911 for chest pain" safety net.</li>
+    </ol>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Primary PCI treats today's clot; DAPT, statin, the remodeling drugs and quitting cigarettes treat the disease. Send him home with all of them, or he comes back with the next plaque."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S16 — PROGRESS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s16">
+  <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+  <div class="section-content">
+    <h3>📅 Course in CCU</h3>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">Day 0, 09:48</div>Primary PCI: 100% proximal LAD occlusion opened, aspiration + drug-eluting stent, TIMI-3 flow. <strong>Door-to-balloon 66 min.</strong> Pain resolves; ST segments &gt; 50% resolved.</div>
+      <div class="t-item"><div class="t-time">Day 0, evening</div>Brief run of accelerated idioventricular rhythm (a benign reperfusion rhythm) — no intervention. BP stable, no recurrent pain.</div>
+      <div class="t-item"><div class="t-time">Day 1</div>Echo: EF 42% with anteroapical hypokinesis, no VSD/MR, no LV thrombus. ACEi and oral beta-blocker started; high-intensity statin continued.</div>
+      <div class="t-item"><div class="t-time">Day 2</div>Mobilizing on the ward, no arrhythmia, troponin peaked then falling. HbA1c confirms new type 2 diabetes — diabetes team involved.</div>
+      <div class="t-item"><div class="t-time">Day 3</div>Cardiac rehab referral, smoking-cessation counselling and nicotine replacement started. Secondary-prevention quartet optimized.</div>
+      <div class="t-item"><div class="t-time">Day 4</div>Stable, symptom-free, understands his medications and red flags. Ready for discharge with follow-up echo to re-assess EF/ICD need at ≥ 40 days.</div>
+    </div>
+
+    <!-- 👨‍👩‍👦 FAMILY & PATIENT JOURNEY MODULE -->
+    <h3>👨‍👩‍👦 Family &amp; Patient Journey</h3>
+    <div class="journey">
+      <div class="j-card"><div class="j-who">🧔 The patient — Mr. A.K.</div><p>"The pain was the worst thing I've ever felt — like a truck on my chest. They moved so fast I barely had time to be scared. One hour from the ambulance to a doctor opening the artery with a balloon. I've smoked since I was sixteen. That stops today."</p></div>
+      <div class="j-card"><div class="j-who">👩 His wife</div><p>"I called 999 and a nurse kept telling me what was happening while they wheeled him to the lab. The hardest part was the waiting, watching the doors. Then they came out and said 'the artery's open' and my legs went weak with relief."</p></div>
+      <div class="j-card"><div class="j-who">👩‍⚕️ The bedside nurse</div><p>"My job was the clock, the defibrillator and the truth — keeping the door-to-balloon time honest, the pads ready, and telling the family what each beep meant. Speed is the medicine in a STEMI."</p></div>
+      <div class="j-card"><div class="j-who">🎓 The team's reflection</div><p>"This wasn't a clever diagnosis — it was a fast one. We saw a regional ST elevation with reciprocal change, called it an occlusion, and let the system run. Time was muscle, and we kept most of it."</p></div>
+    </div>
+
+    <div class="callout pink"><b class="ct">💗 The human thread</b>A stent is not the end of the story — it is the start of a different life: a daily handful of tablets that must not be skipped, cigarettes left behind, and a heart that needs rehab to relearn its strength. Preparing the patient and family for that — why DAPT matters, what recurrent pain means, when to call — is as much treatment as the balloon.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S17 — DISCHARGE -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s17">
+  <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+  <div class="section-content">
+    <h3>📋 Discharge plan &amp; safety net</h3>
+    <ul>
+      <li>💊 <strong>Medications:</strong> aspirin + ticagrelor (<strong>DAPT ≥ 12 months — do NOT stop without cardiology advice</strong>), high-intensity statin, ACEi, beta-blocker, MRA if indicated, with a clear written schedule.</li>
+      <li>🩺 <strong>Stent counselling:</strong> why dual antiplatelet therapy prevents stent thrombosis, the danger of interrupting it for procedures (always ask cardiology first), and carrying a stent/medication card.</li>
+      <li>🚭 <strong>Risk-factor plan:</strong> structured smoking cessation (NRT/varenicline), BP and diabetes management, diet and weight, with clinic and GP follow-up booked before he leaves.</li>
+      <li>🏃 <strong>Cardiac rehabilitation</strong> enrollment; graded activity advice; driving and return-to-work guidance per local rules after MI.</li>
+      <li>🚩 <strong>Red flags → call emergency services:</strong> recurrent chest pain/pressure (especially at rest or unrelieved by GTN), breathlessness, fainting, palpitations — "treat new chest pain as the artery re-closing until proven otherwise."</li>
+      <li>📚 <strong>Education:</strong> what a heart attack is in plain language, why each tablet matters, the absolute importance of not stopping antiplatelets, and CPR/AED awareness offered to his wife.</li>
+    </ul>
+
+    <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Discharge after STEMI is not 'artery fixed, go home' — it is dual antiplatelet protected, a statin and the remodeling drugs, cigarettes quit, rehab booked, and a family who knows when to call 911."</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S18 — CLINICAL PEARLS -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s18">
+  <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+  <div class="section-content">
+    <div class="pearl-grid">
+      <div class="pearl"><b>⏱️ Time is muscle</b>Every 30-minute delay to reperfusion adds roughly 8% to one-year mortality. The clock is the diagnosis-after-the-diagnosis.</div>
+      <div class="pearl"><b>🎈 Door-to-balloon &lt; 90</b>Primary PCI within 90 min door-to-device; FMC-to-device &lt; 120 min. This is the number that everything else serves.</div>
+      <div class="pearl"><b>📈 ECG diagnoses STEMI</b>Regional ST elevation + reciprocal change = occlusion. Never wait for the troponin to act.</div>
+      <div class="pearl"><b>💊 Potent P2Y12</b>Ticagrelor or prasugrel beat clopidogrel in most STEMI (PLATO/TRITON). Clopidogrel is the fallback.</div>
+      <div class="pearl"><b>🚫 No early IV beta-blocker</b>Avoid in acute heart failure or shock — COMMIT showed it precipitates cardiogenic shock. Oral once stable.</div>
+      <div class="pearl"><b>🩻 Rule out dissection</b>Tearing-to-the-back pain or unequal pulses? Exclude aortic dissection before any lytic or anticoagulant.</div>
+      <div class="pearl"><b>🩸 PCI &gt; lysis when timely</b>Primary PCI is the standard if achievable &lt; 120 min of FMC (DANAMI-2). Lyse only when PCI isn't timely.</div>
+      <div class="pearl"><b>🪞 Reciprocal change is real</b>ST depression opposite the infarct strengthens the diagnosis and argues against pericarditis.</div>
+      <div class="pearl"><b>🗺️ V1–V4 = LAD</b>Anterior = the biggest, most dangerous infarct. Inferior STEMI? Get V4R for the RV before any nitrate.</div>
+      <div class="pearl"><b>💙 Statin from day 1</b>High-intensity statin on day 1 regardless of LDL; ACEi within 24 h; MRA if EF &lt; 40%.</div>
+      <div class="pearl"><b>⚖️ Type 1 vs Type 2</b>Plaque rupture (Type 1) → reperfuse. Supply–demand mismatch (Type 2) → treat the trigger.</div>
+      <div class="pearl"><b>🩹 STEMI vs pericarditis</b>Diffuse concave ST + PR depression, no reciprocal change, pleuritic/positional pain = pericarditis — do not lyse.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- S19 — MCQs / ASSESSMENT -->
+<!-- ============================================================ -->
+<section class="case-sec" id="s19">
+  <div class="sec-header"><span class="s-badge">S19</span><h2>🧠 MCQs / Assessment</h2></div>
+  <div class="section-content">
+    <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP and feed your dashboard. Each shows a full explanation.</em></p>
+    <div id="mcqHost"></div>
+    <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  🏥 Virtual Teaching Hospital · ❤️ Cardiology Hospital · Case c-stemi-020 — Acute Anterior STEMI — Primary PCI<br>
+  ⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."
+</div>
+
+</div><!-- /#caseScroll -->
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ XP / DASHBOARD CORE ============ */
+  var XP = 0, XP_MAX = 1200;
+  var awarded = {}; // dedupe one-time awards by key
+  var xpVal = document.getElementById('xpVal');
+  var xpFill = document.getElementById('xpFill');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+  }
+  function addXP(amount, key, label){
+    if(key){ if(awarded[key]) return; awarded[key] = true; }
+    XP += amount;
+    if(XP > XP_MAX) XP = XP_MAX;
+    xpVal.textContent = XP;
+    xpFill.style.width = Math.min(100, Math.round(XP / XP_MAX * 100)) + '%';
+    showToast('+' + amount + ' XP' + (label ? ' · ' + label : ''));
+  }
+  function earnBadge(id){
+    var b = document.getElementById(id);
+    if(b && !b.classList.contains('earned')){ b.classList.add('earned'); }
+  }
+
+  /* Dashboard minimize */
+  var dash = document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){
+    dash.classList.toggle('collapsed');
+    this.textContent = dash.classList.contains('collapsed') ? '+' : '–';
+  });
+
+  /* ============ INTERNAL SCROLL SIZING ============ */
+  /* Size the scroll box to the visible window so the sticky tab bar stays in
+     view. When embedded (srcDoc iframe, same-origin), the host page stretches
+     the iframe to full content height and scrolls the OUTER page — so we size
+     this box from the parent window's height minus whatever app chrome sits
+     above the iframe, and scroll internally instead. Standalone → 100vh. */
+  var caseScroll = document.getElementById('caseScroll');
+  var topnav = document.getElementById('topnav');
+  /* The tab bar is position:fixed, so it's out of flow — reserve space at the
+     top of the scroll content (and offset anchor jumps) by its real height. */
+  function setNavOffset(){
+    var navH = topnav ? topnav.offsetHeight : 70;
+    caseScroll.style.paddingTop = navH + 'px';
+    caseScroll.style.scrollPaddingTop = (navH + 14) + 'px';
+  }
+  function sizeScroller(){
+    try {
+      var p = window.parent;
+      if(p && p !== window && window.frameElement){
+        var rectTop = window.frameElement.getBoundingClientRect().top;
+        if(rectTop < 0) rectTop = 0;          // parent scrolled past the chrome
+        var ph = p.innerHeight || 800;
+        var h = ph - rectTop - 6;             // leave the bottom edge breathing room
+        if(h < 460) h = 460;                  // sane minimum on short windows
+        caseScroll.style.height = h + 'px';
+      } else {
+        caseScroll.style.height = '100vh';
+      }
+    } catch(e){ caseScroll.style.height = '100vh'; }
+    setNavOffset();
+  }
+  sizeScroller();
+  window.addEventListener('resize', sizeScroller);
+  window.addEventListener('load', sizeScroller);
+  try { if(window.parent && window.parent !== window) window.parent.addEventListener('resize', sizeScroller); } catch(e){}
+
+  /* ============ NAV: scroll-spy active + visited ============ */
+  var navchips = Array.prototype.slice.call(document.querySelectorAll('.navchip'));
+  var sections = navchips.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited = {};
+  var visitVal = document.getElementById('visitVal');
+
+  function markVisited(idx){
+    var sec = sections[idx];
+    if(!sec) return;
+    if(!visited[sec.id]){
+      visited[sec.id] = true;
+      navchips[idx].classList.add('visited');
+      var count = Object.keys(visited).length;
+      visitVal.textContent = count + ' / 19';
+      addXP(8, 'visit-' + sec.id, 'Section read');
+      if(count >= 19){ earnBadge('bdg-explorer'); addXP(60, 'allvisited', 'Ward Explorer!'); }
+    }
+  }
+  function setActive(idx){
+    navchips.forEach(function(c){ c.classList.remove('active'); });
+    if(navchips[idx]) navchips[idx].classList.add('active');
+  }
+
+  /* True tabs: each chip shows ONLY its section, hidden via CSS otherwise.
+     No scrollIntoView and no scroll-spy — nothing can scroll the tab bar away,
+     which also sidesteps every srcDoc-iframe scrolling quirk. The hero banner
+     and vitals strip belong to the case intro, so they show on S1 only. */
+  var heroBits = [document.querySelector('.hero'), document.querySelector('.vitals-strip')]
+    .filter(function(el){ return !!el; });
+
+  function showSection(idx){
+    sections.forEach(function(s, i){ if(s) s.classList.toggle('sec-active', i === idx); });
+    heroBits.forEach(function(el){ el.style.display = (idx === 0) ? '' : 'none'; });
+    caseScroll.scrollTop = 0;
+    setActive(idx);
+    markVisited(idx);
+  }
+
+  navchips.forEach(function(chip, idx){
+    chip.addEventListener('click', function(ev){
+      ev.preventDefault();
+      showSection(idx);
+    });
+  });
+  showSection(0);
+
+  /* ============ FLAG GAME (S2) ============ */
+  var flagBtns = document.querySelectorAll('#flagGame .flag-btn');
+  var flagResult = document.getElementById('flagResult');
+  var flagsFound = 0, flagsTotal = 0, flagWrong = 0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good') === '1') flagsTotal++; });
+  flagBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.dataset.locked) return;
+      btn.dataset.locked = '1';
+      var good = btn.getAttribute('data-good') === '1';
+      if(good){
+        btn.classList.add('flag-good');
+        flagsFound++;
+        addXP(10, 'flag-' + flagsFound + '-' + Math.random(), 'STEMI flag spotted');
+      } else {
+        btn.classList.add('flag-bad');
+        flagWrong++;
+        showToast('❌ Not a STEMI-specific flag');
+      }
+      if(flagsFound === flagsTotal){
+        flagResult.textContent = '✅ All ' + flagsTotal + ' STEMI red flags found' + (flagWrong ? ' (with ' + flagWrong + ' wrong pick' + (flagWrong>1?'s':'') + ')' : ' — flawless!');
+        earnBadge('bdg-vt');
+        addXP(30, 'flags-complete', 'STEMI-Spotter badge');
+      } else {
+        flagResult.textContent = flagsFound + ' / ' + flagsTotal + ' STEMI red flags found…';
+      }
+    });
+  });
+
+  /* ============ BRANCHING SCENARIO (S3) ============ */
+  var scText = document.getElementById('scText');
+  var scChoices = document.getElementById('scChoices');
+  var scFeedback = document.getElementById('scFeedback');
+  var scRestart = document.getElementById('scRestart');
+  var scStab = document.getElementById('scStab');
+  var scTime = document.getElementById('scTime');
+  var scXP = document.getElementById('scXP');
+  var pathXP = 0, scStability = 2, scElapsed = 0;
+
+  var STEPS = {
+    start: {
+      text: "The 12-lead confirms anterior STEMI. Aspirin was given pre-hospital. BP 150/90, HR 110, pain 9/10, SpO₂ 94%. The cath lab is activated and the interventionalist is scrubbing. What is your FIRST priority?",
+      choices: [
+        { t: "🎈 Give aspirin + a P2Y12 inhibitor + heparin and move him to the cath lab (primary PCI)", good:true, ds:1, dt:10, xp:40, fb:"✅ Exactly. Reperfusion is the whole game. Dual antiplatelet + anticoagulant, keep the door-to-balloon clock under 90 min, and get him on the table. You've saved muscle." , next:"dissection" },
+        { t: "⏳ Wait for the troponin to come back to confirm the diagnosis first", good:false, ds:-2, dt:30, xp:0, fb:"☠️ Dangerous delay. The early troponin will be normal — necrosis hasn't leaked yet. The ECG already made the diagnosis. Waiting just kills muscle. Restart and choose again.", end:true },
+        { t: "💉 Give fibrinolytics now even though the cath lab is ready", good:false, ds:-1, dt:20, xp:5, fb:"⚠️ Wrong when timely PCI is available. Primary PCI beats lysis for a proximal LAD (DANAMI-2) with less reinfarction and bleeding. Lysis is only the fallback when PCI can't be delivered in time.", next:"start2" }
+      ]
+    },
+    start2: {
+      text: "Someone points out the cath lab is right here and ready. You step back from the lytic. The team asks how you'll reperfuse. Now what?",
+      choices: [
+        { t: "🎈 Primary PCI — antiplatelets + heparin, to the table now", good:true, ds:1, dt:8, xp:30, fb:"✅ The right call. When the lab is hot and timely, PCI is the standard. Lesson banked: don't lyse a STEMI you can stent in time.", next:"dissection" },
+        { t: "💊 Just give clopidogrel and observe a while", good:false, ds:-1, dt:20, xp:0, fb:"⚠️ Far too passive, and clopidogrel is the weaker P2Y12 anyway. He needs a potent agent and immediate reperfusion, not observation.", next:"dissection" }
+      ]
+    },
+    dissection: {
+      text: "Before the heparin goes in, what 20-second check do you insist on?",
+      choices: [
+        { t: "🩻 Feel both radial pulses, compare arm BPs, ask about tearing/back pain — exclude aortic dissection", good:true, ds:1, dt:6, xp:30, fb:"✅ Vital. A 'STEMI' that is a dissection involving a coronary will be killed by anticoagulation or lysis. Pulses equal, no tearing pain, mediastinum normal — proceed safely.", next:"betablocker" },
+        { t: "⏭️ Skip it — the ECG says STEMI, just anticoagulate", good:false, ds:-1, dt:4, xp:5, fb:"⚠️ This is the M&M case in S13. Most are fine, but the missed dissection you anticoagulate dies of tamponade. Always do the 20-second screen first.", next:"betablocker" }
+      ]
+    },
+    betablocker: {
+      text: "He has HR 110 and fine bibasal crackles. A colleague wants to push IV metoprolol 'to rest the heart.' Your move?",
+      choices: [
+        { t: "🚫 Hold the IV beta-blocker — he has signs of early failure; give it orally once stable", good:true, ds:1, dt:5, xp:40, fb:"🏆 Perfect close. COMMIT showed early IV beta-blockade in an unstable/failing STEMI precipitates cardiogenic shock. Beta-blockers are for later, oral, once he isn't failing. Case on track to the lab.", end:true },
+        { t: "💉 Push IV metoprolol now to slow the rate", good:false, ds:-2, dt:10, xp:0, fb:"⚠️ The COMMIT trap. With tachycardia and crackles he is showing early pump dysfunction — an IV beta-blocker bolus can tip him into cardiogenic shock. Avoid it; use oral once stable.", end:true }
+      ]
+    }
+  };
+
+  function renderStab(){
+    var s = Math.max(0, Math.min(5, scStability + 2)); // map -2..3 → 0..5
+    var dots = '';
+    for(var i=0;i<5;i++) dots += (i < s ? '●' : '○');
+    scStab.textContent = dots;
+  }
+  function renderStep(key){
+    var step = STEPS[key];
+    scText.textContent = step.text;
+    scFeedback.className = 'feedback';
+    scFeedback.style.display = 'none';
+    scChoices.innerHTML = '';
+    step.choices.forEach(function(ch){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = ch.t;
+      b.addEventListener('click', function(){
+        pathXP += ch.xp; scXP.textContent = pathXP;
+        scElapsed += ch.dt; scTime.textContent = scElapsed + ' s';
+        scStability += ch.ds; renderStab();
+        if(ch.xp) addXP(ch.xp, null, 'Scenario choice');
+        scFeedback.textContent = ch.fb;
+        scFeedback.className = 'feedback ' + (ch.good ? 'good' : 'bad');
+        scFeedback.style.display = 'block';
+        Array.prototype.forEach.call(scChoices.children, function(c){ c.disabled = true; c.style.opacity = .6; });
+        if(ch.end){
+          scRestart.style.display = 'inline-block';
+          if(ch.good && key === 'betablocker'){ earnBadge('bdg-shock'); addXP(20, 'scenario-win', 'Reperfused On Time!'); }
+        } else if(ch.next){
+          setTimeout(function(){ renderStep(ch.next); }, 1400);
+        }
+      });
+      scChoices.appendChild(b);
+    });
+  }
+  scRestart.addEventListener('click', function(){
+    pathXP = 0; scStability = 2; scElapsed = 0;
+    scXP.textContent = 0; scTime.textContent = '0 s'; renderStab();
+    scRestart.style.display = 'none';
+    renderStep('start');
+  });
+  renderStab();
+  renderStep('start');
+
+  /* ============ REVEAL BUTTONS ============ */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.getAttribute('data-target'));
+      if(!t) return;
+      if(t.classList.contains('reveal-shown')){
+        t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden');
+      } else {
+        t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown');
+        addXP(8, 'reveal-' + btn.getAttribute('data-target'), 'Self-test');
+      }
+    });
+  });
+
+  /* ============ DOOR-TO-BALLOON SIM (S6) ============ */
+  var kRange = document.getElementById('kRange');
+  var kVal = document.getElementById('kVal');
+  var kNeedle = document.getElementById('kNeedle');
+  var kReadout = document.getElementById('kReadout');
+  if(kRange){
+    var simUsed = false;
+    function updateK(){
+      var k = parseInt(kRange.value,10) * 2; // 40 .. 150 minutes
+      kVal.textContent = k;
+      var pct = (parseInt(kRange.value,10) - 20) / (75 - 20) * 100;
+      kNeedle.style.left = pct + '%';
+      var msg, cls;
+      if(k < 60){ msg = '🟢 Outstanding — door-to-balloon well under 90 min. Maximal myocardium salvaged, lowest mortality. This is the wavefront stopped early.'; cls='good'; }
+      else if(k <= 90){ msg = '🟢 Target band — door-to-balloon under 90 min. Most of the anterior wall saved; mortality at its lowest. This is where you want him.'; cls='good'; }
+      else if(k <= 120){ msg = '🟠 Borderline — 90–120 min. Salvage is falling and mortality climbing. Still within the system window, but every minute now costs muscle.'; cls='warn-r'; }
+      else { msg = '🔴 Too slow — over 120 min to reperfusion. Large completed infarct, rising shock/arrhythmia and one-year mortality — every 30-min delay adds roughly 8%.'; cls='bad'; }
+      kReadout.innerHTML = msg;
+      kReadout.className = 'readout ' + cls;
+      if(!simUsed){ simUsed = true; addXP(15, 'ksim', 'Clock Master'); }
+    }
+    kRange.addEventListener('input', updateK);
+    updateK();
+  }
+
+  /* ============ CHECKLISTS (S7) ============ */
+  var allChecklistsDone = 0, totalChecklists = document.querySelectorAll('.checklist').length;
+  document.querySelectorAll('.checklist').forEach(function(list){
+    var boxes = list.querySelectorAll('input[type=checkbox]');
+    var prog = list.querySelector('[data-progress]');
+    var total = boxes.length;
+    var doneAwarded = false;
+    function refresh(){
+      var done = 0;
+      boxes.forEach(function(b){
+        if(b.checked){ done++; b.closest('.ck').classList.add('done'); }
+        else { b.closest('.ck').classList.remove('done'); }
+      });
+      prog.textContent = done + ' / ' + total + ' complete';
+      if(done === total && !doneAwarded){
+        doneAwarded = true;
+        allChecklistsDone++;
+        addXP(25, 'ck-' + list.id, 'Checklist done');
+        if(allChecklistsDone >= totalChecklists){ earnBadge('bdg-ck'); addXP(20, 'allck', 'Checklist Champion'); }
+      }
+    }
+    boxes.forEach(function(b){
+      b.addEventListener('change', function(){
+        if(b.checked) addXP(4, null, 'Step checked');
+        refresh();
+      });
+    });
+  });
+
+  /* ============ MCQs (S19) ============ */
+  var MCQS = [
+    {
+      q: "A 58-year-old man has crushing chest pain with ST elevation in leads V1–V4. Which coronary artery is most likely occluded?",
+      opts: ["Right coronary artery (RCA)","Left circumflex (LCx)","Left anterior descending (LAD)","Posterior descending artery"],
+      correct: 2,
+      exp: "ST elevation in V1–V4 localizes to the anterior wall, supplied by the left anterior descending (LAD) artery — the largest territory and the most dangerous infarct. Inferior leads (II/III/aVF) point to the RCA; lateral leads (I/aVL/V5–V6) to the LCx."
+    },
+    {
+      q: "For primary PCI in STEMI, the recommended door-to-balloon (door-to-device) target is:",
+      opts: ["Less than 90 minutes","Less than 4 hours","Less than 12 hours","Within 24 hours"],
+      correct: 0,
+      exp: "Door-to-balloon should be under 90 minutes (and first-medical-contact-to-device under 120 minutes). Time is muscle — every 30-minute delay to reperfusion adds roughly 8% to one-year mortality."
+    },
+    {
+      q: "Which P2Y12 inhibitor is preferred over clopidogrel for most patients with STEMI undergoing primary PCI?",
+      opts: ["Ticagrelor or prasugrel","Aspirin","Warfarin","No second antiplatelet is needed"],
+      correct: 0,
+      exp: "The potent P2Y12 inhibitors ticagrelor (PLATO) and prasugrel (TRITON-TIMI 38) reduce ischemic events compared with clopidogrel and are preferred in STEMI managed with PCI. Clopidogrel is the fallback when these are contraindicated or when fibrinolysis is used."
+    },
+    {
+      q: "Your STEMI patient has HR 110 and bibasal crackles (early heart failure). A colleague wants IV metoprolol now. The best response is:",
+      opts: ["Give the IV beta-blocker immediately to rest the heart","Avoid early IV beta-blocker in acute heart failure/shock; use oral once stable","Double the dose for faster effect","Give it only if the heart rate is below 60"],
+      correct: 1,
+      exp: "COMMIT showed that early routine IV beta-blockade in unstable/failing STEMI increases cardiogenic shock. With tachycardia and crackles he shows early pump dysfunction — avoid the IV bolus and start an oral beta-blocker once he is hemodynamically stable."
+    },
+    {
+      q: "When is fibrinolysis the correct reperfusion choice in STEMI rather than primary PCI?",
+      opts: ["Whenever the patient is over 60","Only when timely primary PCI is not available (cannot be delivered within ~120 min of first medical contact)","Always, because it is faster to give","Never, under any circumstance"],
+      correct: 1,
+      exp: "Primary PCI is the reperfusion standard when it can be delivered within 120 minutes of first medical contact (DANAMI-2). Fibrinolysis is the fallback only when timely PCI is unavailable — and only after excluding contraindications and aortic dissection."
+    },
+    {
+      q: "What do reciprocal ST-segment changes (e.g. inferior ST depression in an anterior STEMI) signify?",
+      opts: ["They argue against a true coronary occlusion","They strengthen the diagnosis of acute coronary occlusion","They indicate pericarditis","They are an artefact to ignore"],
+      correct: 1,
+      exp: "Reciprocal ST depression in leads opposite the infarct strengthens the diagnosis of a true acute coronary occlusion and helps distinguish STEMI from pericarditis or early repolarization, which lack reciprocal changes."
+    },
+    {
+      q: "Regarding statin therapy after acute STEMI, the correct approach is:",
+      opts: ["Wait for outpatient lipids before starting any statin","Start a high-intensity statin from day 1 regardless of baseline LDL","Only start a statin if LDL is above 5 mmol/L","Statins are contraindicated in the acute phase"],
+      correct: 1,
+      exp: "A high-intensity statin should be started from day 1 after STEMI regardless of the baseline LDL, for plaque stabilization and secondary prevention. The acute event resets the LDL target much lower (often below 1.4 mmol/L)."
+    },
+    {
+      q: "A patient with chest pain and ST changes also reports tearing pain radiating to the back, and you find a blood-pressure difference between the arms. Before reperfusion you must:",
+      opts: ["Give fibrinolytics immediately","Rule out aortic dissection before any lytic or anticoagulant","Ignore it and proceed with heparin","Give a calcium-channel blocker"],
+      correct: 1,
+      exp: "Tearing-to-the-back pain and unequal pulses/inter-arm BP difference suggest aortic dissection, which can mimic MI. Giving a lytic or anticoagulant to a dissection can cause fatal hemopericardium and tamponade — exclude dissection first (the classic M&M catastrophe)."
+    }
+  ];
+
+  var host = document.getElementById('mcqHost');
+  var mcqVal = document.getElementById('mcqVal');
+  var mcqScore = 0, mcqAnswered = 0;
+  var letters = ['A','B','C','D','E'];
+
+  MCQS.forEach(function(item, qi){
+    var box = document.createElement('div');
+    box.className = 'mcq';
+    var html = '<div class="mcq-q">QUESTION ' + (qi+1) + ' / ' + MCQS.length + '</div>';
+    html += '<div class="mcq-stem">' + item.q + '</div>';
+    item.opts.forEach(function(opt, oi){
+      html += '<label class="mcq-opt" data-oi="' + oi + '"><strong>' + letters[oi] + '.</strong> ' + opt + '</label>';
+    });
+    html += '<div class="mcq-exp"></div>';
+    box.innerHTML = html;
+    host.appendChild(box);
+
+    var opts = box.querySelectorAll('.mcq-opt');
+    var exp = box.querySelector('.mcq-exp');
+    var locked = false;
+    opts.forEach(function(label){
+      label.addEventListener('click', function(){
+        if(locked) return;
+        locked = true;
+        var oi = parseInt(label.getAttribute('data-oi'),10);
+        box.classList.add('answered');
+        var correct = item.correct;
+        if(oi === correct){
+          label.classList.add('picked-right');
+          mcqScore++;
+          addXP(25, null, 'Correct answer');
+        } else {
+          label.classList.add('picked-wrong');
+          opts[correct].classList.add('show-right');
+          showToast('❌ Correct: ' + letters[correct]);
+        }
+        exp.innerHTML = '<strong>' + (oi === correct ? '✅ Correct. ' : '📘 Explanation. ') + '</strong>' + item.exp;
+        mcqAnswered++;
+        mcqVal.textContent = mcqScore + ' / ' + MCQS.length;
+        if(mcqAnswered === MCQS.length){
+          var done = document.getElementById('mcqDone');
+          var summary = document.getElementById('mcqSummary');
+          done.style.display = 'block';
+          summary.textContent = 'You scored ' + mcqScore + ' / ' + MCQS.length + '. ' +
+            (mcqScore === MCQS.length ? 'Flawless — you reperfuse early and rule out dissection every time. 🏆' :
+             mcqScore >= 6 ? 'Strong — review the misses and the contrast pairs in S6.' :
+             'Revisit S3, S5, S6 and S11 — the reperfuse-fast-and-safely logic is the whole case.');
+          if(mcqScore >= 7){ earnBadge('bdg-quiz'); addXP(50, 'quizace', 'Quiz Ace!'); }
+        }
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
