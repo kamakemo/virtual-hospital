@@ -3213,6 +3213,11 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
   const iframeRef = useRef(null);
   const [iframeHeight, setIframeHeight] = useState(800);
   const [fullscreen, setFullscreen] = useState(false);
+  // Some cases are built like an app (a position:fixed sidebar + 100vh layout)
+  // rather than one long document. Those need the iframe sized to the visible
+  // window (so 100vh maps to the real viewport and the sidebar scrolls), not
+  // auto-grown to full content height. Detected from the HTML below.
+  const [viewportMode, setViewportMode] = useState(false);
   const [completed, setCompleted] = useState(
     !!progress?.completedStages?.[`rich:${caseData.id}`]
   );
@@ -3250,10 +3255,21 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
       });
   }, [rawValue]);
 
-  // Auto-resize: measure once after load, then watch via ResizeObserver
+  // Detect an app-style (fixed sidebar / 100vh) layout that should fill the
+  // window and scroll internally, vs a long document that should auto-grow.
+  useEffect(() => {
+    if (!htmlDoc) { setViewportMode(false); return; }
+    const usesFixed = /position\s*:\s*fixed/i.test(htmlDoc) || /position\s*:\s*sticky/i.test(htmlDoc);
+    const usesViewportUnits = /\b\d{1,3}vh\b/i.test(htmlDoc);
+    const usesSidebar = /class\s*=\s*["'][^"']*sidebar/i.test(htmlDoc);
+    setViewportMode((usesFixed && usesViewportUnits) || usesSidebar);
+  }, [htmlDoc]);
+
+  // Auto-resize (long-document cases): grow the iframe to fit all content so
+  // the outer page scrolls. Skipped in viewportMode.
   useEffect(() => {
     const iframe = iframeRef.current;
-    if (!iframe || !htmlDoc) return;
+    if (!iframe || !htmlDoc || viewportMode) return;
     let observer = null;
     const measure = () => {
       try {
@@ -3280,7 +3296,32 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
       iframe.removeEventListener('load', onLoad);
       if (observer) observer.disconnect();
     };
-  }, [htmlDoc]);
+  }, [htmlDoc, viewportMode]);
+
+  // Viewport mode (app-style cases): size the iframe to the visible window so
+  // the case's own 100vh / fixed sidebar map to the real viewport and scroll
+  // inside the iframe — matching how the file behaves opened standalone.
+  useEffect(() => {
+    if (!viewportMode) return;
+    const iframe = iframeRef.current;
+    if (!iframe) return;
+    const fit = () => {
+      const top = iframe.getBoundingClientRect().top;
+      const h = Math.max(460, Math.round(window.innerHeight - Math.max(0, top) - 4));
+      setIframeHeight(h);
+    };
+    fit();
+    const onLoad = () => setTimeout(fit, 50);
+    iframe.addEventListener('load', onLoad);
+    window.addEventListener('resize', fit);
+    const t1 = setTimeout(fit, 200);
+    const t2 = setTimeout(fit, 500);
+    return () => {
+      iframe.removeEventListener('load', onLoad);
+      window.removeEventListener('resize', fit);
+      clearTimeout(t1); clearTimeout(t2);
+    };
+  }, [viewportMode, htmlDoc, fullscreen]);
 
   const markComplete = () => {
     if (completed) return;
@@ -3373,7 +3414,7 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
           srcDoc={htmlDoc}
           title={caseData.title}
           className="w-full block border-0 bg-white"
-          style={{ height: `${iframeHeight}px`, minHeight: '600px' }}
+          style={{ height: `${iframeHeight}px`, minHeight: viewportMode ? '320px' : '600px' }}
           allow="fullscreen; clipboard-write; encrypted-media; picture-in-picture"
           sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-presentation allow-downloads"
         />
