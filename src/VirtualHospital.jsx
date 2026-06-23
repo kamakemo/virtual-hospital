@@ -1727,7 +1727,27 @@ export default function VirtualHospital() {
     };
   }, [progress, auth.user?.id]);
 
-  const navigate = (r) => setRoute(r);
+  // In-app routing wired to the browser History API so the Back/Forward
+  // buttons move between pages (hospital → department → case) instead of
+  // leaving the site. navigate() pushes a history entry; popstate restores it.
+  const navigate = (r) => {
+    setRoute(r);
+    try { window.history.pushState({ route: r }, ''); } catch (e) { /* no-op */ }
+    window.scrollTo(0, 0);
+  };
+
+  useEffect(() => {
+    // Seed the initial history entry with the landing route so the first
+    // Back press from a deep page returns here rather than exiting the site.
+    try { window.history.replaceState({ route: { name: 'landing' } }, ''); } catch (e) { /* no-op */ }
+    const onPop = (e) => {
+      const r = e.state && e.state.route ? e.state.route : { name: 'landing' };
+      setRoute(r);
+      window.scrollTo(0, 0);
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
 
   // Case CRUD — go through Supabase
   const updateCase = async (updated) => {
@@ -1879,6 +1899,10 @@ export default function VirtualHospital() {
       />
 
       <main>
+        <div
+          key={`${route.name}:${route.hospital || ''}:${route.departmentId || ''}:${route.caseId || ''}:${route.examId || ''}:${route.topicId || ''}:${route.conferenceId || ''}:${route.sessionId || ''}`}
+          className="page-transition"
+        >
         {casesLoading && route.name === 'landing' && (
           <div className="max-w-7xl mx-auto px-6 py-12 text-center text-slate-500">
             <div className="inline-flex items-center gap-2"><RefreshCw size={14} className="animate-spin" /> Loading cases…</div>
@@ -1961,6 +1985,7 @@ export default function VirtualHospital() {
             auth={auth}
           />
         )}
+        </div>
       </main>
 
       <footer className="mt-20 border-t border-slate-200 dark:border-slate-800 py-8 text-center text-xs text-slate-500">
