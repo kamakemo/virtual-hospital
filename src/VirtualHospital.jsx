@@ -3349,7 +3349,8 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
           title={caseData.title}
           className="w-full block border-0 bg-white"
           style={{ height: `${iframeHeight}px`, minHeight: '600px' }}
-          sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+          allow="fullscreen; clipboard-write; encrypted-media; picture-in-picture"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-presentation allow-downloads"
         />
       )}
     </div>
