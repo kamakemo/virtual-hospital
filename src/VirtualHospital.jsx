@@ -3209,6 +3209,38 @@ function CaseCard({ caseData: c, onClick, progress, delay = 0 }) {
 // ============== RICH HTML CASE VIEW ==============
 // Renders a Rich HTML case (uploaded HTML file shown as-is) inside an iframe.
 // Preserves the file's original styling, fonts, scripts, and layout completely.
+// Rich cases render inside a srcDoc iframe, which has no base URL of its own —
+// so an in-page link like <a href="#section"> resolves against the PARENT app
+// URL and clicking it loads the landing page into the frame. Inject a tiny
+// interceptor that keeps same-page anchor clicks scrolling within the case.
+const ANCHOR_FIX_SCRIPT = `<script>
+(function(){
+  try {
+    document.addEventListener('click', function(e){
+      var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+      if(!a) return;
+      var href = a.getAttribute('href') || '';
+      if(href.charAt(0) !== '#') return;
+      e.preventDefault();
+      var id = '';
+      try { id = decodeURIComponent(href.slice(1)); } catch(_) { id = href.slice(1); }
+      if(!id){ window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+      var el = document.getElementById(id);
+      if(!el){ try { el = document.querySelector('a[name="' + id + '"]'); } catch(_){} }
+      if(el && el.scrollIntoView){ el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    }, true);
+  } catch(_){}
+})();
+<\/script>`;
+
+function injectAnchorFix(doc) {
+  if (!doc) return doc;
+  if (doc.indexOf('</body>') !== -1) {
+    return doc.replace('</body>', function(){ return ANCHOR_FIX_SCRIPT + '</body>'; });
+  }
+  return doc + ANCHOR_FIX_SCRIPT;
+}
+
 function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
   const iframeRef = useRef(null);
   const [iframeHeight, setIframeHeight] = useState(800);
@@ -3234,6 +3266,8 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
   const [htmlDoc, setHtmlDoc] = useState(isInline ? rawValue : '');
   const [fetchError, setFetchError] = useState('');
   const [fetching, setFetching] = useState(false);
+  // Document actually fed to the iframe: the case HTML + the in-page anchor fix.
+  const srcDocFinal = useMemo(() => injectAnchorFix(htmlDoc), [htmlDoc]);
 
   // If we have a URL, fetch the HTML text once
   useEffect(() => {
@@ -3411,7 +3445,7 @@ function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
       {htmlDoc && !fetching && (
         <iframe
           ref={iframeRef}
-          srcDoc={htmlDoc}
+          srcDoc={srcDocFinal}
           title={caseData.title}
           className="w-full block border-0 bg-white"
           style={{ height: `${iframeHeight}px`, minHeight: viewportMode ? '320px' : '600px' }}
