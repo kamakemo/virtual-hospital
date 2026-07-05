@@ -22,6 +22,10 @@ import {
   supabase,
   isSupabaseConfigured,
   signInWithMagicLink,
+  signInWithPassword,
+  signUpWithPassword,
+  sendPasswordReset,
+  signInWithProvider,
   signOut,
   isUserAdmin,
   fetchAllCases,
@@ -2117,24 +2121,85 @@ function NavLink({ active, onClick, icon: Icon, label }) {
 }
 
 // ============== LOGIN SCREEN ==============
-function LoginScreen({ theme, setTheme, navigate, returnTo }) {
-  const [email, setEmail] = useState('');
-  const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState(false);
-  const [error, setError] = useState('');
+function GoogleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+      <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C33.6 6.1 29.1 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z"/>
+      <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 18.9 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C33.6 6.1 29.1 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+      <path fill="#4CAF50" d="M24 44c5 0 9.5-1.9 12.9-5.1l-6-4.9C29 35.7 26.6 36.5 24 36.5c-5.2 0-9.6-3.3-11.2-8l-6.5 5C9.6 39.6 16.2 44 24 44z"/>
+      <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.5l6 4.9c-.4.4 6.8-5 6.8-14.4 0-1.3-.1-2.3-.4-3.5z"/>
+    </svg>
+  );
+}
+function MicrosoftIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="#F25022" d="M1 1h10v10H1z"/>
+      <path fill="#7FBA00" d="M13 1h10v10H13z"/>
+      <path fill="#00A4EF" d="M1 13h10v10H1z"/>
+      <path fill="#FFB900" d="M13 13h10v10H13z"/>
+    </svg>
+  );
+}
 
-  const handleSubmit = async (e) => {
+function LoginScreen({ theme, setTheme, navigate, returnTo }) {
+  const [mode, setMode] = useState('signin'); // 'signin' | 'signup' | 'magic'
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [oauthBusy, setOauthBusy] = useState('');
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [magicSent, setMagicSent] = useState(false);
+
+  const goHome = () => { if (navigate) navigate(returnTo || { name: 'landing' }); };
+
+  const handlePassword = async (e) => {
     e.preventDefault();
-    if (!email.trim()) return;
-    setSending(true);
-    setError('');
-    const { error } = await signInWithMagicLink(email.trim());
-    setSending(false);
-    if (error) {
-      setError(error.message || 'Could not send the magic link.');
+    setError(''); setNotice('');
+    if (!email.trim() || !password) return;
+    setBusy(true);
+    if (mode === 'signup') {
+      const { data, error } = await signUpWithPassword(email.trim(), password);
+      setBusy(false);
+      if (error) { setError(error.message || 'Could not create the account.'); return; }
+      if (data?.session) { goHome(); }
+      else { setNotice('Account created — check your email to confirm your address, then sign in.'); setMode('signin'); setPassword(''); }
     } else {
-      setSent(true);
+      const { data, error } = await signInWithPassword(email.trim(), password);
+      setBusy(false);
+      if (error) { setError(error.message || 'Could not sign in.'); return; }
+      if (data?.session) goHome();
     }
+  };
+
+  const handleMagic = async (e) => {
+    e.preventDefault();
+    setError(''); setNotice('');
+    if (!email.trim()) return;
+    setBusy(true);
+    const { error } = await signInWithMagicLink(email.trim());
+    setBusy(false);
+    if (error) setError(error.message || 'Could not send the magic link.');
+    else setMagicSent(true);
+  };
+
+  const handleReset = async () => {
+    setError(''); setNotice('');
+    if (!email.trim()) { setError('Enter your email above first, then tap "Forgot password".'); return; }
+    setBusy(true);
+    const { error } = await sendPasswordReset(email.trim());
+    setBusy(false);
+    if (error) setError(error.message || 'Could not send the reset email.');
+    else setNotice('Password reset link sent — check your email.');
+  };
+
+  const handleOAuth = async (provider) => {
+    setError(''); setNotice('');
+    setOauthBusy(provider);
+    const { error } = await signInWithProvider(provider);
+    if (error) { setOauthBusy(''); setError(error.message || 'Could not start sign-in.'); }
+    // on success the browser redirects to the provider and back to the app
   };
 
   return (
@@ -2181,58 +2246,131 @@ function LoginScreen({ theme, setTheme, navigate, returnTo }) {
 
           <h1 className="display-font text-3xl font-bold text-center mb-1">Virtual Hospital</h1>
           <p className="text-center text-sm text-slate-500 mb-6">
-            {returnTo ? 'Sign in to continue' : 'Sign in to enter the ward'}
+            {mode === 'signup' ? 'Create your account' : returnTo ? 'Sign in to continue' : 'Sign in to enter the ward'}
           </p>
 
-          {sent ? (
+          {magicSent ? (
             <div className="text-center py-4">
               <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center">
                 <CheckCircle2 className="text-emerald-600 dark:text-emerald-400" size={24} />
               </div>
               <h2 className="font-bold mb-2">Check your inbox</h2>
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                We sent a magic sign-in link to<br />
+                We sent a one-time sign-in link to<br />
                 <strong className="text-slate-900 dark:text-white">{email}</strong>
               </p>
               <p className="text-xs text-slate-500 mt-3">
                 Click the link in your email to finish signing in. You can close this tab.
               </p>
               <button
-                onClick={() => { setSent(false); setEmail(''); }}
+                onClick={() => { setMagicSent(false); setMode('signin'); }}
                 className="mt-4 text-xs text-teal-600 dark:text-teal-400 hover:underline"
               >
-                Use a different email
+                Back to sign in
               </button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-3">
-              <div>
-                <label className="text-xs uppercase tracking-wider text-slate-500 font-semibold block mb-1.5">
-                  Email address
-                </label>
-                <input
-                  type="email" required autoFocus
-                  value={email} onChange={e => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-transparent focus:border-teal-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none text-sm"
-                />
+            <>
+              {/* OAuth providers */}
+              <div className="space-y-2.5">
+                <button
+                  type="button" onClick={() => handleOAuth('google')} disabled={!!oauthBusy}
+                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-semibold text-sm flex items-center justify-center gap-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors"
+                >
+                  <GoogleIcon /> {oauthBusy === 'google' ? 'Redirecting…' : 'Continue with Google'}
+                </button>
+                <button
+                  type="button" onClick={() => handleOAuth('azure')} disabled={!!oauthBusy}
+                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-semibold text-sm flex items-center justify-center gap-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors"
+                >
+                  <MicrosoftIcon /> {oauthBusy === 'azure' ? 'Redirecting…' : 'Continue with Microsoft'}
+                </button>
               </div>
-              {error && (
-                <div className="text-xs text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 px-3 py-2 rounded-lg">
-                  {error}
+
+              <div className="flex items-center gap-3 my-4">
+                <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
+                <span className="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">or {mode === 'magic' ? 'email a link' : 'with email'}</span>
+                <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
+              </div>
+
+              {notice && (
+                <div className="text-xs text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 px-3 py-2 rounded-lg mb-3">
+                  {notice}
                 </div>
               )}
-              <button
-                type="submit"
-                disabled={sending || !email.trim()}
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01] transition-transform"
-              >
-                {sending ? 'Sending magic link…' : 'Send magic link'}
-              </button>
-              <p className="text-xs text-slate-500 text-center pt-2">
-                We'll email you a one-tap sign-in link. No password needed.
-              </p>
-            </form>
+
+              {mode === 'magic' ? (
+                <form onSubmit={handleMagic} className="space-y-3">
+                  <div>
+                    <label className="text-xs uppercase tracking-wider text-slate-500 font-semibold block mb-1.5">Email address</label>
+                    <input
+                      type="email" required autoFocus value={email} onChange={e => setEmail(e.target.value)}
+                      placeholder="you@example.com"
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-transparent focus:border-teal-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none text-sm"
+                    />
+                  </div>
+                  {error && (
+                    <div className="text-xs text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 px-3 py-2 rounded-lg">{error}</div>
+                  )}
+                  <button type="submit" disabled={busy || !email.trim()}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01] transition-transform">
+                    {busy ? 'Sending link…' : 'Email me a sign-in link'}
+                  </button>
+                  <button type="button" onClick={() => { setMode('signin'); setError(''); }} className="w-full text-xs text-slate-500 hover:text-teal-600 dark:hover:text-teal-400">
+                    ← Back to password sign-in
+                  </button>
+                </form>
+              ) : (
+                <form onSubmit={handlePassword} className="space-y-3">
+                  <div>
+                    <label className="text-xs uppercase tracking-wider text-slate-500 font-semibold block mb-1.5">Email address</label>
+                    <input
+                      type="email" required autoFocus autoComplete="email" value={email} onChange={e => setEmail(e.target.value)}
+                      placeholder="you@example.com"
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-transparent focus:border-teal-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none text-sm"
+                    />
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="text-xs uppercase tracking-wider text-slate-500 font-semibold">Password</label>
+                      {mode === 'signin' && (
+                        <button type="button" onClick={handleReset} className="text-[11px] text-teal-600 dark:text-teal-400 hover:underline">Forgot password?</button>
+                      )}
+                    </div>
+                    <input
+                      type="password" required minLength={6}
+                      autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+                      value={password} onChange={e => setPassword(e.target.value)}
+                      placeholder={mode === 'signup' ? 'At least 6 characters' : '••••••••'}
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-transparent focus:border-teal-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none text-sm"
+                    />
+                  </div>
+                  {error && (
+                    <div className="text-xs text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 px-3 py-2 rounded-lg">{error}</div>
+                  )}
+                  <button type="submit" disabled={busy || !email.trim() || !password}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01] transition-transform">
+                    {busy ? 'Please wait…' : mode === 'signup' ? 'Create account' : 'Sign in'}
+                  </button>
+                </form>
+              )}
+
+              {mode !== 'magic' && (
+                <div className="text-center text-xs text-slate-500 pt-4 space-y-1.5">
+                  <div>
+                    {mode === 'signin' ? "Don't have an account? " : 'Already have an account? '}
+                    <button type="button" onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setError(''); setNotice(''); }}
+                      className="text-teal-600 dark:text-teal-400 font-semibold hover:underline">
+                      {mode === 'signin' ? 'Create one' : 'Sign in'}
+                    </button>
+                  </div>
+                  <button type="button" onClick={() => { setMode('magic'); setError(''); setNotice(''); }}
+                    className="text-slate-400 hover:text-teal-600 dark:hover:text-teal-400">
+                    Prefer a one-time email link?
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
 

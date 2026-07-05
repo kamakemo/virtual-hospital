@@ -25,6 +25,41 @@ export const isSupabaseConfigured = () =>
   Boolean(supabaseUrl && supabaseAnonKey && !supabaseUrl.includes('placeholder'))
 
 // ============== AUTH ==============
+// Email + password sign-in
+export async function signInWithPassword(email, password) {
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  return { data, error }
+}
+
+// Create an account with email + password. If "Confirm email" is enabled in
+// Supabase, no session is returned until the user confirms via email.
+export async function signUpWithPassword(email, password) {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { emailRedirectTo: window.location.origin },
+  })
+  return { data, error }
+}
+
+// Send a password-reset email
+export async function sendPasswordReset(email) {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin,
+  })
+  return { error }
+}
+
+// OAuth sign-in. provider: 'google' | 'azure' (Microsoft)
+export async function signInWithProvider(provider) {
+  const options = { redirectTo: window.location.origin }
+  // Request the email scope explicitly for Microsoft/Azure
+  if (provider === 'azure') options.scopes = 'email openid profile'
+  const { data, error } = await supabase.auth.signInWithOAuth({ provider, options })
+  return { data, error }
+}
+
+// Magic-link (kept as an optional fallback sign-in method)
 export async function signInWithMagicLink(email) {
   const { error } = await supabase.auth.signInWithOtp({
     email,
