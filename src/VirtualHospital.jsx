@@ -3371,12 +3371,115 @@ const ANCHOR_FIX_SCRIPT = `<script>
 })();
 <\/script>`;
 
+// "Rounds Mode" — a presentation layer injected into every rich case. Turns the
+// case into a full-screen, big-type, section-by-section slideshow for teaching a
+// room: ← / → to move, Space to reveal punchlines then advance, +/- to resize,
+// Esc to exit. Works on any case that exposes sections (section.case-sec, or
+// section[id], or #s1..#sN); shows nothing if it can't find ≥2 slides.
+const ROUNDS_MODE = `<style id="vhr-style">
+.vhr-launch{position:fixed;left:14px;bottom:14px;z-index:2147483000;display:inline-flex;align-items:center;gap:6px;background:#0f172a;color:#fff;border:none;border-radius:999px;padding:9px 15px;font:600 13px/1 'Segoe UI',system-ui,sans-serif;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.vhr-launch:hover{background:#1e293b;transform:translateY(-1px)}
+@media print{.vhr-launch,.vhr-bar{display:none!important}}
+html.vhr-on,html.vhr-on body{background:#f8fafc!important}
+html.vhr-on .topnav,html.vhr-on .dash,html.vhr-on .toast,html.vhr-on .hero,html.vhr-on .vitals-strip,html.vhr-on .footer,html.vhr-on .sidebar,html.vhr-on .vhr-launch{display:none!important}
+html.vhr-on #caseScroll{height:auto!important;overflow:visible!important;padding:0!important}
+html.vhr-on main{max-width:none!important;margin:0!important;padding:0!important}
+html.vhr-on .r-slide-el{display:none!important}
+html.vhr-on .r-slide-el.r-current{display:block!important;max-width:1180px;margin:0 auto;padding:3vh 4vw 16vh;zoom:var(--r-zoom,1.3);animation:vhrIn .25s ease}
+@keyframes vhrIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+html.vhr-on .r-spoiler.r-hidden{filter:blur(12px);cursor:pointer;transition:filter .25s}
+html.vhr-on .r-spoiler.r-hidden:hover{filter:blur(7px)}
+.vhr-bar{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:2147483001;display:none;align-items:center;gap:8px;background:rgba(15,23,42,.94);color:#fff;border-radius:14px;padding:8px 12px;font:600 13px/1 'Segoe UI',system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.35);max-width:96vw;flex-wrap:wrap;justify-content:center}
+html.vhr-on .vhr-bar{display:flex}
+.vhr-bar button{background:rgba(255,255,255,.14);color:#fff;border:none;border-radius:9px;padding:7px 11px;font:600 13px/1 inherit;cursor:pointer}
+.vhr-bar button:hover{background:rgba(255,255,255,.28)}
+.vhr-bar .vhr-count{min-width:60px;text-align:center;opacity:.9}
+.vhr-bar .vhr-title{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.75;font-weight:500}
+.vhr-bar .vhr-sep{width:1px;height:20px;background:rgba(255,255,255,.2)}
+.vhr-bar .vhr-tgl.active{background:#f59e0b;color:#0f172a}
+<\/style>
+<script>
+(function(){
+  try{
+    var D=document, root=D.documentElement;
+    function pickSlides(){
+      var s=[].slice.call(D.querySelectorAll('section.case-sec'));
+      if(s.length<2){ var g=[].slice.call(D.querySelectorAll('main section[id], main > section')); if(g.length>=2) s=g; }
+      if(s.length<2){ s=[].slice.call(D.querySelectorAll('[id]')).filter(function(e){ return /^s\\d+$/i.test(e.id) && (e.tagName==='SECTION'||e.tagName==='DIV'); }); }
+      return s;
+    }
+    var slides=[], idx=0, zoom=1.3, hideP=false, count, ttl, tglBtn;
+    function slideTitle(el){ var h=el.querySelector('.sec-header h2, h1, h2, h3'); return h?(h.textContent||'').trim().slice(0,80):''; }
+    function markSpoilers(){
+      slides.forEach(function(el){
+        [].slice.call(el.querySelectorAll('.rule, .reveal-box, [data-spoiler], [data-answer]')).forEach(function(x){
+          x.classList.add('r-spoiler');
+          if(hideP) x.classList.add('r-hidden'); else x.classList.remove('r-hidden');
+        });
+      });
+    }
+    function render(){
+      slides.forEach(function(el,i){ el.classList.toggle('r-current', i===idx); });
+      root.style.setProperty('--r-zoom', zoom);
+      if(count) count.textContent=(idx+1)+' / '+slides.length;
+      if(ttl) ttl.textContent=slideTitle(slides[idx]);
+      markSpoilers();
+      try{ window.scrollTo(0,0); }catch(_){}
+    }
+    function enter(){
+      slides=pickSlides();
+      if(slides.length<2) return;
+      slides.forEach(function(el){ el.classList.add('r-slide-el'); });
+      root.classList.add('vhr-on'); idx=0; render();
+      try{ if(!D.fullscreenElement && root.requestFullscreen) root.requestFullscreen().catch(function(){}); }catch(_){}
+    }
+    function exit(){
+      root.classList.remove('vhr-on');
+      slides.forEach(function(el){ el.classList.remove('r-current','r-slide-el'); });
+      [].slice.call(D.querySelectorAll('.r-spoiler')).forEach(function(x){ x.classList.remove('r-spoiler','r-hidden'); });
+      try{ if(D.fullscreenElement) D.exitFullscreen(); }catch(_){}
+    }
+    function next(){ if(idx<slides.length-1){ idx++; render(); } }
+    function prev(){ if(idx>0){ idx--; render(); } }
+    function revealNext(){ var el=slides[idx]; if(!el) return false; var sp=el.querySelector('.r-spoiler.r-hidden'); if(sp){ sp.classList.remove('r-hidden'); return true; } return false; }
+    function toggleHide(){ hideP=!hideP; if(tglBtn) tglBtn.classList.toggle('active',hideP); markSpoilers(); }
+    function build(){
+      if(pickSlides().length<2) return;
+      var launch=D.createElement('button'); launch.className='vhr-launch'; launch.type='button'; launch.innerHTML='🎤 Rounds Mode';
+      launch.addEventListener('click', enter); D.body.appendChild(launch);
+      var bar=D.createElement('div'); bar.className='vhr-bar';
+      bar.innerHTML='<button class="vhr-prev" title="Previous (left arrow)">◀</button><span class="vhr-count">1 / 1</span><button class="vhr-next" title="Next (right arrow)">▶</button><span class="vhr-sep"></span><span class="vhr-title"></span><span class="vhr-sep"></span><button class="vhr-sm" title="Smaller text (-)">A−</button><button class="vhr-bg" title="Bigger text (+)">A+</button><button class="vhr-tgl" title="Hide punchlines until clicked (Space reveals)">🙈 Reveal</button><span class="vhr-sep"></span><button class="vhr-exit" title="Exit (Esc)">✕ Exit</button>';
+      D.body.appendChild(bar);
+      count=bar.querySelector('.vhr-count'); ttl=bar.querySelector('.vhr-title'); tglBtn=bar.querySelector('.vhr-tgl');
+      bar.querySelector('.vhr-prev').addEventListener('click', prev);
+      bar.querySelector('.vhr-next').addEventListener('click', next);
+      bar.querySelector('.vhr-sm').addEventListener('click', function(){ zoom=Math.max(0.8,zoom-0.1); render(); });
+      bar.querySelector('.vhr-bg').addEventListener('click', function(){ zoom=Math.min(2.4,zoom+0.1); render(); });
+      tglBtn.addEventListener('click', toggleHide);
+      bar.querySelector('.vhr-exit').addEventListener('click', exit);
+    }
+    if(D.readyState==='loading') D.addEventListener('DOMContentLoaded', build); else build();
+    D.addEventListener('keydown', function(e){
+      if(!root.classList.contains('vhr-on')) return;
+      var k=e.key;
+      if(k==='Escape'){ exit(); }
+      else if(k==='ArrowRight'||k==='PageDown'){ e.preventDefault(); next(); }
+      else if(k==='ArrowLeft'||k==='PageUp'){ e.preventDefault(); prev(); }
+      else if(k===' '){ e.preventDefault(); if(!(hideP && revealNext())) next(); }
+      else if(k==='+'||k==='='){ zoom=Math.min(2.4,zoom+0.1); render(); }
+      else if(k==='-'||k==='_'){ zoom=Math.max(0.8,zoom-0.1); render(); }
+    }, true);
+  }catch(_){}
+})();
+<\/script>`;
+
 function injectAnchorFix(doc) {
   if (!doc) return doc;
+  const add = ANCHOR_FIX_SCRIPT + ROUNDS_MODE;
   if (doc.indexOf('</body>') !== -1) {
-    return doc.replace('</body>', function(){ return ANCHOR_FIX_SCRIPT + '</body>'; });
+    return doc.replace('</body>', function(){ return add + '</body>'; });
   }
-  return doc + ANCHOR_FIX_SCRIPT;
+  return doc + add;
 }
 
 function RichHTMLCaseView({ caseData, navigate, progress, setProgress }) {
