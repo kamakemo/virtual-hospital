@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Undifferentiated Chest Pain & ACS Rule-Out — Virtual Teaching Hospital</title>
+<!-- META
+id: c-ed-acs-031
+title: Undifferentiated Chest Pain — the ACS Rule-Out
+hospital: cardiology
+department: cv-ed
+bednumber: 1
+chiefcomplaint: Central chest pain × 40 min, diaphoretic, "not quite a STEMI" on the monitor
+system: Cardiology
+severity: critical
+tags: ACS, Chest pain, hs-troponin, HEART score, STEMI-equivalents, Emergency
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🚨</div>
+      <div>
+        <div class="t1">Emergency Dept</div>
+        <div class="t2">Bed 1 · ACS Rule-Out</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🚨 Emergency Department · 🛏️ Bed 1</div>
+        <h1>🫀 Undifferentiated Chest Pain — "The One That Looks Like Nothing"</h1>
+        <div class="sub">⚡ 03:12. A 54-year-old is clutching his chest, gray and sweating. The first ECG is "non-specific." The nurse says "probably reflux." Your job in the next 10 minutes is to make sure this isn't the STEMI that hides.</div>
+        <div class="chips">
+          <span class="chip crit">🔴 CRITICAL</span>
+          <span class="chip">🫀 ACS Pathway</span>
+          <span class="chip">🧪 hs-Troponin 0/1h</span>
+          <span class="chip">📈 STEMI-Equivalents</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital warn"><div class="v-label">💓 HR</div><div class="v-num">98</div></div>
+        <div class="vital warn"><div class="v-label">🩸 BP</div><div class="v-num">148/92</div></div>
+        <div class="vital"><div class="v-label">🌬️ RR</div><div class="v-num">20</div></div>
+        <div class="vital warn"><div class="v-label">🫁 SpO₂</div><div class="v-num">95%</div></div>
+        <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.7°</div></div>
+        <div class="vital"><div class="v-label">🧠 GCS</div><div class="v-num">15</div></div>
+        <div class="vital alert"><div class="v-label">😖 Pain</div><div class="v-num">8/10</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 03:12, Resus 3</b>A man grips the trolley rail, jaw clenched, a fine sweat on his forehead. He says: <em>"It feels like a belt tightening… and my left arm's gone heavy."</em> The triage note says "atypical chest pain, likely GORD." The first monitor rhythm strip looks almost normal. This is the exact moment a STEMI-equivalent gets sent to the waiting room. Not today.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>🧔 Name</td><td><strong>Mr. T.E.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>54-year-old male</td></tr>
+          <tr><td>🆔 MRN</td><td>CV-ED-0501</td></tr>
+          <tr><td>⚖️ Weight</td><td>90 kg (BMI 29)</td></tr>
+          <tr><td>💼 Occupation</td><td>Taxi driver — sedentary, irregular meals</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 Past history — every line shifts the pre-test probability</h3>
+        <ul>
+          <li>🔺 <strong>Hypertension</strong> (poor adherence), <strong>type 2 diabetes</strong> (HbA1c 8.9%), <strong>dyslipidaemia</strong>. Three of the big modifiable risks.</li>
+          <li>🚬 <strong>Smoker, 25 pack-years.</strong></li>
+          <li>👨‍👦 <strong>Father: fatal MI at 52.</strong> Premature family history.</li>
+          <li>🩺 Diabetic autonomic neuropathy → <em>blunted, "atypical" pain</em>. The diabetic and elderly are the classic "silent/atypical" presenters — and the ones most often missed.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In diabetics, women, and the elderly, 'atypical' chest pain is TYPICAL for a missed MI — raise your suspicion, don't lower it."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why the ED is the highest-risk place to be wrong</b>Chest pain is ~5% of all ED visits. Miss rate for ACS historically ~2%, and a missed MI carries roughly double the short-term mortality of an admitted one — and it is the single largest source of emergency-medicine malpractice payouts. The whole game is a <strong>structured rule-out</strong>, not a gestalt "looks well."</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 Paramedic handover — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ Pre-hospital SBAR (verbatim)</b>
+          <p><strong>S:</strong> "54-year-old male, central chest tightness 40 minutes ago at rest, radiating to the left arm and jaw, sweaty, one vomit."</p>
+          <p><strong>B:</strong> "Diabetic, hypertensive, heavy smoker, dad died of a heart attack young."</p>
+          <p><strong>A:</strong> "Aspirin 300 mg chewed en route. Pre-hospital 12-lead: we called it 'non-specific ST changes', no clear elevation. GTN eased it a little. HR 98, BP 148/92, SpO₂ 95%."</p>
+          <p><strong>R:</strong> "We pre-alerted as ?ACS. Pain's still 8/10. He's frightened."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Relief with GTN does NOT rule in cardiac pain, and lack of relief does NOT rule it out — GTN relaxes oesophageal spasm too. Never let 'the GTN worked' close the book."</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each high-risk feature</h3>
+        <p>🎮 <em>Click every feature that RAISES the probability of ACS. Each correct = +10 XP.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">💪 Radiation to left arm &amp; jaw</button>
+          <button class="btn ghost flag-btn" data-good="1">💦 Diaphoresis + vomiting</button>
+          <button class="btn ghost flag-btn" data-good="1">🧨 Pain at rest, &gt; 20 min</button>
+          <button class="btn ghost flag-btn" data-good="1">🩺 Diabetic + premature family history</button>
+          <button class="btn ghost flag-btn" data-good="1">🚬 Heavy smoker</button>
+          <button class="btn ghost flag-btn" data-good="0">🍽️ "Sounds like reflux"</button>
+          <button class="btn ghost flag-btn" data-good="0">😌 GTN eased it slightly</button>
+          <button class="btn ghost flag-btn" data-good="0">🌡️ Temperature 36.7°C</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Praise where due</b>The paramedics gave aspirin and pre-alerted — exactly right for undifferentiated high-risk chest pain. Aspirin's ~20% mortality benefit in ACS (ISIS-2) is one of the cheapest lives saved in medicine.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🅰️🅱️🅲️ Primary survey — and the "chest-pain-in-90-seconds"</h3>
+        <table class="tbl">
+          <tr><th>Step</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>🅰️ Airway</td><td>Patent, speaking full sentences.</td><td>Talking = airway OK; buys you thinking time.</td></tr>
+          <tr><td>🅱️ Breathing</td><td>RR 20, SpO₂ 95% RA, chest clear.</td><td>Clear chest argues against pulmonary oedema now — but re-examine, LV failure can evolve.</td></tr>
+          <tr><td>🅲️ Circulation</td><td>HR 98 regular, <strong>BP equal both arms 148/92</strong>, warm peripheries, no murmur, no radio-radial delay.</td><td>Equal arm pressures + no tearing pain lowers (not eliminates) dissection. A murmur could mean acute MR from papillary ischaemia.</td></tr>
+          <tr><td>🅳 Disability</td><td>GCS 15, anxious.</td><td>Fear itself raises catecholamines, HR, and myocardial oxygen demand.</td></tr>
+          <tr><td>🅴 Exposure</td><td>No calf swelling, no rash, no chest-wall tenderness that reproduces the pain.</td><td>Reproducible chest-wall pain lowers ACS probability but never excludes it (up to ~7% of MIs have some reproducible component).</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"For every chest pain: a 12-lead ECG within 10 MINUTES of arrival, and repeated if the pain changes. The clock starts at the door, not at the doctor."</div>
+
+        <h3>🧭 The three killers you exclude at the bedside first</h3>
+        <p>Before ACS, your reflex differential for "sudden chest pain + unwell" is the <strong>immediately lethal trio</strong>: <strong>ACS</strong>, <strong>aortic dissection</strong>, <strong>pulmonary embolism</strong> (± tension pneumothorax, oesophageal rupture). One 12-lead, one focused exam, and a couple of targeted questions triage all three in minutes (see S14).</p>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of "the first ECG is normal"</b>A single normal ECG does NOT exclude ACS — up to a third of NSTEMIs have a non-diagnostic initial ECG, and early hyperacute changes are subtle. The answer is <strong>serial ECGs</strong> (every 15–30 min while symptomatic) and hs-troponin, not reassurance.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The EM resident thinks out loud at 03:16:</em></p>
+        <h3>🧠 Frame it as a probability problem, not a yes/no</h3>
+        <p>"High-risk story, high-risk patient. My job isn't to 'diagnose reflux' — it's to <strong>risk-stratify</strong>. I'll compute a <strong>HEART score</strong>, get a 12-lead now and repeat it, and start a <strong>hs-troponin 0/1-hour</strong> pathway. Aspirin's on board. I do NOT give routine oxygen (SpO₂ 95%), and I hold on ticagrelor/heparin until I know it isn't a dissection."</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>📈 <strong>Serial 12-leads</strong> — now, at 15 min, and with any pain change; hunt for STEMI-equivalents (S10).</li>
+          <li>🧪 <strong>hs-troponin at 0 and 1 h</strong> — the delta matters more than the single value.</li>
+          <li>🧮 <strong>HEART score</strong> to place him in low/moderate/high risk (S5).</li>
+          <li>💊 Aspirin continued; <strong>P2Y₁₂ + anticoagulation deferred</strong> until dissection is off the table and a diagnosis of ACS is firm.</li>
+          <li>🩻 Portable CXR (mediastinum, oedema, pneumothorax) while he stays monitored with defib pads to hand.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Rule out the aorta before you anticoagulate the coronary. A tearing-to-the-back story or a wide mediastinum earns a second look BEFORE heparin and ticagrelor go in."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>He asks for oxygen "to be safe" though SpO₂ is 95%. Give it?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No.</strong> Routine oxygen in normoxic ACS does not help and may harm — hyperoxia causes coronary vasoconstriction and, in the <em>DETO2X-AMI</em> and <em>AVOID</em> trials, showed no benefit (a signal of larger infarcts with oxygen in AVOID). <strong>Only give O₂ if SpO₂ &lt; 90%.</strong></p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The EM consultant at the bedside, 03:22:</em></p>
+        <h3>🧮 The HEART score — the ED's most validated chest-pain tool</h3>
+        <table class="tbl">
+          <tr><th>Element</th><th>0</th><th>1</th><th>2</th><th>This patient</th></tr>
+          <tr><td><strong>H</strong>istory</td><td>Slightly suspicious</td><td>Moderately</td><td>Highly suspicious</td><td class="hi">2</td></tr>
+          <tr><td><strong>E</strong>CG</td><td>Normal</td><td>Non-specific repol</td><td>Significant ST dev</td><td class="hi">1</td></tr>
+          <tr><td><strong>A</strong>ge</td><td>&lt;45</td><td>45–64</td><td>≥65</td><td class="hi">1</td></tr>
+          <tr><td><strong>R</strong>isk factors</td><td>None</td><td>1–2</td><td>≥3 or known CAD</td><td class="hi">2</td></tr>
+          <tr><td><strong>T</strong>roponin</td><td>Normal</td><td>1–3× normal</td><td>&gt;3× normal</td><td class="hi">pending</td></tr>
+        </table>
+        <p>Even before troponin he sits at <strong>6/10 → high risk</strong> (HEART ≥ 7 ⇒ ~50% 6-week MACE). This is an <strong>admit-and-work-up</strong> patient, full stop.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"HEART 0–3 = low risk, safe for early discharge with a negative troponin pathway; 4–6 = observe &amp; serial troponin; ≥7 = high risk, early invasive thinking. The story and risk factors alone can make a man high-risk before a single number returns."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">VALIDATION</span> HEART / HEART Pathway (Backus, Mahler)</td><td>HEART 0–3 with negative troponin ⇒ &lt;1–2% 30-day MACE; the HEART Pathway safely increased early discharge.</td><td>Use a validated score, not gestalt, to decide who goes home.</td></tr>
+            <tr><td><span class="lvl">RCT/DIAGNOSTIC</span> hs-troponin 0/1-h algorithms (ESC 2023)</td><td>Rapid rule-out/rule-in with very high negative predictive value using absolute deltas.</td><td>A single low value + low-risk story can rule out fast; the <em>delta</em> rules in.</td></tr>
+            <tr><td><span class="lvl">RCT</span> ISIS-2</td><td>Aspirin ~23% and streptokinase each cut vascular death; together additive.</td><td>Aspirin early in suspected ACS — one of the highest-value ED acts.</td></tr>
+            <tr><td><span class="lvl">RCT</span> DETO2X-AMI / AVOID</td><td>Routine O₂ in normoxic MI: no benefit; AVOID hinted at larger infarcts.</td><td>Oxygen only for SpO₂ &lt; 90%.</td></tr>
+            <tr><td><span class="lvl">RCT</span> TIMACS / early invasive</td><td>Early angiography (&lt;24 h) benefits higher-risk NSTE-ACS (esp. GRACE &gt;140).</td><td>High-risk NSTEMI → cath within 24 h.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The chart that keeps me awake is the diabetic 'gastritis' who was given antacid and a GP letter. His posterior STEMI — tall R and ST depression in V1–V3 — was on the first ECG nobody turned into a posterior lead. He arrested in the car park."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY the pain, WHY the danger (the WHY behind the WHY)</h3>
+        <ol>
+          <li>🧱 <strong>Plaque rupture:</strong> a lipid-rich atheroma's fibrous cap tears; sub-endothelial collagen and tissue factor are exposed.</li>
+          <li>🩸 <strong>Thrombosis:</strong> platelets adhere, activate and aggregate; a thrombus forms. <em>Non-occlusive</em> → NSTE-ACS; <em>fully occlusive</em> → STEMI.</li>
+          <li>⚡ <strong>Supply–demand mismatch:</strong> distal myocardium becomes ischaemic. Anaerobic metabolism → adenosine and lactate stimulate cardiac afferents → <strong>visceral, poorly-localised pain</strong> referred to arm/jaw (shared spinal segments) — which is exactly why it's "atypical."</li>
+          <li>💀 <strong>Necrosis over time:</strong> "time is muscle" — the ischaemic wavefront spreads from endocardium to epicardium. Troponin leaks from dying myocytes; it rises over hours (hence the <em>delta</em>).</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A single troponin is a snapshot; ACS is a movie. It's the CHANGE (delta) over 1–3 hours that separates an evolving infarct from chronic troponin leak."</div>
+
+        <h3>⚖️ Contrast pair — Type 1 vs Type 2 MI</h3>
+        <div class="vs">
+          <div class="side a"><h4>🩸 Type 1 MI</h4><ul><li>Primary plaque rupture + thrombus</li><li>Treat the clot: antiplatelets, anticoagulation, revascularisation</li><li>Our patient's likely mechanism</li></ul></div>
+          <div class="side b"><h4>🔋 Type 2 MI (supply–demand)</h4><ul><li>Ischaemia from a mismatch: tachyarrhythmia, anaemia, sepsis, hypotension, hypertensive crisis</li><li>Treat the CAUSE (transfuse, rate-control, treat sepsis) — stenting the wrong problem harms</li></ul></div>
+        </div>
+        <p>💡 A raised troponin is not a diagnosis — it is a <em>finding</em>. Ask: is this a clot to open, or a stressed heart to unload?</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The hs-Troponin Delta Dial</h3>
+          <p style="font-size:13px">Two values, one hour apart. Drag the 1-hour value and watch how the <strong>delta</strong> (not the absolute number) drives the decision.</p>
+          <label for="kRange">🧪 1-hour hs-troponin (0-h value fixed at 12 ng/L): <b id="kVal">12</b> ng/L</label>
+          <input type="range" id="kRange" min="5" max="120" value="12">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore rule-out vs rule-in.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 A low, unchanging value with a reassuring story → rule-OUT. A rising delta beyond the assay threshold → rule-IN, regardless of how "normal" one number looks.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The order set (03:14)</h3>
+        <ul>
+          <li>📈 <strong>12-lead ECG now</strong>, repeat at 15 min and with any pain change; posterior (V7–V9) &amp; right-sided (V4R) leads if inferior/posterior suspicion.</li>
+          <li>🩸 <strong>Aspirin 300 mg</strong> chewed (given) → 75–100 mg daily.</li>
+          <li>🧪 <strong>hs-troponin 0 &amp; 1 h</strong>, plus CBC, U&amp;E, glucose, lipid, coag, CRP.</li>
+          <li>💉 <strong>GTN</strong> sublingual/infusion for pain (avoid if hypotensive, RV infarct, or recent PDE5 inhibitor).</li>
+          <li>💊 <strong>Analgesia</strong> — small IV opioid if pain persists (note: morphine can slow P2Y₁₂ absorption; use judiciously).</li>
+          <li>🚫 <strong>Hold P2Y₁₂ + anticoagulation</strong> until dissection excluded and ACS confirmed; O₂ only if SpO₂ &lt; 90%.</li>
+          <li>🩻 Portable CXR; continuous cardiac monitoring with <strong>defib pads on</strong>; IV access ×2.</li>
+          <li>📞 If any ECG turns into STEMI/STEMI-equivalent → <strong>activate primary PCI</strong> immediately.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Aspirin and a repeat ECG cost pennies and save lives; the expensive mistakes are the ones you skip because 'he looks well.'"</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Resus-bay priorities — the nurse runs the safety net</h3>
+        <ul>
+          <li>📟 <strong>Continuous telemetry, defib pads attached</strong>; the first hours carry the highest VT/VF risk.</li>
+          <li>📈 <strong>Repeat the ECG the moment pain changes</strong> — nurses catch the dynamic ECG doctors miss between rounds. Time-stamp every strip.</li>
+          <li>😖 Pain score every 5–15 min; escalate analgesia and flag ongoing pain (ongoing pain = ongoing ischaemia = pressure to re-image/re-troponin/cath).</li>
+          <li>🩸 Cannulate ×2, draw the troponin set, label sample times precisely (the delta depends on accurate timing).</li>
+          <li>🧾 Keep the patient calm and informed — anxiety drives HR and demand; a composed bedside is anti-ischaemic.</li>
+          <li>🚫 Confirm no antithrombotics are given until the plan clears the aorta; challenge any premature heparin.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who re-does the ECG on every twinge of pain is the most sensitive ischaemia monitor in the department."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>0 h</th><th>1 h</th><th>Interpretation</th></tr>
+          <tr><td>hs-Troponin T</td><td class="hi">28 ng/L</td><td class="hi">96 ng/L</td><td><strong>Rise-and-Δ well above threshold → rule-IN.</strong> The delta, not the single value, seals it.</td></tr>
+          <tr><td>Glucose</td><td colspan="2" class="hi">14.8 mmol/L</td><td>Stress hyperglycaemia + poorly controlled diabetes.</td></tr>
+          <tr><td>Creatinine</td><td colspan="2">96 µmol/L</td><td>Normal — relevant for contrast/anticoagulant dosing at PCI.</td></tr>
+          <tr><td>Hb</td><td colspan="2" class="ok-v">146 g/L</td><td>Excludes anaemia as a type-2 driver.</td></tr>
+          <tr><td>K⁺</td><td colspan="2">4.2 mmol/L</td><td>Keep 4.0–5.0 to reduce arrhythmia risk in ischaemia.</td></tr>
+          <tr><td>D-dimer</td><td colspan="2">Not sent</td><td>Correctly NOT ordered — a positive would only muddy a high pre-test ACS picture; image the aorta clinically/CT if truly suspected.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Don't fire a D-dimer shotgun at a high-risk chest pain — a falsely positive result drags you toward CTPA and away from the coronary that's actually occluding."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why hs-troponin changed the game — and its trap</b>High-sensitivity assays detect tiny myocyte injury, ruling ACS in/out in 1–2 h. The trap: they are <em>sensitive, not specific</em> — troponin also rises in PE, myocarditis, sepsis, CKD, tachyarrhythmia and heart failure. Always interpret the number inside the clinical story and the delta.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 ECG / IMAGING + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🫀 Serial 12-leads — read them like a movie</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 130" preserveAspectRatio="none" aria-label="Evolving ECG: subtle then hyperacute anterior changes">
+            <rect width="820" height="130" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="32" x2="820" y2="32"/><line x1="0" y1="65" x2="820" y2="65"/><line x1="0" y1="98" x2="820" y2="98"/></g>
+            <polyline fill="none" stroke="#86efac" stroke-width="2.3" points="0,70 40,70 52,66 66,40 78,92 90,70 130,70 150,68 168,66 210,70 250,70 262,60 276,34 288,94 300,70 340,70 360,66 380,64 420,70 460,70 472,50 486,20 500,96 512,66 520,64 560,70 600,70 612,44 626,16 640,96 652,62 664,66 700,70 740,70 752,44 766,14 780,96 792,64 804,66 820,70"/>
+            <text x="150" y="20" fill="#93c5fd" font-size="11">03:12 — subtle</text>
+            <text x="470" y="14" fill="#fca5a5" font-size="11">03:40 — hyperacute T / early ST↑</text>
+          </svg>
+          <div class="ecg-cap">The <span style="color:#93c5fd">first ECG</span> is nearly normal; the <span style="color:#fca5a5">repeat</span> shows tall hyperacute T waves and early ST elevation in the anterior leads. The diagnosis lived in the SECOND ECG.</div>
+        </div>
+
+        <h3>🔎 The STEMI-equivalents you must know cold (they don't "elevate")</h3>
+        <table class="tbl">
+          <tr><th>Pattern</th><th>Look for</th><th>Meaning</th></tr>
+          <tr><td>🔵 <strong>Posterior MI</strong></td><td>Tall R + ST <em>depression</em> V1–V3; confirm with V7–V9 ST↑</td><td>Circumflex/RCA occlusion — a "reciprocal" that IS the STEMI.</td></tr>
+          <tr><td>🅰️ <strong>aVR ST elevation</strong> with diffuse ST depression</td><td>ST↑ aVR &gt; V1, widespread depression</td><td>Left main / triple-vessel / severe global ischaemia.</td></tr>
+          <tr><td>🌊 <strong>de Winter T waves</strong></td><td>Upsloping ST depression + tall symmetric T at J-point, V1–V6</td><td>Proximal LAD occlusion equivalent — activate PCI.</td></tr>
+          <tr><td>⚡ <strong>Wellens</strong></td><td>Biphasic (A) or deep symmetric (B) T in V2–V3, pain-free</td><td>Critical proximal LAD stenosis — will infarct if stressed; NOT a stress-test candidate.</td></tr>
+          <tr><td>🧱 <strong>Sgarbossa (in LBBB/paced)</strong></td><td>Concordant ST↑ ≥1 mm; concordant ST↓ V1–V3; excessively discordant ST↑ (Smith-modified)</td><td>MI can hide inside LBBB — Sgarbossa unmasks it.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'No ST elevation' is not 'no occlusion.' Posterior MI, de Winter, aVR-elevation and Sgarbossa-positive LBBB are STEMIs in disguise — learn them or send them home to die."</div>
+
+        <h3>🩻 Adjunct imaging</h3>
+        <ul>
+          <li><strong>CXR:</strong> normal mediastinum, no oedema, no pneumothorax — reassuring for dissection/alternative causes.</li>
+          <li><strong>Bedside echo (POCUS):</strong> regional wall-motion abnormality (anterior hypokinesis) supports ischaemia; also screens for effusion, RV strain (PE), and gross valve pathology.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The ACS drug map — what, why, and the traps</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>Aspirin</strong> 300 mg → 75–100 mg</td><td>Immediate, for all suspected ACS</td><td>Irreversible COX-1 → ↓thromboxane A₂ → ↓platelet aggregation. Give unless true anaphylaxis.</td></tr>
+          <tr><td><strong>P2Y₁₂ inhibitor</strong> (ticagrelor/prasugrel &gt; clopidogrel)</td><td>Once ACS confirmed &amp; dissection excluded; timing per local pathway</td><td>Blocks ADP-P2Y₁₂. Prasugrel avoided if prior stroke/TIA; ticagrelor causes dyspnoea/bradypauses.</td></tr>
+          <tr><td><strong>Anticoagulant</strong> (heparin/enoxaparin/fondaparinux/bivalirudin)</td><td>NSTE-ACS/STEMI per pathway</td><td>Do NOT start before the aorta is cleared.</td></tr>
+          <tr><td><strong>GTN</strong></td><td>Ongoing ischaemic pain, hypertension, pulmonary oedema</td><td>Venodilator → ↓preload → ↓wall stress. Avoid in hypotension, RV infarct, recent sildenafil/tadalafil.</td></tr>
+          <tr><td><strong>High-intensity statin</strong> (atorvastatin 80 mg)</td><td>Day 1, regardless of LDL</td><td>Plaque stabilisation + early event reduction.</td></tr>
+          <tr><td><strong>Beta-blocker</strong></td><td>Within 24 h once stable</td><td>↓demand &amp; arrhythmia. AVOID in acute failure/shock/bradycardia (COMMIT lesson).</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Aspirin now for everyone; P2Y₁₂ and heparin only once you've cleared the aorta and confirmed a clot — and never a beta-blocker into a failing or shocked heart."</div>
+        <div class="callout danger"><b class="ct">🚫 The 'never before the aorta' list</b>❌ heparin · ❌ ticagrelor/prasugrel · ❌ thrombolysis — until dissection is excluded. Anticoagulating a dissection turns a contained tear into a fatal haemorrhage.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why</h3>
+        <ul>
+          <li>📈 <strong>Continuous telemetry</strong> with defib to hand — VT/VF peaks in the first hours; ST-segment monitoring catches re-occlusion.</li>
+          <li>🧪 <strong>Serial troponin</strong> to define the trajectory; repeat 12-leads with every symptom change.</li>
+          <li>🩸 BP each 5–15 min — hypotension may mean RV involvement, over-nitration, or evolving shock.</li>
+          <li>🫁 SpO₂ (target ≥ 94% only if hypoxic), respiratory rate for evolving LV failure.</li>
+          <li>🧮 Recompute risk (GRACE) once troponin returns — GRACE &gt; 140 pushes toward early (&lt; 24 h) invasive management.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After you decide 'ACS,' the monitor's question changes from 'is he ischaemic?' to 'is he about to arrest or re-occlude?' — and the answers are the rhythm and the recurring pain."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong in the ED phase</h3>
+        <ul>
+          <li>⚡ <strong>VT / VF / cardiac arrest</strong> — commonest early killer; why pads stay on.</li>
+          <li>🫀 <strong>Evolution to STEMI / re-occlusion</strong> — the "NSTEMI" that declares itself on the 4th ECG.</li>
+          <li>💔 <strong>Acute LV failure / cardiogenic shock</strong> — large territory at risk.</li>
+          <li>🔊 <strong>Mechanical (later, days 3–7):</strong> papillary muscle rupture (acute MR), VSD, free-wall rupture — a new murmur + crash.</li>
+          <li>🧠 <strong>Bleeding</strong> from antithrombotics; <strong>contrast nephropathy</strong> around PCI.</li>
+          <li>🩹 <strong>The system complication:</strong> premature discharge — the biggest "complication" of all in the ED.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The deadliest ED complication of ACS isn't in the patient — it's the decision to send them home. Treat disposition as a procedure with its own checklist."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The chest-pain differential — killers first</h3>
+        <table class="tbl">
+          <tr><th>Diagnosis</th><th>Discriminators</th><th>Don't-miss action</th></tr>
+          <tr><td>🫀 <strong>ACS</strong> (this patient)</td><td>Exertional/rest pressure, radiation, risk factors, dynamic ECG, troponin delta</td><td>Serial ECG + hs-troponin; aspirin; PCI pathway.</td></tr>
+          <tr><td>🩸 <strong>Aortic dissection</strong></td><td>Tearing, maximal-at-onset, radiates to back, pulse/BP differential, wide mediastinum</td><td>Image the aorta (CT) BEFORE anticoagulation.</td></tr>
+          <tr><td>🫁 <strong>Pulmonary embolism</strong></td><td>Pleuritic, dyspnoea, tachycardia, risk factors, RV strain, S1Q3T3</td><td>Wells/PERC → D-dimer or CTPA.</td></tr>
+          <tr><td>📋 <strong>Pericarditis / myopericarditis</strong></td><td>Positional/pleuritic, diffuse concave ST↑ + PR depression, rub</td><td>Distinguish from STEMI; NSAID + colchicine.</td></tr>
+          <tr><td>💨 <strong>Pneumothorax / pneumonia / oesophageal</strong></td><td>Pleuritic, breath sounds, fever, relation to swallowing</td><td>CXR; treat cause.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Every chest pain gets the same first question set: does it TEAR (aorta), does it hurt to BREATHE (PE/pleura/pericardium), or does it PRESS (ACS)? Three questions triage three killers."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The First Ten Minutes"</h3>
+          <div class="hud"><span>❤️ Safety: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">First ECG is "non-specific," troponin is pending, pain is 8/10 in a diabetic smoker with a family history. The registrar on the phone says "sounds like reflux — give antacid and reassess in a few hours." What do you do?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The disposition plan</h3>
+        <ol>
+          <li>🫀 <strong>Diagnosis:</strong> NSTE-ACS (rising troponin, high HEART, dynamic ECG). Serial ECG watched for STEMI-evolution → if it declares, primary PCI.</li>
+          <li>💊 Aspirin continued; P2Y₁₂ + anticoagulation started per pathway (aorta cleared); high-intensity statin; GTN/analgesia; beta-blocker once stable.</li>
+          <li>🧮 <strong>Risk-stratify (GRACE):</strong> high-risk → <strong>invasive coronary angiography &lt; 24 h</strong>.</li>
+          <li>🏥 Admit to CCU/monitored bed; cardiology referral; treat diabetes/BP; secondary prevention started day 1.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"NSTE-ACS is not 'the mild one' — high-risk NSTEMI (GRACE &gt; 140, ongoing pain, dynamic changes) gets the cath lab within 24 hours, not a ward bed and a shrug."</div>
+
+        <div class="checklist" id="ckACS">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Safe ACS pathway checklist (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>📈 12-lead ECG within 10 min of arrival + repeat at 15 min / any pain change; posterior &amp; right leads if indicated</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 Aspirin 300 mg given; allergy checked</span></label>
+          <label class="ck"><input type="checkbox"><span>🧪 hs-troponin 0 &amp; 1 h drawn with exact times; delta interpreted</span></label>
+          <label class="ck"><input type="checkbox"><span>🧮 HEART (and GRACE once troponin back) documented</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 Aorta considered/cleared BEFORE anticoagulation &amp; P2Y₁₂</span></label>
+          <label class="ck"><input type="checkbox"><span>📟 Continuous monitoring, defib pads on, IV ×2</span></label>
+          <label class="ck"><input type="checkbox"><span>📞 Clear disposition: admit + cardiology referral; safety-net if truly low-risk discharge</span></label>
+          <div class="ck-progress" data-progress>0 / 7 complete</div>
+        </div>
+
+        <div class="checklist" id="ckSTEMI">
+          <h3 style="margin-top:0">🩺 Procedure Guide — If it declares as STEMI (primary PCI activation)</h3>
+          <label class="ck"><input type="checkbox"><span>🚨 Confirm STEMI / STEMI-equivalent on a repeat 12-lead</span></label>
+          <label class="ck"><input type="checkbox"><span>📞 Single-call cath-lab activation; note first-medical-contact time (target FMC-to-device &lt; 90 min)</span></label>
+          <label class="ck"><input type="checkbox"><span>💊 Dual antiplatelet loaded + anticoagulation per interventionist</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 If PCI not available &lt; 120 min → fibrinolysis (after dissection excluded, no contraindication)</span></label>
+          <label class="ck"><input type="checkbox"><span>🫀 Defib pads on, escort with resus drugs to the lab</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">03:12</div>Arrival, aspirin on board, first ECG non-specific, pain 8/10.</div>
+          <div class="t-item"><div class="t-time">03:40</div>Repeat ECG: hyperacute anterior T waves; troponin 28 → 96. NSTE-ACS with high-risk features; cardiology alerted.</div>
+          <div class="t-item"><div class="t-time">04:10</div>Recurrent pain with new anterior ST elevation → <strong>declares as STEMI</strong>. Primary PCI activated.</div>
+          <div class="t-item"><div class="t-time">04:52</div>Cath: proximal LAD occlusion, drug-eluting stent, TIMI-3 flow restored. Door-to-device 100 min (delayed by the rule-out — the lesson lives here).</div>
+          <div class="t-item"><div class="t-time">Day 1</div>CCU: EF 45%, pain-free, DAPT + high-intensity statin + ACEi + beta-blocker; glucose &amp; BP addressed.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>He is alive because someone refused "probably reflux," repeated the ECG, trended the troponin, and kept the aorta in mind before heparin. Ordinary discipline, extraordinary outcome.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 (Post-PCI) discharge &amp; the low-risk chest-pain discharge — two different worlds</h3>
+        <div class="vs">
+          <div class="side a"><h4>🫀 This patient (confirmed MI)</h4><ul><li>DAPT 12 months, high-intensity statin, ACEi/ARB, beta-blocker, ± MRA if EF &lt; 40%</li><li>Cardiac rehab, smoking cessation, diabetes &amp; BP control</li><li>Red flags: recurrent chest pain, breathlessness, syncope → 999</li><li>Cardiology + GP follow-up; no driving per local rules</li></ul></div>
+          <div class="side b"><h4>🟢 The genuinely low-risk chest pain</h4><ul><li>HEART 0–3 + negative serial hs-troponin + non-ischaemic ECG</li><li>Shared decision-making, written safety-net, timely outpatient testing if needed</li><li>Explicit "come back immediately if…" advice</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A safe chest-pain discharge is an active decision with a score, a negative troponin, a clean ECG and a written safety-net — never a silent 'looked fine.'"</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>⏱️ 10-minute ECG</b>Every chest pain gets a 12-lead within 10 minutes — and a repeat with any change.</div>
+          <div class="pearl"><b>🎬 ACS is a movie</b>Trend the ECG and the troponin — the delta rules in, one snapshot rules nothing out.</div>
+          <div class="pearl"><b>🕵️ Atypical = typical to miss</b>Diabetics, women, elderly present atypically; raise suspicion, don't lower it.</div>
+          <div class="pearl"><b>📈 STEMI-equivalents</b>Posterior MI, de Winter, aVR-elevation, Sgarbossa+ LBBB — occlusions without "elevation."</div>
+          <div class="pearl"><b>🩸 Aorta before heparin</b>Clear dissection before anticoagulating or lysing.</div>
+          <div class="pearl"><b>🫧 No routine O₂</b>Oxygen only for SpO₂ &lt; 90% — hyperoxia can enlarge infarcts.</div>
+          <div class="pearl"><b>🧮 Score, don't guess</b>HEART + hs-troponin for the disposition decision; GRACE for invasive timing.</div>
+          <div class="pearl"><b>🔋 Type 1 vs Type 2</b>Treat the clot, or treat the cause — a high troponin is a finding, not a diagnosis.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the pathway</h3>
+          <ul>
+            <li>🩻 <strong>The "Occlusion MI (OMI)" paradigm:</strong> the STEMI/NSTEMI dichotomy misses acute coronary occlusion without ST-elevation criteria. OMI-vs-NOMI thinking (subtle occlusion patterns, hyperacute T waves, modified-Sgarbossa, AI-ECG) identifies patients who benefit from emergent reperfusion despite "non-STEMI" labels.</li>
+            <li>🧪 <strong>hs-troponin nuance:</strong> sex-specific 99th-percentile cut-offs; the value of very low single values (&lt; limit of detection) for immediate rule-out; assay-specific 0/1-h and 0/2-h absolute delta thresholds (ESC 2023).</li>
+            <li>🫀 <strong>MINOCA</strong> (MI with non-obstructive coronaries): work up plaque disruption (intravascular imaging — OCT/IVUS), coronary spasm (provocation), spontaneous coronary artery dissection (SCAD — think young women, peripartum), microvascular disease, and cardiac MRI to distinguish true MI from myocarditis/Takotsubo.</li>
+            <li>🧬 <strong>Antiplatelet timing debate:</strong> routine pre-treatment with P2Y₁₂ before angiography in NSTE-ACS is no longer recommended (no ischaemic benefit, more bleeding — <em>ISAR-REACT 5</em> favoured prasugrel over ticagrelor with a deferred-loading strategy).</li>
+            <li>🖥️ <strong>Coronary CT angiography</strong> in low–intermediate-risk ED chest pain: high NPV for ruling out CAD (<em>ROMICAT-II</em>, <em>PROMISE</em>), useful when troponin/ECG are equivocal and pre-test probability is modest.</li>
+            <li>🩸 <strong>Cardiogenic-shock ACS:</strong> culprit-only PCI (<em>CULPRIT-SHOCK</em>), early revascularisation (<em>SHOCK</em>), judicious use of mechanical support.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The Antacid That Killed"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 61-year-old diabetic man came to a crowded ED at 02:00 with "burning" epigastric/chest discomfort and one vomit. Triaged as "dyspepsia." He was given an antacid "GI cocktail," felt "a bit better," and — with the department full — was moved to the corridor to await review. The single ECG taken at triage showed <strong>tall R waves and ST depression in V1–V3</strong>; no one recorded posterior leads and no one repeated it. Ninety minutes later he was found unresponsive in the corridor chair — a <strong>posterior STEMI</strong> that had extended, then arrested in VF. Resuscitation failed.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🧠 ANCHORING</b>"Dyspepsia" label stuck; the GI cocktail "response" falsely reassured.</div>
+            <div class="hole"><b>📈 ECG NOT READ</b>Posterior STEMI pattern (ST↓ V1–V3) unrecognised; posterior leads never done.</div>
+            <div class="hole"><b>🔁 NO SERIAL ECG</b>One snapshot, never repeated despite ongoing symptoms.</div>
+            <div class="hole"><b>🏥 SYSTEM</b>Overcrowding → corridor care → no monitoring, no defib to hand.</div>
+            <div class="hole"><b>🩺 RISK IGNORED</b>Diabetic with atypical presentation treated as low-risk.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> treat every diabetic with chest/epigastric pain as high-risk; read ST depression in V1–V3 as a possible posterior STEMI and record V7–V9; repeat the ECG on any ongoing symptom; keep suspected ACS monitored with defib to hand — never in an unmonitored corridor; and never let a "GI cocktail response" close the door. <strong>This is exactly the discipline that saved the patient in Bed 1.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Responded to antacid' has killed more patients than it has ever diagnosed. Symptom relief is not a diagnosis — the ECG and the troponin are."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🚨 Emergency Department · Bed 1 — Undifferentiated Chest Pain / ACS Rule-Out<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+  /* ===== SIDEBAR SCROLL-SPY (vertical) ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); var t=sections[idx]; if(t) t.scrollIntoView({behavior:'smooth',block:'start'}); setActive(idx); markVisited(idx); }); });
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){ entries.forEach(function(e){ if(!e.isIntersecting) return; var i=sections.indexOf(e.target); if(i>-1){ setActive(i); markVisited(i); } }); }, { rootMargin:'-10% 0px -75% 0px' });
+    sections.forEach(function(s){ if(s) io.observe(s); });
+  }
+  markVisited(0); setActive(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not a high-risk feature'); } if(found===total){ flagResult.textContent='✅ All '+total+' high-risk features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' high-risk features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: troponin delta ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=(v-5)/(120-5)*100; kNeedle.style.left=pct+'%'; var base=12, delta=v-base; var msg,cls;
+      if(v<=14 && delta<7){ msg='🟢 Low, unchanging (Δ '+delta+' ng/L). With a reassuring story + low HEART → rule-OUT pathway.'; cls='good'; }
+      else if(delta<7){ msg='🟠 Mildly elevated but flat (Δ '+delta+'). Could be chronic (CKD/HF) troponin — interpret in context, consider a 3-h value.'; cls='warn-r'; }
+      else if(delta<20){ msg='🟠 Rising (Δ '+delta+' ng/L). Above the assay delta threshold → this is a MOVIE, not chronic leak. Rule-IN thinking.'; cls='warn-r'; }
+      else { msg='🔴 Steep rise (Δ '+delta+' ng/L). Rule-IN: evolving myocardial injury — treat as ACS, watch for STEMI-evolution.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Delta Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"First ECG is 'non-specific,' troponin pending, pain 8/10 in a diabetic smoker with a family history. The phone advice is 'sounds like reflux — antacid and reassess in a few hours.' What do you do?",
+      choices:[
+        {t:"🍽️ Give the GI cocktail and move him to the waiting room",good:false,ds:-2,dt:90,xp:0,fb:"☠️ This is the M&M case in S21. Unmonitored, unrepeated ECG, high-risk patient — the posterior/anterior STEMI declares in the corridor and he arrests. Restart.",end:true},
+        {t:"📈 Keep him monitored, repeat the ECG now and at 15 min, start hs-troponin 0/1h, continue aspirin",good:true,ds:1,dt:8,xp:40,fb:"✅ Exactly. Serial ECG + troponin delta + monitoring is the rule-out. You've built the safety net.",next:"repeat"},
+        {t:"💉 Load ticagrelor + heparin immediately 'to be safe'",good:false,ds:-1,dt:10,xp:5,fb:"⚠️ Premature — you haven't confirmed ACS or cleared the aorta. Anticoagulating a possible dissection can be fatal. Risk-stratify first.",next:"repeat"}
+      ]},
+    repeat:{ text:"The 15-minute ECG shows tall hyperacute anterior T waves; troponin 28 → 96. He's high-risk NSTE-ACS. The pain is worsening. Next best step?",
+      choices:[
+        {t:"🫀 Continue ACS therapy, alert cardiology, watch the ECG closely for STEMI-evolution and be ready to activate PCI",good:true,ds:1,dt:6,xp:40,fb:"✅ Right. High-risk NSTEMI with dynamic changes → early invasive; and a hyperacute T wave can become ST-elevation any minute.",next:"declare"},
+        {t:"🏓 Send him to the ward for a 6-hour troponin and review in the morning",good:false,ds:-2,dt:30,xp:0,fb:"⚠️ Dangerous — worsening pain + rising troponin + dynamic ECG is NOT a 'review-in-the-morning' patient.",next:"declare"}
+      ]},
+    declare:{ text:"He clutches his chest again — the monitor now shows clear anterior ST elevation. What now?",
+      choices:[
+        {t:"🚨 Activate primary PCI immediately; DAPT + anticoagulation per interventionist; defib pads on; escort to the lab",good:true,ds:1,dt:5,xp:45,fb:"🏆 Perfect. It declared as STEMI — the whole rule-out existed to catch this moment. Time is muscle.",end:true},
+        {t:"💊 Give more GTN and antacid and wait for the next troponin",good:false,ds:-1,dt:20,xp:0,fb:"⚠️ This is now a STEMI — waiting loses myocardium and courts VF. Reperfuse now.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='declare'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 54-year-old diabetic smoker has 40 minutes of chest pressure. First ECG is non-specific. The single most important next step is:", opts:["Reassure and discharge with antacid","Repeat the ECG and start a serial hs-troponin pathway with monitoring","Immediately load ticagrelor and heparin","D-dimer to exclude PE"], correct:1, exp:"Serial ECGs + hs-troponin with monitoring is the rule-out. A single non-diagnostic ECG never excludes ACS; anticoagulation is premature before confirming ACS and clearing the aorta; a D-dimer in a high pre-test ACS story just misleads." },
+    { q:"Which best reflects correct oxygen use in this normoxic ACS patient (SpO₂ 95%)?", opts:["High-flow O₂ for all chest pain","O₂ only if SpO₂ < 90%","Target SpO₂ 100%","2 L nasal O₂ routinely"], correct:1, exp:"DETO2X-AMI/AVOID: routine oxygen in normoxic MI gives no benefit and may enlarge infarcts (hyperoxic coronary vasoconstriction). Give O₂ only for SpO₂ < 90%." },
+    { q:"ST depression with tall R waves in V1–V3 most likely represents:", opts:["Benign early repolarisation","Posterior STEMI (a STEMI-equivalent)","Pericarditis","Digoxin effect"], correct:1, exp:"Tall R + ST depression in V1–V3 is the mirror image of a posterior STEMI. Confirm with posterior leads (V7–V9) and activate reperfusion — it is an occlusion, not a 'non-STEMI.'" },
+    { q:"In suspected ACS, why must aortic dissection be considered before anticoagulation?", opts:["Heparin worsens troponin","Anticoagulating/lysing a dissection can cause fatal haemorrhage","Dissection needs aspirin first","It changes the troponin assay"], correct:1, exp:"Antithrombotics turn a contained aortic dissection into uncontrolled bleeding (haemopericardium/tamponade). Clear the aorta (story, exam, imaging) before heparin, P2Y₁₂, or lysis." },
+    { q:"The value of high-sensitivity troponin lies mainly in:", opts:["A single absolute number","The rise/fall (delta) over 1–3 hours interpreted with the story","Being 100% specific for ACS","Replacing the ECG"], correct:1, exp:"hs-troponin is sensitive but not specific (rises in PE, myocarditis, sepsis, CKD, HF). The delta over time, within the clinical context, distinguishes evolving MI from chronic leak." },
+    { q:"A HEART score of 6 before troponin in this patient means he is:", opts:["Low risk — safe for discharge","Moderate–high risk — admit and work up","Zero risk","Only at risk if troponin is positive"], correct:1, exp:"HEART 4–6 is moderate and ≥7 high risk. With a high-risk story and ≥3 risk factors he is already moderate–high before a number returns — this is an admit-and-investigate patient." },
+    { q:"de Winter T waves (upsloping ST depression with tall symmetric T at the J-point across the precordium) indicate:", opts:["A benign variant","A proximal LAD occlusion equivalent needing emergent reperfusion","Hyperkalaemia","Left ventricular hypertrophy"], correct:1, exp:"de Winter pattern is a STEMI-equivalent signalling acute proximal LAD occlusion — treat like a STEMI and activate the cath lab despite the absence of classic ST elevation." },
+    { q:"High-risk NSTE-ACS (rising troponin, dynamic ECG, GRACE > 140) should undergo:", opts:["Outpatient stress test in 6 weeks","Invasive coronary angiography within 24 hours","Discharge on aspirin only","Thrombolysis"], correct:1, exp:"Guidelines/TIMACS support early (<24 h) invasive management for high-risk NSTE-ACS. Thrombolysis is for STEMI (not NSTE-ACS); discharge/outpatient testing is unsafe here." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you rule out ACS like a consultant. 🏆':score>=6?'Strong — review the misses and S10 STEMI-equivalents.':'Revisit S5, S6 and S10 — the rule-out logic is the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>
