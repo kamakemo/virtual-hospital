@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>High-Risk (Massive) Pulmonary Embolism — Virtual Teaching Hospital</title>
+<!-- META
+id: c-ed-pe-033
+title: High-Risk (Massive) Pulmonary Embolism
+hospital: cardiology
+department: cv-ed
+bednumber: 3
+chiefcomplaint: Sudden breathlessness and syncope with hypotension and tachycardia
+system: Cardiology
+severity: critical
+tags: Pulmonary embolism, RV strain, Thrombolysis, Massive PE, Anticoagulation
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🚨</div>
+      <div>
+        <div class="t1">Emergency Dept</div>
+        <div class="t2">Bed 3 · Massive PE</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🚨 Emergency Department · 🛏️ Bed 3</div>
+        <h1>🫁 High-Risk (Massive) Pulmonary Embolism — "The Crash With Clear Lungs"</h1>
+        <div class="sub">⚡ 14:05. A 34-year-old collapses in the waiting room — sudden breathlessness, a syncopal episode, cold and clammy. BP 84/56, heart racing at 122, SpO₂ 86% on air. The chest sounds clear. The obstruction isn't in the lungs — it's in the right heart, and the clock is the pulmonary artery.</div>
+        <div class="chips">
+          <span class="chip crit">🔴 CRITICAL</span>
+          <span class="chip">🫁 Massive PE</span>
+          <span class="chip">💔 RV Strain / Shock</span>
+          <span class="chip">💉 Thrombolysis Decision</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital alert"><div class="v-label">💓 HR</div><div class="v-num">122</div></div>
+        <div class="vital alert"><div class="v-label">🩸 BP</div><div class="v-num">84/56</div></div>
+        <div class="vital alert"><div class="v-label">🌬️ RR</div><div class="v-num">32</div></div>
+        <div class="vital alert"><div class="v-label">🫁 SpO₂</div><div class="v-num">86%</div></div>
+        <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">37.1°</div></div>
+        <div class="vital warn"><div class="v-label">🧠 GCS</div><div class="v-num">14</div></div>
+        <div class="vital warn"><div class="v-label">😖 Pain</div><div class="v-num">5/10</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 14:05, Resus 3</b>A young woman is wheeled in grey and gasping after collapsing at the front desk. She whispers: <em>"I stood up… everything went black… I can't get my breath."</em> Her calf has been swollen and sore for three days since a long-haul flight. The triage nurse wrote "?panic attack — hyperventilating." Her pressure is 84/56 and dropping. This is the exact moment a massive PE gets mislabelled as anxiety. Not today.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>👩 Name</td><td><strong>Ms. L.P.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>34-year-old female</td></tr>
+          <tr><td>🆔 MRN</td><td>CV-ED-0503</td></tr>
+          <tr><td>⚖️ Weight</td><td>78 kg (BMI 28)</td></tr>
+          <tr><td>💼 Occupation</td><td>Software developer — desk-bound, just returned from an 11-hour flight</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 Past history — every line shifts the pre-test probability</h3>
+        <ul>
+          <li>💊 <strong>Combined oral contraceptive pill</strong> — a prothrombotic state, the classic young-woman VTE risk.</li>
+          <li>✈️ <strong>Recent long-haul travel + immobility</strong>; three days of <strong>unilateral left calf swelling and tenderness</strong> (likely DVT).</li>
+          <li>👪 <strong>Family history of "clots"</strong> — a maternal aunt had a "blood clot in the lung" post-partum; possible inherited thrombophilia.</li>
+          <li>🩺 No known cardiorespiratory disease — so a crashing BP with clear lungs is <em>not</em> her baseline; treat it as obstructive shock until proven otherwise.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Massive PE is defined by the BLOOD PRESSURE, not the clot size on CT. Sustained SBP &lt; 90 (or pressor need) makes it high-risk — reperfusion territory."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why the young, well-looking PE is the deadliest miss</b>PE kills fast and it kills the unsuspected. In a young patient with no chest disease, breathlessness and syncope get reflexively pattern-matched to anxiety or hyperventilation. But <strong>syncope in PE is an ominous sign of haemodynamic compromise</strong> — the right heart is failing. The whole game is to <strong>suspect it, prove it fast (or bedside-echo it), and reperfuse before the RV spirals to arrest.</strong></div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 Triage / walk-in handover — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ Front-of-house SBAR (verbatim)</b>
+          <p><strong>S:</strong> "34-year-old woman, sudden shortness of breath, collapsed at the desk — brief loss of consciousness, now grey and sweaty."</p>
+          <p><strong>B:</strong> "On the pill, back from a long flight two days ago, left calf swollen and sore for three days, aunt had a PE."</p>
+          <p><strong>A:</strong> "She's tachypnoeic at 32, HR 122, BP 84/56, SpO₂ 86% on air. Chest sounds clear. First read was 'panic attack — hyperventilating.'"</p>
+          <p><strong>R:</strong> "I wasn't happy with the pressure — pulled her straight into Resus and put you on notice for ?PE."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Syncope + hypoxia + a clear chest is a pulmonary embolus until proven otherwise. 'Hyperventilating' does not drop your saturations to 86% — hypoxia is not a diagnosis of anxiety."</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each high-risk feature</h3>
+        <p>🎮 <em>Click every feature that RAISES the probability of high-risk PE. Each correct = +10 XP.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">🌬️ Sudden pleuritic dyspnoea</button>
+          <button class="btn ghost flag-btn" data-good="1">🕳️ Syncope / near-collapse</button>
+          <button class="btn ghost flag-btn" data-good="1">🩸 Hypotension (SBP &lt; 90)</button>
+          <button class="btn ghost flag-btn" data-good="1">💓 Tachycardia (HR 122)</button>
+          <button class="btn ghost flag-btn" data-good="1">🫁 Hypoxia (SpO₂ 86%)</button>
+          <button class="btn ghost flag-btn" data-good="1">🦵 Unilateral leg swelling + recent immobility / travel</button>
+          <button class="btn ghost flag-btn" data-good="0">🤕 Reproducible chest-wall tenderness</button>
+          <button class="btn ghost flag-btn" data-good="0">🌡️ Isolated low-grade fever</button>
+          <button class="btn ghost flag-btn" data-good="0">🍽️ "Sounds like reflux"</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Praise where due</b>The triage nurse overrode the "panic attack" label the moment she saw the blood pressure and the sats, and moved the patient to Resus. That single act — trusting the numbers over the gestalt — is what buys this patient a chance.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🅰️🅱️🅲️ Primary survey — obstructive shock at the bedside</h3>
+        <table class="tbl">
+          <tr><th>Step</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>🅰️ Airway</td><td>Patent, speaking short phrases only.</td><td>Short sentences = respiratory distress; she is working hard.</td></tr>
+          <tr><td>🅱️ Breathing</td><td>RR 32, SpO₂ 86% RA, <strong>chest clear</strong>, no wheeze/crepitations.</td><td>Profound hypoxia with a CLEAR chest points to a V/Q mismatch / shunt — the classic "clear lungs, dying patient" of PE.</td></tr>
+          <tr><td>🅲️ Circulation</td><td>HR 122 regular, <strong>BP 84/56</strong>, cool peripheries, <strong>raised JVP</strong>, a left <strong>parasternal heave</strong>, loud P2.</td><td>Hypotension + raised JVP + RV heave = acute RIGHT heart strain / obstructive shock. Cold and shut down = the spiral has begun.</td></tr>
+          <tr><td>🅳 Disability</td><td>GCS 14, anxious, transient syncope on standing.</td><td>Syncope = the RV can't maintain cardiac output — a marker of massive PE, not anxiety.</td></tr>
+          <tr><td>🅴 Exposure</td><td><strong>Left calf swollen, warm, tender</strong>; no chest-wall tenderness; no rash.</td><td>A clinically obvious DVT completes the story — the clot's source is in the leg.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The bedside triad of massive PE is HYPOTENSION + a RAISED JVP + a CLEAR CHEST. When the lungs are clear but the patient is shocked and hypoxic, think the obstruction is in front of the left heart, not in it."</div>
+
+        <h3>🧭 The immediately lethal causes of sudden dyspnoea + shock</h3>
+        <p>Your reflex differential for "sudden breathlessness + collapse + shock" is the <strong>obstructive/vascular killers</strong>: <strong>massive PE</strong>, <strong>tension pneumothorax</strong>, <strong>cardiac tamponade</strong>, and <strong>acute MI with cardiogenic shock</strong> (± anaphylaxis, aortic catastrophe). One focused exam, a bedside ultrasound and a 12-lead triage all of them in minutes (see S14). Here, clear lungs + distended neck veins + a swollen leg screams PE.</p>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of "she's just anxious / hyperventilating"</b>Anxiety and hyperventilation do NOT cause sustained hypoxia (SpO₂ 86%), hypotension, a raised JVP, or a unilateral swollen leg. Labelling a crashing PE as "panic attack" is one of the most lethal cognitive errors in emergency medicine — the fix is to <strong>let the vital signs and the leg lead you</strong>, not the affect.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The EM resident thinks out loud at 14:09:</em></p>
+        <h3>🧠 Frame it as "is this HIGH-RISK PE?" — a haemodynamic question</h3>
+        <p>"Everything says PE — sudden dyspnoea, syncope, hypoxia, a swollen leg, oestrogen and immobility. But the decision that matters right now isn't 'PE yes/no,' it's <strong>'is she high-risk?'</strong> She's hypotensive with signs of RV strain — that's <strong>massive (high-risk) PE</strong>, which changes the algorithm from 'anticoagulate and image' to <strong>'reperfuse.'</strong> I want a <strong>bedside echo now</strong>, heparin started, and the thrombolysis conversation started in parallel — I do NOT want to send a shocked patient down a corridor to CT alone."</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>🫀 <strong>Bedside echo (POCUS) now</strong> — dilated hypokinetic RV, McConnell sign, septal flattening confirm the diagnosis without leaving Resus.</li>
+          <li>💉 <strong>Therapeutic anticoagulation immediately</strong> — IV unfractionated heparin (titratable, reversible, bridges to reperfusion).</li>
+          <li>💧 <strong>CAUTIOUS fluids</strong> — a single small bolus (≤ 250–500 mL) if pre-load-responsive; then STOP — over-filling distends and worsens the failing RV.</li>
+          <li>💊 <strong>Vasopressor (noradrenaline)</strong> for shock to support the coronary perfusion of the RV.</li>
+          <li>🩻 <strong>CTPA only if she can be stabilised</strong>; if peri-arrest, the bedside echo IS the decision-making study — do not delay lysis for the scanner.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In a crashing patient, don't send the RV to CT to die in the doughnut. A dilated RV on bedside echo in shock is enough — reperfuse, don't wait for the perfect picture."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>The BP is 84/56 — she reaches for a litre of fluid wide open "to fill her up." Right move?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No — this is the classic trap.</strong> The failing, dilated RV is already over-stretched; flooding it pushes it further up (down) its Starling curve, bows the septum further into the LV, and drops cardiac output <em>more</em>. Give a <strong>small</strong> bolus (≤ 250–500 mL) only if there is pre-load responsiveness, then move quickly to <strong>vasopressors and reperfusion</strong>. "Don't drown the right heart."</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The EM consultant at the bedside, 14:14:</em></p>
+        <h3>🧮 Risk-stratify PE — the classification that drives everything</h3>
+        <table class="tbl">
+          <tr><th>Category</th><th>Haemodynamics</th><th>RV dysfunction / biomarkers</th><th>Treatment anchor</th></tr>
+          <tr><td class="hi"><strong>High-risk (massive)</strong> — this patient</td><td>Sustained hypotension (SBP &lt; 90 ≥ 15 min / pressors) or arrest</td><td>RV strain present</td><td class="hi"><strong>Reperfuse — systemic thrombolysis</strong> (or catheter-directed / embolectomy) + heparin</td></tr>
+          <tr><td><strong>Intermediate (submassive)</strong></td><td>Normotensive</td><td>RV dysfunction &amp;/or ↑troponin/BNP</td><td>Anticoagulate; monitor closely; lysis if deteriorates (intermediate-high)</td></tr>
+          <tr><td><strong>Low-risk</strong></td><td>Normotensive</td><td>No RV strain, normal biomarkers, low sPESI</td><td>Anticoagulate; consider early/outpatient discharge</td></tr>
+        </table>
+        <p>Our patient is <strong>hypotensive with RV strain → HIGH-RISK / MASSIVE</strong>. That is a <strong>reperfusion patient</strong> — the question is only <em>which</em> reperfusion (systemic lysis vs catheter-directed vs surgical), not <em>whether</em>.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Wells/PERC and sPESI decide who to test and who to send home; the BLOOD PRESSURE decides who gets lysed. Once SBP &lt; 90 with RV strain, you are past risk scores and into reperfusion."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">RCT</span> PEITHO (submassive lysis)</td><td>Tenecteplase in intermediate-risk PE cut haemodynamic decompensation but roughly tripled major bleeding and raised intracranial haemorrhage — no mortality benefit.</td><td>Lysis is NOT routine in stable submassive PE; reserve for deterioration. In true massive PE the benefit-risk shifts firmly toward lysis.</td></tr>
+            <tr><td><span class="lvl">DECISION RULE</span> Wells / PERC</td><td>Structure pre-test probability; PERC rules out PE in low-risk patients without a D-dimer.</td><td>Use to decide WHO needs testing — never to "rule out" a shocked, hypoxic patient (she is high pre-test, PERC cannot apply).</td></tr>
+            <tr><td><span class="lvl">PROGNOSIS</span> PESI / sPESI</td><td>Validated 30-day mortality scores; sPESI = 0 identifies low-risk PE safe for early discharge.</td><td>Prognostic triage tool for stable PE; irrelevant once the patient is already in shock.</td></tr>
+            <tr><td><span class="lvl">DIAGNOSTIC</span> CTPA (gold standard)</td><td>CT pulmonary angiography is the definitive imaging test; RV:LV diameter &gt; 1.0 flags strain.</td><td>Confirm and risk-stratify with CTPA <em>when the patient is stable enough</em>; if peri-arrest, bedside echo substitutes.</td></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> ESC / AHA PE</td><td>High-risk PE → primary reperfusion (systemic thrombolysis unless contraindicated); anticoagulate all; PERT-style team decisions for catheter/surgical options.</td><td>Massive PE = reperfuse; escalate to catheter-directed or embolectomy if lysis fails or is contraindicated.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The chart that keeps me awake is the young woman on the pill who was reassured as a 'panic attack' and left on a corridor trolley. She had a saddle embolus; McConnell's sign was sitting on a bedside echo nobody did. She arrested in PEA while waiting for a routine CT."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY the shock, WHY the spiral (the WHY behind the WHY)</h3>
+        <ol>
+          <li>🧱 <strong>Obstruction:</strong> thrombus (usually from a leg DVT) lodges in the pulmonary arteries, mechanically blocking flow and triggering hypoxic vasoconstriction and mediator release.</li>
+          <li>📈 <strong>Pulmonary vascular resistance soars:</strong> the cross-sectional area of the pulmonary bed falls → acute rise in PVR → the thin-walled RV must suddenly generate high pressure it was never built for → <strong>RV pressure overload</strong>.</li>
+          <li>🎈 <strong>RV dilatation → ventricular interdependence:</strong> the overloaded RV dilates and the <strong>interventricular septum bows into the LV</strong>. The shared pericardial space means a big RV squashes the LV → <strong>impaired LV filling</strong> → falling stroke volume and BP.</li>
+          <li>💀 <strong>The death spiral:</strong> hypotension ↓ coronary perfusion to a wall that is now doing more work → <strong>RV ischaemia</strong> → the RV fails further → output falls further → PEA arrest. Each step feeds the next.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Massive PE kills through the RIGHT heart: obstruction → RV overload → septal bowing → the LV can't fill → shock → RV ischaemia → arrest. Break the spiral by unloading the RV (reperfusion) and perfusing it (pressors)."</div>
+
+        <h3>⚖️ Contrast pair — Massive vs Submassive PE</h3>
+        <div class="vs">
+          <div class="side a"><h4>🔴 Massive (high-risk) PE</h4><ul><li>Sustained hypotension (SBP &lt; 90) / pressor need / arrest</li><li>RV strain present; obstructive shock</li><li><strong>Reperfuse:</strong> systemic thrombolysis (± catheter/surgical) + heparin</li><li>Our patient</li></ul></div>
+          <div class="side b"><h4>🟠 Submassive (intermediate) PE</h4><ul><li>Normotensive but RV dysfunction &amp;/or raised troponin/BNP</li><li>At risk of deteriorating</li><li><strong>Anticoagulate + monitor closely;</strong> consider lysis only if they decompensate (PEITHO caution)</li></ul></div>
+        </div>
+        <p>💡 The dividing line is the <em>blood pressure</em>, not the CT clot burden — a modest-looking clot in a poor-reserve patient can be "massive," and a big clot in a compensated patient can be "submassive."</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — RV Afterload: The Obstruction Dial</h3>
+          <p style="font-size:13px">Drag the dial to increase <strong>clot burden / pulmonary vascular resistance (RV afterload)</strong>. Watch the RV dilate, the septum bow, and LV output &amp; BP fall as obstruction climbs.</p>
+          <label for="kRange">🫁 Clot burden / PVR (RV afterload index): <b id="kVal">20</b> %</label>
+          <input type="range" id="kRange" min="5" max="120" value="20">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore compensation vs obstructive shock.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 Low afterload → the RV compensates and BP holds. As obstruction rises, the RV dilates and the septum bows into the LV → LV filling and BP fall → obstructive shock → the reperfusion threshold.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The order set (14:08)</h3>
+        <ul>
+          <li>🫀 <strong>Bedside echo (POCUS) now</strong> — look for dilated hypokinetic RV, McConnell sign, septal flattening, RV:LV &gt; 1; screen for tamponade/pneumothorax.</li>
+          <li>💉 <strong>IV unfractionated heparin</strong> (bolus + infusion) immediately unless contraindicated — titratable and reversible if lysis follows.</li>
+          <li>🩸 <strong>hs-troponin, BNP/NT-proBNP, lactate</strong>, CBC, U&amp;E, coag (baseline pre-lysis), group &amp; save, ABG.</li>
+          <li>💧 <strong>Cautious fluid:</strong> ≤ 250–500 mL crystalloid ONCE if pre-load responsive — then reassess; avoid over-filling the RV.</li>
+          <li>💊 <strong>Noradrenaline infusion</strong> for shock (SBP target ≈ ≥ 90 / MAP ≥ 65); consider dobutamine for RV inotropy if low-output persists.</li>
+          <li>🫁 <strong>High-flow oxygen</strong> — she is hypoxic (SpO₂ 86%); target ≥ 94%.</li>
+          <li>🩻 <strong>CTPA if she can be stabilised</strong>; if peri-arrest, treat on bedside echo and DO NOT delay reperfusion for the scanner.</li>
+          <li>📞 <strong>Prepare systemic thrombolysis</strong> (alteplase) and activate the PE-response team; screen contraindications now.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Heparin buys time, pressors buy pressure, but only REPERFUSION removes the obstruction. In massive PE, start all three lines of thinking at once — anticoagulate, support, and reperfuse."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Resus-bay priorities — the nurse runs the safety net</h3>
+        <ul>
+          <li>📟 <strong>Continuous telemetry + defib pads on</strong> — massive PE can drop into PEA arrest without warning; be ready.</li>
+          <li>🩸 <strong>Arterial line / frequent NIBP</strong> — titrate noradrenaline to the pressure; flag any fall in BP or rise in HR immediately.</li>
+          <li>💧 <strong>Guard the fluids</strong> — question any "wide-open litre"; the failing RV is over-filled already. Small boluses only, on the doctor's call.</li>
+          <li>💉 <strong>Draw the pre-lysis bloods and coag NOW</strong> and check the thrombolysis contraindication checklist with the team — every minute saved matters.</li>
+          <li>🧾 Keep the patient calm and flat-ish but not fully supine if it worsens breathlessness; explain each step — terror drives tachycardia and oxygen demand.</li>
+          <li>🚑 <strong>Ready the transfer/cath-lab bag</strong> with resus drugs if catheter-directed therapy or embolectomy is chosen; never move a crashing PE unescorted.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In massive PE the nurse's most important reflex is the hand that STOPS the fluid and reaches for the pressor — you cannot fill your way out of a failing right ventricle."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Value</th><th>Interpretation</th></tr>
+          <tr><td>hs-Troponin T</td><td class="hi">86 ng/L</td><td><strong>Raised — RV micro-injury from acute strain.</strong> A marker of risk in PE, NOT evidence of coronary ACS here.</td></tr>
+          <tr><td>NT-proBNP</td><td class="hi">2,940 pg/mL</td><td>High → RV wall stress / dysfunction. Supports high-risk stratification.</td></tr>
+          <tr><td>Lactate</td><td class="hi">4.1 mmol/L</td><td>Tissue hypoperfusion — confirms shock, an ominous prognostic sign.</td></tr>
+          <tr><td>ABG</td><td class="lo">pH 7.47, pO₂ 7.4 kPa, pCO₂ 3.6 kPa</td><td>Hypoxia + respiratory alkalosis (hyperventilation) + widened A–a gradient — the physiology of PE, not panic.</td></tr>
+          <tr><td>D-dimer</td><td class="hi">Markedly elevated</td><td>Expected and NON-discriminating here — pre-test probability is already high; do NOT use it to "rule out." Proceed to imaging / echo.</td></tr>
+          <tr><td>Creatinine</td><td>84 µmol/L</td><td>Normal — relevant for CTPA contrast and dosing.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A D-dimer is a rule-OUT test for the LOW-risk patient — never a rule-out for the shocked, hypoxic one. In high pre-test PE it only wastes time you don't have."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why troponin and BNP matter in PE — and their trap</b>In PE these biomarkers are <em>risk stratifiers</em>, not diagnostic of a coronary event — they reflect RV strain and predict deterioration (they define the intermediate-HIGH subgroup). The trap is misreading a raised troponin as "so it's an MI" and anticoagulating/stenting the wrong problem. Interpret them inside the PE story and the echo.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 ECG / IMAGING + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🫀 The ECG of acute RV strain — read it as a stressed right heart</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 130" preserveAspectRatio="none" aria-label="ECG showing sinus tachycardia with S1Q3T3 and anterior T-wave inversion">
+            <rect width="820" height="130" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="32" x2="820" y2="32"/><line x1="0" y1="65" x2="820" y2="65"/><line x1="0" y1="98" x2="820" y2="98"/></g>
+            <polyline fill="none" stroke="#86efac" stroke-width="2.3" points="0,70 30,70 40,66 50,44 60,86 70,70 110,70 120,68 150,70 190,70 200,60 212,40 224,90 236,70 270,70 285,74 300,78 340,70 380,70 392,52 404,34 416,90 428,66 440,74 470,78 510,70 522,50 536,30 550,90 562,66 576,80 610,82 650,70 662,48 676,28 690,92 702,64 716,82 750,84 790,70 804,66 820,70"/>
+            <text x="120" y="20" fill="#93c5fd" font-size="11">Lead I — S wave</text>
+            <text x="360" y="20" fill="#fca5a5" font-size="11">Lead III — Q + inverted T (S1Q3T3)</text>
+            <text x="600" y="118" fill="#fca5a5" font-size="11">V1–V4 — T-wave inversion (RV strain)</text>
+          </svg>
+          <div class="ecg-cap">The commonest ECG in PE is <span style="color:#93c5fd">sinus tachycardia</span>. The classic (but insensitive) <span style="color:#fca5a5">S1Q3T3</span> and anterior T-wave inversion (V1–V4) signal acute RIGHT-heart strain — supportive, never required to act.</div>
+        </div>
+
+        <h3>🔎 The findings you must know cold — ECG, echo, CT</h3>
+        <table class="tbl">
+          <tr><th>Modality</th><th>Look for</th><th>Meaning</th></tr>
+          <tr><td>📈 <strong>ECG</strong></td><td>Sinus tachycardia (most common); S1Q3T3; T-inversion V1–V4; RBBB; right-axis</td><td>Acute RV pressure overload — supports PE but a normal-ish ECG never excludes it.</td></tr>
+          <tr><td>🫀 <strong>Echo — dilated RV</strong></td><td>RV ≥ LV size, RV:LV &gt; 1, hypokinetic free wall</td><td>Acute RV strain / pressure overload — the bedside diagnosis in a crashing patient.</td></tr>
+          <tr><td>🎯 <strong>Echo — McConnell sign</strong></td><td>RV free-wall akinesis with preserved (sparing) APICAL contraction</td><td>Relatively specific for acute PE — a strong nudge toward lysis in shock.</td></tr>
+          <tr><td>➖ <strong>Echo — septal flattening / "D-sign"</strong></td><td>Interventricular septum bows into LV; D-shaped LV in short axis</td><td>Ventricular interdependence — the LV is being squashed → falling output.</td></tr>
+          <tr><td>🩻 <strong>CTPA (gold standard)</strong></td><td>Filling defect(s), saddle embolus; RV:LV diameter &gt; 1.0, contrast reflux into IVC</td><td>Confirms PE AND risk-stratifies — when the patient is stable enough to travel.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"McConnell's sign plus a big, poorly-moving RV in a crashing patient is a LYSIS conversation. In peri-arrest PE, the bedside echo is the study that changes hands on the syringe."</div>
+
+        <h3>🩻 Adjunct imaging</h3>
+        <ul>
+          <li><strong>CXR:</strong> often normal or non-specific; may show Hampton's hump or Westermark's sign — mostly it helps EXCLUDE mimics (pneumothorax, consolidation) that explain a clear/abnormal chest.</li>
+          <li><strong>Lower-limb venous Doppler:</strong> a confirmed proximal DVT in the swollen leg supports treating for PE when CT is not feasible.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The massive-PE drug map — what, why, and the traps</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>Systemic thrombolysis</strong> — alteplase (e.g. 100 mg / 2 h, or weight-based; 50 mg if peri-arrest)</td><td><strong>First-line reperfusion for high-risk (massive) PE</strong> unless contraindicated</td><td>Plasminogen → plasmin → dissolves clot, unloads the RV. Major risk: haemorrhage, esp. intracranial — screen contraindications.</td></tr>
+          <tr><td><strong>Unfractionated heparin</strong> (IV bolus + infusion)</td><td>Anticoagulate ALL PE; bridges to and around lysis</td><td>Potentiates antithrombin → stops clot propagation. Titratable/reversible (protamine) — preferred when lysis or procedures are likely.</td></tr>
+          <tr><td><strong>LMWH / fondaparinux</strong></td><td>Anticoagulation in stable (non-high-risk) PE</td><td>Simpler dosing; less ideal when reperfusion or reversal may be needed imminently.</td></tr>
+          <tr><td><strong>Noradrenaline</strong></td><td>Vasopressor of choice for PE shock</td><td>Restores MAP → improves RV coronary perfusion; avoids the pure vasodilation that worsens hypotension.</td></tr>
+          <tr><td><strong>Dobutamine</strong></td><td>Inotrope for low-output RV failure</td><td>↑RV contractility; can drop SBP — usually paired with a vasopressor.</td></tr>
+          <tr><td><strong>DOAC / warfarin</strong></td><td>Longer-term anticoagulation once stabilised</td><td>Started after the acute phase for ≥ 3 months; agent/duration depend on provoking factors and bleeding risk.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Heparin stops the clot getting worse; thrombolysis makes it better. In massive PE the definitive drug is the lytic — heparin alone is not enough for a shocked right heart."</div>
+        <div class="callout danger"><b class="ct">🚫 Absolute contraindications to thrombolysis — know them cold</b>❌ prior intracranial haemorrhage · ❌ known structural cerebral vascular lesion / malignant CNS neoplasm · ❌ ischaemic stroke &lt; 3 months · ❌ suspected aortic dissection · ❌ active major bleeding · ❌ recent significant closed-head/facial trauma or intracranial/spinal surgery. If lysis is contraindicated in a crashing patient → <strong>catheter-directed therapy or surgical embolectomy</strong>.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why</h3>
+        <ul>
+          <li>📈 <strong>Continuous telemetry + arterial line</strong> — massive PE can arrest suddenly; beat-to-beat BP guides pressor titration.</li>
+          <li>🫁 <strong>SpO₂ and respiratory rate</strong> — worsening hypoxia or a rising RR signals decompensation.</li>
+          <li>🩸 <strong>Serial lactate</strong> — a falling lactate after reperfusion/pressors means the shock is resolving; a rising one means the RV is losing.</li>
+          <li>🫀 <strong>Repeat bedside echo</strong> — track RV size/function and septal position; improving RV:LV after lysis is the win.</li>
+          <li>🩹 <strong>Post-lysis bleeding watch</strong> — neuro obs for intracranial haemorrhage, puncture sites, Hb — the price of reperfusion is bleeding risk.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After you commit to reperfusion, the monitor's question changes from 'is the RV failing?' to 'is it recovering — and is she bleeding?' The answers are the lactate, the echo, and the neuro obs."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong in the ED phase</h3>
+        <ul>
+          <li>⚡ <strong>PEA / cardiac arrest</strong> — the RV loses; consider empirical thrombolysis during arrest if PE is the presumed cause, and prolonged CPR (50–60+ min) after lysis.</li>
+          <li>💔 <strong>Refractory obstructive shock</strong> — despite heparin/pressors; escalate to lysis, catheter-directed therapy, embolectomy, or ECMO.</li>
+          <li>🩸 <strong>Thrombolysis haemorrhage</strong> — intracranial (the feared one), GI, retroperitoneal; the main downside seen in PEITHO.</li>
+          <li>💧 <strong>Iatrogenic RV overfilling</strong> — the "wide-open litre" that tips a compensating RV into shock.</li>
+          <li>🫁 <strong>Recurrent embolism</strong> — further clot from an untreated leg DVT; anticoagulate, consider IVC filter only if anticoagulation is truly contraindicated.</li>
+          <li>🩹 <strong>The system complication:</strong> the missed diagnosis — labelling it "anxiety," "pneumonia," or "reflux" and losing the reperfusion window.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The two deadliest complications of massive PE are opposite mistakes: doing too little (missing it / fluids only) and doing lysis blind to a contraindication. Both are avoided by a fast, deliberate reperfusion decision."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The sudden-dyspnoea-and-shock differential — killers first</h3>
+        <table class="tbl">
+          <tr><th>Diagnosis</th><th>Discriminators</th><th>Don't-miss action</th></tr>
+          <tr><td>🫁 <strong>Massive PE</strong> (this patient)</td><td>Sudden dyspnoea, syncope, hypoxia + CLEAR chest, raised JVP, RV heave, swollen leg</td><td>Bedside echo (RV strain/McConnell) + heparin; reperfuse if shocked.</td></tr>
+          <tr><td>💨 <strong>Tension pneumothorax</strong></td><td>Absent breath sounds one side, hyper-resonance, tracheal shift, distended neck veins</td><td>Immediate needle/finger decompression — clinical, not imaging.</td></tr>
+          <tr><td>💧 <strong>Cardiac tamponade</strong></td><td>Muffled heart sounds, raised JVP, pulsus paradoxus; effusion on echo</td><td>Bedside echo → pericardiocentesis.</td></tr>
+          <tr><td>🫀 <strong>MI / cardiogenic shock</strong></td><td>Ischaemic ECG, regional wall-motion abnormality, pump failure</td><td>ECG + troponin trend; PCI pathway (don't confuse RV-strain troponin with ACS).</td></tr>
+          <tr><td>🌊 <strong>Sepsis / anaphylaxis</strong></td><td>Fever/source or urticaria/exposure, warm shock or wheeze/angio-oedema</td><td>Treat cause; adrenaline for anaphylaxis.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"For sudden dyspnoea + shock, one bedside ultrasound triages the vascular killers: a big RV (PE), a lung point/absent sliding (pneumothorax), or a pericardial stripe (tamponade). Ultrasound first, CT later."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The Crashing PE"</h3>
+          <div class="hud"><span>❤️ Safety: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">A 34-year-old on the pill, back from a long flight, collapses with sudden dyspnoea. BP 84/56, HR 122, SpO₂ 86%, chest clear, JVP up, left calf swollen. The nurse says "she's just having a panic attack." What do you do?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The management plan</h3>
+        <ol>
+          <li>🫁 <strong>Diagnosis:</strong> high-risk (massive) PE — hypotension + RV strain on bedside echo, obvious DVT and provoking factors. Confirmed on CTPA once briefly stabilised.</li>
+          <li>💉 <strong>Reperfuse + anticoagulate:</strong> IV heparin immediately; <strong>systemic thrombolysis (alteplase)</strong> as no contraindication → escalate to catheter-directed / embolectomy if lysis fails or is contraindicated.</li>
+          <li>💊 <strong>Support:</strong> cautious fluid (≤ 250–500 mL once), noradrenaline for shock, high-flow O₂; PE-response team activated.</li>
+          <li>🏥 Admit to ICU/HDU for post-lysis monitoring; then long-term anticoagulation and a thrombophilia / provoking-factor review (stop the pill, treat the DVT).</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Massive PE is not 'a big DVT' — it is obstructive shock with a treatable obstruction. The plan is reperfuse, support, anticoagulate, and hunt the cause — in that urgency, not that leisure."</div>
+
+        <div class="checklist" id="ckThromb">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Thrombolysis for massive PE (indications · contraindications · monitoring)</h3>
+          <label class="ck"><input type="checkbox"><span>🎯 INDICATION confirmed: high-risk PE (sustained SBP &lt; 90 / pressors) with RV strain</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 ABSOLUTE contraindications screened: prior ICH, ischaemic stroke &lt; 3 mo, CNS lesion/neoplasm, aortic dissection, active major bleeding, recent head trauma/neurosurgery</span></label>
+          <label class="ck"><input type="checkbox"><span>⚖️ RELATIVE contraindications weighed (recent surgery, pregnancy, uncontrolled HTN, anticoagulation) against the arrest risk</span></label>
+          <label class="ck"><input type="checkbox"><span>💉 Alteplase dose &amp; regimen chosen (e.g. 100 mg / 2 h; 50 mg if peri-arrest); heparin plan around it agreed</span></label>
+          <label class="ck"><input type="checkbox"><span>📟 MONITORING set: neuro obs for ICH, puncture sites, Hb, serial BP/lactate and repeat echo</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+
+        <div class="checklist" id="ckPeriarrest">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Peri-arrest PE (bedside echo · empirical lysis in arrest)</h3>
+          <label class="ck"><input type="checkbox"><span>🫀 Bedside echo obtained IN RESUS — dilated RV / McConnell / D-sign as the decision study (do NOT delay for CTPA)</span></label>
+          <label class="ck"><input type="checkbox"><span>💊 If cardiac arrest with presumed PE → give EMPIRICAL thrombolysis during CPR</span></label>
+          <label class="ck"><input type="checkbox"><span>⏱️ Continue CPR for a PROLONGED period after lysis (≈ 50–60+ min) to allow clot dissolution</span></label>
+          <label class="ck"><input type="checkbox"><span>💧 Avoid over-resuscitation with fluid; start noradrenaline early for RV coronary perfusion</span></label>
+          <label class="ck"><input type="checkbox"><span>🚑 Escalation lined up: catheter-directed therapy, surgical embolectomy, or ECMO if lysis fails/contraindicated</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">14:05</div>Collapse in waiting room; pulled into Resus. BP 84/56, HR 122, SpO₂ 86%, clear chest, raised JVP, swollen calf.</div>
+          <div class="t-item"><div class="t-time">14:10</div>Bedside echo: dilated hypokinetic RV, McConnell sign, D-shaped septum. IV heparin started; small 250 mL bolus, then noradrenaline commenced.</div>
+          <div class="t-item"><div class="t-time">14:22</div>High-risk (massive) PE confirmed clinically; no contraindication → <strong>systemic alteplase</strong> given. PE-response team activated.</div>
+          <div class="t-item"><div class="t-time">15:05</div>BP up to 108/70, HR 98, SpO₂ 94% on high-flow; lactate falling 4.1 → 2.0. Repeat echo: RV size improving, septum re-centring.</div>
+          <div class="t-item"><div class="t-time">Day 1</div>ICU: stable, no bleeding complication; DVT confirmed on Doppler; transitioned to therapeutic anticoagulation; pill stopped, thrombophilia work-up planned.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>She is alive because someone refused "panic attack," trusted the vital signs, put a probe on the chest, and reperfused a failing right heart before it arrested. Suspicion + a bedside echo + a timely lytic — extraordinary outcome from ordinary discipline.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 (Post-recovery) discharge &amp; the genuinely low-risk PE — two different worlds</h3>
+        <div class="vs">
+          <div class="side a"><h4>🫁 This patient (survived massive PE)</h4><ul><li>Therapeutic anticoagulation ≥ 3 months (often longer / indefinite if unprovoked or thrombophilia)</li><li>Stop the oestrogen pill; thrombophilia + provoking-factor review; treat the DVT</li><li>Red flags: recurrent breathlessness, chest pain, syncope, leg swelling → 999</li><li>Bleeding precautions post-lysis; haematology / follow-up echo for CTEPH surveillance</li></ul></div>
+          <div class="side b"><h4>🟢 The genuinely low-risk PE</h4><ul><li>sPESI = 0, normotensive, no RV strain, normal biomarkers</li><li>Consider early/outpatient management on a DOAC with shared decision-making</li><li>Written safety-net + rapid anticoagulation clinic follow-up</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Not every PE needs a hospital bed, and not every PE is 'small' — the disposition follows the RISK (BP, RV, sPESI), never the word 'clot.' Match the intensity of care to the physiology."</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>🩸 BP defines massive</b>Sustained SBP &lt; 90 (or pressors) with RV strain = high-risk PE → reperfuse. It's the pressure, not the CT clot size.</div>
+          <div class="pearl"><b>🫁 Clear chest, low sats</b>Hypoxia + syncope + a clear chest is PE until proven otherwise — never "just anxiety."</div>
+          <div class="pearl"><b>💧 Don't drown the RV</b>Small boluses only, then pressors — you cannot fill your way out of a failing right ventricle.</div>
+          <div class="pearl"><b>🎯 McConnell + big RV</b>RV free-wall akinesis with apical sparing in a crashing patient is a lysis conversation.</div>
+          <div class="pearl"><b>🩻 Echo, don't wait</b>Peri-arrest? Use bedside echo — don't send a crashing PE to CT to die in the scanner.</div>
+          <div class="pearl"><b>💉 Heparin for all, lysis for shock</b>Anticoagulate everyone; reperfuse the hypotensive. Heparin alone won't fix a shocked RV.</div>
+          <div class="pearl"><b>🧮 Scores triage, BP decides</b>Wells/PERC/sPESI pick who to test/discharge; the blood pressure picks who to lyse.</div>
+          <div class="pearl"><b>🔬 Troponin = risk, not ACS</b>A raised troponin in PE reflects RV strain — stratify with it, don't stent for it.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the pathway</h3>
+          <ul>
+            <li>🩺 <strong>Chronic thromboembolic pulmonary hypertension (CTEPH):</strong> a minority of PE survivors develop organised, non-resolving clot → progressive pulmonary hypertension. Screen persistent breathlessness with echo/V-Q; potentially curable by pulmonary endarterectomy, or treated with balloon pulmonary angioplasty / riociguat.</li>
+            <li>🧵 <strong>Catheter-directed therapy (CDT) &amp; EKOS:</strong> catheter-directed (± ultrasound-assisted, EKOS) thrombolysis delivers a lower lytic dose locally — an option in intermediate-high or massive PE when systemic lysis is risky or has failed; also mechanical/aspiration thrombectomy devices.</li>
+            <li>🫀 <strong>ECMO (VA):</strong> veno-arterial ECMO as a bridge in refractory obstructive shock or peri-arrest massive PE — buys time for lysis to work or for surgical embolectomy.</li>
+            <li>🧬 <strong>Thrombophilia work-up:</strong> factor V Leiden, prothrombin G20210A, protein C/S and antithrombin deficiency, antiphospholipid syndrome; timing matters (test off anticoagulation/acute phase). Guides duration of anticoagulation and family counselling.</li>
+            <li>⚖️ <strong>Sub-massive risk stratification:</strong> the intermediate group is split by troponin, BNP/NT-proBNP and RV dysfunction (echo or CT RV:LV &gt; 1.0). "Intermediate-HIGH" (positive biomarker AND RV dysfunction) is the group to watch closely and rescue-lyse if they tip.</li>
+            <li>🤰 <strong>Special populations:</strong> pregnancy-adapted diagnostic pathways (YEARS, modified Wells, bilateral leg Dopplers first), and massive PE in pregnancy where lysis is relatively — not absolutely — contraindicated when life-threatening.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The Panic Attack That Wasn't"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 28-year-old woman on the combined pill presented to a busy ED with sudden breathlessness and a feeling of impending doom two days after a long flight. She was tachypnoeic and tachycardic; her SpO₂ read 89% but was charted as "?probe artefact." She was labelled <strong>"panic attack / hyperventilation,"</strong> given reassurance and a paper bag, and left on a corridor trolley to "settle." A junior briefly wondered about her swollen calf. No bedside echo was performed and a CTPA was booked as "routine." Forty minutes later she was found in <strong>PEA arrest</strong>; post-mortem showed a <strong>saddle pulmonary embolus</strong>. A retrospective bedside echo clip taken during the arrest showed a grossly dilated RV with <strong>McConnell's sign</strong> — the diagnosis had been one probe-touch away the whole time.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🧠 ANCHORING</b>"Panic attack" label stuck; a young woman's distress was read as psychological, not physiological.</div>
+            <div class="hole"><b>🫁 HYPOXIA DISMISSED</b>SpO₂ 89% explained away as "probe artefact" instead of believed.</div>
+            <div class="hole"><b>🦵 CLUE IGNORED</b>Unilateral swollen calf + pill + flight never assembled into a VTE story.</div>
+            <div class="hole"><b>🩻 CT OVER ECHO</b>A "routine" CTPA was awaited while a 30-second bedside echo would have shown the failing RV.</div>
+            <div class="hole"><b>🏥 SYSTEM</b>Overcrowding → corridor care → unmonitored, undressed, no defib to hand.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved her:</strong> believe the sats; treat sudden dyspnoea + syncope + a swollen leg as PE, not panic; put a probe on the chest in Resus rather than waiting for CT; keep a hypotensive/hypoxic patient monitored with defib to hand; and reperfuse a shocked right heart without delay. <strong>This is exactly the discipline that saved the patient in Bed 3.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Panic attack' has killed more young PEs than any clot ever will. Hypoxia, syncope and a swollen leg are physiology, not psychology — put the probe on and look at the right heart."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🚨 Emergency Department · Bed 3 — High-Risk (Massive) Pulmonary Embolism<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+  /* ===== SIDEBAR SCROLL-SPY (vertical) ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); var t=sections[idx]; if(t) t.scrollIntoView({behavior:'smooth',block:'start'}); setActive(idx); markVisited(idx); }); });
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){ entries.forEach(function(e){ if(!e.isIntersecting) return; var i=sections.indexOf(e.target); if(i>-1){ setActive(i); markVisited(i); } }); }, { rootMargin:'-10% 0px -75% 0px' });
+    sections.forEach(function(s){ if(s) io.observe(s); });
+  }
+  markVisited(0); setActive(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not a high-risk feature'); } if(found===total){ flagResult.textContent='✅ All '+total+' high-risk features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' high-risk features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: RV afterload — the obstruction dial ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=(v-5)/(120-5)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<=30){ msg='🟢 Low afterload ('+v+'%). The RV compensates — septum stays central, LV fills normally, BP holds. Non-high-risk physiology.'; cls='good'; }
+      else if(v<=60){ msg='🟠 Rising PVR ('+v+'%). The RV dilates and starts to strain; troponin/BNP leak. Submassive territory — anticoagulate and watch closely.'; cls='warn-r'; }
+      else if(v<=90){ msg='🟠 High afterload ('+v+'%). RV markedly dilated, septum bowing into the LV (D-sign) → LV filling falls, BP sagging. On the edge of obstructive shock.'; cls='warn-r'; }
+      else { msg='🔴 Critical obstruction ('+v+'%). Septum crushes the LV, output collapses → obstructive shock and RV ischaemia → the spiral to arrest. REPERFUSE now.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Afterload Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"A 34-year-old on the pill, back from a long flight, collapses with sudden dyspnoea. BP 84/56, HR 122, SpO₂ 86%, chest clear, JVP up, left calf swollen. The nurse says 'she's just having a panic attack.' What do you do?",
+      choices:[
+        {t:"😮‍💨 Agree it's anxiety — a paper bag and reassurance, review later",good:false,ds:-2,dt:40,xp:0,fb:"☠️ This is the M&M case in S21. Hypoxia, syncope and a swollen leg are physiology, not panic — the saddle embolus arrests her in PEA. Restart.",end:true},
+        {t:"🫀 Move to Resus, monitor, put a probe on the chest (bedside echo) and start IV heparin",good:true,ds:1,dt:6,xp:40,fb:"✅ Exactly. Bedside echo shows a dilated RV with McConnell's sign — this is high-risk PE. Heparin's running and you haven't left the room.",next:"repeat"},
+        {t:"💧 Open a litre of fluid wide to 'fill her up' for the low BP",good:false,ds:-1,dt:12,xp:5,fb:"⚠️ The failing, dilated RV is already over-filled — flooding it bows the septum further and drops output more. Small bolus only, then pressors + reperfusion.",next:"repeat"}
+      ]},
+    repeat:{ text:"Bedside echo confirms a big hypokinetic RV, McConnell's sign and a D-shaped septum. BP is still 84/56 despite a small bolus. She's in obstructive shock. Next best step?",
+      choices:[
+        {t:"💊 Start noradrenaline, screen thrombolysis contraindications, and prepare systemic alteplase — activate the PE team",good:true,ds:1,dt:6,xp:40,fb:"✅ Right. High-risk PE with RV strain and shock is a reperfusion patient — support the pressure and get ready to lyse.",next:"declare"},
+        {t:"🩻 Send her straight to CT scanner alone for a 'definitive' CTPA before doing anything",good:false,ds:-2,dt:25,xp:0,fb:"⚠️ Dangerous — a crashing PE can arrest in the doughnut. The bedside echo already IS your decision study; don't delay reperfusion for the perfect picture.",next:"declare"}
+      ]},
+    declare:{ text:"No contraindication to lysis. As you draw up the alteplase, her BP dips further and she becomes unresponsive — PEA on the monitor. What now?",
+      choices:[
+        {t:"🚨 Start CPR and give EMPIRICAL thrombolysis for presumed massive PE; continue prolonged CPR (~50–60 min) to let it work; line up ECMO/embolectomy",good:true,ds:1,dt:5,xp:45,fb:"🏆 Perfect. In arrest from presumed massive PE, empirical lysis + prolonged CPR is the rescue — and escalation to catheter/surgery/ECMO if it fails.",end:true},
+        {t:"⏸️ Hold the lytic — cancel it as 'too risky in arrest' and just continue standard ACLS",good:false,ds:-1,dt:20,xp:0,fb:"⚠️ Arrest from massive PE is exactly when empirical thrombolysis is indicated — withholding it removes her only chance. Give it and keep going.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='declare'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 34-year-old with sudden dyspnoea, syncope, SpO₂ 86% and a swollen calf has BP 84/56. This PE is classified as:", opts:["Low-risk","Intermediate (submassive)","High-risk (massive)","Not a PE — likely anxiety"], correct:2, exp:"Sustained hypotension (SBP < 90 / pressor need) with RV strain defines high-risk (massive) PE. Massive PE is defined by the blood pressure, not the CT clot size — and it is a reperfusion patient." },
+    { q:"The single best FIRST test in a peri-arrest patient with suspected massive PE is:", opts:["Wait for a formal CTPA in the radiology suite","A bedside echocardiogram in Resus","A D-dimer","A ventilation–perfusion (V/Q) scan"], correct:1, exp:"In a crashing/peri-arrest patient, bedside echo (dilated RV, McConnell sign, D-shaped septum) is the decision study — do NOT delay reperfusion to send an unstable patient to CT." },
+    { q:"McConnell's sign on echocardiography refers to:", opts:["A pericardial effusion with tamponade","RV free-wall akinesis with preserved apical contraction","LV apical ballooning","Concordant ST elevation"], correct:1, exp:"McConnell's sign — akinesis of the RV free wall with relative sparing of the apex — is relatively specific for acute PE and, in a shocked patient, supports reperfusion." },
+    { q:"The mechanism by which massive PE causes hypotension is best described as:", opts:["Left ventricular systolic failure from ischaemia","RV overload → dilatation → septal bowing into the LV → impaired LV filling","Massive vasodilation from mediators","Bradycardia from vagal tone"], correct:1, exp:"Acute rise in pulmonary vascular resistance overloads the RV; it dilates and the septum bows into the LV (ventricular interdependence), impairing LV filling → falling output and BP → RV ischaemia → spiral to arrest." },
+    { q:"Regarding fluids in massive PE with a dilated failing RV, the best approach is:", opts:["Aggressive 2 L crystalloid to raise the BP","A cautious small bolus (≤250–500 mL) if pre-load responsive, then pressors","No fluid ever under any circumstance","Diuresis immediately"], correct:1, exp:"Over-filling distends the already-overloaded RV, worsening septal bowing and dropping output. Give a small bolus only if pre-load responsive, then move to noradrenaline and reperfusion — 'don't drown the right heart.'" },
+    { q:"First-line reperfusion for high-risk (massive) PE with no contraindication is:", opts:["Systemic thrombolysis (e.g. alteplase)","Aspirin alone","Oral DOAC only","Immediate IVC filter"], correct:0, exp:"High-risk PE → primary reperfusion, first-line systemic thrombolysis unless contraindicated, plus anticoagulation. Catheter-directed therapy or surgical embolectomy are alternatives when lysis fails or is contraindicated." },
+    { q:"What did the PEITHO trial show about thrombolysis in INTERMEDIATE-risk (submassive) PE?", opts:["Large mortality benefit with no bleeding cost","Reduced haemodynamic decompensation but significantly more major/intracranial bleeding and no mortality benefit","No effect on any outcome","It is the standard of care for all submassive PE"], correct:1, exp:"PEITHO: tenecteplase reduced decompensation but roughly tripled major bleeding (including intracranial) with no mortality benefit — so routine lysis is NOT recommended in stable submassive PE; reserve it for deterioration." },
+    { q:"An absolute contraindication to systemic thrombolysis in PE is:", opts:["Age over 65","Prior intracranial haemorrhage","A raised D-dimer","Being on the oral contraceptive pill"], correct:1, exp:"Prior ICH, ischaemic stroke <3 months, known CNS vascular lesion/neoplasm, suspected aortic dissection, and active major bleeding are absolute contraindications. When lysis is contraindicated in a crashing patient → catheter-directed therapy or surgical embolectomy." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you resuscitate massive PE like a consultant. 🏆':score>=6?'Strong — review the misses and S5/S10 risk stratification.':'Revisit S5, S6 and S10 — the reperfusion logic is the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>
