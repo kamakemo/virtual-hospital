@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acute Aortic Dissection (Stanford Type A) — Virtual Teaching Hospital</title>
+<!-- META
+id: c-ed-dissection-032
+title: Acute Aortic Dissection (Stanford Type A)
+hospital: cardiology
+department: cv-ed
+bednumber: 2
+chiefcomplaint: Sudden tearing chest pain radiating to the back, unequal arm pressures
+system: Cardiology
+severity: critical
+tags: Aortic dissection, Anti-impulse therapy, Tearing pain, Type A, Surgical emergency
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🚨</div>
+      <div>
+        <div class="t1">Emergency Dept</div>
+        <div class="t2">Bed 2 · Aortic Dissection</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🚨 Emergency Department · 🛏️ Bed 2</div>
+        <h1>🫀 Acute Aortic Dissection — "The One That Tears"</h1>
+        <div class="sub">⚡ 21:47. A 63-year-old grips his chest, then his back, describing a "ripping" that hit its worst in the first second. The right radial is thready; the cuffs disagree by more than 100 mmHg. Someone is about to call this a STEMI and reach for heparin. In the next 10 minutes you have to rule out the aorta first.</div>
+        <div class="chips">
+          <span class="chip crit">🔴 CRITICAL</span>
+          <span class="chip">🫀 Stanford Type A</span>
+          <span class="chip">🩸 Anti-Impulse Therapy</span>
+          <span class="chip">🔪 Surgical Emergency</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital warn"><div class="v-label">💓 HR</div><div class="v-num">116</div></div>
+        <div class="vital alert"><div class="v-label">🩸 BP Right</div><div class="v-num">82/50</div></div>
+        <div class="vital warn"><div class="v-label">🩸 BP Left</div><div class="v-num">190/104</div></div>
+        <div class="vital"><div class="v-label">🌬️ RR</div><div class="v-num">22</div></div>
+        <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">96%</div></div>
+        <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.6°</div></div>
+        <div class="vital"><div class="v-label">🧠 GCS</div><div class="v-num">15</div></div>
+        <div class="vital alert"><div class="v-label">😖 Pain</div><div class="v-num">10/10</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 21:47, Resus 2</b>A man is doubled over the trolley, ashen, a hand pressed flat between his shoulder blades. He gasps: <em>"It ripped — right through to my back — worst pain of my life the moment it started."</em> The triage note says "chest pain, ?ACS." A junior has already printed an ECG showing inferior changes and is asking for aspirin, ticagrelor and heparin. The right radial pulse is barely there. This is the exact moment a dissection gets anticoagulated for a "STEMI." Not today.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>🧔 Name</td><td><strong>Mr. A.D.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>63-year-old male</td></tr>
+          <tr><td>🆔 MRN</td><td>CV-ED-0502</td></tr>
+          <tr><td>⚖️ Weight</td><td>96 kg (BMI 30)</td></tr>
+          <tr><td>💼 Occupation</td><td>Warehouse foreman — heavy lifting, "never sees a doctor"</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 Past history — every line steers you toward the aorta</h3>
+        <ul>
+          <li>🔺 <strong>Long-standing hypertension</strong>, poorly controlled, on-and-off amlodipine, frequently missed. Chronic HTN is the single biggest risk factor for dissection.</li>
+          <li>🚬 <strong>Smoker, 30 pack-years</strong> — accelerates medial degeneration.</li>
+          <li>🫀 A GP letter mentions an <strong>"unfolded aorta / borderline dilated aortic root"</strong> on a chest film two years ago, never followed up.</li>
+          <li>👨‍👦 Tall, long-limbed build; a brother had <strong>"sudden death in his 40s"</strong> — a whisper of a connective-tissue/familial aortopathy (Marfan, Loeys-Dietz, bicuspid valve).</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Chest pain PLUS anything-weird — syncope, stroke, a cold pulseless limb, a new diastolic murmur, unequal pulses — is dissection until the CT says otherwise."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why this is the deadliest miss in the ED</b>Untreated Stanford Type A dissection kills at roughly <strong>1–2% per hour</strong> for the first 24–48 hours — around half are dead by day two. It is uncommon (~3–4 per 100,000/year) but catastrophic, and it is <em>the</em> classic great-mimic: it masquerades as MI, stroke, acute abdomen, or "musculoskeletal" back pain. The whole game is <strong>thinking of it, then imaging before you anticoagulate</strong>.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 Paramedic handover — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ Pre-hospital SBAR (verbatim)</b>
+          <p><strong>S:</strong> "63-year-old male, sudden tearing chest pain 35 minutes ago while lifting, maximal from the very first moment, now radiating through to between the shoulder blades. Nearly passed out standing up."</p>
+          <p><strong>B:</strong> "Long-standing untreated hypertension, heavy smoker, tall build, family history of young sudden death."</p>
+          <p><strong>A:</strong> "We couldn't get a right-arm pressure — it kept erroring — the left arm ran 190-odd systolic. HR 116, SpO₂ 96%. 12-lead looked like inferior ST changes so we pre-alerted as ?STEMI. We gave 300 mg aspirin en route."</p>
+          <p><strong>R:</strong> "Pain is still 10/10 despite our GTN. He is frightened and keeps saying it moved down into his belly."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Maximal at the very first second' and 'ripping through to the back' is aortic language, not ischaemic language — ischaemia crescendos, a tear announces itself instantly."</div>
+
+        <div class="callout danger"><b class="ct">🚫 The handover trap already in motion</b>The crew gave aspirin and called it a STEMI. Aspirin alone rarely tips a dissection over — but the <strong>P2Y₁₂ inhibitor + heparin</strong> the resus team is about to reach for can convert a contained tear into a fatal haemorrhage. Migrating pain + inability to obtain one arm's pressure is a screaming clue that this is the aorta.</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each feature that points to DISSECTION</h3>
+        <p>🎮 <em>Click every feature that RAISES the probability of aortic dissection. Each correct = +10 XP.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">💥 Tearing pain, maximal at onset</button>
+          <button class="btn ghost flag-btn" data-good="1">🔙 Radiation through to the interscapular back</button>
+          <button class="btn ghost flag-btn" data-good="1">🩸 Inter-arm systolic BP differential &gt; 20 mmHg</button>
+          <button class="btn ghost flag-btn" data-good="1">😵 Transient syncope at onset</button>
+          <button class="btn ghost flag-btn" data-good="1">🎵 New early-diastolic murmur (aortic regurgitation)</button>
+          <button class="btn ghost flag-btn" data-good="1">🫲 Pulse deficit / thready right radial</button>
+          <button class="btn ghost flag-btn" data-good="0">👉 Reproducible chest-wall tenderness on palpation</button>
+          <button class="btn ghost flag-btn" data-good="0">😌 "The GTN helped a bit"</button>
+          <button class="btn ghost flag-btn" data-good="0">🌡️ Low-grade fever</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout warn"><b class="ct">⚠️ Why the distractors are traps</b>Reproducible chest-wall pain nudges probability <em>down</em> but never excludes a tear; "GTN helped" is meaningless (it relaxes many pains and can dangerously drop preload); a low fever is common in dissection from the inflammatory response and must never falsely reassure you toward "chest infection."</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🅰️🅱️🅲️ Primary survey — the "dissection-in-90-seconds"</h3>
+        <table class="tbl">
+          <tr><th>Step</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>🅰️ Airway</td><td>Patent, speaking in short sentences.</td><td>Talking = airway OK; but a hoarse voice would hint at recurrent laryngeal stretch from an expanding aorta.</td></tr>
+          <tr><td>🅱️ Breathing</td><td>RR 22, SpO₂ 96% RA, chest clear.</td><td>Clear now — but a left pleural effusion (haemothorax from leak) can evolve. Re-examine.</td></tr>
+          <tr><td>🅲️ Circulation</td><td>HR 116, <strong>right arm 82/50, left arm 190/104</strong>, thready right radial, cool right hand, <strong>new early-diastolic murmur at the left sternal edge</strong>.</td><td>Inter-arm differential + pulse deficit + new AR = dissection extending into the arch/root. The murmur is acute aortic regurgitation.</td></tr>
+          <tr><td>🅳 Disability</td><td>GCS 15 now, but a witnessed near-syncope at onset.</td><td>Syncope in dissection means tamponade, stroke (carotid involvement), or severe hypotension — a marker of a complicated Type A.</td></tr>
+          <tr><td>🅴 Exposure</td><td>Cool mottled right leg, faint femoral on the right; abdomen soft but tender; back tender between the scapulae.</td><td>Malperfusion — the dissection flap is compromising branch vessels (limb, mesenteric, renal).</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Take the blood pressure in BOTH arms and feel ALL the pulses — the diagnosis of dissection is often made with a stethoscope and four fingertips before any scan."</div>
+
+        <h3>🧭 The three killers you exclude at the bedside first</h3>
+        <p>For "sudden severe chest pain + unwell," the immediately lethal trio is <strong>ACS</strong>, <strong>aortic dissection</strong>, and <strong>pulmonary embolism</strong> (± tension pneumothorax, oesophageal rupture). Here the <em>tearing quality, maximal-at-onset, migration to the back and abdomen, inter-arm differential, pulse deficit and new AR murmur</em> pin the aorta to the top of the list — and demand that antithrombotics be held until it is excluded.</p>
+
+        <div class="callout danger"><b class="ct">⚠️ The trap of "the ECG shows a STEMI"</b>A proximal (Type A) dissection can shear across the <strong>right coronary ostium</strong> and produce a genuine <strong>inferior STEMI</strong>. Reflexively giving aspirin + ticagrelor + heparin and rushing to cath a dissection-STEMI is how patients tamponade on the table. When an inferior STEMI comes with tearing/back pain, unequal pulses, or a new AR murmur → <strong>image the aorta first</strong>.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The EM resident thinks out loud at 21:51:</em></p>
+        <h3>🧠 Frame it as "aorta first," not "STEMI reflex"</h3>
+        <p>"High-risk story, high-risk anatomy. That inferior ST change plus a &gt;100 mmHg inter-arm gap, a thready right radial and a new diastolic murmur is a <strong>Type A dissection at the RCA ostium</strong> until proven otherwise. My job is to <strong>hold the antithrombotics</strong>, control the <strong>rate before the pressure</strong>, get a <strong>CT aorta</strong> and call <strong>cardiothoracic surgery now</strong> — not to load ticagrelor and heparin."</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>🚫 <strong>Stop</strong> the P2Y₁₂ + heparin the team was about to give; aspirin already on board is a lower-risk bystander but no more antithrombotics.</li>
+          <li>💉 <strong>Anti-impulse therapy:</strong> IV <strong>esmolol</strong> (or labetalol) titrated to <strong>HR ≤ 60</strong> FIRST, then a vasodilator (nitroprusside/GTN) to <strong>SBP 100–120</strong> measured in the <em>higher</em> (left) arm.</li>
+          <li>😖 <strong>Generous IV analgesia</strong> (opioid) — pain drives catecholamines, HR and dP/dt, which propagates the tear.</li>
+          <li>🩻 <strong>CT angiogram of the aorta</strong> (arch to iliacs) the moment he is stable enough; bedside echo while waiting (root, flap, AR, effusion/tamponade).</li>
+          <li>🩸 <strong>Group &amp; cross-match ≥ 4–6 units</strong>, two large-bore cannulae, arterial line in the <em>higher-pressure</em> arm, catheterise.</li>
+          <li>📞 <strong>Call cardiothoracic surgery immediately</strong> — Type A is a surgical emergency; the CT and the surgeon happen in parallel, not in sequence.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Rule out the aorta BEFORE you anticoagulate the coronary. A tearing-to-the-back story, unequal pulses or a new AR murmur earns a CT aorta BEFORE heparin and ticagrelor go in."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>She's tempted to start GTN infusion first to bring that 190 systolic down fast. Right move?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No — beta-blocker first.</strong> A vasodilator given <em>before</em> rate control triggers <strong>reflex tachycardia</strong>, which <em>raises</em> dP/dt (the shear force of each ejection) and can <strong>propagate the tear</strong>. Blunt the heart rate and contractility with esmolol/labetalol to HR ≤ 60 FIRST, <em>then</em> add the vasodilator to reach SBP 100–120. <strong>Lower the RATE before the PRESSURE.</strong></p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The EM consultant at the bedside, 21:57:</em></p>
+        <h3>🧮 Pre-test probability — the ADD-RS score</h3>
+        <p>The <strong>Aortic Dissection Detection Risk Score (ADD-RS)</strong> gives one point for each of three categories with ANY feature present (0–3):</p>
+        <table class="tbl">
+          <tr><th>Category</th><th>Example features</th><th>This patient</th></tr>
+          <tr><td><strong>High-risk conditions</strong></td><td>Marfan/connective-tissue disease, family history of aortic disease, known aortic valve disease, recent aortic manipulation, known thoracic aneurysm</td><td class="hi">1 (familial aortopathy, prior dilated root)</td></tr>
+          <tr><td><strong>High-risk pain</strong></td><td>Abrupt/instantaneous onset, severe intensity, ripping/tearing quality</td><td class="hi">1 (tearing, maximal at onset)</td></tr>
+          <tr><td><strong>High-risk exam</strong></td><td>Pulse deficit / BP differential, focal neuro deficit, new AR murmur, hypotension/shock</td><td class="hi">1 (pulse deficit + inter-arm gap + new AR)</td></tr>
+        </table>
+        <p>He scores <strong>ADD-RS 3/3 → very high probability</strong>. This is a straight-to-<strong>CT aorta</strong> patient; a D-dimer is not needed to "justify" imaging when the score is high.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"ADD-RS 0 with a negative D-dimer (&lt; 500) rules dissection out with very high sensitivity (the ADvISED strategy). ADD-RS ≥ 2 skips the D-dimer and goes straight to CT — don't let a normal D-dimer talk you out of a high-risk story."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">REGISTRY</span> IRAD (International Registry of Acute Aortic Dissection)</td><td>Type A in-hospital mortality ~50% with medical therapy vs ~20–25% with surgery; classic "tearing" pain in only ~50%, so absence doesn't exclude; ~⅓ initially misdiagnosed.</td><td>Type A = operate; a "typical" description is helpful but its absence never rules dissection out.</td></tr>
+            <tr><td><span class="lvl">DIAGNOSTIC</span> ADD-RS (2011 ACCF/AHA)</td><td>A simple 0–3 clinical score stratifies pre-test probability; ADD-RS ≤ 1 misses very few dissections.</td><td>Use the score to decide who needs the aorta imaged.</td></tr>
+            <tr><td><span class="lvl">DIAGNOSTIC</span> ADvISED (2018)</td><td>ADD-RS ≤ 1 + D-dimer &lt; 500 ng/mL had a failure rate ~0.3% — a safe rule-out pathway for lower-probability patients.</td><td>Low score + negative D-dimer can safely defer CT; high score still goes to CT regardless.</td></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> 2022 ACC/AHA Aortic Disease Guideline</td><td>Anti-impulse therapy (target HR ≤ 60, SBP 100–120), emergent surgery for Type A, uncomplicated Type B medical ± TEVAR if complicated; multidisciplinary Aortic Team.</td><td>The modern standard: rate then pressure, surgeon for Type A, TEVAR for complicated Type B.</td></tr>
+            <tr><td><span class="lvl">IMAGING</span> CT angiography</td><td>Sensitivity/specificity &gt; 95–98% for dissection; TOE is the alternative in the unstable patient who cannot travel.</td><td>CT aorta is the workhorse; use bedside/TOE echo when too unstable to scan.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The chart that keeps me awake is the 'inferior STEMI' who was loaded with aspirin, ticagrelor and heparin and taken straight to the cath lab. The RCA was normal — the ostium was sheared by a Type A dissection. He tamponaded on the table. One inter-arm blood pressure would have changed everything."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY it tears, WHY it kills (the WHY behind the WHY)</h3>
+        <ol>
+          <li>🧱 <strong>Weakened media:</strong> chronic hypertension (and connective-tissue disorders) drives <strong>cystic medial degeneration</strong> — loss of elastin and smooth muscle in the aortic wall's middle layer. The wall loses its tensile strength.</li>
+          <li>💥 <strong>Intimal tear:</strong> each systole delivers a pulse of shear stress — the <strong>dP/dt</strong>, the rate of rise of pressure — against that weakened wall. An intimal tear opens, usually where wall stress is highest (ascending aorta just above the valve, or just distal to the left subclavian).</li>
+          <li>🩸 <strong>False lumen cleaves:</strong> blood is driven under pressure into the media, splitting it into a <strong>true and a false lumen</strong>. Every subsequent heartbeat's dP/dt propagates the dissection along the vessel — antegrade and/or retrograde.</li>
+          <li>💀 <strong>The lethal complications</strong> all flow from where the flap travels: retrograde into the <strong>pericardium</strong> → tamponade; across the <strong>aortic valve</strong> → acute severe AR + heart failure; across the <strong>coronary ostium</strong> (usually RCA) → inferior STEMI; into <strong>arch vessels</strong> → stroke; down into <strong>branch arteries</strong> → limb/mesenteric/renal malperfusion; or free rupture → exsanguination.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Dissection is a plumbing catastrophe driven by shear: lower the dP/dt (the RATE and force of each beat) and you slow the tear — this is why anti-impulse therapy comes before everything except calling the surgeon."</div>
+
+        <h3>⚖️ Contrast pair — Stanford Type A vs Type B</h3>
+        <div class="vs">
+          <div class="side a"><h4>🔪 Type A (the surgeon)</h4><ul><li>Involves the <strong>ascending aorta</strong> (± arch/descending)</li><li>Risks tamponade, acute AR, coronary occlusion, stroke</li><li><strong>Emergency surgery</strong> — medical mortality ~1–2%/hour</li><li>Our patient</li></ul></div>
+          <div class="side b"><h4>💉 Type B (the infusion pump)</h4><ul><li>Begins <strong>distal to the left subclavian</strong>, ascending aorta spared</li><li>Uncomplicated → <strong>medical anti-impulse therapy</strong>, admit, control BP/HR</li><li>Complicated (malperfusion, rupture, refractory pain/HTN) → <strong>TEVAR</strong></li></ul></div>
+        </div>
+        <p>💡 The classification is anatomical but the message is operational: <strong>ascending involvement calls a surgeon; descending-only calls an infusion pump</strong> (and an interventionalist if it misbehaves).</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — dP/dt: the Shear-Force Dial</h3>
+          <p style="font-size:13px">Anti-impulse therapy exists to lower <strong>dP/dt</strong> — the shear each heartbeat delivers to the torn wall. Drag the dial (heart rate / contractility) and watch how the <strong>wall shear and propagation risk</strong> change. Aim to blunt the rate <em>before</em> chasing the pressure.</p>
+          <label for="kRange">💓 Heart rate / contractility (dP/dt driver): <b id="kVal">116</b> bpm</label>
+          <input type="range" id="kRange" min="45" max="140" value="116">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore how rate control lowers aortic wall shear.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 High rate + high contractility = high dP/dt = the tear propagates. Beta-blockade to HR ≤ 60 collapses the shear. Give a vasodilator alone (without rate control) and reflex tachycardia drives the dial back up — widening the tear.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The order set (21:52)</h3>
+        <ul>
+          <li>🚫 <strong>HOLD all further antithrombotics</strong> — no P2Y₁₂ inhibitor, no heparin, no thrombolysis — until dissection is excluded.</li>
+          <li>💉 <strong>Esmolol infusion</strong> (or IV labetalol boluses) titrated to <strong>HR ≤ 60</strong>; if beta-blocker contraindicated, use a non-dihydropyridine calcium blocker (diltiazem).</li>
+          <li>💊 <strong>Then</strong> add <strong>nitroprusside (or GTN) infusion</strong> to a target <strong>SBP 100–120 mmHg</strong>, measured in the <em>higher-pressure (left) arm</em> — never a vasodilator before the beta-blocker.</li>
+          <li>😖 <strong>IV opioid analgesia</strong> generously (morphine/fentanyl) — pain relief IS anti-impulse therapy.</li>
+          <li>🩻 <strong>CT angiogram aorta</strong> (ECG-gated, arch to iliacs) urgently; <strong>bedside echo</strong> now (root diameter, dissection flap, AR severity, pericardial effusion/tamponade).</li>
+          <li>🩸 <strong>Group &amp; cross-match 4–6 units</strong>, FBC, U&amp;E, coag, troponin, lactate; <strong>two large-bore IVs</strong>; arterial line in the higher arm; urinary catheter (monitor renal malperfusion).</li>
+          <li>📞 <strong>Call cardiothoracic surgery immediately</strong> and alert theatres/ICU; if hypotensive, treat cautiously — permissive lower BP, cautious fluids, and think <strong>tamponade</strong>.</li>
+          <li>📈 Continuous monitoring with defib pads on; repeat 12-lead if the picture evolves.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Two infusions and one phone call save this life: esmolol to slow the beat, nitroprusside to soften the pressure, and the cardiothoracic surgeon on the line — in that order."</div>
+        <div class="callout danger"><b class="ct">🚫 The 'never in a dissection' list</b>❌ heparin · ❌ ticagrelor/prasugrel/clopidogrel loading · ❌ thrombolysis · ❌ a vasodilator before rate control. Each one either drives the shear up or turns a contained tear into fatal bleeding.</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Resus-bay priorities — the nurse runs the anti-impulse safety net</h3>
+        <ul>
+          <li>🩸 <strong>Cuff on the HIGHER-pressure arm and title the art-line there</strong> — titrating to the falsely-low (malperfused) arm will over-treat and under-perfuse the brain and heart. Document which arm every reading came from.</li>
+          <li>💓 <strong>Titrate the beta-blocker to HR ≤ 60 first, then the vasodilator to SBP 100–120</strong> — flag immediately if the heart rate climbs after the vasodilator starts (reflex tachycardia = under-blocked).</li>
+          <li>😖 <strong>Aggressive, frequent analgesia</strong> and a calm bedside — every spike of pain or anxiety raises catecholamines, HR and dP/dt and propagates the tear.</li>
+          <li>🩸 <strong>Two large-bore cannulae, send the cross-match, keep blood products moving</strong> — this patient may be in theatre within the hour and may bleed.</li>
+          <li>📟 Continuous ECG + arterial waveform; watch for a <strong>narrowing pulse pressure, rising HR, muffled tone, distended neck veins</strong> — the signature of evolving tamponade.</li>
+          <li>🚫 <strong>Challenge any order for heparin, a P2Y₁₂ inhibitor or thrombolysis</strong> until the aorta is cleared — the nurse is the last line against the fatal antithrombotic.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who insists the blood pressure is titrated to the RIGHT arm — the higher one — and who queries the heparin, is the one who keeps the brain perfused and the tear from spreading."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Result</th><th>Interpretation</th></tr>
+          <tr><td>D-dimer</td><td class="hi">4200 ng/mL</td><td>Markedly elevated — supportive but <strong>not diagnostic</strong>; a normal D-dimer in a low-probability (ADD-RS ≤ 1) patient helps rule out, but here the pre-test probability is too high to rely on it either way.</td></tr>
+          <tr><td>hs-Troponin T</td><td class="hi">58 ng/L</td><td>Mildly raised — the flap is compromising the RCA ostium (inferior ischaemia). Do <strong>not</strong> let a positive troponin trigger reflex anticoagulation here.</td></tr>
+          <tr><td>Lactate</td><td class="hi">3.6 mmol/L</td><td>Elevated — suggests malperfusion (limb/mesenteric) or low-output state; trend it.</td></tr>
+          <tr><td>Creatinine</td><td class="hi">142 µmol/L</td><td>Up from baseline — possible renal artery malperfusion; also relevant for CT contrast load.</td></tr>
+          <tr><td>Hb</td><td class="ok-v">138 g/L</td><td>Normal now, but cross-match sent — a leaking/ruptured dissection can drop it fast.</td></tr>
+          <tr><td>Coag / Group &amp; Save</td><td>Sent, 6 units X-matched</td><td>Essential before theatre; correct coagulopathy in bleeding.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A raised D-dimer supports dissection but never confirms it, and a raised troponin does NOT mean 'give heparin' — in dissection the coronary problem is a torn ostium, not a clot to lyse."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why the labs are a supporting cast, not the star</b>No blood test rules dissection in or out on its own. D-dimer is sensitive (elevated in nearly all acute dissections) but hopelessly non-specific; troponin, lactate and creatinine map the <em>complications</em> (coronary, mesenteric/limb, renal malperfusion). The diagnosis is made by <strong>imaging the aorta</strong> — the labs prepare the patient for theatre and flag which branch beds are threatened.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 ECG / IMAGING + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🫀 The ECG that misleads — inferior "STEMI" from a torn RCA ostium</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 130" preserveAspectRatio="none" aria-label="Inferior ST elevation from proximal dissection compromising the RCA ostium">
+            <rect width="820" height="130" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="32" x2="820" y2="32"/><line x1="0" y1="65" x2="820" y2="65"/><line x1="0" y1="98" x2="820" y2="98"/></g>
+            <polyline fill="none" stroke="#fca5a5" stroke-width="2.3" points="0,70 40,70 52,66 66,40 78,92 90,58 110,56 150,60 168,66 210,70 250,70 262,60 276,34 288,94 300,54 320,52 360,58 380,64 420,70 460,70 472,50 486,20 500,96 512,52 530,50 560,56 600,70 612,44 626,16 640,96 652,50 670,50 700,58 740,70 752,44 766,14 780,96 792,50 804,52 820,60"/>
+            <text x="150" y="20" fill="#fca5a5" font-size="11">Inferior leads: ST elevation (II, III, aVF)</text>
+            <text x="470" y="14" fill="#93c5fd" font-size="11">…but the cause is a dissection flap, not a clot</text>
+          </svg>
+          <div class="ecg-cap">A Type A dissection extending to the <span style="color:#fca5a5">right coronary ostium</span> produces a genuine inferior STEMI pattern. Cathing and anticoagulating this "STEMI" without imaging the aorta is a classic fatal trap.</div>
+        </div>
+
+        <h3>🩻 Imaging — what confirms the diagnosis</h3>
+        <table class="tbl">
+          <tr><th>Modality</th><th>Look for</th><th>Role</th></tr>
+          <tr><td>🖥️ <strong>CT angiogram (aorta)</strong></td><td>Intimal flap, true vs false lumen, entry tear, ascending involvement (= Type A), branch-vessel malperfusion, pericardial blood</td><td><strong>First-line</strong> in the stable-enough patient; maps the whole aorta for the surgeon.</td></tr>
+          <tr><td>🫀 <strong>Transoesophageal echo (TOE)</strong></td><td>Ascending flap, AR mechanism/severity, pericardial effusion/tamponade, entry tear near the root</td><td>For the <strong>too-unstable-to-travel</strong> patient; done in resus/theatre.</td></tr>
+          <tr><td>📟 <strong>Bedside TTE (POCUS)</strong></td><td>Pericardial effusion/tamponade, dilated root, AR jet, proximal flap</td><td>Immediate screen while arranging CT — a pericardial effusion + this story is enough to call the surgeon.</td></tr>
+          <tr><td>🩻 <strong>Chest X-ray</strong></td><td>Widened mediastinum (&gt; 8 cm), abnormal aortic contour, left pleural effusion, displaced calcium</td><td>Supportive only — a <em>normal</em> CXR does NOT exclude dissection.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"An inferior STEMI with tearing/back pain, unequal pulses or a new AR murmur is a dissection until the aorta is imaged — a normal chest X-ray never lets you off that hook."</div>
+
+        <div class="callout warn"><b class="ct">⚠️ Reading the CT like a surgeon</b>The report must answer: does the flap involve the <strong>ascending aorta</strong> (Type A → theatre) or start beyond the left subclavian (Type B)? Which branches are perfused from the true vs false lumen (malperfusion)? Is there <strong>pericardial blood</strong> (tamponade risk)? These findings, not the diagnosis alone, drive the operation.</div>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The anti-impulse drug map — what, why, and the traps</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>Esmolol</strong> (IV infusion)</td><td><strong>FIRST</strong> — rate/contractility control to HR ≤ 60</td><td>Ultra-short-acting β-blocker → ↓HR, ↓dP/dt. Ideal because titratable/reversible; the anchor of anti-impulse therapy.</td></tr>
+          <tr><td><strong>Labetalol</strong> (IV)</td><td>Alternative first agent — combined α/β blockade</td><td>Lowers HR <em>and</em> BP together; convenient single agent, less granular than esmolol + separate vasodilator.</td></tr>
+          <tr><td><strong>Diltiazem/verapamil</strong></td><td>Rate control if β-blockers contraindicated (asthma)</td><td>Non-dihydropyridine calcium blockers slow HR; avoid dihydropyridines (they don't slow the rate).</td></tr>
+          <tr><td><strong>Nitroprusside</strong> (or GTN) infusion</td><td><strong>SECOND</strong> — vasodilator to SBP 100–120 (higher arm)</td><td>Only AFTER β-blockade. Given alone → <strong>reflex tachycardia → ↑dP/dt → wider tear</strong>. Watch cyanide toxicity with prolonged nitroprusside.</td></tr>
+          <tr><td><strong>Opioid analgesia</strong> (morphine/fentanyl)</td><td>Generous — pain control is anti-impulse therapy</td><td>Reduces sympathetic drive, HR and dP/dt; do not skimp.</td></tr>
+          <tr><td><strong>Antithrombotics / thrombolysis</strong></td><td>❌ CONTRAINDICATED</td><td>Heparin, P2Y₁₂ inhibitors and lysis convert a contained tear into fatal haemorrhage/tamponade — the central error of this case.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Lower the RATE before the PRESSURE — esmolol to HR ≤ 60 first, THEN nitroprusside to SBP 100–120; a vasodilator alone is an accelerator pedal on the tear."</div>
+        <div class="callout danger"><b class="ct">🚫 Two lethal medication errors to memorise</b>①  Giving <strong>antithrombotics/thrombolysis</strong> for a "STEMI" that is a dissection → tamponade/haemorrhage. ②  Giving a <strong>vasodilator before a beta-blocker</strong> → reflex tachycardia → propagation. Both are common, both are fatal, both are avoidable.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why</h3>
+        <ul>
+          <li>🩸 <strong>Arterial line + cuff on the higher-pressure arm</strong>, beat-to-beat SBP targeted 100–120; re-check inter-arm differential (a changing gradient means the flap is moving).</li>
+          <li>💓 <strong>Continuous HR</strong> — the anti-impulse target is HR ≤ 60; a rising HR after starting the vasodilator = under-blocked, propagation risk.</li>
+          <li>🫀 <strong>Echo/tamponade surveillance</strong> — narrowing pulse pressure, rising HR, muffled heart sounds, distended neck veins, pulsus paradoxus = pericardial tamponade, a peri-arrest emergency.</li>
+          <li>🧠 <strong>Serial neuro obs + limb perfusion</strong> — new focal deficit (carotid), a newly cold/pulseless limb, or falling urine output signal evolving malperfusion.</li>
+          <li>🧪 <strong>Trend lactate, creatinine, Hb</strong> — rising lactate/creatinine = mesenteric/renal malperfusion; falling Hb = leak/rupture.</li>
+          <li>📈 Repeat 12-lead if chest pain changes — coronary involvement can evolve.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After you say 'dissection,' the monitor's questions become: is he tamponading, is he malperfusing, and is the tear still spreading? — the answers are the pulse pressure, the pulses, and the neuro exam."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can kill him — follow the flap</h3>
+        <ul>
+          <li>🫀 <strong>Cardiac tamponade</strong> — retrograde rupture into the pericardium; the leading cause of death in Type A. Beware pericardiocentesis (see S15).</li>
+          <li>🎵 <strong>Acute severe aortic regurgitation</strong> — the flap disrupts the valve → sudden LV volume overload, flash pulmonary oedema, cardiogenic shock.</li>
+          <li>🩸 <strong>Coronary malperfusion</strong> — usually RCA ostium → inferior STEMI, arrhythmia, pump failure.</li>
+          <li>🧠 <strong>Stroke / syncope</strong> — arch-vessel (carotid) involvement → focal deficit or global hypoperfusion.</li>
+          <li>🦵 <strong>Branch malperfusion</strong> — mesenteric (bowel ischaemia, rising lactate), renal (AKI), limb (cold pulseless leg). Dynamic (flap flutters over the ostium) vs static (flap fixed into the branch).</li>
+          <li>💥 <strong>Free rupture / exsanguination</strong> — into pericardium, pleura (usually left), or mediastinum → instant arrest.</li>
+          <li>🩺 <strong>The system complication:</strong> the misdiagnosis — treated as ACS and anticoagulated, or discharged as "musculoskeletal back pain."</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Every complication of Type A dissection is 'the flap arrived somewhere' — pericardium, valve, coronary, brain, gut, kidney or limb. Examine for all of them, because any one can be the thing that kills in the next ten minutes."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The chest-pain differential — and how dissection unmasks itself</h3>
+        <table class="tbl">
+          <tr><th>Diagnosis</th><th>Discriminators FROM dissection</th><th>Don't-miss action</th></tr>
+          <tr><td>🩸 <strong>Aortic dissection</strong> (this patient)</td><td>Tearing, maximal-at-onset, migrating to back; inter-arm BP differential; pulse deficit; new AR murmur; syncope/stroke</td><td>ADD-RS → CT aorta; anti-impulse therapy; call surgery; NO antithrombotics.</td></tr>
+          <tr><td>🫀 <strong>ACS / STEMI</strong></td><td>Crescendo pressure (not instantaneous), territorial ST with reciprocal change, equal pulses, no AR — but beware the dissection that CAUSES an inferior STEMI</td><td>Serial ECG + troponin; but clear the aorta before heparin if any dissection feature.</td></tr>
+          <tr><td>🫁 <strong>Pulmonary embolism</strong></td><td>Pleuritic, dyspnoea-dominant, RV strain (S1Q3T3), risk factors</td><td>Wells/PERC → D-dimer or CTPA.</td></tr>
+          <tr><td>📋 <strong>Pericarditis / myopericarditis</strong></td><td>Positional/pleuritic, diffuse concave ST↑ + PR depression, rub</td><td>Distinguish from dissection-tamponade; NSAID + colchicine.</td></tr>
+          <tr><td>💨 <strong>Oesophageal rupture / pneumothorax</strong></td><td>Vomiting-then-pain (Boerhaave), pleuritic, surgical emphysema, absent breath sounds</td><td>CT/contrast study; CXR; treat cause.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Three questions triage three killers: does it TEAR and migrate (aorta), does it hurt to BREATHE (PE/pleura/pericardium), or does it PRESS and crescendo (ACS)? — and never anticoagulate the 'ACS' until you've answered the first."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The First Ten Minutes"</h3>
+          <div class="hud"><span>❤️ Safety: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">63-year-old, tearing chest-to-back pain maximal at onset, right arm 82/50 vs left 190/104, thready right radial, a new early-diastolic murmur, and an ECG showing inferior ST elevation. The junior is holding a syringe of ticagrelor and asking you to "activate the cath lab STEMI pathway." What do you do?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The disposition plan</h3>
+        <ol>
+          <li>🩸 <strong>Diagnosis:</strong> acute Stanford Type A aortic dissection (CT: ascending flap, RCA ostial involvement, mild pericardial effusion, mild AR). This is a <strong>surgical emergency</strong>.</li>
+          <li>💉 <strong>Anti-impulse therapy running:</strong> esmolol to HR ≤ 60 first, then nitroprusside to SBP 100–120 in the higher arm; generous analgesia; NO antithrombotics.</li>
+          <li>🩸 <strong>Cross-matched blood, arterial line, catheter</strong>; ICU/anaesthesia involved; correct coagulopathy.</li>
+          <li>🔪 <strong>Straight to theatre</strong> for open repair (interposition graft ± valve/root repair or replacement, ± arch/cerebral protection). The ED job is to get him there alive with the tear as quiet as possible.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"For Type A, the ED is a corridor to the operating room: slow the beat, soften the pressure, kill the pain, cross-match the blood, and get the surgeon — everything else is a distraction."</div>
+
+        <div class="checklist" id="ckImpulse">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Anti-impulse therapy setup (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>🩸 BP measured in BOTH arms; art-line + cuff placed on the HIGHER-pressure arm; target documented</span></label>
+          <label class="ck"><input type="checkbox"><span>💓 Beta-blocker (esmolol/labetalol) titrated to HR ≤ 60 FIRST — rate before pressure</span></label>
+          <label class="ck"><input type="checkbox"><span>💊 Vasodilator (nitroprusside/GTN) added AFTER rate control to SBP 100–120 — watch for reflex tachycardia</span></label>
+          <label class="ck"><input type="checkbox"><span>😖 Generous IV opioid analgesia given (pain control = anti-impulse)</span></label>
+          <label class="ck"><input type="checkbox"><span>🚫 ALL antithrombotics / thrombolysis withheld; team briefed why</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 4–6 units cross-matched, 2 large-bore IVs, catheter in</span></label>
+          <label class="ck"><input type="checkbox"><span>📞 Cardiothoracic surgery called; theatre + ICU + anaesthesia alerted</span></label>
+          <div class="ck-progress" data-progress>0 / 7 complete</div>
+        </div>
+
+        <div class="checklist" id="ckTamponade">
+          <h3 style="margin-top:0">🩺 Procedure Guide — If tamponade / peri-arrest: controlled pericardiocentesis as a bridge to theatre</h3>
+          <label class="ck"><input type="checkbox"><span>🫀 Confirm tamponade physiology (echo effusion + hypotension, distended neck veins, muffled tones)</span></label>
+          <label class="ck"><input type="checkbox"><span>📞 Surgeon and theatre mobilised NOW — pericardiocentesis is a bridge, not the treatment</span></label>
+          <label class="ck"><input type="checkbox"><span>💧 Aspirate only a SMALL, CONTROLLED volume — just enough to restore a perfusing pressure</span></label>
+          <label class="ck"><input type="checkbox"><span>⚠️ Avoid full drainage — over-drainage raises aortic pressure and can re-start catastrophic bleeding</span></label>
+          <label class="ck"><input type="checkbox"><span>🔪 Move to sternotomy without delay for definitive repair</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">21:47</div>Arrival, tearing chest-to-back pain 10/10, inter-arm gap &gt;100 mmHg, new AR murmur, ECG inferior ST elevation. Antithrombotics HELD.</div>
+          <div class="t-item"><div class="t-time">21:55</div>Esmolol to HR 58, then nitroprusside to SBP 110 (left arm); generous opioid; cross-match sent; cardiothoracic surgery called.</div>
+          <div class="t-item"><div class="t-time">22:10</div>CT aorta: Stanford Type A, entry tear in ascending aorta, flap to RCA ostium, small pericardial effusion, mild AR, right iliac malperfusion.</div>
+          <div class="t-item"><div class="t-time">22:35</div>To theatre for emergency ascending aortic replacement (interposition graft) with aortic valve resuspension and re-implantation of the RCA.</div>
+          <div class="t-item"><div class="t-time">Day 1</div>ICU: haemodynamically stable, valve competent, limb reperfused, renal function recovering. Tight BP/HR control continued; genetics/aortopathy work-up planned.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>He is alive because someone put a cuff on both arms, heard the diastolic murmur, refused to anticoagulate the "STEMI," slowed the beat before softening the pressure, and had the surgeon on the phone before the CT was even back. Ordinary discipline, extraordinary outcome.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 Post-repair follow-up vs the low-risk chest pain safely sent home — two different worlds</h3>
+        <div class="vs">
+          <div class="side a"><h4>🫀 This patient (post Type A repair)</h4><ul><li>Lifelong <strong>strict BP control</strong> (β-blocker ± ARB), HR/impulse control, smoking cessation</li><li><strong>Surveillance imaging</strong> (CT/MR) of the whole aorta — the residual/downstream aorta can re-dissect or aneurysm</li><li><strong>Genetics referral</strong> (Marfan/Loeys-Dietz/familial thoracic aortic disease) + <strong>first-degree relative screening</strong></li><li>Avoid heavy isometric straining; red flags (recurrent tearing pain, syncope, limb/neuro symptoms) → 999</li></ul></div>
+          <div class="side b"><h4>🟢 The genuinely low-risk chest pain</h4><ul><li>ADD-RS 0 + negative D-dimer + reassuring alternative diagnosis</li><li>Documented reasoning, written safety-net, explicit "come back if the pain tears, moves, or you faint"</li><li>No antithrombotic error made "just in case"</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Surviving the dissection is chapter one; the residual aorta is chapter two — lifelong BP control, surveillance imaging and family screening are what stop the sequel."</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>💥 Tearing + maximal at onset</b>Ischaemia crescendos; a tear is worst from the first second and migrates. Language matters.</div>
+          <div class="pearl"><b>🩸 Both arms, all pulses</b>Inter-arm BP differential + pulse deficit + new AR murmur = dissection until the CT says otherwise.</div>
+          <div class="pearl"><b>🩺 Rule out the aorta first</b>Clear the aorta BEFORE you anticoagulate the coronary — an inferior STEMI can be a torn RCA ostium.</div>
+          <div class="pearl"><b>💓 Rate before pressure</b>Esmolol to HR ≤ 60 first, THEN nitroprusside to SBP 100–120; a vasodilator alone widens the tear.</div>
+          <div class="pearl"><b>📏 Titrate to the higher arm</b>Target SBP in the higher-pressure arm — the low arm is malperfused and will mislead you.</div>
+          <div class="pearl"><b>🔪 Type A = surgeon, Type B = pump</b>Ascending involvement goes to theatre; descending-only gets medical anti-impulse ± TEVAR.</div>
+          <div class="pearl"><b>🫀 Fear the pericardium</b>Tamponade is the leading killer; drain only a tiny controlled volume as a bridge to theatre.</div>
+          <div class="pearl"><b>🧮 Score, don't guess</b>ADD-RS ≥ 2 → straight to CT; a normal D-dimer only helps when ADD-RS ≤ 1.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the pathway</h3>
+          <ul>
+            <li>🩸 <strong>The acute aortic syndrome spectrum:</strong> classic dissection sits alongside <strong>intramural haematoma (IMH)</strong> — bleeding in the media with no visible intimal flap (may progress to dissection or regress) — and <strong>penetrating atherosclerotic ulcer (PAU)</strong> — an ulcerated plaque eroding into the media. Ascending (Type A) IMH/PAU is generally managed like Type A dissection (surgery); descending like Type B.</li>
+            <li>🦵 <strong>Dynamic vs static malperfusion:</strong> in <em>dynamic</em> obstruction the mobile flap intermittently covers a branch ostium (often relieved by treating the proximal aorta/true-lumen pressure); in <em>static</em> obstruction the flap propagates into the branch and fixes it (needs branch-vessel stenting/fenestration). Distinguishing them changes whether central repair alone suffices.</li>
+            <li>🧬 <strong>Heritable aortopathies:</strong> <strong>Marfan</strong> (FBN1, fibrillin-1), <strong>Loeys-Dietz</strong> (TGFβ-pathway, more aggressive/earlier dissection at smaller diameters), <strong>vascular Ehlers-Danlos</strong> (COL3A1), bicuspid aortic valve and familial thoracic aortic aneurysm/dissection. These drive earlier surgical thresholds and mandate family screening.</li>
+            <li>🖥️ <strong>TEVAR for Type B:</strong> uncomplicated Type B is medical (anti-impulse, BP control); <strong>complicated</strong> Type B (malperfusion, rupture, refractory pain/hypertension, rapid expansion) gets <strong>thoracic endovascular aortic repair</strong>. Trials (INSTEAD-XL, ADSORB) suggest early TEVAR may improve aortic remodelling in selected sub-acute Type B.</li>
+            <li>🧠 <strong>Cerebral protection in arch surgery:</strong> when the arch is involved, repair uses <strong>deep/moderate hypothermic circulatory arrest</strong> with antegrade or retrograde <strong>cerebral perfusion</strong> to protect the brain while the surgeon works in a bloodless field.</li>
+            <li>📏 <strong>Surgical thresholds &amp; prevention:</strong> elective root/ascending replacement is considered at ~5.5 cm (lower in Marfan/Loeys-Dietz/bicuspid or with rapid growth/family history) — the population from which acute dissections emerge, which is why the incidentally 'dilated aorta' letter should never be ignored.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The STEMI That Was a Tear"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 58-year-old hypertensive man arrived with sudden severe chest pain and an ECG showing <strong>inferior ST elevation</strong>. He was pre-alerted as an inferior STEMI, loaded with <strong>aspirin, ticagrelor and heparin</strong>, and rushed to the cath lab. Nobody recorded a blood pressure in both arms; nobody noted the <strong>new early-diastolic murmur</strong> or the fact the pain had <strong>ripped through to his back</strong>. At angiography the coronaries were near-normal — the "occlusion" was a <strong>Type A dissection flap over the RCA ostium</strong>. Minutes later he became hypotensive and bradycardic: <strong>haemopericardium and tamponade</strong>, accelerated by the antithrombotics. He arrested on the table and could not be saved.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🧠 ANCHORING</b>"Inferior STEMI" label locked in; the tearing/back-radiating history was never revisited.</div>
+            <div class="hole"><b>🩸 EXAM SKIPPED</b>No bilateral BP; the new AR murmur and pulse deficit were never sought.</div>
+            <div class="hole"><b>💉 ANTITHROMBOTIC REFLEX</b>Aspirin + ticagrelor + heparin given before the aorta was cleared.</div>
+            <div class="hole"><b>🖥️ NO AORTIC IMAGING</b>Straight to cath without a CT aorta despite dissection features.</div>
+            <div class="hole"><b>🫀 TAMPONADE</b>Anticoagulation turned a contained tear into fatal haemopericardium.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> take the blood pressure in <em>both</em> arms and feel all the pulses on every chest pain; listen for a new aortic-regurgitation murmur; treat "tearing, maximal-at-onset, migrating-to-the-back" as aortic language; and <strong>rule out the aorta BEFORE anticoagulating a coronary</strong> — especially an inferior STEMI with any dissection feature. <strong>This is exactly the discipline that saved the patient in Bed 2.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"An inferior STEMI plus tearing/back pain, unequal pulses or a new AR murmur is a dissection until the aorta is imaged — anticoagulate it and you finish the tear the aorta started."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🚨 Emergency Department · Bed 2 — Acute Aortic Dissection (Stanford Type A)<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+  /* ===== SIDEBAR SCROLL-SPY (vertical) ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); var t=sections[idx]; if(t) t.scrollIntoView({behavior:'smooth',block:'start'}); setActive(idx); markVisited(idx); }); });
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){ entries.forEach(function(e){ if(!e.isIntersecting) return; var i=sections.indexOf(e.target); if(i>-1){ setActive(i); markVisited(i); } }); }, { rootMargin:'-10% 0px -75% 0px' });
+    sections.forEach(function(s){ if(s) io.observe(s); });
+  }
+  markVisited(0); setActive(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not a dissection flag'); } if(found===total){ flagResult.textContent='✅ All '+total+' dissection features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' dissection features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: dP/dt shear-force dial ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=(v-45)/(140-45)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<=60){ msg='🟢 HR '+v+' bpm — dP/dt minimised. Anti-impulse target achieved (HR ≤ 60): wall shear is low and the tear is quiet. NOW add the vasodilator to reach SBP 100–120.'; cls='good'; }
+      else if(v<=80){ msg='🟠 HR '+v+' bpm — still above target. Shear is falling but the tear is not yet quiet. Titrate more beta-blocker before touching the pressure.'; cls='warn-r'; }
+      else if(v<=110){ msg='🟠 HR '+v+' bpm — high dP/dt. Each systole is driving the flap along the media. This is where a vasodilator given ALONE would push the rate (and shear) even higher.'; cls='warn-r'; }
+      else { msg='🔴 HR '+v+' bpm — dangerous shear. Maximal dP/dt propagates the dissection with every beat. Blunt the RATE before the PRESSURE — esmolol first.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Shear Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"63-year-old, tearing chest-to-back pain maximal at onset, right arm 82/50 vs left 190/104, thready right radial, a new early-diastolic murmur, ECG inferior ST elevation. The junior is holding a syringe of ticagrelor and wants to 'activate the STEMI pathway.' What do you do?",
+      choices:[
+        {t:"💉 Load aspirin + ticagrelor + heparin and rush to the cath lab as an inferior STEMI",good:false,ds:-2,dt:20,xp:0,fb:"☠️ This is the S21 M&M case. Those dissection features (tearing/back, inter-arm gap, pulse deficit, new AR) mean the 'STEMI' is a torn RCA ostium — antithrombotics cause haemopericardium and he tamponades. Restart.",end:true},
+        {t:"🩸 STOP the antithrombotics, start anti-impulse therapy, arrange CT aorta and call cardiothoracic surgery",good:true,ds:1,dt:6,xp:40,fb:"✅ Exactly. The story and exam scream dissection — hold the antithrombotics, quiet the tear, image the aorta, get the surgeon.",next:"repeat"},
+        {t:"💊 Start a nitroprusside infusion first to drop that 190 systolic quickly, then reassess",good:false,ds:-1,dt:10,xp:5,fb:"⚠️ Vasodilator BEFORE a beta-blocker causes reflex tachycardia → higher dP/dt → the tear widens. Rate before pressure. (You did at least avoid the antithrombotics.)",next:"repeat"}
+      ]},
+    repeat:{ text:"You're committing to the aortic pathway. In what ORDER do you set up the anti-impulse infusions and to what targets?",
+      choices:[
+        {t:"💓 Esmolol first to HR ≤ 60, THEN nitroprusside to SBP 100–120 measured in the higher (left) arm; generous analgesia",good:true,ds:1,dt:6,xp:40,fb:"✅ Right. Rate before pressure, titrate to the higher arm, and treat pain hard — every element lowers dP/dt and quiets the tear.",next:"declare"},
+        {t:"💊 Nitroprusside alone to SBP 100–120, titrated to the low right arm",good:false,ds:-2,dt:15,xp:0,fb:"⚠️ Two errors: vasodilator without rate control (reflex tachycardia widens the tear) AND targeting the malperfused low arm (you'll over-treat and starve the brain/heart).",next:"declare"}
+      ]},
+    declare:{ text:"CT confirms Stanford Type A with a small pericardial effusion. While waiting for theatre he suddenly becomes hypotensive with distended neck veins and muffled heart sounds — tamponade. What now?",
+      choices:[
+        {t:"🔪 Mobilise theatre NOW; if peri-arrest, a SMALL controlled pericardiocentesis only as a bridge to sternotomy",good:true,ds:1,dt:5,xp:45,fb:"🏆 Perfect. Type A tamponade is a surgical emergency — pericardiocentesis is a tiny controlled bridge, never full drainage (over-drainage re-starts the bleed). Definitive treatment is the operating room.",end:true},
+        {t:"💧 Fully drain the pericardium to completely relieve the tamponade, then observe",good:false,ds:-2,dt:15,xp:0,fb:"⚠️ Over-drainage raises aortic pressure and can re-start catastrophic bleeding into the pericardium. Only a small controlled aspiration as a bridge — get him to theatre.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='declare'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 63-year-old with tearing chest-to-back pain has a right-arm BP of 82/50 and left-arm 190/104, a thready right radial and a new early-diastolic murmur. The single most important next step is:", opts:["Load ticagrelor + heparin and activate the STEMI pathway","Hold antithrombotics, start anti-impulse therapy and image the aorta (CT)","Give a large fluid bolus and discharge if pain settles","Thrombolyse for presumed STEMI"], correct:1, exp:"Inter-arm differential + pulse deficit + new AR murmur + tearing/back pain is aortic dissection until proven otherwise. Hold antithrombotics, quiet the tear (anti-impulse), image the aorta, call surgery. Anticoagulating/lysing a dissection is fatal." },
+    { q:"In anti-impulse therapy, the correct sequence and targets are:", opts:["Vasodilator first to SBP < 100, then a beta-blocker","Beta-blocker first to HR ≤ 60, then a vasodilator to SBP 100–120","Beta-blocker alone to HR ≤ 40","Vasodilator alone to SBP 80–90"], correct:1, exp:"Lower the RATE before the PRESSURE: beta-blockade (esmolol/labetalol) to HR ≤ 60 first, THEN a vasodilator to SBP 100–120. A vasodilator alone causes reflex tachycardia, raising dP/dt and widening the tear." },
+    { q:"Why must a vasodilator NOT be started before a beta-blocker in aortic dissection?", opts:["It causes fatal hyperkalaemia","It triggers reflex tachycardia that raises dP/dt and propagates the tear","It lowers troponin","It has no effect until the beta-blocker is given"], correct:1, exp:"Vasodilation without rate control provokes reflex sympathetic tachycardia and increased contractility — a higher dP/dt (aortic wall shear) that drives the dissection forward. Blunt the rate first." },
+    { q:"When titrating blood pressure in a dissection with a large inter-arm differential, you should target the SBP measured in:", opts:["The lower-pressure (malperfused) arm","The higher-pressure arm","Either arm — it doesn't matter","The leg only"], correct:1, exp:"The low arm is malperfused by the flap and reads falsely low; targeting it would over-treat and under-perfuse the brain and heart. Titrate to the higher-pressure arm." },
+    { q:"A Stanford Type A dissection (ascending aorta involved) is best managed by:", opts:["Outpatient antihypertensives","Emergency cardiothoracic surgery","Anticoagulation and observation","Thrombolysis"], correct:1, exp:"Type A involves the ascending aorta and carries ~1–2%/hour mortality untreated — it is a surgical emergency (open repair). Uncomplicated Type B (distal to the left subclavian) is medical anti-impulse therapy ± TEVAR if complicated." },
+    { q:"An inferior STEMI pattern in a patient with tearing chest pain and unequal pulses most likely reflects:", opts:["A benign early repolarisation variant","A dissection flap compromising the right coronary ostium","Pericarditis","Hyperkalaemia"], correct:1, exp:"A proximal (Type A) dissection can shear the RCA ostium, producing a genuine inferior STEMI. Rule out the aorta BEFORE anticoagulating the coronary — this is the classic fatal trap." },
+    { q:"Regarding the ADD-RS / D-dimer strategy for suspected dissection:", opts:["A normal D-dimer excludes dissection in everyone","ADD-RS ≤ 1 with D-dimer < 500 ng/mL is a safe rule-out; ADD-RS ≥ 2 goes straight to CT","D-dimer is diagnostic of dissection when elevated","The score replaces imaging entirely"], correct:1, exp:"ADvISED: ADD-RS ≤ 1 plus a negative D-dimer safely rules out (failure ~0.3%). A high score (≥ 2) has too high a pre-test probability to be reassured by D-dimer — image the aorta." },
+    { q:"A patient with confirmed Type A dissection develops hypotension, distended neck veins and muffled heart sounds while awaiting theatre. The best action is:", opts:["Fully drain the pericardium to completely relieve tamponade","Mobilise theatre now; if peri-arrest, only a small controlled pericardiocentesis as a bridge","Start heparin for presumed PE","Give thrombolysis"], correct:1, exp:"Tamponade in Type A is a surgical emergency. Full pericardiocentesis raises aortic pressure and can re-start catastrophic bleeding; aspirate only a small controlled volume as a bridge to definitive operative repair." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you rule out the aorta like a consultant. 🏆':score>=6?'Strong — review the misses and S6/S11 anti-impulse logic.':'Revisit S4, S5 and S11 — rate-before-pressure and aorta-before-heparin are the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>
