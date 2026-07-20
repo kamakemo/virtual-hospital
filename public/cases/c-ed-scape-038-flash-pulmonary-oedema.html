@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCAPE — Sympathetic Crashing Acute Pulmonary Oedema — Virtual Teaching Hospital</title>
+<!-- META
+id: c-ed-scape-038
+title: SCAPE — Sympathetic Crashing Acute Pulmonary Oedema
+hospital: cardiology
+department: cv-ed
+bednumber: 8
+chiefcomplaint: Sudden severe breathlessness, drowning, BP 230/130 and hypoxia
+system: Cardiology
+severity: critical
+tags: SCAPE, Flash pulmonary oedema, Nitrates, NIV, Afterload, Hypertensive
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🚨</div>
+      <div>
+        <div class="t1">Emergency Dept</div>
+        <div class="t2">Bed 8 · SCAPE / Flash Oedema</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🚨 Emergency Department · 🛏️ Bed 8</div>
+        <h1>🫀 SCAPE — Sympathetic Crashing Acute Pulmonary Oedema</h1>
+        <div class="sub">⚡ 21:47. A 72-year-old sits bolt upright, gripping the trolley, drowning in her own lungs. She cannot finish a sentence. BP 230/130, SpO₂ 80%, crackles to the apices. The instinct on the ward was "push some furosemide and wait." She does not have time for that instinct to be wrong.</div>
+        <div class="chips">
+          <span class="chip crit">🔴 CRITICAL</span>
+          <span class="chip">🫁 Flash Pulmonary Oedema</span>
+          <span class="chip">💉 High-dose Nitrates</span>
+          <span class="chip">😷 NIV / CPAP</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital warn"><div class="v-label">💓 HR</div><div class="v-num">122</div></div>
+        <div class="vital alert"><div class="v-label">🩸 BP</div><div class="v-num">230/130</div></div>
+        <div class="vital alert"><div class="v-label">🌬️ RR</div><div class="v-num">38</div></div>
+        <div class="vital alert"><div class="v-label">🫁 SpO₂</div><div class="v-num">80%</div></div>
+        <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.8°</div></div>
+        <div class="vital"><div class="v-label">🧠 GCS</div><div class="v-num">14</div></div>
+        <div class="vital alert"><div class="v-label">🪑 Position</div><div class="v-num">Upright</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 21:47, Resus 2</b>A woman is sitting bolt upright on the trolley, both hands braced on the mattress, shoulders heaving. Her lips are dusky. She manages three words at a time: <em>"Can't… breathe… drowning."</em> Frothy, faintly pink sputum flecks her chin. The monitor screams SpO₂ 80% and BP 230/130. She was completely well ninety minutes ago. This is not a slow decompensation — this is a <strong>crash</strong>, and the clock is measured in minutes.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>👵 Name</td><td><strong>Mrs. E.V.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>72-year-old female</td></tr>
+          <tr><td>🆔 MRN</td><td>CV-ED-0808</td></tr>
+          <tr><td>⚖️ Weight</td><td>68 kg — <strong>no recent weight gain</strong>, "her rings still fit"</td></tr>
+          <tr><td>💼 Background</td><td>Retired teacher, independent, walks the dog daily without breathlessness</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 Past history — the setup for an afterload catastrophe</h3>
+        <ul>
+          <li>🔺 <strong>Long-standing hypertension</strong> — recently ran out of her amlodipine and ramipril, "meaning to reorder." The stiff, hypertrophied ventricle is primed.</li>
+          <li>🫀 <strong>Echo last year:</strong> preserved ejection fraction (EF 60%) with LV hypertrophy and diastolic dysfunction — <em>HFpEF</em>. A stiff ventricle floods fast.</li>
+          <li>🩺 Type 2 diabetes, mild CKD (stage 3a), ex-smoker.</li>
+          <li>🚶‍♀️ <strong>No orthopnoea, no ankle swelling, no gradual weight gain</strong> — she was walking the dog this morning. This is sudden, not the tail of a slow build-up. That distinction is the whole case.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"SCAPE is an AFTERLOAD problem — treat it with high-dose nitrates and CPAP, not buckets of furosemide."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why this presentation is deceptively lethal</b>SCAPE patients arrive looking like they will arrest within minutes — and they will, from hypoxia and exhaustion, if the afterload is not broken. Yet the fix is fast and dramatic: a nitrate infusion and CPAP at the door can turn a "peri-arrest" patient into someone talking in full sentences within 20–30 minutes. The danger is not that it is untreatable — it is that the wrong reflex (diurese and wait) wastes the minutes that matter.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 Paramedic handover — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ Pre-hospital SBAR (verbatim)</b>
+          <p><strong>S:</strong> "72-year-old female, sudden severe breathlessness about 90 minutes ago, came on over minutes while watching TV. Now drowning, can't speak in sentences, coughing pink froth."</p>
+          <p><strong>B:</strong> "Known hypertension, ran out of her tablets. Preserved-EF heart on her last echo. No chest pain, no fever, no calf pain."</p>
+          <p><strong>A:</strong> "Sitting bolt upright, sweating, tripoding. Crackles all the way up both lungs. SpO₂ was 78% on air, 84% on a non-rebreather. BP 232/128, HR 120. We gave a GTN spray and sat her up — she looked slightly better."</p>
+          <p><strong>R:</strong> "Pre-alerted as acute pulmonary oedema, hypertensive, hypoxic. She's frightened and tiring."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The patient isn't full of water, the water is in the wrong place — open the exit and the lungs clear in minutes."</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each feature that points to SCAPE</h3>
+        <p>🎮 <em>Click every feature that fits Sympathetic Crashing Acute Pulmonary Oedema. Each correct = +10 XP. The distractors point elsewhere.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">⏱️ Sudden onset over minutes</button>
+          <button class="btn ghost flag-btn" data-good="1">🩸 Severe hypertension (230/130)</button>
+          <button class="btn ghost flag-btn" data-good="1">🫁 Profound hypoxia (SpO₂ 80%)</button>
+          <button class="btn ghost flag-btn" data-good="1">💦 Diaphoresis + tripoding, bolt upright</button>
+          <button class="btn ghost flag-btn" data-good="1">🎧 Bilateral crackles to the apices</button>
+          <button class="btn ghost flag-btn" data-good="1">😰 Marked distress, can't speak in sentences</button>
+          <button class="btn ghost flag-btn" data-good="0">⚖️ Gradual weight gain &amp; ankle oedema over a week</button>
+          <button class="btn ghost flag-btn" data-good="0">🌡️ Fever 38.9°C</button>
+          <button class="btn ghost flag-btn" data-good="0">👉 Reproducible, positional chest-wall pain</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Praise where due</b>The crew nailed the essentials: sat her up, gave GTN early, escalated oxygen, and — crucially — <strong>pre-alerted</strong> so the nitrate infusion and CPAP could be waiting at the door. In SCAPE, pre-arrival preparation buys the minutes that decide whether a tube goes in.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🅰️🅱️🅲️ Primary survey — a crashing airway-in-waiting</h3>
+        <table class="tbl">
+          <tr><td>🅰️ Airway</td><td>Patent but only 2–3 words per breath; frothy pink secretions at the lips.</td><td>Talking, but barely — exhaustion is the airway threat. Froth = alveolar flooding.</td></tr>
+          <tr><td>🅱️ Breathing</td><td>RR 38, SpO₂ 80% on non-rebreather, <strong>fine-to-coarse crackles to both apices</strong>, accessory muscle use, tripoding.</td><td>Crackles from base to apex = massive alveolar oedema. This is the target for CPAP.</td></tr>
+          <tr><td>🅲️ Circulation</td><td>HR 122 sinus, <strong>BP 230/130 both arms</strong>, warm, well-perfused, cool sweat, no murmur of note over the noise.</td><td><strong>Hypertensive, not shocked</strong> — the afterload is the enemy. Warm and hypertensive is the SCAPE fingerprint.</td></tr>
+          <tr><td>🅳 Disability</td><td>GCS 14 (agitated, frightened), no focal deficit.</td><td>Agitation = hypoxia + catecholamine surge; a falling GCS would signal CO₂ narcosis/exhaustion → intubation.</td></tr>
+          <tr><td>🅴 Exposure</td><td>No fever, <strong>no peripheral oedema</strong>, no calf swelling, JVP not grossly elevated, no rash.</td><td>Dry ankles + no weight gain = <strong>euvolaemic</strong>. This is redistribution, not total-body overload.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Warm, wet lungs and a sky-high blood pressure with dry ankles = SCAPE. Reach for the nitrate infusion and the CPAP mask, not the frusemide."</div>
+
+        <h3>🧭 The instant bedside question in the crashing dyspnoeic patient</h3>
+        <p>Sudden severe breathlessness + hypoxia has a short, lethal differential: <strong>flash pulmonary oedema (SCAPE)</strong>, <strong>acute severe asthma/COPD</strong>, <strong>massive PE</strong>, <strong>tension pneumothorax</strong>, <strong>anaphylaxis</strong>. Here the story (sudden, hypertensive), the exam (bilateral crackles apex-to-base, no wheeze, no unilateral silence), and bedside POCUS (diffuse B-lines) point straight at cardiogenic flooding driven by afterload (see S14).</p>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of "she must be fluid-overloaded"</b>The lungs are full of fluid, so the reflex is "she's overloaded, diurese her." But most SCAPE patients are <strong>euvolaemic or only mildly overloaded</strong> — the fluid has been <em>redistributed</em> from the systemic veins into the alveoli by the pressure surge, not accumulated over days. Pouring in loop diuretic chases a problem that isn't the main one and wastes time; the fix is to drop the afterload.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The EM resident thinks out loud at 21:51:</em></p>
+        <h3>🧠 Name the physiology, then treat it</h3>
+        <p>"This is SCAPE — a sympathetic surge has slammed her afterload up, her stiff HFpEF ventricle can't eject against it, and pressure has flooded straight back into the lungs. She's <strong>euvolaemic</strong> — dry ankles, no weight gain. So my priority isn't to empty her, it's to <strong>open the exit</strong>: sit her up, get CPAP on now, and start a <strong>high-dose GTN infusion</strong> to crash the afterload. I'll hold the big furosemide dose — it treats a problem she mostly doesn't have."</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>🪑 <strong>Sit fully upright</strong>, legs dependent — immediately offloads the pulmonary circulation.</li>
+          <li>😷 <strong>CPAP now</strong> (start ~10 cmH₂O) — recruits flooded alveoli, cuts work of breathing, drops preload <em>and</em> afterload, buys oxygenation without a tube.</li>
+          <li>💉 <strong>High-dose IV nitrate</strong> — GTN infusion started high and titrated fast to the blood pressure (some use intermittent high-dose boluses); this is the <em>key</em> intervention.</li>
+          <li>🔎 <strong>Hunt the precipitant</strong> — ischaemia (ECG, troponin), uncontrolled/untreated hypertension, non-adherence, arrhythmia, renal-artery disease.</li>
+          <li>💧 <strong>Defer furosemide</strong> as the primary move; a modest dose only later, once the crisis breaks and if truly overloaded.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"CPAP is a medication you deliver through a mask — it prevents intubations."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>The BP is 230/130. Someone worries a nitrate infusion will "drop her pressure too much." Withhold it?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No.</strong> A pressure of 230/130 is precisely <em>why</em> she is drowning — that afterload is the disease. High-dose nitrates are the treatment, not a hazard; the fear of a modest, titratable fall in BP is not a reason to withhold the one drug that reopens the ventricle's exit. You titrate to effect, you don't withhold. (Genuine cautions — RV infarct, severe aortic stenosis, dissection, recent PDE5 inhibitor — are addressed in S5/S11, but "the BP might drop" is not one of them.)</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The EM consultant at the bedside, 21:56:</em></p>
+        <h3>🧮 The afterload argument — why nitrates beat diuretics here</h3>
+        <p>"Watch the physiology. Her mean arterial pressure is enormous, so LV wall stress is enormous, so a stiff ventricle can barely eject — end-diastolic pressure rockets and transmits back to the pulmonary capillaries. <strong>Nitrates</strong>, at high dose, drop that afterload (and preload) fast and reopen the exit; the lungs decompress in minutes. <strong>Furosemide's</strong> venodilation is minor and slow, its diuresis takes 20–30 minutes to matter, and she isn't volume-overloaded anyway — early it can even reflexively raise afterload. Nitrates and CPAP are the levers; diuretics are, at most, a late adjunct."</p>
+
+        <table class="tbl">
+          <tr><th>Intervention</th><th>What it actually does in SCAPE</th><th>Priority</th></tr>
+          <tr><td>💉 High-dose IV nitrate</td><td class="ok-v">Crashes afterload + preload → LV ejects → pulmonary pressures fall → alveoli clear</td><td class="hi">FIRST-LINE</td></tr>
+          <tr><td>😷 CPAP / NIV</td><td class="ok-v">Recruits alveoli, ↓ work of breathing, ↓ preload &amp; afterload, ↓ intubation rate</td><td class="hi">FIRST-LINE</td></tr>
+          <tr><td>🪑 Sit up</td><td>Redistributes blood away from the pulmonary bed instantly, free</td><td>IMMEDIATE</td></tr>
+          <tr><td>💧 Furosemide</td><td>Slow diuresis; minor venodilation; wrong target if euvolaemic</td><td class="lo">LATE / IF OVERLOADED</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In flash oedema, the nitrate is the resuscitation drug and the diuretic is the afterthought — get that order wrong and the patient tires and gets tubed."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">RCT</span> 3CPO trial (Gray, NEJM 2008)</td><td>NIV (CPAP or BiPAP) in acute cardiogenic pulmonary oedema improved dyspnoea and reduced intubation/metabolic derangement; <strong>mortality-neutral</strong> vs standard O₂.</td><td>Put CPAP on for the drowning patient — it prevents tubes and eases breathing, even if it doesn't independently cut mortality.</td></tr>
+            <tr><td><span class="lvl">RCT</span> Cotter et al. (Lancet 1998)</td><td>High-dose IV nitrate + low-dose furosemide beat high-dose furosemide + low nitrate: <strong>fewer intubations and fewer MIs</strong>.</td><td>Load the nitrate, spare the diuretic — the afterload strategy wins.</td></tr>
+            <tr><td><span class="lvl">PHYSIOLOGY</span> Afterload sensitivity of the failing LV</td><td>The failing/stiff ventricle's stroke volume falls steeply as afterload rises; small drops in SVR yield large gains in ejection.</td><td>Unloading a failing heart pays off far more than unloading a normal one — vasodilators are high-yield.</td></tr>
+            <tr><td><span class="lvl">CONSENSUS</span> Nitrate strategy (ESC AHF, EM literature)</td><td>Vasodilators are recommended in hypertensive acute heart failure/SCAPE to rapidly reduce congestion.</td><td>Hypertensive + flooding = vasodilate first.</td></tr>
+            <tr><td><span class="lvl">CAUTION</span> When nitrates are dangerous</td><td>RV infarction (preload-dependent), severe aortic stenosis (fixed obstruction), suspected aortic dissection, recent PDE5 inhibitor → precipitous hypotension.</td><td>Check the ECG and the story before you open the taps — "BP might drop" is not a caution, but these four are.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The chart that haunts me is the SCAPE patient who was drowned twice — once by his lungs and once by us. He got 80, then 120 mg of furosemide while his 240-systolic afterload was never touched. He tired, we intubated him, and he arrested on induction. A nitrate infusion and CPAP at the door would have had him talking in twenty minutes."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY the lungs flood in minutes (the WHY behind the WHY)</h3>
+        <ol>
+          <li>⚡ <strong>Catecholamine surge:</strong> a trigger (pain, ischaemia, untreated hypertension, anxiety, non-adherence) unleashes a sympathetic storm → intense arteriolar constriction → a sudden, massive rise in <strong>systemic vascular resistance (afterload)</strong>.</li>
+          <li>🚪 <strong>The exit slams shut:</strong> the left ventricle — especially a stiff, hypertrophied HFpEF ventricle — cannot eject against this wall of resistance. Stroke volume falls; blood backs up.</li>
+          <li>📈 <strong>LVEDP rockets:</strong> left ventricular end-diastolic pressure climbs steeply and transmits backward → left atrium → pulmonary veins → pulmonary capillaries.</li>
+          <li>🌊 <strong>Alveoli flood:</strong> capillary hydrostatic pressure overwhelms the alveolar barrier; plasma pours into the alveoli in <em>minutes</em> → hypoxia, frothy pink sputum, crackles apex-to-base.</li>
+          <li>🔁 <strong>Redistribution, not overload:</strong> the fluid came from the patient's own circulation shoved into the lungs by pressure — total body water is often normal. That is why the fix is to <strong>drop afterload</strong>, not to remove litres.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"High afterload shuts the ventricle's exit and the lungs flood; open the exit with nitrates and the same fluid drains back out — no diuretic required to break the crisis."</div>
+
+        <h3>⚖️ Contrast pair — SCAPE vs classic volume-overloaded ADHF</h3>
+        <div class="vs">
+          <div class="side a"><h4>🌊 SCAPE / flash oedema</h4><ul><li>Onset over <strong>minutes</strong>; severely hypertensive</li><li><strong>Euvolaemic</strong> — dry ankles, no weight gain; fluid is redistributed into the lungs</li><li>Afterload problem → <strong>high-dose nitrates + CPAP</strong>, sit up</li><li>Clears in minutes once afterload drops</li></ul></div>
+          <div class="side b"><h4>💧 Classic volume-overloaded ADHF</h4><ul><li>Onset over <strong>days</strong>; weight gain, orthopnoea, PND</li><li><strong>Total-body overload</strong> — pitting oedema, raised JVP, ascites</li><li>Volume problem → <strong>diuresis</strong> (± vasodilators)</li><li>Improves over hours with fluid removal</li></ul></div>
+        </div>
+        <p>💡 Same wet-sounding chest, opposite physiology. Ask "days or minutes? dry ankles or swollen? normotensive or 230 systolic?" — the answers pick the treatment.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The Afterload Dial</h3>
+          <p style="font-size:13px">Systemic vascular resistance drives LV wall stress. Drag the dial and watch how <strong>afterload</strong> — not fluid volume — decides whether the ventricle ejects or the lungs flood.</p>
+          <label for="kRange">🩸 Afterload proxy — systolic BP driving LV wall stress: <b id="kVal">230</b> mmHg</label>
+          <input type="range" id="kRange" min="80" max="240" value="230">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Drag the dial to explore how afterload floods or clears the lungs.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 Sky-high afterload = the LV can't eject, LVEDP rockets, alveoli flood. Lower the afterload (vasodilators) and the exit reopens — the lungs clear without removing a drop of fluid.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The order set (21:49)</h3>
+        <ul>
+          <li>🪑 <strong>Sit fully upright</strong>, legs dependent — before anything else.</li>
+          <li>😷 <strong>CPAP now</strong> at ~10 cmH₂O, titrate FiO₂ to SpO₂ ≥ 94%; reassess work of breathing continuously.</li>
+          <li>💉 <strong>GTN infusion started HIGH and titrated fast</strong> to BP/symptoms (e.g. begin at a high infusion rate; some protocols use intermittent high-dose GTN boluses) — the key intervention. Sublingual GTN sprays as a bridge while the infusion is set up.</li>
+          <li>📈 <strong>12-lead ECG</strong> (hunt ischaemia as trigger; check for RV infarct <em>before</em> heavy nitrates) and continuous monitoring.</li>
+          <li>🧪 <strong>hs-troponin, BNP/NT-proBNP, U&amp;E, glucose, VBG/ABG</strong>; portable CXR; bedside echo/POCUS lung.</li>
+          <li>💧 <strong>Hold high-dose furosemide as the primary move</strong>; a modest IV dose only later if truly overloaded once the crisis breaks.</li>
+          <li>🩸 IV access; arterial line if available for beat-to-beat BP during aggressive nitrate titration; do NOT give routine large fluid boluses.</li>
+          <li>📞 Escalate early: senior EM/ICU/cardiology; be ready to intubate if NIV fails or she tires.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Sit up, mask on, nitrate wide open — the first three orders in flash oedema, and none of them is a diuretic."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Resus-bay priorities — the nurse runs the afterload war</h3>
+        <ul>
+          <li>😷 <strong>Get the CPAP mask sealing and keep it on</strong> — coach the frightened patient through it; a mask she rips off does nothing. Watch for gastric distension and pressure areas.</li>
+          <li>💉 <strong>Titrate the GTN infusion to the BP</strong> with frequent (every 2–5 min) cycling or an arterial line — aggressive up-titration is safe here, but flag any sudden fall.</li>
+          <li>🩸 <strong>Blood pressure is the dashboard:</strong> in SCAPE you are chasing it <em>down</em> from 230 — report a rapid drop, but understand that lowering it is the goal, not the alarm.</li>
+          <li>🫁 SpO₂, RR and work of breathing continuously — rising CO₂, falling RR effort, or a drowsy patient means NIV is failing → call for intubation.</li>
+          <li>🧾 Keep her upright and reassured — panic feeds the catecholamine surge that started this; a calm bedside is genuinely anti-afterload.</li>
+          <li>💧 <strong>Challenge a reflexive big furosemide order</strong> if she's euvolaemic and the afterload hasn't been addressed — the nitrate and CPAP come first.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who keeps the CPAP sealed and the nitrate titrating is doing more to prevent an intubation than any drug chart."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Value</th><th>Interpretation</th></tr>
+          <tr><td>ABG (on NRB, pre-CPAP)</td><td class="hi">pH 7.28 · pO₂ 7.4 · pCO₂ 6.9 kPa</td><td>Type 2 picture with tiring — hypoxia + rising CO₂ from exhaustion. A marker to watch: worsening = intubate.</td></tr>
+          <tr><td>hs-Troponin</td><td class="hi">Mildly raised (54 ng/L)</td><td>Common in SCAPE — demand ischaemia/strain; look for a <em>trigger</em> ACS but a small rise alone is usually type-2. Trend it.</td></tr>
+          <tr><td>NT-proBNP</td><td class="hi">3,800 ng/L</td><td>Confirms cardiac origin of the dyspnoea; helps separate cardiac from lung cause when unclear.</td></tr>
+          <tr><td>Creatinine</td><td>128 µmol/L (baseline 110)</td><td>Mild CKD, slight bump — relevant to diuretic dosing and contrast if angiography needed.</td></tr>
+          <tr><td>Potassium</td><td class="ok-v">4.4 mmol/L</td><td>Normal — keep it 4.0–5.0; heavy diuresis (if later used) can deplete it.</td></tr>
+          <tr><td>Weight / fluid status</td><td class="ok-v">Euvolaemic</td><td>Dry ankles, no weight gain, JVP not grossly up → <strong>redistribution</strong>, not overload. Supports nitrate-first, diuretic-late.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A mildly raised troponin in flash oedema is usually the strain of the crisis, not a reason to abandon the afterload plan — trend it, don't anchor on it."</div>
+
+        <div class="callout info"><b class="ct">🧠 POCUS is your fastest test</b>Bedside lung ultrasound shows <strong>diffuse bilateral B-lines</strong> (the "wet lung") in seconds — far faster than a portable CXR. Cardiac POCUS shows a hypertrophied, vigorously contracting LV with a dilated LA and a plump IVC that varies little — supporting cardiogenic flooding and helping exclude a big pericardial effusion, RV strain (PE), or a hyperdynamic empty heart.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 ECG / IMAGING + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🫀 The 12-lead — look for the trigger, and check before you nitrate</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 130" preserveAspectRatio="none" aria-label="Sinus tachycardia with LV hypertrophy and strain">
+            <rect width="820" height="130" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="32" x2="820" y2="32"/><line x1="0" y1="65" x2="820" y2="65"/><line x1="0" y1="98" x2="820" y2="98"/></g>
+            <polyline fill="none" stroke="#86efac" stroke-width="2.3" points="0,70 24,70 32,66 42,44 52,102 62,70 96,70 108,68 120,70 150,70 158,66 168,44 178,102 188,70 222,70 234,80 246,70 276,70 284,66 294,42 304,104 314,70 348,70 360,82 372,70 402,70 410,66 420,42 430,104 440,70 474,70 486,84 498,70 528,70 536,66 546,44 556,102 566,70 600,70 612,84 624,70 654,70 662,66 672,44 682,102 692,70 726,70 738,84 750,70 780,70 788,66 798,44 808,102 818,70"/>
+            <text x="70" y="20" fill="#93c5fd" font-size="11">HR ~122 · sinus tachycardia</text>
+            <text x="470" y="118" fill="#fca5a5" font-size="11">tall voltages + downsloping ST/T = LVH with strain</text>
+          </svg>
+          <div class="ecg-cap">Sinus tachycardia with tall precordial voltages and a "strain" ST–T pattern of long-standing hypertensive LVH. Crucially: <strong>no ST elevation, no inferior/RV-infarct pattern</strong> — a check you make <em>before</em> opening the nitrate taps.</div>
+        </div>
+
+        <h3>🔎 What the ECG must tell you in SCAPE</h3>
+        <table class="tbl">
+          <tr><th>Look for</th><th>Why it matters</th></tr>
+          <tr><td>🫀 <strong>STEMI / ischaemia</strong></td><td>Ischaemia can be the <em>trigger</em> — flash oedema can be the presentation of ACS; a STEMI changes the destination to the cath lab.</td></tr>
+          <tr><td>➡️ <strong>Inferior MI + RV involvement</strong></td><td>RV infarct is <strong>preload-dependent</strong> — aggressive nitrates can crash the BP. Check V4R before high-dose GTN.</td></tr>
+          <tr><td>💪 <strong>LVH with strain</strong></td><td>Confirms the chronic hypertensive, stiff-ventricle substrate that floods so fast.</td></tr>
+          <tr><td>⚡ <strong>Tachy-/brady-arrhythmia</strong></td><td>New AF with fast ventricular rate is a classic SCAPE precipitant — rate/rhythm control may be part of the fix.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Before you open the nitrate wide in flash oedema, read the ECG for a right-ventricular infarct — the one place where dropping preload can kill."</div>
+
+        <h3>🩻 Imaging</h3>
+        <ul>
+          <li><strong>Lung POCUS:</strong> diffuse bilateral B-lines confirm pulmonary oedema at the bedside in seconds; they clear as the lungs decompress — a real-time treatment gauge.</li>
+          <li><strong>CXR:</strong> bilateral perihilar "bat-wing" alveolar oedema, upper-lobe diversion, Kerley B lines — often a <strong>normal-sized heart</strong> in acute flash oedema (no time for chronic cardiomegaly).</li>
+          <li><strong>Echo:</strong> hypertrophied, hyperdynamic LV with diastolic dysfunction and a dilated LA — the HFpEF flash-oedema substrate.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The SCAPE drug map — what, why, and the traps</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>GTN (nitroglycerin) infusion</strong>, high-dose</td><td class="hi">First-line — the key intervention</td><td>At higher doses arterial + venous dilation → ↓afterload &amp; ↓preload → LV ejects, lungs clear. AVOID/caution in RV infarct, severe AS, dissection, recent PDE5 inhibitor.</td></tr>
+          <tr><td><strong>CPAP / NIV</strong> ("a drug through a mask")</td><td class="hi">First-line, alongside nitrate</td><td>Positive pressure recruits alveoli, ↓ work of breathing, ↓ preload &amp; afterload, cuts intubation (3CPO). Watch for hypotension, vomiting/aspiration, ↓GCS.</td></tr>
+          <tr><td><strong>Sublingual GTN spray</strong></td><td>Immediate bridge while infusion set up</td><td>Fast, simple; repeat while titrating the infusion — same cautions as above.</td></tr>
+          <tr><td><strong>Furosemide</strong></td><td class="lo">Adjunct — late, and only if truly overloaded</td><td>Slow diuresis (peaks 20–30 min); minor, slow venodilation; can transiently ↑ afterload via neurohormonal activation early. Not the crisis-breaker.</td></tr>
+          <tr><td><strong>Treat the precipitant</strong></td><td>Definitive</td><td>Restart/optimise antihypertensives, revascularise if ACS, rate-control AF, address renal-artery stenosis, restore adherence.</td></tr>
+          <tr><td><strong>Opioids (morphine)</strong></td><td class="lo">Largely avoided</td><td>Historically used, but associated with more adverse events (respiratory depression, more intubation) in AHF — not routine.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Nitrates and CPAP break the crisis; furosemide is a mop for afterwards, and morphine is a trap — reach for the first two, not the last two."</div>
+        <div class="callout danger"><b class="ct">🚫 The 'check the ECG first' nitrate cautions</b>❌ RV infarction (preload-dependent — nitrates can cause profound hypotension) · ❌ severe aortic stenosis (fixed obstruction) · ❌ suspected aortic dissection · ❌ recent sildenafil/tadalafil. Outside these, "the BP might drop" is <strong>not</strong> a reason to withhold — the high BP is the disease.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why</h3>
+        <ul>
+          <li>🩸 <strong>Blood pressure, beat-to-beat if possible</strong> — you are deliberately driving it down with the nitrate; an arterial line makes aggressive titration safe. Target a controlled, substantial fall, not a crash.</li>
+          <li>🫁 <strong>SpO₂, RR and work of breathing</strong> — improvement (dropping RR, rising SpO₂, easier speech) means CPAP + nitrate are winning; the reverse means NIV is failing.</li>
+          <li>🩺 <strong>Serial ABG/VBG</strong> — a falling pH or rising CO₂ despite good NIV = tiring → prepare to intubate.</li>
+          <li>📈 <strong>Continuous ECG</strong> — for an evolving ischaemic trigger and for arrhythmia (new fast AF).</li>
+          <li>🧠 <strong>Conscious level</strong> — agitation from hypoxia should settle as she oxygenates; a <em>drowsy</em> patient on CPAP is a red flag (CO₂ narcosis/exhaustion).</li>
+          <li>💧 <strong>Urine output</strong> — relevant later; not the primary early endpoint (the lungs clear from afterload reduction, not diuresis).</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In SCAPE the monitor's key question isn't 'is the BP low?' but 'is she getting easier to breathe?' — falling respiratory rate and rising sats mean you're winning."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong in the ED phase</h3>
+        <ul>
+          <li>🫁 <strong>Respiratory failure &amp; exhaustion → intubation/arrest</strong> — the patient who tires while the afterload is ignored. The commonest avoidable disaster.</li>
+          <li>💉 <strong>Over-diuresis</strong> — heavy furosemide in a euvolaemic patient → hypovolaemia, AKI, electrolyte derangement, and a delayed hunt for the real problem.</li>
+          <li>📉 <strong>Nitrate hypotension in the wrong substrate</strong> — RV infarct, severe AS, or dissection unmasked by aggressive vasodilation.</li>
+          <li>🫀 <strong>Missed ACS trigger</strong> — treating the oedema and forgetting the coronary occlusion that caused it.</li>
+          <li>🤢 <strong>NIV complications</strong> — aspiration, gastric distension, intolerance, barotrauma; failure to recognise NIV failure in time.</li>
+          <li>🔁 <strong>Rebound</strong> — the crisis breaks but the precipitant (uncontrolled hypertension, non-adherence, renal-artery stenosis) is untreated → it recurs.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The two ways to lose a SCAPE patient are to let them tire while you diurese, and to nitrate the one heart (RV infarct) that can't take it — avoid both and they walk out."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The crashing-dyspnoea differential — and how SCAPE stands out</h3>
+        <table class="tbl">
+          <tr><th>Diagnosis</th><th>Discriminators</th><th>Don't-miss action</th></tr>
+          <tr><td>🌊 <strong>SCAPE / flash oedema</strong> (this patient)</td><td>Sudden, severely hypertensive, hypoxic, bilateral crackles apex-to-base, diffuse B-lines, euvolaemic</td><td>Sit up, high-dose nitrate, CPAP; treat trigger.</td></tr>
+          <tr><td>💧 <strong>Volume-overloaded ADHF</strong></td><td>Days of weight gain, orthopnoea, PND, pitting oedema, raised JVP</td><td>Diuresis ± vasodilators; find decompensation cause.</td></tr>
+          <tr><td>🫁 <strong>Massive PE</strong></td><td>Sudden dyspnoea + hypoxia but often <em>hypotensive</em>, clear lungs, RV strain on ECG/echo, risk factors</td><td>POCUS RV, CTPA/echo; anticoagulate ± thrombolysis.</td></tr>
+          <tr><td>🌬️ <strong>Severe asthma / COPD</strong></td><td>Wheeze not crackles, prolonged expiration, smoking/atopy history, no B-lines</td><td>Bronchodilators, steroids; NIV in COPD (BiPAP).</td></tr>
+          <tr><td>🦠 <strong>Pneumonia / ARDS</strong></td><td>Fever, focal signs/consolidation, often unilateral, sepsis picture</td><td>Antibiotics, oxygenation, source control.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Sudden + hypertensive + hypoxic + wet-sounding + dry ankles = SCAPE. Sudden + hypotensive + clear lungs = think PE. The blood pressure and the ankles sort the drowning patients."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The First Ten Minutes of a Crash"</h3>
+          <div class="hud"><span>❤️ Stability: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">She's drowning at 230/130, SpO₂ 80%, sitting bolt upright, crackles to both apices, dry ankles, no weight gain. The medical registrar on the phone says: "Sounds like fluid overload — push 80 mg of IV furosemide and see how she goes." What do you do first?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The disposition plan</h3>
+        <ol>
+          <li>🌊 <strong>Diagnosis:</strong> SCAPE — hypertensive flash pulmonary oedema on a HFpEF substrate, precipitated by antihypertensive non-adherence (± demand ischaemia). Broken with sit-up + high-dose GTN + CPAP.</li>
+          <li>💉 Continue the nitrate infusion, wean as BP and oxygenation improve; wean CPAP as work of breathing settles.</li>
+          <li>🔎 <strong>Treat the precipitant:</strong> restart/optimise antihypertensives, exclude ACS (trend troponin), rate-control any AF, screen for renal-artery stenosis if recurrent.</li>
+          <li>🏥 Admit to a monitored bed / HDU; cardiology review; medication reconciliation and an adherence plan before discharge.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Breaking the flash-oedema crisis is half the job — the other half is finding and fixing the trigger so she isn't back, drowning, next week."</div>
+
+        <div class="checklist" id="ckACS">
+          <h3 style="margin-top:0">🩺 Procedure Guide — SCAPE bundle: sit up, high-dose GTN, NIV/CPAP (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>🪑 Patient sat fully upright, legs dependent — immediately</span></label>
+          <label class="ck"><input type="checkbox"><span>😷 CPAP applied (~10 cmH₂O), FiO₂ titrated to SpO₂ ≥ 94%, mask sealing</span></label>
+          <label class="ck"><input type="checkbox"><span>📈 12-lead ECG checked for STEMI and RV infarct BEFORE high-dose nitrate</span></label>
+          <label class="ck"><input type="checkbox"><span>💉 High-dose GTN infusion started and titrated fast to BP/symptoms (SL spray as bridge)</span></label>
+          <label class="ck"><input type="checkbox"><span>💧 Reflexive high-dose furosemide withheld; patient assessed as euvolaemic</span></label>
+          <label class="ck"><input type="checkbox"><span>🔎 Precipitant sought (ischaemia, non-adherence, AF, renal-artery disease)</span></label>
+          <label class="ck"><input type="checkbox"><span>📞 Senior/ICU/cardiology alerted; monitored bed arranged</span></label>
+          <div class="ck-progress" data-progress>0 / 7 complete</div>
+        </div>
+
+        <div class="checklist" id="ckSTEMI">
+          <h3 style="margin-top:0">🩺 Procedure Guide — When to intubate (NIV failing, exhaustion, GCS drop)</h3>
+          <label class="ck"><input type="checkbox"><span>🫁 Persisting/worsening hypoxia despite optimal CPAP + nitrate</span></label>
+          <label class="ck"><input type="checkbox"><span>📉 Rising CO₂ / falling pH on serial gases — the patient is tiring</span></label>
+          <label class="ck"><input type="checkbox"><span>🧠 Falling GCS / drowsiness / cannot protect airway or tolerate NIV</span></label>
+          <label class="ck"><input type="checkbox"><span>💦 Exhaustion — silent chest, falling respiratory effort, diaphoresis giving way to collapse</span></label>
+          <label class="ck"><input type="checkbox"><span>🚨 Call for skilled airway help early; optimise haemodynamics pre-induction (induction can precipitate arrest)</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">21:47</div>Arrival: bolt upright, drowning, BP 230/130, SpO₂ 80%, crackles apex-to-base. Sat up, CPAP on, GTN infusion started high.</div>
+          <div class="t-item"><div class="t-time">21:55</div>CPAP tolerated; GTN titrated up. BP 205/118, SpO₂ 88%, RR 34. Speaking short phrases again.</div>
+          <div class="t-item"><div class="t-time">22:10</div>BP 168/96, SpO₂ 94% on CPAP, RR 24, crackles receding. Talking in sentences. <strong>No furosemide needed to break the crisis.</strong></div>
+          <div class="t-item"><div class="t-time">22:40</div>Weaned to a Venturi mask, BP 150/88, comfortable. Troponin trending flat — demand ischaemia, no ACS. Trigger: antihypertensive non-adherence.</div>
+          <div class="t-item"><div class="t-time">Day 1</div>HDU: euvolaemic, antihypertensives restarted with an adherence plan, echo confirms HFpEF. Walks to the bathroom unaided.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>She is comfortable because someone named the physiology — afterload, not overload — sat her up, opened the nitrate, and put CPAP on at the door. Not one dose of furosemide was needed to break the crisis. The right lever, pulled early.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 Two very different SCAPE dispositions</h3>
+        <div class="vs">
+          <div class="side a"><h4>🌊 This patient (crisis broken, trigger found)</h4><ul><li>Restart &amp; optimise antihypertensives; a concrete adherence plan (dosette box, pharmacy sync, follow-up)</li><li>HFpEF management: BP control, SGLT2 inhibitor, treat diabetes, salt awareness</li><li>Red flags: sudden breathlessness, unable to lie flat, pink froth → 999 immediately</li><li>Cardiology + GP follow-up; recheck renal function after restarting ACEi</li></ul></div>
+          <div class="side b"><h4>🔁 The recurrent flash-oedema patient</h4><ul><li>Recurrent SCAPE, especially with resistant hypertension → screen for <strong>renal-artery stenosis (Pickering syndrome)</strong></li><li>Look for undertreated ischaemia, obstructive sleep apnoea, non-adherence patterns</li><li>Structured HFpEF/hypertension clinic; ambulatory BP monitoring</li><li>Fix the trigger or it comes back — often worse</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A SCAPE patient discharged without a controlled blood pressure and a workable adherence plan is a re-attendance with a date not yet written."</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>🌊 Afterload, not overload</b>SCAPE is a pressure problem — high-dose nitrates + CPAP, not buckets of furosemide.</div>
+          <div class="pearl"><b>🚪 Open the exit</b>The water is in the wrong place; drop afterload and the lungs clear in minutes.</div>
+          <div class="pearl"><b>😷 CPAP prevents tubes</b>NIV is a drug through a mask — 3CPO: fewer intubations, easier breathing.</div>
+          <div class="pearl"><b>🦵 Check the ankles</b>Dry ankles + no weight gain = euvolaemic = redistribution, not accumulation.</div>
+          <div class="pearl"><b>📈 Read the ECG first</b>Exclude STEMI and RV infarct before opening the nitrate wide.</div>
+          <div class="pearl"><b>💊 "BP might drop" ≠ a reason</b>The 230 systolic <em>is</em> the disease; titrate nitrates, don't withhold them.</div>
+          <div class="pearl"><b>⏱️ Minutes vs days</b>Sudden &amp; hypertensive = SCAPE; slow &amp; swollen = volume-overloaded ADHF.</div>
+          <div class="pearl"><b>🔎 Find the trigger</b>Non-adherence, ischaemia, AF, renal-artery stenosis — fix it or it recurs.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the bundle</h3>
+          <ul>
+            <li>⚖️ <strong>SCAPE vs decompensated chronic HF — redistribution vs total-body overload:</strong> in flash oedema, a sympathetic surge redistributes existing intravascular volume into the lungs within minutes; net body water is often normal. In chronic decompensation, days of salt/water retention produce true total-body overload. Same crackles, opposite volume status — and opposite first-line therapy (vasodilate vs diurese). Mistaking one for the other is the central error of the whole topic.</li>
+            <li>🫀 <strong>Diastolic HF / HFpEF and flash oedema:</strong> the stiff, hypertrophied ventricle sits on the steep part of its pressure–volume relationship — a small rise in afterload or a loss of atrial kick (new AF) causes a large jump in filling pressure and instant pulmonary congestion. HFpEF hearts are exquisitely afterload- and rate-sensitive, which is why elderly hypertensives flash so dramatically and recover so fast when unloaded.</li>
+            <li>🩸 <strong>Renal-artery stenosis flash oedema (Pickering syndrome):</strong> bilateral (or single-functioning-kidney) renal-artery stenosis drives recurrent, sometimes dramatic flash pulmonary oedema via renin–angiotensin activation and sodium avidity. Suspect it in recurrent SCAPE with resistant hypertension; revascularisation or RAAS blockade (with care re: AKI) can be curative. Recurrent flash oedema is a prompt to image the renal arteries.</li>
+            <li>📉 <strong>Frank–Starling &amp; afterload sensitivity of the failing ventricle:</strong> a healthy ventricle's stroke volume is relatively insensitive to afterload; a failing or stiff ventricle sits on a flattened Starling curve where stroke volume falls steeply as afterload rises — and, conversely, climbs steeply as you unload it. This is the physiological reason vasodilators are so high-yield in acute heart failure: you are moving along the steep part of the curve.</li>
+            <li>💉 <strong>Nitrate strategy nuance:</strong> the evidence and much EM practice favour <em>front-loaded</em> nitrate — high starting infusion rates or intermittent high-dose boluses — rather than the timid "5 then creep up" approach, because the therapeutic window in a hypertensive crashing patient is wide and the afterload must be broken fast. Titrate to BP with invasive monitoring where feasible.</li>
+            <li>😷 <strong>NIV physiology and the 3CPO nuance:</strong> CPAP and BiPAP both reduce preload and afterload and improve oxygenation; 3CPO showed symptomatic and intubation benefit but was mortality-neutral (partly because rescue NIV was allowed in the control arm). The practical message is unchanged: NIV early, escalate to intubation on objective failure.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "Drowned Twice"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 78-year-old hypertensive man arrived at 23:10 drowning, sitting bolt upright, BP 244/126, SpO₂ 79%, crackles to both apices. He was labelled "fluid overload." He was given <strong>80 mg of IV furosemide</strong>, then — when he didn't improve in fifteen minutes — <strong>another 120 mg</strong>, and the team waited for him to "diurese." No CPAP was applied and no nitrate infusion was started; his 240-systolic <strong>afterload was never touched</strong>. He passed only a small amount of urine, tired progressively over the next half hour, became drowsy and hypercapnic, and was intubated in extremis. He <strong>arrested on induction</strong> and could not be resuscitated. He was found at post-mortem to be <em>euvolaemic</em> — the fluid had been in his lungs, not his body.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🧠 WRONG MODEL</b>"Fluid overload" anchoring; the afterload/redistribution physiology of SCAPE was never named.</div>
+            <div class="hole"><b>💧 FUROSEMIDE FIXATION</b>Repeated loop diuretic as the primary move in a euvolaemic patient — chasing the wrong problem.</div>
+            <div class="hole"><b>💉 NO NITRATE</b>The one drug that reopens the exit was never started; the 240 systolic was left untouched.</div>
+            <div class="hole"><b>😷 NO CPAP</b>NIV that prevents intubations was never applied; he was allowed to tire.</div>
+            <div class="hole"><b>⏱️ WAITED</b>Fifteen-minute waits for a slow diuretic while a fast crisis outran them.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> name the physiology — <strong>afterload, not overload</strong>; sit him up; start a <strong>high-dose GTN infusion</strong> and put <strong>CPAP</strong> on at the door; withhold the reflexive furosemide in a euvolaemic patient; and never wait fifteen minutes on a slow diuretic while the fast crisis runs. A nitrate infusion and CPAP at the door would have turned him around without a tube. <strong>This is exactly the discipline that saved the patient in Bed 8.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Push more furosemide and wait' has drowned more flash-oedema patients than it has ever rescued — in SCAPE the resuscitation is nitrates and a mask, not a mop."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🚨 Emergency Department · Bed 8 — SCAPE / Flash Pulmonary Oedema<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+  /* ===== SIDEBAR SCROLL-SPY (vertical) ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); var t=sections[idx]; if(t) t.scrollIntoView({behavior:'smooth',block:'start'}); setActive(idx); markVisited(idx); }); });
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){ entries.forEach(function(e){ if(!e.isIntersecting) return; var i=sections.indexOf(e.target); if(i>-1){ setActive(i); markVisited(i); } }); }, { rootMargin:'-10% 0px -75% 0px' });
+    sections.forEach(function(s){ if(s) io.observe(s); });
+  }
+  markVisited(0); setActive(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not a SCAPE feature'); } if(found===total){ flagResult.textContent='✅ All '+total+' SCAPE features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' SCAPE features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: afterload dial ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=(v-80)/(240-80)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v>=200){ msg='🔴 Afterload sky-high (SBP '+v+'). The LV cannot eject against this wall of resistance — LVEDP rockets and pressure floods back to the pulmonary capillaries → alveoli fill in minutes. FLASH oedema. Open the exit: high-dose IV nitrates + CPAP, sit up.'; cls='bad'; }
+      else if(v>=160){ msg='🟠 High afterload (SBP '+v+'). LV ejection is impeded and pulmonary pressures are climbing — she is on the edge of flooding. Vasodilate NOW, before the alveoli fill.'; cls='warn-r'; }
+      else if(v>=110){ msg='🟢 Afterload eased (SBP '+v+'). The ventricle ejects, LVEDP falls, the pulmonary capillaries decompress and the lungs clear — no fluid removed. This is what nitrates + CPAP achieve.'; cls='good'; }
+      else { msg='🟠 Afterload/BP now low (SBP '+v+'). The exit is wide open but watch for overshoot/hypotension — titrate the nitrate, and reconsider the substrate (RV infarct, severe AS, dissection).'; cls='warn-r'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Afterload Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"She's drowning at 230/130, SpO₂ 80%, sitting bolt upright, crackles to both apices, dry ankles, no weight gain. The registrar says 'sounds like fluid overload — push 80 mg of IV furosemide and see how she goes.' What do you do FIRST?",
+      choices:[
+        {t:"💧 Push 80 mg IV furosemide and wait to see if she diureses",good:false,ds:-2,dt:15,xp:0,fb:"☠️ This is the M&M case in S21. She's euvolaemic — the fluid is redistributed into her lungs by afterload, not accumulated. Diuretic is slow and the wrong target; she tires, is intubated, and arrests on induction. Restart.",end:true},
+        {t:"🪑 Sit her fully upright, put CPAP on, start a high-dose GTN infusion; check the ECG for RV infarct/STEMI first",good:true,ds:1,dt:6,xp:40,fb:"✅ Exactly. Afterload, not overload. Sit up + CPAP + high-dose nitrate reopens the ventricle's exit and the lungs decompress in minutes — a quick ECG check rules out the RV infarct that would make you cautious.",next:"repeat"},
+        {t:"💤 Intubate immediately for RSI rather than trying CPAP",good:false,ds:-1,dt:12,xp:5,fb:"⚠️ Premature. Most SCAPE is broken by CPAP + nitrate without a tube, and induction in an under-resuscitated, catecholamine-dependent patient can precipitate arrest. Trial aggressive non-invasive therapy first.",next:"repeat"}
+      ]},
+    repeat:{ text:"CPAP is on and the GTN infusion is running, but the BP is still 210/120 and she's still working hard, RR 34. Next best step?",
+      choices:[
+        {t:"💉 Titrate the nitrate UP fast, keep CPAP on, and hunt the precipitant (ischaemia, non-adherence, AF)",good:true,ds:1,dt:6,xp:40,fb:"✅ Right. The therapeutic window is wide in a hypertensive crashing patient — front-load the nitrate to break the afterload, and find the trigger while you do it.",next:"declare"},
+        {t:"💧 Give up on nitrates 'because the BP might drop' and push more furosemide",good:false,ds:-2,dt:20,xp:0,fb:"⚠️ Wrong lever. The 210 systolic IS the disease — withholding the nitrate for fear of dropping a pressure that's killing her, and reaching for a slow diuretic she doesn't need, is exactly how these patients tire and get tubed.",next:"declare"}
+      ]},
+    declare:{ text:"Twenty minutes in: BP 158/92, SpO₂ 94% on CPAP, RR 22, crackles receding, she's talking in sentences again. What now?",
+      choices:[
+        {t:"🎯 Continue and wean the nitrate/CPAP as she improves, treat the trigger, admit to a monitored bed",good:true,ds:1,dt:5,xp:45,fb:"🏆 Perfect. You broke the crisis with afterload reduction and CPAP — no furosemide needed — and now you fix the precipitant so she doesn't come back drowning next week.",end:true},
+        {t:"💧 Now push a big 120 mg furosemide dose 'to be thorough' and stop the nitrate",good:false,ds:-1,dt:15,xp:0,fb:"⚠️ Unnecessary and harmful. She's euvolaemic and improving on the correct therapy — heavy diuresis risks hypovolaemia and AKI, and stopping the nitrate abruptly can let the afterload rebound.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='declare'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 72-year-old hypertensive woman crashes with sudden breathlessness, BP 230/130, SpO₂ 80%, crackles to both apices and dry ankles. The single most important early intervention is:", opts:["80 mg IV furosemide and wait for diuresis","Sit up, CPAP, and a high-dose IV nitrate infusion","IV morphine for the distress","A 500 mL fluid bolus"], correct:1, exp:"This is SCAPE — an afterload/redistribution problem in a euvolaemic patient. Sit up + CPAP + high-dose nitrate reopens the ventricle's exit and clears the lungs in minutes. Furosemide is slow and mistargeted, morphine is harmful, and fluids would worsen the flooding." },
+    { q:"Why is heavy furosemide the wrong FIRST move in most SCAPE patients?", opts:["It causes hyperkalaemia","They are usually euvolaemic — the fluid is redistributed into the lungs, not accumulated","It raises the troponin","Loop diuretics are contraindicated in HFpEF"], correct:1, exp:"Most SCAPE patients are euvolaemic or only mildly overloaded; the pressure surge shoved existing fluid into the alveoli. Diuresis chases a problem they largely don't have, its venodilation is minor and slow, and it wastes the minutes when afterload reduction would break the crisis." },
+    { q:"The central mechanism of SCAPE is:", opts:["Chronic sodium retention over days","A catecholamine surge → sharp rise in afterload → the LV can't eject → LVEDP transmits back and floods the alveoli","Left-to-right shunting","Primary lung capillary leak from infection"], correct:1, exp:"A sympathetic surge raises systemic vascular resistance; the (often stiff HFpEF) LV cannot eject against it, end-diastolic pressure rockets and transmits to the pulmonary capillaries, and the alveoli flood within minutes — a redistribution driven by afterload." },
+    { q:"Which is a genuine reason to be cautious with high-dose nitrates in acute pulmonary oedema?", opts:["A blood pressure of 230/130","Right ventricular infarction, severe aortic stenosis, dissection, or recent PDE5 inhibitor","A raised NT-proBNP","Bilateral B-lines on lung ultrasound"], correct:1, exp:"Preload-dependent RV infarction, fixed-obstruction severe AS, aortic dissection and recent sildenafil/tadalafil can all produce precipitous hypotension with nitrates — check the ECG and story first. A high BP is the disease, not a caution." },
+    { q:"What does the 3CPO trial support in acute cardiogenic pulmonary oedema?", opts:["NIV reduces intubation and improves symptoms, but is mortality-neutral vs standard oxygen","NIV increases mortality","Furosemide is superior to nitrates","Routine intubation for all patients"], correct:0, exp:"3CPO (NEJM 2008) showed NIV (CPAP or BiPAP) improved dyspnoea and reduced intubation and metabolic derangement, with no independent mortality benefit — so 'CPAP is a medication through a mask' that prevents tubes." },
+    { q:"Which feature most argues for SCAPE rather than classic volume-overloaded ADHF?", opts:["A week of gradual weight gain and ankle swelling","Onset over minutes, severe hypertension, and dry ankles with no weight gain","Raised JVP with pitting oedema and ascites","Gradual worsening orthopnoea over a fortnight"], correct:1, exp:"SCAPE is sudden, hypertensive and euvolaemic (redistribution). Days of weight gain, oedema, raised JVP and ascites describe total-body volume overload — the diuresis-first pathway, not the vasodilate-first pathway." },
+    { q:"A patient with recurrent episodes of flash pulmonary oedema and resistant hypertension should be evaluated for:", opts:["Asthma","Renal-artery stenosis (Pickering syndrome)","Iron-deficiency anaemia","Benign early repolarisation"], correct:1, exp:"Bilateral (or single-functioning-kidney) renal-artery stenosis drives recurrent flash pulmonary oedema via RAAS activation and sodium avidity — Pickering syndrome. Recurrent SCAPE with resistant hypertension warrants imaging of the renal arteries." },
+    { q:"Which explains why unloading the afterload is so effective in the failing/stiff ventricle?", opts:["A normal ventricle is highly afterload-sensitive; a failing one is not","The failing/stiff ventricle sits on the steep part of the curve, so stroke volume climbs sharply as afterload falls","Afterload has no effect on stroke volume","Nitrates work only by diuresis"], correct:1, exp:"On a flattened Frank–Starling relationship, the failing or stiff ventricle's stroke volume is highly afterload-sensitive — small reductions in resistance yield large gains in ejection, which is why vasodilators are high-yield in acute heart failure." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you treat flash oedema like a consultant. 🏆':score>=6?'Strong — review the misses and S5/S6 on the afterload strategy.':'Revisit S5, S6 and S11 — afterload-not-overload is the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>

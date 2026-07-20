@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cocaine-Associated Chest Pain — Virtual Teaching Hospital</title>
+<!-- META
+id: c-ed-cocaine-041
+title: Cocaine-Associated Chest Pain
+hospital: cardiology
+department: cv-ed
+bednumber: 11
+chiefcomplaint: Crushing chest pain and agitation after cocaine use
+system: Cardiology
+severity: critical
+tags: Cocaine, Sympathomimetic, Coronary vasospasm, Benzodiazepines, Unopposed alpha, ACS
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🚨</div>
+      <div>
+        <div class="t1">Emergency Dept</div>
+        <div class="t2">Bed 11 · Cocaine Chest Pain</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🚨 Emergency Department · 🛏️ Bed 11</div>
+        <h1>🫀 Cocaine-Associated Chest Pain — "The Coronary Tourniquet"</h1>
+        <div class="sub">⚡ 23:48 on a Saturday. A 29-year-old is thrashing on the trolley, drenched in sweat, pupils like saucers, gripping his chest. He used cocaine two hours ago. His BP is 198/112 and the monitor is racing. The reflex "beta-blocker for the numbers" is the exact move that could kill him.</div>
+        <div class="chips">
+          <span class="chip crit">🔴 CRITICAL</span>
+          <span class="chip">💥 Sympathomimetic Toxidrome</span>
+          <span class="chip">🫀 Coronary Vasospasm</span>
+          <span class="chip">💊 Benzodiazepines First</span>
+          <span class="chip">🚫 The Unopposed-Alpha Trap</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital alert"><div class="v-label">💓 HR</div><div class="v-num">128</div></div>
+        <div class="vital alert"><div class="v-label">🩸 BP</div><div class="v-num">198/112</div></div>
+        <div class="vital"><div class="v-label">🌬️ RR</div><div class="v-num">24</div></div>
+        <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">97%</div></div>
+        <div class="vital warn"><div class="v-label">🌡️ Temp</div><div class="v-num">38.4°</div></div>
+        <div class="vital warn"><div class="v-label">👁️ Pupils</div><div class="v-num">7 mm</div></div>
+        <div class="vital alert"><div class="v-label">😖 Pain</div><div class="v-num">9/10</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 23:48, Resus 2</b>A young man rakes at his chest, agitated and diaphoretic, eyes wide with dilated pupils. He blurts: <em>"My chest is being crushed… I did a couple of lines a couple of hours ago and now my heart's going to explode."</em> The nurse reaches for IV metoprolol "to bring the blood pressure and pulse down." <strong>Stop.</strong> In an agitated, hypertensive, cocaine-intoxicated patient with chest pain, that single order can slam his coronaries shut. This is the case where the reflex kills.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>🧑 Name</td><td><strong>Mr. J.R.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>29-year-old male</td></tr>
+          <tr><td>🆔 MRN</td><td>CV-ED-1108</td></tr>
+          <tr><td>⚖️ Weight</td><td>78 kg (BMI 24)</td></tr>
+          <tr><td>💼 Occupation</td><td>Bartender — out at a party tonight</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 History — the substance changes the whole physiology</h3>
+        <ul>
+          <li>❄️ <strong>Recreational cocaine use</strong> — "a few lines" ~2 h ago, plus alcohol. Occasional weekend user; denies IV drugs.</li>
+          <li>🚬 <strong>Smoker</strong>, 8 pack-years — cocaine + tobacco is a powerful vasoconstrictor combination.</li>
+          <li>🫀 No known coronary disease, but young cocaine users can have <strong>accelerated atherosclerosis</strong> and are the classic cause of MI in the under-40s.</li>
+          <li>😰 Prior ED visit last year with palpitations after stimulant use, discharged well.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A young adult with crushing chest pain, a racing heart, a soaring blood pressure, big pupils and sweat — assume a sympathomimetic (cocaine) until proven otherwise, and mind the drugs you reach for."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why cocaine chest pain is its own disease</b>Cocaine is the commonest illicit-drug cause of ED chest pain and of MI in the young. Only a minority of these patients are having a true infarct, yet a slice of them are — and the <em>treatment priorities are inverted</em> from classic ACS: here you calm the sympathetic storm first, and you avoid the drug (a beta-blocker) that a classic ACS pathway would happily give.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 Paramedic handover — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ Pre-hospital SBAR (verbatim)</b>
+          <p><strong>S:</strong> "29-year-old male, crushing central chest pain for about an hour, agitated and sweating buckets. Friends say he snorted cocaine at a party a couple of hours back."</p>
+          <p><strong>B:</strong> "Fit and well, smoker, uses cocaine now and then. No cardiac history that anyone knows of."</p>
+          <p><strong>A:</strong> "Found pacing and distressed. HR 128, BP 198/112, temp warm to touch, pupils big. We gave aspirin. Pre-hospital 12-lead: sinus tach with a slightly wide QRS and some ST changes we couldn't call cleanly."</p>
+          <p><strong>R:</strong> "Pre-alerted as chest pain, query cardiac, query stimulant. He's frightened and won't stay still."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In cocaine chest pain the agitation IS a vital sign — the more sympathetically wound-up the patient, the higher the catecholamine drive clamping his coronaries. Treating the brain treats the heart."</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each high-risk feature</h3>
+        <p>🎮 <em>Click every feature that fits a dangerous cocaine (sympathomimetic) chest-pain picture. Each correct = +10 XP.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">❄️ Cocaine use ~2 hours ago</button>
+          <button class="btn ghost flag-btn" data-good="1">💥 Agitation + tachycardia + hypertension</button>
+          <button class="btn ghost flag-btn" data-good="1">👁️ Mydriasis + diaphoresis</button>
+          <button class="btn ghost flag-btn" data-good="1">🌡️ Hyperthermia 38.4°C</button>
+          <button class="btn ghost flag-btn" data-good="1">🫀 Crushing central chest pain</button>
+          <button class="btn ghost flag-btn" data-good="1">📈 Wide QRS (sodium-channel effect)</button>
+          <button class="btn ghost flag-btn" data-good="0">👆 Reproducible chest-wall tenderness alone</button>
+          <button class="btn ghost flag-btn" data-good="0">🦠 Fever from an obvious chest infection</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Praise where due</b>The crew gave aspirin (still correct if a thrombotic ACS is in play) and — crucially — did NOT reach for a beta-blocker to "fix the numbers." Recognising the stimulant toxidrome up front is what steers this case away from disaster.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🅰️🅱️🅲️ Primary survey — with a toxidrome overlay</h3>
+        <table class="tbl">
+          <tr><th>Step</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>🅰️ Airway</td><td>Patent, talking (fast, pressured speech).</td><td>Airway OK, but agitation can escalate — plan for a calm, safe environment.</td></tr>
+          <tr><td>🅱️ Breathing</td><td>RR 24, SpO₂ 97% RA, chest clear.</td><td>Tachypnoea from agitation/acidosis; consider pneumothorax/barotrauma from inhaled use later.</td></tr>
+          <tr><td>🅲️ Circulation</td><td>HR 128 sinus, <strong>BP 198/112 both arms</strong>, warm, no radio-radial delay, no new murmur.</td><td>Severe hypertension + tachycardia = catecholamine surge. Equal pressures lower (not exclude) dissection — cocaine raises dissection risk.</td></tr>
+          <tr><td>🅳 Disability</td><td>GCS 15 but agitated, tremulous, <strong>pupils 7 mm (mydriasis)</strong>.</td><td>Big pupils + agitation + sweat + fever = <strong>sympathomimetic toxidrome</strong>.</td></tr>
+          <tr><td>🅴 Exposure</td><td><strong>Temp 38.4°C</strong>, diaphoretic, no chest-wall tenderness reproducing the pain, no track marks.</td><td>Hyperthermia is dangerous (rhabdomyolysis, seizures) and needs active cooling, not a blanket.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Sweaty, wired and wide-eyed = sympathomimetic. Sweaty and DRY-mouthed with a racing heart = anticholinergic. In cocaine you are hot and WET — cool him, calm him, and never beta-block him."</div>
+
+        <h3>🧭 The toxidrome that reframes everything</h3>
+        <p>The constellation — <strong>tachycardia, hypertension, mydriasis, hyperthermia, diaphoresis, agitation</strong> — is a textbook <strong>sympathomimetic toxidrome</strong>. Recognising it tells you the pain is being driven by a catecholamine surge and coronary vasospasm, and it flags the drugs that will help (benzodiazepines, nitrates, cooling) and the drug that will harm (a beta-blocker).</p>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of "just control the numbers"</b>A tachycardic, hypertensive young man <em>looks</em> like he needs rate and pressure control. But the driver is central sympathetic outflow — sedate that with a benzodiazepine and the numbers fall on their own. Reach for a beta-blocker and you strip away beta-2 vasodilation, leaving alpha-vasoconstriction <strong>unopposed</strong> — the pressure climbs and the coronaries clamp.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The EM resident thinks out loud at 23:52:</em></p>
+        <h3>🧠 Frame it as toxicology AND cardiology at once</h3>
+        <p>"This is cocaine-associated chest pain until proven otherwise. My first drug isn't a cardiac drug in the classic sense — it's a <strong>benzodiazepine</strong> to switch off the sympathetic storm. That single move lowers his heart rate, his blood pressure and his coronary spasm together. Then <strong>GTN</strong> for the spasm, <strong>aspirin</strong> is already on board, and I'll <strong>actively cool</strong> him. I will <strong>not</strong> give a beta-blocker. I'll get serial ECGs and troponin, and keep the aorta in mind."</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>💊 <strong>IV benzodiazepine</strong> (e.g. diazepam/lorazepam), titrated to calm — treat agitation and you treat the coronaries.</li>
+          <li>💉 <strong>GTN</strong> for ongoing ischaemic pain / hypertension (relieves vasospasm), with aspirin continued.</li>
+          <li>🌡️ <strong>Active cooling</strong> for hyperthermia; IV fluids; check for rhabdomyolysis (CK).</li>
+          <li>📈 <strong>Serial 12-leads</strong> — look for true STEMI, and for a <strong>wide QRS</strong> (sodium-channel toxicity → bicarbonate).</li>
+          <li>🚫 <strong>No beta-blocker</strong> acutely; refractory hypertension/spasm → phentolamine (alpha-blocker) or more nitrate/CCB.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In cocaine chest pain, benzodiazepines ARE the cardiac drug — calm the brain and you calm the coronaries. The sedative is doing your rate and pressure control for you."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>The BP is 198/112 and the HR is 128 — is IV metoprolol a reasonable way to bring both down quickly?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No — this is the cardinal error.</strong> Blocking beta receptors removes beta-2-mediated vasodilation, so cocaine's alpha-mediated vasoconstriction acts <em>unopposed</em>: blood pressure paradoxically rises and coronary spasm worsens. Give a benzodiazepine (± GTN, ± phentolamine) instead. This is the same physiology that makes beta-before-alpha blockade dangerous in phaeochromocytoma.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The EM consultant at the bedside, 23:58:</em></p>
+        <h3>🧮 The cocaine chest-pain framework</h3>
+        <table class="tbl">
+          <tr><th>Priority</th><th>Action</th><th>Why</th></tr>
+          <tr><td><strong>1. Calm</strong></td><td>Benzodiazepines, titrated</td><td>Reduce central sympathetic outflow → ↓HR, ↓BP, ↓spasm, ↓agitation.</td></tr>
+          <tr><td><strong>2. Dilate</strong></td><td>GTN (nitrates) ± CCB</td><td>Directly relieve alpha-mediated coronary vasospasm.</td></tr>
+          <tr><td><strong>3. Antiplatelet</strong></td><td>Aspirin (± heparin if true ACS)</td><td>Cocaine activates platelets and promotes thrombosis.</td></tr>
+          <tr><td><strong>4. Cool</strong></td><td>Active cooling, fluids</td><td>Hyperthermia drives rhabdomyolysis, seizures, death.</td></tr>
+          <tr><td><strong>5. Rescue</strong></td><td>Phentolamine (alpha-blocker) for refractory HTN/spasm; bicarbonate for wide QRS; PCI for true STEMI</td><td>Targeted antidotes for the alpha crisis and sodium-channel toxicity.</td></tr>
+        </table>
+        <p>Notice the <strong>absent</strong> line: a beta-blocker. Acutely, it has no safe place here.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Never give a beta-blocker to acute cocaine toxicity — unopposed alpha is a coronary tourniquet, exactly like beta-before-alpha in phaeochromocytoma."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">RCT/MECH</span> Benzodiazepines vs GTN (Honderick; Baumann)</td><td>Both relieve cocaine chest pain; benzodiazepines reduce sympathetic drive, HR and BP — some data suggest at least additive benefit with GTN.</td><td>Benzodiazepines are first-line and complement nitrates.</td></tr>
+            <tr><td><span class="lvl">MECH/HUMAN</span> Lange et al., cath-lab study</td><td>Propranolol after intracoronary cocaine caused <strong>coronary vasoconstriction</strong> (unopposed alpha).</td><td>The physiological basis for avoiding acute beta-blockade.</td></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> AHA scientific statement (cocaine chest pain)</td><td>Benzodiazepines + nitrates first-line; <strong>caution/avoidance of beta-blockers</strong> in the acute setting; standard ACS care otherwise.</td><td>Use the cocaine-specific pathway, not the vanilla ACS reflex.</td></tr>
+            <tr><td><span class="lvl">MECH</span> Phentolamine data</td><td>Alpha-blockade reverses cocaine-induced coronary vasoconstriction.</td><td>Refractory hypertension/spasm → phentolamine.</td></tr>
+            <tr><td><span class="lvl">MECH</span> Sodium bicarbonate for sodium-channel blockade</td><td>Bicarbonate narrows a widened QRS from sodium-channel toxicity.</td><td>Wide QRS after cocaine → bicarbonate.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The chart that keeps me awake is the young man given IV metoprolol 'for the tachycardia and hypertension.' His pressure climbed instead of falling and his ST segments deepened as unopposed alpha clamped his coronaries. A benzodiazepine and a nitrate would have relaxed both him and his arteries."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY the pain, WHY the danger (the WHY behind the WHY)</h3>
+        <ol>
+          <li>🧠 <strong>Reuptake blockade:</strong> cocaine blocks presynaptic reuptake of <strong>noradrenaline and dopamine</strong> (and serotonin) → catecholamines flood the synapse → a whole-body sympathetic surge.</li>
+          <li>🫀 <strong>Coronary vasospasm:</strong> alpha-1 stimulation constricts the coronary arteries — the central, spasm-driven cause of the chest pain, on top of raised heart rate and blood pressure.</li>
+          <li>🩸 <strong>Thrombosis + demand:</strong> cocaine activates platelets and promotes thrombus, while tachycardia + hypertension + hyperthermia ramp up myocardial oxygen <em>demand</em> — supply falls as demand rises.</li>
+          <li>⚡ <strong>Sodium-channel block:</strong> cocaine is a local anaesthetic — it blocks cardiac fast sodium channels → <strong>QRS widening</strong> and ventricular arrhythmia (treated with bicarbonate), and it raises aortic-dissection risk.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Cocaine hits the heart four ways at once: it spasms the coronaries, clots them, drives up demand, and poisons the sodium channels. Your treatment has to answer all four — and never make the spasm worse."</div>
+
+        <h3>⚖️ Contrast pair — Cocaine ACS vs classic atherothrombotic ACS</h3>
+        <div class="vs">
+          <div class="side a"><h4>❄️ Cocaine ACS</h4><ul><li>Spasm + demand + platelet activation from a catecholamine surge</li><li>Benzodiazepines first, plus GTN, aspirin, cooling</li><li><strong>Avoid beta-blockers</strong> (unopposed alpha)</li></ul></div>
+          <div class="side b"><h4>🩸 Classic atherothrombotic ACS</h4><ul><li>Plaque rupture + occlusive thrombus</li><li>Antiplatelets, anticoagulation, PCI</li><li>Beta-blocker within 24 h once stable is standard</li></ul></div>
+        </div>
+        <p>💡 Same symptom, different physiology — and the beta-blocker that helps one can harm the other. Ask "is this a stimulated heart or a blocked pipe?" before you prescribe.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — Alpha/Beta Balance Dial: the Unopposed-Alpha Trap</h3>
+          <p style="font-size:13px">Slide from a <strong>benzodiazepine-led</strong> strategy (calm the whole catecholamine drive) toward giving a <strong>beta-blocker</strong>. Watch how blocking beta-2 vasodilation leaves alpha-vasoconstriction unopposed → worse coronary spasm and a hypertensive crisis.</p>
+          <label for="kRange">💉 Degree of beta-blockade given: <b id="kVal">20</b> %</label>
+          <input type="range" id="kRange" min="0" max="100" value="20">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore the alpha/beta balance.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 Low = benzodiazepines lower central sympathetic outflow so HR, BP and spasm all ease. High = beta-blockade unmasks alpha-vasoconstriction → the coronary tourniquet.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The order set (23:50)</h3>
+        <ul>
+          <li>💊 <strong>IV benzodiazepine</strong> (e.g. diazepam 5–10 mg or lorazepam), titrated to calm — the first and most important order.</li>
+          <li>💉 <strong>GTN</strong> sublingual/infusion for ongoing pain and hypertension (avoid if hypotensive or recent PDE5 inhibitor).</li>
+          <li>🩸 <strong>Aspirin 300 mg</strong> chewed (given pre-hospital) → 75–100 mg daily.</li>
+          <li>🌡️ <strong>Active cooling</strong> for temp &gt; 38.5°C; IV crystalloid; check CK for rhabdomyolysis.</li>
+          <li>📈 <strong>12-lead ECG now</strong>, repeat at 15 min / any pain change; note QRS width (sodium-channel toxicity).</li>
+          <li>🧪 <strong>hs-troponin 0 &amp; 3 h</strong> (myocyte injury may lag), U&amp;E, CK, glucose, VBG/lactate, urine toxicology.</li>
+          <li>🚫 <strong>NO beta-blocker</strong> acutely; refractory hypertension/spasm → phentolamine; wide QRS → sodium bicarbonate.</li>
+          <li>📟 Continuous cardiac monitoring with <strong>defib pads on</strong>; IV access ×2; calm, low-stimulation environment.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Write the benzodiazepine first and the beta-blocker never. In cocaine chest pain the sedative is the antihypertensive, the anti-ischaemic and the anxiolytic in one line."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Resus-bay priorities — the nurse runs the safety net</h3>
+        <ul>
+          <li>📟 <strong>Continuous telemetry, defib pads attached</strong>; watch for wide-complex tachycardia and VT/VF.</li>
+          <li>💊 <strong>Titrate the benzodiazepine to a calm, rousable patient</strong> — re-dose as agitation returns; a settled patient has a settling heart.</li>
+          <li>🌡️ <strong>Active cooling</strong> and frequent temperature checks — hyperthermia is a silent killer here (target &lt; 38.5°C).</li>
+          <li>📈 <strong>Repeat the ECG the moment pain or rhythm changes</strong>; flag any QRS widening to the team (bicarbonate territory).</li>
+          <li>🩸 Cannulate ×2, send the troponin/CK/tox set, monitor BP every 5–15 min (watch for over-nitration).</li>
+          <li>🚫 <strong>Challenge any beta-blocker order</strong> and any premature heparin before the aorta is considered — the nurse is the last line against the unopposed-alpha error.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who keeps the room quiet, the benzodiazepine titrated and the beta-blocker out of the drug tray is doing frontline cardiology."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>0 h</th><th>3 h</th><th>Interpretation</th></tr>
+          <tr><td>hs-Troponin T</td><td class="hi">21 ng/L</td><td class="hi">64 ng/L</td><td><strong>Rising delta → genuine myocardial injury.</strong> Cocaine MI is real in a minority — the delta confirms it here.</td></tr>
+          <tr><td>Urine toxicology</td><td colspan="2" class="hi">Cocaine metabolite positive</td><td>Confirms exposure (benzoylecgonine detectable for days) — but the clinical toxidrome, not the test, drives acute care.</td></tr>
+          <tr><td>Creatine kinase</td><td colspan="2" class="hi">1,180 U/L</td><td>Raised — agitation/hyperthermia → rhabdomyolysis risk; hydrate and monitor renal function.</td></tr>
+          <tr><td>Lactate / VBG</td><td colspan="2" class="hi">Lactate 3.4 mmol/L</td><td>From agitation, hyperthermia and demand ischaemia; should fall as he settles.</td></tr>
+          <tr><td>K⁺</td><td colspan="2">4.1 mmol/L</td><td>Keep 4.0–5.0 to reduce arrhythmia risk in an irritable myocardium.</td></tr>
+          <tr><td>Creatinine</td><td colspan="2">92 µmol/L</td><td>Normal now — recheck given rhabdomyolysis risk.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A positive urine cocaine screen doesn't tell you he's infarcting, and a negative screen doesn't clear him — treat the toxidrome and the troponin trend in front of you, not the lab flag."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why the troponin can lag — and why CK matters</b>Cocaine chest pain often needs a longer rule-out window (e.g. 0/3 h) because spasm/demand injury can evolve. Meanwhile the CK is telling a second story — <strong>rhabdomyolysis</strong> from agitation and hyperthermia — which threatens the kidneys and demands fluids and cooling in parallel with the cardiac work-up.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 ECG / IMAGING + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🫀 Serial 12-leads — read the rate, the ST, and the QRS width</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 130" preserveAspectRatio="none" aria-label="Cocaine ECG: sinus tachycardia with a widening QRS">
+            <rect width="820" height="130" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="32" x2="820" y2="32"/><line x1="0" y1="65" x2="820" y2="65"/><line x1="0" y1="98" x2="820" y2="98"/></g>
+            <polyline fill="none" stroke="#86efac" stroke-width="2.3" points="0,70 30,70 40,66 52,40 64,92 76,70 120,70 140,68 156,66 200,70 236,70 246,60 258,34 270,94 282,70 330,70 350,66 368,64 410,70 446,70 456,48 476,22 496,98 512,66 522,64 560,70 596,70 610,44 632,18 656,98 672,62 684,66 720,70 756,70 770,44 792,16 810,98 820,66"/>
+            <text x="120" y="20" fill="#93c5fd" font-size="11">Sinus tachycardia — rate ~128</text>
+            <text x="450" y="14" fill="#fca5a5" font-size="11">Widening QRS — sodium-channel effect</text>
+          </svg>
+          <div class="ecg-cap">Fast <span style="color:#93c5fd">sinus tachycardia</span> early; the later complexes show a <span style="color:#fca5a5">widening QRS</span> — cocaine's sodium-channel blockade. A QRS &gt; 100–120 ms after cocaine points you to <strong>sodium bicarbonate</strong>.</div>
+        </div>
+
+        <h3>🔎 What to hunt for on the cocaine ECG</h3>
+        <table class="tbl">
+          <tr><th>Pattern</th><th>Look for</th><th>Meaning / action</th></tr>
+          <tr><td>💨 <strong>Sinus tachycardia + HTN</strong></td><td>Fast regular sinus rhythm, high BP</td><td>Catecholamine surge — treat with benzodiazepines, not beta-blockers.</td></tr>
+          <tr><td>⚡ <strong>Wide QRS</strong></td><td>QRS &gt; 100–120 ms, terminal R in aVR</td><td>Sodium-channel toxicity → <strong>sodium bicarbonate</strong>; watch for VT.</td></tr>
+          <tr><td>📐 <strong>ST elevation</strong></td><td>True STEMI pattern in a coronary territory</td><td>Vasospasm ± thrombus/true occlusion → nitrates, and PCI if it is a genuine STEMI.</td></tr>
+          <tr><td>🌊 <strong>QT prolongation</strong></td><td>Long QTc</td><td>Arrhythmia risk; correct K⁺/Mg²⁺, avoid QT-prolonging drugs.</td></tr>
+          <tr><td>🪤 <strong>Early repolarisation</strong></td><td>Benign J-point elevation (common in young men)</td><td>A classic mimic of STEMI in this age group — don't over-call it, but don't under-call a real one.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A wide QRS after cocaine is sodium-channel poisoning — reach for bicarbonate. A tall terminal R in aVR is the fingerprint."</div>
+
+        <h3>🩻 Adjunct imaging</h3>
+        <ul>
+          <li><strong>CXR:</strong> assess the mediastinum (cocaine raises aortic-dissection risk), pneumothorax/pneumomediastinum from inhaled use, and pulmonary oedema.</li>
+          <li><strong>CT aorta</strong> if the story or CXR suggests dissection — before anticoagulation.</li>
+          <li><strong>Bedside echo (POCUS):</strong> regional wall-motion abnormality supports ischaemia; screens effusion/dissection flap.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The cocaine chest-pain drug map — what, why, and the traps</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>Benzodiazepine</strong> (diazepam/lorazepam)</td><td><strong>First-line</strong>, for all cocaine chest pain</td><td>↓Central sympathetic outflow → ↓HR, ↓BP, ↓spasm, ↓agitation. Titrate to calm; the single most important drug.</td></tr>
+          <tr><td><strong>GTN / nitrates</strong></td><td>Ongoing ischaemic pain, hypertension</td><td>Directly relieves alpha-mediated coronary vasospasm. Avoid in hypotension / recent PDE5 inhibitor.</td></tr>
+          <tr><td><strong>Aspirin</strong> 300 mg → 75–100 mg</td><td>Antiplatelet if ACS in play</td><td>Cocaine activates platelets/thrombosis. Add heparin/PCI for a true infarct.</td></tr>
+          <tr><td><strong>Phentolamine</strong> (alpha-blocker)</td><td>Refractory hypertension / coronary spasm</td><td>Reverses unopposed alpha vasoconstriction directly.</td></tr>
+          <tr><td><strong>Sodium bicarbonate</strong></td><td>Wide QRS / sodium-channel toxicity, ventricular arrhythmia</td><td>Overcomes fast-sodium-channel blockade; narrows the QRS.</td></tr>
+          <tr><td class="hi"><strong>Beta-blocker</strong></td><td class="hi">AVOID acutely</td><td class="hi">Blocks beta-2 vasodilation → <strong>unopposed alpha</strong> → worse spasm + hypertensive crisis. The beta-before-alpha catastrophe.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Benzodiazepine and nitrate to open him up; phentolamine and bicarbonate in reserve; a beta-blocker never — it clamps the coronaries you are trying to relax."</div>
+        <div class="callout danger"><b class="ct">🚫 The 'never acutely' list in cocaine toxicity</b>❌ pure beta-blockers (metoprolol, atenolol, propranolol, esmolol) — they unmask unopposed alpha. Even mixed agents (labetalol) are debated and NOT a substitute for calming the sympathetic drive first. Clear the aorta before you anticoagulate.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why</h3>
+        <ul>
+          <li>📈 <strong>Continuous telemetry</strong> with defib to hand — watch for <strong>wide-complex tachycardia / VT</strong> and QRS widening (bicarbonate trigger).</li>
+          <li>🩸 <strong>BP and HR every 5–15 min</strong> — they should <em>fall as the benzodiazepine takes effect</em>; a rising BP after any beta-blocker is the unopposed-alpha signature.</li>
+          <li>🌡️ <strong>Temperature</strong> — hyperthermia trends; keep cooling until &lt; 38.5°C.</li>
+          <li>🧪 <strong>Serial troponin (0/3 h)</strong> and repeat 12-leads with any symptom change; recheck CK/renal function for rhabdomyolysis.</li>
+          <li>🧠 <strong>Sedation level / agitation</strong> — re-dose benzodiazepine before the storm rebuilds; balance against over-sedation.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Your best monitor of success is a calmer patient with a slowing heart and softening pressure — if those numbers climb after a drug, ask what you just gave."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong in the ED phase</h3>
+        <ul>
+          <li>🫀 <strong>Myocardial infarction</strong> from spasm ± thrombus — real in a minority, and it can strike a young patient with clean-looking arteries.</li>
+          <li>⚡ <strong>Ventricular arrhythmia / VT / VF</strong> — from sodium-channel blockade (wide QRS) and an irritable, ischaemic myocardium.</li>
+          <li>🩸 <strong>Aortic dissection</strong> — cocaine + severe hypertension is a classic trigger; keep it in mind before anticoagulation.</li>
+          <li>🌡️ <strong>Hyperthermia → rhabdomyolysis, seizures, DIC, multi-organ failure</strong> — the toxidrome kills beyond the heart.</li>
+          <li>🚫 <strong>The iatrogenic catastrophe:</strong> a beta-blocker given "for the numbers" → unopposed alpha → hypertensive crisis + worsened coronary spasm/MI.</li>
+          <li>🧠 Intracranial haemorrhage / stroke from the pressure surge; agitation-related injury.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The deadliest complication of cocaine chest pain is often the one you prescribe — treat the storm with sedation, not with a beta-blocker."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The differential — killers the stimulant can cause</h3>
+        <table class="tbl">
+          <tr><th>Diagnosis</th><th>Discriminators</th><th>Don't-miss action</th></tr>
+          <tr><td>🫀 <strong>Cocaine ACS / vasospasm</strong> (this patient)</td><td>Toxidrome + chest pain, dynamic ECG, troponin delta</td><td>Benzodiazepines + GTN + aspirin + cooling; PCI if true STEMI.</td></tr>
+          <tr><td>🩸 <strong>Aortic dissection</strong></td><td>Tearing to back, pulse/BP differential, wide mediastinum, severe HTN</td><td>Image the aorta (CT) BEFORE anticoagulation.</td></tr>
+          <tr><td>⚡ <strong>Sodium-channel toxicity / arrhythmia</strong></td><td>Wide QRS, terminal R in aVR, VT</td><td><strong>Sodium bicarbonate</strong>; correct electrolytes.</td></tr>
+          <tr><td>🫁 <strong>Pneumothorax / pneumomediastinum</strong></td><td>Pleuritic pain after inhaling/Valsalva, subcut emphysema</td><td>CXR; treat cause.</td></tr>
+          <tr><td>🌡️ <strong>Hyperthermia / agitation syndrome</strong></td><td>Fever, rigidity, rising CK, altered mental state</td><td>Aggressive cooling, benzodiazepines, fluids.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In a cocaine chest pain, run three questions: is it SPASM (benzo + nitrate), does it TEAR (aorta), and is the QRS WIDE (bicarbonate)? Each answer changes the drug."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The First Ten Minutes"</h3>
+          <div class="hud"><span>❤️ Safety: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">A 29-year-old, agitated and diaphoretic after cocaine, has crushing chest pain. HR 128, BP 198/112, temp 38.4°C, pupils dilated. The nurse holds up a syringe of IV metoprolol: "Shall I push this to bring the pressure and pulse down?" What do you do?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The disposition plan</h3>
+        <ol>
+          <li>🫀 <strong>Diagnosis:</strong> cocaine-associated chest pain with myocardial injury (rising troponin). Benzodiazepine-led control, GTN for spasm, aspirin, active cooling.</li>
+          <li>📈 <strong>Serial ECG</strong> watched for true STEMI-evolution and QRS widening → STEMI = PCI; wide QRS = bicarbonate.</li>
+          <li>🚫 <strong>No beta-blocker</strong>; refractory hypertension/spasm → phentolamine ± more nitrate/CCB.</li>
+          <li>🏥 Admit to a monitored bed; treat rhabdomyolysis; screen for other drugs; <strong>addiction/harm-reduction referral</strong> and cessation support before discharge.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Cocaine chest pain is not 'just anxiety with a fast heart' — a real slice infarct. Sedate, dilate, cool, monitor, and reserve the cath lab for a genuine STEMI."</div>
+
+        <div class="checklist" id="ckACS">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Cocaine chest pain bundle (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>💊 Benzodiazepine given and titrated to calm (first-line)</span></label>
+          <label class="ck"><input type="checkbox"><span>💉 GTN / nitrate for ongoing ischaemic pain &amp; hypertension</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 Aspirin given; allergy checked</span></label>
+          <label class="ck"><input type="checkbox"><span>🌡️ Active cooling for hyperthermia; CK/renal checked (rhabdo)</span></label>
+          <label class="ck"><input type="checkbox"><span>🚫 NO acute beta-blocker; phentolamine reserved for refractory HTN/spasm</span></label>
+          <label class="ck"><input type="checkbox"><span>📈 Serial ECG + hs-troponin (0/3 h); aorta considered before anticoagulation</span></label>
+          <label class="ck"><input type="checkbox"><span>📞 Monitored disposition + addiction/harm-reduction referral</span></label>
+          <div class="ck-progress" data-progress>0 / 7 complete</div>
+        </div>
+
+        <div class="checklist" id="ckSTEMI">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Wide-QRS / sodium-channel toxicity → bicarbonate</h3>
+          <label class="ck"><input type="checkbox"><span>📈 Confirm QRS widening (&gt; 100–120 ms) ± terminal R in aVR on the 12-lead</span></label>
+          <label class="ck"><input type="checkbox"><span>💧 Sodium bicarbonate bolus for wide QRS / ventricular arrhythmia</span></label>
+          <label class="ck"><input type="checkbox"><span>🧪 Correct K⁺ / Mg²⁺; avoid QT-prolonging and sodium-channel-blocking drugs</span></label>
+          <label class="ck"><input type="checkbox"><span>💊 Benzodiazepine to lower catecholamine drive alongside</span></label>
+          <label class="ck"><input type="checkbox"><span>🫀 Defib pads on; escort with resus drugs if unstable</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">23:48</div>Arrival, agitated, BP 198/112, HR 128, temp 38.4°C, pain 9/10. Aspirin on board.</div>
+          <div class="t-item"><div class="t-time">23:55</div>IV benzodiazepine titrated + GTN started + active cooling. Within 20 min: calmer, HR 96, BP 156/92, pain 3/10.</div>
+          <div class="t-item"><div class="t-time">00:30</div>hs-troponin 21 → 64; ECG QRS transiently 118 ms → sodium bicarbonate given, QRS narrows. No STEMI.</div>
+          <div class="t-item"><div class="t-time">02:00</div>Pain-free, normotensive, afebrile with cooling; CK 1,180 → fluids continued; renal function preserved.</div>
+          <div class="t-item"><div class="t-time">Day 1</div>Monitored bed: type-2/vasospastic myocardial injury, no obstructive disease on inpatient work-up; harm-reduction and cessation input arranged.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>He did well because someone recognised the toxidrome, sedated instead of beta-blocked, dilated the coronaries with GTN, cooled him, and treated the wide QRS with bicarbonate. The catastrophe was the drug NOT given.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 Two disposition worlds — the injured heart vs the reassuring rule-out</h3>
+        <div class="vs">
+          <div class="side a"><h4>🫀 This patient (myocardial injury)</h4><ul><li>Admit/observe; aspirin + statin; treat as ACS spectrum, add PCI only for true obstruction</li><li><strong>Cocaine cessation is the key "drug"</strong> — continued use re-runs the risk; harm-reduction + addiction referral</li><li>Avoid future beta-blockers while using cocaine; document clearly</li><li>Red flags: recurrent chest pain, palpitations, syncope → 999</li></ul></div>
+          <div class="side b"><h4>🟢 The reassuring cocaine chest pain</h4><ul><li>Symptoms settle with benzodiazepines, non-ischaemic serial ECG, negative serial troponin</li><li>Low-risk observation-unit pathway; discharge with safety-net</li><li>Explicit cessation advice + "come back immediately if…"</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The most effective long-term prescription in cocaine chest pain is stopping the cocaine — everything else just buys time until the next binge."</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>💊 Benzos are the cardiac drug</b>Calm the brain and you calm the coronaries — sedation lowers HR, BP and spasm together.</div>
+          <div class="pearl"><b>🚫 Never acute beta-block</b>Unopposed alpha = a coronary tourniquet + hypertensive crisis. The beta-before-alpha catastrophe.</div>
+          <div class="pearl"><b>💥 Spot the toxidrome</b>Tachycardia, hypertension, mydriasis, hyperthermia, diaphoresis, agitation = sympathomimetic.</div>
+          <div class="pearl"><b>⚡ Wide QRS → bicarbonate</b>Cocaine blocks sodium channels; a widening QRS (terminal R in aVR) means give bicarbonate.</div>
+          <div class="pearl"><b>💉 Dilate the spasm</b>GTN relieves alpha-mediated coronary vasoconstriction; phentolamine for refractory cases.</div>
+          <div class="pearl"><b>🌡️ Cool the fire</b>Hyperthermia drives rhabdomyolysis and death — cool actively, hydrate, check CK.</div>
+          <div class="pearl"><b>🩸 Think aorta</b>Cocaine + severe hypertension raises dissection risk — clear it before anticoagulation.</div>
+          <div class="pearl"><b>🫀 MI in the young</b>Cocaine is the classic cause of infarct under 40 — a real slice truly infarct.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the pathway</h3>
+          <ul>
+            <li>🧬 <strong>The four-hit mechanism in depth:</strong> cocaine blocks presynaptic <strong>dopamine and noradrenaline reuptake</strong> → synaptic catecholamine excess → alpha-1 coronary vasoconstriction, plus <strong>platelet activation and thrombosis</strong>, increased myocardial oxygen demand (rate/pressure/contractility), and — with chronic use — <strong>accelerated atherosclerosis</strong> and endothelial dysfunction. Four converging insults on coronary supply and demand.</li>
+            <li>🩸 <strong>Cocaine and aortic dissection:</strong> the acute pressure/shear surge plus chronic vascular injury makes cocaine a recognised dissection trigger — a critical reason not to anticoagulate blindly, and to image the aorta when the story fits.</li>
+            <li>⚡ <strong>Sodium-channel-blocking arrhythmia:</strong> cocaine's local-anaesthetic (class-I-like) action widens the QRS and can precipitate ventricular arrhythmia; <strong>sodium bicarbonate</strong> (a sodium load + alkalinisation) is the antidote, as in TCA toxicity. Terminal R wave in aVR is the ECG fingerprint.</li>
+            <li>🦠 <strong>Levamisole-adulterant vasculitis:</strong> levamisole-contaminated cocaine causes agranulocytosis and a retiform/purpuric (ANCA-associated) vasculitis, classically of the ears — a systemic clue to the substance.</li>
+            <li>📦 <strong>Body-packers &amp; body-stuffers:</strong> concealed drug packets can rupture → catastrophic overdose. Surgical/decontamination decisions and imaging matter; avoid endoscopic retrieval that could rupture a packet.</li>
+            <li>🌡️ <strong>Hyperthermia management:</strong> aggressive external/evaporative cooling, generous benzodiazepines, IV fluids, and monitoring for rhabdomyolysis, DIC and multi-organ failure — hyperthermia, not the chest pain, is often what actually kills.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The Beta-Blocker That Clamped the Coronaries"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 26-year-old man arrived agitated and diaphoretic with crushing chest pain after a night of cocaine. HR 130, <strong>BP 200/120</strong>, pupils dilated. A busy team, wanting to "control the tachycardia and hypertension," gave <strong>IV metoprolol</strong>. Over the next fifteen minutes his blood pressure <em>climbed</em> to 220/130 and his anterior <strong>ST segments deepened</strong> as unopposed alpha vasoconstriction clamped his coronaries. He developed a hypertensive crisis and an evolving MI, and arrested in VF before phentolamine could be drawn up. No benzodiazepine had been given.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🧠 REFLEX</b>"High BP and pulse → beta-blocker" applied without asking WHY the numbers were high.</div>
+            <div class="hole"><b>💥 TOXIDROME MISSED</b>Agitation, mydriasis, sweat, fever = sympathomimetic — the cue to sedate, not beta-block.</div>
+            <div class="hole"><b>💊 NO BENZODIAZEPINE</b>The first-line drug that would have dropped HR, BP and spasm was never given.</div>
+            <div class="hole"><b>🩸 UNOPPOSED ALPHA</b>Beta-2 vasodilation removed → alpha vasoconstriction ran unchecked → coronary tourniquet.</div>
+            <div class="hole"><b>⏱️ NO RESCUE READY</b>Phentolamine/nitrate not immediately available when the pressure paradoxically rose.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> recognise the sympathomimetic toxidrome; give a <strong>benzodiazepine first</strong> to lower the whole catecholamine drive; add <strong>GTN</strong> to relieve spasm and <strong>phentolamine</strong> for refractory hypertension; treat the wide QRS with <strong>bicarbonate</strong>; and <strong>never</strong> give an acute beta-blocker — it is the same beta-before-alpha physiology that kills in phaeochromocytoma. <strong>This is exactly the discipline that saved the patient in Bed 11.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Give a beta-blocker for the numbers' has killed cocaine patients who only needed a benzodiazepine and a nitrate. Ask why the numbers are high before you lower them."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🚨 Emergency Department · Bed 11 — Cocaine-Associated Chest Pain<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+  /* ===== SIDEBAR SCROLL-SPY (vertical) ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); var t=sections[idx]; if(t) t.scrollIntoView({behavior:'smooth',block:'start'}); setActive(idx); markVisited(idx); }); });
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){ entries.forEach(function(e){ if(!e.isIntersecting) return; var i=sections.indexOf(e.target); if(i>-1){ setActive(i); markVisited(i); } }); }, { rootMargin:'-10% 0px -75% 0px' });
+    sections.forEach(function(s){ if(s) io.observe(s); });
+  }
+  markVisited(0); setActive(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not a high-risk feature'); } if(found===total){ flagResult.textContent='✅ All '+total+' high-risk features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' high-risk features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: alpha/beta balance ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=(v-0)/(100-0)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<=20){ msg='🟢 Benzodiazepine-led (β-blockade '+v+'%). Central sympathetic outflow falls — HR, BP and coronary spasm all ease. Calm the brain, calm the coronaries.'; cls='good'; }
+      else if(v<=45){ msg='🟠 Partial β-blockade ('+v+'%). Some alpha-vasoconstriction is now unopposed — watch the BP creep up and the ST segments.'; cls='warn-r'; }
+      else if(v<=70){ msg='🟠 High β-blockade ('+v+'%). Unopposed alpha is clamping the coronaries — rising BP, worsening spasm. Back off; give a benzo ± phentolamine.'; cls='warn-r'; }
+      else { msg='🔴 Full β-blockade ('+v+'%) in cocaine toxicity: unopposed alpha = a coronary tourniquet + hypertensive crisis. The beta-before-alpha catastrophe.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Alpha/Beta Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"A 29-year-old, agitated and diaphoretic after cocaine, has crushing chest pain. HR 128, BP 198/112, temp 38.4°C, pupils dilated. The nurse holds up a syringe of IV metoprolol: 'Shall I push this to bring the pressure and pulse down?' What do you do?",
+      choices:[
+        {t:"💉 Give the IV metoprolol to control the tachycardia and hypertension",good:false,ds:-2,dt:15,xp:0,fb:"☠️ This is the M&M case in S21. Beta-blockade removes beta-2 vasodilation → unopposed alpha → BP paradoxically climbs and coronary spasm worsens. He arrests. Restart.",end:true},
+        {t:"💊 Give an IV benzodiazepine first, titrated to calm; add GTN, continue aspirin, start active cooling",good:true,ds:1,dt:8,xp:40,fb:"✅ Exactly. Sedation lowers central sympathetic outflow → HR, BP and spasm all fall together, and GTN relieves the vasospasm. Benzos ARE the cardiac drug.",next:"repeat"},
+        {t:"⏳ Do nothing drug-wise; just observe the numbers for now",good:false,ds:-1,dt:20,xp:5,fb:"⚠️ Passive observation lets the catecholamine storm and hyperthermia keep driving ischaemia. He needs the benzodiazepine now — but at least you avoided the beta-blocker.",next:"repeat"}
+      ]},
+    repeat:{ text:"After benzodiazepines + GTN + cooling he is calmer (HR 96, BP 156/92), but chest pain persists and the repeat ECG shows a QRS that has widened to 120 ms with a terminal R in aVR. Next best step?",
+      choices:[
+        {t:"💧 Recognise sodium-channel toxicity — give sodium bicarbonate; keep sedating and monitor for VT",good:true,ds:1,dt:6,xp:40,fb:"✅ Right. A wide QRS after cocaine is sodium-channel poisoning — bicarbonate narrows it and protects against ventricular arrhythmia.",next:"declare"},
+        {t:"💉 Now give metoprolol to finish controlling the heart rate",good:false,ds:-2,dt:15,xp:0,fb:"⚠️ Still the unopposed-alpha trap — a beta-blocker here worsens spasm and can precipitate a hypertensive crisis. Treat the wide QRS with bicarbonate instead.",next:"declare"}
+      ]},
+    declare:{ text:"The pain intensifies again and the monitor now shows clear anterior ST elevation meeting STEMI criteria, refractory to GTN. What now?",
+      choices:[
+        {t:"🚨 Treat as a true STEMI — activate PCI; continue benzo + nitrate; phentolamine if pressure spikes; defib pads on",good:true,ds:1,dt:5,xp:45,fb:"🏆 Perfect. A genuine cocaine STEMI gets reperfusion — while you keep the sympathetic drive down and never reach for a beta-blocker. Time is muscle.",end:true},
+        {t:"💊 Push IV metoprolol and labetalol to 'cover' the ischaemia and pressure",good:false,ds:-1,dt:20,xp:0,fb:"⚠️ Beta-blockade in acute cocaine ischaemia is exactly wrong — unopposed alpha deepens the infarct. Reperfuse and use phentolamine/nitrate for pressure.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='declare'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 29-year-old with cocaine chest pain has HR 128 and BP 198/112. The single most important first drug is:", opts:["IV metoprolol to control rate and pressure","An IV benzodiazepine, titrated to calm","IV labetalol","High-dose furosemide"], correct:1, exp:"Benzodiazepines are first-line: they reduce central sympathetic outflow, lowering HR, BP and coronary spasm together. Beta-blockers (including some would-be 'mixed' agents) risk the unopposed-alpha catastrophe." },
+    { q:"Why are acute beta-blockers dangerous in cocaine toxicity?", opts:["They cause reflex tachycardia","They block beta-2 vasodilation, leaving alpha-mediated vasoconstriction unopposed","They lower troponin falsely","They interact with aspirin"], correct:1, exp:"Blocking beta receptors removes beta-2 vasodilation, so cocaine's alpha-1 vasoconstriction runs unopposed → worse coronary spasm and a hypertensive crisis — the same physiology that kills in beta-before-alpha phaeochromocytoma." },
+    { q:"A widened QRS (with a terminal R wave in aVR) after cocaine is best treated with:", opts:["Amiodarone","Sodium bicarbonate","A beta-blocker","Calcium gluconate"], correct:1, exp:"Cocaine blocks fast cardiac sodium channels (local-anaesthetic effect), widening the QRS. Sodium bicarbonate — a sodium load plus alkalinisation — narrows the QRS and protects against ventricular arrhythmia." },
+    { q:"Which drug directly relieves cocaine-induced coronary vasospasm and is first-line for ongoing ischaemic pain?", opts:["Glyceryl trinitrate (GTN)","Metoprolol","Digoxin","Adenosine"], correct:0, exp:"Nitrates (GTN) relieve alpha-mediated coronary vasospasm and lower preload — used alongside benzodiazepines. Phentolamine (an alpha-blocker) is reserved for refractory hypertension/spasm." },
+    { q:"For refractory hypertension and coronary spasm despite benzodiazepines and nitrates, the targeted agent is:", opts:["Esmolol","Phentolamine (alpha-blocker)","Propranolol","Verapamil only"], correct:1, exp:"Phentolamine directly reverses the unopposed alpha vasoconstriction. It is the rescue for refractory hypertension/spasm — a beta-blocker would worsen the very problem." },
+    { q:"The mechanism of cocaine's cardiac toxicity includes all EXCEPT:", opts:["Blockade of noradrenaline/dopamine reuptake","Coronary vasoconstriction and platelet activation","Enhanced beta-2 vasodilation of coronaries","Sodium-channel blockade and increased myocardial demand"], correct:2, exp:"Cocaine blocks catecholamine reuptake → coronary vasoconstriction, platelet activation, increased demand and sodium-channel blockade. It does NOT enhance beta-2 vasodilation — that protective dilation is exactly what a beta-blocker removes." },
+    { q:"Besides the heart, which life-threatening complication must be actively managed in this toxidrome?", opts:["Hypothermia","Hyperthermia with rhabdomyolysis","Hypoglycaemia","Bradycardia"], correct:1, exp:"Hyperthermia (from agitation and catecholamine excess) drives rhabdomyolysis, seizures, DIC and multi-organ failure — treat with active cooling, benzodiazepines and IV fluids; monitor CK and renal function." },
+    { q:"A cocaine chest-pain patient develops a genuine anterior STEMI refractory to GTN. The correct approach is:", opts:["Give a beta-blocker and observe","Activate primary PCI, continue benzodiazepine/nitrate, use phentolamine for pressure spikes","Thrombolyse without imaging the aorta","Discharge once the urine screen returns"], correct:1, exp:"A true STEMI still needs reperfusion (PCI), while you keep the catecholamine drive down and avoid beta-blockers. Consider the aorta before anticoagulation, since cocaine also raises dissection risk." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you manage the cocaine heart like a consultant. 🏆':score>=6?'Strong — review the misses and S11 medications.':'Revisit S5, S6 and S11 — benzos first, beta-blockers never is the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>
