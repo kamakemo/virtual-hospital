@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Symptomatic Bradycardia & High-Grade AV Block — Virtual Teaching Hospital</title>
+<!-- META
+id: c-ed-brady-036
+title: Symptomatic Bradycardia & High-Grade AV Block
+hospital: cardiology
+department: cv-ed
+bednumber: 6
+chiefcomplaint: Presyncope with a heart rate of 32 and complete heart block
+system: Cardiology
+severity: critical
+tags: Bradycardia, Complete heart block, Atropine, Transcutaneous pacing, ACLS
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🚨</div>
+      <div>
+        <div class="t1">Emergency Dept</div>
+        <div class="t2">Bed 6 · Bradycardia</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🚨 Emergency Department · 🛏️ Bed 6</div>
+        <h1>🫀 Symptomatic Bradycardia — "The Candle in the Wind"</h1>
+        <div class="sub">⚡ 21:40. A 74-year-old is grey and clammy on the trolley, nearly passing out every time he sits up. The monitor reads 32. The QRS is wide, the P waves march to their own beat — the atria and ventricles have stopped talking. His whole circulation now rests on one flickering escape focus.</div>
+        <div class="chips">
+          <span class="chip crit">🔴 CRITICAL</span>
+          <span class="chip">🫀 Complete Heart Block</span>
+          <span class="chip">💉 Atropine → Pacing</span>
+          <span class="chip">⚡ ACLS Bradycardia</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital alert"><div class="v-label">💓 HR</div><div class="v-num">32</div></div>
+        <div class="vital alert"><div class="v-label">🩸 BP</div><div class="v-num">82/50</div></div>
+        <div class="vital"><div class="v-label">🌬️ RR</div><div class="v-num">18</div></div>
+        <div class="vital warn"><div class="v-label">🫁 SpO₂</div><div class="v-num">96%</div></div>
+        <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.5°</div></div>
+        <div class="vital warn"><div class="v-label">🧠 GCS</div><div class="v-num">14</div></div>
+        <div class="vital alert"><div class="v-label">😵 Presyncope</div><div class="v-num">Yes</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 21:40, Resus 2</b>An elderly man slumps against the trolley rail, grey and sweating, eyes half-closed. As the nurse sits him up to unbutton his shirt he goes limp for two seconds, then rouses. He says: <em>"Everything went black… I keep nearly blacking out."</em> The monitor shows a slow, wide, self-timed rhythm at 32 with independent P waves. This is a heart running on its last reserve pacemaker. Your next ten minutes decide whether it keeps beating.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>🧓 Name</td><td><strong>Mr. R.G.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>74-year-old male</td></tr>
+          <tr><td>🆔 MRN</td><td>CV-ED-0606</td></tr>
+          <tr><td>⚖️ Weight</td><td>78 kg</td></tr>
+          <tr><td>💼 Occupation</td><td>Retired carpenter — normally independent, walks the dog daily</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 Past history — every line hunts for a cause of the block</h3>
+        <ul>
+          <li>🔺 <strong>Hypertension</strong> and <strong>atrial fibrillation</strong>, on <strong>bisoprolol 5 mg</strong> and <strong>diltiazem</strong> — two AV-nodal blockers stacked together.</li>
+          <li>💊 <strong>Digoxin</strong> added last month for rate control. Renal function since drifted.</li>
+          <li>🫀 <strong>Ischaemic heart disease</strong> — degenerative conduction-system disease is common at his age (Lev/Lenègre).</li>
+          <li>🩺 Recent gastroenteritis, poor oral intake → possible <strong>hyperkalaemia</strong> and drug accumulation. The cause list is written in his drug chart and his U&amp;E.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A slow heart with a drug chart full of beta-blockers, calcium-channel blockers, and digoxin — plus a rising potassium — is a bradycardia with a cause you can reverse. Read the chart before you blame old age."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why symptomatic bradycardia is a true emergency</b>Bradycardia only matters when it fails to perfuse. The danger is not the number on the monitor but the <strong>hypotension, presyncope/syncope (Stokes–Adams), ischaemia, or heart failure</strong> it causes. A high-grade block surviving on a slow, wide ventricular escape can drop to asystole without warning — this is a monitored-bed, pads-on, senior-at-the-bedside patient from the first minute.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 Paramedic handover — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ Pre-hospital SBAR (verbatim)</b>
+          <p><strong>S:</strong> "74-year-old man, collapsed twice at home this evening, no warning, out for a few seconds each time, no seizure, no tongue-biting. Now dizzy and clammy."</p>
+          <p><strong>B:</strong> "AF and hypertension, on bisoprolol, diltiazem and just started on digoxin. Been unwell with D&amp;V for three days."</p>
+          <p><strong>A:</strong> "Monitor showed a broad-complex rhythm at 30–34, looked like the P waves and QRS were separate. BP 84 systolic. We put pads on but didn't pace — he stayed rousable. No chest pain."</p>
+          <p><strong>R:</strong> "Pre-alerted as symptomatic bradycardia / ?complete heart block. Cannulated, pads on, ready if he crashes."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Sudden collapse with no warning and quick recovery is a Stokes–Adams attack until proven otherwise — an electrical dropout of the heart, not a faint. Put it on a monitor before it does it again."</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each feature of DANGEROUS bradycardia</h3>
+        <p>🎮 <em>Click every feature that marks this as UNSTABLE / high-grade bradycardia needing urgent pacing readiness. Each correct = +10 XP.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">💔 HR 32 with hypotension &amp; cold, mottled skin</button>
+          <button class="btn ghost flag-btn" data-good="1">😵 Presyncope / Stokes–Adams syncope</button>
+          <button class="btn ghost flag-btn" data-good="1">🔀 AV dissociation — P waves marching through</button>
+          <button class="btn ghost flag-btn" data-good="1">📏 Wide (broad-complex) escape rhythm</button>
+          <button class="btn ghost flag-btn" data-good="1">🌊 Cannon A waves in the JVP</button>
+          <button class="btn ghost flag-btn" data-good="1">🫀 Inferior MI / AV-nodal drugs / hyperkalaemia as cause</button>
+          <button class="btn ghost flag-btn" data-good="0">🏃 Asymptomatic athlete, resting sinus brady 48</button>
+          <button class="btn ghost flag-btn" data-good="0">🌡️ Temperature 37.9°C (fever)</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Praise where due</b>The crew did the two things that matter most before a doctor is involved: they <strong>recognised the rhythm as dangerous</strong> and <strong>applied pacing pads pre-emptively</strong>. When a patient is surviving on an escape rhythm, pads-on-and-ready is worth more than any drug you can draw up.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🅰️🅱️🅲️ Primary survey — is this bradycardia PERFUSING?</h3>
+        <table class="tbl">
+          <tr><th>Step</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>🅰️ Airway</td><td>Patent, speaking in short phrases.</td><td>Talking = airway safe now; but reduced output can drop GCS fast.</td></tr>
+          <tr><td>🅱️ Breathing</td><td>RR 18, SpO₂ 96% RA, bibasal crackles.</td><td>Early crackles hint at low-output/backward failure from the bradycardia.</td></tr>
+          <tr><td>🅲️ Circulation</td><td>HR 32, <strong>BP 82/50</strong>, cool mottled peripheries, capillary refill 4 s, <strong>irregular cannon A waves</strong> in the JVP.</td><td>Hypotension + poor perfusion + cannon waves = unstable AV dissociation. These are the ACLS "adverse signs."</td></tr>
+          <tr><td>🅳 Disability</td><td>GCS 14, drowsy between episodes, no focal deficit.</td><td>Cerebral hypoperfusion from low cardiac output; the near-syncope is the brain browning out.</td></tr>
+          <tr><td>🅴 Exposure</td><td>No trauma from falls beyond a bruised elbow; no rash; warm-then-cold periphery.</td><td>Check for injury from the collapses; look for infective/rheumatological clues to the block.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Treat the patient, not the number. HR 32 in a warm, chatty athlete is physiology; HR 32 with hypotension, syncope, ischaemia or failure is an emergency. The adverse signs decide the urgency."</div>
+
+        <h3>🧭 The ACLS "adverse signs" you screen for in seconds</h3>
+        <p>The moment you see a bradycardia, ask whether any of the four <strong>adverse features</strong> are present: <strong>shock</strong> (hypotension, pale, sweaty, confused), <strong>syncope</strong>, <strong>myocardial ischaemia</strong> (chest pain / ischaemic ECG), or <strong>heart failure</strong>. Any one of them turns "observe" into "atropine and prepare to pace." This patient has three of the four.</p>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of "he's talking, so he's fine"</b>A patient on a wide, slow escape can be conversant one minute and asystolic the next — the escape focus is <strong>unreliable</strong>. Rousable is not stable. Keep the pads on, keep him monitored, and get the pacing and drugs ready <em>before</em> he deteriorates, not after.</p></div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The EM resident thinks out loud at 21:44:</em></p>
+        <h3>🧠 Frame it: unstable bradycardia + find and fix the cause</h3>
+        <p>"This is unstable bradycardia — hypotensive, presyncopal, cool. My ACLS reflex is <strong>atropine 500 mcg IV while I get the pacing set up</strong>. But this looks like a <strong>wide-complex complete block</strong>, so I'm honestly expecting atropine to disappoint — the block is likely below the AV node. Pads are already on. In parallel I'm hunting the reversible cause: <strong>stop the bisoprolol and diltiazem, check a potassium and a digoxin level, and get a 12-lead looking for inferior MI.</strong>"</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>💉 <strong>Atropine 500 mcg IV</strong> now, repeatable to a maximum of 3 mg — while pacing is prepared (not instead of it).</li>
+          <li>⚡ <strong>Transcutaneous pacing pads confirmed on</strong>, pacer switched to standby, analgesia/sedation drawn up in case capture is needed.</li>
+          <li>🧪 <strong>Bloods:</strong> U&amp;E (potassium!), digoxin level, troponin, magnesium, calcium, TFTs, venous gas.</li>
+          <li>🛑 <strong>Withhold all AV-nodal drugs</strong> — no further bisoprolol, diltiazem or digoxin doses.</li>
+          <li>📈 <strong>12-lead ECG</strong> — confirm the level of block and look for inferior/anterior MI; call cardiology early for transvenous pacing.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Atropine is for the AV node; a wide-complex escape won't listen — get the pacing pads on. Give the drug, but never let it delay the pacer in an infranodal block."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>The nurse asks: "He's still 32 — shall I give his regular evening bisoprolol so his rate control doesn't lapse?"
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>Absolutely not.</strong> Giving another AV-nodal blocker into a complete heart block is like pouring water on the flickering escape focus — it can precipitate asystole. <strong>Hold every rate-limiting drug</strong> (beta-blocker, calcium-channel blocker, digoxin) and treat the resulting bradycardia; his AF rate is the least of his problems right now.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The EM consultant at the bedside, 21:50:</em></p>
+        <h3>🧮 The ACLS bradycardia algorithm — the spine of the resus</h3>
+        <table class="tbl">
+          <tr><th>Step</th><th>Action</th><th>This patient</th></tr>
+          <tr><td>1️⃣ Adverse signs?</td><td>Shock / syncope / ischaemia / heart failure</td><td class="hi">Yes — 3 of 4</td></tr>
+          <tr><td>2️⃣ Atropine</td><td>500 mcg IV, repeat to max 3 mg</td><td class="hi">Give — but expect little in wide-complex block</td></tr>
+          <tr><td>3️⃣ Inadequate response / risk of asystole</td><td>Transcutaneous pacing <em>or</em> adrenaline 2–10 mcg/min (or dopamine) infusion</td><td class="hi">Prepare NOW — pads on</td></tr>
+          <tr><td>4️⃣ Definitive</td><td>Transvenous pacing; treat reversible causes</td><td class="hi">Cardiology; stop drugs, fix K⁺</td></tr>
+          <tr><td>⚠️ Risk-of-asystole markers</td><td>Recent asystole, Mobitz II, complete block with broad QRS, ventricular pause &gt; 3 s</td><td class="hi">Present → pace early</td></tr>
+        </table>
+        <p>His <strong>wide-complex complete heart block</strong> ticks the highest-risk box on the algorithm: it may not respond to atropine and it carries a real risk of asystole. That is a <strong>pace-early</strong> patient, not a "give atropine and hope" patient.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Mobitz II and complete block earn a pacemaker; Wenckebach usually earns observation. Broad-complex, high-grade block with adverse signs means the pacing pads go on before the second dose of atropine."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> ACLS / Resuscitation Council bradycardia algorithm</td><td>Atropine 500 mcg (max 3 mg) first-line for unstable bradycardia; if inadequate → transcutaneous pacing and/or adrenaline/dopamine → transvenous.</td><td>Follow the algorithm in order; don't skip pacing readiness.</td></tr>
+            <tr><td><span class="lvl">MECHANISM</span> Atropine in infranodal block</td><td>Atropine is vagolytic and acts on the AV NODE; it is ineffective (and may paradoxically worsen) in infranodal/His–Purkinje (Mobitz II, wide-complex complete) block.</td><td>A wide-complex escape won't respond — pace, don't repeat atropine endlessly.</td></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> 2018 ACC/AHA Bradycardia &amp; Conduction Delay</td><td>Permanent pacing for acquired second-degree Mobitz II, high-grade, or third-degree AV block, and for symptomatic bradycardia without a reversible cause.</td><td>Mobitz II / complete / symptomatic block → pacemaker referral.</td></tr>
+            <tr><td><span class="lvl">EVIDENCE</span> Reversible-cause reversal</td><td>Drug-induced (BB/CCB/digoxin) and hyperkalaemic bradycardia often resolve when the cause is treated; specific antidotes exist (glucagon, calcium, insulin-dextrose, digoxin-Fab).</td><td>Always stop the offending drug and correct K⁺ before assuming a permanent pacer is needed.</td></tr>
+            <tr><td><span class="lvl">EVIDENCE</span> Inferior vs anterior MI block</td><td>Inferior-MI AV block is usually AV-nodal, often vagal/atropine-responsive and transient; anterior-MI block is infranodal, ominous, and pacing-dependent.</td><td>The territory predicts the behaviour and the prognosis of the block.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The case that haunts our unit was an anterior-MI complete block with a wide escape at 28. Someone gave atropine three times while a colleague hunted for the pacing pads across the department. The escape failed before capture — he arrested in asystole. Atropine wasn't wrong to try; <strong>letting it delay the pacer was fatal.</strong>"</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY the block, WHY the danger (the WHY behind the WHY)</h3>
+        <ol>
+          <li>🚦 <strong>The conduction highway fails:</strong> in third-degree (complete) block, no atrial impulse crosses to the ventricles. The atria and ventricles are <strong>fully dissociated</strong> — P waves and QRS complexes march to independent drummers.</li>
+          <li>🕯️ <strong>Survival depends on an escape rhythm:</strong> a subsidiary pacemaker below the block takes over. <em>Where</em> it arises decides everything.</li>
+          <li>🫀 <strong>Junctional escape</strong> (high in the AV node / His): <strong>narrow QRS, ~40–60/min, relatively reliable</strong> — often perfuses and buys time.</li>
+          <li>💀 <strong>Ventricular escape</strong> (low His–Purkinje): <strong>wide QRS, ~20–40/min, unreliable</strong> — a candle in the wind that can gutter out into asystole.</li>
+          <li>🧠 <strong>Why the symptoms:</strong> too few beats per minute → low cardiac output → cerebral hypoperfusion (presyncope/Stokes–Adams), hypotension, ischaemia, and pulmonary congestion.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A wide, slow escape is a candle in the wind — pace before it blows out. The narrower and faster the escape, the more time you have; the wider and slower, the less."</div>
+
+        <h3>⚖️ Contrast pair — atropine-responsive vs atropine-unresponsive block</h3>
+        <div class="vs">
+          <div class="side a"><h4>💉 AV-nodal block (atropine helps)</h4><ul><li>Block IS the AV node — vagally influenced</li><li>Mobitz I (Wenckebach); many inferior-MI blocks</li><li>Narrow escape, ~40–60, often transient</li><li>Atropine / vagolysis frequently improves conduction</li></ul></div>
+          <div class="side b"><h4>🚫 Infranodal block (atropine won't help)</h4><ul><li>Block is below the node, in His–Purkinje</li><li>Mobitz II; anterior-MI complete block</li><li>Wide escape, ~20–40, unreliable, ominous</li><li>Needs PACING — atropine may do nothing or worsen it</li></ul></div>
+        </div>
+        <p>💡 The width of the QRS in the escape rhythm is your bedside proxy for the <em>level</em> of the block — and therefore for whether atropine has any chance of working.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The Escape Pacemaker Dial</h3>
+          <p style="font-size:13px">Drag the escape rate and watch how the <strong>level of the escape focus</strong> — junctional (narrow, faster, reliable) to low ventricular (wide, slower, unreliable) — changes cardiac output and how much time you have.</p>
+          <label for="kRange">🫀 Escape rate &amp; QRS width → output/reliability: <b id="kVal">28</b> /min</label>
+          <input type="range" id="kRange" min="20" max="60" value="28">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout bad" id="kReadout">Set the dial to explore junctional (reliable) vs ventricular (candle-in-the-wind) escape.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 A narrow junctional escape near 50 perfuses and is often atropine-responsive. A wide ventricular escape near 25 is unreliable, atropine-resistant, and one gust from asystole — pace it.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The order set (21:44)</h3>
+        <ul>
+          <li>📈 <strong>12-lead ECG now</strong>, continuous rhythm strip; confirm level of block, look for inferior/anterior MI, measure escape QRS width.</li>
+          <li>💉 <strong>Atropine 500 mcg IV</strong> stat, repeat every 3–5 min to a maximum of 3 mg — while pacing is set up.</li>
+          <li>⚡ <strong>Transcutaneous pacing pads on</strong>, pacer to standby; draw up <strong>analgesia + sedation</strong> (e.g. opioid ± benzodiazepine) for when capture is needed.</li>
+          <li>💊 <strong>Adrenaline 2–10 mcg/min</strong> (or dopamine) infusion prepared as a bridge if atropine fails and pacing is delayed/ineffective.</li>
+          <li>🧪 <strong>U&amp;E (potassium), digoxin level, troponin, Mg, Ca, TFTs, venous gas.</strong></li>
+          <li>🛑 <strong>Hold ALL AV-nodal drugs</strong> — bisoprolol, diltiazem, digoxin — and document why.</li>
+          <li>📟 Continuous cardiac monitoring with <strong>defib/pacer to hand</strong>; IV access ×2; senior + cardiology called for transvenous pacing.</li>
+          <li>🩸 Correct reversible causes: treat hyperkalaemia, consider specific antidotes (glucagon for beta-blocker, calcium for CCB, digoxin-Fab).</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The two orders that save this patient cost nothing: pads on, and every rate-limiting drug stopped. Everything else buys time for the pacemaker."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Resus-bay priorities — the nurse guards the escape rhythm</h3>
+        <ul>
+          <li>📟 <strong>Pacing pads attached, pacer plugged in and tested</strong>; the pause that precedes asystole gives no warning — readiness is everything.</li>
+          <li>🩸 <strong>BP every 3–5 min</strong> and continuous rhythm; call out any drop in rate, widening QRS, or ventricular pause.</li>
+          <li>💉 Draw up atropine, adrenaline/dopamine infusion, and <strong>sedation/analgesia for pacing</strong> — nothing hurts like transcutaneous capture in an awake patient.</li>
+          <li>🛑 <strong>Double-check the drug chart</strong>: ensure no further beta-blocker, calcium-channel blocker or digoxin is administered; flag any that are due.</li>
+          <li>🧾 Label bloods precisely (potassium, digoxin level) — the cause often hides in the biochemistry.</li>
+          <li>🧘 Keep the patient flat/comfortable and reassured; anxiety and pain raise demand a failing circulation can't meet.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse with a finger on the pacer button and an eye on the QRS width is the difference between a captured rhythm and a cardiac arrest."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Value</th><th>Interpretation</th></tr>
+          <tr><td>Potassium</td><td class="hi">6.9 mmol/L</td><td><strong>Hyperkalaemia</strong> — a fully reversible cause of bradycardia/heart block; give calcium + insulin-dextrose now.</td></tr>
+          <tr><td>Digoxin level</td><td class="hi">3.6 ng/mL (toxic)</td><td>Digoxin toxicity (worsened by AKI + hyperkalaemia) can cause AV block; consider digoxin-specific Fab.</td></tr>
+          <tr><td>Creatinine</td><td class="hi">208 µmol/L</td><td>Acute kidney injury from D&amp;V — explains drug accumulation and the high K⁺.</td></tr>
+          <tr><td>Troponin</td><td>Mildly raised</td><td>Non-specific; could be demand ischaemia from hypotension — correlate with the ECG for inferior MI.</td></tr>
+          <tr><td>Magnesium / Calcium</td><td class="ok-v">Normal</td><td>Optimise anyway; keep Mg &amp; K⁺ replete to stabilise the myocardium.</td></tr>
+          <tr><td>TSH</td><td>Pending</td><td>Hypothyroidism is a slow-burn cause of bradycardia — send it, don't wait on it.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Every high-grade block gets a potassium, a drug chart, and a 12-lead before it gets a diagnosis of 'degenerative block.' Reversible causes are cheap to find and lethal to miss."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why this bradycardia is a biochemistry problem too</b>His block is not simply "worn-out wiring." Three reversible insults have stacked: <strong>hyperkalaemia</strong>, <strong>digoxin toxicity</strong>, and <strong>AV-nodal drugs accumulating in AKI</strong>. Fix the potassium and stop the drugs and the conduction may recover entirely — pacing here is a bridge, not necessarily a destination.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 ECG / IMAGING + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🫀 The rhythm strip — read the dissociation</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 130" preserveAspectRatio="none" aria-label="Complete heart block: P waves marching independently of a slow wide escape rhythm">
+            <rect width="820" height="130" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="32" x2="820" y2="32"/><line x1="0" y1="65" x2="820" y2="65"/><line x1="0" y1="98" x2="820" y2="98"/></g>
+            <polyline fill="none" stroke="#86efac" stroke-width="2.3" points="0,70 28,70 36,63 44,70 80,70 92,63 100,70 118,70 132,44 150,44 166,90 182,70 210,70 222,63 230,70 260,70 272,63 280,70 300,70 316,63 324,70 360,70 372,44 390,44 406,90 422,70 452,70 464,63 472,70 500,70 512,63 520,70 548,70 560,63 568,70 600,70 616,44 634,44 650,90 666,70 700,70 712,63 720,70 748,70 760,63 768,70 800,70 812,63 820,70"/>
+            <text x="120" y="20" fill="#93c5fd" font-size="11">P · P · P (regular, marching)</text>
+            <text x="360" y="118" fill="#fca5a5" font-size="11">wide escape QRS (slow, ~30)</text>
+          </svg>
+          <div class="ecg-cap">The little <span style="color:#93c5fd">P waves</span> march at their own regular rate; the <span style="color:#fca5a5">wide QRS escape complexes</span> are slower and unrelated — the atria and ventricles are completely dissociated. More P waves than QRS, no fixed PR: <strong>third-degree (complete) AV block with a broad ventricular escape.</strong></div>
+        </div>
+
+        <h3>🔎 The AV-block spectrum you must read cold</h3>
+        <table class="tbl">
+          <tr><th>Pattern</th><th>Look for</th><th>Meaning</th></tr>
+          <tr><td>🟢 <strong>First-degree</strong></td><td>Fixed long PR &gt; 200 ms, every P conducts</td><td>Usually benign; watch, don't pace.</td></tr>
+          <tr><td>🟡 <strong>Mobitz I (Wenckebach)</strong></td><td>Progressive PR lengthening then a dropped beat; grouped beating</td><td>AV-nodal, usually benign, often no pacing.</td></tr>
+          <tr><td>🔴 <strong>Mobitz II</strong></td><td>Constant PR with sudden non-conducted P; often wide QRS</td><td>Infranodal, dangerous → pacemaker.</td></tr>
+          <tr><td>⚫ <strong>High-grade / 2:1</strong></td><td>≥2 consecutive non-conducted P waves</td><td>Frequently progresses to complete block → pace.</td></tr>
+          <tr><td>💀 <strong>Third-degree (complete)</strong></td><td>AV dissociation; P and QRS independent; escape rhythm</td><td>Ventricles survive only on the escape — narrow=safer, wide=ominous.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"PR lengthening then a drop is Wenckebach; a PR that stays fixed then suddenly drops a beat is Mobitz II — and Mobitz II, wide, is the one that earns a wire before it earns a coffin."</div>
+
+        <h3>🩻 Adjunct imaging &amp; bedside</h3>
+        <ul>
+          <li><strong>12-lead:</strong> inferior ST changes (RCA — AV-nodal, often transient) vs anterior changes/new bundle branch block (LAD — infranodal, ominous).</li>
+          <li><strong>Bedside echo (POCUS):</strong> assess LV function and rule out a large effusion; confirm mechanical capture once pacing (a QRS with a matching pulse and ventricular contraction).</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The bradycardia drug map — what, why, and the traps</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>Atropine</strong> 500 mcg IV (max 3 mg)</td><td>First-line for unstable bradycardia</td><td>Vagolytic → speeds AV-NODAL conduction. Ineffective in infranodal/wide-complex block; avoid trivial 100–200 mcg doses (paradoxical slowing).</td></tr>
+          <tr><td><strong>Adrenaline</strong> 2–10 mcg/min infusion</td><td>Atropine failed / as a bridge to pacing</td><td>β-agonist chronotropy/inotropy; titrate to rate &amp; perfusion.</td></tr>
+          <tr><td><strong>Dopamine</strong> 5–20 mcg/kg/min</td><td>Alternative catecholamine bridge</td><td>Chronotropic at higher doses; second-line to adrenaline in most algorithms.</td></tr>
+          <tr><td><strong>Isoprenaline</strong></td><td>Where available, chronotropic bridge</td><td>Pure β-agonist; useful in some heart-block/torsades settings.</td></tr>
+          <tr><td><strong>Calcium + insulin-dextrose</strong></td><td>Hyperkalaemic bradycardia/block</td><td>Calcium stabilises the myocardium immediately; shift K⁺ intracellularly.</td></tr>
+          <tr><td><strong>Glucagon / Calcium / Digoxin-Fab</strong></td><td>Specific antidotes</td><td>Glucagon for β-blocker OD; high-dose calcium for CCB OD; Fab fragments for digoxin toxicity.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Atropine first, catecholamines and pacing next, antidotes for the specific poison — and the single most important 'drug' is the one you STOP: the beta-blocker or calcium-channel blocker."</div>
+        <div class="callout danger"><b class="ct">🚫 The 'never in this bradycardia' list</b>❌ another beta-blocker · ❌ diltiazem/verapamil · ❌ digoxin · ❌ any further AV-nodal blocker — until the block resolves. Adding rate control to a complete heart block can tip a flickering escape into asystole.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why</h3>
+        <ul>
+          <li>📈 <strong>Continuous ECG with pacer/defib to hand</strong> — watch the escape rate and QRS width; a widening, slowing escape signals imminent failure.</li>
+          <li>⏱️ <strong>Ventricular pauses</strong> — any pause &gt; 3 s is a red flag for asystole; pace.</li>
+          <li>🩸 BP every 3–5 min — the block only matters through perfusion; falling BP = escalate.</li>
+          <li>⚡ If pacing: confirm <strong>electrical capture</strong> (pacing spike → QRS) AND <strong>mechanical capture</strong> (palpable pulse / femoral Doppler / echo) — a spike without a pulse is not capturing.</li>
+          <li>🧪 Serial potassium and repeat ECG as hyperkalaemia is treated; watch the block improve as the biochemistry corrects.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A pacing spike is not a heartbeat. Confirm mechanical capture — a spike marching across the screen with no pulse is a false sense of security while the patient dies."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong in the ED phase</h3>
+        <ul>
+          <li>⚡ <strong>Asystole / cardiac arrest</strong> — the escape focus fails; the reason pads stay on and the pacer stays ready.</li>
+          <li>🌀 <strong>Bradycardia-dependent ventricular arrhythmia</strong> — long pauses provoke torsades de pointes ("pause-dependent" VT).</li>
+          <li>💔 <strong>Cardiogenic shock / pulmonary oedema</strong> from sustained low output.</li>
+          <li>😖 <strong>Failure to capture / painful pacing</strong> — transcutaneous pacing is agonising; under-sedation and non-capture are common pitfalls.</li>
+          <li>🧠 <strong>Falls &amp; injury</strong> from recurrent Stokes–Adams syncope (head injury, fractures).</li>
+          <li>🩹 <strong>The decision complication:</strong> treating a wide-complex block with repeated atropine while pacing is delayed — the single most dangerous management error here.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The deadliest complication of high-grade block is the minute you spend giving a third dose of atropine instead of pressing the pacer. Time you spend on a drug that can't work is time the escape rhythm may not have."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The bradycardia differential — reversible causes first</h3>
+        <table class="tbl">
+          <tr><th>Cause</th><th>Discriminators</th><th>Don't-miss action</th></tr>
+          <tr><td>💊 <strong>Drugs</strong> (BB / CCB / digoxin)</td><td>Drug chart, recent dose change, digoxin level, AKI</td><td>Stop the drug; specific antidote (glucagon/calcium/Fab).</td></tr>
+          <tr><td>🧪 <strong>Hyperkalaemia</strong></td><td>Peaked T waves, wide QRS, AKI, potassium-retaining drugs</td><td>Calcium + insulin-dextrose immediately.</td></tr>
+          <tr><td>🫀 <strong>Inferior MI</strong> (RCA)</td><td>Inferior ST elevation, often vagal, AV-nodal, transient</td><td>Reperfuse; atropine often works; usually recovers.</td></tr>
+          <tr><td>🚨 <strong>Anterior MI</strong> (LAD)</td><td>Anterior changes / new BBB, wide escape, ominous</td><td>Reperfuse + pace early; infranodal, atropine-resistant.</td></tr>
+          <tr><td>🦠 <strong>Infiltrative/infective</strong></td><td>Lyme (endemic/tick), sarcoid, endocarditis with aortic-root abscess</td><td>Treat cause; Lyme block is often reversible with antibiotics.</td></tr>
+          <tr><td>🧓 <strong>Degenerative (Lev/Lenègre)</strong> / hypothyroid</td><td>Elderly, no reversible cause, low TSH</td><td>Permanent pacemaker; replace thyroxine.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Before you call it 'age,' rule out the four reversibles: DRUGS, POTASSIUM, ISCHAEMIA, and INFECTION/INFILTRATION. A pacemaker for a hyperkalaemic, drug-toxic block is treating the smoke, not the fire."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "Unstable at 32"</h3>
+          <div class="hud"><span>❤️ Safety: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">HR 32, BP 82/50, presyncopal and clammy. The monitor shows a wide-complex complete heart block. Pads are already on. What is your first move?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The disposition plan</h3>
+        <ol>
+          <li>🫀 <strong>Diagnosis:</strong> unstable third-degree AV block with a wide escape, driven by hyperkalaemia + digoxin toxicity + AV-nodal drugs in AKI.</li>
+          <li>💉 <strong>ACLS bradycardia:</strong> atropine 500 mcg → transcutaneous pacing (with sedation) and/or adrenaline/dopamine infusion → transvenous pacing as the bridge.</li>
+          <li>🧪 <strong>Reverse the causes:</strong> calcium + insulin-dextrose for K⁺, stop all rate-limiting drugs, digoxin-Fab, treat the AKI.</li>
+          <li>🏥 <strong>Admit to CCU/monitored bed</strong>; cardiology for transvenous pacing now and permanent pacemaker assessment once reversible causes are addressed.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Pace the patient AND fix the biochemistry — the temporary wire keeps him alive while the potassium, digoxin and drugs are corrected, and only then do you decide if he truly needs a permanent box."</div>
+
+        <div class="checklist" id="ckACS">
+          <h3 style="margin-top:0">🩺 Procedure Guide — ACLS bradycardia: atropine → pacing → infusions (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>🔎 Confirm adverse signs (shock / syncope / ischaemia / heart failure) &amp; put on pacing pads</span></label>
+          <label class="ck"><input type="checkbox"><span>💉 Atropine 500 mcg IV; repeat every 3–5 min to a maximum of 3 mg</span></label>
+          <label class="ck"><input type="checkbox"><span>⚡ If inadequate → start transcutaneous pacing AND/OR adrenaline 2–10 mcg/min (or dopamine) infusion</span></label>
+          <label class="ck"><input type="checkbox"><span>🩹 Recognise infranodal (Mobitz II / wide complete) block won't respond to atropine → pace early</span></label>
+          <label class="ck"><input type="checkbox"><span>🛑 Stop all AV-nodal drugs; correct K⁺; give specific antidote (glucagon / calcium / digoxin-Fab)</span></label>
+          <label class="ck"><input type="checkbox"><span>📞 Arrange transvenous pacing &amp; cardiology; plan permanent pacemaker assessment</span></label>
+          <div class="ck-progress" data-progress>0 / 6 complete</div>
+        </div>
+
+        <div class="checklist" id="ckSTEMI">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Transcutaneous pacing setup (capture, sedation)</h3>
+          <label class="ck"><input type="checkbox"><span>🩹 Apply pads (antero-posterior preferred); connect pacer, confirm rhythm on monitor</span></label>
+          <label class="ck"><input type="checkbox"><span>💊 Give analgesia + sedation BEFORE pacing — transcutaneous capture is very painful</span></label>
+          <label class="ck"><input type="checkbox"><span>🎚️ Set rate ~60–80; increase output (mA) until ELECTRICAL capture (spike → wide QRS)</span></label>
+          <label class="ck"><input type="checkbox"><span>💓 Confirm MECHANICAL capture — palpable pulse / femoral Doppler / echo (a spike alone is not a beat)</span></label>
+          <label class="ck"><input type="checkbox"><span>⏭️ Set output slightly above capture threshold; arrange transvenous pacing as the definitive bridge</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">21:40</div>Arrival, pads on, HR 32 wide-complex complete block, BP 82/50, presyncopal.</div>
+          <div class="t-item"><div class="t-time">21:45</div>Atropine 500 mcg IV — minimal, transient response (as expected for an infranodal block). Adrenaline infusion started as a bridge; pacer readied.</div>
+          <div class="t-item"><div class="t-time">21:52</div>K⁺ 6.9 and digoxin 3.6 back: calcium + insulin-dextrose given, all AV-nodal drugs stopped, digoxin-Fab administered.</div>
+          <div class="t-item"><div class="t-time">22:05</div>Transcutaneous pacing with sedation → electrical AND mechanical capture at 70/min; BP rises to 104/64, mentation clears.</div>
+          <div class="t-item"><div class="t-time">23:30</div>Transvenous wire placed in CCU. Over 24 h, as K⁺ and digoxin normalise, <strong>conduction recovers</strong> — the escape narrows and 1:1 conduction returns; wire removed, no permanent pacemaker needed.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>He is alive because the team put pads on early, didn't chase a wide-complex block with endless atropine, bridged with an infusion and pacing, and — crucially — <strong>reversed the potassium, digoxin and drugs</strong>. The block was the smoke; the biochemistry was the fire.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 Two very different endings — reversible cause vs permanent block</h3>
+        <div class="vs">
+          <div class="side a"><h4>🔁 This patient (reversible)</h4><ul><li>Cause reversed (K⁺, digoxin, drugs) → conduction recovered, no permanent pacemaker</li><li>Rationalise rate-control drugs; avoid stacking AV-nodal agents; renal-adjust dosing</li><li>Monitor renal function; safety-net for recurrent syncope</li><li>Red flags: blackouts, dizziness, chest pain, breathlessness → 999</li></ul></div>
+          <div class="side b"><h4>🔋 The irreversible high-grade block</h4><ul><li>Mobitz II / complete / symptomatic block with NO reversible cause → permanent pacemaker</li><li>Device education, wound care, follow-up device checks</li><li>Driving restrictions per local rules after syncope/device</li><li>Cardiology follow-up; secondary prevention of ischaemia</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A recovered block from a reversible cause goes home WITHOUT a pacemaker and with a de-prescribing plan; a Mobitz II or complete block with no reversible cause goes home WITH one. Match the box to the cause."</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>🩺 Treat the patient, not the number</b>Bradycardia only matters when it fails to perfuse — adverse signs decide urgency.</div>
+          <div class="pearl"><b>💉 Atropine is for the AV node</b>A wide-complex infranodal escape won't listen — pace, don't repeat atropine endlessly.</div>
+          <div class="pearl"><b>🕯️ Wide, slow escape = candle in the wind</b>Narrow junctional (40–60) buys time; wide ventricular (20–40) can gutter to asystole — pace early.</div>
+          <div class="pearl"><b>🔁 Read the drug chart &amp; the potassium</b>BB/CCB/digoxin + hyperkalaemia are the reversible causes hiding in plain sight.</div>
+          <div class="pearl"><b>⚡ Confirm mechanical capture</b>A pacing spike without a pulse is not a heartbeat — check femoral pulse/echo.</div>
+          <div class="pearl"><b>💊 Sedate before you pace</b>Transcutaneous capture is agonising — analgesia + sedation are mandatory.</div>
+          <div class="pearl"><b>📈 Mobitz II earns a wire</b>Fixed PR then a dropped beat, especially wide QRS → pacemaker; Wenckebach usually observation.</div>
+          <div class="pearl"><b>🫀 Inferior vs anterior MI block</b>Inferior = AV-nodal, atropine-responsive, transient; anterior = infranodal, ominous, pace.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the algorithm</h3>
+          <ul>
+            <li>🎚️ <strong>Level of block &amp; why atropine helps one not the other:</strong> atropine is vagolytic and accelerates <em>AV-nodal</em> conduction, so it aids AV-nodal block (Mobitz I, many inferior-MI blocks). In <em>infranodal</em> (His–Purkinje) block — Mobitz II, wide-complex complete block — conduction failure is structural and vagally independent; atropine does nothing and, by speeding the atrial rate, can even worsen the ratio of conducted beats.</li>
+            <li>🫀 <strong>Inferior vs anterior MI block — prognosis:</strong> inferior-MI (RCA) block is usually AV-nodal, narrow-escape, vagally mediated, atropine-responsive and typically resolves within days. Anterior-MI (LAD) block reflects extensive septal necrosis of the His–Purkinje system — wide-escape, atropine-resistant, pacing-dependent, and a marker of large infarct with high mortality.</li>
+            <li>👶 <strong>Congenital vs acquired complete block:</strong> congenital CHB (often maternal anti-Ro/anti-La) usually has a stable, narrow, faster junctional escape and may be tolerated for years; acquired block in the elderly tends to have lower, less reliable escapes and warrants pacing far sooner.</li>
+            <li>🦠 <strong>Infective/infiltrative causes:</strong> <em>Lyme carditis</em> (reversible AV block, often needs only temporary pacing + antibiotics — always ask about tick exposure in young patients with unexplained block), <em>cardiac sarcoidosis</em> (patchy granulomatous conduction disease — think in young/middle-aged unexplained high-grade block; cardiac MRI/PET), and <em>infective endocarditis with an aortic-root/perivalvular abscess</em> eroding into the conduction system (a new AV block in endocarditis is a surgical alarm).</li>
+            <li>🔋 <strong>Permanent pacemaker indications:</strong> acquired symptomatic or high-grade/complete AV block, Mobitz II (even asymptomatic), alternating bundle branch block, and symptomatic sinus node disease — <em>after</em> excluding reversible causes (drugs, hyperkalaemia, ischaemia, hypothyroidism, Lyme).</li>
+            <li>⚡ <strong>Transvenous vs transcutaneous vs epicardial pacing:</strong> transcutaneous is the immediate bridge (fast, painful, capture must be confirmed); transvenous is the reliable temporary solution; leadless and His-bundle/conduction-system pacing are advancing the permanent-device landscape.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "Three Doses of Atropine"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 68-year-old man arrived with chest pain and collapse. The monitor showed a <strong>complete heart block with a wide ventricular escape at 28/min</strong>; the 12-lead showed an <strong>anterior STEMI</strong>. He was hypotensive and drowsy. The team gave <strong>atropine 500 mcg — no response — then a second, then a third dose</strong>, while one nurse was sent across the department to find the transcutaneous pacing pads and another paged cardiology. Roughly seven minutes passed with a drug that could not work on an infranodal block. The escape rhythm slowed further, then <strong>failed into asystole</strong> before pacing pads were ever placed. Resuscitation was unsuccessful.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🧠 WRONG DRUG, WRONG BLOCK</b>Atropine repeated in a wide-complex infranodal (anterior-MI) block that it cannot fix.</div>
+            <div class="hole"><b>⏱️ PACING DELAYED</b>Pads not immediately to hand; capture never achieved before the escape failed.</div>
+            <div class="hole"><b>📈 LEVEL NOT READ</b>Wide QRS escape = infranodal = pace, not more atropine — the ECG clue was missed.</div>
+            <div class="hole"><b>🚨 CAUSE UNTREATED</b>Anterior STEMI needing emergent reperfusion + pacing, not drug titration.</div>
+            <div class="hole"><b>🏥 SYSTEM</b>Pacer/pads not pre-positioned at the bedside of a high-grade block.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> recognise a wide-complex complete block as <strong>infranodal and atropine-resistant</strong>; put the pacing pads on <em>first</em> and pace within a minute of an inadequate atropine response; bridge with adrenaline/dopamine; treat the underlying anterior MI with emergent reperfusion; and never let repeated atropine substitute for the pacer. <strong>Contrast the M&amp;M M with hyperkalaemic bradycardia treated as merely 'a slow rhythm'</strong> — where the fatal miss is failing to check a potassium and give calcium. <strong>This is exactly the discipline that saved the patient in Bed 6.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Atropine three times for a wide-complex block is three doses of nothing while the clock runs out. When the QRS is broad and the block is complete, the pacer — not the syringe — is the treatment."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🚨 Emergency Department · Bed 6 — Symptomatic Bradycardia &amp; High-Grade AV Block<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+  /* ===== SIDEBAR SCROLL-SPY (vertical) ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); var t=sections[idx]; if(t) t.scrollIntoView({behavior:'smooth',block:'start'}); setActive(idx); markVisited(idx); }); });
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){ entries.forEach(function(e){ if(!e.isIntersecting) return; var i=sections.indexOf(e.target); if(i>-1){ setActive(i); markVisited(i); } }); }, { rootMargin:'-10% 0px -75% 0px' });
+    sections.forEach(function(s){ if(s) io.observe(s); });
+  }
+  markVisited(0); setActive(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not a high-risk feature'); } if(found===total){ flagResult.textContent='✅ All '+total+' high-risk features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' high-risk features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: escape pacemaker dial ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=(60-v)/(60-20)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v>=45){ msg='🟢 Narrow junctional escape ~'+v+'/min. A relatively reliable pacemaker high in the AV node/His — perfuses, buys time, and is often atropine-responsive.'; cls='good'; }
+      else if(v>=38){ msg='🟠 Borderline escape ~'+v+'/min. Output is marginal — watch for hypotension/presyncope and get the pacing pads on standby now.'; cls='warn-r'; }
+      else if(v>=30){ msg='🟠 Low escape ~'+v+'/min, often widening. Cardiac output is falling — prepare transcutaneous pacing and treat reversible causes without delay.'; cls='warn-r'; }
+      else { msg='🔴 Wide ventricular escape ~'+v+'/min — a candle in the wind. Unreliable and atropine-resistant: PACE now, bridge with adrenaline/dopamine, arrange a transvenous wire.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Escape Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"HR 32, BP 82/50, presyncopal and clammy. The monitor shows a wide-complex complete heart block. Pads are already on. What is your first move?",
+      choices:[
+        {t:"💉 Atropine 500 mcg IV NOW while switching the pacer to standby and calling for senior help",good:true,ds:1,dt:2,xp:40,fb:"✅ Correct ACLS first step. You give atropine but — knowing a wide-complex block is likely infranodal — you set up pacing in parallel, not instead.",next:"repeat"},
+        {t:"💊 Give his due bisoprolol/diltiazem so his AF rate doesn't run away",good:false,ds:-2,dt:60,xp:0,fb:"☠️ This is the fatal error. Adding an AV-nodal blocker to a complete heart block can extinguish the escape and precipitate asystole. Hold every rate-limiting drug. Restart.",end:true},
+        {t:"💉 Give atropine 500 mcg but hold off preparing the pacer until you see if it works",good:false,ds:-1,dt:6,xp:5,fb:"⚠️ Atropine is reasonable to try, but a wide-complex infranodal block often won't respond — NEVER let that delay pacing setup. Get the pads and pacer ready simultaneously.",next:"repeat"}
+      ]},
+    repeat:{ text:"Atropine gives only a brief, minimal response; he's still ~30 with a wide escape, BP 78/48 and getting drowsier. What now?",
+      choices:[
+        {t:"⚡ Start transcutaneous pacing WITH analgesia/sedation (confirm electrical AND mechanical capture) and start an adrenaline/dopamine infusion; arrange transvenous pacing and treat reversible causes",good:true,ds:1,dt:5,xp:45,fb:"✅ Exactly. Atropine failed as expected for an infranodal block — escalate to pacing + catecholamine bridge and hunt the reversible cause. Confirm capture with a pulse, not just a spike.",next:"declare"},
+        {t:"💉 Give a third and fourth dose of atropine and keep waiting for the pacing pads to be found",good:false,ds:-2,dt:30,xp:0,fb:"☠️ This is the S21 war story. Repeated atropine in a wide-complex block does nothing while the escape fails — the patient arrests in asystole before capture. Restart.",end:true}
+      ]},
+    declare:{ text:"Capture achieved and BP improves. Bloods now return: K⁺ 6.9, digoxin 3.6 (toxic), creatinine 208. He's on bisoprolol, diltiazem and digoxin. Next?",
+      choices:[
+        {t:"🧪 Treat the hyperkalaemia (calcium + insulin-dextrose), stop ALL AV-nodal drugs, give digoxin-Fab, continue pacing, refer for transvenous/permanent pacing as indicated",good:true,ds:1,dt:5,xp:45,fb:"🏆 Perfect. The block was driven by reversible causes — fix the potassium and digoxin, stop the drugs, and the conduction may recover. Pacing is the bridge, not necessarily the destination.",end:true},
+        {t:"👍 He's captured and stable — restart his rate-control drugs and send him to a ward bed",good:false,ds:-1,dt:20,xp:0,fb:"⚠️ Restarting AV-nodal drugs into a hyperkalaemic, digoxin-toxic block invites relapse and asystole; you also haven't treated the K⁺. Reverse the causes first.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='declare'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 74-year-old has HR 32, BP 82/50, and presyncope with a complete heart block. The first-line drug is:", opts:["Adenosine 6 mg IV","Atropine 500 mcg IV","Amiodarone 300 mg IV","A further dose of his beta-blocker"], correct:1, exp:"Unstable bradycardia with adverse signs → atropine 500 mcg IV (repeat to max 3 mg) is first-line per the ACLS bradycardia algorithm, while preparing to pace. Adenosine/amiodarone treat tachyarrhythmias; more beta-blocker would worsen the block." },
+    { q:"Atropine is most likely to be EFFECTIVE in which of these blocks?", opts:["Mobitz II with a wide QRS","Complete heart block with a broad ventricular escape","AV-nodal block (e.g. Mobitz I / inferior-MI block)","Anterior-MI infranodal block"], correct:2, exp:"Atropine is vagolytic and acts on the AV NODE. It helps AV-nodal (Mobitz I, many inferior-MI) blocks but is ineffective in infranodal His–Purkinje block — Mobitz II and wide-complex complete/anterior-MI blocks won't respond." },
+    { q:"A wide-complex complete heart block after an anterior MI does not respond to atropine. The next best step is:", opts:["Repeat atropine every 2 minutes indefinitely","Transcutaneous pacing (and/or adrenaline/dopamine infusion)","Give the scheduled diltiazem","Discharge with outpatient Holter"], correct:1, exp:"An infranodal block won't respond to atropine — escalate to transcutaneous pacing with sedation and/or a catecholamine infusion (adrenaline/dopamine) as a bridge to transvenous pacing. Repeating atropine wastes time the escape may not have." },
+    { q:"Which second-degree AV block is dangerous and typically warrants a pacemaker?", opts:["Mobitz I (Wenckebach)","First-degree AV block","Mobitz II","Sinus bradycardia at 50"], correct:2, exp:"Mobitz II is infranodal, unpredictable, and prone to progressing to complete block — it earns a pacemaker even if asymptomatic. Mobitz I is usually AV-nodal and benign; first-degree and asymptomatic sinus brady need no pacing." },
+    { q:"In complete heart block, which escape rhythm is more reliable and better perfusing?", opts:["Wide QRS ventricular escape at ~25/min","Narrow QRS junctional escape at ~50/min","Both are equally reliable","Neither perfuses at all"], correct:1, exp:"A narrow junctional escape (~40–60/min) arises high in the conduction system and is relatively reliable. A wide ventricular escape (~20–40/min) is low, slow and unreliable — 'a candle in the wind' — and mandates early pacing." },
+    { q:"Complete heart block complicating an INFERIOR MI is usually:", opts:["Infranodal, atropine-resistant and permanent","AV-nodal, often vagal/atropine-responsive and transient","An indication for immediate permanent pacemaker","Caused by hyperthyroidism"], correct:1, exp:"Inferior MI (RCA territory) causes AV-nodal block that is often vagally mediated, atropine-responsive and transient, usually resolving within days. Anterior-MI block is infranodal, ominous and pacing-dependent." },
+    { q:"During transcutaneous pacing, what confirms the pacing is actually working?", opts:["A pacing spike on the monitor alone","Electrical capture only (spike followed by QRS)","Electrical AND mechanical capture (spike→QRS with a palpable pulse)","The set rate on the pacer dial"], correct:2, exp:"You must confirm BOTH electrical capture (spike → wide QRS) AND mechanical capture (a matching palpable pulse / femoral Doppler / echo). A spike marching across the screen without a pulse is not capturing — and always give analgesia/sedation, as it is painful." },
+    { q:"A bradycardic patient has peaked T waves, a wide QRS, AKI and K⁺ 6.9. The most urgent specific treatment is:", opts:["Insert a permanent pacemaker immediately","IV calcium (then insulin-dextrose) to treat hyperkalaemia","Start a beta-blocker for rate control","Give a fluid bolus only"], correct:1, exp:"This is a reversible, hyperkalaemic bradycardia/block. IV calcium stabilises the myocardium immediately, followed by insulin-dextrose to shift potassium; stop AV-nodal drugs. Pacing bridges while the biochemistry is corrected — a permanent pacemaker is treating the smoke, not the fire." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you run a bradycardia arrest like a consultant. 🏆':score>=6?'Strong — review the misses and S5/S6 on level-of-block and pacing.':'Revisit S5, S6 and S10 — atropine vs pacing and the level of block are the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>

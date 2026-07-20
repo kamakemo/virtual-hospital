@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cardiac Arrest — ACLS in Resus — Virtual Teaching Hospital</title>
+<!-- META
+id: c-ed-arrest-034
+title: Cardiac Arrest — ACLS in Resus
+hospital: cardiology
+department: cv-ed
+bednumber: 4
+chiefcomplaint: Witnessed collapse, pulseless, VF on the monitor
+system: Cardiology
+severity: critical
+tags: Cardiac arrest, ACLS, Defibrillation, VF, Reversible causes, CPR
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🚨</div>
+      <div>
+        <div class="t1">Emergency Dept</div>
+        <div class="t2">Bed 4 · Cardiac Arrest</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🚨 Emergency Department · 🛏️ Bed 4</div>
+        <h1>🫀 Cardiac Arrest — "The Defibrillator Is the Drug"</h1>
+        <div class="sub">⚡ 21:04. A 58-year-old clutched his chest, then dropped. No pulse. The monitor shows a coarse, chaotic waveform — <strong>ventricular fibrillation</strong>. You are mid-code in Resus 4. Every second of hands-off time is a second the brain and heart get no blood. Run the algorithm.</div>
+        <div class="chips">
+          <span class="chip crit">🔴 CRITICAL · MID-CODE</span>
+          <span class="chip">⚡ Shockable — VF</span>
+          <span class="chip">🫀 ACLS Pathway</span>
+          <span class="chip">🔎 4 H's &amp; 4 T's</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital alert"><div class="v-label">💓 HR</div><div class="v-num">0</div></div>
+        <div class="vital alert"><div class="v-label">🩸 BP</div><div class="v-num">—</div></div>
+        <div class="vital alert"><div class="v-label">📟 Rhythm</div><div class="v-num">VF</div></div>
+        <div class="vital warn"><div class="v-label">🫁 SpO₂</div><div class="v-num">—</div></div>
+        <div class="vital warn"><div class="v-label">🌬️ EtCO₂</div><div class="v-num">12</div></div>
+        <div class="vital alert"><div class="v-label">🧠 GCS</div><div class="v-num">3</div></div>
+        <div class="vital warn"><div class="v-label">⏱️ Downtime</div><div class="v-num">2 min</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 21:04, Resus 4, mid-code</b>A man is flat on the trolley, blue at the lips, unresponsive. A nurse is doing compressions; the monitor traces a coarse, disorganised, high-amplitude waveform with no discernible QRS. Someone shouts <em>"No pulse — he's in VF!"</em> The defibrillator is being wheeled to the bedside. This is the single most time-critical rhythm in medicine: <strong>a shockable rhythm in a witnessed arrest</strong>. Everything you do in the next 8 minutes decides whether he walks out neurologically intact.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>🧔 Name</td><td><strong>Mr. R.K.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>58-year-old male</td></tr>
+          <tr><td>🆔 MRN</td><td>CV-ED-0804</td></tr>
+          <tr><td>⚖️ Weight</td><td>84 kg</td></tr>
+          <tr><td>💼 Occupation</td><td>Warehouse supervisor — collapsed in the waiting room while awaiting review for chest pain</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 Past history — every line hints at a reversible cause or a shockable substrate</h3>
+        <ul>
+          <li>🫀 <strong>Ischaemic heart disease</strong> — prior anterior MI, drug-eluting stent to LAD 3 years ago. Coronary occlusion (a "T" — Thrombosis) is the single commonest cause of adult VF arrest.</li>
+          <li>🩺 <strong>End-stage renal disease on haemodialysis</strong> — missed his last two sessions. Flags <strong>hyperkalaemia</strong> (a metabolic "H") loudly.</li>
+          <li>💊 On a beta-blocker, an ACE-inhibitor and a diuretic; irregular adherence.</li>
+          <li>🚬 Ex-smoker, hypertension, type 2 diabetes — the classic coronary substrate.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In VF the defibrillator is the drug — everything else buys time until the next shock. Get the pads on and shock a shockable rhythm without delay."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why the first minutes own the outcome</b>In witnessed VF arrest, survival to discharge falls roughly <strong>7–10% for every minute</strong> defibrillation is delayed. High-quality CPR and early defibrillation are the only two interventions with a robust survival benefit; drugs and airways are supporting acts. The arrest that is <em>witnessed, monitored, and shockable</em> is the most salvageable arrest there is — do not waste it.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 Team handover at the moment of arrest — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ Rapid SBAR (verbatim, from the triage nurse)</b>
+          <p><strong>S:</strong> "58-year-old man, waiting for chest-pain review, suddenly clutched his chest, groaned, and collapsed in front of me. No pulse, not breathing — I called the arrest and started compressions immediately."</p>
+          <p><strong>B:</strong> "Known ischaemic heart disease, LAD stent, on dialysis and missed his last two runs. Came in with 30 minutes of chest tightness."</p>
+          <p><strong>A:</strong> "Witnessed and monitored. First analysed rhythm is VF. Down-time under two minutes. One nurse on compressions, pads going on now."</p>
+          <p><strong>R:</strong> "I need the defibrillator charged, IV access, adrenaline and amiodarone drawn up, and someone on the reversible causes — he's a dialysis patient."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A witnessed, monitored, shockable arrest is the best hand you will ever be dealt in resus — play it fast: minimise interruptions and shock early."</div>
+
+        <h3>🚩 Spot-the-Right-Move — tap each action that IMPROVES survival</h3>
+        <p>🎮 <em>Click every action that helps in this arrest. Each correct = +10 XP. The distractors are classic code-killers.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">⚡ Recognise a shockable rhythm — VF / pulseless VT</button>
+          <button class="btn ghost flag-btn" data-good="1">👀 Leverage that it is witnessed &amp; monitored</button>
+          <button class="btn ghost flag-btn" data-good="1">🔁 Minimise interruptions — compression fraction &gt; 60%</button>
+          <button class="btn ghost flag-btn" data-good="1">💉 Adrenaline 1 mg IV every 3–5 min</button>
+          <button class="btn ghost flag-btn" data-good="1">🔎 Hunt &amp; treat reversible causes (4 H's &amp; 4 T's)</button>
+          <button class="btn ghost flag-btn" data-good="0">🛑 Defibrillate asystole</button>
+          <button class="btn ghost flag-btn" data-good="0">⏸️ Long pauses to study the rhythm strip</button>
+          <button class="btn ghost flag-btn" data-good="0">🌬️ Hyperventilate — bag as fast as you can</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Praise where due</b>The nurse witnessed the collapse, called the arrest, and started compressions <em>immediately</em> — bystander/first-responder CPR that never stops is the foundation the whole algorithm is built on. Early, uninterrupted compressions plus early defibrillation are the two interventions that actually move survival.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🔁 The arrest primary survey — CPR, rhythm, shock, causes</h3>
+        <p>In arrest, the ABCDE reflex is compressed into a continuous loop: <strong>confirm arrest → high-quality CPR → analyse rhythm → shock if shockable → drugs → reversible causes → repeat every 2 minutes.</strong></p>
+        <table class="tbl">
+          <tr><th>Step</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>✅ Confirm arrest</td><td>Unresponsive, not breathing normally, no central pulse (&lt; 10 s check).</td><td>Don't spend &gt; 10 s hunting a pulse — start compressions if in doubt. Agonal gasps are NOT breathing.</td></tr>
+          <tr><td>❤️ Circulation (CPR)</td><td>Compressions ongoing: rate 100–120/min, depth 5–6 cm, full recoil.</td><td>Compressions are the only circulation he has. Coronary perfusion pressure builds only when hands are ON the chest.</td></tr>
+          <tr><td>📟 Rhythm</td><td><strong>VF — coarse, chaotic, no QRS.</strong> Shockable.</td><td>Shockable (VF/pVT) → defibrillate. Non-shockable (PEA/asystole) → no shock, CPR + adrenaline + causes.</td></tr>
+          <tr><td>🫁 Airway / Breathing</td><td>Bag-mask 30:2, or continuous compressions with async ventilation once advanced airway placed. Do NOT over-ventilate.</td><td>Hyperventilation ↑ intrathoracic pressure → ↓ venous return → ↓ coronary perfusion → worse ROSC.</td></tr>
+          <tr><td>🔎 Causes</td><td>Dialysis patient, chest pain, known CAD.</td><td>Immediately raises hyperkalaemia (H) and coronary thrombosis (T) to the top of the reversible list.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Every pause in compressions is a pause in the only blood the brain and heart are getting. Charge the defibrillator while CPR continues, and pause for shock delivery only."</div>
+
+        <h3>🧭 The one branch that changes everything: shockable vs non-shockable</h3>
+        <p>The very first fork in ACLS is whether the rhythm is <strong>shockable</strong> (VF / pulseless VT — defibrillate) or <strong>non-shockable</strong> (PEA / asystole — do NOT shock). Misfiling one for the other is the classic fatal error: shocking asystole wastes a hands-off pause and achieves nothing, while failing to shock VF forfeits the single most effective intervention.</p>
+
+        <div class="callout warn"><b class="ct">⚠️ EtCO₂ is your CPR quality monitor and your ROSC alarm</b>A capnograph on the airway tells you two things: a persistently low EtCO₂ (&lt; 10 mmHg) means poor compressions or a truly non-perfusing state (consider quality and prognosis after &gt; 20 min); a <em>sudden surge</em> in EtCO₂ often heralds <strong>ROSC</strong> — check a pulse at the next rhythm analysis, not by stopping compressions randomly.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The EM resident is running the code, thinking out loud at 21:05:</em></p>
+        <h3>🧠 Frame the arrest as a loop, not a checklist</h3>
+        <p>"Shockable rhythm — so the defibrillator leads. I'll keep compressions going while the pads charge, deliver a single shock, and get hands straight back on the chest — no lingering post-shock pause. Two minutes of CPR, then re-analyse. Adrenaline goes in after the second shock and every 3–5 minutes thereafter; amiodarone after the third shock. And because he's a dialysis patient with chest pain, I'm treating hyperkalaemia and coronary occlusion as live possibilities from minute one."</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>❤️ <strong>Uninterrupted, high-quality CPR</strong> — rate 100–120, depth 5–6 cm, full recoil, rotate compressor every 2 min, compression fraction &gt; 60%.</li>
+          <li>⚡ <strong>Defibrillate the VF</strong> at minimal interruption — charge during compressions, clear, shock, resume immediately.</li>
+          <li>💉 <strong>Adrenaline 1 mg IV</strong> after the 2nd shock, then every 3–5 min; <strong>amiodarone 300 mg</strong> after the 3rd shock (150 mg after the 5th).</li>
+          <li>🫁 <strong>Airway without over-ventilating</strong> — bag-mask 30:2 initially; once an advanced airway is in, ~10 breaths/min with continuous compressions.</li>
+          <li>🔎 <strong>Work the 4 H's &amp; 4 T's</strong> in parallel — send a blood gas/potassium, give empirical calcium for likely hyperkalaemia, POCUS in any organised-but-pulseless rhythm.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Don't shock asystole; find the reversible cause. And don't stop shocking VF — persistent VF is not a reason to change tack, it's a reason to keep shocking, keep compressing, and hunt the 4 H's &amp; 4 T's."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>The airway is proving difficult and someone suggests everyone pause CPR "so we can intubate cleanly." Allow it?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No.</strong> The airway is a supporting act, not the priority. Compressions and defibrillation save lives; a perfect tube does not. Intubate <em>around</em> ongoing compressions or use a supraglottic device — do NOT interrupt CPR for airway placement. If you cannot secure it without a pause, keep bagging 30:2 and defer. Compression fraction is the metric that predicts survival.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The EM consultant arrives to supervise the code, 21:07:</em></p>
+        <h3>🧮 The ACLS shockable-arm algorithm — the sequence that has to be automatic</h3>
+        <table class="tbl">
+          <tr><th>Cycle</th><th>Action</th><th>Drug this cycle</th></tr>
+          <tr><td>Shock 1</td><td>CPR 2 min → analyse → <strong>shock VF</strong> → resume CPR</td><td>—</td></tr>
+          <tr><td>Shock 2</td><td>CPR 2 min → analyse → shock → resume CPR</td><td class="hi">Adrenaline 1 mg IV (then every 3–5 min)</td></tr>
+          <tr><td>Shock 3</td><td>CPR 2 min → analyse → shock → resume CPR</td><td class="hi">Amiodarone 300 mg IV</td></tr>
+          <tr><td>Shock 4</td><td>CPR 2 min → analyse → shock → resume CPR</td><td>Adrenaline 1 mg (3–5 min cycle continues)</td></tr>
+          <tr><td>Shock 5</td><td>CPR 2 min → analyse → shock → resume CPR</td><td class="hi">Amiodarone 150 mg IV</td></tr>
+        </table>
+        <p>Throughout: <strong>uninterrupted high-quality CPR</strong>, minimal pre/post-shock pauses, adrenaline on a 3–5 minute clock, and a continuous sweep of the reversible causes. Persisting VF is <em>refractory VF</em> — keep the loop running and escalate (S20).</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Adrenaline every 3–5 minutes; amiodarone after the 3rd shock in shock-refractory VF. Know the numbers cold so the code runs while your brain works the causes."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">OBSERVATIONAL</span> Early defibrillation &amp; minimal-interruption CPR</td><td>Survival in shockable arrest falls ~7–10%/min of defibrillation delay; higher compression fraction &amp; shorter peri-shock pauses independently improve survival.</td><td>Shock early; charge during compressions; keep hands-off time to seconds.</td></tr>
+            <tr><td><span class="lvl">RCT</span> ALIVE</td><td>In shock-refractory VF, <strong>amiodarone</strong> improved survival to admission versus <strong>lidocaine</strong>.</td><td>Amiodarone 300 mg is the antiarrhythmic of choice after the 3rd shock.</td></tr>
+            <tr><td><span class="lvl">RCT</span> TTM / TTM2</td><td>Targeted temperature 33 °C vs 36 °C: no outcome difference; TTM2 showed hypothermia no better than normothermia — but <strong>fever must be actively prevented</strong>.</td><td>Post-ROSC: avoid fever, target normothermia (≤ 37.5 °C); don't chase deep cooling.</td></tr>
+            <tr><td><span class="lvl">RCT</span> COACT / TOMAHAWK</td><td>In resuscitated OHCA <strong>without ST-elevation</strong>, immediate vs delayed/selective angiography showed no survival benefit.</td><td>STEMI after ROSC → immediate cath. No STEMI → stabilise first, selective angiography.</td></tr>
+            <tr><td><span class="lvl">RCT</span> PARAMEDIC-2</td><td>Adrenaline improved ROSC &amp; 30-day survival but with more survivors having poor neurological outcome.</td><td>Give adrenaline per algorithm, but high-quality CPR &amp; early defibrillation remain the outcome-drivers.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The code I still think about was a witnessed VF that we lost — not for want of shocks, but because the compressor kept stopping and the bag was going at 30 a minute. The debrief clock showed a compression fraction of 40%. And nobody sent a gas: he was a dialysis patient with a potassium of 7. Calcium would have bought us the rhythm. We treated the monitor and forgot the metabolism."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY CPR quality is the currency of ROSC (the WHY behind the WHY)</h3>
+        <ol>
+          <li>🫀 <strong>The arrested heart makes no pressure of its own.</strong> The only forward flow is the pressure you generate with your hands — chest compression squeezes the heart and thorax, ejecting blood.</li>
+          <li>🩸 <strong>Coronary perfusion pressure (CPP) = aortic diastolic − right-atrial diastolic pressure.</strong> CPP builds up over consecutive uninterrupted compressions and <em>collapses to near zero the instant you stop</em>. A CPP above roughly 15 mmHg is associated with ROSC.</li>
+          <li>⏸️ <strong>Every interruption resets the pressure.</strong> After a pause you must build CPP again from scratch — which is why peri-shock pauses, long rhythm checks, and compressor fumbling are so costly.</li>
+          <li>🌬️ <strong>Hyperventilation is a silent CPP killer.</strong> Fast bagging raises intrathoracic pressure, which impedes venous return to the chest, lowers the pressure gradient, and drops CPP — worsening ROSC. Ventilate slow and shallow.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Good CPR is not a formality — coronary perfusion pressure is the currency of ROSC, and it is spent every time your hands leave the chest."</div>
+
+        <h3>⚖️ Contrast pair — Shockable vs Non-shockable arrest</h3>
+        <div class="vs">
+          <div class="side a"><h4>⚡ Shockable (VF / pulseless VT)</h4><ul><li>Defibrillate — the single most effective intervention</li><li>CPR + early shock + adrenaline (after 2nd shock) + amiodarone (after 3rd)</li><li>Best prognosis; our patient's rhythm</li></ul></div>
+          <div class="side b"><h4>🚫 Non-shockable (PEA / asystole)</h4><ul><li>Do NOT shock — there is nothing to defibrillate</li><li>CPR + adrenaline ASAP + relentless hunt for reversible causes</li><li>Worse prognosis unless a cause is found &amp; fixed</li></ul></div>
+        </div>
+        <p>💡 The first decision in every arrest is this fork. <em>VF vs asystole</em>: one earns a shock, the other earns a search. Shocking asystole is not benign — it is a wasted, harmful pause.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The CPR Quality Dial</h3>
+          <p style="font-size:13px">Depth, rate, recoil and interruptions all feed one number: <strong>coronary perfusion pressure</strong>. Drag the dial and watch how CPR quality — not luck — decides whether ROSC is even possible.</p>
+          <label for="kRange">🫀 Compression quality (depth, rate, full recoil, minimal interruptions): <b id="kVal">55</b> %</label>
+          <input type="range" id="kRange" min="0" max="100" value="55">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout warn-r" id="kReadout">Set the dial to explore how CPR quality drives coronary perfusion pressure.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 Shallow, slow or constantly interrupted compressions → low CPP → no ROSC. Optimal depth/rate with full recoil and a compression fraction &gt; 60% → high CPP → the best chance of a shock converting.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The code order set (21:05)</h3>
+        <ul>
+          <li>❤️ <strong>Continuous high-quality CPR</strong> — rate 100–120, depth 5–6 cm, full recoil; rotate compressor every 2 min; target compression fraction &gt; 60%.</li>
+          <li>⚡ <strong>Defibrillate VF</strong> now and every 2-minute cycle while shockable — biphasic 150–200 J (or per device); charge during compressions, minimise peri-shock pause.</li>
+          <li>💉 <strong>Adrenaline 1 mg IV/IO</strong> after the 2nd shock, then every 3–5 min; <strong>amiodarone 300 mg IV/IO</strong> after the 3rd shock, 150 mg after the 5th.</li>
+          <li>🫁 <strong>Airway:</strong> bag-mask 30:2 with 100% O₂; supraglottic or ETT without interrupting compressions; capnography on. <strong>Do NOT hyperventilate</strong> (~10 breaths/min once advanced airway placed).</li>
+          <li>🩸 <strong>IV/IO access ×2</strong>; VBG with potassium; empirical <strong>calcium gluconate/chloride</strong> if hyperkalaemia suspected (dialysis patient) plus insulin-dextrose ± bicarbonate.</li>
+          <li>🔎 <strong>Reversible-cause sweep — 4 H's &amp; 4 T's</strong> (S15); POCUS for tamponade/PE/hypovolaemia in any organised rhythm.</li>
+          <li>📈 <strong>If ROSC → 12-lead ECG immediately</strong>; if STEMI → activate primary PCI; start post-arrest bundle (S17).</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Compressions and a charged defibrillator are the orders that save lives; the drugs and the tube are the ones you must never let interrupt them."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ The resus team runs the choreography of a good code</h3>
+        <ul>
+          <li>❤️ <strong>Compressor rotation every 2 minutes</strong> — fatigue silently degrades depth and rate; swap at each rhythm check to keep quality high without hands-off time.</li>
+          <li>⏱️ <strong>Call the clock:</strong> announce the 2-minute cycles, the adrenaline every-3–5-min timer, and total down-time. A nurse with the code sheet is the team's memory.</li>
+          <li>⚡ <strong>Defibrillator readiness:</strong> pads on early, charge <em>during</em> compressions, clear safely, and get hands straight back — the nurse who pre-charges saves seconds of CPP.</li>
+          <li>💉 <strong>Draw and label drugs ahead of time</strong> — adrenaline and amiodarone ready before they're called; flush after each IV/IO push.</li>
+          <li>🔎 <strong>Own a reversible cause:</strong> get the VBG/potassium to the machine, ready the calcium and insulin-dextrose for a dialysis patient, set up POCUS.</li>
+          <li>🌬️ <strong>Guard the ventilation rate</strong> — challenge anyone bagging too fast; count breaths aloud (~10/min) to protect coronary perfusion.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who pre-charges the defibrillator and counts the breaths aloud protects the two things that actually decide the code: peri-shock pause and coronary perfusion pressure."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Intra-arrest results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Value</th><th>Interpretation</th></tr>
+          <tr><td>VBG — Potassium</td><td class="hi">7.2 mmol/L</td><td><strong>Severe hyperkalaemia</strong> in a dialysis patient who missed sessions — a treatable "H." Give calcium immediately; insulin-dextrose ± bicarbonate; plan urgent dialysis if ROSC.</td></tr>
+          <tr><td>VBG — pH</td><td class="hi">7.02</td><td>Metabolic (lactic) acidosis of arrest + renal failure; will improve with perfusion. Treat the cause, not the number.</td></tr>
+          <tr><td>EtCO₂</td><td class="lo">12 mmHg</td><td>Low — reflects compression quality &amp; low flow. Watch for a sudden surge signalling ROSC.</td></tr>
+          <tr><td>Glucose</td><td>9.1 mmol/L</td><td>Adequate; excludes hypoglycaemia as a driver. (Metabolic "H".)</td></tr>
+          <tr><td>Ionised calcium</td><td class="lo">Low-normal</td><td>Supports empirical calcium in the setting of hyperkalaemia to stabilise the myocardium.</td></tr>
+          <tr><td>Troponin</td><td>Pending</td><td>Will rise from the arrest itself — of limited intra-arrest value; the ECG after ROSC decides the cath-lab.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In any arrest, send a gas and read the potassium — the reversible cause you can fix at the bedside is often written in the electrolytes, not the monitor."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why the point-of-care gas is the highest-yield arrest test</b>A blood gas returns in seconds and screens several reversible causes at once: <strong>hyper/hypokalaemia</strong>, <strong>acidosis</strong>, <strong>hypoxia</strong> (via oxygenation), <strong>hypoglycaemia</strong>, and a lactate that trends the adequacy of resuscitation. In a dialysis patient with VF, a potassium of 7 changes management immediately — calcium first, then shift the potassium.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 ECG / IMAGING + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🫀 The rhythm strip — VF, then organised rhythm after a shock</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 130" preserveAspectRatio="none" aria-label="Ventricular fibrillation converting to an organised rhythm after defibrillation">
+            <rect width="820" height="130" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="32" x2="820" y2="32"/><line x1="0" y1="65" x2="820" y2="65"/><line x1="0" y1="98" x2="820" y2="98"/></g>
+            <polyline fill="none" stroke="#fca5a5" stroke-width="2.3" points="0,66 18,40 30,92 44,50 58,86 70,44 84,96 98,52 112,84 126,42 140,90 154,54 168,80 182,46 196,94 210,50 224,86 238,44 252,92 266,56 280,78 300,66"/>
+            <line x1="330" y1="14" x2="330" y2="116" stroke="#fde68a" stroke-width="2.5" stroke-dasharray="5,4"/>
+            <text x="336" y="22" fill="#fde68a" font-size="11">⚡ SHOCK</text>
+            <polyline fill="none" stroke="#86efac" stroke-width="2.3" points="360,66 400,66 412,62 426,40 438,94 450,66 490,66 502,62 516,40 528,94 540,66 580,66 592,62 606,40 618,94 630,66 670,66 682,62 696,40 708,94 720,66 760,66 772,62 786,40 798,94 810,66 820,66"/>
+            <text x="120" y="20" fill="#fca5a5" font-size="11">VF — chaotic, no QRS</text>
+            <text x="560" y="30" fill="#93c5fd" font-size="11">Post-shock: organised rhythm — check a pulse</text>
+          </svg>
+          <div class="ecg-cap">The <span style="color:#fca5a5">coarse fibrillatory waveform</span> has no organised QRS — it is <strong>shockable</strong>. After <span style="color:#fde68a">defibrillation</span>, an <span style="color:#93c5fd">organised rhythm</span> appears: resume CPR for 2 minutes, then check for a pulse and ROSC at the next analysis.</div>
+        </div>
+
+        <h3>🔎 Rhythm recognition you must know cold</h3>
+        <table class="tbl">
+          <tr><th>Rhythm</th><th>Look for</th><th>Action</th></tr>
+          <tr><td>⚡ <strong>Ventricular fibrillation (VF)</strong></td><td>Chaotic, irregular, no discernible QRS; coarse or fine</td><td><strong>Shockable</strong> — defibrillate, CPR, drugs per algorithm.</td></tr>
+          <tr><td>⚡ <strong>Pulseless VT</strong></td><td>Broad, regular, rapid complexes with no pulse</td><td><strong>Shockable</strong> — treat as VF.</td></tr>
+          <tr><td>🚫 <strong>Asystole</strong></td><td>Flat line (confirm leads/gain, check another lead)</td><td><strong>Non-shockable</strong> — CPR + adrenaline + causes. Do NOT shock.</td></tr>
+          <tr><td>🚫 <strong>PEA</strong></td><td>Organised electrical activity, no pulse</td><td><strong>Non-shockable</strong> — CPR + adrenaline + urgent reversible-cause hunt (POCUS).</td></tr>
+          <tr><td>🩺 <strong>Fine VF vs asystole</strong></td><td>Low-amplitude undulation vs true flat line</td><td>If in doubt treat as VF isn't advised blindly — optimise CPR, check leads; don't repeatedly shock a flat line.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Shockable or not is the only question that matters at the rhythm check — get that fork right, deliver the shock in seconds, and get back on the chest."</div>
+
+        <h3>🩻 Point-of-care ultrasound (during a &lt; 10-second pause only)</h3>
+        <ul>
+          <li><strong>Cardiac POCUS</strong> in PEA: pericardial effusion/<em>tamponade</em>, a dilated RV (<em>PE</em>), an empty hyperdynamic LV (<em>hypovolaemia</em>), or true cardiac standstill (prognostic).</li>
+          <li><strong>Lung POCUS:</strong> absent lung sliding → <em>tension pneumothorax</em>. Integrate imaging into the rhythm-check pause — never add a hands-off pause for it.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The ACLS drug map — what, why, and the traps</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role / timing</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>Adrenaline</strong> 1 mg IV/IO</td><td>Shockable: after 2nd shock, then every 3–5 min. Non-shockable: as soon as possible, then every 3–5 min.</td><td>α-agonism ↑ aortic diastolic pressure → ↑ coronary/cerebral perfusion. Improves ROSC/survival (PARAMEDIC-2); does not substitute for CPR &amp; defibrillation.</td></tr>
+          <tr><td><strong>Amiodarone</strong> 300 mg → 150 mg IV/IO</td><td>Shock-refractory VF/pVT: 300 mg after 3rd shock, 150 mg after 5th.</td><td>Class III antiarrhythmic; improved survival to admission vs lidocaine (ALIVE). Lidocaine 1–1.5 mg/kg is an accepted alternative.</td></tr>
+          <tr><td><strong>Calcium</strong> (chloride/gluconate)</td><td>Suspected hyperkalaemia (dialysis) or calcium-channel-blocker toxicity</td><td>Stabilises the myocardium against hyperkalaemia within minutes. Give first when K⁺ is the culprit; not routine in arrest.</td></tr>
+          <tr><td><strong>Insulin + dextrose ± bicarbonate</strong></td><td>Shift potassium in hyperkalaemic arrest</td><td>Drives K⁺ intracellularly after calcium has protected the myocardium; arrange urgent dialysis on ROSC.</td></tr>
+          <tr><td><strong>Magnesium</strong> 2 g IV</td><td><em>Torsades de pointes</em> / polymorphic VT with long QT</td><td>Not routine in VF; reserved for torsades or documented hypomagnesaemia.</td></tr>
+          <tr><td><strong>Thrombolysis</strong> (e.g. alteplase)</td><td>Arrest strongly suspected to be from massive <em>PE</em></td><td>Consider in presumed PE arrest; then continue CPR for 60–90 min before stopping.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Adrenaline every 3–5 minutes and amiodarone after the 3rd shock keep the algorithm moving — but the drug that saves a dialysis patient in VF is the calcium you give for a potassium of 7."</div>
+        <div class="callout danger"><b class="ct">🚫 What NOT to do with the drugs</b>❌ Don't let drawing up drugs interrupt compressions · ❌ Don't give amiodarone in a non-shockable rhythm · ❌ Don't withhold calcium waiting for a formal potassium if hyperkalaemia is clinically obvious · ❌ Don't give routine bicarbonate for the arrest itself (reserve for hyperkalaemia/TCA toxicity).</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why during the code</h3>
+        <ul>
+          <li>📟 <strong>Rhythm at every 2-minute cycle</strong> — the only question is shockable vs not; deliver the decision in seconds and resume CPR.</li>
+          <li>🌬️ <strong>Waveform capnography (EtCO₂)</strong> — your live CPR-quality gauge (aim &gt; 10–20 mmHg) and your ROSC alarm (a sudden surge). Also confirms tube placement.</li>
+          <li>⏱️ <strong>The clocks:</strong> total down-time, 2-minute CPR cycles, adrenaline every-3–5-min timer, and peri-shock pause duration — the metrics of a good code.</li>
+          <li>❤️ <strong>Compression feedback</strong> (device or coach) — rate, depth, recoil, and compression fraction &gt; 60%.</li>
+          <li>🔎 <strong>Reversible-cause tracking</strong> — has each of the 4 H's &amp; 4 T's been actively considered and, where possible, excluded or treated?</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Capnography is the code's honest witness — it tells you if your compressions are working and shouts the moment ROSC arrives, without anyone lifting their hands off the chest."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong — during the code and after ROSC</h3>
+        <ul>
+          <li>⏸️ <strong>Prolonged hands-off time / high peri-shock pause</strong> — the commonest self-inflicted killer; CPP never builds.</li>
+          <li>🌬️ <strong>Hyperventilation</strong> — ↑ intrathoracic pressure → ↓ venous return → ↓ CPP → failed ROSC.</li>
+          <li>🔁 <strong>Re-arrest after ROSC</strong> — unstable early rhythm; keep pads on, treat the cause, avoid hypotension.</li>
+          <li>🧠 <strong>Hypoxic-ischaemic brain injury</strong> — the dominant determinant of long-term outcome; every minute of low-flow counts.</li>
+          <li>🫁 <strong>Post-arrest complications:</strong> rib/sternal fractures from CPR, aspiration, hyperoxia injury, and post-cardiac-arrest syndrome (myocardial stunning, SIRS-like state).</li>
+          <li>🔎 <strong>The missed reversible cause</strong> — the code that never converts because a hyperkalaemia, tamponade, tension pneumothorax or PE was never sought.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The deadliest complications of an arrest are the ones the team creates — hands-off time, hyperventilation, and the reversible cause nobody looked for."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The reversible causes — the 4 H's &amp; 4 T's</h3>
+        <table class="tbl">
+          <tr><th>Cause</th><th>Clues</th><th>Fix</th></tr>
+          <tr><td>💨 <strong>Hypoxia</strong></td><td>Airway/respiratory event, cyanosis, low SpO₂ before arrest</td><td>Oxygenate, secure airway, confirm ventilation.</td></tr>
+          <tr><td>🩸 <strong>Hypovolaemia</strong></td><td>Bleeding, empty hyperdynamic LV on POCUS</td><td>Fluids/blood; stop the bleeding.</td></tr>
+          <tr><td>🧪 <strong>Hypo/Hyperkalaemia &amp; metabolic</strong></td><td>Dialysis, tall T/wide QRS (hyperK); gas result</td><td><strong>Calcium</strong> then insulin-dextrose (this patient); correct K⁺/glucose.</td></tr>
+          <tr><td>❄️ <strong>Hypothermia</strong></td><td>Cold exposure, low core temp</td><td>Active rewarming; prolonged resuscitation ("not dead until warm and dead").</td></tr>
+          <tr><td>🫁 <strong>Tension pneumothorax</strong></td><td>Absent lung sliding, high airway pressures, deviated trachea</td><td>Immediate decompression (finger/needle thoracostomy).</td></tr>
+          <tr><td>💧 <strong>Tamponade</strong></td><td>Effusion on POCUS, PEA, recent cardiac procedure/trauma</td><td>Pericardiocentesis / resuscitative thoracotomy.</td></tr>
+          <tr><td>☠️ <strong>Toxins</strong></td><td>Overdose history, specific toxidrome</td><td>Antidote (e.g. bicarbonate for TCA, calcium for CCB, lipid emulsion).</td></tr>
+          <tr><td>🫀 <strong>Thrombosis</strong> (coronary/PE)</td><td>Chest pain, known CAD (coronary); RV strain/DVT (PE)</td><td>Coronary: PCI on ROSC. PE: thrombolysis, prolonged CPR.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Run the 4 H's and 4 T's on every arrest that won't convert — a shock cannot fix a potassium of 7, a tamponade, or a tension pneumothorax; only the specific treatment can."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "Running the VF Code"</h3>
+          <div class="hud"><span>❤️ CPP: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">Witnessed collapse, no pulse, monitor shows coarse VF. Compressions have just started and the defibrillator is at the bedside, charging. What is your first move?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The code plan</h3>
+        <ol>
+          <li>⚡ <strong>Shockable arrest:</strong> uninterrupted high-quality CPR + early defibrillation every 2-minute cycle while VF persists.</li>
+          <li>💉 <strong>Drugs on the clock:</strong> adrenaline after the 2nd shock then every 3–5 min; amiodarone 300 mg after the 3rd shock (150 mg after the 5th).</li>
+          <li>🔎 <strong>Reversible causes:</strong> gas + potassium; empirical calcium and potassium-shift for this dialysis patient; POCUS for tamponade/PE/pneumothorax.</li>
+          <li>🏥 <strong>On ROSC:</strong> 12-lead ECG → cath if STEMI; post-arrest bundle — oxygenation/ventilation targets, MAP support, avoid fever, urgent dialysis for hyperkalaemia.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A great code is boringly disciplined: relentless CPR, shocks without pauses, drugs on time, and a reversible-cause sweep that never gets forgotten in the noise."</div>
+
+        <div class="checklist" id="ckCPR">
+          <h3 style="margin-top:0">🩺 Procedure Guide — High-quality CPR &amp; defibrillation (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>❤️ Compressions rate 100–120/min, depth 5–6 cm, full recoil, minimal leaning</span></label>
+          <label class="ck"><input type="checkbox"><span>🔁 Rotate compressor every 2 min; compression fraction &gt; 60%</span></label>
+          <label class="ck"><input type="checkbox"><span>⚡ Pads on early; charge during compressions; peri-shock pause &lt; 5 s; resume CPR immediately after shock</span></label>
+          <label class="ck"><input type="checkbox"><span>🌬️ Ventilate without hyperventilating (~10 breaths/min once advanced airway placed); capnography on</span></label>
+          <label class="ck"><input type="checkbox"><span>💉 Adrenaline every 3–5 min; amiodarone 300 mg after 3rd shock, 150 mg after 5th</span></label>
+          <label class="ck"><input type="checkbox"><span>⏱️ Rhythm/pulse check only at the 2-minute cycle; no random interruptions</span></label>
+          <div class="ck-progress" data-progress>0 / 6 complete</div>
+        </div>
+
+        <div class="checklist" id="ckReversible">
+          <h3 style="margin-top:0">🩺 Procedure Guide — The 4 H's &amp; 4 T's reversible-cause sweep</h3>
+          <label class="ck"><input type="checkbox"><span>💨 Hypoxia — airway secured, oxygenating &amp; ventilating; 🩸 Hypovolaemia — fluids/blood, POCUS LV</span></label>
+          <label class="ck"><input type="checkbox"><span>🧪 Hyper/hypokalaemia &amp; metabolic — gas/potassium sent; calcium + shift for dialysis patient</span></label>
+          <label class="ck"><input type="checkbox"><span>❄️ Hypothermia — core temp checked; rewarm &amp; prolong resuscitation if cold</span></label>
+          <label class="ck"><input type="checkbox"><span>🫁 Tension pneumothorax — lung sliding checked; decompress if absent</span></label>
+          <label class="ck"><input type="checkbox"><span>💧 Tamponade — cardiac POCUS; pericardiocentesis if effusion + arrest</span></label>
+          <label class="ck"><input type="checkbox"><span>☠️ Toxins — history/toxidrome; specific antidote. 🫀 Thrombosis — coronary (PCI on ROSC) / PE (thrombolysis + prolonged CPR)</span></label>
+          <div class="ck-progress" data-progress>0 / 6 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">21:04</div>Witnessed collapse, VF on the monitor, immediate CPR; pads applied, first shock delivered with a &lt; 5-second pause.</div>
+          <div class="t-item"><div class="t-time">21:06</div>Still VF after 2nd shock → adrenaline 1 mg IV; VBG back: K⁺ 7.2 → calcium given, insulin-dextrose started.</div>
+          <div class="t-item"><div class="t-time">21:08</div>3rd shock → amiodarone 300 mg IV; compression fraction held &gt; 70%, EtCO₂ 18 and climbing.</div>
+          <div class="t-item"><div class="t-time">21:11</div>Post-4th-shock rhythm check: organised rhythm, EtCO₂ surges to 40, palpable central pulse — <strong>ROSC</strong>.</div>
+          <div class="t-item"><div class="t-time">21:14</div>12-lead: anterior STEMI → primary PCI activated. Post-arrest bundle started; urgent dialysis arranged for hyperkalaemia. Normothermia targeted, MAP supported.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>He is alive because the team shocked early, never let the compressions stop, gave the drugs on the clock, and — crucially — found and fixed the hyperkalaemia that the shocks alone could never have corrected. Discipline plus a reversible-cause sweep converted a refractory VF into a ROSC.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 Post-ROSC care &amp; the two divergent trajectories</h3>
+        <div class="vs">
+          <div class="side a"><h4>🫀 This patient (ROSC after VF)</h4><ul><li>Post-arrest bundle: SpO₂ 94–98% (avoid hypoxia AND hyperoxia), normocapnia, MAP ≥ 65 mmHg</li><li>12-lead → STEMI → immediate PCI; treat hyperkalaemia, urgent dialysis</li><li><strong>Avoid fever</strong>, target normothermia (TTM2); neuroprognostication delayed &amp; multimodal</li><li>ICU admission; ICD assessment for secondary prevention once recovered</li></ul></div>
+          <div class="side b"><h4>🕊️ When the code does not succeed</h4><ul><li>Stop after a reversible-cause sweep is complete and resuscitation is futile (persistent asystole, EtCO₂ &lt; 10 despite good CPR &gt; 20 min)</li><li>Prolong for hypothermia, PE thrombolysis, or ECPR candidacy</li><li>Compassionate team debrief; family communication; organ-donation pathway where appropriate</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"ROSC is half-time, not full-time: the post-arrest bundle — oxygenation targets, blood pressure, avoiding fever, and a 12-lead that finds the STEMI — decides whether the brain survives the save."</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>⚡ Shock a shockable rhythm fast</b>In VF the defibrillator is the drug — survival falls ~7–10% per minute of delay.</div>
+          <div class="pearl"><b>❤️ CPP is the currency of ROSC</b>Coronary perfusion pressure builds over compressions and collapses with every pause.</div>
+          <div class="pearl"><b>⏸️ Charge during compressions</b>Keep peri-shock pause &lt; 5 s; compression fraction &gt; 60%.</div>
+          <div class="pearl"><b>🌬️ Don't hyperventilate</b>Fast bagging ↑ intrathoracic pressure → ↓ venous return → ↓ CPP → worse ROSC.</div>
+          <div class="pearl"><b>🚫 Don't shock asystole</b>Non-shockable = CPR + adrenaline + hunt the cause; a shock does nothing.</div>
+          <div class="pearl"><b>💉 Know the drug clock</b>Adrenaline every 3–5 min; amiodarone 300 mg after the 3rd shock, 150 mg after the 5th.</div>
+          <div class="pearl"><b>🔎 4 H's &amp; 4 T's</b>The reversible cause you don't look for is the one that kills the code.</div>
+          <div class="pearl"><b>🩸 Dialysis + VF = potassium</b>Give calcium first, then shift K⁺; a gas is the highest-yield arrest test.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the standard algorithm</h3>
+          <ul>
+            <li>🫀 <strong>ECPR / E-CPR (extracorporeal CPR):</strong> veno-arterial ECMO instituted during ongoing CPR for selected refractory arrests (witnessed, shockable, short low-flow, reversible cause such as coronary occlusion or PE). Trials (ARREST, PRAGUE-OHCA, INCEPTION) show benefit is highly system- and selection-dependent — it demands a rapid-deployment team and strict criteria.</li>
+            <li>⚡ <strong>Double-sequential (dual) defibrillation</strong> and <strong>vector change</strong> for refractory VF: the DOSE-VF trial suggested improved survival with a vector change or double-sequential external defibrillation over standard repeated shocks in shock-refractory VF.</li>
+            <li>🩻 <strong>Point-of-care ultrasound in PEA:</strong> differentiates the "pseudo-PEA" (organised cardiac motion, often hypovolaemia/obstruction — better prognosis) from true standstill, and rapidly identifies tamponade, massive PE (dilated RV), tension pneumothorax and hypovolaemia — integrated into the &lt; 10-second rhythm-check pause.</li>
+            <li>🧊 <strong>The post-cardiac-arrest bundle:</strong> targeted temperature management (normothermia/fever avoidance per TTM2), controlled oxygenation (avoid hyperoxia) and ventilation (normocapnia), haemodynamic optimisation (MAP ≥ 65), early coronary angiography for STEMI, and delayed multimodal neuroprognostication.</li>
+            <li>🔌 <strong>Refractory-cause-directed therapy:</strong> thrombolysis for presumed PE arrest (then CPR 60–90 min), resuscitative thoracotomy for tamponade/penetrating trauma, and hyperkalaemia protocols (calcium, shift, emergent dialysis) — the arrest that won't convert almost always has a cause to fix.</li>
+            <li>💉 <strong>Airway &amp; drug-route nuance:</strong> intraosseous vs IV (fast, reliable in arrest), supraglottic-first strategies (AIRWAYS-2/PART), and continuous-compression CPR with asynchronous ventilation once an advanced airway is placed.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The Code We Lost to the Clock"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 62-year-old man on haemodialysis arrested in a busy resus bay — a <strong>witnessed VF</strong>, the most salvageable rhythm there is. Yet he never achieved ROSC. The debrief, replayed from the defibrillator's own log, was painful: the compressor stopped repeatedly to "reassess," pushing the <strong>compression fraction down to 40%</strong>; the peri-shock pauses ran to 20 seconds each; and someone bag-masked at <strong>30 breaths a minute</strong> throughout. No one sent a blood gas. His potassium, found later, was <strong>7.4</strong> — a <strong>hyperkalaemia that calcium would have fixed</strong>. The team shocked a heart that could not sustain a rhythm because its metabolism was never corrected, while its coronary perfusion pressure was repeatedly reset to zero.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>⏸️ HANDS-OFF TIME</b>Compression fraction 40%; long peri-shock pauses reset CPP every cycle.</div>
+            <div class="hole"><b>🌬️ HYPERVENTILATION</b>Bagging at 30/min ↑ intrathoracic pressure → ↓ venous return → ↓ CPP.</div>
+            <div class="hole"><b>🧪 MISSED CAUSE</b>No gas sent; a K⁺ of 7.4 in a dialysis patient — calcium never given.</div>
+            <div class="hole"><b>👥 NO ROLE CLARITY</b>No one owned the timer, the reversible causes, or CPR quality.</div>
+            <div class="hole"><b>📟 TREATED THE MONITOR</b>Shocks delivered; the metabolism behind the VF ignored.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> protect compression fraction (charge during CPR, peri-shock pause &lt; 5 s, rotate the compressor); ventilate slow and shallow (~10/min); send a gas on every arrest and give empirical calcium for an obvious hyperkalaemia; and assign explicit roles — a timekeeper, a CPR-quality coach, and someone whose only job is the 4 H's &amp; 4 T's. <strong>This is exactly the discipline that achieved ROSC in Bed 4.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"You can shock perfect VF forever and still lose the patient if the compressions stop, the bag runs too fast, and the potassium of 7 goes unlooked-for. Fix the CPR, fix the ventilation, find the cause."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🚨 Emergency Department · Bed 4 — Cardiac Arrest / ACLS in Resus<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+  /* ===== SIDEBAR SCROLL-SPY (vertical) ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); var t=sections[idx]; if(t) t.scrollIntoView({behavior:'smooth',block:'start'}); setActive(idx); markVisited(idx); }); });
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){ entries.forEach(function(e){ if(!e.isIntersecting) return; var i=sections.indexOf(e.target); if(i>-1){ setActive(i); markVisited(i); } }); }, { rootMargin:'-10% 0px -75% 0px' });
+    sections.forEach(function(s){ if(s) io.observe(s); });
+  }
+  markVisited(0); setActive(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not a high-risk feature'); } if(found===total){ flagResult.textContent='✅ All '+total+' high-risk features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' high-risk features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: CPR quality dial ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=100-v; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v>=80){ msg='🟢 High-quality CPR ('+v+'%): depth 5–6 cm, rate 100–120, full recoil, compression fraction >60%. Coronary perfusion pressure is high → the best chance a shock converts to ROSC.'; cls='good'; }
+      else if(v>=55){ msg='🟠 Adequate but leaky ('+v+'%): slightly shallow or a few too many pauses. CPP is borderline — tighten depth and cut the hands-off time.'; cls='warn-r'; }
+      else if(v>=30){ msg='🟠 Poor CPR ('+v+'%): too shallow / too many interruptions. CPP is falling below the ~15 mmHg needed for ROSC.'; cls='warn-r'; }
+      else { msg='🔴 Failing CPR ('+v+'%): shallow, slow, constantly interrupted. CPP collapses toward zero → no ROSC. Every pause is a pause in the only blood the brain and heart get.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','CPP Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"Witnessed collapse, no pulse, monitor shows coarse VF. Compressions have just started and the defibrillator is at the bedside, charging. What is your first move?",
+      choices:[
+        {t:"⚡ Continue CPR while the defib charges, clear, deliver a single shock with a <5-second pause, then resume compressions immediately",good:true,ds:1,dt:2,xp:40,fb:"✅ Exactly. Shock a shockable rhythm fast, charge during compressions, and get hands straight back on the chest. The defibrillator is the drug in VF.",next:"repeat"},
+        {t:"⏸️ Stop compressions for a prolonged rhythm and pulse check to be sure before shocking",good:false,ds:-2,dt:3,xp:0,fb:"⚠️ Every second of hands-off time drops coronary perfusion pressure to zero. Long pre-shock pauses are exactly what lost the M&M code in S21. Shock without a long pause.",next:"repeat"},
+        {t:"🌬️ Intubate and bag hard at 30/min first, defibrillate afterwards",good:false,ds:-2,dt:4,xp:0,fb:"☠️ Hyperventilation raises intrathoracic pressure, drops venous return and CPP, and delaying the shock forfeits the one intervention that works. Airway is a supporting act — shock now.",next:"repeat"}
+      ]},
+    repeat:{ text:"After the first shock and 2 minutes of CPR he is STILL in VF. What now?",
+      choices:[
+        {t:"🔁 Continue high-quality CPR, shock again, give adrenaline 1 mg IV and repeat every 3–5 min; give amiodarone 300 mg after the 3rd shock",good:true,ds:1,dt:2,xp:40,fb:"✅ Right. Persistent VF is a reason to keep shocking and keep compressing — adrenaline on the 3–5 min clock, amiodarone after the 3rd shock.",next:"declare"},
+        {t:"🛑 It's not converting — switch off the defibrillator and treat him as asystole with adrenaline only",good:false,ds:-2,dt:4,xp:0,fb:"⚠️ VF is still shockable — you never stop shocking a shockable rhythm because it's stubborn. Confusing refractory VF for a non-shockable rhythm forfeits the shocks that convert it.",next:"declare"}
+      ]},
+    declare:{ text:"Refractory VF. The VBG is back: potassium 7.2 in this dialysis patient who missed two sessions. What is the key next step?",
+      choices:[
+        {t:"🧪 Give IV calcium immediately to stabilise the myocardium, start insulin-dextrose to shift K⁺, and continue CPR + defibrillation while sweeping the rest of the 4 H's & 4 T's",good:true,ds:1,dt:2,xp:45,fb:"🏆 Perfect. A shock cannot fix a potassium of 7 — calcium can. Treat the reversible cause and the refractory VF converts. This is the discipline that achieves ROSC.",end:true},
+        {t:"⚡ Ignore the bloods and just keep shocking — it's 'only VF'",good:false,ds:-2,dt:6,xp:0,fb:"☠️ This is the M&M case (S21). Shocking a hyperkalaemic heart forever without giving calcium never converts it — the missed reversible cause loses the code.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='declare'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 58-year-old collapses; the monitor shows coarse VF in a witnessed, monitored arrest. The single most important intervention is:", opts:["Immediate intubation","Early defibrillation with minimal interruption to CPR","A fluid bolus","Sodium bicarbonate"], correct:1, exp:"In shockable arrest the defibrillator is the drug — survival falls ~7–10% per minute of delay. Deliver the shock fast, charging during compressions and keeping the peri-shock pause under 5 seconds. Airway and drugs are supporting acts." },
+    { q:"In shock-refractory VF, the correct adrenaline dosing is:", opts:["3 mg once only","1 mg IV/IO every 3–5 minutes","1 mg IV every minute","No adrenaline in shockable rhythms"], correct:1, exp:"Adrenaline is 1 mg IV/IO every 3–5 minutes. In the shockable arm it is first given after the 2nd shock; in non-shockable rhythms it is given as soon as possible." },
+    { q:"When should amiodarone be given in shock-refractory VF/pulseless VT?", opts:["Before the first shock","300 mg after the 3rd shock (150 mg after the 5th)","Only if adrenaline fails","Never — it is contraindicated in VF"], correct:1, exp:"Amiodarone 300 mg IV/IO is given after the 3rd shock, with a further 150 mg after the 5th (ALIVE: amiodarone improved survival to admission vs lidocaine). Lidocaine is an accepted alternative." },
+    { q:"The monitor shows asystole. The correct management is:", opts:["Defibrillate immediately","High-quality CPR + adrenaline + hunt reversible causes; do NOT shock","A single synchronised shock","Amiodarone 300 mg"], correct:1, exp:"Asystole and PEA are non-shockable — there is nothing to defibrillate. Give high-quality CPR, adrenaline as soon as possible, and relentlessly search the 4 H's & 4 T's. Don't shock; find the reversible cause." },
+    { q:"Why is hyperventilation harmful during CPR?", opts:["It cools the patient","It raises intrathoracic pressure, reducing venous return and coronary perfusion pressure","It causes hyperkalaemia","It has no effect"], correct:1, exp:"Fast bagging increases intrathoracic pressure, which impedes venous return to the chest, lowers the pressure gradient and drops coronary perfusion pressure — worsening ROSC. Ventilate slow and shallow (~10 breaths/min once an advanced airway is placed)." },
+    { q:"Which parameters define high-quality chest compressions?", opts:["Rate 60/min, depth 2 cm","Rate 100–120/min, depth 5–6 cm, full recoil, compression fraction >60%","Rate 140/min, depth 8 cm","As deep as possible with frequent long pauses"], correct:1, exp:"Rate 100–120/min, depth 5–6 cm, full chest recoil, minimal interruptions and a compression fraction above 60%. Coronary perfusion pressure builds over uninterrupted compressions and collapses with every pause." },
+    { q:"A dialysis patient who missed sessions arrests in refractory VF with a potassium of 7.2. The key drug is:", opts:["More amiodarone","IV calcium (then insulin-dextrose to shift K⁺)","Sodium bicarbonate alone","Magnesium 2 g"], correct:1, exp:"Hyperkalaemia is a reversible cause a shock cannot fix. Give IV calcium first to stabilise the myocardium, then insulin-dextrose (± bicarbonate) to shift potassium, and arrange urgent dialysis on ROSC. Always send a gas in an arrest." },
+    { q:"Immediately after ROSC, appropriate post-arrest care includes:", opts:["Deliberate hyperoxia and permissive fever","Avoiding hypoxia AND hyperoxia, maintaining MAP, preventing fever, and a 12-lead → PCI if STEMI","Immediate extubation and ward transfer","Routine deep hypothermia to 33 °C for everyone"], correct:1, exp:"The post-arrest bundle targets SpO₂ 94–98% (avoid hypoxia and hyperoxia), normocapnia, MAP ≥ 65, active fever avoidance/normothermia (TTM2), and an immediate 12-lead with primary PCI for STEMI (COACT/TOMAHAWK: routine early angiography without ST-elevation showed no benefit)." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you run a code like a consultant. 🏆':score>=6?'Strong — review the misses and S5 EBM.':'Revisit S3, S5 and S6 — the shockable-arm algorithm and CPR quality are the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>

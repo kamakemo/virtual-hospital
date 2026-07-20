@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Severe Hyperkalaemia with Cardiac Toxicity — Virtual Teaching Hospital</title>
+<!-- META
+id: c-ed-hyperk-035
+title: Severe Hyperkalaemia with Cardiac Toxicity
+hospital: cardiology
+department: cv-ed
+bednumber: 5
+chiefcomplaint: Dialysis patient, weak and unwell, peaked T waves and a widening QRS
+system: Cardiology
+severity: critical
+tags: Hyperkalaemia, Calcium, Membrane stabilisation, Sine wave, Peri-arrest
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🚨</div>
+      <div>
+        <div class="t1">Emergency Dept</div>
+        <div class="t2">Bed 5 · Hyperkalaemia</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🚨 Emergency Department · 🛏️ Bed 5</div>
+        <h1>⚡ Severe Hyperkalaemia — "What the Potassium Is Doing to the Myocyte"</h1>
+        <div class="sub">🩸 14:40. A haemodialysis patient who missed Saturday's session is wheeled in grey, weak and nauseated. The monitor shows a slow, wide-complex rhythm the triage nurse called "just a bradycardia." The gas machine prints K⁺ 7.9. The T waves are tented and the QRS is fattening in front of you. Calcium goes in before you finish reading the gas.</div>
+        <div class="chips">
+          <span class="chip crit">🔴 CRITICAL</span>
+          <span class="chip">⚡ Hyperkalaemia</span>
+          <span class="chip">🛡️ Calcium First</span>
+          <span class="chip">🌊 Sine-Wave Watch</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital alert"><div class="v-label">💓 HR (wide QRS)</div><div class="v-num">44</div></div>
+        <div class="vital warn"><div class="v-label">🩸 BP</div><div class="v-num">96/60</div></div>
+        <div class="vital"><div class="v-label">🌬️ RR</div><div class="v-num">18</div></div>
+        <div class="vital warn"><div class="v-label">🫁 SpO₂</div><div class="v-num">96%</div></div>
+        <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.4°</div></div>
+        <div class="vital"><div class="v-label">🧠 GCS</div><div class="v-num">15</div></div>
+        <div class="vital alert"><div class="v-label">⚡ K⁺</div><div class="v-num">7.9</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 14:40, Resus 2</b>A man on a hospital trolley is pale and floppy, breathing but too weak to lift his arm off the rail. He whispers: <em>"I feel like I'm switching off… I missed my dialysis this weekend."</em> The monitor shows a broad, slow complex at 44/min. The venous gas that just printed reads <strong>K⁺ 7.9 mmol/L</strong>. This is the exact moment a "slow rhythm" is really a heart minutes from a sine wave. Calcium first — then think.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>🧔 Name</td><td><strong>Mr. R.K.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>58-year-old male</td></tr>
+          <tr><td>🆔 MRN</td><td>CV-ED-0512</td></tr>
+          <tr><td>⚖️ Weight</td><td>78 kg (post-dialysis "dry" weight 74 kg — 4 kg of fluid on)</td></tr>
+          <tr><td>🩺 Access</td><td>Left forearm AV fistula (thrill present); anuric</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 Past history — every line raises the potassium ceiling</h3>
+        <ul>
+          <li>🩸 <strong>End-stage kidney disease on haemodialysis</strong> (Mon/Wed/Fri), <strong>anuric</strong> — no renal route to excrete potassium at all. He <em>missed Saturday and this morning's</em> sessions.</li>
+          <li>💊 <strong>Ramipril</strong> (ACE inhibitor) and <strong>spironolactone</strong> — both raise potassium; continued at home.</li>
+          <li>🍌 Ate "a lot of fruit and a salt-substitute" over the weekend (potassium chloride salt substitutes are a classic hidden load).</li>
+          <li>❤️ Ischaemic heart disease, type 2 diabetes, hypertension — a heart already primed for arrhythmia.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In a missed-dialysis, anuric patient with a wide-complex bradycardia, the diagnosis is hyperkalaemia until proven otherwise — and calcium is both the test and the treatment."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why hyperkalaemia is the quiet ED killer</b>Symptoms are vague — weakness, nausea, palpitations, "feeling awful" — so it is easy to under-triage. Yet severe hyperkalaemia (K⁺ &gt; 6.5, or any level with ECG change) can go from tented T waves to asystole in minutes, and it is one of the few cardiac arrests that is fully reversible if you recognise it. The whole game is a <strong>structured STABILISE → SHIFT → REMOVE</strong> response, not a leisurely "recheck the level."</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 Paramedic / renal-unit handover — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ Handover SBAR (verbatim)</b>
+          <p><strong>S:</strong> "58-year-old dialysis patient, increasingly weak over two days, now barely able to stand, nauseated, a couple of palpitation episodes."</p>
+          <p><strong>B:</strong> "Anuric ESKD on haemodialysis, missed his Saturday session and today's, on ramipril and spironolactone, ischaemic heart disease and diabetes."</p>
+          <p><strong>A:</strong> "En route the monitor showed a slow wide rhythm at 40–46, BP 96/60. No chest pain. Our read was 'a slow rhythm, maybe his beta-blocker.' We didn't have bloods."</p>
+          <p><strong>R:</strong> "We brought him straight to resus. He looks like he's fading."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A wide-complex bradycardia in a dialysis patient is a POTASSIUM rhythm until a gas says otherwise — don't reach for atropine, reach for calcium and a venous gas."</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each feature that points to dangerous hyperkalaemia</h3>
+        <p>🎮 <em>Click every feature that RAISES the probability/severity of hyperkalaemic cardiac toxicity. Each correct = +10 XP.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">📈 Peaked (tented) T waves</button>
+          <button class="btn ghost flag-btn" data-good="1">🧱 Widening QRS complex</button>
+          <button class="btn ghost flag-btn" data-good="1">〰️ Loss / flattening of P waves</button>
+          <button class="btn ghost flag-btn" data-good="1">🌊 Sine-wave pattern on the monitor</button>
+          <button class="btn ghost flag-btn" data-good="1">🐢 Bradycardia</button>
+          <button class="btn ghost flag-btn" data-good="1">🩸 Missed dialysis / anuric AKI</button>
+          <button class="btn ghost flag-btn" data-good="1">💊 ACEi / spironolactone / K-sparing drugs</button>
+          <button class="btn ghost flag-btn" data-good="0">🌡️ Fever 38.5°C</button>
+          <button class="btn ghost flag-btn" data-good="0">🤕 Reproducible chest-wall pain</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Praise where due</b>The crew resisted the temptation to treat the number "44" with atropine or pacing and brought him straight to resus with a monitor. In hyperkalaemia the rate is a symptom of the potassium — fix the potassium and the rhythm follows.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🅰️🅱️🅲️ Primary survey — with the ECG on the wall from second one</h3>
+        <table class="tbl">
+          <tr><th>Step</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>🅰️ Airway</td><td>Patent, phonating weakly.</td><td>Talking = airway OK; profound weakness is itself a hyperkalaemic sign (skeletal muscle depolarised too).</td></tr>
+          <tr><td>🅱️ Breathing</td><td>RR 18, SpO₂ 96% RA, chest clear.</td><td>Neuromuscular weakness can eventually blunt respiration; re-check as the picture evolves.</td></tr>
+          <tr><td>🅲️ Circulation</td><td>HR <strong>44, regular, WIDE complexes</strong>, BP 96/60, cool peripheries. Fistula thrill present.</td><td>Wide + slow + a known dialysis patient = assume hyperkalaemia and get a gas <em>and</em> a 12-lead simultaneously. Preserve the fistula arm for later.</td></tr>
+          <tr><td>🅳 Disability</td><td>GCS 15 but drowsy.</td><td>Hypoperfusion from bradycardia lowers conscious level; a falling GCS is an ominous trend.</td></tr>
+          <tr><td>🅴 Exposure</td><td>Generalised flaccid weakness, no focal deficit, no rash; no chest-wall tenderness.</td><td>Ascending weakness/paraesthesiae mimic Guillain–Barré but resolve with treatment.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Two things happen at once in this patient: a venous gas/iSTAT for K⁺ AND a 12-lead ECG. Don't wait for the formal lab potassium — the ECG and the point-of-care gas ARE the emergency."</div>
+
+        <h3>🧭 The immediate question at the bedside</h3>
+        <p>Before anything else you ask: <strong>are there ECG changes of hyperkalaemia?</strong> If yes — peaked T waves, wide QRS, lost P waves, or a sine wave — this is <strong>severe hyperkalaemia with cardiac toxicity</strong> and the treatment clock is now measured in minutes, not the hour it takes a formal potassium to return. <strong>Give IV calcium now.</strong></p>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of "wait for the confirmed lab potassium"</b>A haemolysed sample can falsely raise potassium (pseudohyperkalaemia — see S20), but you cannot afford to wait for a repeat while a real sine wave evolves. When the ECG shows hyperkalaemic changes in a plausible patient, <strong>treat first, confirm in parallel</strong>. A point-of-care venous gas gives you a potassium in ~60 seconds.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The EM resident thinks out loud at 14:43:</em></p>
+        <h3>🧠 Frame it as three jobs, in order — STABILISE, SHIFT, REMOVE</h3>
+        <p>"K⁺ 7.9 with a wide QRS and tented T waves — that's severe hyperkalaemia with cardiac toxicity. My job is three distinct tasks, in strict order: <strong>(1) STABILISE the myocardium with IV calcium right now</strong> — it protects the heart within minutes but does NOT lower the potassium. <strong>(2) SHIFT potassium into cells</strong> with insulin + dextrose (and nebulised salbutamol). <strong>(3) REMOVE potassium from the body</strong> — this anuric patient needs <em>dialysis</em>; binders are too slow to rely on alone. And I stop his ramipril and spironolactone."</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>🛡️ <strong>IV calcium gluconate 10% 10–30 mL</strong> (or calcium chloride via a good/central line) over a few minutes — repeat if ECG changes persist after 5 minutes.</li>
+          <li>💉 <strong>Insulin 10 units actrapid + 25 g dextrose</strong> IV to shift K⁺ into cells; check glucose and monitor for hypoglycaemia for hours afterwards.</li>
+          <li>💨 <strong>Salbutamol 10–20 mg nebulised</strong> as an additional shift (additive to insulin).</li>
+          <li>☎️ <strong>Call renal/ICU for urgent haemodialysis</strong> — the only reliable way to REMOVE potassium in an anuric patient.</li>
+          <li>🚫 <strong>Stop ramipril, spironolactone, any K supplements/salt substitute</strong>; review all K-raising drugs.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Calcium FIRST — it doesn't lower the potassium, it saves the heart while you do. Insulin HIDES potassium; dialysis REMOVES it."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>She is tempted to give the insulin-dextrose first because "that's what actually lowers the potassium." Do the calcium and insulin order matter?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>Yes — calcium goes first when there are ECG changes.</strong> Insulin takes 10–20 minutes to start shifting potassium and hours to move much of it, while the myocardium is unprotected in the meantime. IV calcium antagonises the membrane effect within 1–3 minutes and buys the time the shift needs. Giving insulin without calcium first leaves the heart exposed exactly when a sine wave can degenerate to VF. <strong>Order: calcium → shift → remove.</strong></p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The EM consultant at the bedside, 14:48:</em></p>
+        <h3>🧮 Grading severity — and why the ECG outranks the number</h3>
+        <table class="tbl">
+          <tr><th>Severity</th><th>Serum K⁺</th><th>Typical ECG</th><th>Action</th></tr>
+          <tr><td>🟢 Mild</td><td>5.5–5.9</td><td>Often normal; early peaked T</td><td>Address cause, dietary/drug review, recheck.</td></tr>
+          <tr><td>🟠 Moderate</td><td>6.0–6.4</td><td>Peaked T ± PR prolongation</td><td>Shift ± remove; monitor; treat cause.</td></tr>
+          <tr><td>🔴 Severe</td><td class="hi">≥ 6.5</td><td>Wide QRS, flat/absent P, sine wave</td><td class="hi">STABILISE → SHIFT → REMOVE now.</td></tr>
+          <tr><td>☠️ Any level + ECG change</td><td>Any</td><td>Any hyperkalaemic ECG</td><td class="hi">Treat as severe regardless of the number — IV calcium.</td></tr>
+        </table>
+        <p>Our patient (K⁺ 7.9, wide QRS, tented T, drowsy) is unambiguously <strong>severe hyperkalaemia with cardiac toxicity</strong> — the ECG changes alone would justify calcium even before the number came back.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Treat the ECG, not just the number. A K⁺ of 6.2 with a widening QRS is more dangerous than a K⁺ of 7.0 with a normal ECG — the myocardium's electrical response, not the lab value, drives urgency."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> UK Renal Association / UK Kidney Association (2020, updated 2022)</td><td>Structured pathway: IV calcium for ECG changes; insulin-dextrose ± salbutamol to shift; dialysis for refractory/anuric; stop K-raising drugs.</td><td>Follow a protocolised STABILISE → SHIFT → REMOVE bundle, not ad-hoc treatment.</td></tr>
+            <tr><td><span class="lvl">MECHANISM/RCT</span> Insulin-dextrose shift</td><td>10 units insulin + dextrose lowers K⁺ by ~0.6–1.2 mmol/L over 30–60 min via Na/K-ATPase; effect is temporary.</td><td>Shift buys hours, not a cure — <strong>hypoglycaemia is common</strong>, monitor glucose for 4–6 h; consider lower-dose insulin/continuous dextrose in ESKD.</td></tr>
+            <tr><td><span class="lvl">MECHANISM</span> IV calcium as membrane stabiliser</td><td>Raises the threshold potential back away from the (elevated) resting potential, restoring the gap that fast Na channels need — reverses ECG changes in 1–3 min. Does <em>not</em> change serum K⁺.</td><td>Calcium is a <strong>bridge</strong>: it protects the heart but you MUST still shift and remove. Repeat if ECG changes persist.</td></tr>
+            <tr><td><span class="lvl">RCT/COCHRANE</span> Salbutamol nebuliser</td><td>10–20 mg nebulised lowers K⁺ ~0.5–1.0 mmol/L; additive to insulin; ~40% show a blunted response, so never rely on it alone.</td><td>Use as an adjunct to insulin, not a substitute; expect tachycardia/tremor.</td></tr>
+            <tr><td><span class="lvl">DEFINITIVE</span> Haemodialysis</td><td>The only rapid, reliable way to REMOVE potassium from the body; essential in anuria/ESKD and refractory cases.</td><td>Shift alone in an anuric patient guarantees rebound — <strong>book dialysis early</strong>.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The death that haunts our unit was a missed-dialysis man read as 'a slow rhythm.' They gave insulin and salbutamol — no calcium, no urgent dialysis — and moved him to a monitored ward bed. The QRS widened into a sine wave and he arrested in VF within the hour. Ten millilitres of calcium at the door would have bought the time dialysis needed."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — what the potassium is doing to the myocyte (the WHY behind the WHY)</h3>
+        <ol>
+          <li>🔋 <strong>Resting membrane potential rises:</strong> the resting potential of a cardiac myocyte is set almost entirely by the potassium gradient across the membrane (the Nernst equation for K⁺). Raising <em>extracellular</em> K⁺ shrinks that gradient, so the resting potential becomes <strong>less negative</strong> (moves from ~−90 mV toward −70 mV).</li>
+          <li>🚪 <strong>Fast sodium channels inactivate:</strong> voltage-gated Na⁺ channels sit at a more depolarised, partially <em>inactivated</em> state when the cell rests less negative. Fewer channels are available to open.</li>
+          <li>🐌 <strong>Depolarisation & conduction slow:</strong> with fewer Na channels firing, phase 0 upstroke is smaller and slower — conduction through atria, AV node and ventricle drags. This is the electrical basis of every ECG change.</li>
+          <li>📈 <strong>The ECG marches:</strong> altered repolarisation gives <strong>tall, tented T waves</strong> first → then <strong>PR prolongation and flattening/loss of P waves</strong> (atrial tissue is exquisitely sensitive) → then <strong>QRS widening</strong> → the widened QRS merges with the T wave into a <strong>sine wave</strong> → <strong>VF or asystole</strong>.</li>
+        </ol>
+
+        <div class="callout danger"><b class="ct">🔁 The vicious cycle to never forget</b>High K⁺ → slowed conduction → bradycardia & hypoperfusion → acidosis → potassium shifts OUT of cells (H⁺/K⁺ exchange) → even higher extracellular K⁺ → worse conduction. The spiral tightens toward asystole. <strong>Calcium (stabilise) + insulin/salbutamol (shift) + dialysis (remove) break the cycle at three different points.</strong></div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A sine-wave ECG is minutes from asystole — give calcium before you finish reading the gas."</div>
+
+        <h3>⚖️ Contrast triad — STABILISE vs SHIFT vs REMOVE (three different jobs)</h3>
+        <div class="vs">
+          <div class="side a"><h4>🛡️ STABILISE (calcium)</h4><ul><li>IV calcium gluconate/chloride</li><li>Protects the myocardium in 1–3 min by restoring the threshold gap</li><li><strong>Does NOT lower serum K⁺</strong> — a bridge, not a cure; repeat if ECG changes persist</li></ul></div>
+          <div class="side b"><h4>🔀 SHIFT (insulin/salbutamol/bicarb)</h4><ul><li>Insulin+dextrose, nebulised salbutamol, bicarbonate if acidotic</li><li>Drives K⁺ into cells via Na/K-ATPase — lowers the <em>measured</em> level temporarily</li><li><strong>Hides</strong> potassium; it will rebound out of cells within hours</li></ul></div>
+        </div>
+        <div class="callout ok"><b class="ct">🧹 …and REMOVE (the job the first two can't do)</b>Only <strong>dialysis</strong> (definitive, essential in anuria/ESKD) and, more slowly, <strong>potassium binders</strong> (patiromer, sodium zirconium cyclosilicate) actually take potassium out of the body. Stop K-raising drugs and treat the cause. <em>Stabilise buys minutes, shift buys hours, remove buys the cure.</em></div>
+        <p>💡 The classic error is to do the shift, watch the number fall, and relax — then the patient rebounds and re-arrests because nobody REMOVED anything.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The Potassium Dial: serum K⁺ → myocyte membrane &amp; ECG</h3>
+          <p style="font-size:13px">Drag the serum potassium and watch the myocyte's resting potential, sodium-channel availability, and the ECG march from normal → peaked T → wide QRS/lost P → sine wave.</p>
+          <label for="kRange">⚡ Serum potassium: <b id="kVal">4.0</b> mmol/L</label>
+          <input type="range" id="kRange" min="3" max="9" step="0.1" value="4">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to walk the myocyte from a healthy −90 mV to the sine wave.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 Notice: it isn't a light switch. As K⁺ climbs, the resting potential creeps up, Na channels inactivate, conduction slows, and the ECG deteriorates in a predictable order. Any wide-QRS/sine-wave reading = <strong>IV calcium now</strong>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The order set (14:44)</h3>
+        <ul>
+          <li>📈 <strong>12-lead ECG now</strong> + continuous cardiac monitoring with defib pads on; repeat ECG after each intervention.</li>
+          <li>🛡️ <strong>STABILISE: IV calcium gluconate 10% 10–30 mL over 5–10 min</strong> (or calcium chloride 10% 10 mL via central/large-bore line). Repeat in 5 min if ECG changes persist.</li>
+          <li>💉 <strong>SHIFT: 10 units soluble insulin in 25 g dextrose (e.g. 50 mL of 50% or 250 mL of 10%) IV</strong>; check capillary glucose now, at 30 min, then hourly ×6.</li>
+          <li>💨 <strong>SHIFT: salbutamol 10–20 mg nebulised.</strong></li>
+          <li>🧪 <strong>SHIFT (only if acidotic): sodium bicarbonate</strong> — adjunct, not a substitute; avoid mixing in the same line as calcium (precipitates).</li>
+          <li>☎️ <strong>REMOVE: urgent renal/ICU referral for haemodialysis</strong>; enteral potassium binder (patiromer / sodium zirconium cyclosilicate) for ongoing control.</li>
+          <li>🚫 <strong>STOP</strong> ramipril, spironolactone, any potassium supplement/salt-substitute; hold other K-raising drugs (NSAIDs, trimethoprim).</li>
+          <li>🩸 Formal U&amp;E, venous gas, CK (rhabdomyolysis?), glucose, calcium/magnesium; treat the cause (missed dialysis + drugs here).</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Write the orders in the order the heart needs them: calcium, then insulin-dextrose + salbutamol, then the dialysis call — and never mix calcium and bicarbonate in the same line."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Resus-bay priorities — the nurse runs the safety net</h3>
+        <ul>
+          <li>📟 <strong>Continuous telemetry, defib pads attached, arrest trolley to hand</strong> — a sine wave can become VF in seconds.</li>
+          <li>🛡️ <strong>Draw up calcium first</strong> and know your two vials apart: calcium gluconate for peripheral use; calcium chloride (3× more elemental calcium) needs a good/central line as it is a vesicant.</li>
+          <li>🍬 <strong>Glucose watch after insulin</strong> — check capillary glucose at 30 min then hourly for at least 6 h; hypoglycaemia can arrive late, especially in ESKD. Keep dextrose ready.</li>
+          <li>💉 <strong>Guard the fistula arm</strong> — no BP cuffs, cannulae or venepuncture in the AV fistula limb; it is the patient's dialysis lifeline.</li>
+          <li>🔁 <strong>Repeat the ECG after each drug</strong> and re-send potassium — the nurse's serial strips show whether calcium is holding and whether the shift is working.</li>
+          <li>🧾 Time-stamp every drug and every strip precisely; escalate immediately if the QRS re-widens (calcium wearing off → needs repeat).</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who repeats the ECG after every drug is the person who catches the calcium wearing off before the sine wave comes back."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>On arrival</th><th>Interpretation</th></tr>
+          <tr><td>Venous gas K⁺ (point-of-care)</td><td class="hi">7.9 mmol/L</td><td><strong>Severe hyperkalaemia</strong> — with the wide QRS this is cardiac toxicity. Treat now; don't wait for the formal lab.</td></tr>
+          <tr><td>Venous pH / HCO₃⁻</td><td class="hi">7.24 / 15</td><td>Metabolic acidosis — drives more K⁺ out of cells (part of the vicious cycle) and is a reason to consider bicarbonate as an adjunct.</td></tr>
+          <tr><td>Creatinine / urea</td><td class="hi">920 µmol/L / 41 mmol/L</td><td>Baseline ESKD numbers, anuric — no renal excretion route, so REMOVE = dialysis.</td></tr>
+          <tr><td>Formal serum K⁺ (lab)</td><td class="hi">7.7 mmol/L</td><td>Confirms it is real (not just pseudohyperkalaemia); slightly lower than gas — treatment already started.</td></tr>
+          <tr><td>Corrected calcium</td><td class="lo">2.02 mmol/L</td><td>Low-ish — CKD-MBD; relevant because low calcium <em>worsens</em> the membrane effect of hyperkalaemia.</td></tr>
+          <tr><td>CK</td><td>310 U/L</td><td>Mildly up — exclude rhabdomyolysis as an additional K⁺ source if higher.</td></tr>
+          <tr><td>Glucose</td><td>7.1 mmol/L</td><td>Baseline before insulin — the reference point for hypoglycaemia monitoring.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A point-of-care venous gas gives you the potassium in a minute — in a crashing hyperkalaemic patient it is the single most useful test, and it tells you the pH too."</div>
+
+        <div class="callout info"><b class="ct">🧠 Confirm it's real — but don't be paralysed</b>Always send a formal potassium and think about <strong>pseudohyperkalaemia</strong> (haemolysed sample, prolonged tourniquet, delayed processing, marked leucocytosis/thrombocytosis — see S20). But when the ECG shows hyperkalaemic changes in a plausible patient, the pre-test probability is high enough to <strong>treat first and confirm in parallel</strong>. Here the lab confirmed 7.7.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 ECG / IMAGING + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🫀 The hyperkalaemia ECG — read it as a progression, not a snapshot</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 130" preserveAspectRatio="none" aria-label="Hyperkalaemia ECG progression: peaked T waves to wide QRS to sine wave">
+            <rect width="820" height="130" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="32" x2="820" y2="32"/><line x1="0" y1="65" x2="820" y2="65"/><line x1="0" y1="98" x2="820" y2="98"/></g>
+            <polyline fill="none" stroke="#86efac" stroke-width="2.3" points="0,70 30,70 40,66 54,60 66,40 78,60 90,66 100,70 150,70 210,70 224,64 238,40 252,10 266,40 280,64 294,70 330,70 380,72 396,58 414,20 430,96 448,58 462,70 500,72 560,74 578,52 598,26 620,84 642,44 660,70 700,72 740,70 762,44 784,90 810,60"/>
+            <text x="40" y="20" fill="#93c5fd" font-size="11">peaked T</text>
+            <text x="360" y="14" fill="#fcd34d" font-size="11">wide QRS / lost P</text>
+            <text x="700" y="18" fill="#fca5a5" font-size="11">sine wave → VF</text>
+          </svg>
+          <div class="ecg-cap">Left to right: <span style="color:#93c5fd">tall tented T waves</span> → <span style="color:#fcd34d">broadening QRS with flattening/loss of P waves</span> → the QRS and T merge into a <span style="color:#fca5a5">sine wave</span>, the herald of VF/asystole. Each step is the potassium climbing.</div>
+        </div>
+
+        <h3>🔎 The ordered march of hyperkalaemic ECG changes</h3>
+        <table class="tbl">
+          <tr><th>Stage (approx K⁺)</th><th>Look for</th><th>Meaning</th></tr>
+          <tr><td>📈 <strong>Peaked / tented T</strong> (~5.5–6.5)</td><td>Tall, narrow-based, symmetric, pointed T waves; short QT</td><td>Earliest change — accelerated repolarisation. Warning shot.</td></tr>
+          <tr><td>〰️ <strong>P-wave flattening + PR prolongation</strong> (~6.5–7.5)</td><td>P waves shrink then vanish; PR lengthens</td><td>Atrial myocardium depolarised/unexcitable; AV conduction slowing.</td></tr>
+          <tr><td>🧱 <strong>QRS widening</strong> (~7.0–8.0)</td><td>Broad, bizarre complexes; may mimic BBB/VT</td><td>Ventricular conduction failing — the danger zone.</td></tr>
+          <tr><td>🌊 <strong>Sine wave</strong> (&gt; 8.0)</td><td>QRS merges with T into a smooth undulation</td><td>Pre-terminal — <strong>calcium immediately</strong>; minutes from VF/asystole.</td></tr>
+          <tr><td>🐢 <strong>Brady/blocks & escape rhythms</strong></td><td>Sinus brady, junctional/ventricular escape, AV block, asystole</td><td>Do NOT treat as a primary brady — atropine/pacing won't fix the potassium.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Peaked T → flat P → wide QRS → sine wave → flatline. The ECG tells you where on the cliff you are — and a wide QRS means calcium goes in this minute."</div>
+
+        <div class="callout warn"><b class="ct">⚠️ The mimics</b>Hyperkalaemia can masquerade as a wide-complex tachycardia/VT, a bundle-branch block, a STEMI (rarely, "pseudo-STEMI" from marked ST changes), or a primary bradyarrhythmia. In a dialysis/AKI patient with a broad, slow, bizarre rhythm, <strong>check a potassium before you commit to the cardiology diagnosis</strong> — calcium is diagnostic and therapeutic.</div>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The hyperkalaemia drug map — what, why, and the traps</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Job (S/S/R)</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>Calcium gluconate 10%</strong> 10–30 mL</td><td>🛡️ STABILISE</td><td>Restores the threshold-to-resting gap → protects myocardium in 1–3 min. Does NOT lower K⁺. Repeat if ECG changes persist. Peripheral-friendly.</td></tr>
+          <tr><td><strong>Calcium chloride 10%</strong> 10 mL</td><td>🛡️ STABILISE</td><td>~3× more elemental calcium than gluconate; use in arrest/severe or when big dose needed — but vesicant, prefer central/large-bore line.</td></tr>
+          <tr><td><strong>Insulin (soluble) 10 U + dextrose 25 g</strong></td><td>🔀 SHIFT</td><td>Drives K⁺ into cells via Na/K-ATPase; lowers K⁺ ~0.6–1.2 mmol/L for a few hours. <strong>Hypoglycaemia is the key hazard</strong> — always with dextrose, monitor glucose 6 h.</td></tr>
+          <tr><td><strong>Salbutamol 10–20 mg neb</strong></td><td>🔀 SHIFT</td><td>β₂-agonist → intracellular K⁺ shift; additive to insulin. ~40% blunted response — never sole therapy. Causes tachycardia/tremor.</td></tr>
+          <tr><td><strong>Sodium bicarbonate</strong></td><td>🔀 SHIFT (if acidotic)</td><td>Only helpful with metabolic acidosis; modest/adjunct effect. Do NOT co-infuse with calcium (precipitates); Na load a concern in fluid-overloaded ESKD.</td></tr>
+          <tr><td><strong>Patiromer / sodium zirconium cyclosilicate (SZC)</strong></td><td>🧹 REMOVE (slow)</td><td>Gut binders that remove K⁺ over hours–days; good for ongoing/chronic control, too slow for the acute emergency alone.</td></tr>
+          <tr><td><strong>Haemodialysis</strong></td><td>🧹 REMOVE (definitive)</td><td>The reliable, rapid removal route — essential in anuria/ESKD/refractory. Arrange early.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Calcium protects, insulin and salbutamol hide, dialysis and binders remove — and salt-substitute 'low-sodium' salt is potassium chloride in disguise, so stop it."</div>
+        <div class="callout danger"><b class="ct">🚫 The classic errors</b>❌ Giving insulin/salbutamol WITHOUT calcium first when there are ECG changes · ❌ Relying on the shift alone in an anuric patient (guaranteed rebound) · ❌ Salbutamol as sole treatment · ❌ Forgetting to stop the ACEi/spironolactone that caused it.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why</h3>
+        <ul>
+          <li>📈 <strong>Continuous telemetry with defib to hand</strong> and a repeat 12-lead after each intervention — the QRS width is your real-time read on whether calcium is holding.</li>
+          <li>🔁 <strong>Serial potassium (venous gas)</strong> at ~30–60 min intervals — confirm the shift is working and detect <strong>rebound</strong> as insulin/salbutamol wear off.</li>
+          <li>🍬 <strong>Capillary glucose</strong> at 30 min then hourly for 6 h — insulin-induced hypoglycaemia is common and can be delayed, especially in ESKD.</li>
+          <li>🩸 BP and conscious level — improving perfusion and rate as potassium falls is a good sign; a re-widening QRS or falling GCS means escalate.</li>
+          <li>🧮 Track the plan for <strong>REMOVAL</strong> — has renal accepted for dialysis, is access ready? Shifting without a removal plan is a countdown to rebound.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After the first calcium and insulin, the two questions are: 'is the QRS narrowing?' and 'when is dialysis?' — the ECG and the removal plan, not a single reassuring number."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong in the ED phase</h3>
+        <ul>
+          <li>⚡ <strong>VF / asystole / cardiac arrest</strong> — the endpoint of the untreated march; why pads stay on and calcium goes early.</li>
+          <li>🔁 <strong>Rebound hyperkalaemia</strong> — the shift wears off in 2–6 h and potassium climbs again if it was never REMOVED (the anuric patient's trap).</li>
+          <li>🍬 <strong>Hypoglycaemia from insulin</strong> — common, sometimes delayed; a treatment complication you must actively prevent and monitor.</li>
+          <li>💉 <strong>Calcium extravasation / tissue necrosis</strong> — especially calcium chloride peripherally; and the digoxin-toxicity calcium controversy (S20).</li>
+          <li>🧊 <strong>Over-correction / hypokalaemia</strong> after aggressive shift + dialysis — swing the other way and you provoke different arrhythmias.</li>
+          <li>🩺 <strong>The system complication:</strong> "treated" and moved to a ward without dialysis arranged — the patient re-arrests where nobody is watching.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The deadliest complication of 'treated' hyperkalaemia is a falsely reassuring number that let everyone stop watching before the potassium was actually removed."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The differential — wide-complex bradycardia / "weak dialysis patient"</h3>
+        <table class="tbl">
+          <tr><th>Diagnosis</th><th>Discriminators</th><th>Don't-miss action</th></tr>
+          <tr><td>⚡ <strong>Severe hyperkalaemia</strong> (this patient)</td><td>Dialysis/AKI, tented T → wide QRS → sine wave, weakness, K⁺ high on gas</td><td>IV calcium now; shift; dialysis; stop K-raising drugs.</td></tr>
+          <tr><td>🫀 <strong>Primary bradyarrhythmia / AV block</strong></td><td>No hyperkalaemic ECG stigmata, normal K⁺, drug (beta-blocker/CCB/digoxin) history</td><td>Check K⁺ first; atropine/pacing only once K⁺ excluded as cause.</td></tr>
+          <tr><td>🩸 <strong>Wide-complex tachy / VT mimic</strong></td><td>Rate, morphology; hyperK can look like slow VT/BBB</td><td>Don't shock a sine wave — treat the potassium.</td></tr>
+          <tr><td>💊 <strong>Digoxin toxicity</strong></td><td>Nausea, visual changes, brady/blocks, raised K⁺ (marker of severity)</td><td>Digoxin-specific antibodies; calcium controversial (S20).</td></tr>
+          <tr><td>🧠 <strong>Neuromuscular / GBS mimic</strong></td><td>Ascending weakness/paraesthesiae — but hyperK weakness reverses with treatment</td><td>Check K⁺ before an LP.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Every weak, slow, wide-complex dialysis patient gets the same first move: a potassium and a dose of calcium — the differential collapses once the K⁺ comes back."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The First Ten Minutes"</h3>
+          <div class="hud"><span>❤️ Safety: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">K⁺ 7.9 on the gas, wide QRS and tented T waves in a missed-dialysis anuric patient, drowsy, BP 96/60. The nurse asks what you want first. What do you do?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The management plan</h3>
+        <ol>
+          <li>🛡️ <strong>STABILISE:</strong> IV calcium immediately for the ECG changes; repeat if the QRS stays wide after 5 min.</li>
+          <li>🔀 <strong>SHIFT:</strong> insulin 10 U + dextrose 25 g, salbutamol 10–20 mg neb, bicarbonate if acidotic — with glucose monitoring.</li>
+          <li>🧹 <strong>REMOVE:</strong> urgent haemodialysis (anuric ESKD); enteral binder (patiromer/SZC) for ongoing control; stop ramipril/spironolactone/salt-substitute; treat the cause (missed dialysis).</li>
+          <li>🏥 Admit to a monitored bed / renal-HDU; do NOT move to an unmonitored ward until potassium is falling and dialysis is secured; document the rebound-watch plan.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Insulin HIDES potassium; dialysis REMOVES it — shifting alone lets it rebound. No anuric hyperkalaemic patient leaves resus without a removal plan in writing."</div>
+
+        <div class="checklist" id="ckACS">
+          <h3 style="margin-top:0">🩺 Procedure Guide — The hyperkalaemia bundle: STABILISE → SHIFT → REMOVE (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>🛡️ STABILISE: IV calcium given for ECG changes; ECG repeated; second dose if QRS still wide at 5 min</span></label>
+          <label class="ck"><input type="checkbox"><span>🔀 SHIFT: insulin 10 U + dextrose 25 g given; glucose monitoring started (30 min then hourly ×6)</span></label>
+          <label class="ck"><input type="checkbox"><span>💨 SHIFT: salbutamol 10–20 mg nebulised (± bicarbonate if acidotic)</span></label>
+          <label class="ck"><input type="checkbox"><span>🧹 REMOVE: urgent dialysis referral made / access confirmed; binder considered</span></label>
+          <label class="ck"><input type="checkbox"><span>🚫 K-raising drugs stopped (ACEi/ARB, spironolactone, K supplement/salt-substitute, NSAIDs)</span></label>
+          <label class="ck"><input type="checkbox"><span>📟 Continuous monitoring, defib pads on, serial K⁺ to detect rebound</span></label>
+          <label class="ck"><input type="checkbox"><span>📞 Clear disposition to a MONITORED bed with a documented rebound-watch plan; cause treated</span></label>
+          <div class="ck-progress" data-progress>0 / 7 complete</div>
+        </div>
+
+        <div class="checklist" id="ckSTEMI">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Peri-arrest hyperK during CPR (empirical calcium)</h3>
+          <label class="ck"><input type="checkbox"><span>🚨 Suspect hyperK in any arrest with dialysis/AKI, missed dialysis, or a wide/sine-wave pre-arrest rhythm</span></label>
+          <label class="ck"><input type="checkbox"><span>🛡️ Give empirical IV calcium (chloride 10% 10 mL) during CPR — a reversible-cause treatment</span></label>
+          <label class="ck"><input type="checkbox"><span>💉 Insulin 10 U + 25 g dextrose IV to shift; consider bicarbonate if acidotic/known</span></label>
+          <label class="ck"><input type="checkbox"><span>🧹 Activate emergency haemodialysis; call renal/ICU early — removal is the definitive fix</span></label>
+          <label class="ck"><input type="checkbox"><span>🔁 Consider prolonged resuscitation — hyperkalaemic arrest is reversible if potassium is corrected</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">14:40</div>Arrival: K⁺ 7.9 on gas, wide-complex bradycardia at 44, tented T waves, drowsy.</div>
+          <div class="t-item"><div class="t-time">14:44</div><strong>IV calcium gluconate</strong> given — within 2 minutes the QRS visibly narrows and the rate picks up to 58. Membrane stabilised (K⁺ unchanged).</div>
+          <div class="t-item"><div class="t-time">14:50</div>Insulin 10 U + 25 g dextrose and salbutamol 10 mg neb started; ramipril and spironolactone stopped; renal called for urgent dialysis.</div>
+          <div class="t-item"><div class="t-time">15:20</div>Repeat gas K⁺ 6.4 (shift working); QRS narrower, P waves reappearing. Second calcium not needed. Glucose 4.1 → extra dextrose given.</div>
+          <div class="t-item"><div class="t-time">16:30</div><strong>Haemodialysis</strong> commenced in renal HDU; K⁺ removed to 4.6. No rebound because potassium was actually taken out of the body.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>He is alive because someone gave calcium before finishing the gas, shifted the potassium, and — crucially — <strong>arranged dialysis to REMOVE it</strong> rather than trusting a falling number. Stabilise bought minutes, shift bought hours, dialysis bought the cure.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 Two different worlds — the recovered severe case vs the mild outpatient</h3>
+        <div class="vs">
+          <div class="side a"><h4>⚡ This patient (severe, post-dialysis)</h4><ul><li>Admitted/observed until K⁺ stable off shifting therapy; dialysis schedule reinforced (never miss a session)</li><li>ACEi/spironolactone reviewed before restart; potassium binder if needed</li><li>Dietary K⁺ counselling; <strong>no salt-substitutes</strong> (they are KCl)</li><li>Red flags: weakness, palpitations, missed dialysis → return immediately</li></ul></div>
+          <div class="side b"><h4>🟢 The mild ambulatory hyperkalaemia</h4><ul><li>K⁺ 5.5–6.0, no ECG change, reversible cause</li><li>Stop/adjust the offending drug, dietary advice, arrange a recheck</li><li>Safety-net: what to look for, when to come back</li><li>GP/renal follow-up and a plan for the underlying CKD/drugs</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A safe hyperkalaemia discharge means the cause is fixed, the K-raising drug is addressed, the potassium is stable OFF shifting therapy, and the patient knows the salt-substitute in the cupboard is really potassium."</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>🛡️ Calcium FIRST</b>It doesn't lower the potassium — it saves the heart while you do. Give it before you finish reading the gas.</div>
+          <div class="pearl"><b>🔀 Three jobs, in order</b>STABILISE (calcium) → SHIFT (insulin/salbutamol) → REMOVE (dialysis/binders). Different jobs, all needed.</div>
+          <div class="pearl"><b>🌊 The sine wave</b>QRS merged with T = minutes from asystole. Treat instantly, don't wait for confirmation.</div>
+          <div class="pearl"><b>🔁 Shift ≠ cure</b>Insulin HIDES potassium; dialysis REMOVES it. Shifting alone in anuria guarantees rebound.</div>
+          <div class="pearl"><b>🍬 Watch the glucose</b>Insulin causes hypoglycaemia, sometimes late, especially in ESKD — monitor 6 h.</div>
+          <div class="pearl"><b>🐢 Not a primary brady</b>A wide-complex bradycardia in a dialysis patient is potassium — reach for calcium, not atropine.</div>
+          <div class="pearl"><b>🧾 Treat the ECG, not the number</b>Any hyperkalaemic ECG change = severe, whatever the value.</div>
+          <div class="pearl"><b>🧂 Hidden potassium</b>Stop ACEi/ARB/spironolactone/NSAIDs and the "low-sodium" salt-substitute (it's KCl).</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the pathway</h3>
+          <ul>
+            <li>🔋 <strong>The electrophysiology in detail:</strong> the resting membrane potential is approximated by the Nernst equation for K⁺, E<sub>K</sub> = −61·log([K]<sub>in</sub>/[K]<sub>out</sub>); raising extracellular K⁺ makes E<sub>K</sub> (and thus the resting potential) less negative. A less-negative rest voltage leaves voltage-gated <strong>fast Na⁺ channels in a partially inactivated state</strong>, reducing available current for phase 0 → slower upstroke, slower conduction, wider QRS. Calcium raises the <strong>threshold potential</strong>, restoring the voltage gap the Na channels need — it treats the electrical effect without touching [K⁺].</li>
+            <li>🧪 <strong>Pseudohyperkalaemia:</strong> a spuriously high potassium from sample handling — haemolysis, prolonged tourniquet/fist-clenching, delayed processing, or extreme thrombocytosis/leucocytosis (potassium released after the sample is drawn). Clue: high K⁺ with a completely normal ECG in a well patient — repeat carefully (ideally a heparinised gas, minimal stasis) before over-treating.</li>
+            <li>💊 <strong>Hyperkalaemia in digoxin toxicity — the calcium controversy:</strong> hyperkalaemia is a marker of severe digoxin poisoning, and the definitive treatment is <strong>digoxin-specific antibody fragments (DigiFab)</strong>. Classic teaching warned that IV calcium in digoxin toxicity could cause "stone heart" (calcium-mediated tetanic contraction); modern evidence questions how real this is, but the pragmatic approach is to <strong>prioritise Fab and use calcium cautiously</strong> if at all.</li>
+            <li>🧹 <strong>Newer potassium binders:</strong> <em>patiromer</em> and <em>sodium zirconium cyclosilicate (SZC)</em> are gut binders that outperform old sodium/calcium resonium for chronic control and enable continuation of prognostically important RAAS inhibitors in heart failure/CKD. SZC has a faster onset (hours) but neither replaces dialysis in the acute anuric emergency.</li>
+            <li>🫀 <strong>Management in the arrested patient:</strong> hyperkalaemia is a reversible cause of cardiac arrest (a "K" among the 4Hs/4Ts). Give <strong>empirical IV calcium chloride</strong> during CPR when hyperK is plausible, plus insulin-dextrose (± bicarbonate), and activate <strong>emergency dialysis</strong>. Consider prolonged resuscitation and, in refractory cases, extracorporeal support — these arrests can recover fully once potassium is corrected.</li>
+            <li>🧊 <strong>Why calcium wears off & the low-Ca⁺⁺ amplifier:</strong> the membrane-stabilising effect lasts ~30–60 min, so it must be repeated while the shift/removal catch up; concurrent <strong>hypocalcaemia</strong> (common in CKD) worsens hyperkalaemic cardiotoxicity, so correcting calcium is doubly useful.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The Sine Wave in the Corridor"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 62-year-old anuric dialysis patient who had <strong>missed a session</strong> arrived weak and nauseated at a busy ED. The monitor showed a <strong>wide-complex bradycardia</strong>, read by the team as "a slow rhythm — probably his beta-blocker." A gas showed K⁺ 8.1. He was given <strong>insulin-dextrose and salbutamol — but NO calcium</strong>, and the referral for dialysis was "for later." The number on the next gas ticked down to 7.0, so he was moved to a monitored ward bed to "await renal." Within the hour the QRS widened into a <strong>sine wave</strong> and he arrested in VF. Despite prolonged resuscitation and belated calcium, he could not be brought back — the potassium had never been removed and the heart was never protected.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🛡️ NO CALCIUM</b>The one drug that protects the myocardium was omitted; the heart was unshielded during the whole event.</div>
+            <div class="hole"><b>🔁 SHIFT ≠ REMOVE</b>Insulin/salbutamol "hid" the potassium; nobody REMOVED it, so it rebounded.</div>
+            <div class="hole"><b>📉 FALSE REASSURANCE</b>A falling number let everyone relax before dialysis was even arranged.</div>
+            <div class="hole"><b>🐢 WRONG LABEL</b>"A slow rhythm" instead of "a potassium rhythm" delayed the right treatment.</div>
+            <div class="hole"><b>🏥 SYSTEM</b>Moved to a less-watched bed with definitive treatment still pending.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> give IV calcium the moment the wide QRS/high K⁺ was seen — before the gas even finished; recognise that shifting is temporary and book <strong>urgent dialysis to REMOVE</strong> the potassium; keep him in resus with defib to hand until the potassium was actually falling <em>and</em> being removed; and never let a temporarily improving number substitute for definitive treatment. <strong>This is exactly the discipline that saved the patient in Bed 5 — 10 mL of calcium at the door bought the time dialysis needed.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In a peri-arrest missed-dialysis patient, calcium is a diagnostic and a therapeutic in one — and a falling potassium is not a treated potassium until dialysis has removed it."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🚨 Emergency Department · Bed 5 — Severe Hyperkalaemia with Cardiac Toxicity<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+  /* ===== SIDEBAR SCROLL-SPY (vertical) ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); var t=sections[idx]; if(t) t.scrollIntoView({behavior:'smooth',block:'start'}); setActive(idx); markVisited(idx); }); });
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){ entries.forEach(function(e){ if(!e.isIntersecting) return; var i=sections.indexOf(e.target); if(i>-1){ setActive(i); markVisited(i); } }); }, { rootMargin:'-10% 0px -75% 0px' });
+    sections.forEach(function(s){ if(s) io.observe(s); });
+  }
+  markVisited(0); setActive(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not a hyperkalaemia red flag'); } if(found===total){ flagResult.textContent='✅ All '+total+' hyperkalaemia red flags found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' red flags found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: The Potassium Dial ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseFloat(kRange.value); kVal.textContent=v.toFixed(1); var pct=(v-3)/(9-3)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<5.5){ msg='🟢 K⁺ '+v.toFixed(1)+' — resting potential ~−90 mV, Na channels ready. Normal ECG, normal conduction.'; cls='good'; }
+      else if(v<=6.5){ msg='🟠 K⁺ '+v.toFixed(1)+' — resting potential creeping up; repolarisation accelerates → tall, TENTED T waves. First warning shot.'; cls='warn-r'; }
+      else if(v<=7.5){ msg='🟠 K⁺ '+v.toFixed(1)+' — Na channels inactivating: PR prolongs, P waves flatten/DISAPPEAR and the QRS WIDENS. Danger zone — give IV calcium.'; cls='warn-r'; }
+      else { msg='🔴 K⁺ '+v.toFixed(1)+' — conduction failing: QRS merges with T into a SINE WAVE → VF/asystole. CALCIUM NOW, before you finish reading the gas.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Potassium Dial'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"K⁺ 7.9 on the gas, wide QRS and tented T waves in a missed-dialysis anuric patient, drowsy, BP 96/60. The nurse asks what you want first. What do you do?",
+      choices:[
+        {t:"💉 Give insulin + dextrose and salbutamol first — 'that's what actually lowers the potassium'",good:false,ds:-2,dt:15,xp:0,fb:"☠️ This is the M&M case in S21. Insulin takes 10–20 min to work and the myocardium is UNPROTECTED meanwhile. With a wide QRS, calcium must go first. Restart.",end:true},
+        {t:"🛡️ Give IV calcium NOW to stabilise the myocardium, then start the shift",good:true,ds:1,dt:3,xp:40,fb:"✅ Exactly. Calcium antagonises the membrane effect in 1–3 min and buys the time the shift and dialysis need. Now shift and remove.",next:"repeat"},
+        {t:"🐢 Treat the rate: give atropine and prepare to pace the bradycardia",good:false,ds:-2,dt:12,xp:0,fb:"⚠️ This is a POTASSIUM rhythm, not a primary brady. Atropine/pacing won't fix the K⁺ and wastes time — give calcium and treat the hyperkalaemia.",next:"repeat"}
+      ]},
+    repeat:{ text:"Calcium is in and the QRS has narrowed a little. K⁺ is still 7.9 (calcium doesn't lower it). This is an anuric, missed-dialysis patient. What's your plan to actually get the potassium DOWN and OUT?",
+      choices:[
+        {t:"🔀 Insulin 10 U + dextrose 25 g and salbutamol neb to SHIFT, AND call renal now for urgent dialysis to REMOVE — with glucose monitoring",good:true,ds:1,dt:6,xp:40,fb:"✅ Right. Shift buys hours, but only dialysis removes potassium in an anuric patient — booking it now prevents rebound. And you're watching the glucose.",next:"declare"},
+        {t:"🔀 Just give insulin + salbutamol and recheck the level — the shift will sort it",good:false,ds:-2,dt:20,xp:0,fb:"⚠️ Shift alone HIDES the potassium; in an anuric patient it will rebound within hours because nothing removed it. You must arrange dialysis.",next:"declare"}
+      ]},
+    declare:{ text:"An hour later the shift has worn off and K⁺ is climbing again toward 7.0; the QRS is re-widening. Dialysis access is being prepared. What now?",
+      choices:[
+        {t:"🛡️ Repeat IV calcium to re-stabilise and push the dialysis to start immediately; keep him monitored in resus",good:true,ds:1,dt:5,xp:45,fb:"🏆 Perfect. Calcium is repeatable as it wears off, and definitive REMOVAL (dialysis) is the only thing that ends the cycle. Stabilise → shift → remove, held together.",end:true},
+        {t:"🏓 Move him to a general ward to 'await renal' since the number was improving earlier",good:false,ds:-2,dt:30,xp:0,fb:"⚠️ This is exactly the M&M error — a temporarily better number is not a removed potassium. Off the monitor he can re-arrest. Keep him watched and dialyse.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='declare'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A haemodialysis patient has K⁺ 7.9 with a wide QRS and tented T waves. The single most important FIRST step is:", opts:["Insulin + dextrose to lower the potassium","IV calcium to stabilise the myocardium","Nebulised salbutamol","Urgent haemodialysis before any drug"], correct:1, exp:"With ECG changes, IV calcium goes first — it antagonises the membrane effect within 1–3 minutes and protects the heart while the slower shift and definitive removal are arranged. Insulin takes 10–20 min and leaves the myocardium unprotected in the meantime." },
+    { q:"What does IV calcium do to the serum potassium level?", opts:["Lowers it rapidly","Raises it","Nothing — it does not change serum K⁺","Lowers it only if given with dextrose"], correct:2, exp:"Calcium is a membrane stabiliser: it restores the gap between resting and threshold potential and reverses the ECG changes, but it does NOT lower serum potassium. It is a bridge — you still must SHIFT and REMOVE." },
+    { q:"The mechanism by which rising extracellular K⁺ slows cardiac conduction is best described as:", opts:["Blockade of L-type calcium channels","A less-negative resting potential that inactivates fast sodium channels","Direct destruction of the SA node","Increased sympathetic tone"], correct:1, exp:"Higher extracellular K⁺ raises (makes less negative) the resting membrane potential; fast Na⁺ channels then sit partially inactivated, so phase-0 depolarisation and conduction slow — producing peaked T waves, wide QRS and ultimately a sine wave." },
+    { q:"An anuric dialysis patient is given insulin-dextrose and salbutamol; the K⁺ falls from 7.8 to 6.2. The most important next action is:", opts:["Discharge once K⁺ < 6.5","Arrange urgent dialysis to REMOVE potassium","Stop monitoring as the number is improving","Give a second dose of insulin only"], correct:1, exp:"Shifting only HIDES potassium temporarily; in an anuric patient it will rebound within hours because none has been removed. Dialysis is the definitive removal route and must be arranged — the falling number is not a cure." },
+    { q:"Which is the key monitoring hazard after giving insulin-dextrose for hyperkalaemia?", opts:["Hyperglycaemia","Hypoglycaemia, sometimes delayed","Hypernatraemia","Hypercalcaemia"], correct:1, exp:"Insulin-induced hypoglycaemia is common and can be delayed, especially in ESKD. Give dextrose with the insulin and monitor capillary glucose at 30 min then hourly for ~6 hours." },
+    { q:"A K⁺ of 6.2 with a widening QRS versus a K⁺ of 7.0 with a completely normal ECG — which is the more urgent, and why?", opts:["The 7.0 — always treat the higher number","The 6.2 — the ECG shows cardiac toxicity, which drives urgency","They are identical","Neither needs treatment"], correct:1, exp:"Treat the ECG, not just the number. Any hyperkalaemic ECG change means severe/cardiotoxic hyperkalaemia and warrants IV calcium, regardless of the absolute value; a high number with a normal ECG is less immediately dangerous (and should prompt thought about pseudohyperkalaemia)." },
+    { q:"Which drug ACTUALLY removes potassium from the body (rather than shifting it)?", opts:["Calcium gluconate","Insulin + dextrose","Salbutamol","Sodium zirconium cyclosilicate / dialysis"], correct:3, exp:"Removal = gut binders (patiromer, SZC) over hours–days, and dialysis rapidly and definitively. Calcium stabilises, insulin and salbutamol shift — none of those three removes potassium from the body." },
+    { q:"In a cardiac arrest in a missed-dialysis patient with a pre-arrest wide/sine-wave rhythm, appropriate management includes:", opts:["Withholding calcium until a confirmed lab potassium returns","Empirical IV calcium, insulin-dextrose, and activating emergency dialysis","Atropine as the primary treatment","Immediate defibrillation only, no drugs"], correct:1, exp:"Hyperkalaemia is a reversible cause of arrest. Give empirical IV calcium (chloride) during CPR, shift with insulin-dextrose (± bicarbonate), and activate emergency dialysis to remove potassium; consider prolonged resuscitation — these arrests can recover fully once K⁺ is corrected." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you stabilise, shift and remove like a consultant. 🏆':score>=6?'Strong — review the misses and S6 mechanism + S10 ECG march.':'Revisit S4, S6 and S11 — STABILISE → SHIFT → REMOVE is the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>

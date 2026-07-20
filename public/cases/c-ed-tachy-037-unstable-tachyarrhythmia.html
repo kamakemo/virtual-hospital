@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Unstable Tachyarrhythmia — a Triage Emergency — Virtual Teaching Hospital</title>
+<!-- META
+id: c-ed-tachy-037
+title: The Unstable Tachyarrhythmia — a Triage Emergency
+hospital: cardiology
+department: cv-ed
+bednumber: 7
+chiefcomplaint: Palpitations with a fast tachycardia, hypotension and chest pain
+system: Cardiology
+severity: critical
+tags: Tachyarrhythmia, Synchronized cardioversion, SVT, VT, Pre-excited AF, ACLS
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🚨</div>
+      <div>
+        <div class="t1">Emergency Dept</div>
+        <div class="t2">Bed 7 · Unstable Tachycardia</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🚨 Emergency Department · 🛏️ Bed 7</div>
+        <h1>⚡ The Unstable Tachyarrhythmia — a Triage Emergency</h1>
+        <div class="sub">🚨 02:47. A 48-year-old is grey, sweating and gripping the trolley, heart racing at 190. The blood pressure prints 80/48 and she says her chest is tight and the room is "going dark." The monitor screams a fast, wide, irregular rhythm. Before you name it, answer the one question that collapses the whole differential: is she STABLE or UNSTABLE?</div>
+        <div class="chips">
+          <span class="chip crit">🔴 CRITICAL</span>
+          <span class="chip">⚡ Tachyarrhythmia</span>
+          <span class="chip">⚖️ Stable-or-Unstable?</span>
+          <span class="chip">🔌 Synchronized Cardioversion</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital alert"><div class="v-label">💓 HR</div><div class="v-num">190</div></div>
+        <div class="vital alert"><div class="v-label">🩸 BP</div><div class="v-num">80/48</div></div>
+        <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">26</div></div>
+        <div class="vital warn"><div class="v-label">🫁 SpO₂</div><div class="v-num">93%</div></div>
+        <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.8°</div></div>
+        <div class="vital warn"><div class="v-label">🧠 GCS</div><div class="v-num">14</div></div>
+        <div class="vital alert"><div class="v-label">😖 Chest Pain</div><div class="v-num">7/10</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 02:47, Resus 2</b>A woman is slumped in the trolley, pale and clammy, hands pressed to her chest. She gasps: <em>"It just took off… it's pounding… I feel like I'm going to pass out."</em> The monitor shows a broad, fast, irregular complex marching across the screen at ~190. The automated cuff cycles and prints <strong>80/48</strong>. This is not a "work it up over an hour" rhythm — this is a patient whose heart is beating too fast to fill. The single decision in front of you decides whether she gets a drug or a shock.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>👩 Name</td><td><strong>Ms. R.A.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>48-year-old female</td></tr>
+          <tr><td>🆔 MRN</td><td>CV-ED-0709</td></tr>
+          <tr><td>⚖️ Weight</td><td>68 kg</td></tr>
+          <tr><td>💼 Occupation</td><td>Schoolteacher — usually fit and active</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 Past history — the clues that shape the rhythm</h3>
+        <ul>
+          <li>💓 <strong>Recurrent palpitations since her twenties</strong>, previously self-terminating in minutes. Once told of an "extra electrical pathway" but never followed up.</li>
+          <li>📈 An old ECG in the notes shows a <strong>short PR interval and a slurred delta wave</strong> — the signature of <strong>ventricular pre-excitation (WPW)</strong>. This one line changes everything about which drugs are safe.</li>
+          <li>☕ Two coffees and a cold-and-flu decongestant this evening; poor sleep; some alcohol at a leaving-do.</li>
+          <li>🚭 Non-smoker, no diabetes, no known structural heart disease.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In any tachyarrhythmia the first question is never 'what is the rhythm?' — it is 'is the patient STABLE or UNSTABLE?' Instability answers the treatment question before you finish naming the rhythm."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why a fast heart can be a dying heart</b>A rate of 190 is not just uncomfortable — at very high rates diastole (the filling phase) collapses. The ventricle cannot fill, stroke volume falls, and coronary perfusion (which happens in diastole) drops just as demand soars. The result is a self-reinforcing spiral: less output → hypotension and ischaemia → more sympathetic drive → faster rate → even less filling. The rate itself becomes the killer.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 Paramedic handover — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ Pre-hospital SBAR (verbatim)</b>
+          <p><strong>S:</strong> "48-year-old woman, sudden palpitations 35 minutes ago, now chest tightness and near-collapse when she stood."</p>
+          <p><strong>B:</strong> "Lifelong on-off palpitations, told she has an extra pathway years ago. Some caffeine and a decongestant tonight."</p>
+          <p><strong>A:</strong> "Monitor shows a fast, broad, irregular tachycardia around 190. BP 82/50 en route, cool peripheries, one near-syncopal episode. We put on defib pads and pre-alerted."</p>
+          <p><strong>R:</strong> "Pain and light-headedness persisting. She looks worse than she did ten minutes ago."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Palpitations' is a symptom, not a diagnosis — the vitals and the adverse features, not the word, decide how fast you must act."</div>
+
+        <h3>🚩 Spot-the-Adverse-Feature — tap each sign of instability</h3>
+        <p>🎮 <em>Click every feature that makes this patient UNSTABLE (an "adverse feature" mandating urgent cardioversion). Each correct = +10 XP. The distractors are things that do NOT signal instability.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">🩸 Shock — SBP 80/48 with cool, clammy peripheries</button>
+          <button class="btn ghost flag-btn" data-good="1">🕳️ Syncope / presyncope — "the room went dark"</button>
+          <button class="btn ghost flag-btn" data-good="1">💔 Myocardial ischaemia — chest pain at 7/10</button>
+          <button class="btn ghost flag-btn" data-good="1">🌊 Acute heart failure — new dyspnoea, SpO₂ 93%, crackles</button>
+          <button class="btn ghost flag-btn" data-good="0">😰 Feeling anxious about the racing heart</button>
+          <button class="btn ghost flag-btn" data-good="0">🌡️ Temperature 36.8°C</button>
+          <button class="btn ghost flag-btn" data-good="0">☕ Drank two coffees this evening</button>
+          <button class="btn ghost flag-btn" data-good="0">🫥 Sinus tachycardia at 105 in a well, chatty patient</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Praise where due</b>The crew did the two things that matter most before a diagnosis: they <strong>attached defib pads</strong> and <strong>pre-alerted</strong>. In an unstable tachyarrhythmia, having the pads on turns "she arrested" into "we cardioverted in seconds."</div>
+
+        <div class="callout warn"><b class="ct">⚠️ The 4 S's — the adverse features that define UNSTABLE</b><strong>S</strong>hock (SBP &lt; 90 / hypoperfusion) · <strong>S</strong>yncope or presyncope · <strong>S</strong>evere ischaemia (chest pain / ST changes) · <strong>S</strong>evere heart failure (pulmonary oedema). <strong>ANY ONE</strong> of these makes the patient unstable — and unstable means electricity, not chemistry.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🅰️🅱️🅲️ Primary survey — assess the patient, not just the monitor</h3>
+        <table class="tbl">
+          <tr><th>Step</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>🅰️ Airway</td><td>Patent, speaking in short phrases.</td><td>Talking = airway safe for now; short phrases hint at breathlessness/low output.</td></tr>
+          <tr><td>🅱️ Breathing</td><td>RR 26, SpO₂ 93% RA, fine bibasal crackles.</td><td>New crackles + hypoxia = evolving <strong>acute heart failure</strong> — an adverse feature.</td></tr>
+          <tr><td>🅲️ Circulation</td><td><strong>HR ~190 irregular</strong>, <strong>BP 80/48</strong>, cool clammy peripheries, thready pulse, cap refill 4 s.</td><td>Shock — an adverse feature. Feel the pulse: a pulse means a synchronized shock (not defib) is the tool.</td></tr>
+          <tr><td>🅳 Disability</td><td>GCS 14, drowsy between sentences, one presyncopal episode.</td><td>Cerebral hypoperfusion / presyncope — an adverse feature.</td></tr>
+          <tr><td>🅴 Exposure</td><td>No fever, no focal sepsis source, no obvious bleeding.</td><td>Argues against a secondary/compensatory (sinus) tachycardia — this is a primary arrhythmia.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Treat the patient, not the number — but when the patient AND the number are both screaming (rate 190, BP 80, grey and dizzy), stop investigating and start treating."</div>
+
+        <h3>🧭 The single fork that organises everything</h3>
+        <p>Every tachyarrhythmia collapses to one decision tree. <strong>STABLE</strong> patients buy you time to characterise the rhythm (narrow vs wide, regular vs irregular) and choose a drug. <strong>UNSTABLE</strong> patients — any of the 4 S's — jump straight to <strong>synchronized DC cardioversion</strong>, whatever the rhythm turns out to be, because instability itself is the emergency. This patient has <em>three</em> adverse features (shock, presyncope, ischaemia) plus early failure. She is unmistakably unstable.</p>
+
+        <div class="callout danger"><b class="ct">🚫 The trap of "let me just try a drug first"</b>Reaching for adenosine or a rate-control drug in a shocked patient wastes the minutes she does not have — and if this broad irregular rhythm is <strong>pre-excited AF</strong>, an AV-nodal blocker can accelerate conduction down the accessory pathway and tip her into <strong>VF</strong>. In the unstable patient, the safe, universal answer is a synchronized shock.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The EM resident thinks out loud at 02:51:</em></p>
+        <h3>🧠 Frame it as a triage decision, not a rhythm quiz</h3>
+        <p>"I'm not going to freeze trying to name this rhythm. She has shock, presyncope, chest pain and early pulmonary oedema — that's the 4 S's, she's <strong>unstable</strong>. Per ACLS she needs <strong>synchronized DC cardioversion now</strong>, and because she has a pulse and an organised (if irregular) rhythm, it's SYNC, not defib. She's still conscious, so I'll get a quick <strong>sedation/analgesia</strong> on board if the few seconds allow — but I won't let a difficult cannula delay a shock in a peri-arrest patient."</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>📟 <strong>Pads on, monitor on, SYNC engaged</strong> — confirm the machine is marking each R wave.</li>
+          <li>💉 <strong>Brief procedural sedation</strong> (e.g. ketamine or midazolam ± short-acting opioid) if consciousness and time allow — never delay a shock in a crashing patient.</li>
+          <li>⚡ <strong>Synchronized cardioversion</strong>, escalating energy; reassess pulse and rhythm after each shock; <strong>re-arm SYNC every time</strong>.</li>
+          <li>🧪 <strong>Bloods and reversible causes</strong> in parallel — K⁺, Mg²⁺, gas, look for the pre-excitation history — but not before the shock.</li>
+          <li>📞 <strong>Call for senior / cardiology help early</strong>; anticipate that a pre-excited or refractory rhythm may need procainamide or repeated shocks.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Unstable = electricity, not chemistry — a synchronized shock is the right answer for VT AND for SVT, because instability collapses the differential."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>The rhythm is broad and irregular. A colleague says "let's just give adenosine to see if it's SVT." Do it?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No — twice over.</strong> First, she is <em>unstable</em>: the answer is a shock, not a diagnostic drug. Second, a broad <em>irregular</em> tachycardia should make you think <strong>pre-excited AF</strong>, in which adenosine (and any AV-nodal blocker) can accelerate accessory-pathway conduction and precipitate <strong>VF</strong>. Adenosine is for the <em>stable, regular, narrow</em> SVT — not this patient.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The EM consultant at the bedside, 02:55:</em></p>
+        <h3>🧭 The ACLS tachycardia algorithm — one page, two branches</h3>
+        <table class="tbl">
+          <tr><th>Branch</th><th>Trigger</th><th>Action</th><th>This patient</th></tr>
+          <tr><td><strong>UNSTABLE</strong></td><td>Any of the 4 S's (shock, syncope, ischaemia, heart failure)</td><td><strong>Synchronized DC cardioversion</strong> (sedate if time) — regardless of narrow/wide, regular/irregular</td><td class="hi">✅ This is her</td></tr>
+          <tr><td><strong>STABLE · regular narrow</strong></td><td>Well-perfused, QRS &lt; 120 ms, regular</td><td>Vagal manoeuvres → <strong>adenosine</strong> (diagnostic &amp; therapeutic)</td><td>—</td></tr>
+          <tr><td><strong>STABLE · irregular narrow</strong></td><td>AF / flutter with variable block / MAT</td><td>Rate or rhythm control per context</td><td>—</td></tr>
+          <tr><td><strong>STABLE · regular wide</strong></td><td>QRS ≥ 120 ms, regular</td><td><strong>Treat as VT</strong> — amiodarone or procainamide</td><td>—</td></tr>
+          <tr><td><strong>STABLE · irregular wide</strong></td><td>Broad + irregular</td><td>Think <strong>pre-excited AF</strong> → procainamide or cardiovert; <strong>NO AV-nodal blockers</strong></td><td>Her rhythm type — but she is unstable, so shock</td></tr>
+        </table>
+        <p>The consultant: "She sits at the top of the tree. We don't need to win the VT-versus-SVT argument tonight — <strong>the shock is right either way</strong>. What we must NOT do is give her a drug that blocks the AV node, because if this is pre-excited AF that drug can kill her."</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Regular wide = VT until proven otherwise; irregular wide = pre-excited AF until proven otherwise — and in the second the AV node is strictly off-limits."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> ACLS / ERC tachycardia algorithm</td><td>Adverse features → immediate synchronized cardioversion; stable → rhythm-specific drug therapy.</td><td>Stable-or-unstable is the master switch; unstable means a shock, not a drip.</td></tr>
+            <tr><td><span class="lvl">RCT/PHYSIOLOGY</span> Adenosine for regular narrow SVT</td><td>Transient AV-nodal block terminates AVNRT/AVRT in the majority; also unmasks atrial flutter diagnostically.</td><td>First-line for the <em>stable, regular, narrow</em> SVT after vagal manoeuvres.</td></tr>
+            <tr><td><span class="lvl">RCT</span> PROCAMIO (procainamide vs amiodarone, stable VT)</td><td>IV procainamide terminated stable monomorphic VT more often with fewer major cardiac adverse events than amiodarone.</td><td>Procainamide is a strong choice for stable wide-complex tachycardia / VT.</td></tr>
+            <tr><td><span class="lvl">GUIDELINE/SAFETY</span> Pre-excited AF — avoid AV-nodal blockers</td><td>Adenosine, verapamil, diltiazem, beta-blockers and digoxin can accelerate accessory-pathway conduction → rapid ventricular rates / VF.</td><td>In WPW + AF use procainamide (or cardiovert); never an AV-nodal blocker.</td></tr>
+            <tr><td><span class="lvl">PHYSIOLOGY</span> Rate, diastole and cardiac output</td><td>At very high rates diastolic filling time falls disproportionately → stroke volume, BP and coronary perfusion drop.</td><td>The rate itself drives the instability — restoring rhythm restores output.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The case that still haunts our M&amp;M is a young man with a fast irregular broad-complex tachycardia labelled 'SVT with aberrancy' and given IV verapamil. His accessory pathway conducted even faster, the rhythm degenerated into VF, and a patient who needed nothing more than a routine cardioversion arrested on the trolley."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY fast is dangerous, and WHY a shock fixes it</h3>
+        <ol>
+          <li>⏱️ <strong>Diastole is where filling happens:</strong> as heart rate climbs, systole barely shortens but <em>diastole collapses</em>. At 190/min there is almost no time for the ventricle to fill.</li>
+          <li>📉 <strong>Falling stroke volume:</strong> an under-filled ventricle ejects less per beat. Even with a huge rate, cardiac output (rate × stroke volume) falls once filling is critically impaired.</li>
+          <li>🫀 <strong>Coronary starvation:</strong> the left ventricle is perfused in diastole. Short diastole + high demand = subendocardial ischaemia → chest pain and ST changes, weakening contraction further.</li>
+          <li>🌀 <strong>The instability spiral:</strong> low output → hypotension → reflex sympathetic surge → faster rate → even less filling. Left alone it ends in shock, pulmonary oedema, or VF.</li>
+          <li>⚡ <strong>Why electricity works:</strong> a <strong>synchronized shock</strong> depolarises the whole myocardium at once, letting the sinus node re-seize control — instantly restoring an organised rhythm with proper filling. Drugs are slower and, in the wrong rhythm, dangerous.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A heart beating too fast to fill is a heart failing to pump — restore the rhythm and you restore the output; that is why the unstable patient gets a shock, not a strategy."</div>
+
+        <h3>⚖️ Contrast pair — Synchronized cardioversion vs Unsynchronised defibrillation</h3>
+        <div class="vs">
+          <div class="side a"><h4>🔌 Synchronized cardioversion</h4><ul><li>For an <strong>organised rhythm WITH a pulse</strong> (unstable VT with pulse, SVT, AF/flutter)</li><li>Shock is <strong>timed to the R wave</strong> to avoid the T-wave "R-on-T" and iatrogenic VF</li><li>Sedate the conscious patient if time allows</li><li>Machine <strong>reverts to unsync after each shock — re-arm SYNC every time</strong></li></ul></div>
+          <div class="side b"><h4>⚡ Unsynchronised defibrillation</h4><ul><li>For <strong>pulseless VT and VF</strong>, and chaotic <strong>polymorphic VT</strong> where the machine can't sync</li><li>Shock delivered immediately, any point in the cycle</li><li>Part of the cardiac-arrest algorithm with <strong>CPR</strong></li><li>If your "SVT" degenerates and loses its pulse → switch to <strong>defib + CPR</strong></li></ul></div>
+        </div>
+        <p>💡 Same machine, two modes. The pulse and the organisation of the rhythm tell you which button to press.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The Rate Dial: heart rate → diastolic filling &amp; cardiac output</h3>
+          <p style="font-size:13px">Drag the heart rate and watch how rising rate steals <strong>diastolic filling time</strong>, dropping stroke volume, blood pressure and coronary perfusion until the patient crosses the <strong>instability threshold</strong>.</p>
+          <label for="kRange">❤️ Heart rate: <b id="kVal">190</b> /min</label>
+          <input type="range" id="kRange" min="60" max="240" value="190">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore how rate erodes filling and output.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 Below ~120 there is time to think and time to fill. Above ~150 the margin thins fast; above ~180 diastole is too brief and output collapses — that is when adverse features appear and the answer becomes a synchronized shock.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The order set (02:49)</h3>
+        <ul>
+          <li>📟 <strong>Defib pads on, continuous 3-/12-lead monitoring</strong>, print a rhythm strip and a 12-lead if seconds allow.</li>
+          <li>⚡ <strong>Prepare synchronized cardioversion</strong> — SYNC engaged, biphasic energy set and escalating protocol ready.</li>
+          <li>💉 <strong>Procedural sedation / analgesia</strong> drawn up (e.g. ketamine or midazolam ± fentanyl) for the conscious patient — but do not delay the shock in peri-arrest.</li>
+          <li>🩸 <strong>Two large-bore IV lines</strong>; bloods: U&amp;E (<strong>K⁺, Mg²⁺</strong>), gas, glucose, FBC, troponin, TFTs; correct electrolytes.</li>
+          <li>🚫 <strong>Do NOT give AV-nodal blockers</strong> (adenosine, verapamil, diltiazem, beta-blockers, digoxin) to a broad irregular rhythm — possible pre-excited AF.</li>
+          <li>🫁 O₂ to keep SpO₂ ≥ 94%; sit up if pulmonary oedema; small cautious fluid only if clearly under-filled.</li>
+          <li>📞 <strong>Call senior EM + cardiology early</strong>; if pulseless or degenerates → switch to the <strong>cardiac-arrest algorithm</strong> (unsync defib + CPR).</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In the unstable tachyarrhythmia, the order that matters is 'charge to sync and shock' — every other order runs alongside it, not before it."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Resus-bay priorities — the nurse runs the shock safely</h3>
+        <ul>
+          <li>📟 <strong>Confirm pads are correctly placed and SYNC is on</strong>; check the monitor is marking each R wave before every shock and call "re-sync" after each one.</li>
+          <li>💉 <strong>Draw up and titrate sedation</strong>; watch airway and SpO₂ through the procedure; have suction and BVM ready.</li>
+          <li>⚡ <strong>Safety choreography:</strong> "charging… oxygen away… I'm clear, you're clear, everyone clear… shocking." Nobody touching the patient or bed.</li>
+          <li>🩸 Cycle BP every 1–3 min; feel a central pulse after each shock — <strong>a lost pulse means switch to defib + CPR immediately</strong>.</li>
+          <li>🧪 Send electrolytes fast and keep K⁺ 4.0–5.0 and Mg²⁺ replete — hypokalaemia/hypomagnesaemia lower the shock's success and invite recurrence/torsades.</li>
+          <li>🧾 Time-stamp every shock, energy used, rhythm before/after, and sedation given; keep the frightened, conscious patient informed.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After every shock the defibrillator forgets — the nurse who calls 'SYNC is back on' before the next shock prevents an accidental defibrillation into the T wave."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Value</th><th>Interpretation</th></tr>
+          <tr><td>K⁺</td><td class="lo">3.4 mmol/L</td><td>Mild hypokalaemia — correct to 4.0–5.0; lowers cardioversion success and promotes recurrence.</td></tr>
+          <tr><td>Mg²⁺</td><td class="lo">0.62 mmol/L</td><td>Low — replace; magnesium stabilises myocardium and is key in polymorphic VT/torsades.</td></tr>
+          <tr><td>hs-Troponin</td><td class="hi">Mildly raised</td><td>Demand ischaemia (type 2) from the tachycardia — expected; treat the rhythm, not a "coronary."</td></tr>
+          <tr><td>TSH</td><td>Pending</td><td>Thyrotoxicosis is a classic driver of tachyarrhythmia — send it, don't wait on it.</td></tr>
+          <tr><td>Venous gas / lactate</td><td class="hi">Lactate 3.1</td><td>Raised lactate reflects hypoperfusion — an objective marker that she is genuinely shocked.</td></tr>
+          <tr><td>Old 12-lead in notes</td><td class="hi">Short PR + delta wave</td><td><strong>Pre-excitation (WPW)</strong> — the single most important line: AV-nodal blockers are unsafe here.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Send the bloods, but never let a pending potassium hold up a shock — investigations run alongside the resus, not in front of it."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why the troponin can mislead here</b>A raised troponin in a tachyarrhythmia is usually <strong>type 2 (demand) ischaemia</strong> from the rate itself, not an acute coronary occlusion. Anchoring on "she's having a heart attack" can distract from the real emergency — the rhythm. Fix the rate first, then reassess the coronary picture once she's out of the arrhythmia.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 ECG / IMAGING + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🫀 The rhythm strip — broad, fast, and irregular</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 130" preserveAspectRatio="none" aria-label="Fast broad irregular tachycardia converting to sinus rhythm after a synchronized shock">
+            <rect width="820" height="130" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="32" x2="820" y2="32"/><line x1="0" y1="65" x2="820" y2="65"/><line x1="0" y1="98" x2="820" y2="98"/></g>
+            <polyline fill="none" stroke="#fca5a5" stroke-width="2.3" points="0,66 24,64 40,30 56,100 72,66 96,66 128,63 150,34 168,98 190,66 214,66 250,62 268,26 288,102 312,66 340,66 372,64 392,34 414,98 440,66"/>
+            <line x1="452" y1="10" x2="452" y2="120" stroke="#fde68a" stroke-width="2.5" stroke-dasharray="5,4"/>
+            <text x="456" y="18" fill="#fde68a" font-size="11">⚡ SYNC shock</text>
+            <polyline fill="none" stroke="#86efac" stroke-width="2.3" points="470,66 500,66 512,62 524,44 536,86 548,64 560,66 610,66 622,62 634,44 646,86 658,64 670,66 720,66 732,62 744,44 756,86 768,64 780,66 820,66"/>
+            <text x="150" y="20" fill="#fca5a5" font-size="11">before — fast, broad, irregular (~190)</text>
+            <text x="560" y="20" fill="#93c5fd" font-size="11">after — organised sinus rhythm</text>
+          </svg>
+          <div class="ecg-cap">The <span style="color:#fca5a5">pre-shock</span> rhythm is broad, fast and irregularly irregular — the picture of <strong>pre-excited AF</strong>. After the <span style="color:#fde68a">synchronized shock</span> an <span style="color:#93c5fd">organised sinus rhythm</span> returns and the blood pressure recovers.</div>
+        </div>
+
+        <h3>🔎 Reading any tachyarrhythmia in two axes — WIDTH and REGULARITY</h3>
+        <table class="tbl">
+          <tr><th>Pattern</th><th>Look for</th><th>Most likely / action</th></tr>
+          <tr><td>▫️ <strong>Narrow &amp; regular</strong></td><td>QRS &lt; 120 ms, regular</td><td>SVT (AVNRT/AVRT) or atrial flutter — vagal → adenosine (if stable).</td></tr>
+          <tr><td>🌀 <strong>Narrow &amp; irregular</strong></td><td>QRS &lt; 120 ms, irregularly irregular</td><td>AF, flutter with variable block, MAT — rate/rhythm control (if stable).</td></tr>
+          <tr><td>🟥 <strong>Wide &amp; regular</strong></td><td>QRS ≥ 120 ms, regular</td><td><strong>Treat as VT</strong> — amiodarone/procainamide (if stable); AV dissociation/capture/fusion confirm VT.</td></tr>
+          <tr><td>⚡ <strong>Wide &amp; irregular</strong></td><td>QRS ≥ 120 ms, irregular, varying morphology/rate</td><td><strong>Pre-excited AF</strong> (WPW) — procainamide/cardiovert, <strong>NO AV-nodal blockers</strong>. Or polymorphic VT (torsades → magnesium, defib if pulseless).</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Width tells you the danger, regularity tells you the diagnosis: wide-and-regular is VT, wide-and-irregular is pre-excited AF — and in the second, hands off the AV node."</div>
+
+        <h3>🩻 Adjunct imaging</h3>
+        <ul>
+          <li><strong>Bedside echo (POCUS):</strong> gauge LV function and filling, look for pericardial effusion or gross structural disease that changes management.</li>
+          <li><strong>CXR (after stabilisation):</strong> pulmonary oedema, cardiomegaly, or a precipitant such as pneumonia.</li>
+          <li><strong>Post-conversion 12-lead:</strong> the <em>real</em> diagnostic ECG — look for a delta wave (WPW), old infarct/scar (VT substrate), or a long QT.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The tachyarrhythmia drug map — for the STABLE patient (the unstable one gets a shock)</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>Adenosine</strong> 6 → 12 mg IV push</td><td>Stable, regular, narrow SVT (after vagal manoeuvres)</td><td>Transient AV-nodal block; diagnostic (unmasks flutter) &amp; therapeutic. <strong>Avoid in irregular/pre-excited rhythms.</strong></td></tr>
+          <tr><td><strong>Procainamide</strong> IV</td><td>Stable VT; drug of choice in <strong>pre-excited AF</strong></td><td>Na-channel blocker; slows accessory-pathway conduction. Stop for hypotension, QRS widening &gt;50%, or QT prolongation.</td></tr>
+          <tr><td><strong>Amiodarone</strong> IV</td><td>Stable wide-complex / VT; adjunct in refractory arrhythmia</td><td>Broad class III action; caution — can accelerate rate in some pre-excited AF, so procainamide is often preferred there.</td></tr>
+          <tr><td><strong>Verapamil / diltiazem, beta-blockers</strong></td><td>Rate control in stable narrow AF/flutter/SVT</td><td>❌ <strong>Contraindicated in pre-excited AF and in any wide-complex tachycardia of uncertain cause</strong> — can precipitate VF.</td></tr>
+          <tr><td><strong>Magnesium sulphate</strong> IV</td><td>Polymorphic VT / torsades; hypomagnesaemia</td><td>Membrane stabiliser; give empirically in polymorphic VT with a long QT.</td></tr>
+          <tr><td><strong>Sedation</strong> (ketamine / midazolam ± fentanyl)</td><td>For the conscious patient before synchronized cardioversion</td><td>Give if time and consciousness allow; never let it delay a shock in peri-arrest.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Adenosine is for the regular, narrow, STABLE SVT — give it to an irregular wide-complex rhythm and you may be feeding an accessory pathway straight into VF."</div>
+        <div class="callout danger"><b class="ct">🚫 The 'never in pre-excited AF' list</b>❌ adenosine · ❌ verapamil · ❌ diltiazem · ❌ beta-blockers · ❌ digoxin. Each blocks the AV node, leaving the fast accessory pathway to conduct AF to the ventricles even faster → VF. Use <strong>procainamide or synchronized cardioversion</strong> instead.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why</h3>
+        <ul>
+          <li>📟 <strong>Continuous telemetry with defib pads on</strong> — the rhythm can recur or degenerate to VF at any moment; be ready to switch to unsync defib.</li>
+          <li>🩸 <strong>BP every 1–3 min</strong> and a central pulse check after each shock — recovery of BP confirms restored output; a lost pulse means arrest.</li>
+          <li>💓 <strong>Rate and rhythm before/after each shock</strong> — document conversion, recurrence, and QRS width/regularity changes.</li>
+          <li>🫁 SpO₂ and respiratory rate through sedation and for evolving/receding pulmonary oedema.</li>
+          <li>🧪 <strong>Serial K⁺/Mg²⁺</strong> and a post-conversion 12-lead (delta wave? long QT? ischaemia?) to guide the definitive plan.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After you convert her, the monitor's question changes from 'is she perfusing?' to 'will it come back?' — keep the pads on and the potassium topped up."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong</h3>
+        <ul>
+          <li>⚡ <strong>Degeneration to VF / pulseless VT</strong> — from the arrhythmia itself, from an AV-nodal blocker in pre-excited AF, or from an unsynchronised shock landing on the T wave.</li>
+          <li>💔 <strong>Cardiogenic shock / pulmonary oedema</strong> — sustained high rates that outrun the failing pump.</li>
+          <li>🧠 <strong>Syncope with injury or aspiration</strong> from cerebral hypoperfusion.</li>
+          <li>🫀 <strong>Post-cardioversion complications</strong> — bradyarrhythmia/asystole (especially with sick sinus), or thromboembolic stroke if AF &gt; 48 h is cardioverted without anticoagulation (a calculated risk when the patient is unstable).</li>
+          <li>💉 <strong>Sedation-related</strong> hypotension or airway compromise.</li>
+          <li>🔁 <strong>Recurrence</strong> — untreated triggers (electrolytes, thyrotoxicosis, stimulants, the pathway itself) bring the rhythm straight back.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The two ways a cardioversion goes wrong are shocking off-sync into VF, and forgetting the pulse check — organised-with-a-pulse gets SYNC, no-pulse gets defib and CPR."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The tachyarrhythmia differential — organised by the two axes</h3>
+        <table class="tbl">
+          <tr><th>Rhythm</th><th>Discriminators</th><th>If STABLE — action</th></tr>
+          <tr><td>▫️ <strong>SVT (AVNRT / AVRT)</strong></td><td>Narrow, regular, abrupt onset, rate 150–250</td><td>Vagal manoeuvres → adenosine.</td></tr>
+          <tr><td>🌀 <strong>AF / atrial flutter</strong></td><td>Narrow, irregular (AF) or regular ~150 (flutter 2:1)</td><td>Rate or rhythm control; anticoagulation considerations.</td></tr>
+          <tr><td>🟥 <strong>Monomorphic VT</strong></td><td>Wide, regular, AV dissociation / capture / fusion beats, concordance</td><td>Treat as VT — amiodarone or procainamide.</td></tr>
+          <tr><td>⚡ <strong>Pre-excited AF (WPW)</strong></td><td>Wide, <strong>irregular</strong>, very fast, varying QRS morphology</td><td>Procainamide or cardioversion — <strong>NO AV-nodal blockers</strong>.</td></tr>
+          <tr><td>🌪️ <strong>Polymorphic VT / torsades</strong></td><td>Wide, irregular, twisting axis; long QT</td><td>Magnesium, correct QT drivers; <strong>defibrillate if pulseless</strong>.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Every tachyarrhythmia gets the same two questions before any drug: is the patient STABLE, and is the QRS NARROW or WIDE, REGULAR or IRREGULAR? Those answers pick the whole pathway."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "Stable or Unstable, and Which Drug (if Any)"</h3>
+          <div class="hud"><span>❤️ Safety: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">HR ~190, BP 80/48, chest pain 7/10, one presyncopal episode, new bibasal crackles. The monitor shows a broad, irregular tachycardia. A colleague reaches for the adenosine. What do you do?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The disposition plan</h3>
+        <ol>
+          <li>⚡ <strong>Immediate:</strong> unstable tachyarrhythmia → <strong>synchronized DC cardioversion</strong> under sedation; convert to sinus, BP and symptoms recover.</li>
+          <li>🧪 <strong>Stabilise &amp; correct:</strong> replace K⁺/Mg²⁺, treat precipitants (stimulants, thyroid), keep pads on for recurrence.</li>
+          <li>📈 <strong>Diagnose the substrate:</strong> post-conversion 12-lead shows a delta wave → <strong>WPW with pre-excited AF</strong>. Avoid AV-nodal blockers lifelong until ablated.</li>
+          <li>🏥 <strong>Refer cardiology / electrophysiology:</strong> admit monitored; plan <strong>accessory-pathway ablation</strong> — curative and removes the VF risk.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The synchronized shock buys the minute; the electrophysiologist's ablation buys the lifetime — pre-excited AF is a warning shot that earns a definitive fix."</div>
+
+        <div class="checklist" id="ckSync">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Synchronized cardioversion (SYNC on, sedate, escalate energy)</h3>
+          <label class="ck"><input type="checkbox"><span>📟 Pads correctly placed, monitor leads on, <strong>SYNC engaged</strong> — confirm each R wave is marked</span></label>
+          <label class="ck"><input type="checkbox"><span>💉 Sedation/analgesia given if conscious and time allows (never delay a shock in peri-arrest)</span></label>
+          <label class="ck"><input type="checkbox"><span>⚡ Charge to appropriate biphasic energy; call "oxygen away, I'm clear, you're clear, all clear"</span></label>
+          <label class="ck"><input type="checkbox"><span>🔌 Deliver the shock; reassess rhythm AND pulse; <strong>re-arm SYNC before the next shock</strong></span></label>
+          <label class="ck"><input type="checkbox"><span>⬆️ Escalate energy on each successive shock; correct K⁺/Mg²⁺ if refractory</span></label>
+          <label class="ck"><input type="checkbox"><span>🧪 Post-conversion 12-lead + reversible-cause work-up; senior/cardiology involved</span></label>
+          <div class="ck-progress" data-progress>0 / 6 complete</div>
+        </div>
+
+        <div class="checklist" id="ckDefib">
+          <h3 style="margin-top:0">🩺 Procedure Guide — If pulseless / degenerates to VF → UNSYNCHRONISED defibrillation + CPR</h3>
+          <label class="ck"><input type="checkbox"><span>🫀 Confirm no pulse / VF or pulseless VT → start the cardiac-arrest algorithm</span></label>
+          <label class="ck"><input type="checkbox"><span>⚡ Switch the machine to <strong>UNSYNCHRONISED</strong> (defib) mode — SYNC will fail to find an R wave</span></label>
+          <label class="ck"><input type="checkbox"><span>🙌 High-quality CPR, minimise pauses; shock at maximal energy</span></label>
+          <label class="ck"><input type="checkbox"><span>💊 Adrenaline / amiodarone per ALS; magnesium if polymorphic VT/torsades</span></label>
+          <label class="ck"><input type="checkbox"><span>🔁 Reassess every 2 min; treat reversible causes (4 H's &amp; 4 T's)</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">02:47</div>Arrival, pads on, HR ~190 broad &amp; irregular, BP 80/48, chest pain, presyncope. Adverse features → UNSTABLE.</div>
+          <div class="t-item"><div class="t-time">02:55</div>Brief ketamine sedation; <strong>synchronized cardioversion</strong> (SYNC confirmed). First shock restores sinus rhythm; BP recovers to 118/72.</div>
+          <div class="t-item"><div class="t-time">03:05</div>K⁺ 3.4 and Mg²⁺ 0.62 replaced; pads left on. Post-conversion 12-lead: <strong>short PR + delta wave = WPW</strong>.</div>
+          <div class="t-item"><div class="t-time">03:30</div>Diagnosis: <strong>pre-excited AF in WPW</strong>. Documented "avoid all AV-nodal blockers." Cardiology/EP referral made.</div>
+          <div class="t-item"><div class="t-time">Day 3</div>Electrophysiology study + <strong>accessory-pathway ablation</strong> — curative. Discharged well, arrhythmia-free.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>She is well because someone answered "unstable" in the first minute, reached for the defibrillator instead of the drug trolley, kept SYNC on, and — crucially — never gave the AV-nodal blocker that her pre-excited rhythm would have punished with VF.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 Two very different tachycardia dispositions</h3>
+        <div class="vs">
+          <div class="side a"><h4>⚡ This patient (WPW / pre-excited AF)</h4><ul><li>Admitted, cardioverted, then <strong>ablation</strong> of the accessory pathway — definitive cure</li><li>Documented allergy-style alert: <strong>"avoid AV-nodal blockers"</strong> until ablated</li><li>Avoid stimulants/decongestants; correct electrolytes; treat thyroid if abnormal</li><li>Red flags: recurrent fast palpitations, syncope, chest pain → 999</li></ul></div>
+          <div class="side b"><h4>🟢 The stable, self-terminating SVT</h4><ul><li>Converted in ED (vagal/adenosine), well and pain-free, normal post-conversion ECG</li><li>Teach vagal manoeuvres; discuss caffeine/alcohol/sleep triggers</li><li>Outpatient cardiology for consideration of ablation vs prophylaxis</li><li>Written safety-net: return if it doesn't self-terminate, or with any red-flag symptom</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A tachyarrhythmia discharge isn't 'it stopped' — it's a named rhythm, a corrected trigger, a documented drug caution, and a plan for definitive rhythm control."</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>⚖️ Stable or unstable first</b>The 4 S's (shock, syncope, ischaemia, heart failure) decide everything before you name the rhythm.</div>
+          <div class="pearl"><b>🔌 Unstable = electricity</b>A synchronized shock is right for VT AND SVT — instability collapses the differential.</div>
+          <div class="pearl"><b>🔁 Re-arm SYNC every time</b>The defibrillator forgets and defaults back to defib after each shock.</div>
+          <div class="pearl"><b>🫀 SYNC vs DEFIB</b>Organised rhythm WITH a pulse → sync; pulseless VT/VF or polymorphic → unsync defib + CPR.</div>
+          <div class="pearl"><b>🟥 Wide + regular = VT</b>When in doubt, treat wide-and-regular as VT — it's safer than assuming SVT-aberrancy.</div>
+          <div class="pearl"><b>⚡ Wide + irregular = pre-excited AF</b>Think WPW — and keep hands off the AV node.</div>
+          <div class="pearl"><b>🚫 No AV-nodal blockers in WPW+AF</b>Adenosine/verapamil/diltiazem/beta-blocker/digoxin can accelerate to VF.</div>
+          <div class="pearl"><b>⏱️ Rate steals diastole</b>Too fast to fill = failing to pump; restore rhythm, restore output.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the algorithm</h3>
+          <ul>
+            <li>🟥 <strong>VT vs SVT-with-aberrancy:</strong> features that argue strongly for VT — <em>AV dissociation</em>, <em>capture</em> and <em>fusion beats</em>, very wide QRS, extreme axis, and <em>precordial concordance</em>. Structured tools (<em>Brugada</em> algorithm, <em>Vereckei</em> aVR algorithm) formalise this, but the safest bedside default remains the <strong>"treat wide-and-regular as VT" rule</strong> — misclassifying VT as SVT and giving a nodal blocker is far more dangerous than the reverse.</li>
+            <li>⚡ <strong>Pre-excited AF physiology:</strong> the accessory pathway lacks the AV node's decremental "brake," so it can conduct AF at rates &gt; 250/min. Block the node and you funnel <em>all</em> conduction down that fast pathway → VF. Procainamide (or ibutilide) slows the pathway; cardioversion resets it.</li>
+            <li>💉 <strong>Sedation for cardioversion:</strong> balancing amnesia/analgesia against haemodynamics in a shocked patient — ketamine (haemodynamically favourable), midazolam, propofol (watch hypotension), etomidate, ± short-acting opioid. Pre-oxygenate, prepare the airway, and accept lighter sedation if peri-arrest.</li>
+            <li>🌪️ <strong>Polymorphic VT / electrical storm:</strong> distinguish long-QT torsades (→ magnesium, correct QT drivers, overdrive pacing, isoproterenol) from ischaemic polymorphic VT (→ revascularisation, beta-blockade). Electrical storm (≥3 episodes/24 h) may need deep sedation, IV beta-blockade (esmolol), amiodarone, stellate ganglion block, or mechanical support.</li>
+            <li>🔧 <strong>Drug-refractory / recurrent arrhythmia:</strong> when repeated shocks fail or the rhythm recurs — hunt reversible drivers (ischaemia, electrolytes, hypoxia, drugs), consider antiarrhythmic loading, and escalate to EP for ablation or device therapy.</li>
+            <li>🫀 <strong>Cardioversion &amp; thromboembolism:</strong> in AF &gt; 48 h, elective cardioversion needs anticoagulation or a TOE to exclude atrial thrombus — but in the <em>unstable</em> patient the shock proceeds now and anticoagulation follows, a justified acceptance of stroke risk to save a life.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The Verapamil That Started a VF Arrest"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 24-year-old man arrived with palpitations and a rate of ~210. The monitor showed a <strong>broad, irregular</strong> tachycardia, but he was chatting and his BP was 105/68 — so the team called it "SVT with aberrancy" and pushed <strong>IV verapamil</strong> to slow it down. Within a minute the ventricular rate <em>accelerated</em>, the QRS became chaotic, he lost consciousness, and the rhythm degenerated into <strong>ventricular fibrillation</strong>. He was a routine cardioversion candidate; instead the room ran a full arrest. He survived after defibrillation and CPR — but only just, and with an avoidable ICU stay. His post-arrest ECG showed a delta wave: this had been <strong>pre-excited AF in WPW</strong> all along.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🧠 MISREAD RHYTHM</b>Broad + irregular called "SVT with aberrancy" instead of pre-excited AF.</div>
+            <div class="hole"><b>💊 NODAL BLOCKER</b>Verapamil blocked the AV node and unleashed the accessory pathway → VF.</div>
+            <div class="hole"><b>📈 ECG NOT SOUGHT</b>The old WPW ECG in his record was never checked before treating.</div>
+            <div class="hole"><b>⚖️ WRONG FRAME</b>"He looks stable" led to reaching for a drug when the safe universal tool was a shock.</div>
+            <div class="hole"><b>🚫 RULE IGNORED</b>The "no AV-nodal blockers in wide-and-irregular" rule wasn't applied.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved the near-miss:</strong> read the two axes — <em>wide + irregular</em> = think pre-excited AF and keep hands off the AV node; if unstable, <strong>synchronized cardioversion</strong>; if stable, <strong>procainamide</strong> or elective cardioversion, never verapamil/adenosine/diltiazem/beta-blocker/digoxin. And the mirror-image error — giving an <em>unstable</em> VT escalating drug infusions while the patient circles the drain instead of simply delivering a synchronized shock — kills the same way, by chemistry when the patient needed electricity. <strong>That discipline is exactly what saved the patient in Bed 7.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'It looked like SVT' has arrested more WPW patients than the arrhythmia itself — respect wide-and-irregular, keep off the AV node, and when in doubt, shock."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🚨 Emergency Department · Bed 7 — The Unstable Tachyarrhythmia<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+  /* ===== SIDEBAR SCROLL-SPY (vertical) ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); var t=sections[idx]; if(t) t.scrollIntoView({behavior:'smooth',block:'start'}); setActive(idx); markVisited(idx); }); });
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){ entries.forEach(function(e){ if(!e.isIntersecting) return; var i=sections.indexOf(e.target); if(i>-1){ setActive(i); markVisited(i); } }); }, { rootMargin:'-10% 0px -75% 0px' });
+    sections.forEach(function(s){ if(s) io.observe(s); });
+  }
+  markVisited(0); setActive(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not an adverse feature'); } if(found===total){ flagResult.textContent='✅ All '+total+' adverse features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' adverse features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: rate dial — heart rate → diastolic filling & cardiac output ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=(v-60)/(240-60)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<=120){ msg='🟢 HR '+v+'/min. Diastole is long enough to fill the ventricle — stroke volume, BP and coronary perfusion preserved. Stable: time to characterise the rhythm and choose a drug.'; cls='good'; }
+      else if(v<=150){ msg='🟠 HR '+v+'/min. Diastolic filling time is shortening; output still compensated but the margin is thinning — watch for adverse features.'; cls='warn-r'; }
+      else if(v<180){ msg='🟠 HR '+v+'/min. Filling time is short — stroke volume and BP starting to fall, subendocardial ischaemia looming. Reassess stability constantly.'; cls='warn-r'; }
+      else { msg='🔴 HR '+v+'/min. Diastole is too brief to fill — stroke volume, BP and coronary flow collapse into the instability spiral. This is electricity, not chemistry: synchronized cardioversion.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Rate Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"HR ~190, BP 80/48, chest pain 7/10, one presyncopal episode, new bibasal crackles. The monitor shows a broad, irregular tachycardia. A colleague reaches for the adenosine. What do you do?",
+      choices:[
+        {t:"💉 Push adenosine to 'see if it's SVT'",good:false,ds:-2,dt:4,xp:0,fb:"☠️ She's unstable — the answer is a shock, not a diagnostic drug. Worse, a broad IRREGULAR rhythm suggests pre-excited AF, where adenosine (an AV-nodal blocker) can accelerate the pathway into VF. This is the S21 disaster. Restart.",end:true},
+        {t:"⚡ Recognise the adverse features (shock, presyncope, ischaemia) → UNSTABLE → prepare SYNCHRONIZED cardioversion, sedate if time, call for help",good:true,ds:1,dt:6,xp:40,fb:"✅ Exactly. Any of the 4 S's makes her unstable, and unstable means a synchronized shock — correct whether this is VT or SVT.",next:"repeat"},
+        {t:"💧 Give a fluid bolus and amiodarone infusion and wait for it to work",good:false,ds:-1,dt:12,xp:5,fb:"⚠️ Too slow for a shocked, peri-arrest patient losing output every minute. Drugs are for the STABLE patient; this one needs electricity now.",next:"repeat"}
+      ]},
+    repeat:{ text:"You've decided on synchronized cardioversion. Before you charge, you glance at an old ECG: short PR with a delta wave, and the live rhythm is broad and irregular — pre-excited AF. Someone suggests 'just slow the rate with verapamil first.' Now what?",
+      choices:[
+        {t:"🚫 Do NOT give any AV-nodal blocker — proceed to synchronized cardioversion (procainamide only if she were stable)",good:true,ds:1,dt:5,xp:40,fb:"✅ Right. In pre-excited AF, verapamil/adenosine/diltiazem/beta-blockers/digoxin can accelerate accessory-pathway conduction to VF. Unstable + pre-excited → shock.",next:"declare"},
+        {t:"💊 Give IV verapamil to control the rate before shocking",good:false,ds:-2,dt:8,xp:0,fb:"☠️ Blocking the AV node funnels AF down the fast accessory pathway → the rate accelerates and degenerates to VF. This is exactly the war story. Restart.",end:true}
+      ]},
+    declare:{ text:"You sedate her and deliver a synchronized shock. What must you verify on the defibrillator, and what's your plan if she loses her pulse?",
+      choices:[
+        {t:"✅ Confirm SYNC is engaged before EACH shock; if she becomes pulseless / degenerates to VF, switch to UNSYNCHRONISED defibrillation + CPR",good:true,ds:1,dt:4,xp:45,fb:"🏆 Perfect. The machine reverts to defib after every shock, so re-arm SYNC each time — and an organised-with-a-pulse rhythm gets sync, while pulseless VT/VF gets unsync defib and CPR.",end:true},
+        {t:"🔁 Assume SYNC stays on and just shock again immediately if it recurs",good:false,ds:-1,dt:6,xp:0,fb:"⚠️ The defibrillator forgets — it defaults back to unsynchronised after each shock, so an un-checked 'sync' shock could land on the T wave and induce VF. Always re-confirm SYNC.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='declare'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A patient arrives with a tachycardia at 190/min. What is the single most important first determination?", opts:["The exact rhythm diagnosis (VT vs SVT)","Whether the patient is STABLE or UNSTABLE (presence of adverse features)","The serum potassium","The QRS axis"], correct:1, exp:"Stable-or-unstable is the master switch of the tachycardia algorithm. Any adverse feature (the 4 S's) mandates immediate synchronized cardioversion regardless of the precise rhythm — instability collapses the differential." },
+    { q:"Which of the following is an 'adverse feature' mandating urgent cardioversion?", opts:["Anxiety about the palpitations","SBP 80 mmHg with cool, clammy peripheries (shock)","A temperature of 36.8°C","Having drunk caffeine earlier"], correct:1, exp:"The adverse features (4 S's) are Shock, Syncope/presyncope, Severe ischaemia (chest pain/ST changes), and Severe heart failure. Anxiety, a normal temperature and caffeine are not markers of haemodynamic instability." },
+    { q:"An UNSTABLE patient has a regular narrow-complex SVT. The correct immediate treatment is:", opts:["A trial of adenosine while preparing other options","Synchronized DC cardioversion","IV verapamil","Oral beta-blocker"], correct:1, exp:"Instability means electricity, not chemistry. A synchronized shock is correct whether the rhythm is SVT or VT. A brief attempt at adenosine may be reasonable only if it will not delay a needed shock, but cardioversion is the definitive answer in the unstable patient." },
+    { q:"A STABLE patient has a regular, narrow-complex tachycardia at 180. First-line management is:", opts:["Immediate defibrillation","Vagal manoeuvres, then adenosine","IV procainamide","Amiodarone infusion"], correct:1, exp:"Stable, regular, narrow SVT is treated with vagal manoeuvres (e.g. modified Valsalva) followed by adenosine, which is both therapeutic and diagnostic (it can unmask atrial flutter)." },
+    { q:"A patient in pre-excited AF (WPW) has a fast, irregular, broad-complex tachycardia. Which drug is CONTRAINDICATED?", opts:["Procainamide","IV verapamil","Synchronized cardioversion","Magnesium (if torsades)"], correct:1, exp:"AV-nodal blockers — verapamil, diltiazem, adenosine, beta-blockers and digoxin — can accelerate conduction down the accessory pathway in pre-excited AF and precipitate VF. Use procainamide or synchronized cardioversion instead." },
+    { q:"A STABLE patient has a regular, wide-complex tachycardia and you are unsure whether it is VT or SVT-with-aberrancy. The safest approach is:", opts:["Give adenosine assuming it is SVT","Treat it as VT (e.g. amiodarone or procainamide)","Give verapamil","Reassure and observe only"], correct:1, exp:"When in doubt, treat a wide-and-regular tachycardia as VT. Misclassifying VT as SVT and giving a nodal blocker is far more dangerous than the reverse. Amiodarone or procainamide is appropriate for stable VT." },
+    { q:"What distinguishes synchronized cardioversion from unsynchronised defibrillation?", opts:["Sync uses more energy","Sync times the shock to the R wave for an organised rhythm WITH a pulse; defib is unsynchronised for pulseless VT/VF","Defib is only for children","There is no real difference"], correct:1, exp:"Synchronized cardioversion delivers the shock on the R wave to avoid the vulnerable T-wave period (R-on-T → VF); it is used for organised rhythms with a pulse. Pulseless VT, VF and chaotic polymorphic VT get unsynchronised defibrillation with CPR." },
+    { q:"Immediately after delivering a synchronized shock, the defibrillator:", opts:["Stays permanently in SYNC mode","Reverts to unsynchronised (defib) mode, so SYNC must be re-armed before the next shock","Automatically increases energy","Locks out for 60 seconds"], correct:1, exp:"Most defibrillators default back to unsynchronised mode after each synchronized shock. You must re-engage SYNC before every subsequent cardioversion, or an un-checked shock could land on the T wave and induce VF." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you triage tachyarrhythmias like a consultant. 🏆':score>=6?'Strong — review the misses and S10 width-and-regularity logic.':'Revisit S5, S6 and S10 — the stable-or-unstable fork is the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>
