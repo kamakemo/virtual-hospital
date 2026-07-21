@@ -102,7 +102,8 @@ tags: Aortic dissection, Anti-impulse therapy, Tearing pain, Type A, Surgical em
   @media(max-width:900px){.dash{display:none}}
 
   /* ===== SECTIONS ===== */
-  section.case-sec{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
   .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
   .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
   .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
@@ -831,18 +832,16 @@ tags: Aortic dissection, Anti-impulse therapy, Tearing pain, Type A, Surgical em
   var dash=document.getElementById('dash');
   document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
 
-  /* ===== SIDEBAR SCROLL-SPY (vertical) ===== */
+    /* ===== SIDEBAR TABS — show one section at a time ===== */
   var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
   var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
   var visited={}, visitVal=document.getElementById('visitVal');
   function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
   function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
-  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); var t=sections[idx]; if(t) t.scrollIntoView({behavior:'smooth',block:'start'}); setActive(idx); markVisited(idx); }); });
-  if('IntersectionObserver' in window){
-    var io=new IntersectionObserver(function(entries){ entries.forEach(function(e){ if(!e.isIntersecting) return; var i=sections.indexOf(e.target); if(i>-1){ setActive(i); markVisited(i); } }); }, { rootMargin:'-10% 0px -75% 0px' });
-    sections.forEach(function(s){ if(s) io.observe(s); });
-  }
-  markVisited(0); setActive(0);
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
 
   /* ===== FLAG GAME ===== */
   var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
