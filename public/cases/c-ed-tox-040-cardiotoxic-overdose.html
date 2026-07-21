@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cardiotoxic Overdose — Beta-Blocker / Calcium-Channel-Blocker / Digoxin — Virtual Teaching Hospital</title>
+<!-- META
+id: c-ed-tox-040
+title: Cardiotoxic Overdose — Beta-Blocker / Calcium-Channel-Blocker / Digoxin
+hospital: cardiology
+department: cv-ed
+bednumber: 10
+chiefcomplaint: Deliberate overdose with profound bradycardia and refractory hypotension
+system: Cardiology
+severity: critical
+tags: Cardiotoxicity, Beta-blocker overdose, Calcium-channel blocker, HIET, Digoxin, Antidotes
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🚨</div>
+      <div>
+        <div class="t1">Emergency Dept</div>
+        <div class="t2">Bed 10 · Cardiotoxic Overdose</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🚨 Emergency Department · 🛏️ Bed 10</div>
+        <h1>💊 Cardiotoxic Overdose — "The Poisoned Heart That Won't Beat"</h1>
+        <div class="sub">⚡ 22:40. A young woman is wheeled in drowsy and grey, HR 38, BP 68/40. Empty blister packs of verapamil and metoprolol were found beside her. Atropine and a fluid bolus have done nothing. The next decision — start high-dose insulin now, or "wait and see" — is the difference between a discharge and a post-mortem.</div>
+        <div class="chips">
+          <span class="chip crit">🔴 CRITICAL</span>
+          <span class="chip">💊 BB / CCB Overdose</span>
+          <span class="chip">💉 HIET Cornerstone</span>
+          <span class="chip">🧬 Digoxin + Digifab</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital alert"><div class="v-label">💓 HR</div><div class="v-num">38</div></div>
+        <div class="vital alert"><div class="v-label">🩸 BP</div><div class="v-num">68/40</div></div>
+        <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">9</div></div>
+        <div class="vital warn"><div class="v-label">🫁 SpO₂</div><div class="v-num">94%</div></div>
+        <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.1°</div></div>
+        <div class="vital warn"><div class="v-label">🧠 GCS</div><div class="v-num">12</div></div>
+        <div class="vital warn"><div class="v-label">🍬 Glucose</div><div class="v-num">12.1</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 22:40, Resus 1</b>A 19-year-old woman is slumped on the trolley, eyes half-closed, skin cool and mottled. The monitor alarms: a slow, wide-ish complex at 38 with a pressure the cuff barely registers. Her flatmate hands you two empty foil strips — <em>verapamil 240 mg MR</em> and <em>metoprolol 100 mg</em> — and a half-finished note. "She's just tired," someone says. She is not tired. She is being poisoned by drugs that are switching her heart off, and the clock on her myocardium started an hour ago.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>👩 Name</td><td><strong>Ms. R.K.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>19-year-old female</td></tr>
+          <tr><td>🆔 MRN</td><td>CV-ED-1040</td></tr>
+          <tr><td>⚖️ Weight</td><td>60 kg</td></tr>
+          <tr><td>💊 The agents</td><td>Verapamil 240 mg MR ×~14 tablets + metoprolol 100 mg ×~10 (household supply — grandmother's cardiac meds)</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 History — every line steers the antidote</h3>
+        <ul>
+          <li>💭 <strong>Deliberate self-poisoning</strong> ~60–90 min ago after an argument; found a note. Intent + timing changes decontamination and disposition (see S15/S17).</li>
+          <li>🏠 Took her <strong>grandmother's tablets</strong>: a <em>calcium-channel blocker (verapamil MR)</em> and a <em>beta-blocker (metoprolol)</em> — a lethal, synergistic combination of negative inotropy, chronotropy and vasodilatation.</li>
+          <li>⏳ <strong>Modified-release (MR) verapamil</strong> — the danger keeps coming: absorption is delayed and prolonged, so a "stable-ish" patient can crash hours later.</li>
+          <li>🍬 Bedside glucose <strong>12.1 mmol/L (high)</strong> — a quiet but crucial clue pointing at the calcium-channel blocker (see S6).</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In cardiotoxic overdose the label on the empty packet IS the diagnosis — read it, weigh it, and reach for the specific antidote before the pressure disappears."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why cardiotoxic overdose is a distinct emergency</b>Beta-blocker, calcium-channel blocker and digoxin poisoning don't behave like ordinary shock — they don't respond to fluids and pressors alone because the poison is jamming the machinery of the myocyte itself. Cardiovascular medications are among the leading causes of fatal poisoning; verapamil and diltiazem overdoses in particular carry disproportionate mortality. The whole management is a <strong>structured antidote escalation</strong>, started early, not a "resus and hope."</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 Paramedic handover — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ Pre-hospital SBAR (verbatim)</b>
+          <p><strong>S:</strong> "19-year-old female, deliberate overdose about an hour ago. Empty verapamil and metoprolol packets on scene. Drowsy, very slow heart rate, barely a pressure."</p>
+          <p><strong>B:</strong> "No regular meds of her own, no known cardiac disease. Flatmate says an argument then she took the grandmother's tablets."</p>
+          <p><strong>A:</strong> "HR 38, BP 68/40, GCS 12, SpO₂ 94%. We gave 500 mg atropine — barely touched the rate — and a 250 mL fluid bolus. Sugar reads HIGH."</p>
+          <p><strong>R:</strong> "Pre-alerted as a cardiotoxic overdose. She's cold and shutting down — needs resus now."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Refractory bradycardia + hypotension that shrugs off atropine and fluid is a poisoned heart until proven otherwise — go looking for the packet, not just the pacing wire."</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each feature that points to cardiotoxic overdose</h3>
+        <p>🎮 <em>Click every feature that RAISES the probability of a cardiotoxic (BB/CCB/digoxin) overdose. Each correct = +10 XP.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">🐢 Profound bradycardia + hypotension</button>
+          <button class="btn ghost flag-btn" data-good="1">📦 Empty beta-blocker / calcium-channel-blocker packets</button>
+          <button class="btn ghost flag-btn" data-good="1">💭 History of deliberate ingestion + note</button>
+          <button class="btn ghost flag-btn" data-good="1">🍬 Hyperglycaemia (CCB) or hypoglycaemia (BB)</button>
+          <button class="btn ghost flag-btn" data-good="1">💧 Refractory to atropine and fluid boluses</button>
+          <button class="btn ghost flag-btn" data-good="1">🧬 Digoxin use with a raised potassium</button>
+          <button class="btn ghost flag-btn" data-good="0">🌡️ Temperature 38.5°C with rigors</button>
+          <button class="btn ghost flag-btn" data-good="0">🤕 Sharp, reproducible chest-wall pain</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Praise where due</b>The crew pre-alerted, brought the packets, and gave atropine + fluid — reasonable first moves. Their most valuable act was carrying in the <strong>empty blister strips</strong>: in poisoning, the container is the fastest diagnostic test in the department.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🅰️🅱️🅲️ Primary survey — resuscitate and identify the toxidrome together</h3>
+        <table class="tbl">
+          <tr><th>Step</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>🅰️ Airway</td><td>Own airway, but GCS 12 and falling.</td><td>A dropping GCS in BB/CCB overdose means impending arrest — pre-oxygenate, prepare for intubation with a shock-tolerant induction.</td></tr>
+          <tr><td>🅱️ Breathing</td><td>RR 9, SpO₂ 94%, chest clear.</td><td>Hypoventilation (CNS depression, esp. propranolol/lipophilic BB) and evolving pulmonary oedema from HIET/fluids are both threats.</td></tr>
+          <tr><td>🅲️ Circulation</td><td>HR 38, <strong>BP 68/40</strong>, cool mottled peripheries, capillary refill 5 s, no murmur.</td><td>Combined <em>vasodilatory + cardiogenic</em> shock. This will not respond to fluid alone — the myocyte is energy-starved and the vessels are dilated.</td></tr>
+          <tr><td>🅳 Disability</td><td>GCS 12, pupils mid-size, glucose 12.1 (high).</td><td>Hyperglycaemia is a CCB fingerprint; hypoglycaemia would point to BB. Always check a sugar — it tells you which poison leads.</td></tr>
+          <tr><td>🅴 Exposure</td><td>Cool, no rash, no injuries; foil packs bagged.</td><td>Quantify the dose (tablets missing × strength) and the formulation (MR = delayed, prolonged toxicity).</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Check the glucose in every collapsed overdose: a HIGH sugar whispers calcium-channel blocker, a LOW sugar whispers beta-blocker — the pancreas is telling you which antidote to prioritise."</div>
+
+        <h3>🧭 The three cardiotoxic threads you hold from the first minute</h3>
+        <p>Frame the poisoned heart as three overlapping stories: <strong>beta-blocker</strong> (brady, hypotension, hypoglycaemia, bronchospasm; propranolol adds sodium-channel blockade + seizures), <strong>calcium-channel blocker</strong> (brady, vasodilatory + cardiogenic shock, hyperglycaemia), and <strong>digoxin</strong> (nausea, visual halos, bradyarrhythmias/AV block or bidirectional VT, hyperkalaemia in acute toxicity). One glucose, one potassium, one ECG and the packet triage all three within minutes (see S14).</p>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of "she looks stable-ish"</b>Modified-release verapamil and diltiazem can lull you: a patient who is "only mildly slow" at hour 1 can be periarrest at hour 4 as the MR coat keeps dissolving. <strong>Anticipate deterioration, secure two large IVs, and get the antidotes to the bedside BEFORE she crashes</strong> — the reactive team always arrives late.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The EM resident thinks out loud at 22:46:</em></p>
+        <h3>🧠 Frame it as "which poison, how much, how fast, which antidote"</h3>
+        <p>"Empty verapamil <em>and</em> metoprolol — so I'm treating a combined CCB/BB overdose, and the high sugar tells me the calcium-channel blocker is driving the shock. She's already refractory to atropine and fluid, so I'm not going to chase them. I want <strong>IV calcium and glucagon at the bedside now</strong>, I'm <strong>preparing high-dose insulin (HIET)</strong> because that's the therapy that actually rescues these hearts, and I'm calling <strong>toxicology and ICU early</strong> and warning the cath lab/ECMO team that this could go to mechanical support."</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>💉 <strong>Two large-bore IVs + central access</strong>; ECG, continuous monitoring, defib pads on, arterial line if time allows.</li>
+          <li>🦴 <strong>IV calcium</strong> (calcium gluconate 10% or calcium chloride via central line), repeated/infused — first-line for CCB shock.</li>
+          <li>🧫 <strong>Glucagon</strong> bolus then infusion — especially for the beta-blocker component (bypasses the β-receptor to raise cAMP); have anti-emetics ready.</li>
+          <li>💧 <strong>Start HIET early</strong>: 1 unit/kg insulin bolus then 1 unit/kg/hr, titrated up, with dextrose and potassium monitoring — do <em>not</em> wait for atropine to fail three times.</li>
+          <li>📉 <strong>Vasopressors</strong> (noradrenaline ± adrenaline) for refractory hypotension; consider <strong>lipid emulsion</strong> and escalate to <strong>pacing / VA-ECMO</strong> if refractory.</li>
+          <li>🧪 <strong>Bloods:</strong> glucose, potassium, VBG/lactate, digoxin level (if any suspicion), paracetamol/salicylate co-ingestion screen, renal function.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Refractory CCB/BB shock lives or dies on HIGH-DOSE INSULIN — start it early, don't wait for atropine to fail three times."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>The nurse asks: "Her sugar is high anyway — do we still give dextrose with the insulin?"
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>Yes — HIET means high-dose insulin WITH euglycaemia.</strong> You run insulin at doses far above diabetic ranges (1 u/kg/hr and climbing) and give dextrose to keep glucose ~5–8 mmol/L, checking sugars every 15–30 min initially. Even a "high" starting glucose will fall once you unload insulin at these doses. You must also watch <strong>potassium</strong> — insulin drives K into cells; replace to keep it in the low-normal range, but don't over-correct. The insulin is the treatment; the dextrose and potassium are the safety rails.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The EM consultant at the bedside, 22:54:</em></p>
+        <h3>🪜 The antidote-escalation ladder for BB/CCB shock</h3>
+        <table class="tbl">
+          <tr><th>Rung</th><th>Intervention</th><th>Why / caveat</th></tr>
+          <tr><td>1️⃣ Supportive</td><td>Airway, O₂, IV access, fluids (cautious), <strong>atropine</strong></td><td>Atropine is often ineffective in significant BB/CCB poisoning — try it, but don't lean on it.</td></tr>
+          <tr><td>2️⃣ Calcium</td><td><strong>IV calcium</strong> (gluconate/chloride), repeat/infuse</td><td>Overcomes channel blockade; most useful in CCB. Caution in <em>digoxin</em> toxicity ("stone heart").</td></tr>
+          <tr><td>3️⃣ Glucagon</td><td><strong>Glucagon</strong> bolus + infusion</td><td>Raises cAMP independent of the β-receptor — the classic beta-blocker antidote; causes vomiting.</td></tr>
+          <tr><td>4️⃣ HIET</td><td><strong>High-dose insulin euglycaemia therapy</strong> + dextrose + K monitoring</td><td>The cornerstone: positive inotropy + metabolic rescue of the poisoned myocardium. Start early.</td></tr>
+          <tr><td>5️⃣ Pressors</td><td><strong>Noradrenaline / adrenaline</strong></td><td>For vasodilatory + cardiogenic shock; titrate to perfusion, not just a number.</td></tr>
+          <tr><td>6️⃣ Lipid</td><td><strong>IV lipid emulsion</strong> ("lipid sink")</td><td>For lipophilic agents (e.g. verapamil, propranolol) in periarrest/refractory shock.</td></tr>
+          <tr><td>7️⃣ Mechanical</td><td><strong>Transvenous pacing / VA-ECMO</strong></td><td>Buys time while the drug is metabolised in truly refractory cases.</td></tr>
+        </table>
+        <p>She has combined CCB/BB poisoning with a high sugar and shock refractory to atropine and fluid — that puts her at <strong>rung 2–4 already</strong>, which is exactly why calcium + glucagon go in now and HIET is being drawn up. This is a <strong>resuscitate-and-escalate</strong> patient, full stop.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Climb the ladder deliberately: supportive → calcium/glucagon → HIET → pressors → lipid → pacing/ECMO — and if the patient is crashing, jump straight to insulin. The sicker the heart, the earlier the rungs collapse together."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence / guidance</th><th>What it says</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">CONSENSUS</span> HIET for CCB/BB toxicity (tox society guidance, case series)</td><td>High-dose insulin improves inotropy and survival in severe CCB/BB shock; it is a metabolic rescue for the poisoned myocardium.</td><td>Start HIET early in refractory BB/CCB shock — a cornerstone, not a last resort.</td></tr>
+            <tr><td><span class="lvl">MECHANISM</span> Glucagon for beta-blocker overdose</td><td>Glucagon raises myocardial cAMP independent of the β-receptor, improving rate and contractility.</td><td>The classic BB antidote; give with anti-emetic cover, then move to HIET if inadequate.</td></tr>
+            <tr><td><span class="lvl">INDICATION</span> Digoxin-specific antibody (Fab / Digifab)</td><td>Indicated for life-threatening dysrhythmia, haemodynamic instability, or K⁺ &gt; ~5–6 mmol/L in acute toxicity (and chronic toxicity with end-organ effects).</td><td>In digoxin toxicity treat the digoxin with antibody — don't just chase the potassium.</td></tr>
+            <tr><td><span class="lvl">ANTIDOTE</span> Sodium bicarbonate for TCA (wide QRS)</td><td>Sodium loading + alkalinisation narrows the QRS and treats hypotension from sodium-channel blockade.</td><td>Wide QRS + terminal R in aVR after TCA (or propranolol) → give bicarbonate.</td></tr>
+            <tr><td><span class="lvl">RESCUE</span> Lipid emulsion &amp; VA-ECMO</td><td>Lipid emulsion for lipophilic-drug periarrest; ECMO improves survival in refractory toxin-induced cardiogenic shock.</td><td>Escalate early in refractory cases; involve tox + ECMO teams before the arrest, not after.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The chart that keeps me awake is the young woman who took a bottle of verapamil, got atropine and a litre of saline, and was 'observed.' Over three hours she slid into refractory shock and arrested — HIET and ECMO were never even discussed until CPR was in progress. Insulin at the door would have bought her life."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY the heart stops, WHY the sugar moves (the WHY behind the WHY)</h3>
+        <ol>
+          <li>🚪 <strong>Calcium-channel blockers</strong> block myocardial and vascular L-type calcium channels → less calcium entry → <em>negative inotropy, chronotropy, dromotropy</em> + vasodilatation. Crucially, the <strong>same L-type channels trigger insulin release from pancreatic β-cells</strong> — block them and you cause <em>insulin deficiency</em>. The stressed myocardium, which in shock prefers to burn carbohydrate, is now both energy-starved and can't use glucose → <strong>hyperglycaemia</strong> is the fingerprint.</li>
+          <li>📵 <strong>Beta-blockers</strong> block β-receptors → ↓cAMP → ↓heart rate and contractility, plus <em>hypoglycaemia</em> (blunted glycogenolysis/gluconeogenesis) and bronchospasm. Lipophilic/membrane-active agents (<strong>propranolol</strong>) add <em>sodium-channel blockade</em> → wide QRS + seizures, behaving like a TCA.</li>
+          <li>💊 <strong>The rescue logic:</strong> <em>calcium</em> forces more charge through the blocked channels; <em>glucagon</em> raises cAMP around the blocked β-receptor; <strong>HIET</strong> gives the poisoned heart the insulin it lacks, switching the myocardium to carbohydrate fuel and acting as a direct positive inotrope — while dextrose and potassium keep the patient safe.</li>
+          <li>🧬 <strong>Digoxin</strong> poisons the Na⁺/K⁺-ATPase → intracellular Na↑ → via Na/Ca exchange intracellular Ca↑ (some inotropy) but in overdose → <em>bradyarrhythmias, AV block, bidirectional VT</em>, and — because the pump that keeps K inside cells is jammed — acute toxicity causes <strong>hyperkalaemia</strong>, a marker of severity. The antidote is <strong>digoxin-specific antibody</strong>.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"CCB overdose runs HIGH sugar; beta-blocker overdose runs LOW — the glucose tells you which poison, and both are rescued by high-dose insulin."</div>
+
+        <h3>⚖️ Contrast pair — Beta-blocker vs Calcium-channel-blocker overdose</h3>
+        <div class="vs">
+          <div class="side a"><h4>📵 Beta-blocker overdose</h4><ul><li><strong>Low</strong> glucose (hypoglycaemia)</li><li>Bronchospasm; propranolol → wide QRS + seizures (Na-channel) → bicarbonate</li><li>Signature antidote: <strong>GLUCAGON</strong> (raises cAMP past the β-receptor)</li><li>Still give HIET if refractory</li></ul></div>
+          <div class="side b"><h4>🚪 Calcium-channel-blocker overdose</h4><ul><li><strong>High</strong> glucose (hyperglycaemia — the fingerprint)</li><li>Verapamil/diltiazem worst; vasodilatory + cardiogenic shock</li><li>Signature moves: <strong>IV CALCIUM + HIET</strong></li><li>MR formulations → delayed, prolonged, biphasic crash</li></ul></div>
+        </div>
+        <p>💡 A number is a clue, not a diagnosis: the glucose points to the poison, but in a mixed BB/CCB ingestion you treat <em>both</em> threads — calcium, glucagon and insulin are not mutually exclusive.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The Antidote-Escalation Dial</h3>
+          <p style="font-size:13px">Drag the dial from mild toxicity to periarrest and watch the <strong>escalation ladder</strong> climb: supportive → calcium/glucagon → HIET → vasopressors/lipid → mechanical support. The worse the poisoned heart, the higher the rung.</p>
+          <label for="kRange">☠️ Toxicity / shock severity: <b id="kVal">10</b> / 100</label>
+          <input type="range" id="kRange" min="0" max="100" value="10">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore the antidote-escalation ladder.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 Notice how HIGH-DOSE INSULIN appears well before mechanical support — starting it early is what keeps patients off ECMO and alive.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The order set (22:44)</h3>
+        <ul>
+          <li>📈 <strong>12-lead ECG now</strong> + continuous monitoring, <strong>defib pads on</strong>; repeat with any change (watch PR/QRS, AV block, junctional rhythm).</li>
+          <li>💉 <strong>Two large-bore IVs + central line</strong>; arterial line for beat-to-beat pressure.</li>
+          <li>🦴 <strong>IV calcium</strong> — calcium gluconate 10% (or calcium chloride 10% centrally), bolus then infusion, titrated to effect and ionised calcium.</li>
+          <li>🧫 <strong>Glucagon</strong> bolus (e.g. 5–10 mg) then infusion; give an anti-emetic.</li>
+          <li>💧 <strong>HIET:</strong> insulin 1 unit/kg IV bolus, then 1 unit/kg/hr infusion titrated up; <strong>dextrose to keep glucose ~5–8 mmol/L</strong>; monitor glucose q15–30 min and <strong>potassium</strong>.</li>
+          <li>📉 <strong>Noradrenaline ± adrenaline</strong> for refractory hypotension; prepare <strong>IV lipid emulsion</strong> for periarrest.</li>
+          <li>🧪 <strong>Bloods:</strong> glucose, U&amp;E/potassium, VBG + lactate, digoxin level if any suspicion, paracetamol + salicylate, ethanol, coag, group &amp; save.</li>
+          <li>🗑️ <strong>Decontamination:</strong> activated charcoal 50 g if within ~1 h and airway protected; consider <strong>whole-bowel irrigation</strong> for large modified-release CCB ingestions (with airway secured).</li>
+          <li>📞 Early calls: <strong>toxicology / poisons centre, ICU, and the ECMO / cardiology team</strong> — warn them before she arrests.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Draw up calcium, glucagon and insulin the moment the packet says BB/CCB — the pharmacy trip you make early is the resuscitation you don't have to run later."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Resus-bay priorities — the nurse runs the metabolic safety net</h3>
+        <ul>
+          <li>📟 <strong>Continuous telemetry, defib pads attached</strong>; watch for progressive AV block, junctional escape and asystole.</li>
+          <li>🍬 <strong>Point-of-care glucose every 15–30 min</strong> once HIET starts — high-dose insulin can drop the sugar fast; titrate the dextrose to keep euglycaemia.</li>
+          <li>🧂 <strong>Serial potassium</strong> — insulin shifts K into cells; replace to keep low-normal, but flag any digoxin picture where the K is <em>high</em> (that changes the whole plan — see S11/S14).</li>
+          <li>💉 Manage multiple infusions safely: <strong>calcium, glucagon, insulin, dextrose, noradrenaline</strong> — label lines, avoid calcium/bicarbonate incompatibility, use dedicated lumens.</li>
+          <li>🤮 Anticipate <strong>glucagon-induced vomiting</strong>; protect the airway in a drowsy patient; have suction ready.</li>
+          <li>🧠 <strong>Mental-health/safety context:</strong> deliberate self-poisoning — ensure a safe environment, remove ligature/medication risks, and arrange psychiatric review once stabilised.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"During HIET the nurse's glucometer and potassium are the resuscitation — a missed sugar or a missed K is how the antidote turns into a new emergency."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Result</th><th>Interpretation</th></tr>
+          <tr><td>Glucose</td><td class="hi">12.1 mmol/L</td><td><strong>Hyperglycaemia → calcium-channel blocker fingerprint.</strong> Insulin deficiency from blocked pancreatic Ca channels.</td></tr>
+          <tr><td>Potassium</td><td class="ok-v">4.0 mmol/L</td><td>Normal now — but watch it fall on HIET (replace) and rise if a digoxin picture emerges.</td></tr>
+          <tr><td>Lactate</td><td class="hi">4.8 mmol/L</td><td>Marker of hypoperfusion/shock severity; trend it as a resuscitation endpoint.</td></tr>
+          <tr><td>VBG pH</td><td class="lo">7.28</td><td>Metabolic acidosis of shock; guides ventilation and bicarbonate if QRS widens (propranolol/TCA).</td></tr>
+          <tr><td>Digoxin level</td><td>Not detected</td><td>No digoxin co-ingestion here — but always consider it in the elderly/renal patient with bradyarrhythmia + high K.</td></tr>
+          <tr><td>Paracetamol / salicylate</td><td>Negative</td><td>Routine co-ingestion screen in every deliberate overdose.</td></tr>
+          <tr><td>Creatinine</td><td>78 µmol/L</td><td>Renal function matters for digoxin clearance and drug dosing.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Two numbers steer the poisoned heart: the GLUCOSE tells you BB vs CCB, and the POTASSIUM tells you how sick a digoxin patient is — check both early, trend both often."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why the glucose and potassium are the two anchors</b>In CCB toxicity a rising glucose tracks severity (blocked insulin release); in BB toxicity glucose falls. In acute digoxin toxicity a rising potassium is the alarm bell of a jammed Na/K-ATPase and predicts death — it is a key trigger for digoxin-specific antibody. Interpret every value inside the story, the ECG and the packet.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 ECG / IMAGING + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🫀 The poisoned-heart ECG — bradycardia, block, and widening</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 130" preserveAspectRatio="none" aria-label="ECG: profound bradycardia with prolonged PR and widening QRS">
+            <rect width="820" height="130" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="32" x2="820" y2="32"/><line x1="0" y1="65" x2="820" y2="65"/><line x1="0" y1="98" x2="820" y2="98"/></g>
+            <polyline fill="none" stroke="#86efac" stroke-width="2.3" points="0,70 60,70 78,64 96,64 120,70 180,70 210,52 240,90 270,66 300,70 430,70 452,64 470,64 500,70 560,70 596,48 632,92 664,66 700,70 820,70"/>
+            <text x="150" y="20" fill="#93c5fd" font-size="11">Long PR + slow rate</text>
+            <text x="560" y="18" fill="#fca5a5" font-size="11">Wide, sluggish complexes</text>
+          </svg>
+          <div class="ecg-cap">Profound <span style="color:#93c5fd">bradycardia with a prolonged PR</span> and, as toxicity deepens, <span style="color:#fca5a5">widening QRS</span> (marked with propranolol / sodium-channel blockade). Junctional escape, high-grade AV block and asystole are the feared progression.</div>
+        </div>
+
+        <h3>🔎 ECG signatures worth knowing cold across the three poisons</h3>
+        <table class="tbl">
+          <tr><th>Poison</th><th>ECG clues</th><th>Meaning / action</th></tr>
+          <tr><td>🚪 <strong>Calcium-channel blocker</strong></td><td>Sinus brady, PR prolongation, AV block, junctional rhythm; often <em>narrow</em> QRS</td><td>Negative dromotropy; escalate ladder — calcium, HIET, pressors.</td></tr>
+          <tr><td>📵 <strong>Beta-blocker</strong></td><td>Brady, AV block; <strong>propranolol</strong> → wide QRS + terminal R in aVR, seizures</td><td>Sodium-channel blockade → <strong>sodium bicarbonate</strong> for the wide QRS.</td></tr>
+          <tr><td>🧬 <strong>Digoxin</strong></td><td>Brady/AV block, <strong>bidirectional VT</strong> (pathognomonic), atrial tachycardia with block, "reverse-tick" ST</td><td>Life-threatening dysrhythmia or K⁺&gt;5–6 → <strong>digoxin-specific antibody</strong>.</td></tr>
+          <tr><td>💊 <strong>TCA (cardiotoxic cousin)</strong></td><td>Wide QRS, <strong>terminal R wave in aVR</strong>, tachycardia, right-axis</td><td>Sodium-channel blockade → <strong>sodium bicarbonate</strong>.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A widening QRS in an overdose is a sodium-channel scream — reach for bicarbonate; bidirectional VT is digoxin until proven otherwise — reach for the antibody."</div>
+
+        <h3>🩻 Adjunct imaging</h3>
+        <ul>
+          <li><strong>Bedside echo (POCUS):</strong> assess contractility and filling — distinguishes the pump failure of poisoning, guides fluids vs pressors vs inotropy, and screens for a mechanical mimic.</li>
+          <li><strong>Abdominal X-ray:</strong> may show a pharmacobezoar / radiopaque tablet mass in large ingestions, supporting whole-bowel irrigation for MR preparations.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The antidote map — what, why, and the traps</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>Atropine</strong></td><td>First reflex for bradycardia</td><td>Often ineffective in significant BB/CCB poisoning — a try, not a plan.</td></tr>
+          <tr><td><strong>IV Calcium</strong> (gluconate/chloride)</td><td>First-line for CCB shock</td><td>Drives charge through blocked channels. <strong>Caution in digoxin toxicity ("stone heart")</strong> — avoid routine calcium.</td></tr>
+          <tr><td><strong>Glucagon</strong></td><td>Signature beta-blocker antidote</td><td>↑cAMP independent of the β-receptor → ↑rate &amp; contractility. Causes vomiting; short-lived, so infuse.</td></tr>
+          <tr><td><strong>High-dose insulin (HIET)</strong></td><td>Cornerstone inotrope/metabolic rescue for BB &amp; CCB</td><td>1 u/kg bolus → 1 u/kg/hr titrated up, with <strong>dextrose + potassium monitoring</strong>. Positive inotrope in the poisoned heart.</td></tr>
+          <tr><td><strong>Noradrenaline / adrenaline</strong></td><td>Refractory vasodilatory + cardiogenic shock</td><td>Titrate to perfusion; combine with HIET, don't rely on pressors alone.</td></tr>
+          <tr><td><strong>IV lipid emulsion</strong></td><td>Periarrest with lipophilic drugs (verapamil, propranolol)</td><td>"Lipid sink" sequesters lipophilic drug; reserve for refractory/periarrest.</td></tr>
+          <tr><td><strong>Digoxin-specific antibody (Fab)</strong></td><td>Digoxin toxicity with life-threatening arrhythmia or K⁺&gt;5–6</td><td>Binds digoxin directly. Treat the digoxin, not just the potassium.</td></tr>
+          <tr><td><strong>Sodium bicarbonate</strong></td><td>Wide QRS from sodium-channel blockade (TCA, propranolol)</td><td>Sodium load + alkalinisation narrows QRS, supports BP.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Match the antidote to the poison: calcium + HIET for the channel blocker, glucagon + HIET for the beta-blocker, the antibody for digoxin, and bicarbonate for the widening QRS."</div>
+        <div class="callout danger"><b class="ct">🚫 The 'stone heart' caution</b>In <strong>digoxin</strong> toxicity, avoid giving IV calcium casually to treat the hyperkalaemia — theory (and case reports) warn of a fatal "stone heart" from calcium loading an already calcium-overloaded myocyte. Give the <strong>digoxin-specific antibody</strong>; treat the potassium with insulin/dextrose while the antibody works — and don't reach reflexively for the calcium ampoule.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why</h3>
+        <ul>
+          <li>📈 <strong>Continuous telemetry + arterial line</strong> — track rate, rhythm, AV conduction and beat-to-beat pressure; defib/pacing to hand.</li>
+          <li>🍬 <strong>Glucose q15–30 min on HIET</strong>, titrating dextrose to euglycaemia; a rising insulin requirement can mean rising toxicity.</li>
+          <li>🧂 <strong>Serial potassium</strong> — replace as insulin drives it down; a rising K in a digoxin picture is an emergency, not a lab error.</li>
+          <li>🩸 <strong>Lactate and urine output</strong> as perfusion endpoints — the goal is tissue perfusion, not a single blood-pressure number.</li>
+          <li>⏳ <strong>Extended observation for MR ingestions</strong> — verapamil/diltiazem MR can crash hours later; do not stand down early.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"With modified-release cardiotoxins the monitor's question is never 'is she better now?' but 'will she still be perfused in three hours?' — keep her monitored until the MR curve is truly over."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong</h3>
+        <ul>
+          <li>⚡ <strong>Progressive AV block → asystole / cardiac arrest</strong> — the endpoint of untreated brady-toxicity.</li>
+          <li>💔 <strong>Refractory vasodilatory-cardiogenic shock</strong> — the crash that HIET and, if needed, ECMO exist to prevent.</li>
+          <li>🍬 <strong>HIET complications:</strong> hypoglycaemia and hypokalaemia — iatrogenic and preventable with vigilant monitoring.</li>
+          <li>🫁 <strong>Aspiration / pulmonary oedema</strong> — from glucagon vomiting, CNS depression, and large fluid + dextrose volumes.</li>
+          <li>🧠 <strong>Seizures</strong> (propranolol, membrane-active agents) and <strong>bronchospasm</strong> (beta-blockade in asthmatics).</li>
+          <li>🧬 <strong>Digoxin thread:</strong> life-threatening hyperkalaemia and dysrhythmia — and the iatrogenic "stone heart" if calcium is given carelessly.</li>
+          <li>🩹 <strong>The system complication:</strong> delayed escalation — treating with atropine and fluids and "observing" while the therapeutic window closes.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The deadliest complication of cardiotoxic overdose is the hour you spent 'observing' — refractory shock is a diagnosis you make early and escalate through, not one you wait to confirm."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The brady-hypotension differential — poisons and mimics</h3>
+        <table class="tbl">
+          <tr><th>Diagnosis</th><th>Discriminators</th><th>Don't-miss action</th></tr>
+          <tr><td>🚪 <strong>CCB overdose</strong> (this patient)</td><td>Empty packet, <strong>hyperglycaemia</strong>, vasodilatory + cardiogenic shock, MR = biphasic</td><td>IV calcium + <strong>HIET</strong> early; pressors, lipid, ECMO if refractory.</td></tr>
+          <tr><td>📵 <strong>Beta-blocker overdose</strong></td><td><strong>Hypoglycaemia</strong>, bronchospasm, brady; propranolol → wide QRS + seizures</td><td>Glucagon + HIET; bicarbonate for wide QRS.</td></tr>
+          <tr><td>🧬 <strong>Digoxin toxicity</strong></td><td>Nausea, xanthopsia, <strong>hyperkalaemia</strong>, bidirectional VT / AV block; often elderly/renal</td><td><strong>Digoxin-specific antibody</strong>; avoid casual calcium.</td></tr>
+          <tr><td>💓 <strong>Primary cardiac / MI / high-grade block</strong></td><td>Ischaemic ECG, chest pain, no ingestion history</td><td>ACS pathway / pacing — not an antidote problem.</td></tr>
+          <tr><td>🧂 <strong>Metabolic / other</strong></td><td>Hyperkalaemia, hypothermia, hypothyroidism, raised ICP (Cushing), sepsis</td><td>Treat the cause; correct electrolytes; rewarm.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Bradycardia + hypotension + a story of pills = a poisoned heart until proven otherwise. Ask the glucose, the potassium and the packet before you settle for 'she's just crashing.'"</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The Verapamil That Wouldn't Wait"</h3>
+          <div class="hud"><span>❤️ Safety: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">A 19-year-old took ~14 verapamil MR + metoprolol an hour ago. HR 38, BP 68/40, GCS 12, glucose HIGH. Atropine and a fluid bolus have done nothing. The night is busy and someone suggests "give a bit more fluid and see how she goes." What do you do?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The management plan</h3>
+        <ol>
+          <li>🚪 <strong>Diagnosis:</strong> combined CCB (verapamil MR) + BB (metoprolol) overdose with refractory shock and hyperglycaemia. Treat both threads simultaneously.</li>
+          <li>🪜 <strong>Escalate the ladder without delay:</strong> calcium + glucagon now → <strong>HIET early</strong> → noradrenaline/adrenaline → lipid emulsion → pacing / VA-ECMO if refractory.</li>
+          <li>🗑️ <strong>Decontaminate:</strong> activated charcoal if early + airway protected; whole-bowel irrigation for the large MR verapamil load.</li>
+          <li>🏥 <strong>Disposition:</strong> ICU with extended monitoring (MR biphasic crash); toxicology and ECMO teams engaged early; psychiatric review once stable.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Cardiotoxic overdose is treated on the way up the ladder, not at the top of it — every rung you delay is myocardium you can't get back."</div>
+
+        <div class="checklist" id="ckACS">
+          <h3 style="margin-top:0">🩺 Procedure Guide — CCB/BB overdose escalation (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>💉 Two large-bore IVs + central/arterial access; ECG, defib pads on</span></label>
+          <label class="ck"><input type="checkbox"><span>🦴 IV calcium given (bolus → infusion), titrated to ionised calcium</span></label>
+          <label class="ck"><input type="checkbox"><span>🧫 Glucagon bolus + infusion with anti-emetic cover</span></label>
+          <label class="ck"><input type="checkbox"><span>💧 HIET started early: 1 u/kg bolus → 1 u/kg/hr, dextrose + K monitoring</span></label>
+          <label class="ck"><input type="checkbox"><span>📉 Noradrenaline/adrenaline for refractory hypotension</span></label>
+          <label class="ck"><input type="checkbox"><span>🧴 Lipid emulsion prepared for periarrest; ECMO team alerted early</span></label>
+          <label class="ck"><input type="checkbox"><span>🗑️ Decontamination considered (charcoal / whole-bowel irrigation for MR)</span></label>
+          <div class="ck-progress" data-progress>0 / 7 complete</div>
+        </div>
+
+        <div class="checklist" id="ckSTEMI">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Digoxin toxicity: when to give Digifab</h3>
+          <label class="ck"><input type="checkbox"><span>🧬 Confirm digoxin toxicity (history, level, bradyarrhythmia / bidirectional VT)</span></label>
+          <label class="ck"><input type="checkbox"><span>🧂 Potassium &gt; ~5–6 mmol/L in acute toxicity → give digoxin-specific antibody</span></label>
+          <label class="ck"><input type="checkbox"><span>⚡ Life-threatening dysrhythmia or haemodynamic instability → give antibody now</span></label>
+          <label class="ck"><input type="checkbox"><span>🚫 Avoid routine IV calcium for the hyperkalaemia ("stone heart" caution)</span></label>
+          <label class="ck"><input type="checkbox"><span>🩺 Treat K with insulin/dextrose while antibody works; monitor rhythm</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">22:40</div>Arrival: HR 38, BP 68/40, GCS 12, glucose high. Atropine + fluid ineffective. Packets identify verapamil MR + metoprolol.</div>
+          <div class="t-item"><div class="t-time">22:50</div>IV calcium + glucagon given; two large IVs, central + arterial line; charcoal (airway protected). Tox + ICU + ECMO teams alerted.</div>
+          <div class="t-item"><div class="t-time">23:05</div><strong>HIET started early</strong> (1 u/kg bolus → 1 u/kg/hr, up-titrated) with dextrose + K monitoring; noradrenaline added for pressure.</div>
+          <div class="t-item"><div class="t-time">00:30</div>Whole-bowel irrigation for MR load; HIET at 4 u/kg/hr; lactate falling, pressure improving, still monitored for the biphasic crash.</div>
+          <div class="t-item"><div class="t-time">Day 2</div>Haemodynamics recovered; insulin and pressors weaned; extubated. Psychiatric review and safety planning arranged.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>She is alive because the team refused "a bit more fluid and see," read the packet, and started high-dose insulin at the door instead of waiting for atropine to fail. Early escalation, not heroics at the arrest.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 Two very different endings — the toxic crash vs the reassuring ingestion</h3>
+        <div class="vs">
+          <div class="side a"><h4>💊 This patient (severe CCB/BB overdose)</h4><ul><li>ICU-level care, extended monitoring for MR biphasic toxicity, weaning of HIET/pressors</li><li><strong>Psychiatric assessment</strong> + safety planning before discharge (deliberate self-harm)</li><li>Means restriction; social support; follow-up arranged</li><li>Medical clearance only once truly off vasoactives and past the MR window</li></ul></div>
+          <div class="side b"><h4>🟢 The low-risk / trivial ingestion</h4><ul><li>Small immediate-release ingestion, asymptomatic, normal ECG, normal glucose &amp; K over an adequate observation period</li><li>MR/verapamil ingestions need <strong>longer</strong> observation even if well</li><li>Psychosocial assessment still mandatory in every deliberate overdose</li><li>Clear safety-net and mental-health follow-up</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A cardiotoxic overdose is never medically clear until the modified-release window has passed AND the psychiatric risk has been addressed — the heart and the mind both get a safe disposition."</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>💧 Insulin early, not late</b>Refractory CCB/BB shock lives or dies on HIET — start it before atropine fails three times.</div>
+          <div class="pearl"><b>🍬 Glucose names the poison</b>High sugar = calcium-channel blocker; low sugar = beta-blocker.</div>
+          <div class="pearl"><b>🦴 Calcium for CCB</b>IV calcium is first-line in calcium-channel-blocker shock — repeat and infuse.</div>
+          <div class="pearl"><b>🧫 Glucagon for BB</b>Bypasses the β-receptor to raise cAMP — the classic beta-blocker antidote.</div>
+          <div class="pearl"><b>🧬 Digoxin: K is the alarm</b>Hyperkalaemia signals severity — give the antibody, don't just chase the K.</div>
+          <div class="pearl"><b>🚫 Stone-heart caution</b>Avoid casual IV calcium in digoxin toxicity.</div>
+          <div class="pearl"><b>⏳ MR = biphasic crash</b>Verapamil/diltiazem MR can arrest you hours later — monitor long, decontaminate.</div>
+          <div class="pearl"><b>📈 Wide QRS = bicarbonate</b>Propranolol/TCA sodium-channel blockade → sodium bicarbonate.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the ladder</h3>
+          <ul>
+            <li>💧 <strong>The metabolic mechanism of HIET:</strong> the poisoned, stressed myocardium switches its preferred fuel from free fatty acids to <em>carbohydrate</em>, but CCB-induced insulin deficiency and cellular resistance starve it of usable glucose. Supraphysiological insulin restores myocardial glucose uptake and calcium handling, acting as a <strong>direct positive inotrope and metabolic rescue</strong> — which is why HIET outperforms catecholamines in these hearts and is titrated to inotropy, not just glucose.</li>
+            <li>🧴 <strong>Intravenous lipid emulsion — the "lipid sink":</strong> a lipid compartment in the blood sequesters lipophilic drug (verapamil, propranolol, local anaesthetics), and may also provide myocardial fatty-acid substrate and a direct cardiotonic effect. Reserved for periarrest/refractory toxicity; interferes with some lab assays and oxygenators.</li>
+            <li>🫀 <strong>VA-ECMO for refractory toxin-induced shock:</strong> because most cardiotoxins are eventually metabolised, extracorporeal support is a <em>bridge to recovery</em> — outcomes from refractory poisoning-induced cardiogenic shock are meaningfully better with early ECMO, so the referral must precede the arrest.</li>
+            <li>📈 <strong>TCA (and membrane-active) sodium-channel blockade:</strong> fast-sodium-channel blockade produces a wide QRS, terminal R in aVR, hypotension and seizures. <strong>Sodium bicarbonate</strong> (sodium load + alkalinisation) is the antidote; hypertonic saline and hyperventilation are adjuncts. The same physiology applies to propranolol overdose.</li>
+            <li>🔵 <strong>Methylene blue for vasoplegia:</strong> in refractory vasodilatory shock (including some CCB and metformin-associated cases), methylene blue inhibits nitric-oxide-mediated guanylate cyclase, raising systemic vascular resistance as a rescue when catecholamines and HIET are maxed out.</li>
+            <li>🧬 <strong>Digoxin nuance:</strong> chronic vs acute toxicity differ (chronic often normokalaemic/hypokalaemic with lower levels but real toxicity); antibody dosing can be empirical in arrest, and free-digoxin levels rise transiently after Fab — interpret post-treatment levels with care, especially in renal failure.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "Atropine, A Litre, And Wait"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 23-year-old woman took a bottle of <strong>verapamil MR</strong> after a break-up and arrived HR 44, BP 82/50, mildly drowsy. The team, reassured that she was "talking and only a bit slow," gave <strong>atropine and a litre of saline</strong> and moved her to a monitored corridor bay to "observe." IV calcium was given late and only once; glucagon was drawn but not started; <strong>HIET was never begun</strong>. Over the next three hours the modified-release tablets kept dissolving — she became increasingly hypotensive, then bradycardic, then arrested in PEA. By the time HIET and ECMO were <em>discussed</em>, CPR was already in progress. Resuscitation failed.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🧠 FALSE REASSURANCE</b>"Talking and only a bit slow" was read as stable — MR verapamil had not finished absorbing.</div>
+            <div class="hole"><b>💧 HIET DELAYED</b>The cornerstone therapy was never started until it was too late; hours were lost to atropine and fluid.</div>
+            <div class="hole"><b>🪜 STUCK ON RUNG 1</b>Escalation stalled at supportive care; calcium under-dosed, glucagon undelivered.</div>
+            <div class="hole"><b>⏳ MR UNDER-RESPECTED</b>No whole-bowel irrigation, no extended-crash anticipation for a modified-release load.</div>
+            <div class="hole"><b>📞 LATE ESCALATION</b>Tox and ECMO teams were called during the arrest, not before it.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved her:</strong> treat refractory brady-hypotension after a BB/CCB ingestion as a poisoned heart from minute one; <strong>start high-dose insulin early</strong> rather than waiting for atropine to fail; dose calcium and glucagon properly and move up the ladder; respect the modified-release curve with decontamination and prolonged monitoring; and phone toxicology and the ECMO team <em>before</em> the crash. <strong>This is exactly the discipline that saved the patient in Bed 10.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Atropine, a litre, and wait' has killed more cardiotoxic overdoses than any drug — insulin started at the door buys these patients their lives."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🚨 Emergency Department · Bed 10 — Cardiotoxic Overdose (Beta-Blocker / Calcium-Channel-Blocker / Digoxin)<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+  /* ===== SIDEBAR SCROLL-SPY (vertical) ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); var t=sections[idx]; if(t) t.scrollIntoView({behavior:'smooth',block:'start'}); setActive(idx); markVisited(idx); }); });
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){ entries.forEach(function(e){ if(!e.isIntersecting) return; var i=sections.indexOf(e.target); if(i>-1){ setActive(i); markVisited(i); } }); }, { rootMargin:'-10% 0px -75% 0px' });
+    sections.forEach(function(s){ if(s) io.observe(s); });
+  }
+  markVisited(0); setActive(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not a high-risk feature'); } if(found===total){ flagResult.textContent='✅ All '+total+' high-risk features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' high-risk features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: antidote-escalation ladder ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=v; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<20){ msg='🟢 Rung 1 — Supportive: airway, O₂, IV access, cautious fluids, ATROPINE (often ineffective in poisoning). Mild toxicity — get calcium, glucagon and insulin to the bedside NOW.'; cls='good'; }
+      else if(v<40){ msg='🟠 Rung 2–3 — IV CALCIUM (esp. CCB) + GLUCAGON (esp. BB, raises cAMP past the β-receptor). Shock developing — do not wait for atropine to fail three times.'; cls='warn-r'; }
+      else if(v<62){ msg='🟠 Rung 4 — HIGH-DOSE INSULIN EUGLYCAEMIA THERAPY: 1 u/kg bolus then 1 u/kg/hr titrated up, dextrose + K monitoring. The inotrope that rescues the poisoned heart — start pressors alongside.'; cls='warn-r'; }
+      else if(v<84){ msg='🔴 Rung 5–6 — VASOPRESSORS (noradrenaline/adrenaline) + IV LIPID EMULSION for lipophilic drugs. Refractory vasodilatory–cardiogenic shock; call the ECMO team now.'; cls='bad'; }
+      else { msg='🔴 Rung 7 — MECHANICAL SUPPORT: transvenous pacing and VA-ECMO for refractory toxin-induced shock. This is the arrest that early HIET was meant to prevent.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Delta Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"A 19-year-old took ~14 verapamil MR + metoprolol an hour ago. HR 38, BP 68/40, GCS 12, glucose HIGH. Atropine and a fluid bolus have done nothing. Someone suggests 'give a bit more fluid and see how she goes.' What do you do?",
+      choices:[
+        {t:"💧 Give another litre of saline, repeat atropine, and 'wait and see' in the corridor",good:false,ds:-2,dt:120,xp:0,fb:"☠️ This is the M&M case in S21. Atropine and fluid don't touch a poisoned heart; the MR verapamil keeps absorbing and she arrests in PEA before HIET is even started. Restart.",end:true},
+        {t:"🦴 IV calcium + glucagon now, monitored, draw up HIET, and call tox/ICU/ECMO early",good:true,ds:1,dt:8,xp:40,fb:"✅ Exactly. Refractory brady-hypotension after a BB/CCB ingestion is a poisoned heart — climb the ladder now and get the metabolic rescue ready.",next:"repeat"},
+        {t:"🧬 Assume digoxin toxicity and push a big slug of IV calcium fast",good:false,ds:-1,dt:10,xp:5,fb:"⚠️ Wrong poison and a dangerous reflex — the packet says verapamil/metoprolol, not digoxin, and casual IV calcium in digoxin toxicity risks a 'stone heart.' Treat the CCB/BB in front of you.",next:"repeat"}
+      ]},
+    repeat:{ text:"Calcium and glucagon are in but she's still HR 40, BP 70/44 with a rising lactate. The MR load means more drug is still coming. Next best step?",
+      choices:[
+        {t:"💧 Start HIET (1 u/kg bolus → 1 u/kg/hr, dextrose + K monitoring) + noradrenaline; prepare lipid emulsion",good:true,ds:1,dt:6,xp:40,fb:"✅ Right. High-dose insulin is the cornerstone inotrope for refractory CCB/BB shock — titrate it up, support the pressure, and keep the ECMO team warm.",next:"declare"},
+        {t:"🔁 Give more atropine and another fluid bolus and hold the insulin",good:false,ds:-2,dt:30,xp:0,fb:"⚠️ Dangerous — she is refractory to atropine and fluid by definition. Holding HIET is exactly how these patients slide into arrest.",next:"declare"}
+      ]},
+    declare:{ text:"Despite HIET + pressors she remains in refractory vasodilatory-cardiogenic shock with worsening perfusion. What now?",
+      choices:[
+        {t:"🫀 Escalate: continue HIET + lipid, refer for transvenous pacing / VA-ECMO as a bridge while the drug is metabolised",good:true,ds:1,dt:5,xp:45,fb:"🏆 Perfect. Cardiotoxins are eventually cleared — mechanical support buys time to recovery, and it works best when called before the arrest.",end:true},
+        {t:"💊 Give IV metoprolol/verapamil to 'settle' the rhythm and wait for the next gas",good:false,ds:-1,dt:20,xp:0,fb:"⚠️ Never — adding a beta-blocker/CCB to a heart being poisoned by them will finish the job. Escalate support, don't deepen the block.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='declare'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A patient with a deliberate overdose is profoundly bradycardic and hypotensive; bedside glucose is 15 mmol/L. Which poison is most likely and what is a cornerstone therapy?", opts:["Beta-blocker; treat with glucagon only","Calcium-channel blocker; IV calcium plus high-dose insulin (HIET)","Digoxin; give IV calcium for the sugar","Opioid; give naloxone"], correct:1, exp:"Hyperglycaemia is the fingerprint of calcium-channel-blocker overdose — blocked pancreatic L-type calcium channels cause insulin deficiency. Cornerstones are IV calcium and high-dose insulin euglycaemia therapy (HIET)." },
+    { q:"Which lab pattern best distinguishes beta-blocker from calcium-channel-blocker overdose?", opts:["BB → hyperglycaemia; CCB → hypoglycaemia","BB → hypoglycaemia; CCB → hyperglycaemia","Both cause hyperkalaemia","Neither affects glucose"], correct:1, exp:"Beta-blocker overdose tends to cause hypoglycaemia (blunted glycogenolysis/gluconeogenesis); calcium-channel-blocker overdose classically causes hyperglycaemia. The glucose tells you which poison leads." },
+    { q:"Why is glucagon a specific antidote in beta-blocker overdose?", opts:["It blocks calcium channels","It raises myocardial cAMP independent of the beta-receptor","It chelates the beta-blocker","It causes hyperkalaemia to stimulate the heart"], correct:1, exp:"Glucagon acts on its own receptor to raise intracellular cAMP, bypassing the blocked beta-receptor to improve rate and contractility. It causes vomiting and is short-acting, so it is given as a bolus then infusion." },
+    { q:"Regarding high-dose insulin euglycaemia therapy (HIET) in severe CCB/BB shock:", opts:["Give insulin without any glucose to maximise effect","1 u/kg bolus then 1 u/kg/hr titrated, with dextrose and potassium monitoring — insulin is a positive inotrope","Use only tiny sliding-scale doses","It is contraindicated because the glucose is already high"], correct:1, exp:"HIET uses supraphysiological insulin (about 1 u/kg bolus then 1 u/kg/hr, up-titrated) as a metabolic rescue and positive inotrope, with dextrose to maintain euglycaemia and close potassium monitoring. Even a high starting glucose falls at these doses." },
+    { q:"An 80-year-old on digoxin has nausea, bradyarrhythmia and K⁺ 6.4 mmol/L in acute toxicity. The best treatment is:", opts:["Immediate IV calcium to treat the hyperkalaemia","Digoxin-specific antibody (Fab / Digifab)","A beta-blocker to control the rhythm","Observation and recheck in the morning"], correct:1, exp:"In acute digoxin toxicity hyperkalaemia is a marker of severity and, with life-threatening arrhythmia, an indication for digoxin-specific antibody. Treat the digoxin, not just the potassium — and avoid casual IV calcium." },
+    { q:"Why is routine IV calcium approached with caution in digoxin toxicity?", opts:["It has no effect on the heart","Theoretical/reported risk of a 'stone heart' in the calcium-overloaded myocyte","It worsens the hypoglycaemia","It binds digoxin directly"], correct:1, exp:"Digoxin already raises intracellular calcium; adding more IV calcium risks a hypercontractile, non-relaxing 'stone heart' in theory and some case reports. Use digoxin-specific antibody and manage potassium with insulin/dextrose." },
+    { q:"A tricyclic antidepressant overdose shows a wide QRS with a terminal R wave in aVR. First-line treatment is:", opts:["IV calcium","Sodium bicarbonate","Glucagon","Digoxin-specific antibody"], correct:1, exp:"TCA cardiotoxicity is due to fast-sodium-channel blockade producing a wide QRS and terminal R in aVR. Sodium bicarbonate (sodium load plus alkalinisation) narrows the QRS and supports blood pressure. Propranolol overdose can behave similarly." },
+    { q:"In refractory calcium-channel-blocker shock, the safest overall strategy is to:", opts:["Rely on repeated atropine and fluid boluses","Start high-dose insulin early and escalate through pressors, lipid emulsion and VA-ECMO as needed","Give a beta-blocker to slow the compensatory tachycardia","Discharge once the first blood pressure improves"], correct:1, exp:"Atropine and fluids rarely fix a poisoned heart. Start HIET early and climb the ladder — calcium/glucagon, insulin, vasopressors, lipid emulsion, and mechanical support (pacing/VA-ECMO) — calling tox and ECMO teams before the arrest." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you resuscitate the poisoned heart like a toxicologist. 🏆':score>=6?'Strong — review the misses and the S5 antidote ladder.':'Revisit S5, S6 and S11 — the antidote-escalation logic is the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>
