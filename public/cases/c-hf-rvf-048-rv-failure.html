@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Right Ventricular Failure & Pulmonary Hypertension — Virtual Teaching Hospital</title>
+<!-- META
+id: c-hf-rvf-048
+title: Right Ventricular Failure & Pulmonary Hypertension
+hospital: cardiology
+department: cv-hf
+bednumber: 6
+chiefcomplaint: Breathlessness, marked peripheral oedema and hypotension with a failing right heart
+system: Cardiology
+severity: critical
+tags: RV failure, Pulmonary hypertension, Afterload, Preload, Septal shift, Inotropes
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🫀</div>
+      <div>
+        <div class="t1">Heart Failure Ward</div>
+        <div class="t2">Bed 6 · RV Failure & PH</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🫁 Heart Failure Ward · 🛏️ Bed 6</div>
+        <h1>🫀 The Failing Right Heart — "Clear Lungs, Huge JVP, and a Falling Blood Pressure"</h1>
+        <div class="sub">⚡ 14:20. A 58-year-old with known pulmonary hypertension is breathless, oedematous to the thighs, and his BP is drifting down. The lungs are almost clear. The covering team is reaching for a bag of saline "to fill him up." This is the moment the right ventricle lives or dies.</div>
+        <div class="chips">
+          <span class="chip crit">🔴 CRITICAL</span>
+          <span class="chip">🫀 RV Failure</span>
+          <span class="chip">🫁 Pulmonary Hypertension</span>
+          <span class="chip">⚖️ Afterload / Preload</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital warn"><div class="v-label">💓 HR</div><div class="v-num">108</div></div>
+        <div class="vital alert"><div class="v-label">🩸 BP</div><div class="v-num">92/70</div></div>
+        <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">24</div></div>
+        <div class="vital warn"><div class="v-label">🫁 SpO₂</div><div class="v-num">90%</div></div>
+        <div class="vital alert"><div class="v-label">🌊 JVP</div><div class="v-num">↑↑↑</div></div>
+        <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.8°</div></div>
+        <div class="vital warn"><div class="v-label">🦵 Oedema</div><div class="v-num">+++</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 14:20, HF Ward Bed 6</b>A man sits bolt upright, jugular veins pulsating almost to his earlobe, his abdomen tense with ascites and his legs pitting to the thigh. He gasps: <em>"I can't get comfortable… my belly's swollen and my legs feel like water balloons."</em> His lungs sound almost clear on auscultation, yet his blood pressure reads 92/70 and slipping. A nurse hangs a 500 mL bag of saline "because he's hypotensive." STOP — this is the exact moment a congested, failing right ventricle gets pushed into collapse.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>🧔 Name</td><td><strong>Mr. R.V.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>58-year-old male</td></tr>
+          <tr><td>🆔 MRN</td><td>CV-HF-0648</td></tr>
+          <tr><td>⚖️ Weight</td><td>84 kg (up 6 kg in 10 days — all fluid)</td></tr>
+          <tr><td>💼 Occupation</td><td>Retired warehouse worker; NYHA/WHO functional class IV</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 Past history — every line points at the right heart</h3>
+        <ul>
+          <li>🫁 <strong>Pulmonary arterial hypertension (WHO Group 1)</strong>, on a background of connective-tissue disease; on an endothelin-receptor antagonist and a PDE5 inhibitor. Baseline mean pulmonary artery pressure (mPAP) ~48 mmHg.</li>
+          <li>🫀 Progressive <strong>right heart failure</strong> with recurrent congestion; two admissions this year for decompensation.</li>
+          <li>🩸 Recurrent <strong>peripheral oedema, ascites and hepatic congestion</strong> — the classic downstream of a backed-up right atrium.</li>
+          <li>💧 Chronic diuretic use (loop ± thiazide); intermittent renal impairment from cardiorenal congestion.</li>
+          <li>🚭 Ex-smoker; no significant left heart disease on prior echo (LV function preserved).</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Clear lungs + a huge JVP + hypotension = the RIGHT ventricle is failing. Think fluids OFF, not on."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why the failing RV is so treacherous</b>The right ventricle is a thin-walled, compliant volume-pump built to eject into a low-pressure lung circuit. It is <strong>exquisitely afterload-sensitive</strong> — a small rise in pulmonary vascular resistance (PVR) sharply drops its output. And unlike the LV, its failure signature is <em>systemic venous congestion with relatively clear lungs</em>, so it is repeatedly mis-read as "dehydration" or "sepsis" and given fluid — the one thing it cannot tolerate.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 Nursing / clinical handover — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ Ward SBAR (verbatim)</b>
+          <p><strong>S:</strong> "58-year-old man with WHO Group 1 pulmonary arterial hypertension, in with 10 days of worsening breathlessness, gross leg oedema and a swollen belly. Now his BP is dropping — 92/70."</p>
+          <p><strong>B:</strong> "Known dilated, failing right ventricle. On endothelin antagonist + PDE5 inhibitor + loop diuretic. Six kilos of weight gain, orthopnoea, off his food from the ascites."</p>
+          <p><strong>A:</strong> "JVP up to the ear, huge V-waves, pulsatile liver, ascites, legs pitting to the thigh. Chest is nearly clear. SpO₂ 90% on air, HR 108, cool-ish peripheries, lactate creeping up."</p>
+          <p><strong>R:</strong> "I'm worried he's tipping into shock — do we give fluid for the low BP or not?"</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A low blood pressure in a congested right-heart-failure patient is almost never a call for more fluid — the failing RV is already over-filled. Decongest and support the perfusion pressure instead."</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each feature of a FAILING RIGHT HEART</h3>
+        <p>🎮 <em>Click every feature that points to RIGHT ventricular failure / pulmonary hypertension. Each correct = +10 XP. The distractors belong to a different picture.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">🌊 Markedly raised JVP with prominent v-waves</button>
+          <button class="btn ghost flag-btn" data-good="1">🦵 Peripheral oedema, ascites &amp; a pulsatile hepatomegaly</button>
+          <button class="btn ghost flag-btn" data-good="1">🩸 Hypotension with relatively CLEAR lungs</button>
+          <button class="btn ghost flag-btn" data-good="1">🫀 Dilated, hypokinetic RV + septal flattening on echo</button>
+          <button class="btn ghost flag-btn" data-good="1">🫁 Raised estimated pulmonary artery pressures</button>
+          <button class="btn ghost flag-btn" data-good="1">📈 RV-strain ECG (RAD, RBBB, T-inversion V1–V3, P pulmonale)</button>
+          <button class="btn ghost flag-btn" data-good="0">💦 Frothy pink sputum with loud bibasal crackles (isolated LV oedema)</button>
+          <button class="btn ghost flag-btn" data-good="0">🌡️ Fever 39°C with rigors</button>
+          <button class="btn ghost flag-btn" data-good="0">👉 Sharp chest-wall pain reproduced by palpation</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 The nurse asked the right question</b>Recognising that "low BP + huge JVP + clear lungs" is a RIGHT-heart problem — and pausing before hanging fluid — is exactly the instinct that saves these patients. The reflex "hypotension = fluid" is precisely how the failing RV is killed.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🅰️🅱️🅲️ Primary survey — reading the congested, low-output patient</h3>
+        <table class="tbl">
+          <tr><th>Step</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>🅰️ Airway</td><td>Patent, speaking short sentences.</td><td>Short sentences = work of breathing rising; watch for fatigue.</td></tr>
+          <tr><td>🅱️ Breathing</td><td>RR 24, SpO₂ 90% on air, chest <strong>nearly clear</strong> (maybe a few bibasal crackles).</td><td>Clear lungs with a failing heart is the signature of RIGHT-sided failure. Hypoxia here also RAISES PVR and worsens RV afterload — a vicious circle.</td></tr>
+          <tr><td>🅲️ Circulation</td><td>HR 108, <strong>BP 92/70</strong>, narrow pulse pressure, cool peripheries, <strong>JVP to the earlobe with giant v-waves</strong>, pulsatile tender liver, ascites, oedema to the thighs.</td><td>Systemic venous congestion + low output = the classic RV-failure haemodynamic. Giant v-waves suggest functional tricuspid regurgitation from RV dilatation.</td></tr>
+          <tr><td>🅳 Disability</td><td>GCS 15 but anxious and restless.</td><td>Restlessness can be an early sign of falling cerebral perfusion (low output).</td></tr>
+          <tr><td>🅴 Exposure</td><td>Cold mottled knees, prolonged capillary refill, rising lactate.</td><td>Peripheral hypoperfusion = the systemic circulation is being starved because the LV is under-filled.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Systemic hypotension starves the right ventricle's own blood supply — keep the aortic pressure up (noradrenaline) to feed the RV."</div>
+
+        <h3>🧭 The one physiological question that governs everything</h3>
+        <p>At the bedside, decide: <strong>is this RV under-filled or over-filled?</strong> Almost always in decompensated PH the RV is <em>congested and over-distended</em> — the JVP is sky-high, the liver is pulsatile, there is ascites and oedema. That patient needs <strong>decongestion and perfusion-pressure support</strong>, NOT volume. Only the genuinely under-filled RV (e.g. an acute RV infarct with flat neck veins, or over-diuresis) benefits from a small, cautious fluid challenge.</p>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of "the BP is low, so give fluid"</b>In an over-filled, dilated RV, more preload stretches an already-failing chamber further, bows the interventricular septum into the LV, under-fills the LV, and drops systemic output even more. The "fluid responsive" reflex is the single most dangerous move in RV failure.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The cardiology resident thinks out loud at 14:26:</em></p>
+        <h3>🧠 Frame it as a pump with the wrong loading conditions</h3>
+        <p>"This is decompensated RIGHT heart failure on a background of pulmonary hypertension. He's congested AND under-perfused — the worst quadrant. My job is to <strong>optimise (not overload) preload</strong>, <strong>reduce RV afterload / treat the cause</strong>, <strong>support contractility</strong>, and <strong>protect the systemic perfusion pressure</strong> so the RV coronary keeps flowing. I am NOT giving him a fluid bolus. I want an urgent bedside echo and I need to know his PH group before anyone reaches for a pulmonary vasodilator."</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>🫀 <strong>Bedside echo now</strong> — RV size &amp; function, septal shift (D-shaped LV), TAPSE, estimated PASP, IVC, tamponade/effusion, and crucially the <strong>LV</strong> (to sort pre- vs post-capillary PH).</li>
+          <li>💧 <strong>Optimise preload</strong> — because he is congested, start/uptitrate <strong>IV loop diuretic</strong> (± infusion); NO routine fluid bolus.</li>
+          <li>🩸 <strong>Maintain perfusion pressure</strong> — early <strong>noradrenaline</strong> to keep MAP and thus RV coronary perfusion; this is protective, not cosmetic.</li>
+          <li>💪 <strong>Support contractility</strong> — add an inodilator (<strong>dobutamine or milrinone</strong>) if output stays low despite adequate MAP.</li>
+          <li>🫁 <strong>Treat the cause / reduce afterload</strong> — correct hypoxia, hypercapnia and acidosis (all raise PVR); look hard for a precipitant (PE, sepsis, arrhythmia, missed PH meds).</li>
+          <li>📞 Early <strong>PH / ICU discussion</strong> — refractory RV failure may need mechanical support (RVAD/VA-ECMO) and a specialist centre.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Optimise, reduce, support, perfuse: OPTIMISE preload (usually diurese), REDUCE afterload, SUPPORT contractility, and PERFUSE the RV with adequate aortic pressure."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>He is hypotensive. A colleague wants to give 1 litre of saline "to fill the tank." Correct?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No.</strong> This RV is congested and over-distended (JVP to the ear, ascites, oedema). Fluid loading a failing, dilated RV worsens the septal shift, under-fills the LV, and drops systemic output further — it can precipitate arrest. The right moves are <strong>decongestion + noradrenaline to protect coronary perfusion + inotrope</strong>. Reserve a <em>small</em> (≈250 mL) fluid challenge only for the genuinely under-filled RV with flat neck veins.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The PH/HF consultant at the bedside, 14:34:</em></p>
+        <h3>🫁 The WHO classification of pulmonary hypertension — and why treatment lives or dies by the group</h3>
+        <p>Haemodynamic definition (2022 ESC/ERS): PH is a resting <strong>mean pulmonary artery pressure &gt; 20 mmHg</strong>. The critical split is <strong>pre-capillary</strong> (PVR &gt; 2 Wood units, pulmonary artery wedge pressure ≤ 15) versus <strong>post-capillary</strong> (wedge &gt; 15 — a LEFT-heart problem).</p>
+        <table class="tbl">
+          <tr><th>WHO Group</th><th>Cause</th><th>Pre/Post-capillary</th><th>Treatment principle</th></tr>
+          <tr><td><strong>1 — PAH</strong></td><td>Pulmonary arterial hypertension (idiopathic, heritable, connective-tissue disease, drugs, congenital)</td><td>Pre-capillary</td><td class="ok-v">Targeted pulmonary vasodilators (endothelin antagonists, PDE5i/riociguat, prostacyclins)</td></tr>
+          <tr><td><strong>2 — LEFT heart</strong></td><td>HFrEF, HFpEF, valve disease — <strong>the commonest cause</strong></td><td>Post-capillary</td><td class="hi">Treat the LEFT heart; do NOT give PAH vasodilators (risk of flash pulmonary oedema)</td></tr>
+          <tr><td><strong>3 — Lung / hypoxia</strong></td><td>COPD, ILD, sleep-disordered breathing, chronic hypoxia</td><td>Pre-capillary</td><td>Treat lung disease + oxygen; correct hypoxia (a potent pulmonary vasoconstrictor)</td></tr>
+          <tr><td><strong>4 — CTEPH</strong></td><td>Chronic thromboembolic PH</td><td>Pre-capillary</td><td>Lifelong anticoagulation; pulmonary endarterectomy / balloon angioplasty ± riociguat</td></tr>
+          <tr><td><strong>5 — Misc / multifactorial</strong></td><td>Sarcoid, haematological, metabolic, mechanical</td><td>Mixed</td><td>Treat the underlying disorder</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Never give a pulmonary vasodilator to pulmonary hypertension caused by the LEFT heart (group 2) — you'll flood the lungs. Classify BEFORE you vasodilate."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Principle / Evidence</th><th>What it says</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> 2022 ESC/ERS PH guideline</td><td>mPAP &gt; 20 mmHg defines PH; PVR &gt; 2 WU defines pre-capillary; group-directed therapy; risk-stratify group 1.</td><td>Get the group and the wedge before choosing therapy — the group dictates everything.</td></tr>
+            <tr><td><span class="lvl">PRINCIPLE</span> Treat-the-cause</td><td>Acute RV failure is precipitated by PE, sepsis, arrhythmia, hypoxia/acidosis, non-adherence — each has its own fix.</td><td>Hunt the trigger; correcting hypoxia/acidosis alone can drop PVR and unload the RV.</td></tr>
+            <tr><td><span class="lvl">PHYSIOLOGY</span> RV-protective ventilation</td><td>High PEEP, high plateau pressures, hypercapnia, hypoxia and acidosis all RAISE PVR and RV afterload.</td><td>If ventilated: lowest effective PEEP/tidal volumes, avoid hypercapnia/hypoxia, keep the RV afterload down.</td></tr>
+            <tr><td><span class="lvl">HAEMODYNAMICS</span> Pressor/inotrope choice</td><td>Noradrenaline restores MAP &amp; RV coronary perfusion; dobutamine/milrinone improve RV contractility &amp; lower PVR (milrinone can drop systemic BP).</td><td>Perfuse first (noradrenaline), then augment contractility (inodilator), watching systemic pressure.</td></tr>
+            <tr><td><span class="lvl">SELECTIVE</span> Inhaled pulmonary vasodilators</td><td>Inhaled NO / epoprostenol selectively lower PVR without systemic hypotension — useful in appropriate pre-capillary PH / RV crisis.</td><td>When afterload reduction is needed, inhaled agents spare the systemic pressure the RV depends on.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The chart that haunts me is the PH patient whose 'low BP' triggered three saline boluses on a busy afternoon. His RV distended, the septum bowed into the LV, the output vanished, and he arrested. And in another ward, a group-2 patient got IV prostacyclin 'to bring the pulmonary pressures down' — and drowned in flash pulmonary oedema within the hour. Both were preventable with one question: what is the loading condition, and what is the PH group?"</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — the RV FAILURE SPIRAL you will never forget</h3>
+        <ol>
+          <li>🫀 <strong>The thin, afterload-sensitive RV:</strong> the right ventricle is a compliant volume-pump made for a low-pressure circuit. A small rise in pulmonary vascular resistance (PH, PE, hypoxia, high PEEP) — or over-filling it with volume — sharply reduces its output.</li>
+          <li>🎈 <strong>RV dilatation &amp; rising pressure:</strong> the overloaded RV enlarges and its wall tension climbs; tricuspid annulus stretches → functional TR → more volume churning back into the right atrium and the systemic veins (JVP↑, liver, ascites, oedema).</li>
+          <li>↔️ <strong>Septal shift:</strong> the swollen RV pushes the interventricular septum into the LV — the LV becomes <strong>D-shaped</strong> and is mechanically UNDER-FILLED (ventricular interdependence within a shared pericardium).</li>
+          <li>📉 <strong>Systemic output &amp; BP fall:</strong> an under-filled LV ejects less → cardiac output and aortic pressure drop.</li>
+          <li>🩸 <strong>RV coronary starvation:</strong> the RV coronary is perfused in BOTH systole and diastole and depends on aortic pressure. A falling aortic pressure means falling RV coronary flow → <strong>RV ischaemia</strong> → weaker RV → the spiral tightens toward collapse.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The right ventricle hates afterload and hates over-filling — fix the lungs and DECONGEST, don't drown it in fluid."</div>
+
+        <h3>⚖️ Contrast pair — Right ventricular failure vs Left ventricular failure</h3>
+        <div class="vs">
+          <div class="side a"><h4>🫀 RV failure</h4><ul><li>Raised JVP, oedema, ascites, pulsatile liver</li><li>Lungs relatively CLEAR; hypotension, low output</li><li>Preload- and afterload-SENSITIVE</li><li>Fix: decongest, reduce PVR, support perfusion pressure — usually fluid OFF</li></ul></div>
+          <div class="side b"><h4>🫁 LV failure</h4><ul><li>Pulmonary congestion / crackles / orthopnoea dominate</li><li>Pink frothy sputum, bibasal crepitations</li><li>Fix: preload &amp; afterload reduction, decongestion of the LUNGS</li><li>PH from LV disease = Group 2 (post-capillary)</li></ul></div>
+        </div>
+        <p>💡 And the second essential contrast: <strong>pre-capillary PH</strong> (groups 1/3/4 — treat the pulmonary vasculature/lung/clots) vs <strong>post-capillary PH</strong> (group 2 — treat the LEFT heart, do NOT vasodilate the lungs).</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The RV Loading Dial &amp; the Spiral</h3>
+          <p style="font-size:13px">The thin RV lives or dies by its loading conditions. Drag the dial to change total RV load (preload + pulmonary afterload) and watch RV output — there is a <strong>middle sweet spot</strong>. Too little and it can't fill; too much and it over-distends, the septum shifts, and the spiral begins.</p>
+          <label for="kRange">🫀 RV load — preload + pulmonary afterload: <b id="kVal">50</b> / 100</label>
+          <input type="range" id="kRange" min="0" max="100" value="50">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore under-filling, the sweet spot, and the failure spiral.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 The goal of RV-failure management is to move the patient back INTO the sweet spot — decongest an over-loaded RV, and give only a small cautious fluid challenge to a truly under-filled one. Overshooting either way costs output.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The order set (14:24)</h3>
+        <ul>
+          <li>🫀 <strong>Urgent bedside echo</strong> — RV size/function (TAPSE, S′), septal shift/D-sign, estimated PASP, IVC, effusion; assess the LV to classify PH group.</li>
+          <li>💧 <strong>IV loop diuretic</strong> (bolus then infusion) for decongestion — target a net negative balance; <strong>NO routine fluid bolus</strong>. A small (≈250 mL) challenge ONLY if echo shows a genuinely under-filled RV.</li>
+          <li>🩸 <strong>Noradrenaline infusion</strong> via central access to maintain MAP ≥ 65 mmHg and protect RV coronary perfusion.</li>
+          <li>💪 <strong>Inodilator</strong> (dobutamine or milrinone) if low-output state persists despite adequate MAP.</li>
+          <li>🫁 <strong>Oxygen to correct hypoxia</strong> (hypoxia raises PVR); check ABG for hypercapnia/acidosis and correct; avoid over-sedation/hypoventilation.</li>
+          <li>🧪 Bloods: <strong>NT-proBNP</strong>, troponin, lactate, U&amp;E/LFTs (congestive hepatopathy), FBC, coag, ABG; consider CTPA if PE suspected.</li>
+          <li>💊 <strong>Continue his established PAH therapy</strong> (endothelin antagonist, PDE5 inhibitor) — abrupt withdrawal can precipitate rebound PH crisis.</li>
+          <li>📞 Early referral to the <strong>pulmonary hypertension centre / ICU</strong>; escalate toward mechanical support if refractory.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In decompensated RV failure the default order is DIURESE and PERFUSE — not a bag of saline; and never stop the PAH drugs abruptly."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Ward priorities — the nurse guards the loading conditions</h3>
+        <ul>
+          <li>⚖️ <strong>Strict fluid balance and daily weights</strong> — the failing RV is a fluid problem; every mL in and out matters. Challenge any unnecessary IV fluids or "maintenance" saline.</li>
+          <li>🩸 <strong>Continuous BP / MAP monitoring</strong> (arterial line if on pressors) — a falling MAP is directly dangerous to the RV coronary; titrate noradrenaline to target.</li>
+          <li>🌊 <strong>Track the JVP, oedema, girth and liver tenderness</strong> shift-to-shift — rising congestion means the decongestion is not keeping up.</li>
+          <li>🫁 <strong>Maintain oxygenation</strong> and avoid hypoventilation/over-sedation — hypoxia, hypercapnia and acidosis all raise pulmonary afterload.</li>
+          <li>💉 <strong>Never interrupt continuous prostacyclin / PAH infusions</strong> — a line disconnection or pump failure can trigger a fatal rebound PH crisis; know the emergency backup.</li>
+          <li>🧾 Keep the patient calm and upright; anxiety and pain raise catecholamines and PVR. Report any drop in urine output (cardiorenal congestion) promptly.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who questions the 'routine' bag of fluid and guards the prostacyclin line is the RV's best friend on the ward."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Value</th><th>Interpretation</th></tr>
+          <tr><td>NT-proBNP</td><td class="hi">6,400 ng/L</td><td>Markedly raised — RV wall stress / volume overload. Trends track decongestion.</td></tr>
+          <tr><td>Troponin</td><td class="hi">Mildly raised</td><td>RV strain/ischaemia (demand + falling coronary perfusion) — a marker of a stressed, under-perfused RV, not necessarily ACS.</td></tr>
+          <tr><td>Lactate</td><td class="hi">3.4 mmol/L</td><td>Low-output tissue hypoperfusion — the systemic circulation is being starved.</td></tr>
+          <tr><td>Creatinine / urea</td><td class="hi">Rising (AKI)</td><td>Cardiorenal — venous congestion (high CVP) impairs renal outflow as much as low forward flow.</td></tr>
+          <tr><td>Bilirubin / ALT</td><td class="hi">Raised</td><td>Congestive hepatopathy from a backed-up, pulsatile liver; severe cases → ischaemic hepatitis.</td></tr>
+          <tr><td>ABG</td><td class="lo">Type 1 ± rising CO₂</td><td>Hypoxia and any hypercapnia/acidosis RAISE PVR and worsen RV afterload — correct them.</td></tr>
+          <tr><td>D-dimer / CTPA</td><td>As indicated</td><td>Consider acute PE as a precipitant of acute-on-chronic RV failure (a treatable cause).</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A rising creatinine in RV failure is often CONGESTION, not dryness — the kidney is drowning in venous pressure, so decongesting can improve it while fluid makes it worse."</div>
+
+        <div class="callout info"><b class="ct">🧠 The gold standard: right heart catheterisation</b>Definitive haemodynamics come from a <strong>right heart catheter</strong>: mean PA pressure, <strong>pulmonary artery wedge pressure</strong> (≤15 = pre-capillary; &gt;15 = post-capillary/left-heart), PVR (&gt;2 WU = pre-capillary), cardiac output, and RA pressure. A high RA pressure with a low cardiac index defines the failing, congested RV — and vasoreactivity testing (in appropriate group-1 PAH) guides therapy.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 ECG / IMAGING + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🫀 The ECG of RV strain / pressure overload</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 130" preserveAspectRatio="none" aria-label="ECG showing right heart strain: right axis, tall R in V1, T inversions V1-V3">
+            <rect width="820" height="130" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="32" x2="820" y2="32"/><line x1="0" y1="65" x2="820" y2="65"/><line x1="0" y1="98" x2="820" y2="98"/></g>
+            <polyline fill="none" stroke="#86efac" stroke-width="2.3" points="0,70 40,70 52,68 66,58 78,74 90,70 130,70 150,66 168,68 210,70 250,70 262,50 276,18 288,80 300,70 340,70 356,74 372,90 388,86 404,80 420,74 460,74 500,72 540,72 560,70 574,64 588,54 604,44 618,54 632,64 648,70 700,70 740,70 752,66 766,60 780,74 792,70 820,70"/>
+            <text x="150" y="20" fill="#93c5fd" font-size="11">P pulmonale</text>
+            <text x="250" y="14" fill="#fca5a5" font-size="11">tall R in V1 (RVH)</text>
+            <text x="470" y="112" fill="#fca5a5" font-size="11">T-wave inversion V1–V3 (RV strain)</text>
+          </svg>
+          <div class="ecg-cap">Right heart pressure overload: <span style="color:#93c5fd">peaked P waves (P pulmonale)</span>, right-axis deviation, a <span style="color:#fca5a5">dominant R in V1 (RVH)</span> and <span style="color:#fca5a5">right-precordial T-wave inversion</span> — and in acute PE the classic (insensitive) S1Q3T3.</div>
+        </div>
+
+        <h3>🔎 Echo — the single most useful bedside test in RV failure</h3>
+        <table class="tbl">
+          <tr><th>Finding</th><th>Look for</th><th>Meaning</th></tr>
+          <tr><td>🎈 <strong>Dilated, hypokinetic RV</strong></td><td>RV:LV basal diameter &gt; 1; poor free-wall motion</td><td>The failing pressure-overloaded RV. <strong>McConnell's sign</strong> (apex spared) suggests acute PE.</td></tr>
+          <tr><td>↔️ <strong>Septal flattening / D-sign</strong></td><td>Flattened interventricular septum, D-shaped LV in short axis</td><td>RV pressure/volume overload bowing the septum → LV under-filling (ventricular interdependence).</td></tr>
+          <tr><td>📏 <strong>Reduced TAPSE / S′</strong></td><td>TAPSE &lt; 17 mm, tissue-Doppler S′ low</td><td>Impaired RV longitudinal systolic function.</td></tr>
+          <tr><td>🌊 <strong>Functional TR + high PASP</strong></td><td>TR jet velocity → estimated systolic PA pressure</td><td>Quantifies pulmonary pressure and the annular dilatation driving the giant v-waves.</td></tr>
+          <tr><td>🫁 <strong>Dilated IVC, no collapse</strong></td><td>IVC &gt; 21 mm, minimal respiratory variation</td><td>High right atrial pressure = a congested, over-filled RV — evidence AGAINST giving fluid.</td></tr>
+          <tr><td>❤️ <strong>The LV</strong></td><td>LV systolic/diastolic function, valve disease</td><td>Normal LV → think pre-capillary PH; impaired LV/valve → post-capillary (Group 2).</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A D-shaped LV on echo is the septum telling you the RV is over-loaded — the answer is to UNLOAD the right heart, not to fill it."</div>
+
+        <h3>🩻 Adjunct imaging</h3>
+        <ul>
+          <li><strong>CXR:</strong> enlarged central pulmonary arteries, prominent RA/RV, oligaemic lung fields; often clearer lungs than the illness suggests.</li>
+          <li><strong>CTPA / V-Q:</strong> to diagnose acute PE or chronic thromboembolic PH (CTEPH, group 4).</li>
+          <li><strong>Cardiac MRI:</strong> gold-standard RV volumes, mass and function; useful for aetiology and prognosis.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The RV-failure drug map — what, why, and the traps</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>Loop diuretic</strong> (furosemide bolus/infusion)</td><td>Decongest the over-filled RV — the mainstay</td><td>Lowers RA pressure, relieves TR and hepatic/renal congestion. Watch for over-diuresis into an under-filled RV.</td></tr>
+          <tr><td><strong>Noradrenaline</strong></td><td>Maintain MAP → RV coronary perfusion</td><td>α-agonist; raises systemic pressure without much rise in PVR. FIRST-line pressor for the hypotensive failing RV.</td></tr>
+          <tr><td><strong>Dobutamine</strong></td><td>Inotropy + modest PVR reduction</td><td>β1 inodilator; can cause tachyarrhythmia and some systemic vasodilatation — often paired with noradrenaline.</td></tr>
+          <tr><td><strong>Milrinone</strong></td><td>Inodilator, lowers PVR</td><td>PDE3 inhibitor; good for RV afterload but can drop systemic BP (usually needs a pressor alongside); accumulates in renal failure.</td></tr>
+          <tr><td><strong>Inhaled NO / inhaled prostacyclin</strong></td><td>Selective pulmonary vasodilatation in appropriate pre-capillary PH / RV crisis</td><td>Lowers PVR without systemic hypotension. Avoid abrupt cessation (rebound).</td></tr>
+          <tr><td><strong>PAH-targeted therapy</strong> (endothelin antagonist, PDE5i/riociguat, prostacyclins)</td><td>Group-1 PAH (and selected group 4)</td><td>Continue established therapy; escalate under specialist guidance. <strong>NOT for group-2 (LV-driven) PH.</strong></td></tr>
+          <tr><td><strong>Anticoagulation</strong></td><td>PE / CTEPH (group 4)</td><td>Lifelong in CTEPH; treat acute PE precipitating RV failure.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Perfuse with noradrenaline, decongest with a loop, augment with an inodilator, and reduce afterload SELECTIVELY (inhaled) — and only vasodilate the lungs when the PH is pre-capillary."</div>
+        <div class="callout danger"><b class="ct">🚫 The 'do NOT' list in RV failure</b>❌ Fluid boluses into a congested RV · ❌ Systemic vasodilators / high-dose GTN (drop aortic pressure → RV coronary starvation) · ❌ PAH pulmonary vasodilators in group-2 (LV) PH (flash pulmonary oedema) · ❌ Abruptly stopping continuous prostacyclin (rebound PH crisis) · ❌ Careless intubation/high PEEP (a peri-intubation arrest risk in severe PH).</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why</h3>
+        <ul>
+          <li>🩸 <strong>Arterial line / continuous MAP</strong> — the RV coronary depends on aortic pressure; a falling MAP is an emergency in RV failure. Titrate noradrenaline to MAP ≥ 65.</li>
+          <li>⚖️ <strong>Hourly fluid balance, urine output and daily weight</strong> — the objective read-out of decongestion; rising urine output as MAP is restored is a good sign.</li>
+          <li>🌊 <strong>Serial JVP / IVC / lactate</strong> — falling lactate + falling congestion = the spiral is reversing.</li>
+          <li>📈 <strong>ECG / telemetry</strong> — atrial arrhythmias (AF/flutter) are poorly tolerated in RV failure (loss of atrial kick, rate-dependent RV filling) and often need prompt rate/rhythm control.</li>
+          <li>🫁 <strong>SpO₂ and ABG</strong> — keep well-oxygenated; watch CO₂ (hypercapnia raises PVR). If ventilated, monitor plateau pressure and PEEP for RV tolerance.</li>
+          <li>🧮 <strong>Consider invasive haemodynamics</strong> (PA catheter) in refractory shock to guide preload, PVR, cardiac output and pressor/inotrope titration in a specialist setting.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In RV failure the two numbers that keep the patient alive are the MAP (feeds the RV coronary) and the volume trend (unloads the RV) — watch them like a hawk."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong</h3>
+        <ul>
+          <li>🌀 <strong>The RV failure spiral to cardiovascular collapse</strong> — over-load → septal shift → LV under-filling → hypotension → RV ischaemia → arrest. The core catastrophe.</li>
+          <li>💧 <strong>Iatrogenic fluid overload</strong> — the "hypotension = bolus" reflex tipping a congested RV over the edge.</li>
+          <li>🫁 <strong>Flash pulmonary oedema</strong> — from giving a PAH pulmonary vasodilator to group-2 (LV) PH.</li>
+          <li>🫀 <strong>Peri-intubation / induction arrest</strong> — sedation, positive-pressure ventilation and loss of sympathetic tone can collapse a pressure-overloaded RV. Severe PH patients are among the highest-risk intubations in medicine.</li>
+          <li>💔 <strong>PH / RV crisis</strong> — an acute rise in PVR (hypoxia, pain, acidosis, PE, sepsis) causing abrupt RV decompensation and syncope/arrest.</li>
+          <li>🩸 <strong>Cardiorenal &amp; congestive hepatopathy</strong> — AKI and liver dysfunction from venous congestion; severe cases progress to ischaemic hepatitis.</li>
+          <li>⚡ <strong>Atrial arrhythmias</strong> — frequently precipitate decompensation; often need urgent control.</li>
+          <li>🫀 <strong>Sudden cardiac death</strong> — a leading mode of death in advanced pulmonary hypertension.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The two most lethal complications of RV failure are both iatrogenic and avoidable — a fluid bolus into a congested RV, and a pulmonary vasodilator into a left-heart PH."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 Why is this right ventricle failing? — the differential of acute RV failure</h3>
+        <table class="tbl">
+          <tr><th>Cause</th><th>Discriminators</th><th>Key action</th></tr>
+          <tr><td>🫁 <strong>Chronic PH decompensating</strong> (this patient, group 1)</td><td>Known PAH, gradual congestion, dilated hypertrophied RV</td><td>Decongest, support perfusion, continue/escalate PAH therapy, treat trigger.</td></tr>
+          <tr><td>🩸 <strong>Acute pulmonary embolism</strong></td><td>Sudden dyspnoea, pleuritic pain, McConnell's sign, S1Q3T3, DVT risk</td><td>CTPA; anticoagulate ± thrombolysis/thrombectomy if high-risk.</td></tr>
+          <tr><td>🫀 <strong>RV infarction</strong></td><td>Inferior STEMI, ST↑ in V4R, hypotension, CLEAR lungs, often UNDER-filled RV</td><td>Reperfuse; this is the RV that DOES need a cautious fluid challenge + avoid nitrates.</td></tr>
+          <tr><td>🫁 <strong>ARDS / hypoxic-hypercapnic lung disease</strong> (group 3)</td><td>Ventilated, high PEEP, hypoxia/hypercapnia raising PVR</td><td>RV-protective ventilation; correct gases; treat lung disease.</td></tr>
+          <tr><td>❤️ <strong>LEFT heart disease → group-2 PH</strong></td><td>LV dysfunction/valve disease, wedge &gt; 15, pulmonary congestion</td><td>Treat the LEFT heart; do NOT give PAH pulmonary vasodilators.</td></tr>
+          <tr><td>🧊 <strong>Cardiac tamponade / constriction</strong></td><td>Raised JVP + hypotension + muffled sounds/pulsus paradoxus</td><td>Echo; drain/relieve — a rapidly reversible mimic.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A raised JVP with clear lungs and hypotension has a short, deadly differential — RV failure, PE, RV infarct, tamponade — and each hinges on the echo you should already be doing."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The Failing Right Heart"</h3>
+          <div class="hud"><span>❤️ RV Stability: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">Mr R.V. is hypotensive (BP 92/70) with JVP to the earlobe, ascites, gross oedema and nearly clear lungs. The covering doctor says "he's shocked — let's give fluid to bring the pressure up." What do you do?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The management plan</h3>
+        <ol>
+          <li>🫀 <strong>Diagnosis:</strong> decompensated RIGHT ventricular failure on group-1 pulmonary arterial hypertension, congested and low-output. Echo: dilated hypokinetic RV, D-shaped LV, dilated non-collapsing IVC, functional TR, normal LV.</li>
+          <li>💧 <strong>Optimise preload:</strong> IV loop diuretic (bolus → infusion) for decongestion; NO routine fluid; small challenge only for a proven under-filled RV.</li>
+          <li>🩸 <strong>Perfuse the RV:</strong> noradrenaline to MAP ≥ 65 to protect RV coronary flow.</li>
+          <li>💪 <strong>Support contractility:</strong> add dobutamine/milrinone for persistent low output.</li>
+          <li>🫁 <strong>Reduce afterload / treat cause:</strong> correct hypoxia/hypercapnia/acidosis; exclude/treat PE; continue PAH therapy; consider inhaled selective vasodilator; escalate PAH-specific treatment with the specialist centre.</li>
+          <li>🏥 <strong>Escalate:</strong> refractory RV failure → ICU, RVAD or VA-ECMO as a bridge; PH multidisciplinary team; transplant assessment where appropriate.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Decongest, perfuse, support, and treat the cause — in that mental order — and reach for mechanical support early rather than late in the RV that won't turn the corner."</div>
+
+        <div class="checklist" id="ckRV">
+          <h3 style="margin-top:0">🩺 Procedure Guide — RV-failure management (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>💧 PRELOAD optimised — congestion assessed (JVP/IVC/echo); decongest if over-filled, small challenge only if truly under-filled; NO reflex bolus</span></label>
+          <label class="ck"><input type="checkbox"><span>🫁 AFTERLOAD reduced — hypoxia/hypercapnia/acidosis corrected; cause treated (PE/sepsis/arrhythmia); selective pulmonary vasodilator only if pre-capillary PH</span></label>
+          <label class="ck"><input type="checkbox"><span>💪 CONTRACTILITY supported — dobutamine/milrinone titrated for low output</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 PERFUSION PRESSURE maintained — noradrenaline to MAP ≥ 65 to feed the RV coronary</span></label>
+          <label class="ck"><input type="checkbox"><span>🌬️ VENTILATION made RV-friendly — lowest effective PEEP/tidal volume; avoid hypercapnia/hypoxia; anticipate peri-intubation collapse</span></label>
+          <label class="ck"><input type="checkbox"><span>💉 Established PAH therapy continued (no abrupt withdrawal); prostacyclin line safeguarded</span></label>
+          <label class="ck"><input type="checkbox"><span>📞 Early PH-centre / ICU discussion; mechanical support (RVAD/VA-ECMO) considered if refractory</span></label>
+          <div class="ck-progress" data-progress>0 / 7 complete</div>
+        </div>
+
+        <div class="checklist" id="ckPH">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Pulmonary hypertension work-up &amp; group classification</h3>
+          <label class="ck"><input type="checkbox"><span>🫀 Echo: RV size/function, D-sign, PASP estimate, IVC — and assess the LV/valves</span></label>
+          <label class="ck"><input type="checkbox"><span>🧪 Right heart catheter: mPAP, wedge (≤15 pre- vs &gt;15 post-capillary), PVR (&gt;2 WU), cardiac output, RA pressure</span></label>
+          <label class="ck"><input type="checkbox"><span>🩻 CTPA / V-Q scan to exclude CTEPH (group 4); PFTs/HRCT for lung disease (group 3)</span></label>
+          <label class="ck"><input type="checkbox"><span>🧬 Aetiology screen: connective-tissue disease, HIV, liver disease, drugs/toxins, congenital heart disease</span></label>
+          <label class="ck"><input type="checkbox"><span>🗂️ Assign WHO group 1–5 and, for group 1, risk-stratify — because the group dictates therapy</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">14:20</div>BP 92/70, JVP to ear, ascites, oedema, clear lungs. The reflex fluid bolus is held.</div>
+          <div class="t-item"><div class="t-time">14:40</div>Bedside echo: dilated hypokinetic RV, D-shaped LV, dilated IVC, functional TR, normal LV. Diagnosis confirmed: congested RV failure — fluids OFF.</div>
+          <div class="t-item"><div class="t-time">15:00</div>Noradrenaline started to MAP ≥ 65; IV furosemide infusion begun; oxygen optimised, ABG corrected. Lactate begins to fall.</div>
+          <div class="t-item"><div class="t-time">18:00</div>Dobutamine added for persistent low output. Urine output rises, JVP falls, peripheries warm. The spiral reverses.</div>
+          <div class="t-item"><div class="t-time">Day 2</div>Net −2.5 L, weight down 3 kg, lactate normal, creatinine improving. Discussed with PH centre; PAH therapy optimised. Weaning pressors.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>He is alive because someone recognised "clear lungs + huge JVP + hypotension" as a RIGHT-heart problem, refused the saline, decongested, protected the perfusion pressure to feed the RV coronary, and treated the loading conditions instead of the number on the monitor.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 Getting the failing right heart safely home — and keeping it there</h3>
+        <div class="vs">
+          <div class="side a"><h4>🫀 This patient (group-1 PAH, RV failure)</h4><ul><li>Optimised diuretic regimen + strict fluid/salt restriction; daily weights with a clear action plan</li><li>PAH-targeted therapy reviewed/escalated by the PH centre; prostacyclin training if applicable</li><li>Oxygen if hypoxic; vaccination; avoid pregnancy and high altitude; caution with drugs that raise PVR</li><li>Red flags: rising weight/oedema, syncope, worsening breathlessness, chest pain → seek help early</li><li>PH multidisciplinary follow-up; transplant discussion where appropriate; advance-care planning</li></ul></div>
+          <div class="side b"><h4>🧭 The reversible-cause patient</h4><ul><li>Acute PE → anticoagulation, CTEPH surveillance; RV infarct → revascularisation &amp; recovery</li><li>Group-2 (LV) PH → optimise the LEFT heart and valve disease, NOT pulmonary vasodilators</li><li>Group-3 → treat lung disease + oxygen; correct hypoxia</li><li>Address the precipitant (arrhythmia, sepsis, non-adherence) so it doesn't recur</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Discharge in RV failure is a fluid plan, a group-specific drug plan, and a decompensation early-warning plan — daily weights are the home version of watching the JVP."</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>🫀 Clear lungs + huge JVP + low BP</b>= the RIGHT ventricle is failing. Think fluids OFF, not on.</div>
+          <div class="pearl"><b>⚖️ Afterload-sensitive pump</b>A small rise in PVR sharply cuts RV output — the RV hates afterload.</div>
+          <div class="pearl"><b>🌀 The RV spiral</b>Over-load → septal shift → LV under-fills → BP falls → RV coronary starves → collapse.</div>
+          <div class="pearl"><b>🩸 Perfuse the RV</b>Systemic hypotension starves the RV coronary — keep aortic pressure up with noradrenaline.</div>
+          <div class="pearl"><b>💧 Decongest, don't drown</b>Most congested failing RVs need diuresis; only the truly under-filled RV gets a small bolus.</div>
+          <div class="pearl"><b>🫁 Classify before you vasodilate</b>Never give a PAH pulmonary vasodilator to group-2 (LV) PH — flash pulmonary oedema.</div>
+          <div class="pearl"><b>🌬️ RV-friendly ventilation</b>Avoid high PEEP, hypercapnia, hypoxia and acidosis — all raise PVR.</div>
+          <div class="pearl"><b>💉 Don't stop prostacyclin</b>Abrupt withdrawal of continuous prostacyclin can trigger a fatal rebound PH crisis.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the ward</h3>
+          <ul>
+            <li>🫁 <strong>Pre- vs post- vs combined PH:</strong> pre-capillary (wedge ≤15, PVR &gt;2 WU — groups 1/3/4) is a pulmonary-vascular disease; isolated post-capillary (wedge &gt;15, PVR ≤2 — group 2) is a LEFT-heart backpressure problem; <strong>combined post- and pre-capillary (CpcPH)</strong> has wedge &gt;15 AND PVR &gt;2 — a left-heart substrate that has acquired fixed pulmonary vascular remodelling and a worse prognosis.</li>
+            <li>🔗 <strong>RV–PA coupling:</strong> the RV works well only while its contractility (Ees) keeps pace with the afterload it faces (Ea). The Ees/Ea ratio quantifies coupling; as afterload outstrips contractility the ventricle "uncouples," dilates, and output falls — the physiological basis of afterload-sensitivity.</li>
+            <li>🌀 <strong>Acute-on-chronic RV failure:</strong> a hypertrophied chronic RV has more reserve than a naïve RV (which fails acutely at an mPAP it cannot generate above ~40 mmHg), but once a chronically adapted RV decompensates, mortality is high. A trigger (PE, sepsis, arrhythmia, non-adherence) usually tips it over.</li>
+            <li>💥 <strong>PH / RV crisis physiology:</strong> an acute PVR spike (hypoxia, acidosis, pain, PE) abruptly raises RV afterload → acute RV dilatation → septal shift → LV under-filling → systemic hypotension → RV coronary hypoperfusion → RV ischaemia → the spiral to arrest. Management targets every step: oxygenate, correct pH, sedate/analgese carefully, and support MAP.</li>
+            <li>🫀 <strong>The failing RV in specific settings:</strong> massive/submassive PE (acute pressure overload), RV infarction (an under-filled RV that needs preload and reperfusion), ARDS (hypoxic vasoconstriction + high ventilator pressures = acute cor pulmonale), and LV failure (group-2 backpressure) — same organ, different levers.</li>
+            <li>⚙️ <strong>Mechanical support:</strong> RV assist devices (RVAD, percutaneous options) and <strong>VA-ECMO</strong> can unload a failing RV as a bridge to recovery, decision, or transplant; success depends on early rather than late deployment and a clear exit strategy.</li>
+            <li>🩸 <strong>Why systemic hypotension is uniquely lethal to the RV:</strong> unlike the thick LV (perfused mainly in diastole), the normal RV coronary is perfused in BOTH systole and diastole and depends on the aortic-to-RV pressure gradient. As RV pressure rises and aortic pressure falls, that gradient collapses — so maintaining aortic pressure (noradrenaline) is a direct RV-protective, anti-ischaemic intervention.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "Three Boluses for a Blood Pressure"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 62-year-old man with pulmonary hypertension and a known dilated, failing right ventricle became hypotensive on the ward (BP 88/64). His JVP was to the ear and his legs were oedematous, but the covering team focused on the number: over ninety minutes they ran <strong>three 500 mL saline boluses "to fill him up."</strong> With each bolus his RV distended further, the interventricular septum bowed into the LV, the LV under-filled, the systemic output collapsed and the aortic pressure — and with it the RV's own coronary perfusion — fell away. He became bradycardic and <strong>arrested with a dilated, akinetic RV on the crash echo.</strong> Resuscitation failed. (In a parallel case discussed the same afternoon, a patient with group-2 PH from severe LV disease was given IV prostacyclin "to lower the pulmonary pressures" and developed fatal flash pulmonary oedema within the hour.)
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🧠 REFLEX</b>"Hypotension = give fluid" applied to a congested RV that was already over-filled.</div>
+            <div class="hole"><b>🌊 SIGNS IGNORED</b>A JVP to the ear and gross oedema were the RV shouting "I'm full" — and were overlooked.</div>
+            <div class="hole"><b>🫀 NO ECHO</b>No bedside echo to see the dilated RV and D-shaped LV before treating.</div>
+            <div class="hole"><b>🩸 PERFUSION NEGLECTED</b>The RV coronary was starved as aortic pressure fell; no pressor to protect it.</div>
+            <div class="hole"><b>🫁 GROUP NOT CHECKED</b>In the parallel case, a pulmonary vasodilator was given to LEFT-heart (group-2) PH.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved them:</strong> read "clear lungs + huge JVP + hypotension" as a failing RIGHT heart; get a bedside echo before treating; <strong>decongest</strong> the over-filled RV rather than fluid-load it; <strong>protect the perfusion pressure</strong> with noradrenaline to feed the RV coronary; support contractility with an inodilator; correct hypoxia/acidosis; and <strong>classify the PH group before ever vasodilating the lungs</strong>. The failing right heart needed decongestion and perfusion-pressure support — not litres of saline. <strong>This is exactly the discipline that saved the patient in Bed 6.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Treating the blood-pressure number instead of the loading conditions has killed more failing right ventricles than the disease itself — decongest and perfuse, don't drown."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🫁 Heart Failure Ward · Bed 6 — Right Ventricular Failure &amp; Pulmonary Hypertension<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+    /* ===== SIDEBAR TABS — show one section at a time ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not a right-heart-failure feature'); } if(found===total){ flagResult.textContent='✅ All '+total+' right-heart-failure features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' right-heart-failure features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: RV loading dial ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=v; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<20){ msg='🟠 Under-filled RV (load '+v+'/100). Too little preload → the thin RV can\'t generate stroke volume → low output. If genuinely hypovolaemic (e.g. RV infarct, over-diuresis), a SMALL cautious fluid challenge may help.'; cls='warn-r'; }
+      else if(v<=60){ msg='🟢 Sweet spot (load '+v+'/100). Optimised preload + acceptable afterload → best RV–PA coupling and systemic output. This is the goal — decongest to HERE, don\'t overshoot.'; cls='good'; }
+      else if(v<=80){ msg='🟠 Rising load (load '+v+'/100). Excess preload/afterload → the RV dilates, pressure climbs, the septum begins to bow toward the LV. Reduce afterload, treat the cause, decongest gently.'; cls='warn-r'; }
+      else { msg='🔴 Over-loaded RV (load '+v+'/100). Over-distension + high PVR → septal shift → LV under-fills → BP falls → RV coronary perfusion drops → RV ischaemia → the spiral tightens to collapse. Fluids OFF; DECONGEST and support perfusion pressure.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','RV Coupling Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"Mr R.V. is hypotensive (BP 92/70) with JVP to the earlobe, ascites, gross oedema and nearly clear lungs. The covering doctor says 'he's shocked — let's give fluid to bring the pressure up.' What do you do?",
+      choices:[
+        {t:"💧 Give repeated 500 mL saline boluses to 'fill him up' and lift the BP",good:false,ds:-2,dt:60,xp:0,fb:"☠️ This is the M&M case in S21. His RV is already congested and over-filled — more preload over-distends it, bows the septum into the LV, the LV under-fills, output collapses and he arrests. Restart.",end:true},
+        {t:"🫀 Hold the fluid, get an urgent bedside echo, start noradrenaline to protect RV coronary perfusion and begin decongestion; correct hypoxia/acidosis",good:true,ds:1,dt:8,xp:40,fb:"✅ Exactly. Read 'clear lungs + huge JVP + hypotension' as a failing RIGHT heart: perfuse it, decongest it, and treat the cause — never fluid-load it.",next:"support"},
+        {t:"🩸 Give high-dose GTN / a systemic vasodilator to 'offload the heart'",good:false,ds:-1,dt:12,xp:5,fb:"⚠️ Dangerous — dropping the systemic (aortic) pressure starves the RV coronary and worsens RV ischaemia. The RV needs its perfusion pressure PROTECTED, not lowered.",next:"support"}
+      ]},
+    support:{ text:"Echo confirms a dilated hypokinetic RV, a D-shaped LV, a dilated non-collapsing IVC and functional TR — a congested, over-filled right heart. MAP is now supported but output stays low. Next best step?",
+      choices:[
+        {t:"💪 Add an inodilator (dobutamine/milrinone) for contractility and continue IV diuresis, keeping MAP up with noradrenaline",good:true,ds:1,dt:6,xp:40,fb:"✅ Right. Decongest the over-filled RV, augment contractility, and maintain perfusion pressure — the four levers of RV-failure care working together.",next:"declare"},
+        {t:"💧 The BP is still soft — give another litre of fluid to be safe",good:false,ds:-2,dt:25,xp:0,fb:"⚠️ No. The dilated RV and dilated IVC say it is over-filled. More volume worsens the septal shift and drops LV output further. Decongest, don't fill.",next:"declare"}
+      ]},
+    declare:{ text:"Echo shows the PH here is driven by severe LEFT ventricular disease (post-capillary, WHO Group 2). A colleague suggests starting IV epoprostenol (a pulmonary vasodilator) 'to bring the pulmonary pressures down.' What now?",
+      choices:[
+        {t:"🚫 Decline the pulmonary vasodilator (group-2 PH — risk of flash pulmonary oedema); optimise the LEFT heart, keep decongesting and perfusing, and escalate to ICU/mechanical support if refractory",good:true,ds:1,dt:5,xp:45,fb:"🏆 Perfect. In group-2 (LV-driven) PH a pulmonary vasodilator can flood the lungs. Treat the LEFT heart, protect the RV's loading and perfusion, and escalate early. That is the whole case.",end:true},
+        {t:"💉 Start the pulmonary vasodilator anyway to drop the pulmonary pressures",good:false,ds:-1,dt:20,xp:0,fb:"⚠️ This is group-2 PH — vasodilating the lungs increases flow into a stiff left heart and causes flash pulmonary oedema (the parallel M&M death in S21). Never vasodilate the lungs in left-heart PH.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='declare'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A patient with pulmonary hypertension has a raised JVP, gross oedema, clear lungs and BP 90/68. The single WORST next step is:", opts:["Urgent bedside echo","A 500 mL fluid bolus to raise the blood pressure","Start noradrenaline to maintain MAP","IV loop diuretic to decongest"], correct:1, exp:"This is a congested, over-filled failing RV. A fluid bolus over-distends it, bows the septum into the LV, under-fills the LV and drops systemic output — it can precipitate arrest. Decongest and support perfusion pressure instead." },
+    { q:"Why is systemic hypotension especially dangerous in right ventricular failure?", opts:["It raises pulmonary vascular resistance directly","It reduces aortic pressure and therefore RV coronary perfusion, causing RV ischaemia","It causes flash pulmonary oedema","It has no specific effect on the RV"], correct:1, exp:"The RV coronary is perfused in both systole and diastole and depends on the aortic-to-RV pressure gradient. A falling aortic pressure starves the RV coronary → RV ischaemia → the failure spiral. Noradrenaline to maintain MAP is RV-protective." },
+    { q:"Pulmonary hypertension due to LEFT heart disease (WHO Group 2) should be managed by:", opts:["Starting a pulmonary vasodilator such as epoprostenol","Treating the left heart / valve disease and NOT giving PAH pulmonary vasodilators","Aggressive fluid loading","Immediate pulmonary endarterectomy"], correct:1, exp:"Group 2 is post-capillary PH from a backed-up left heart. Giving a PAH pulmonary vasodilator increases flow into a stiff left heart and can cause flash pulmonary oedema. Treat the left heart instead." },
+    { q:"On echo in decompensated RV failure you see a D-shaped LV in short axis. This indicates:", opts:["Severe LV hypertrophy","Septal shift from RV pressure/volume overload under-filling the LV","Cardiac tamponade","A normal variant"], correct:1, exp:"The over-loaded, dilated RV bows the interventricular septum into the LV (ventricular interdependence), producing the D-shaped LV and mechanically under-filling it. The answer is to UNLOAD the right heart, not to fill it." },
+    { q:"Which best describes the right ventricle's key vulnerability?", opts:["It is a thick pressure-pump insensitive to afterload","It is a thin, compliant volume-pump that is exquisitely afterload-sensitive","It tolerates large rises in pulmonary vascular resistance easily","It fails only from primary contractile disease"], correct:1, exp:"The RV is built to eject into a low-resistance pulmonary circuit. Small rises in PVR (PE, hypoxia, high PEEP, PH) sharply reduce its output — it hates afterload and hates over-filling." },
+    { q:"A ventilated patient with severe PH is deteriorating. Which ventilator strategy protects the RV?", opts:["High PEEP and permissive hypercapnia","Lowest effective PEEP/tidal volumes, avoiding hypoxia, hypercapnia and acidosis","Deliberate hyperventilation to alkalosis with high pressures","Maximal recruitment manoeuvres regardless of pressures"], correct:1, exp:"High PEEP/plateau pressures, hypoxia, hypercapnia and acidosis all RAISE pulmonary vascular resistance and RV afterload. RV-protective ventilation uses the lowest effective pressures and keeps gases/ pH corrected." },
+    { q:"In acute RV failure with a low-output state despite an adequate MAP on noradrenaline, the next agent to consider is:", opts:["A further large fluid bolus","An inodilator such as dobutamine or milrinone to support contractility","A systemic vasodilator to reduce afterload","Stopping all support"], correct:1, exp:"Once perfusion pressure is protected, an inodilator (dobutamine/milrinone) augments RV contractility and modestly lowers PVR. Milrinone can drop systemic BP, so it is often paired with a pressor." },
+    { q:"Which statement about a patient on continuous IV prostacyclin (e.g. epoprostenol) for Group 1 PAH is correct?", opts:["It can be stopped abruptly with no consequence","Abrupt interruption can precipitate a life-threatening rebound pulmonary hypertensive crisis","It should be stopped whenever the BP is low","It is the treatment of choice for Group 2 PH"], correct:1, exp:"Prostacyclin has a very short half-life; an interrupted infusion (line disconnection, pump failure) can trigger rebound PH crisis and death. The line must be safeguarded and never stopped abruptly." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you manage the failing right heart like a consultant. 🏆':score>=6?'Strong — review the misses and S5/S6 on loading conditions and PH groups.':'Revisit S5, S6 and S11 — decongest, perfuse, support, and classify before you vasodilate.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>
