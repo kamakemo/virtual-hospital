@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Asymptomatic Severe Valve — Virtual Teaching Hospital</title>
+<!-- META
+id: c-clin-valve-059
+title: The Asymptomatic Severe Valve — When to Watch, When to Act
+hospital: cardiology
+department: cv-clinic
+bednumber: 5
+chiefcomplaint: An asymptomatic murmur found to be severe aortic stenosis on echo
+system: Cardiology
+severity: urgent
+tags: Valvular heart disease, Aortic stenosis, Surveillance, Timing of intervention, TAVI, Exercise testing
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🫀</div>
+      <div>
+        <div class="t1">Cardiology Clinic</div>
+        <div class="t2">Bed 5 · Valve Surveillance</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🫀 Outpatient Cardiology Clinic · 🛏️ Bed 5</div>
+        <h1>🫀 The Asymptomatic Severe Valve — "The Calm Before the Cliff"</h1>
+        <div class="sub">🕙 10:20, valve clinic. A fit-looking 72-year-old sits down smiling — "I feel perfectly well, doctor, my GP just heard a murmur." His echo says severe aortic stenosis with a normal EF. Your whole job today is to decide: is this a patient to <em>watch</em>, or a patient to <em>act</em> on — and how to tell the difference before the first symptom becomes the last.</div>
+        <div class="chips">
+          <span class="chip crit">🟠 URGENT SURVEILLANCE</span>
+          <span class="chip">🫀 Severe Aortic Stenosis</span>
+          <span class="chip">🏃 Exercise Testing</span>
+          <span class="chip">🔧 Timing of Intervention</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital"><div class="v-label">💓 HR</div><div class="v-num">72</div></div>
+        <div class="vital"><div class="v-label">🩸 BP</div><div class="v-num">132/78</div></div>
+        <div class="vital"><div class="v-label">🌬️ RR</div><div class="v-num">14</div></div>
+        <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">98%</div></div>
+        <div class="vital"><div class="v-label">🫀 LVEF</div><div class="v-num">60%</div></div>
+        <div class="vital warn"><div class="v-label">🎵 Vmax</div><div class="v-num">4.4</div></div>
+        <div class="vital"><div class="v-label">😌 Symptoms</div><div class="v-num">None</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout info"><b class="ct">🩺 YOU ARE HERE — 10:20, Valve Clinic, Room 5</b>A well-dressed retired schoolteacher walks in briskly and shakes your hand. <em>"My GP found a heart murmur at my blood-pressure check and sent me for a scan. Honestly I feel fine — I'm here to be told there's nothing to worry about."</em> His echo report on the screen says something very different: <strong>severe aortic stenosis</strong>. This is the exact clinic encounter where a "reassuringly well" patient carries a lesion that, the day it declares itself, becomes a killer.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>🧓 Name</td><td><strong>Mr. A.S.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>72-year-old male</td></tr>
+          <tr><td>🆔 MRN</td><td>CV-CLIN-0559</td></tr>
+          <tr><td>⚖️ Weight</td><td>78 kg (BMI 25)</td></tr>
+          <tr><td>💼 Occupation</td><td>Retired teacher — walks the dog daily, keen gardener</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 Past history — the surveillance context</h3>
+        <ul>
+          <li>🫀 <strong>Calcific aortic stenosis</strong> — first noted "mild" 6 years ago on an echo for a murmur; today's echo has progressed to <strong>severe</strong>.</li>
+          <li>🔺 <strong>Hypertension</strong> (well controlled on amlodipine), <strong>dyslipidaemia</strong> on a statin. Degenerative (calcific) AS shares the atherosclerotic risk-factor profile.</li>
+          <li>🧬 Tricuspid aortic valve (age-related calcific degeneration — the commonest cause of AS in the elderly). No bicuspid valve, no rheumatic history.</li>
+          <li>🏃 <strong>Functionally active</strong> — but he has "cut back the hills a bit lately." That single throwaway line is the whole case (see S3).</li>
+          <li>🚭 Ex-smoker, stopped 20 years ago. No diabetes.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Severe aortic stenosis is a benign bystander until the first symptom — then it becomes a killer; the whole game is catching that transition."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why the asymptomatic severe valve is the trap</b>An asymptomatic patient <em>feels</em> low-risk, so it is tempting to reassure and defer. But severe AS is a fixed obstruction the LV has silently compensated for; the moment symptoms appear, average survival collapses (heart failure ≈ 2 years, syncope ≈ 3, angina ≈ 5, historically). The surveillance clinic exists to catch that inflection — with a <strong>plan and an echo interval</strong>, not a shrug.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Referral &amp; Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 GP referral — the story behind the murmur</h3>
+        <div class="callout info"><b class="ct">🎙️ Referral letter (verbatim)</b>
+          <p><strong>S:</strong> "72-year-old man, ejection systolic murmur loudest at the aortic area radiating to both carotids, found at a routine BP review. Says he feels well."</p>
+          <p><strong>B:</strong> "Known mild AS 6 years ago, hypertension, high cholesterol, ex-smoker. Independent, walks daily."</p>
+          <p><strong>A:</strong> "Requested an echo — reported as SEVERE aortic stenosis: peak velocity 4.4 m/s, mean gradient 48 mmHg, valve area 0.8 cm², LVEF 60%. ECG shows LVH. He denies chest pain, breathlessness, or blackouts."</p>
+          <p><strong>R:</strong> "Grateful for your assessment and a plan for follow-up / timing of any intervention."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'He denies symptoms' in severe AS is a starting point, not a conclusion — patients (and their families) blame slowing down on 'getting older.' Interrogate the history and, where indicated, exercise-test it."</div>
+
+        <h3>🚩 Spot-the-Trigger — tap each feature that converts "WATCH" to "ACT"</h3>
+        <p>🎮 <em>Click every feature that would move an asymptomatic severe valve toward INTERVENTION. Each correct = +10 XP.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">🫁 New exertional dyspnoea / falling exercise tolerance</button>
+          <button class="btn ghost flag-btn" data-good="1">💔 Exertional angina</button>
+          <button class="btn ghost flag-btn" data-good="1">🕳️ Exertional syncope or presyncope</button>
+          <button class="btn ghost flag-btn" data-good="1">📉 Falling LVEF (&lt; 50–55%)</button>
+          <button class="btn ghost flag-btn" data-good="1">🎈 Progressive LV dilatation on serial echo</button>
+          <button class="btn ghost flag-btn" data-good="1">🏃 Symptoms / abnormal BP response unmasked on exercise testing</button>
+          <button class="btn ghost flag-btn" data-good="1">⚡ Very severe or rapidly progressive AS with low operative risk</button>
+          <button class="btn ghost flag-btn" data-good="0">🟢 A truly asymptomatic mild–moderate lesion with a normal LV</button>
+          <button class="btn ghost flag-btn" data-good="0">🌡️ Temperature 36.6°C</button>
+          <button class="btn ghost flag-btn" data-good="0">👆 Reproducible chest-wall tenderness</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Credit to the GP</b>Referring an asymptomatic severe valve promptly to a valve clinic — rather than "watching it in the community" — is exactly right. Severe AS deserves specialist surveillance, an exercise assessment, and Heart-Team access the moment a trigger appears.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🎯 The clinic assessment — is he REALLY asymptomatic?</h3>
+        <table class="tbl">
+          <tr><th>Domain</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>🗣️ Symptom history</td><td>No chest pain, no blackouts. But: "I've stopped doing the steep part of my dog walk — my legs, or maybe I'm just older." Wife adds he stops halfway up the stairs now.</td><td><strong>This is the pivot.</strong> Covert exertional breathlessness dressed up as "age." Never accept the first "I'm fine."</td></tr>
+          <tr><td>👂 Auscultation</td><td>Harsh <strong>ejection systolic murmur</strong>, loudest at the right 2nd interspace, <strong>radiating to both carotids</strong>; soft/absent A2; slow-rising, low-volume carotid pulse (<em>parvus et tardus</em>); late-peaking murmur.</td><td>A soft/absent A2, a late-peaking murmur and a slow-rising pulse all point to <em>severe</em>, haemodynamically significant AS.</td></tr>
+          <tr><td>🫀 Precordium</td><td>Sustained (heaving) apex beat, not displaced; no thrill today.</td><td>Pressure-loaded, hypertrophied LV — concentric LVH compensating for the fixed obstruction.</td></tr>
+          <tr><td>🫁 Volume status</td><td>JVP normal, chest clear, no oedema.</td><td>Compensated; no overt heart failure — yet.</td></tr>
+          <tr><td>🩸 Perfusion</td><td>Warm, alert, BP 132/78, narrow-ish pulse pressure.</td><td>A narrow pulse pressure fits fixed outflow obstruction.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Patients with severe aortic stenosis lie to you (and to themselves) about symptoms — exercise-test the 'asymptomatic' ones to reveal the truth."</div>
+
+        <h3>🧭 The two questions that run the whole clinic</h3>
+        <p>For any severe valve lesion, two questions decide everything: <strong>(1) Is the patient genuinely asymptomatic?</strong> and <strong>(2) Is the LV still performing (size and function preserved)?</strong> If BOTH answers are reassuring → <em>watch</em>, with a defined surveillance interval. If EITHER fails — symptoms (overt or exercise-unmasked), a falling LVEF, or a dilating LV — the answer flips to <em>act</em> (see S6, S14).</p>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of "he denies symptoms"</b>Elderly patients unconsciously self-limit — they stop climbing the hill, take the lift, garden less — and attribute it to age. A meticulous <em>functional</em> history (and an exercise test where indicated) is the only way to separate the genuinely asymptomatic from the <strong>pseudo-asymptomatic</strong>.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The cardiology registrar reasons it through at 10:35:</em></p>
+        <h3>🧠 Frame it as "watch vs act", not "reassure vs refer"</h3>
+        <p>"Echo confirms <strong>severe AS</strong> with a <strong>preserved EF</strong>. On paper that's a 'watch' patient — but his history isn't clean. He's quietly dropped his exercise tolerance and blamed age. I won't take 'asymptomatic' at face value: I'll <strong>exercise-test him</strong> to unmask covert symptoms or an abnormal blood-pressure response. If the test is truly normal, he enters structured surveillance with a defined echo interval and clear safety-netting. If it's positive — or any class-I trigger appears — he goes to the <strong>Heart Team</strong>."</p>
+
+        <h3>🎯 The registrar's order of operations</h3>
+        <ol>
+          <li>🗣️ <strong>Re-take the functional history</strong> with the spouse present — quantify what he's stopped doing.</li>
+          <li>📈 <strong>Confirm severity</strong> on the echo (velocity, mean gradient, valve area, flow state, EF, LV dimensions, valve calcification).</li>
+          <li>🏃 <strong>Exercise (treadmill) test</strong> — appropriate ONLY because he is (apparently) asymptomatic; look for symptoms, a fall or failure of BP to rise, or significant ECG changes.</li>
+          <li>🗓️ If negative → <strong>surveillance</strong> with a severity-appropriate interval + written symptom safety-net.</li>
+          <li>🤝 If positive / any trigger → <strong>Heart-Team referral</strong> for SAVR vs TAVI on age/anatomy/risk.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Exercise-testing is FOR the asymptomatic severe valve and AGAINST the symptomatic one — in a patient with symptoms, severe AS is already an indication to intervene, and stressing them is dangerous."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Registrar's self-test</b>He wonders whether to start a vasodilator (e.g. an ACE inhibitor or GTN) for the patient's "occasional chest tightness." Do it?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No — dangerous.</strong> In severe AS the cardiac output is fixed by the stenotic valve. A vasodilator (nitrate, high-dose ACE inhibitor, GTN) drops systemic vascular resistance but the heart cannot increase output to compensate → <strong>profound hypotension, syncope, even arrest</strong>. Exertional chest tightness in severe AS is a <em>symptom to act on</em> (Heart-Team), not a symptom to vasodilate.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The valve consultant at the bedside, 10:50:</em></p>
+        <h3>📏 Grading aortic stenosis — the numbers that define "severe"</h3>
+        <table class="tbl">
+          <tr><th>Parameter</th><th>Mild</th><th>Moderate</th><th>Severe</th><th>This patient</th></tr>
+          <tr><td>Peak jet velocity (m/s)</td><td>2.6–2.9</td><td>3.0–3.9</td><td>≥ 4.0</td><td class="hi">4.4</td></tr>
+          <tr><td>Mean gradient (mmHg)</td><td>&lt; 20</td><td>20–39</td><td>≥ 40</td><td class="hi">48</td></tr>
+          <tr><td>Aortic valve area (cm²)</td><td>&gt; 1.5</td><td>1.0–1.5</td><td>&lt; 1.0</td><td class="hi">0.8</td></tr>
+          <tr><td>LVEF</td><td colspan="3">Preserved unless late/decompensated</td><td class="ok-v">60%</td></tr>
+        </table>
+        <p>He meets every echo criterion for <strong>severe, high-gradient AS with a preserved EF</strong>. The decision is therefore driven not by the valve numbers alone but by <strong>symptom status, exercise response and LV performance</strong>.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Watch the asymptomatic valve with a plan and an echo interval; intervene the moment symptoms, a falling EF, or a positive exercise test appears."</div>
+
+        <h3>🗓️ Surveillance intervals for the truly asymptomatic (guideline-based)</h3>
+        <table class="tbl">
+          <tr><th>Lesion severity</th><th>Typical echo interval (asymptomatic, preserved LV)</th></tr>
+          <tr><td>Severe AS</td><td>Every <strong>6 months</strong> (with clinical review and prompt reassessment for any symptom)</td></tr>
+          <tr><td>Moderate AS</td><td>Every 1–2 years</td></tr>
+          <tr><td>Mild AS</td><td>Every 3–5 years</td></tr>
+        </table>
+        <p style="font-size:12.5px; color:var(--ink2)">Intervals shorten with rapid progression, heavy valve calcification, or borderline LV markers. The interval is a floor, not a ceiling — <strong>any new symptom brings the patient back immediately.</strong></p>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">NATURAL HISTORY</span> Ross &amp; Braunwald</td><td>Once symptoms appear in severe AS, average survival falls steeply — heart failure ≈ 2 yr, syncope ≈ 3 yr, angina ≈ 5 yr — and sudden-death risk rises.</td><td>The first symptom is the alarm; symptomatic severe AS needs valve replacement, not more watching.</td></tr>
+            <tr><td><span class="lvl">RCT</span> RECOVERY (2020)</td><td>In <em>very severe</em> asymptomatic AS, early surgery reduced cardiac death vs conservative care.</td><td>Selected asymptomatic very-severe AS may benefit from earlier intervention.</td></tr>
+            <tr><td><span class="lvl">RCT</span> AVATAR (2022)</td><td>Early SAVR in asymptomatic severe AS (with negative exercise test) improved a composite outcome vs watchful waiting.</td><td>Supports earlier intervention in selected low-risk asymptomatic patients — a Heart-Team discussion.</td></tr>
+            <tr><td><span class="lvl">RCT</span> PARTNER / Evolut programme</td><td>TAVI non-inferior/superior to SAVR across high-, intermediate- and low-surgical-risk symptomatic severe AS.</td><td>TAVI is a validated option across risk categories; SAVR vs TAVI is a Heart-Team, anatomy/age/risk decision.</td></tr>
+            <tr><td><span class="lvl">DIAGNOSTIC</span> Exercise testing in AS</td><td>Unmasks symptoms or an abnormal BP response in ~1/3 of "asymptomatic" patients, identifying higher-risk individuals.</td><td>Exercise-test the apparently asymptomatic severe AS patient — never the symptomatic one.</td></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> 2021 ESC/EACTS · 2020 ACC/AHA valve guidelines</td><td>Codify class-I triggers: symptoms, LVEF &lt; 50%, concomitant cardiac surgery, and (IIa) exercise-unmasked symptoms / very severe / rapid progression / low-risk.</td><td>Use the thresholds — not gestalt — to time intervention.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The chart that keeps me awake is the 'asymptomatic' severe AS I watched on a 12-month recall while he quietly stopped gardening and blamed his age. He collapsed and died on the stairs before his next echo. He was never asymptomatic — nobody elicited or exercise-tested the truth."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY it stays silent, then WHY it kills</h3>
+        <ol>
+          <li>🧱 <strong>Fixed obstruction:</strong> calcific degeneration stiffens and narrows the valve. To eject through a small orifice the LV must generate a large pressure gradient.</li>
+          <li>💪 <strong>Compensatory hypertrophy:</strong> the LV responds with <em>concentric hypertrophy</em>, normalising wall stress and maintaining stroke volume — so the patient stays <strong>asymptomatic for years</strong>.</li>
+          <li>⚠️ <strong>Decompensation:</strong> eventually the hypertrophied, stiff LV cannot keep up. Three failure modes generate the ominous triad:
+            <ul>
+              <li>🫁 <em>Exertional dyspnoea / heart failure</em> — rising LV filling pressures.</li>
+              <li>💔 <em>Angina</em> — supply–demand mismatch: a thick LV with high oxygen demand and compressed sub-endocardial perfusion, often without epicardial coronary disease.</li>
+              <li>🕳️ <em>Exertional syncope</em> — fixed output can't rise to meet peripheral vasodilatation on exertion → cerebral hypoperfusion.</li>
+            </ul>
+          </li>
+          <li>💀 <strong>The cliff:</strong> once any of these appears, survival falls off a cliff and sudden-death risk rises — because the obstruction is fixed and mechanical, medicine cannot fix it. <strong>Only relieving the valve changes the trajectory.</strong></li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In severe aortic stenosis the LV writes cheques the fixed valve can't cash — the instant the account overdraws (a symptom, a falling EF), you must replace the valve."</div>
+
+        <h3>⚖️ Contrast pair — Watch vs Act, and Fixed vs Regurgitant</h3>
+        <div class="vs">
+          <div class="side b"><h4>👁️ WATCH — asymptomatic, LV preserved</h4><ul><li>Genuinely asymptomatic (confirmed, and exercise-tested if in doubt)</li><li>Preserved LVEF, normal LV size, normal exercise BP response</li><li>Structured surveillance with a defined echo interval + safety-net</li></ul></div>
+          <div class="side a"><h4>🔧 ACT — a trigger has appeared</h4><ul><li>Symptoms (overt or exercise-unmasked)</li><li>Falling LVEF (&lt; 50–55%) or progressive LV dilatation</li><li>Very severe / rapidly progressive; another cardiac surgery planned → Heart-Team AVR/TAVI</li></ul></div>
+        </div>
+        <div class="vs">
+          <div class="side a"><h4>🚫 AS — a FIXED obstruction</h4><ul><li>Output is fixed; the LV cannot compensate for vasodilatation</li><li><strong>Never</strong> give GTN / nitrates / high-dose vasodilators for "chest pain" — risk of catastrophic hypotension</li></ul></div>
+          <div class="side b"><h4>🌊 Regurgitant lesions (AR / MR)</h4><ul><li>Volume overload; same "symptoms + LV size/function" logic drives timing</li><li>Vasodilators tolerated and sometimes helpful — a very different haemodynamic world</li></ul></div>
+        </div>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The "Watch or Act" Timing Dial</h3>
+          <p style="font-size:13px">The valve is already <strong>severe</strong>. Drag the dial across the patient's <strong>symptom + LV marker</strong> spectrum — from truly asymptomatic with a preserved, normal-sized LV (left) toward symptoms and/or a falling EF / dilating LV (right) — and watch the decision flip from <em>watch</em> to <em>act</em>.</p>
+          <label for="kRange">🎚️ Symptom + LV trigger index (0 = asymptomatic, LVEF 60%, normal LV → 100 = symptomatic, LVEF &lt; 50% / LV dilating): <b id="kVal">10</b></label>
+          <input type="range" id="kRange" min="0" max="100" value="10">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore watchful surveillance vs intervention.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 The valve severity does not decide timing — the <strong>symptom status and LV performance</strong> do. A preserved, asymptomatic LV earns surveillance; a single class-I trigger earns the Heart Team.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The clinic order set (10:40)</h3>
+        <ul>
+          <li>📈 <strong>Transthoracic echo review / repeat</strong> — confirm velocity, mean gradient, valve area, flow state, LVEF, LV dimensions (LVESD/LVEDD), valve calcification, aortic root/ascending aorta.</li>
+          <li>🏃 <strong>Symptom-limited exercise (treadmill) test</strong> — because he is apparently asymptomatic; halt for symptoms, an abnormal BP response (fall or failure to rise ≥ 20 mmHg), or significant ST change/arrhythmia.</li>
+          <li>🩸 <strong>Bloods:</strong> FBC, U&amp;E, glucose/HbA1c, lipids, TFTs; <strong>BNP/NT-proBNP</strong> (a rising natriuretic peptide flags early decompensation).</li>
+          <li>📉 <strong>12-lead ECG</strong> — LVH, strain, conduction disease (relevant pre-TAVI/SAVR).</li>
+          <li>🖥️ If low-flow/low-gradient or discordant numbers → <strong>dobutamine stress echo</strong> and/or <strong>CT aortic-valve calcium scoring</strong> (see S20).</li>
+          <li>🩻 <strong>CT for pre-procedural planning</strong> (annulus sizing, access, coronary height) if intervention is on the horizon; coronary assessment (angiography/CT) before AVR.</li>
+          <li>🗓️ <strong>Book structured surveillance</strong> (6-monthly for severe) with an explicit written symptom safety-net; <strong>Heart-Team referral</strong> triggered by any class-I indication.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"An echo alone doesn't manage severe AS — a functional test, a follow-up interval and a written 'come back if…' plan do. Discharge without a surveillance plan is the error."</div>
+        <div class="callout danger"><b class="ct">🚫 The 'never in severe AS' order</b>❌ GTN / nitrates for chest pain · ❌ high-dose vasodilators / aggressive diuresis as a knee-jerk · ❌ competitive/high-intensity exertion advice. Fixed obstruction punishes anything that drops preload/afterload without warning.</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Valve-clinic nursing — the safety net and the truth-finder</h3>
+        <ul>
+          <li>🗣️ <strong>Take the "real" history:</strong> patients disclose covert symptoms to the nurse they hide from the doctor — "I've stopped the stairs," "I get puffed hanging washing." Document and flag these.</li>
+          <li>🏃 <strong>Supervise the exercise test:</strong> continuous BP and rhythm; stop immediately for symptoms, a falling/flat BP, or arrhythmia — a positive test in severe AS ends the test, it does not push through it.</li>
+          <li>📞 <strong>Safety-net education:</strong> teach the patient and family the three alarm symptoms — breathlessness on exertion, chest tightness, blackouts/dizziness — and to seek review the same week, not at the next routine appointment.</li>
+          <li>🗓️ <strong>Own the recall system:</strong> ensure the surveillance echo and clinic are actually booked and tracked; a patient lost to follow-up is a patient un-monitored.</li>
+          <li>💊 <strong>Medication review:</strong> reconcile antihypertensives cautiously (avoid over-vasodilating), promote statin/BP control of comorbidities, and confirm no one has started a nitrate.</li>
+          <li>🦷 <strong>Endocarditis awareness:</strong> reinforce dental/skin hygiene; explain who does and does not need antibiotic prophylaxis (see S20).</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who asks 'what have you stopped doing?' finds the symptom the doctor's 'any chest pain?' missed — that question times the valve replacement."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Result</th><th>Interpretation</th></tr>
+          <tr><td>Echo — peak velocity</td><td class="hi">4.4 m/s</td><td>Severe (≥ 4.0). High-gradient AS.</td></tr>
+          <tr><td>Echo — mean gradient</td><td class="hi">48 mmHg</td><td>Severe (≥ 40).</td></tr>
+          <tr><td>Echo — valve area</td><td class="hi">0.8 cm²</td><td>Severe (&lt; 1.0). Concordant with the gradient — a true high-gradient severe AS.</td></tr>
+          <tr><td>LVEF / LV size</td><td class="ok-v">60% · normal cavity</td><td>Preserved function, no dilatation — the "watch" side of the ledger… for now.</td></tr>
+          <tr><td>NT-proBNP</td><td class="hi">Mildly raised</td><td>Even asymptomatic, a rising natriuretic peptide flags early decompensation and warrants tighter follow-up.</td></tr>
+          <tr><td>Exercise treadmill test</td><td class="hi">Positive</td><td><strong>Breathless at low workload with a flat BP response.</strong> Covert symptoms unmasked → this is no longer a "watch" patient.</td></tr>
+          <tr><td>Coronary assessment</td><td>Pending</td><td>Required before AVR (concomitant CABG or TAVI/PCI planning).</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A concordant velocity, gradient AND valve area confirm true severe AS; when they disagree (low-flow/low-gradient), stop and re-flow the valve with dobutamine or a calcium score before you trust the numbers."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why the exercise test is the hinge investigation</b>He <em>reported</em> he was asymptomatic. The treadmill told the truth: breathless at low workload with a flat blood-pressure response — a class-I / IIa trigger to intervene. Exercise testing converts a self-declared "asymptomatic" into an objective category, and is the single test that most often reclassifies these patients.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 ECG / IMAGING + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🫀 The pressure-loaded ventricle — read the trace</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 130" preserveAspectRatio="none" aria-label="ECG showing LV hypertrophy with strain: tall precordial R waves and lateral ST depression">
+            <rect width="820" height="130" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="32" x2="820" y2="32"/><line x1="0" y1="65" x2="820" y2="65"/><line x1="0" y1="98" x2="820" y2="98"/></g>
+            <polyline fill="none" stroke="#86efac" stroke-width="2.3" points="0,70 40,70 52,66 66,18 78,104 90,70 130,70 150,68 168,66 210,70 250,70 262,60 276,12 288,108 300,74 312,80 340,78 360,72 380,70 420,70 460,70 472,50 486,14 500,110 512,76 524,82 560,80 600,72 612,50 626,16 640,108 652,78 664,84 700,80 740,72 752,54 766,20 780,106 792,80 804,84 820,80"/>
+            <text x="120" y="20" fill="#93c5fd" font-size="11">Tall precordial R (LVH)</text>
+            <text x="470" y="120" fill="#fca5a5" font-size="11">Lateral ST depression / T inversion — LV "strain"</text>
+          </svg>
+          <div class="ecg-cap">Left-ventricular hypertrophy with a <span style="color:#fca5a5">strain pattern</span> (lateral ST depression / T-wave inversion) — the electrical footprint of a chronically pressure-loaded ventricle in severe AS.</div>
+        </div>
+
+        <h3>🔎 What each imaging modality answers</h3>
+        <table class="tbl">
+          <tr><th>Modality</th><th>Answers</th><th>When</th></tr>
+          <tr><td>🫀 <strong>Transthoracic echo</strong></td><td>Severity (velocity, gradient, valve area), flow state, LVEF, LV size, valve calcification, other valves, aorta</td><td>First line + serial surveillance.</td></tr>
+          <tr><td>💉 <strong>Dobutamine stress echo</strong></td><td>Distinguishes <em>true</em> severe low-flow/low-gradient AS from pseudo-severe; assesses contractile (flow) reserve</td><td>Low-flow, low-gradient AS with reduced EF.</td></tr>
+          <tr><td>🖥️ <strong>CT aortic-valve calcium score</strong></td><td>Flow-independent severity marker (sex-specific thresholds)</td><td>Discordant/low-gradient AS with preserved EF.</td></tr>
+          <tr><td>🩻 <strong>CT angiography</strong></td><td>Annulus sizing, access route, coronary height, ascending aorta — pre-TAVI planning</td><td>When intervention is planned.</td></tr>
+          <tr><td>🫁 <strong>Coronary angiography</strong></td><td>Concomitant CAD (guides CABG at SAVR, or PCI around TAVI)</td><td>Before valve intervention.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"When the gradient is 'severe' but the flow is low, don't trust the valve area alone — dobutamine stress echo and a CT calcium score tell you whether it's TRULY severe or just under-flowing."</div>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The valve-surveillance drug map — mostly what NOT to do</h3>
+        <table class="tbl">
+          <tr><th>Agent</th><th>Role in severe AS</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>None disease-modifying</strong></td><td>There is <strong>no medical therapy</strong> that reverses or halts AS</td><td>Statins do NOT slow AS progression (SEAS, ASTRONOMER). The definitive treatment is mechanical — SAVR or TAVI.</td></tr>
+          <tr><td><strong>Antihypertensives</strong> (cautious)</td><td>Treat coexisting hypertension gently to target</td><td>Uncontrolled BP adds afterload; but over-vasodilating a fixed obstruction risks hypotension — titrate slowly, monitor.</td></tr>
+          <tr><td><strong>Nitrates / GTN</strong></td><td>❌ Avoid for "chest pain" in severe AS</td><td>Venous/arterial dilatation into a fixed output → <strong>collapse</strong>. Exertional angina here is an indication to intervene, not to nitrate.</td></tr>
+          <tr><td><strong>Diuretics</strong></td><td>Only for overt congestion, cautiously</td><td>Excess preload reduction in a stiff, hypertrophied LV drops output — use sparingly.</td></tr>
+          <tr><td><strong>Statin / risk-factor control</strong></td><td>For atherosclerotic risk, not the valve</td><td>Won't change the valve, but manages coexisting CAD and vascular risk.</td></tr>
+          <tr><td><strong>Anticoagulation</strong></td><td>Per comorbidity (e.g. AF), and post-mechanical-valve</td><td>Mechanical prostheses need lifelong warfarin (not DOACs); bioprostheses/TAVI per protocol.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Never reach for GTN or a vasodilator to treat 'chest pain' in severe aortic stenosis — and never expect a statin to fix the valve. The only definitive drug is a new valve."</div>
+        <div class="callout danger"><b class="ct">🚫 The 'fixed obstruction' danger list</b>❌ GTN/nitrates · ❌ aggressive vasodilators · ❌ over-diuresis · ❌ high-intensity exertion. Each drops preload or afterload the fixed valve cannot compensate for → syncope or arrest.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What "monitoring" means for an outpatient valve</h3>
+        <ul>
+          <li>🗓️ <strong>Scheduled surveillance echo</strong> — severe AS every ~6 months; track velocity, gradient, valve area, LVEF and LV dimensions for <em>trends</em>, not single snapshots.</li>
+          <li>📉 <strong>LVEF trajectory</strong> — a fall toward or below 50% is a class-I trigger even in the "asymptomatic" patient.</li>
+          <li>🎈 <strong>LV dimensions</strong> — progressive dilatation (especially relevant in AR/MR) flags decompensation.</li>
+          <li>🩸 <strong>Serial natriuretic peptides</strong> — a rising BNP/NT-proBNP suggests the LV is beginning to fail and warrants earlier reassessment.</li>
+          <li>🏃 <strong>Repeat exercise testing</strong> — reassess functional status if the clinical picture is borderline or the patient minimises symptoms.</li>
+          <li>🗣️ <strong>Symptom surveillance</strong> — the most important monitor of all is a diligent, spouse-corroborated functional history at every visit.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Surveillance is trend-watching, not snapshot-collecting — the valve area barely moves between visits, but the symptom history and the EF trajectory are what actually cross the intervention line."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong — of the disease, and of watching it</h3>
+        <ul>
+          <li>💔 <strong>Symptom onset → the cliff:</strong> exertional dyspnoea/HF, angina, syncope — once present, survival collapses without valve replacement.</li>
+          <li>⚡ <strong>Sudden cardiac death:</strong> the feared event; risk rises once symptoms appear, and is the reason "watchful waiting" must be tightly governed.</li>
+          <li>🫀 <strong>Progressive LV dysfunction / dilatation:</strong> if intervention is delayed past the LVEF/dimension thresholds, some LV impairment may not fully recover.</li>
+          <li>🦠 <strong>Infective endocarditis:</strong> a diseased valve is a substrate; new fever + murmur change = think endocarditis.</li>
+          <li>🩸 <strong>Atrial fibrillation / conduction disease:</strong> new AF or heart block alters symptoms, prognosis and procedural planning.</li>
+          <li>🩹 <strong>The system complication — being lost to follow-up:</strong> the deadliest "complication" of an asymptomatic severe valve is a missed recall and an un-elicited symptom (the M&M in S21).</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The most lethal complication of asymptomatic severe AS isn't in the valve — it's the missed appointment and the symptom nobody asked about. Govern the watching as tightly as you'd govern a treatment."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The systolic murmur / severe-valve differential</h3>
+        <table class="tbl">
+          <tr><th>Lesion</th><th>Discriminators</th><th>Class-I intervention triggers (asymptomatic focus)</th></tr>
+          <tr><td>🫀 <strong>Aortic stenosis</strong> (this patient)</td><td>Late-peaking ESM → carotids, soft A2, slow-rising pulse, LVH; severe on echo</td><td>Symptoms; LVEF &lt; 50%; concomitant cardiac surgery. (IIa: positive exercise test, very severe / rapid progression, low risk.)</td></tr>
+          <tr><td>🌊 <strong>Aortic regurgitation</strong></td><td>Early diastolic murmur, wide pulse pressure, collapsing pulse; dilated LV</td><td>Symptoms; LVEF ≤ 50%; LV end-systolic diameter &gt; 50 mm (or indexed); severe dilatation.</td></tr>
+          <tr><td>🌀 <strong>Primary mitral regurgitation</strong></td><td>Pansystolic murmur → axilla, displaced apex; volume-loaded LV</td><td>Symptoms; LVEF ≤ 60%; LVESD ≥ 40 mm; new AF or pulmonary hypertension.</td></tr>
+          <tr><td>🩻 <strong>HOCM (dynamic obstruction)</strong></td><td>Murmur louder on Valsalva/standing (opposite of AS), jerky pulse</td><td>Different disease — beware misreading dynamic LVOT obstruction as AS.</td></tr>
+          <tr><td>🧒 <strong>Flow murmur / sclerosis</strong></td><td>Soft, no radiation, normal A2, normal pulse, non-severe echo</td><td>No intervention — reassure; the true asymptomatic mild lesion.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Whatever the valve, the same two levers time the operation: SYMPTOMS and the LV (size + function). Aortic stenosis just adds one rule — never vasodilate a fixed obstruction."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "Watch, or Act?"</h3>
+          <div class="hud"><span>❤️ Safety: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">Mr. A.S., 72, sits in your valve clinic with echo-confirmed severe aortic stenosis and a preserved EF. He says he feels "perfectly well," though his wife mentions he's "slowed down." What is your first move?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The management plan</h3>
+        <ol>
+          <li>🫀 <strong>Diagnosis:</strong> severe high-gradient AS, preserved EF, but a <strong>positive exercise test</strong> (covert symptoms + flat BP) → this patient has crossed from "watch" to "act."</li>
+          <li>🤝 <strong>Heart-Team referral:</strong> SAVR vs TAVI decided on age, anatomy, surgical risk, frailty and comorbidity; pre-procedural CT and coronary assessment.</li>
+          <li>🗓️ <strong>Had the test been negative:</strong> structured surveillance (6-monthly echo for severe AS) with a written symptom safety-net and rapid re-access on any symptom.</li>
+          <li>💊 Optimise comorbidities (BP, lipids, AF), reinforce endocarditis awareness, avoid nitrates/aggressive vasodilators.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Symptomatic (or exercise-positive) severe AS is a Heart-Team referral, not a 'come back in a year' — the prognosis has changed the moment the first symptom is proven."</div>
+
+        <div class="checklist" id="ckSurv">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Asymptomatic severe valve surveillance &amp; intervention triggers (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>🗣️ Meticulous functional history taken (spouse corroborated); covert symptoms actively sought</span></label>
+          <label class="ck"><input type="checkbox"><span>📈 Severity confirmed on echo (velocity, mean gradient, valve area, flow state, LVEF, LV dimensions)</span></label>
+          <label class="ck"><input type="checkbox"><span>📉 LV markers checked: LVEF ≥ 50% and no progressive LV dilatation documented</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 NT-proBNP / risk-factor comorbidities addressed; no nitrate/vasodilator started</span></label>
+          <label class="ck"><input type="checkbox"><span>🗓️ Surveillance interval booked (severe AS ~6-monthly) with a WRITTEN symptom safety-net</span></label>
+          <label class="ck"><input type="checkbox"><span>🚩 Any class-I trigger (symptom / EF &lt; 50% / other cardiac surgery) → Heart-Team referral triggered</span></label>
+          <div class="ck-progress" data-progress>0 / 6 complete</div>
+        </div>
+
+        <div class="checklist" id="ckHeartTeam">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Exercise testing &amp; Heart-Team referral for aortic stenosis</h3>
+          <label class="ck"><input type="checkbox"><span>🏃 Exercise test performed ONLY in the apparently asymptomatic patient (never the symptomatic one)</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 Test halted for symptoms, an abnormal BP response (fall / failure to rise), or significant ECG change/arrhythmia</span></label>
+          <label class="ck"><input type="checkbox"><span>🖥️ Discordant / low-gradient AS worked up (dobutamine stress echo &amp; CT calcium score)</span></label>
+          <label class="ck"><input type="checkbox"><span>🩻 Pre-procedural CT (annulus/access/coronary height) + coronary assessment before AVR</span></label>
+          <label class="ck"><input type="checkbox"><span>🤝 SAVR vs TAVI decided by multidisciplinary Heart Team on age, anatomy, risk &amp; frailty</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">Visit 1</div>Referred as "asymptomatic" severe AS. Careful history uncovers reduced exercise tolerance blamed on age; exercise test booked rather than a blind 12-month recall.</div>
+          <div class="t-item"><div class="t-time">Exercise test</div>Breathless at low workload with a flat BP response — <strong>covert symptoms unmasked.</strong> No longer a "watch" patient.</div>
+          <div class="t-item"><div class="t-time">Heart Team</div>Severe symptomatic AS confirmed. Age/anatomy/risk reviewed; pre-procedural CT and coronary assessment completed.</div>
+          <div class="t-item"><div class="t-time">Intervention</div>Aortic valve replacement (SAVR/TAVI per Heart Team). Gradient relieved, symptoms resolve, LV function preserved.</div>
+          <div class="t-item"><div class="t-time">Follow-up</div>Recovers well, back to gardening and his dog walk — including the hill he'd quietly abandoned. Surveillance transitions to prosthetic-valve follow-up.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>He is alive and well because someone refused "he feels fine," took the real history, exercise-tested the truth, and referred to the Heart Team the moment the covert symptom was proven — instead of watching him toward the cliff.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Disposition &amp; Safety-Netting</h2></div>
+      <div class="section-content">
+        <h3>📋 Two very different clinic dispositions</h3>
+        <div class="vs">
+          <div class="side a"><h4>🔧 Trigger present (this patient)</h4><ul><li>Symptoms / positive exercise test / EF &lt; 50% → Heart-Team referral for SAVR or TAVI</li><li>Pre-procedural CT + coronary assessment; frailty &amp; comorbidity review</li><li>Red flags reinforced: worsening breathlessness, chest tightness, blackouts → urgent review</li><li>After valve replacement: prosthetic-valve surveillance, endocarditis awareness, anticoagulation per valve type</li></ul></div>
+          <div class="side b"><h4>👁️ Truly asymptomatic, LV preserved</h4><ul><li>Structured surveillance: severe AS ~6-monthly echo + clinic</li><li>WRITTEN symptom safety-net — the three alarm symptoms explained to patient &amp; family</li><li>Rapid re-access pathway on any symptom (not "wait for the next appointment")</li><li>Comorbidity optimisation; avoid nitrates/aggressive vasodilators</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A safe 'watch' disposition is an active plan — a defined echo interval, a written safety-net, and a same-week route back the day a symptom appears — never a silent 'he looked well, see in a year.'"</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>🪨 Benign until the first symptom</b>Severe AS is quiet for years, then the first symptom starts the clock — HF ≈ 2 yr, syncope ≈ 3, angina ≈ 5 without replacement.</div>
+          <div class="pearl"><b>🕵️ Patients lie about symptoms</b>They blame slowing down on age. Take a spouse-corroborated functional history and exercise-test the "asymptomatic."</div>
+          <div class="pearl"><b>🎚️ Watch vs Act = symptoms + LV</b>Asymptomatic + preserved LV → watch with an interval. Symptoms / EF &lt; 50% / LV dilating → act.</div>
+          <div class="pearl"><b>🏃 Exercise-test the asymptomatic, never the symptomatic</b>It unmasks covert symptoms / abnormal BP; in a symptomatic patient it's an indication to operate, not to stress.</div>
+          <div class="pearl"><b>🚫 No GTN in fixed AS</b>Never vasodilate severe AS for "chest pain" — risk of catastrophic hypotension/syncope.</div>
+          <div class="pearl"><b>💊 No pill fixes the valve</b>Statins don't slow AS; the definitive treatment is SAVR or TAVI via the Heart Team.</div>
+          <div class="pearl"><b>🌊 Same logic for AR &amp; MR</b>LVEF and LV dimensions (LVESD) — plus new AF/pulmonary HTN in MR — time regurgitant-lesion surgery.</div>
+          <div class="pearl"><b>🔧 Earlier may be better</b>RECOVERY &amp; AVATAR support early intervention in selected asymptomatic very-severe / low-risk AS.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the surveillance clinic</h3>
+          <ul>
+            <li>🫀 <strong>Class-I intervention triggers by lesion (2021 ESC/EACTS · 2020 ACC/AHA):</strong>
+              <ul>
+                <li><em>Severe AS:</em> symptoms; LVEF &lt; 50%; undergoing other cardiac surgery. (IIa) exercise-unmasked symptoms / abnormal BP; very severe (Vmax &gt; 5–5.5 m/s); rapid progression; markedly raised BNP; low procedural risk.</li>
+                <li><em>Severe AR:</em> symptoms; LVEF ≤ 50%; LV end-systolic diameter &gt; 50 mm (or &gt; 25 mm/m² indexed); undergoing other cardiac surgery.</li>
+                <li><em>Severe primary MR:</em> symptoms; LVEF ≤ 60%; LVESD ≥ 40 mm; new AF or pulmonary hypertension (in the asymptomatic) — favour durable repair over replacement.</li>
+              </ul>
+            </li>
+            <li>💉 <strong>Low-flow, low-gradient AS:</strong> valve area &lt; 1 cm² but mean gradient &lt; 40 mmHg. Classical (reduced EF): <em>dobutamine stress echo</em> separates true-severe (gradient rises, area stays small) from pseudo-severe, and assesses contractile/flow reserve. Paradoxical low-flow (preserved EF, small hypertrophied LV): confirm with <em>CT aortic-valve calcium score</em> (sex-specific thresholds).</li>
+            <li>🤝 <strong>TAVI vs SAVR selection:</strong> a Heart-Team decision on age, anatomy (annulus, access, bicuspid, coronary height, calcification), surgical risk (STS/EuroSCORE), frailty, life expectancy and need for concomitant surgery. Older/higher-risk/suitable anatomy → TAVI; younger/low-risk/complex anatomy or concomitant surgery → SAVR. Trial base: PARTNER and Evolut across high-, intermediate- and low-risk cohorts.</li>
+            <li>🌀 <strong>Primary vs secondary MR:</strong> primary (degenerative/prolapse) → fix the valve (surgical repair preferred; transcatheter edge-to-repair if inoperable). Secondary/functional MR → optimise guideline-directed HF therapy and CRT first; transcatheter edge-to-edge repair (COAPT-selected patients) for persistent severe MR.</li>
+            <li>🌊 <strong>AR &amp; aortic-root disease surveillance:</strong> bicuspid valve and connective-tissue disease (Marfan, Loeys-Dietz) need <em>aortic dimension</em> surveillance and earlier surgical thresholds; root replacement thresholds are lower in Marfan (≈ 45–50 mm) and bicuspid than in tricuspid aortas.</li>
+            <li>🦠 <strong>Endocarditis prophylaxis:</strong> antibiotic prophylaxis is reserved for the <em>highest-risk</em> patients (prosthetic valves/material, previous endocarditis, certain congenital lesions) undergoing high-risk dental procedures — not for native calcific AS/AR/MR. Universal emphasis on oral/skin hygiene.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The Man Who Was Watched Off the Cliff"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 72-year-old man with echo-proven <strong>severe aortic stenosis</strong> and a "normal" examination was labelled asymptomatic and given a <strong>routine 12-month recall</strong> — no exercise test, no written safety-net. Over the following two years he quietly <strong>stopped gardening and climbing the stairs "because of his age."</strong> No one at his brief reviews re-took the functional history or exercise-tested him; his covert exertional breathlessness was never elicited. <strong>Three months before his next scheduled echo he collapsed and died on the stairs</strong> — a sudden death from what had, unrecognised, become <strong>symptomatic severe AS</strong>: the exact lesion that, the day those symptoms began, was a class-I indication for a valve replacement that would have saved him.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🕵️ HISTORY NOT TAKEN</b>"Feels well" accepted at face value; slowing down attributed to age, never quantified or corroborated.</div>
+            <div class="hole"><b>🏃 NO EXERCISE TEST</b>The one test that unmasks covert symptoms in "asymptomatic" severe AS was never done.</div>
+            <div class="hole"><b>🗓️ INTERVAL TOO LONG</b>12-month recall for SEVERE AS (should be ~6-monthly) with no rapid-access route for symptoms.</div>
+            <div class="hole"><b>📞 NO SAFETY-NET</b>Patient/family never taught the three alarm symptoms or told to seek review the same week.</div>
+            <div class="hole"><b>🚩 TRIGGER MISSED</b>Symptomatic severe AS — a clear indication to intervene — was never recognised as such.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> treat every severe AS as one symptom away from a valve replacement; take a meticulous, spouse-corroborated functional history at every visit; exercise-test the apparently asymptomatic to reveal the truth; keep severe AS on a ~6-monthly interval with a written same-week safety-net; and refer to the Heart Team the moment a symptom (overt or exercise-unmasked), a falling EF, or a dilating LV appears. <strong>This is exactly the discipline that saved the patient in Bed 5.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'He feels fine' has watched more patients off the cliff than any echo number — in severe aortic stenosis, prove the symptom status; don't assume it."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🫀 Outpatient Cardiology Clinic · Bed 5 — The Asymptomatic Severe Valve / Valve Surveillance<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting triggers, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+    /* ===== SIDEBAR TABS — show one section at a time ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not an intervention trigger'); } if(found===total){ flagResult.textContent='✅ All '+total+' intervention triggers found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' intervention triggers found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: watch vs act timing dial ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=(v-0)/(100-0)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<=25){ msg='🟢 Truly asymptomatic, LVEF preserved (>55%), normal LV size, normal exercise response → WATCH with a defined echo interval (severe AS ≈ 6-monthly) + written safety-net.'; cls='good'; }
+      else if(v<=50){ msg='🟠 Borderline — very severe or rapidly progressive, an equivocal history, or a rising BNP. EXERCISE-TEST to unmask covert symptoms / an abnormal BP response, and tighten surveillance.'; cls='warn-r'; }
+      else if(v<=75){ msg='🟠 A class-I trigger is emerging (exertional symptoms, LVEF drifting toward 50–55%, or the LV starting to dilate). Refer to the HEART TEAM now — do not re-book a distant recall.'; cls='warn-r'; }
+      else { msg='🔴 Symptomatic severe AS and/or LVEF < 50% / progressive LV dilatation → INTERVENE (SAVR or TAVI via the Heart Team). The prognosis has changed — watching kills.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Timing Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"Mr. A.S., 72, has echo-confirmed severe aortic stenosis with a preserved EF. He insists he feels 'perfectly well,' though his wife says he's slowed down. What is your first move?",
+      choices:[
+        {t:"🗓️ Reassure him, book a routine 12-month echo, no exercise test, no symptom safety-net",good:false,ds:-2,dt:60,xp:0,fb:"☠️ This is the M&M case in S21. Severe AS on a distant recall with no functional testing — covert symptoms develop, are never elicited, and he dies suddenly before the next echo. Restart.",end:true},
+        {t:"🗣️🏃 Take a meticulous (spouse-corroborated) functional history, confirm severity, and EXERCISE-TEST this 'asymptomatic' patient",good:true,ds:1,dt:12,xp:40,fb:"✅ Exactly. Patients minimise symptoms and blame age — the exercise test reveals the truth in the apparently asymptomatic severe valve.",next:"exercise"},
+        {t:"💊 Prescribe GTN for his occasional 'chest tightness' and send him home",good:false,ds:-1,dt:10,xp:5,fb:"⚠️ Dangerous — never vasodilate a fixed obstruction; GTN can precipitate hypotension/syncope in severe AS. His exertional tightness is a symptom to ACT on, not to nitrate. Proceed to properly assess him.",next:"exercise"}
+      ]},
+    exercise:{ text:"On the treadmill he becomes breathless at a low workload with a flat blood-pressure response (fails to rise). His covert symptoms are now unmasked. Next best step?",
+      choices:[
+        {t:"🚩 Recognise these as symptoms / an abnormal exercise response — a trigger to intervene — and refer to the Heart Team, keeping close review",good:true,ds:1,dt:8,xp:40,fb:"✅ Right. Exercise-unmasked symptoms + a flat BP response reclassify him from 'watch' to 'act.' Symptomatic severe AS needs a valve, not another recall.",next:"declare"},
+        {t:"🛋️ Call it 'deconditioning', reassure him, and continue annual surveillance",good:false,ds:-2,dt:30,xp:0,fb:"⚠️ Dangerous — dismissing a positive exercise test as deconditioning ignores that symptomatic severe AS carries a dismal prognosis without valve replacement.",next:"declare"}
+      ]},
+    declare:{ text:"The Heart Team reviews him: he now clearly reports exertional dyspnoea and the echo shows LVEF slipping to 50%. What is the decision?",
+      choices:[
+        {t:"🔧 Proceed to aortic valve replacement (SAVR or TAVI, decided by the Heart Team on age / anatomy / risk) — symptomatic severe AS is a class-I indication",good:true,ds:1,dt:6,xp:45,fb:"🏆 Perfect. This is exactly the transition the whole surveillance existed to catch — symptoms plus a falling EF in severe AS mean the valve must be replaced. Time (and LV function) is muscle.",end:true},
+        {t:"👁️ Keep watching with medical therapy and another vasodilator trial",good:false,ds:-1,dt:20,xp:0,fb:"⚠️ No medical therapy fixes a fixed obstruction — symptomatic severe AS without valve replacement carries ~50% mortality within ~2 years, and vasodilators are hazardous here. Reperfuse the valve.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='declare'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 72-year-old has echo: Vmax 4.4 m/s, mean gradient 48 mmHg, valve area 0.8 cm², LVEF 60%, and is genuinely asymptomatic with a normal exercise test. Best management?", opts:["Immediate aortic valve replacement for everyone with severe AS","Watchful surveillance with a defined echo interval (~6-monthly) and symptom safety-netting","Start a vasodilator to reduce afterload","Discharge with no follow-up"], correct:1, exp:"A truly asymptomatic severe AS with a preserved, normal LV and a negative exercise test is watched with structured surveillance (severe AS ≈ 6-monthly) plus a written safety-net — not routine immediate surgery, never a vasodilator, and never discharge without a plan." },
+    { q:"Which finding in asymptomatic severe AS is a class-I trigger to intervene?", opts:["Peak velocity 4.0 m/s","A fall in LVEF to < 50%","Mild LV hypertrophy on ECG","A soft ejection systolic murmur"], correct:1, exp:"An LVEF falling below 50% is a class-I indication to intervene even without symptoms. Velocity alone (already severe), LVH, or murmur intensity do not by themselves time the operation." },
+    { q:"Why is exercise testing useful in the 'asymptomatic' severe AS patient?", opts:["To measure the valve area more accurately","To unmask covert symptoms or an abnormal BP response (a fall / failure to rise)","To deliberately provoke arrhythmia","It is contraindicated in all aortic stenosis"], correct:1, exp:"Exercise testing is used in the APPARENTLY asymptomatic patient to reveal covert symptoms or an abnormal blood-pressure response, reclassifying them as higher-risk. It is contraindicated in the SYMPTOMATIC patient (already an indication to operate)." },
+    { q:"A patient with severe AS reports exertional chest tightness and the intern reaches for GTN. The best response is:", opts:["Give GTN — it is safe in aortic stenosis","Avoid nitrates/vasodilators — they can cause profound hypotension/syncope in a fixed obstruction","Give a high-dose ACE inhibitor instead","Give nifedipine"], correct:1, exp:"In severe AS the output is fixed by the valve; vasodilators (GTN, high-dose ACE inhibitors) drop systemic vascular resistance without a compensatory rise in output → catastrophic hypotension. Exertional symptoms are an indication to intervene, not to vasodilate." },
+    { q:"Once heart failure appears in untreated severe AS, approximate median survival without valve replacement is:", opts:["About 10 years","About 2 years","Unchanged from the general population","No effect on survival"], correct:1, exp:"Classic natural-history data: after symptom onset, median survival without valve replacement is roughly 2 years for heart failure, 3 for syncope and 5 for angina — the 'cliff' that makes symptom onset the alarm." },
+    { q:"The RECOVERY and AVATAR trials support:", opts:["Medical therapy over surgery in severe AS","Early intervention (surgery) in selected asymptomatic very-severe / low-risk AS","Statins to slow AS progression","Balloon valvuloplasty as a definitive treatment"], correct:1, exp:"RECOVERY and AVATAR showed benefit from earlier surgical intervention in selected asymptomatic (very) severe AS, supporting earlier action in low-risk patients after Heart-Team discussion. Statins do not slow AS; balloon valvuloplasty is only a bridge/palliation." },
+    { q:"In asymptomatic severe PRIMARY mitral regurgitation, which triggers class-I intervention?", opts:["Any systolic murmur","LVEF ≤ 60% or LVESD ≥ 40 mm (or new AF / pulmonary hypertension)","Isolated palpitations","Mild left-atrial enlargement"], correct:1, exp:"For severe primary MR the LV thresholds are stricter than for AS: intervene (favouring durable repair) for symptoms, LVEF ≤ 60%, LVESD ≥ 40 mm, or new atrial fibrillation / pulmonary hypertension in the asymptomatic patient." },
+    { q:"Choosing between TAVI and SAVR for severe AS is best decided by:", opts:["The on-call resident alone","A multidisciplinary Heart Team weighing age, anatomy, surgical risk and frailty","The patient's postcode","Always TAVI regardless of age or anatomy"], correct:1, exp:"SAVR vs TAVI is a Heart-Team decision integrating age, valve/vascular anatomy, surgical risk, frailty, life expectancy and concomitant procedures — validated across risk categories by the PARTNER and Evolut programmes." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you time the valve like a Heart-Team consultant. 🏆':score>=6?'Strong — review the misses and S5/S20 intervention thresholds.':'Revisit S5, S6 and S14 — the watch-vs-act logic is the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>

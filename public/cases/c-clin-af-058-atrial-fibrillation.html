@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atrial Fibrillation — the ABC Pathway in Clinic — Virtual Teaching Hospital</title>
+<!-- META
+id: c-clin-af-058
+title: Atrial Fibrillation — the ABC Pathway in Clinic
+hospital: cardiology
+department: cv-clinic
+bednumber: 4
+chiefcomplaint: Newly diagnosed atrial fibrillation, referred for stroke-prevention and rhythm decisions
+system: Cardiology
+severity: urgent
+tags: Atrial fibrillation, CHA2DS2-VASc, Anticoagulation, DOAC, Rate vs rhythm, Ablation
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🫀</div>
+      <div>
+        <div class="t1">Cardiology Clinic</div>
+        <div class="t2">Bed 4 · Atrial Fibrillation</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🩺 Outpatient Clinic · 🛏️ Bed 4</div>
+        <h1>🫀 Atrial Fibrillation — "The ABC Pathway in Clinic"</h1>
+        <div class="sub">🩺 10:20, cardiology clinic. A 69-year-old man is referred with a newly discovered irregular pulse and weeks of palpitations. He feels "basically fine." Your job over the next 20 minutes is to prevent the stroke this rhythm is quietly rehearsing — and to decide rate versus rhythm.</div>
+        <div class="chips">
+          <span class="chip crit">🟠 URGENT REVIEW</span>
+          <span class="chip">🧮 CHA₂DS₂-VASc</span>
+          <span class="chip">💊 DOAC &gt; Warfarin</span>
+          <span class="chip">🎚️ Rate vs Rhythm</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital warn"><div class="v-label">💓 HR</div><div class="v-num">96</div></div>
+        <div class="vital warn"><div class="v-label">🩸 BP</div><div class="v-num">138/82</div></div>
+        <div class="vital"><div class="v-label">🌬️ RR</div><div class="v-num">14</div></div>
+        <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">98%</div></div>
+        <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.6°</div></div>
+        <div class="vital"><div class="v-label">🧠 GCS</div><div class="v-num">15</div></div>
+        <div class="vital alert"><div class="v-label">🎵 Rhythm</div><div class="v-num">AF</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🩺 YOU ARE HERE — 10:20, Cardiology Clinic Room 4</b>A comfortable-looking man settles into the chair. He says: <em>"My GP found my pulse was all over the place at a check-up. I've had a bit of fluttering and get puffed on the stairs, but honestly I feel okay — do I really need to be here?"</em> The referral reads "AF on ECG, ?needs blood thinner." This is the exact moment a symptomless-feeling patient gets under-treated and, months later, has the stroke nobody thought was coming. Not today.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>🧔 Name</td><td><strong>Mr. A.F.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>69-year-old male</td></tr>
+          <tr><td>🆔 MRN</td><td>CV-CLIN-0904</td></tr>
+          <tr><td>⚖️ Weight</td><td>104 kg (BMI 34)</td></tr>
+          <tr><td>💼 Occupation</td><td>Retired accountant — sedentary, sociable, "a few drinks most nights"</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 Past history — every line moves the stroke, bleeding, AND rhythm decision</h3>
+        <ul>
+          <li>🔺 <strong>Hypertension</strong> (on amlodipine, often 150s systolic) — a CHA₂DS₂-VASc point, a HAS-BLED point, and a driver of the fibrillating atrium.</li>
+          <li>🍬 <strong>Type 2 diabetes</strong> (HbA1c 7.8%) — another CHA₂DS₂-VASc point.</li>
+          <li>🛌 <strong>Obesity (BMI 34)</strong> with heavy snoring and witnessed apnoeas — likely <strong>obstructive sleep apnoea</strong>, a potent AF promoter.</li>
+          <li>🍷 <strong>Alcohol ~25 units/week</strong> — "holiday heart" and a bleeding-risk modifier.</li>
+          <li>💓 <strong>Palpitations &amp; exertional breathlessness for ~6 weeks</strong> — this is symptomatic AF, not an incidental blip.</li>
+          <li>🩸 No prior stroke/TIA, no bleeding history, no mechanical valve, no significant mitral stenosis (relevant later for DOAC vs warfarin).</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'I feel fine' is not a stroke-risk score. In AF the danger is silent — you anticoagulate for the CHA₂DS₂-VASc, not for how the patient feels."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why AF is the quiet giant of the clinic</b>AF is the commonest sustained arrhythmia (lifetime risk roughly 1 in 3) and it multiplies stroke risk about five-fold. AF-related strokes are <strong>larger, more disabling and more often fatal</strong> than non-AF strokes because they are cardioembolic — a whole clot from the left atrial appendage, not a small-vessel lacune. The entire clinic visit exists to stop that clot before it forms.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 GP referral — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ Referral letter (verbatim)</b>
+          <p><strong>S:</strong> "69-year-old man, irregular pulse noted at a routine BP check; 6 weeks of palpitations and breathlessness on exertion. 12-lead ECG confirms atrial fibrillation, rate ~96."</p>
+          <p><strong>B:</strong> "Hypertension, type 2 diabetes, obese, drinks heavily, snores badly. No prior stroke or bleeding."</p>
+          <p><strong>A:</strong> "I've started him on <em>aspirin 75 mg to thin the blood</em> while he waits for your clinic. Bloods: TSH normal, U&amp;E normal, FBC normal. Please advise on rhythm and 'proper' anticoagulation."</p>
+          <p><strong>R:</strong> "He's keen to avoid tablets if possible and worried a blood thinner will make him bleed."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Aspirin does NOT prevent strokes in atrial fibrillation — anticoagulate by CHA₂DS₂-VASc with a DOAC, or don't anticoagulate at all. The 'aspirin to thin the blood' bridge is a trap, not a treatment."</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each feature that should shape the AF plan</h3>
+        <p>🎮 <em>Click every feature that is a GENUINE, action-changing issue in this AF patient. Each correct = +10 XP.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">💓 Irregularly irregular pulse / AF on ECG</button>
+          <button class="btn ghost flag-btn" data-good="1">🧮 CHA₂DS₂-VASc ≥1 (male) — warrants anticoagulation</button>
+          <button class="btn ghost flag-btn" data-good="1">🩸 Modifiable bleeding risks to address (BP, alcohol)</button>
+          <button class="btn ghost flag-btn" data-good="1">😮‍💨 Symptomatic burden (palpitations, breathlessness)</button>
+          <button class="btn ghost flag-btn" data-good="1">🛌 Comorbidities to manage (HTN, obesity, OSA, alcohol, diabetes)</button>
+          <button class="btn ghost flag-btn" data-good="0">💊 Aspirin as 'stroke prevention' in AF</button>
+          <button class="btn ghost flag-btn" data-good="0">🌡️ Low-grade fever</button>
+          <button class="btn ghost flag-btn" data-good="0">🤕 Reproducible chest-wall pain</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Credit where due</b>The GP confirmed the rhythm with a 12-lead, checked thyroid function and renal function, and referred promptly. Those are exactly the right first moves — the only misstep is the aspirin, which we will correct today.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🩺 The focused AF clinic assessment</h3>
+        <table class="tbl">
+          <tr><th>Domain</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>💓 Pulse</td><td><strong>Irregularly irregular</strong>, ~96/min, with an <strong>apex–radial deficit</strong>.</td><td>The clinical signature of AF. The deficit means not every ventricular beat perfuses — rate at the wrist under-reads the true rate.</td></tr>
+          <tr><td>🩸 BP</td><td>138/82 today; home readings often 150s.</td><td>Hypertension drives atrial remodelling and is the single biggest modifiable AF risk factor — and a CHA₂DS₂-VASc + HAS-BLED point.</td></tr>
+          <tr><td>🫁 Chest / JVP</td><td>Chest clear, JVP normal, no oedema, no added sounds.</td><td>No overt heart failure now — but screen with echo; AF can both cause and be caused by HF.</td></tr>
+          <tr><td>🦋 Thyroid / neck</td><td>No goitre, no tremor, no bruit.</td><td>Thyrotoxicosis is a reversible AF trigger — TSH already normal.</td></tr>
+          <tr><td>🧠 Neuro</td><td>No focal deficit; no prior TIA symptoms on questioning.</td><td>Baseline neurology matters — a prior silent event would raise the score to secondary-prevention territory.</td></tr>
+          <tr><td>🛌 General</td><td>BMI 34, collar size 18", Mallampati high, daytime somnolence (Epworth 13).</td><td>Points strongly to OSA — treating it reduces AF recurrence and improves rhythm-control success.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Confirm AF on a 12-lead ECG, never on the monitor blip alone — and check an apex–radial deficit: the wrist lies about the rate in AF."</div>
+
+        <h3>🧭 The three questions that frame every new AF patient</h3>
+        <p>Before any prescription, structure the encounter as the integrated <strong>ABC / CARE</strong> pathway (2020 ESC ABC → 2024 ESC <strong>CARE</strong>): <strong>C</strong>omorbidity &amp; risk-factor management, <strong>A</strong>void stroke (anticoagulate), <strong>R</strong>educe symptoms (rate/rhythm), <strong>E</strong>valuate &amp; re-evaluate. Ask: (1) <em>Is this really AF, and is it secondary to something reversible?</em> (2) <em>What is the stroke risk, and what is the net benefit of anticoagulation?</em> (3) <em>How symptomatic is he, and does he want rate or rhythm control?</em></p>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of "the pulse is only 96 — he's fine"</b>A controlled rate does <strong>not</strong> mean a controlled disease. Stroke risk is independent of rate and of whether AF is paroxysmal, persistent or permanent. A comfortable rate can lull you into skipping the anticoagulation decision — the decision that actually saves the life.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The cardiology registrar thinks out loud at 10:28:</em></p>
+        <h3>🧠 Frame it as the ABC/CARE pathway, not a single prescription</h3>
+        <p>"Confirmed AF, symptomatic, with a stack of comorbidities. My job isn't just 'start a tablet' — it's to run the whole pathway. <strong>A — Avoid stroke:</strong> his CHA₂DS₂-VASc is at least 3, so he needs anticoagulation, and it should be a <strong>DOAC</strong>, not aspirin and not warfarin. <strong>B — Better symptom control:</strong> he's symptomatic, so I'll rate-control now and seriously discuss <strong>early rhythm control / ablation</strong>. <strong>C — Comorbidities:</strong> his BP, weight, alcohol and probable OSA are the engine of this arrhythmia."</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>🧮 <strong>Calculate CHA₂DS₂-VASc</strong> (stroke risk) and <strong>HAS-BLED</strong> (to <em>modify</em>, not withhold) — see S5.</li>
+          <li>💊 <strong>Start a DOAC</strong> (e.g. apixaban) after checking renal/hepatic function and interactions; <strong>stop the aspirin</strong> — it adds bleeding risk without stroke protection.</li>
+          <li>🎚️ <strong>Rate control</strong> with a beta-blocker; book <strong>echo</strong> and discuss <strong>early rhythm control / catheter ablation</strong>, especially as he's symptomatic and paroxysmal.</li>
+          <li>🛠️ <strong>Attack the comorbidities</strong> — tighten BP, weight-loss referral, alcohol reduction, sleep-study for OSA.</li>
+          <li>🗓️ <strong>Structured follow-up</strong> — the "E" of CARE: re-evaluate stroke risk (it rises with age), symptoms, and renal function over time.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A DOAC is first choice for almost every AF patient — warfarin is reserved for mechanical valves and moderate-to-severe mitral stenosis. Everyone else, reach for the DOAC."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>The patient asks to "just stick with the aspirin the GP gave me — it's gentler." Agree?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No.</strong> Aspirin is <em>not</em> effective stroke prevention in AF and is no longer recommended for it. In <em>AVERROES</em>, apixaban roughly halved stroke versus aspirin <strong>with similar major-bleeding rates</strong> — so aspirin gives you the bleeding of an antithrombotic with almost none of the protection. Stop the aspirin and start a DOAC.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The consultant cardiologist at the desk, 10:36:</em></p>
+        <h3>🧮 CHA₂DS₂-VASc — the stroke-risk score that decides anticoagulation</h3>
+        <table class="tbl">
+          <tr><th>Letter</th><th>Risk factor</th><th>Points</th><th>This patient</th></tr>
+          <tr><td><strong>C</strong></td><td>Congestive HF / LV dysfunction</td><td>1</td><td class="ok-v">0</td></tr>
+          <tr><td><strong>H</strong></td><td>Hypertension</td><td>1</td><td class="hi">1</td></tr>
+          <tr><td><strong>A₂</strong></td><td>Age ≥ 75</td><td>2</td><td class="ok-v">0</td></tr>
+          <tr><td><strong>D</strong></td><td>Diabetes mellitus</td><td>1</td><td class="hi">1</td></tr>
+          <tr><td><strong>S₂</strong></td><td>Prior stroke / TIA / thromboembolism</td><td>2</td><td class="ok-v">0</td></tr>
+          <tr><td><strong>V</strong></td><td>Vascular disease (MI, PAD, aortic plaque)</td><td>1</td><td class="ok-v">0</td></tr>
+          <tr><td><strong>A</strong></td><td>Age 65–74</td><td>1</td><td class="hi">1</td></tr>
+          <tr><td><strong>Sc</strong></td><td>Sex category (female)</td><td>1</td><td class="ok-v">0</td></tr>
+        </table>
+        <p>His score is <strong>3</strong> (HTN + diabetes + age 65–74) → estimated <strong>~3–4% annual stroke risk untreated</strong>. Threshold to anticoagulate: <strong>men ≥ 1, women ≥ 2</strong> (i.e. ≥ 2 / ≥ 3 once the sex point is included). At a score of 3 this is a clear, guideline-mandated anticoagulation patient — with a DOAC.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"CHA₂DS₂-VASc 0 in a man (or 1 in a woman = sex only) → no anticoagulation. Score 1 in a man → consider it. Score ≥ 2 → anticoagulate with a DOAC. The sex point never anticoagulates a woman on its own."</div>
+
+        <h3>🩸 HAS-BLED — read it to FIX bleeding risk, not to withhold the drug</h3>
+        <table class="tbl">
+          <tr><th>Element (H-A-S-B-L-E-D)</th><th>This patient</th><th>Action (modifiable?)</th></tr>
+          <tr><td><strong>H</strong>ypertension (uncontrolled, SBP &gt;160)</td><td class="hi">Yes — often 150s</td><td>✅ Tighten BP control</td></tr>
+          <tr><td><strong>A</strong>bnormal renal/liver function</td><td class="ok-v">No</td><td>Monitor renal function for DOAC dosing</td></tr>
+          <tr><td><strong>S</strong>troke history</td><td class="ok-v">No</td><td>—</td></tr>
+          <tr><td><strong>B</strong>leeding history/predisposition</td><td class="ok-v">No</td><td>—</td></tr>
+          <tr><td><strong>L</strong>abile INR</td><td class="ok-v">N/A on DOAC</td><td>DOAC avoids this entirely</td></tr>
+          <tr><td><strong>E</strong>lderly (&gt;65)</td><td class="hi">Yes (69)</td><td>Non-modifiable</td></tr>
+          <tr><td><strong>D</strong>rugs/alcohol (≥8 units/wk)</td><td class="hi">Yes — ~25 units/wk</td><td>✅ Reduce alcohol; avoid NSAIDs/antiplatelets</td></tr>
+        </table>
+        <p>HAS-BLED ≈ <strong>3</strong> here — but note it is dominated by <strong>modifiable</strong> factors (BP, alcohol). A high HAS-BLED flags who needs their bleeding risks fixed and closer review; it is <strong>not</strong> a reason to withhold a life-saving anticoagulant.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"HAS-BLED tells you which bleeding risks to FIX, not whether to withhold the anticoagulant. Uncontrolled BP and alcohol are things to treat, not excuses to leave a stroke un-prevented."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">RCT</span> RE-LY (dabigatran)</td><td>Dabigatran 150 mg <em>superior</em> to warfarin for stroke; 110 mg non-inferior with less bleeding; both less intracranial haemorrhage.</td><td>DOAC beats warfarin on the brain bleeds that matter most.</td></tr>
+            <tr><td><span class="lvl">RCT</span> ROCKET-AF (rivaroxaban)</td><td>Non-inferior to warfarin, with less intracranial and fatal bleeding (higher-risk cohort).</td><td>Once-daily option; non-inferior with fewer catastrophic bleeds.</td></tr>
+            <tr><td><span class="lvl">RCT</span> ARISTOTLE (apixaban)</td><td><em>Superior</em> to warfarin for stroke, <em>less</em> major bleeding, and <em>lower mortality</em>.</td><td>Often the default DOAC — best bleeding profile in trials.</td></tr>
+            <tr><td><span class="lvl">RCT</span> ENGAGE AF-TIMI 48 (edoxaban)</td><td>Non-inferior for stroke with significantly less bleeding.</td><td>Fourth DOAC option; mind renal-based dosing.</td></tr>
+            <tr><td><span class="lvl">RCT</span> AVERROES / ACTIVE-W</td><td>Apixaban halved stroke vs <strong>aspirin</strong> with similar bleeding; warfarin beat aspirin+clopidogrel.</td><td>Aspirin is <strong>not</strong> a valid AF stroke-prevention strategy.</td></tr>
+            <tr><td><span class="lvl">RCT</span> EAST-AFNET 4</td><td>Early rhythm control (drugs/ablation) cut CV death, stroke and HF hospitalisation vs usual care.</td><td>Rhythm control early is a treatment, not a last resort.</td></tr>
+            <tr><td><span class="lvl">RCT</span> CASTLE-AF / CABANA / EARLY-AF / STOP-AF</td><td>Ablation cut death/HF hospitalisation in AF+HFrEF (CASTLE-AF), improved QoL (CABANA), and beat drugs as first-line for paroxysmal AF (EARLY-AF, STOP-AF).</td><td>Catheter ablation is effective and can be first-line for symptomatic paroxysmal AF.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The chart that keeps me awake is the woman with a CHA₂DS₂-VASc of 5 who was left on aspirin 'because a DOAC might make her bleed.' Eight months later a whole clot left her appendage and took out her left middle cerebral artery. Aspirin gave her the bleeding risk and none of the protection."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY AF harms (the WHY behind the WHY)</h3>
+        <ol>
+          <li>⚡ <strong>Disorganised atrial activity:</strong> multiple re-entrant wavelets / rapid ectopic firing (often from <strong>pulmonary vein</strong> sleeves) replace coordinated atrial contraction. The atria quiver at 350–600/min; the AV node filters this into an <em>irregularly irregular</em> ventricular response.</li>
+          <li>🌀 <strong>Stasis → thrombus:</strong> the non-contracting left atrium — especially the <strong>left atrial appendage</strong> — becomes a stagnant pool. Virchow's triad (stasis + endothelial change + hypercoagulability) forms a clot there.</li>
+          <li>🧠 <strong>Cardioembolic stroke:</strong> a whole clot embolises to the brain → a <em>large, disabling</em> stroke (a full MCA territory, not a small lacune). This is the harm the whole visit exists to prevent.</li>
+          <li>💔 <strong>Tachycardia-mediated cardiomyopathy:</strong> a persistently fast, irregular ventricular rate impairs filling and, over weeks–months, weakens the ventricle — a <em>reversible</em> cardiomyopathy if the rate/rhythm is controlled.</li>
+          <li>🫀 <strong>Loss of atrial kick:</strong> ~20–30% of ventricular filling is lost, which is why some patients feel breathless and fatigued even at a "normal" rate.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The atrium doesn't kill by beating fast — it kills by standing still. Stasis in the left atrial appendage makes the clot; anticoagulation, not rate control, is what prevents the stroke."</div>
+
+        <h3>⚖️ Contrast pair — Rate control vs (early) Rhythm control</h3>
+        <div class="vs">
+          <div class="side a"><h4>🐢 Rate control</h4><ul><li>Accept AF, slow the ventricle: beta-blocker or non-DHP CCB (diltiazem/verapamil)</li><li>Avoid non-DHP CCBs in HFrEF; digoxin as add-on/if sedentary</li><li>Lenient target &lt; 110/min if asymptomatic (RACE II); stricter if symptomatic/LV dysfunction</li><li>Simple, safe — but does not restore atrial kick or reduce symptoms as much</li></ul></div>
+          <div class="side b"><h4>🎯 (Early) Rhythm control</h4><ul><li>Restore/maintain sinus rhythm: antiarrhythmics (flecainide if no structural disease; amiodarone/sotalol) or <strong>catheter ablation (PVI)</strong></li><li>EAST-AFNET 4: <em>early</em> rhythm control improves outcomes</li><li>Ablation can be <strong>first-line</strong> for symptomatic paroxysmal AF; improves outcomes in AF+HF (CASTLE-AF)</li><li>Best for symptomatic, younger, HF, or recent-onset AF</li></ul></div>
+        </div>
+        <p>💡 Remember: <strong>rhythm vs rate control changes symptoms and outcomes — it does NOT change the anticoagulation decision.</strong> Even after successful ablation, stroke prophylaxis continues based on CHA₂DS₂-VASc.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The CHA₂DS₂-VASc Stroke-Risk Dial</h3>
+          <p style="font-size:13px">Drag the score and watch the <strong>annual stroke risk</strong> climb — and with it, the net clinical benefit of a DOAC. Aspirin is deliberately not on this dial: it does not meaningfully prevent AF strokes.</p>
+          <label for="kRange">🧮 CHA₂DS₂-VASc score: <b id="kVal">1</b></label>
+          <input type="range" id="kRange" min="0" max="9" value="1">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore stroke risk and anticoagulation benefit.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 As the score rises, yearly stroke risk rises steeply and the absolute benefit of a DOAC grows. Bleeding risk rises far more gently — which is why net benefit favours anticoagulation for almost every patient at a score ≥ 2.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The clinic order set (10:40)</h3>
+        <ul>
+          <li>📈 <strong>12-lead ECG</strong> (confirm AF, assess rate, look for pre-excitation/LVH/prior MI); baseline <strong>rhythm strip</strong>.</li>
+          <li>🧪 <strong>Bloods:</strong> FBC, U&amp;E + eGFR (DOAC dosing), LFTs, TSH, HbA1c, lipids, coagulation, calcium/magnesium.</li>
+          <li>🫀 <strong>Transthoracic echo</strong> — LV function, LA size, valve assessment (exclude significant mitral stenosis before committing to a DOAC), screen for structural heart disease.</li>
+          <li>💊 <strong>Start a DOAC</strong> (e.g. apixaban 5 mg BD; reduce to 2.5 mg BD if ≥2 of: age ≥80, weight ≤60 kg, creatinine ≥133 µmol/L) — and <strong>STOP the aspirin</strong>.</li>
+          <li>🎚️ <strong>Rate control:</strong> bisoprolol 2.5–5 mg OD (or diltiazem if beta-blocker not tolerated and no HFrEF); target symptom relief, resting HR &lt; 110 as a starting goal.</li>
+          <li>🩺 <strong>Comorbidity work-up:</strong> home BP monitoring, weight-management referral, alcohol brief intervention, <strong>sleep study for OSA</strong>.</li>
+          <li>🗓️ Refer to <strong>AF nurse-led integrated clinic</strong>; flag for <strong>rhythm-control / ablation discussion</strong> given symptomatic paroxysmal AF.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Two orders do the heavy lifting in new AF: start the DOAC and stop the aspirin. Everything else — rate, rhythm, comorbidities — is important, but the anticoagulant is what prevents the funeral."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ AF nurse-led clinic priorities — the nurse runs integrated care</h3>
+        <ul>
+          <li>💓 <strong>Manual pulse + 12-lead confirmation</strong> — automated BP cuffs mis-measure in AF; palpate and confirm rhythm on ECG.</li>
+          <li>💊 <strong>DOAC adherence counselling</strong> — a missed DOAC dose leaves the patient <em>unprotected within a day</em> (short half-life); stress not stopping without advice, and same-time daily dosing.</li>
+          <li>🩸 <strong>Bleeding safety-net</strong> — teach the patient to recognise and report black stools, unusual bruising, or any head injury; provide an anticoagulation alert card.</li>
+          <li>🍷 <strong>Risk-factor coaching</strong> — alcohol reduction, weight loss, smoking, medication review for NSAIDs/interactions.</li>
+          <li>😮‍💨 <strong>Symptom diary / EHRA class</strong> — record palpitations, breathlessness, effort tolerance to inform the rate-vs-rhythm decision at review.</li>
+          <li>🚫 <strong>Confirm the aspirin is stopped</strong> — reconcile the medication list; combining aspirin with a DOAC adds bleeding without benefit unless there is a separate vascular indication.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The most dangerous day on a DOAC is the day it's forgotten — a short half-life means protection disappears fast. Adherence teaching by the AF nurse is stroke prevention."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Result</th><th>Interpretation</th></tr>
+          <tr><td>12-lead ECG</td><td class="hi">AF, ~96/min</td><td>Absent P waves, fibrillatory baseline, irregularly irregular QRS. No pre-excitation, no acute ischaemia.</td></tr>
+          <tr><td>eGFR / creatinine</td><td class="ok-v">78 mL/min · 92 µmol/L</td><td>Adequate renal function — supports full-dose apixaban; recheck at least annually (more often if it declines).</td></tr>
+          <tr><td>TSH</td><td class="ok-v">Normal</td><td>Excludes thyrotoxicosis as a reversible AF driver.</td></tr>
+          <tr><td>FBC / LFTs / coag</td><td class="ok-v">Normal</td><td>No anaemia or occult bleeding; liver function fine for a DOAC.</td></tr>
+          <tr><td>HbA1c</td><td class="hi">7.8%</td><td>Sub-optimal diabetes control — part of the comorbidity ('C') work.</td></tr>
+          <tr><td>Echocardiogram</td><td>LVEF 52%, <strong>LA dilated</strong>, no significant MS, mild MR</td><td>Preserved EF (no HFrEF → beta-blocker/non-DHP CCB both allowable); dilated LA = AF substrate; <strong>no mitral stenosis → DOAC is appropriate</strong>.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Before you commit to a DOAC, the echo answers one make-or-break question: is there a mechanical valve or moderate-to-severe mitral stenosis? If yes → warfarin. If no → DOAC."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why the echo and renal function are non-negotiable</b>The echo defines the substrate (LA size, LV function, valves) and, crucially, screens for the two DOAC contraindications (mechanical valve, significant mitral stenosis). Renal function sets DOAC eligibility and dose — dabigatran and edoxaban are especially renally cleared, so eGFR must be checked at baseline and tracked over time.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 ECG / IMAGING + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🫀 The AF ECG — read it like a fingerprint</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 130" preserveAspectRatio="none" aria-label="Atrial fibrillation: irregularly irregular QRS, no P waves, fibrillatory baseline">
+            <rect width="820" height="130" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="32" x2="820" y2="32"/><line x1="0" y1="65" x2="820" y2="65"/><line x1="0" y1="98" x2="820" y2="98"/></g>
+            <polyline fill="none" stroke="#86efac" stroke-width="2.3" points="0,68 20,66 40,69 60,65 78,68 90,66 100,40 108,96 116,66 150,67 168,64 190,69 210,66 230,68 246,42 254,94 262,66 300,68 316,65 340,69 360,66 372,41 380,95 388,66 430,67 452,64 470,69 486,66 500,40 508,96 516,66 560,68 580,65 600,68 618,66 632,42 640,94 648,66 690,67 712,64 732,68 748,66 760,41 768,95 776,66 810,68 820,67"/>
+            <text x="150" y="20" fill="#93c5fd" font-size="11">no P waves · fibrillatory baseline</text>
+            <text x="470" y="118" fill="#fca5a5" font-size="11">irregularly irregular R–R intervals</text>
+          </svg>
+          <div class="ecg-cap">The hallmarks: <span style="color:#93c5fd">absent P waves</span> with a wavering fibrillatory baseline, and <span style="color:#fca5a5">irregularly irregular</span> QRS spacing. Narrow QRS unless there is bundle branch block or aberrancy.</div>
+        </div>
+
+        <h3>🔎 Patterns and mimics you must know cold</h3>
+        <table class="tbl">
+          <tr><th>Pattern</th><th>Look for</th><th>Meaning / action</th></tr>
+          <tr><td>💠 <strong>Typical AF</strong></td><td>No P waves, fibrillatory baseline, irregularly irregular narrow QRS</td><td>Confirm the diagnosis on a 12-lead; stratify with CHA₂DS₂-VASc.</td></tr>
+          <tr><td>🔺 <strong>Atrial flutter</strong></td><td>Sawtooth F waves (~300/min), often 2:1 → regular ~150</td><td>Same thromboembolic risk as AF; anticoagulate identically; very ablatable (cavotricuspid isthmus).</td></tr>
+          <tr><td>⚡ <strong>AF with pre-excitation (WPW)</strong></td><td>Irregular, <em>broad</em>, very fast, varying QRS</td><td>🚨 EMERGENCY — <strong>avoid AV-nodal blockers</strong> (digoxin, verapamil, adenosine, beta-blockers); they can accelerate to VF. Use procainamide / DC cardioversion.</td></tr>
+          <tr><td>🌀 <strong>Multifocal atrial tachycardia</strong></td><td>≥3 distinct P-wave morphologies, irregular — but P waves ARE present</td><td>Not AF; usually pulmonary disease — treat the lung, correct hypoxia/electrolytes.</td></tr>
+          <tr><td>🎛️ <strong>AF with complete heart block</strong></td><td>AF baseline but <em>regular</em>, slow ventricular rate</td><td>Regularisation of AF = think AV block or digoxin toxicity — investigate, don't ignore.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Irregular, broad and very fast? Think AF with WPW — and never give an AV-nodal blocker, or you can tip it into ventricular fibrillation."</div>
+
+        <h3>🩻 Adjunct imaging &amp; monitoring</h3>
+        <ul>
+          <li><strong>Transthoracic echo:</strong> LV function, LA size, valves (the DOAC-vs-warfarin decision).</li>
+          <li><strong>Transoesophageal echo (TOE):</strong> visualises the left atrial appendage for thrombus before early cardioversion when AF duration is uncertain/≥48 h and the patient isn't already anticoagulated.</li>
+          <li><strong>Ambulatory / prolonged ECG monitoring:</strong> quantifies AF <em>burden</em> and correlates symptoms with rhythm; wearables and implantable loop recorders increasingly detect subclinical AF.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The AF drug map — what, why, and the traps</h3>
+        <h4>🩸 Anticoagulation (the 'A')</h4>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role / dosing pearls</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>Apixaban</strong> 5 mg BD (2.5 mg if ≥2 of age≥80/≤60 kg/Cr≥133)</td><td>Often the default DOAC — best bleeding profile in trials</td><td>Factor Xa inhibitor. Avoid CrCl &lt;15; caution with strong CYP3A4/P-gp inhibitors.</td></tr>
+          <tr><td><strong>Rivaroxaban</strong> 20 mg OD with food (15 mg if CrCl 15–49)</td><td>Once-daily; take with food for absorption</td><td>Factor Xa inhibitor. Avoid in severe renal/hepatic impairment.</td></tr>
+          <tr><td><strong>Dabigatran</strong> 150 mg BD (110 mg if elderly/bleeding risk)</td><td>Direct thrombin inhibitor; reversal agent = <strong>idarucizumab</strong></td><td>Most renally cleared — avoid CrCl &lt;30; dyspepsia common.</td></tr>
+          <tr><td><strong>Edoxaban</strong> 60 mg OD (30 mg if CrCl 15–50/≤60 kg)</td><td>Once-daily</td><td>Factor Xa inhibitor; <strong>reduced efficacy at high CrCl (&gt;95)</strong> — avoid there.</td></tr>
+          <tr><td><strong>Warfarin</strong> (INR 2–3; 2.5–3.5 for mechanical mitral valve)</td><td><strong>Required</strong> for mechanical valves &amp; moderate–severe mitral stenosis</td><td>Vitamin-K antagonist; many interactions; reversal = vitamin K / PCC.</td></tr>
+          <tr><td><s><strong>Aspirin</strong></s></td><td>❌ <strong>NOT for AF stroke prevention</strong></td><td>Ineffective for cardioembolic prevention; adds bleeding risk. Only if a separate vascular indication.</td></tr>
+        </table>
+
+        <h4>🎚️ Rate &amp; rhythm control (the 'B')</h4>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role</th><th>Caution</th></tr>
+          <tr><td><strong>Beta-blocker</strong> (bisoprolol, metoprolol)</td><td>First-line rate control</td><td>Bradycardia; caution in decompensated HF but first-line in stable HFrEF.</td></tr>
+          <tr><td><strong>Non-DHP CCB</strong> (diltiazem, verapamil)</td><td>Rate control if beta-blocker not tolerated</td><td>🚫 <strong>AVOID in HFrEF</strong> (negative inotropy); never with a beta-blocker IV.</td></tr>
+          <tr><td><strong>Digoxin</strong></td><td>Add-on / sedentary / HF rate control</td><td>Narrow window; toxicity; not for lone exertional rate control.</td></tr>
+          <tr><td><strong>Flecainide</strong> (rhythm)</td><td>Cardioversion / maintenance in structurally normal hearts</td><td>🚫 Contraindicated in CAD/structural disease; pair with AV-nodal blocker ("pill-in-the-pocket").</td></tr>
+          <tr><td><strong>Amiodarone / sotalol / dronedarone</strong></td><td>Rhythm control, incl. structural heart disease (amiodarone)</td><td>Amiodarone: thyroid/lung/liver toxicity; sotalol: QT/torsades; dronedarone avoided in HF/permanent AF.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A DOAC needs a working kidney and the right dose — check CrCl, avoid it in mechanical valves and significant mitral stenosis, and never leave a patient on both a DOAC and aspirin without a reason."</div>
+        <div class="callout danger"><b class="ct">🚫 The 'warfarin-only' and 'never' lists</b>Use <strong>warfarin, not a DOAC</strong>, for: mechanical heart valve · moderate-to-severe (rheumatic) mitral stenosis. <strong>Never</strong> give AV-nodal blockers in AF with WPW pre-excitation. <strong>Never</strong> use aspirin as a substitute for anticoagulation in AF.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why (over months, in clinic)</h3>
+        <ul>
+          <li>🩸 <strong>Renal function</strong> — recheck eGFR at least annually (more often if CrCl &lt;60, elderly, or unwell); a falling eGFR changes DOAC dose or eligibility. <em>No routine INR needed on a DOAC.</em></li>
+          <li>💊 <strong>Adherence &amp; bleeding</strong> — review at each visit; ask about bruising, GI bleeding, and any missed doses.</li>
+          <li>💓 <strong>Rate &amp; symptoms</strong> — resting HR, effort tolerance, EHRA symptom class; up-titrate rate control or escalate to rhythm control if symptomatic.</li>
+          <li>🎛️ <strong>Ambulatory ECG</strong> — to assess rate control across the day and AF burden, and to correlate symptoms.</li>
+          <li>🧮 <strong>Re-score CHA₂DS₂-VASc</strong> — it rises with age and new comorbidities; a patient who "didn't need" anticoagulation last year may now.</li>
+          <li>🛠️ <strong>Comorbidities</strong> — BP, weight, HbA1c, alcohol, OSA treatment adherence (CPAP).</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"AF care doesn't end at the first prescription — it's a movie. Re-check the kidney, re-score the stroke risk, and re-ask about symptoms at every visit ('E' for Evaluate)."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong — of the disease and of the treatment</h3>
+        <ul>
+          <li>🧠 <strong>Cardioembolic stroke / systemic embolism</strong> — the big one; large, disabling, often fatal. The reason anticoagulation exists.</li>
+          <li>💔 <strong>Tachycardia-mediated cardiomyopathy &amp; heart failure</strong> — from chronic uncontrolled rate; reversible with rate/rhythm control.</li>
+          <li>🩸 <strong>Bleeding from anticoagulation</strong> — GI and (less commonly with DOACs) intracranial; the trade-off you actively manage with HAS-BLED modification.</li>
+          <li>⚗️ <strong>Drug interactions / dosing errors</strong> — DOAC under-dosing (loss of protection) or over-dosing (bleeding); interactions with azoles, rifampicin, some anticonvulsants, and P-gp inhibitors.</li>
+          <li>🎯 <strong>Rhythm-control harms</strong> — proarrhythmia (flecainide, sotalol/QT), amiodarone organ toxicity.</li>
+          <li>🔧 <strong>Ablation complications</strong> — rare but serious: cardiac tamponade, pulmonary vein stenosis, atrio-oesophageal fistula, phrenic nerve palsy, vascular access issues.</li>
+          <li>🩹 <strong>The system complication:</strong> under-anticoagulation — the patient left on aspirin or nothing "to be safe," who then has the preventable stroke.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The commonest serious complication of AF isn't a drug side-effect — it's the stroke you didn't prevent because you were afraid of the bleed you could have managed."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The irregular-pulse / palpitations differential</h3>
+        <table class="tbl">
+          <tr><th>Diagnosis</th><th>Discriminators</th><th>Action</th></tr>
+          <tr><td>💠 <strong>Atrial fibrillation</strong> (this patient)</td><td>Irregularly irregular, no P waves, fibrillatory baseline</td><td>CHA₂DS₂-VASc → DOAC; rate/rhythm control; comorbidities.</td></tr>
+          <tr><td>🔺 <strong>Atrial flutter</strong></td><td>Sawtooth F waves, often regular 2:1 ~150</td><td>Same anticoagulation as AF; consider isthmus ablation.</td></tr>
+          <tr><td>🌀 <strong>Multifocal atrial tachycardia</strong></td><td>≥3 P-wave morphologies, present P waves; lung disease</td><td>Treat the underlying pulmonary disease; not AF.</td></tr>
+          <tr><td>💓 <strong>Frequent ectopy / AVNRT / SVT</strong></td><td>Regular tachycardia or isolated skipped beats; often younger</td><td>Vagal manoeuvres/adenosine for SVT; reassure ectopy.</td></tr>
+          <tr><td>🦋 <strong>Thyrotoxicosis / sepsis / anaemia / alcohol</strong></td><td>Secondary drivers of AF or sinus tachycardia</td><td>Identify &amp; treat the reversible cause ('C').</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Atrial flutter is not 'AF-lite' — it carries the same stroke risk and gets the same anticoagulation. Regular at 150? Look for the flutter waves before you call it SVT."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The ABC Pathway in Clinic"</h3>
+          <div class="hud"><span>❤️ Care quality: <b id="scStab">●●●○○</b></span><span>⏱️ Visit time: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">Mr A.F. sits opposite you: confirmed AF, CHA₂DS₂-VASc 3, HAS-BLED ~3 (uncontrolled BP + alcohol). He asks, "Do I really need a blood thinner? The GP already gave me aspirin." Where do you start — the 'A' of the pathway?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The integrated ABC / CARE plan</h3>
+        <ol>
+          <li>🩸 <strong>A — Avoid stroke:</strong> CHA₂DS₂-VASc 3 → start a <strong>DOAC (apixaban 5 mg BD)</strong>, stop aspirin, modify (not withhold for) HAS-BLED risks.</li>
+          <li>🎚️ <strong>B — Better symptoms:</strong> rate control with bisoprolol now; <strong>refer for early rhythm control / catheter ablation</strong> given symptomatic paroxysmal AF (EAST-AFNET 4, EARLY-AF).</li>
+          <li>🛠️ <strong>C — Comorbidities:</strong> tighten BP, weight-loss programme, alcohol reduction, treat OSA, optimise diabetes.</li>
+          <li>🗓️ <strong>E — Evaluate:</strong> AF nurse-led follow-up; re-check renal function, re-score stroke risk, reassess symptoms and adherence.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Early rhythm control and catheter ablation are no longer last resorts — they improve outcomes (EAST-AFNET 4, CASTLE-AF). A symptomatic patient deserves the ablation conversation on day one, not after years of tablets."</div>
+
+        <div class="checklist" id="ckABC">
+          <h3 style="margin-top:0">🩺 Procedure Guide — AF ABC/CARE pathway (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>🧮 CHA₂DS₂-VASc calculated → anticoagulation decision documented (male ≥1 / female ≥2)</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 HAS-BLED assessed → modifiable bleeding risks addressed (NOT used to withhold)</span></label>
+          <label class="ck"><input type="checkbox"><span>💊 DOAC started and aspirin stopped (unless separate vascular indication)</span></label>
+          <label class="ck"><input type="checkbox"><span>🎚️ Symptom/rhythm control decided: rate control + early rhythm-control/ablation discussion</span></label>
+          <label class="ck"><input type="checkbox"><span>🛠️ Comorbidities managed: HTN, weight, alcohol, OSA, diabetes, HF</span></label>
+          <label class="ck"><input type="checkbox"><span>🫀 Echo + reversible causes (TSH) reviewed; mechanical valve / mitral stenosis excluded</span></label>
+          <label class="ck"><input type="checkbox"><span>🗓️ Structured AF follow-up booked (re-score risk, re-check renal function)</span></label>
+          <div class="ck-progress" data-progress>0 / 7 complete</div>
+        </div>
+
+        <div class="checklist" id="ckDOAC">
+          <h3 style="margin-top:0">🩺 Procedure Guide — DOAC selection, dosing &amp; when NOT to use aspirin</h3>
+          <label class="ck"><input type="checkbox"><span>🧪 Baseline FBC, LFTs, renal function/CrCl checked; dose adjusted for renal function/weight/age</span></label>
+          <label class="ck"><input type="checkbox"><span>🚫 Mechanical valve / moderate-severe mitral stenosis excluded (else use WARFARIN, not a DOAC)</span></label>
+          <label class="ck"><input type="checkbox"><span>⚗️ Interactions reviewed (azoles, rifampicin, P-gp/CYP3A4, avoid concurrent NSAIDs)</span></label>
+          <label class="ck"><input type="checkbox"><span>❌ Aspirin NOT used as AF stroke prevention; dual antiplatelet+DOAC only if compelling reason, time-limited</span></label>
+          <label class="ck"><input type="checkbox"><span>🆘 Reversal plan known (idarucizumab for dabigatran; andexanet/PCC for Xa inhibitors)</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">Day 0 · Clinic</div>AF confirmed, CHA₂DS₂-VASc 3. Apixaban 5 mg BD started, aspirin stopped, bisoprolol commenced. Comorbidity plan set; ablation discussion begun.</div>
+          <div class="t-item"><div class="t-time">Week 4</div>Echo: LVEF 52%, dilated LA, no mitral stenosis. Symptoms improved on rate control but still gets breathless in paroxysms. Sleep study confirms moderate OSA → CPAP started.</div>
+          <div class="t-item"><div class="t-time">Month 3</div>BP now 128/78, alcohol cut to &lt;8 units/week, 6 kg weight loss. Opts for <strong>early rhythm control</strong> → referred for <strong>pulmonary vein isolation (catheter ablation)</strong>.</div>
+          <div class="t-item"><div class="t-time">Month 5</div>Successful PVI. Anticoagulation <strong>continued</strong> (CHA₂DS₂-VASc unchanged) — ablation treats symptoms, not stroke risk. Symptomatically much better.</div>
+          <div class="t-item"><div class="t-time">Month 12</div>In sinus rhythm most of the time, EHRA class I–II, adherent to apixaban, renal function stable, comorbidities controlled. No stroke, no bleed.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>He is protected because someone refused "just stay on the aspirin," scored his stroke risk, started a DOAC, and treated the whole patient — rhythm and risk factors. Ordinary pathway discipline, extraordinary outcome.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 Two AF patients, two worlds — anticoagulate or not</h3>
+        <div class="vs">
+          <div class="side a"><h4>🫀 This patient (CHA₂DS₂-VASc 3)</h4><ul><li>DOAC (apixaban) lifelong, adherence stressed; aspirin stopped</li><li>Rate control ± ablation for symptoms; anticoagulation continues even after ablation</li><li>Comorbidity plan: BP, weight, alcohol, OSA, diabetes</li><li>Red flags: focal weakness/speech change → 999 (FAST); black stools or major bleeding → urgent review</li><li>AF nurse + GP follow-up; annual renal function &amp; re-score</li></ul></div>
+          <div class="side b"><h4>🟢 The genuinely low-risk AF patient</h4><ul><li>CHA₂DS₂-VASc 0 (man) or 1 (woman, sex only) → <strong>no anticoagulation</strong></li><li>Manage symptoms and comorbidities; do NOT default to aspirin</li><li>Re-score periodically — risk rises with age; the answer can change</li><li>Clear safety-net and symptom advice</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A safe AF discharge is a documented CHA₂DS₂-VASc, a DOAC (or a justified decision not to anticoagulate), an aspirin that's been stopped, and a plan to re-score as the patient ages — never a silent 'seems low-risk.'"</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>🚫 Aspirin ≠ stroke prevention</b>In AF, aspirin doesn't prevent strokes — anticoagulate by CHA₂DS₂-VASc with a DOAC, or don't anticoagulate at all.</div>
+          <div class="pearl"><b>🧮 Score, don't guess</b>Men ≥1, women ≥2 on CHA₂DS₂-VASc → anticoagulate. The sex point never anticoagulates a woman alone.</div>
+          <div class="pearl"><b>🩸 HAS-BLED fixes, not forbids</b>Use it to modify bleeding risk (BP, alcohol), never as an excuse to withhold the anticoagulant.</div>
+          <div class="pearl"><b>💊 DOAC first</b>DOAC for almost everyone — warfarin only for mechanical valves &amp; moderate–severe mitral stenosis.</div>
+          <div class="pearl"><b>🎯 Rhythm control early</b>EAST-AFNET 4 &amp; CASTLE-AF: early rhythm control and ablation improve outcomes — not last resorts.</div>
+          <div class="pearl"><b>🌀 Stasis, not speed</b>The stroke comes from the stagnant left atrial appendage — anticoagulation, not rate control, prevents it.</div>
+          <div class="pearl"><b>🛠️ Treat the whole patient</b>BP, obesity, OSA, alcohol, diabetes — risk-factor control reduces AF burden ('C'/CARE).</div>
+          <div class="pearl"><b>⚡ WPW + AF</b>Irregular, broad, very fast: avoid all AV-nodal blockers — they can precipitate VF.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the pathway</h3>
+          <ul>
+            <li>🗂️ <strong>AF subtypes &amp; burden:</strong> paroxysmal (self-terminating &lt;7 days), persistent (&gt;7 days / needs cardioversion), long-standing persistent (&gt;1 year), permanent (accepted). Stroke risk is driven by CHA₂DS₂-VASc, <em>not</em> by subtype — but higher AF <strong>burden</strong> (time in AF) associates with higher risk, blurring the old categories.</li>
+            <li>📟 <strong>Device-detected subclinical AF:</strong> brief atrial high-rate episodes on pacemakers/loop recorders. <em>NOAH-AFNET 6</em> and <em>ARTESIA</em> showed anticoagulation gives only a <strong>modest</strong> stroke reduction at the cost of more bleeding — so short subclinical episodes are a nuanced, individualised decision, not an automatic DOAC (unlike clinical ECG-documented AF).</li>
+            <li>🎯 <strong>Catheter ablation:</strong> <strong>pulmonary vein isolation (PVI)</strong> is the cornerstone (the PVs trigger most paroxysmal AF). <strong>Pulsed-field ablation (PFA)</strong> — non-thermal, tissue-selective electroporation — reduces oesophageal/phrenic injury and speeds procedures. Indications: symptomatic paroxysmal AF (can be <strong>first-line</strong>, EARLY-AF/STOP-AF), drug-refractory AF, and AF with HFrEF (CASTLE-AF improves survival/HF hospitalisation). Anticoagulation continues per CHA₂DS₂-VASc regardless of success.</li>
+            <li>🔒 <strong>Left atrial appendage occlusion (LAAO):</strong> for patients with a genuine long-term contraindication to anticoagulation (e.g. recurrent life-threatening bleeding). Devices (Watchman/Amulet) close the appendage — the source of &gt;90% of AF thrombi — an alternative <em>only</em> when a DOAC truly can't be used, not a convenience substitute.</li>
+            <li>⚗️ <strong>DOAC dosing pitfalls:</strong> renal-based dose reductions (dabigatran/edoxaban most renally cleared); <strong>edoxaban loses efficacy at very high CrCl &gt;95</strong>; avoid strong P-gp/CYP3A4 interactions; inappropriate <em>under-dosing</em> is a common, dangerous error that leaves patients under-protected. <strong>Contraindicated in mechanical valves and moderate–severe mitral stenosis → use warfarin.</strong></li>
+            <li>🆘 <strong>Reversal agents:</strong> <em>idarucizumab</em> for dabigatran; <em>andexanet alfa</em> (or PCC where unavailable) for factor Xa inhibitors; vitamin K + PCC for warfarin — know these before major bleeding or urgent surgery.</li>
+            <li>🤝 <strong>Integrated AF care:</strong> nurse-led, guideline-based ABC/CARE management reduces death and hospitalisation. Aggressive risk-factor modification (the LEGACY/CARDIO-FIT weight-loss data) meaningfully <strong>reduces AF burden and improves ablation success</strong> — comorbidity control is disease-modifying, not adjunctive.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The Aspirin That Wasn't a Blood Thinner"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 76-year-old woman with atrial fibrillation and a <strong>CHA₂DS₂-VASc of 5</strong> (age, hypertension, diabetes, female) was seen after an incidental AF diagnosis. Her GP worried a DOAC "might cause a bleed," so she was started on <strong>aspirin 75 mg "to thin the blood a bit."</strong> She felt well and was never re-scored. Eight months later she collapsed at home with a dense right hemiplegia and global aphasia — a <strong>massive left middle-cerebral-artery embolic stroke</strong> from left atrial appendage thrombus. She died two weeks later. Aspirin had given her the bleeding risk of an antithrombotic with almost none of the stroke protection — a DOAC would very likely have prevented the event.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>💊 WRONG DRUG</b>Aspirin used as 'stroke prevention' — ineffective in AF (AVERROES/ACTIVE-W).</div>
+            <div class="hole"><b>🩸 FEAR OF BLEEDING</b>Bleeding worry withheld the effective drug — DOACs bleed less intracranially than even warfarin.</div>
+            <div class="hole"><b>🧮 SCORE IGNORED</b>CHA₂DS₂-VASc 5 mandated anticoagulation; the number was never acted on.</div>
+            <div class="hole"><b>🔁 NEVER RE-SCORED</b>No structured follow-up; the 'E' of CARE never happened.</div>
+            <div class="hole"><b>🤫 FALSE REASSURANCE</b>"She feels fine" — but AF stroke risk is silent and independent of symptoms.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved her:</strong> calculate CHA₂DS₂-VASc and act on it; start a <strong>DOAC</strong> (preferred over warfarin, far less intracranial bleeding); understand that aspirin is <em>not</em> stroke prevention in AF; use HAS-BLED to <em>fix</em> bleeding risks (BP, alcohol, NSAIDs), not to withhold anticoagulation; and re-score at structured follow-up. <strong>This is exactly the discipline that protected the patient in Bed 4.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'I gave aspirin to be safe' has caused more AF strokes than it has ever prevented. In atrial fibrillation, aspirin is the illusion of protection — anticoagulate with a DOAC, or make a documented decision not to."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🩺 Outpatient Clinic · Bed 4 — Atrial Fibrillation / the ABC Pathway<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+    /* ===== SIDEBAR TABS — show one section at a time ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not an action-changing AF issue'); } if(found===total){ flagResult.textContent='✅ All '+total+' key AF issues found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' key AF issues found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: CHA2DS2-VASc stroke-risk dial ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    var riskTbl=[0.2,0.6,2.2,3.2,4.8,7.2,9.7,11.2,10.8,12.2];
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=v/9*100; kNeedle.style.left=pct+'%'; var risk=riskTbl[v]; var msg,cls;
+      if(v===0){ msg='🟢 Score 0 (male): ~'+risk+'%/yr stroke risk. Truly low — no anticoagulation recommended. (A woman scores ≥1 for sex alone and still would not anticoagulate on that point.)'; cls='good'; }
+      else if(v===1){ msg='🟠 Score 1: ~'+risk+'%/yr. In a man (1 non-sex point) anticoagulation should be CONSIDERED — a DOAC is preferred. A woman with score 1 (sex only) does not need it.'; cls='warn-r'; }
+      else if(v<=3){ msg='🟠 Score '+v+': ~'+risk+'%/yr stroke risk. ANTICOAGULATE — offer a DOAC. Net benefit clearly outweighs bleeding for almost all. Aspirin is not an option.'; cls='warn-r'; }
+      else { msg='🔴 Score '+v+': ~'+risk+'%/yr stroke risk. Strong indication for a DOAC — withholding it (or giving aspirin) risks a large, disabling embolic stroke.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Risk Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"Mr A.F. — confirmed AF, CHA₂DS₂-VASc 3, HAS-BLED ~3 (uncontrolled BP + alcohol). He asks 'Do I really need a blood thinner? The GP gave me aspirin.' Start the 'A' of the pathway — Avoid stroke. What do you do?",
+      choices:[
+        {t:"💊 Keep him on aspirin 75 mg 'to thin the blood' and reassure him",good:false,ds:-2,dt:2,xp:0,fb:"☠️ This is the M&M case in S21. Aspirin does NOT prevent AF strokes (AVERROES/ACTIVE-W) — you've given bleeding risk with no protection. A CHA₂DS₂-VASc 3 stroke is now waiting to happen. Restart.",end:true},
+        {t:"🩸 Stop the aspirin, start a DOAC (apixaban), and address the modifiable HAS-BLED risks (BP, alcohol)",good:true,ds:1,dt:8,xp:40,fb:"✅ Exactly. Score ≥2 → anticoagulate with a DOAC (preferred over warfarin); use HAS-BLED to FIX bleeding risks, not to withhold. Now move to symptoms.",next:"repeat"},
+        {t:"🚫 Withhold anticoagulation because he 'might fall' and drinks",good:false,ds:-1,dt:5,xp:5,fb:"⚠️ Falls-risk almost never justifies withholding — you'd need to fall ~300 times/year for the bleed risk to outweigh the stroke benefit. Alcohol and BP are things to TREAT, not reasons to leave a stroke un-prevented. Reconsider.",next:"repeat"}
+      ]},
+    repeat:{ text:"Anticoagulation sorted. He's clearly symptomatic — palpitations and breathlessness, paroxysmal AF, preserved EF on echo. This is the 'B' — Better symptom control. Best strategy?",
+      choices:[
+        {t:"🎯 Rate-control with a beta-blocker now AND discuss early rhythm control / catheter ablation (PVI)",good:true,ds:1,dt:6,xp:40,fb:"✅ Right. EAST-AFNET 4 supports early rhythm control; ablation can be first-line for symptomatic paroxysmal AF (EARLY-AF). Rate control gives symptom relief while the plan is made.",next:"declare"},
+        {t:"🐢 Rate-control only and tell him 'nothing more can be done for the rhythm'",good:false,ds:-2,dt:20,xp:0,fb:"⚠️ Out of date. A symptomatic patient deserves the rhythm-control/ablation conversation — early rhythm control improves outcomes and quality of life. Don't close that door.",next:"declare"}
+      ]},
+    declare:{ text:"Anticoagulation and symptom strategy are set. Now the 'C' — Comorbidities: BP often 150s, BMI 34, ~25 units alcohol/week, witnessed apnoeas. Final move?",
+      choices:[
+        {t:"🛠️ Aggressively manage comorbidities: tighten BP, weight-loss programme, cut alcohol, treat OSA — with structured AF follow-up",good:true,ds:1,dt:8,xp:45,fb:"🏆 Perfect. Risk-factor modification reduces AF burden and improves ablation success — it's disease-modifying, not optional. That's the full ABC/CARE pathway delivered.",end:true},
+        {t:"🙈 Focus only on the anticoagulant and ignore the lifestyle 'stuff'",good:false,ds:-1,dt:15,xp:0,fb:"⚠️ Ignoring the modifiable comorbidities lets the AF (and stroke/HF risk) keep progressing. HTN, obesity, alcohol and OSA are the engine of this arrhythmia — treat them.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='declare'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 69-year-old man has newly diagnosed AF, hypertension, type 2 diabetes (CHA₂DS₂-VASc 3). His GP started aspirin. The single most important change is:", opts:["Continue aspirin — it's gentler","Stop aspirin and start a DOAC","Add clopidogrel to the aspirin","Withhold all antithrombotics because he drinks"], correct:1, exp:"Aspirin does not prevent strokes in AF (AVERROES/ACTIVE-W). A CHA₂DS₂-VASc of 3 mandates anticoagulation with a DOAC (preferred over warfarin). Dual antiplatelets are not stroke prevention, and alcohol is a risk to modify, not a reason to withhold." },
+    { q:"According to CHA₂DS₂-VASc thresholds, anticoagulation is recommended for:", opts:["Any patient over 40","Men with score ≥1 and women with score ≥2 (i.e. ≥2/≥3 including sex)","Only patients with prior stroke","Everyone with AF regardless of score"], correct:1, exp:"Men score ≥1 (non-sex point) and women ≥2 warrant anticoagulation. The female sex point alone (score 1 in a woman) does not, and a true score of 0 (man) needs none." },
+    { q:"A high HAS-BLED score in an AF patient who needs anticoagulation should prompt you to:", opts:["Withhold the anticoagulant","Substitute aspirin","Identify and correct modifiable bleeding risks and review more closely","Halve the DOAC dose regardless"], correct:2, exp:"HAS-BLED flags modifiable risks (uncontrolled BP, alcohol, NSAIDs, labile INR) to FIX and identifies patients needing closer review — it is not a tool to withhold anticoagulation or to justify ineffective aspirin." },
+    { q:"Which situation REQUIRES warfarin rather than a DOAC?", opts:["Diabetes and hypertension","Prior GI bleed","Mechanical heart valve or moderate–severe mitral stenosis","Age over 80"], correct:2, exp:"DOACs are contraindicated in mechanical valves and moderate–severe (rheumatic) mitral stenosis — warfarin is required. For almost all other AF, a DOAC is first choice." },
+    { q:"The main mechanism of AF-related stroke is:", opts:["Small-vessel lipohyalinosis","Thrombus forming in the stagnant left atrial appendage, then embolising","Rapid ventricular rate directly damaging the brain","Coronary plaque rupture"], correct:1, exp:"Loss of atrial contraction causes stasis in the left atrial appendage; a whole clot forms and embolises, producing a large cardioembolic stroke. Anticoagulation, not rate control, prevents it." },
+    { q:"EAST-AFNET 4 and CASTLE-AF support which principle?", opts:["Rate control is always superior","Early rhythm control and catheter ablation can improve outcomes","Aspirin is adequate stroke prevention","Ablation removes the need for anticoagulation"], correct:1, exp:"EAST-AFNET 4 showed early rhythm control improves outcomes; CASTLE-AF showed ablation improves survival/HF hospitalisation in AF with HFrEF. Anticoagulation continues per CHA₂DS₂-VASc even after successful ablation." },
+    { q:"In AF with WPW pre-excitation (irregular, broad, very fast QRS), you must AVOID:", opts:["Procainamide","DC cardioversion","AV-nodal blockers (digoxin, verapamil, adenosine, beta-blockers)","Anticoagulation"], correct:2, exp:"AV-nodal blockers can promote conduction down the accessory pathway and precipitate ventricular fibrillation. Use procainamide or DC cardioversion; do not give AV-nodal blocking agents." },
+    { q:"A well 62-year-old man on apixaban for AF asks why he must not simply stop it when he feels fine. Best answer:", opts:["Stroke risk in AF is silent and independent of symptoms; a DOAC's short half-life means protection is lost within a day of stopping","He can stop once his rate is controlled","Symptoms reliably predict stroke risk","He should switch to aspirin instead"], correct:0, exp:"AF stroke risk does not track with symptoms, and DOACs have short half-lives, so adherence is critical — a missed dose leaves the patient unprotected quickly. Rate control and aspirin do not prevent AF strokes." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you run the AF ABC pathway like a consultant. 🏆':score>=6?'Strong — review the misses and S5 anticoagulation logic.':'Revisit S4, S5 and S6 — the ABC/CARE pathway is the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>

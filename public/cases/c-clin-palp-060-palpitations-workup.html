@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palpitations — the Ambulatory Rhythm Work-Up — Virtual Teaching Hospital</title>
+<!-- META
+id: c-clin-palp-060
+title: Palpitations — the Ambulatory Rhythm Work-Up
+hospital: cardiology
+department: cv-clinic
+bednumber: 6
+chiefcomplaint: Recurrent palpitations — is this benign ectopy or a dangerous arrhythmia?
+system: Cardiology
+severity: urgent
+tags: Palpitations, Ambulatory monitoring, WPW, Holter, Loop recorder, SVT
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🫀</div>
+      <div>
+        <div class="t1">Cardiology Clinic</div>
+        <div class="t2">Bed 6 · Palpitations Workup</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🩺 Outpatient Clinic · 🛏️ Bed 6</div>
+        <h1>🫀 Palpitations — "The Rhythm You Have to Catch"</h1>
+        <div class="sub">🩺 Clinic, 10:20. A 26-year-old sits calmly, pulse regular and slow — he "feels completely fine now." But he gets sudden racing-heart episodes every few weeks, and the resting 12-lead in front of you has a short PR and a slurred upstroke. Your job is to separate benign awareness of the heartbeat from a dangerous arrhythmia — and to choose the tool that will actually capture it.</div>
+        <div class="chips">
+          <span class="chip crit">🟠 URGENT WORK-UP</span>
+          <span class="chip">🫀 Ambulatory Rhythm</span>
+          <span class="chip">📟 Monitor-to-Frequency</span>
+          <span class="chip">⚡ Pre-excitation / WPW</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital"><div class="v-label">💓 HR</div><div class="v-num">74</div></div>
+        <div class="vital"><div class="v-label">🩸 BP</div><div class="v-num">122/76</div></div>
+        <div class="vital"><div class="v-label">🌬️ RR</div><div class="v-num">14</div></div>
+        <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">99%</div></div>
+        <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.6°</div></div>
+        <div class="vital warn"><div class="v-label">📏 PR</div><div class="v-num">104 ms</div></div>
+        <div class="vital alert"><div class="v-label">📈 ECG</div><div class="v-num">δ-wave</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🩺 YOU ARE HERE — 10:20, Cardiology Clinic Room 6</b>A fit young man leans back in the chair, relaxed, phone in hand. He smiles: <em>"Honestly I feel totally normal right now — it only happens now and then. My GP said it's probably just anxiety."</em> His pulse is regular at 74. He is <strong>asymptomatic in front of you</strong> — the classic ambulatory trap. Everything depends on the ECG already printed on your desk, and on choosing a monitor that will still be recording when his next episode strikes.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>🧑 Name</td><td><strong>Mr. J.M.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>26-year-old male</td></tr>
+          <tr><td>🆔 MRN</td><td>CV-CLIN-0606</td></tr>
+          <tr><td>⚖️ Build</td><td>72 kg, BMI 23 — lean, active</td></tr>
+          <tr><td>💼 Occupation</td><td>Software developer; plays 5-a-side football weekly</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 The story — every phrase steers benign vs dangerous</h3>
+        <ul>
+          <li>⚡ <strong>Sudden-onset, regular, fast palpitations</strong> — "like a switch flips, heart goes off like a drum" — lasting minutes to ~half an hour, then stopping abruptly. Happens roughly <strong>every 2–4 weeks</strong>.</li>
+          <li>😵‍💫 Twice he felt <strong>light-headed</strong> during an episode; once had to sit down suddenly during football. No frank syncope.</li>
+          <li>🏃 One episode <strong>started during exertion</strong> on the pitch. Exertional onset is a yellow-to-red flag.</li>
+          <li>👨‍👩‍👦 <strong>Family history:</strong> a cousin died suddenly in his 30s, cause "never explained." Unexplained premature sudden death matters enormously.</li>
+          <li>📈 The <strong>resting 12-lead</strong> printed today shows a <strong>short PR interval and a delta wave</strong> — pre-excitation (WPW pattern). The diagnosis may already be on the paper.</li>
+          <li>☕ Modest caffeine, no recreational drugs, no thyroid symptoms, no alcohol excess.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Every palpitation gets a resting 12-lead ECG — the diagnosis (a delta wave, a long QT) is often sitting there between the episodes, while the patient feels perfectly well."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why palpitations are deceptively high-stakes</b>Palpitations are one of the commonest reasons for cardiology referral, and the vast majority are benign (ectopy, sinus tachycardia, anxiety). But hidden in the crowd are the dangerous few — pre-excitation, long QT, Brugada, structural disease, VT — where the first missed clue can end in sudden cardiac death. The entire skill is a <strong>structured triage plus capturing the culprit rhythm</strong>, not a reassuring "you feel fine, so you are fine."</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 GP referral letter — SBAR</h3>
+        <div class="callout info"><b class="ct">✉️ Referral to Cardiology Clinic (verbatim)</b>
+          <p><strong>S:</strong> "26-year-old man, recurrent sudden-onset racing-heart episodes for ~8 months, every few weeks, lasting minutes. Twice light-headed; one episode began while playing football."</p>
+          <p><strong>B:</strong> "Fit, no regular meds, non-smoker. A young cousin died suddenly, cause never found. Bloods including TFTs and FBC normal."</p>
+          <p><strong>A:</strong> "Examination normal between episodes. Resting ECG done at surgery — I've noticed a short PR and possible delta wave but I'm not certain. Never captured during an attack."</p>
+          <p><strong>R:</strong> "Please assess and arrange appropriate ambulatory monitoring — I can't reproduce the rhythm in clinic."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Feels fine now, ECG at rest looks OK-ish' is exactly the setting where a delta wave hides. Read the resting 12-lead like it holds the diagnosis — because sometimes it does."</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each dangerous feature</h3>
+        <p>🎮 <em>Click every feature that UPGRADES these palpitations from benign to potentially dangerous. Each correct = +10 XP.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">😵 Palpitations WITH syncope / presyncope</button>
+          <button class="btn ghost flag-btn" data-good="1">🏃 Exertional onset of the palpitations</button>
+          <button class="btn ghost flag-btn" data-good="1">💔 Known structural heart disease / reduced EF</button>
+          <button class="btn ghost flag-btn" data-good="1">👪 Family history of sudden cardiac death</button>
+          <button class="btn ghost flag-btn" data-good="1">⚡ Delta wave / long QT / Brugada on resting ECG</button>
+          <button class="btn ghost flag-btn" data-good="1">🥁 Sudden-onset regular FAST palpitations</button>
+          <button class="btn ghost flag-btn" data-good="0">💤 Isolated "skipped beats" at rest, normal ECG, no red flags</button>
+          <button class="btn ghost flag-btn" data-good="0">🌡️ Palpitations only with a fever / viral illness</button>
+          <button class="btn ghost flag-btn" data-good="0">👉 Reproducible chest-wall tenderness on palpation</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Credit where due</b>The GP took a resting ECG, sent thyroid function and a blood count, and — crucially — <em>flagged the possible delta wave rather than reassuring blindly</em>. Recognising that the rhythm was never captured and asking for the right monitor is precisely the correct ambulatory reflex.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🎯 The palpitation history — the four questions that do the work</h3>
+        <table class="tbl">
+          <tr><th>Question</th><th>This patient</th><th>Why it matters</th></tr>
+          <tr><td>🥁 Regular or irregular? Fast or slow?</td><td>Regular, fast ("drumming"), he can't tap it out it's so quick.</td><td>Regular + fast + sudden = re-entrant SVT (AVNRT/AVRT). Irregular = ectopy or AF.</td></tr>
+          <tr><td>⏱️ Onset &amp; offset — sudden or gradual?</td><td><strong>Instantaneous</strong> on and off — "a switch."</td><td>Abrupt on/off = paroxysmal SVT. Gradual = sinus tachycardia (anxiety, exercise, fever).</td></tr>
+          <tr><td>😵 Associated syncope, presyncope, chest pain?</td><td>Twice light-headed; once nearly sat on the pitch.</td><td>Any haemodynamic compromise = red flag → structural work-up + urgency.</td></tr>
+          <tr><td>🏃 Triggers — rest, exertion, posture, drugs?</td><td>Mostly at rest, but ONE clear exertional onset.</td><td>Exertional arrhythmia raises the stakes (channelopathy, WPW, VT).</td></tr>
+        </table>
+
+        <h3>🩻 Focused examination — between episodes</h3>
+        <ul>
+          <li>💓 Pulse regular 74, normal character; no radio-radial delay. BP 122/76 equal both arms.</li>
+          <li>🫀 Heart sounds normal, <strong>no murmur</strong> (a murmur would raise HOCM/valve disease); apex not displaced.</li>
+          <li>🫁 Chest clear; no signs of heart failure (no oedema, JVP normal).</li>
+          <li>🦋 No goitre, no tremor, no thyroid eye signs; no anaemia.</li>
+          <li>👉 <strong>Chest wall not tender</strong>; the palpitations are not reproducible by palpation (musculoskeletal awareness is a distractor, not this story).</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Ask the patient to TAP OUT the rhythm on the desk. Regular and too-fast-to-tap points to SVT; an irregular random tapping points to ectopy or AF. The tapping hand is a free diagnostic tool."</div>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of the reassuring resting pulse</b>He is in sinus rhythm at 74 and feels well — but that tells you nothing about the paroxysmal rhythm you haven't captured. A normal exam <strong>between</strong> episodes never excludes a dangerous intermittent arrhythmia. The examination's job here is to hunt for <em>structural</em> and <em>ECG</em> clues, not to catch the tachycardia.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The cardiology registrar thinks out loud at 10:34:</em></p>
+        <h3>🧠 Frame it as benign-vs-dangerous, then capture the rhythm</h3>
+        <p>"Two jobs. First, <strong>is this dangerous?</strong> He has three amber-to-red features — presyncope, one exertional onset, and a family history of unexplained sudden death — plus a resting ECG with <strong>pre-excitation</strong>. That is emphatically NOT a 'reassure and discharge' patient. Second, <strong>capture the culprit rhythm</strong>: episodes every 2–4 weeks mean a 24-hour Holter is almost useless — I need a monitor that matches his frequency."</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>📈 <strong>Read the resting 12-lead first</strong> — confirm the short PR + delta wave (pre-excitation); measure the QT; look for Brugada morphology and structural clues (LVH, Q waves).</li>
+          <li>🚩 <strong>Risk-stratify</strong> — red flags (syncope, exertional, structural, family SCD, abnormal ECG) push toward urgent, specialist pathway.</li>
+          <li>🫀 <strong>Transthoracic echo</strong> — exclude structural heart disease / cardiomyopathy given the exertional symptom and family history.</li>
+          <li>📟 <strong>Match the monitor to frequency</strong> — every-few-weeks episodes → a 7–14-day patch or an external event/loop recorder, NOT a single 24-h Holter.</li>
+          <li>⚡ <strong>Refer to electrophysiology</strong> — documented pre-excitation warrants accessory-pathway risk stratification (see S5).</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Match the monitor to the frequency: a 24-hour Holter for episodes that come every few weeks will simply miss them — you need a longer or implantable recorder."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>She is tempted to just book "a Holter" because it's the default. Given episodes every 2–4 weeks, is a 24-hour Holter the right first monitor?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No.</strong> A 24–48-hour Holter only captures a rhythm that occurs most days. For episodes every few weeks the yield is close to zero — he will almost certainly have no attack during the recording. The correct tool is a <strong>7–14-day patch or an external event/loop recorder</strong> (or, for rarer serious events, an implantable loop recorder). Choosing the wrong-duration monitor is the single commonest reason a dangerous rhythm is 'missed'.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The consultant electrophysiologist at the desk, 10:48:</em></p>
+        <h3>📟 Diagnostic yield — match the monitor to the symptom frequency</h3>
+        <table class="tbl">
+          <tr><th>Monitor</th><th>Best when symptoms occur…</th><th>Typical duration / yield</th></tr>
+          <tr><td>📼 <strong>24–48h Holter</strong></td><td>Daily (most days)</td><td>1–2 days; symptomatic-rhythm yield only ~10–20% because most patients have no episode in the window.</td></tr>
+          <tr><td>🩹 <strong>Patch monitor</strong> (e.g. 7–14 day adhesive)</td><td>Every few days to ~2 weeks</td><td>Longer wear = higher yield; patches out-diagnose 24h Holter for infrequent symptoms (ZIO/EMBRACE-type data).</td></tr>
+          <tr><td>🔘 <strong>External event / loop recorder</strong></td><td>Weekly-ish, patient can trigger</td><td>Weeks; good for capturing a symptomatic rhythm the patient activates.</td></tr>
+          <tr><td>💠 <strong>Implantable loop recorder (ILR)</strong></td><td>Rare (monthly or less), esp. with syncope</td><td>Up to ~3 years; highest yield for infrequent but serious events (CRYSTAL-AF, syncope guidelines).</td></tr>
+        </table>
+        <p>His episodes every 2–4 weeks sit squarely in the <strong>patch / external loop</strong> zone — a 24-h Holter would be the wrong tool.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The frequency dictates the tool: daily → Holter; weekly → patch/event recorder; monthly-or-rarer (especially with syncope) → implantable loop recorder. Capture-during-symptoms is the whole point."</div>
+
+        <h3>⚡ WPW / pre-excitation — risk-stratify the accessory pathway</h3>
+        <table class="tbl">
+          <tr><th>Tool</th><th>What it assesses</th><th>Reassuring vs high-risk</th></tr>
+          <tr><td><strong>SPERRI</strong> (shortest pre-excited RR in AF)</td><td>How fast the pathway can conduct to the ventricle in AF</td><td>SPERRI ≤ 250 ms = high-risk (rapid conduction → risk of VF).</td></tr>
+          <tr><td><strong>Exercise / ambulatory testing</strong></td><td>Sudden, complete loss of pre-excitation at higher rates</td><td>Abrupt loss of delta wave = likely low-risk pathway; persistent pre-excitation = needs EP study.</td></tr>
+          <tr><td><strong>EP study</strong> (invasive)</td><td>Antegrade effective refractory period, inducibility, mapping</td><td>Definitive risk stratification; enables curative ablation in the same session.</td></tr>
+        </table>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">RCT/DIAGNOSTIC</span> Longer patch vs 24h Holter (ZIO / EMBRACE-type)</td><td>Prolonged ambulatory monitoring detects substantially more actionable arrhythmias than a single 24h Holter.</td><td>For infrequent symptoms, wear longer — duration is the yield.</td></tr>
+            <tr><td><span class="lvl">RCT</span> CRYSTAL-AF</td><td>Implantable loop recorders vastly out-detected conventional monitoring for infrequent paroxysmal AF.</td><td>Rare-but-important events → implantable loop recorder.</td></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> 2019 ESC SVT guideline</td><td>Structured SVT diagnosis; catheter ablation is first-line curative therapy for symptomatic AVNRT/AVRT; asymptomatic pre-excitation should be risk-stratified (exercise/EP).</td><td>Documented SVT or pre-excitation → refer to EP for ablation assessment.</td></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> 2020 ESC sports cardiology</td><td>Pre-excitation and inherited arrhythmia syndromes need risk stratification before competitive sport; exertional palpitations/syncope demand work-up.</td><td>Exertional symptoms in a young athlete are never dismissed as 'just anxiety.'</td></tr>
+            <tr><td><span class="lvl">EVIDENCE</span> Smartwatch single-lead ECG</td><td>Consumer single-lead ECG can capture a symptomatic rhythm the clinic never sees; confirmatory 12-lead still required.</td><td>A patient-captured tracing during symptoms is gold — teach him to record one.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The chart that keeps me awake is the young man given a single 24-hour Holter that was 'normal' because he simply had no episode that day — and whose resting ECG delta wave nobody read. Months later he had pre-excited atrial fibrillation and arrested. The diagnosis was on the first ECG; the monitor was just the wrong tool."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY the racing, WHY the danger (the WHY behind the WHY)</h3>
+        <ol>
+          <li>🔁 <strong>Re-entry:</strong> most sudden regular SVT is a self-perpetuating circuit. In <strong>AVNRT</strong> the circuit is within the AV node (fast + slow pathways); in <strong>AVRT</strong> it uses an <strong>accessory pathway</strong> (as in WPW) that bypasses the AV node.</li>
+          <li>⚡ <strong>Pre-excitation:</strong> the accessory pathway lets the atrial impulse reach the ventricle early, pre-exciting it → <strong>short PR + delta wave</strong> (slurred QRS upstroke) on the resting ECG. This is the fingerprint sitting there between episodes.</li>
+          <li>🥁 <strong>The palpitation itself:</strong> during the tachycardia the ventricle fires ~150–250/min; the patient feels a sudden, regular, pounding rush — abrupt on and abrupt off, because the circuit either runs or it doesn't.</li>
+          <li>💀 <strong>The lethal scenario:</strong> if <strong>atrial fibrillation</strong> develops in a WPW patient, the accessory pathway can conduct the fast, irregular atrial impulses to the ventricle without the AV node's protective delay → <strong>pre-excited AF</strong> that can degenerate into <strong>ventricular fibrillation</strong>. Rare, but this is why pre-excitation earns respect.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A delta wave means WPW — risk-stratify and refer, because pre-excited AF can conduct at a lethal rate and degenerate to VF."</div>
+
+        <h3>⚖️ Contrast pair — benign palpitations vs dangerous</h3>
+        <div class="vs">
+          <div class="side a"><h4>🟢 Benign awareness of the heartbeat</h4><ul><li>Isolated "skipped beats" / thumps at rest, often when lying quietly</li><li>Normal resting ECG, no red flags, no syncope</li><li>Ectopy (PVCs/PACs), sinus tachycardia, anxiety</li><li>→ Reassure, explain, minimal or no monitoring</li></ul></div>
+          <div class="side b"><h4>🔴 Dangerous arrhythmia until proven otherwise</h4><ul><li>Syncope/presyncope, exertional onset, structural heart disease, family SCD</li><li>Abnormal resting ECG: pre-excitation, long QT, Brugada</li><li>Sudden regular fast palpitations (re-entrant SVT)</li><li>→ Investigate urgently: echo + right monitor + EP referral</li></ul></div>
+        </div>
+        <p>💡 The same complaint — "palpitations" — spans a reassure-and-discharge patient and a cardiac-arrest-in-waiting. The resting ECG and the red-flag screen split them.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The Symptom-Frequency Dial</h3>
+          <p style="font-size:13px">Drag the dial to set how often the patient's episodes occur. Watch the diagnostic <strong>yield of a plain 24-hour Holter</strong> collapse as episodes get rarer — and see which monitor actually matches the frequency.</p>
+          <label for="kRange">📆 Days between episodes: <b id="kVal">21</b> days</label>
+          <input type="range" id="kRange" min="1" max="60" value="21">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore which monitor fits the frequency.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 The gauge shows a 24-h Holter's yield: high for daily symptoms (green, left), near-zero for rare ones (red, right). Matching the monitor to the frequency is what makes the work-up diagnostic.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The clinic order set (10:55)</h3>
+        <ul>
+          <li>📈 <strong>Resting 12-lead ECG</strong> — reviewed carefully: confirm short PR + delta wave; measure QTc; assess for Brugada morphology, LVH, Q waves.</li>
+          <li>🧪 <strong>Bloods:</strong> FBC (anaemia), TFTs (thyrotoxicosis), U&amp;E + Mg²⁺/Ca²⁺ (electrolyte drivers of arrhythmia), glucose. Reversible non-cardiac causes screened.</li>
+          <li>🫀 <strong>Transthoracic echocardiogram</strong> — structural heart disease / cardiomyopathy, given exertional symptom + family SCD.</li>
+          <li>📟 <strong>Ambulatory monitor matched to frequency:</strong> for every-2–4-week episodes → a 7–14-day patch or external event/loop recorder (NOT a 24-h Holter).</li>
+          <li>⌚ <strong>Patient-triggered capture:</strong> teach him to record a smartwatch/handheld single-lead ECG during an episode and to activate the event recorder.</li>
+          <li>⚡ <strong>EP referral</strong> for pre-excitation risk stratification (exercise test ± EP study) and ablation assessment.</li>
+          <li>🩺 <strong>Safety advice</strong> pending work-up: vagal manoeuvre teaching; when to attend ED (sustained palpitations with chest pain, breathlessness, or syncope).</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A resting 12-lead and the right-duration monitor cost almost nothing; the expensive mistake is a single Holter fired at infrequent symptoms and a delta wave left unread."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🩹 Clinic &amp; monitoring-nurse priorities — the ambulatory safety net</h3>
+        <ul>
+          <li>📟 <strong>Fit the ambulatory monitor correctly</strong> — good skin prep and electrode adhesion; explain wear time and that it must stay on to capture an episode.</li>
+          <li>📓 <strong>Teach the symptom diary</strong> — patient logs the exact time, duration, and what he was doing when palpitations strike; the diary is matched to the recording to correlate rhythm with symptoms.</li>
+          <li>🔘 <strong>Train the event-recorder trigger / smartwatch capture</strong> — show him how to press the button (or record a single-lead ECG) the moment an episode starts; a captured symptomatic rhythm is the diagnostic prize.</li>
+          <li>💓 <strong>Teach pulse self-assessment</strong> — regular vs irregular, roughly how fast; and safe <strong>vagal manoeuvres</strong> (Valsalva, modified Valsalva) to try to terminate an SVT.</li>
+          <li>🚨 <strong>Red-flag safety-netting</strong> — attend ED urgently if an episode comes with chest pain, severe breathlessness, or blackout, or if palpitations do not stop.</li>
+          <li>🧾 Reinforce that "feeling fine in clinic" does not mean the work-up is over — the monitor and the diary do the real work at home.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The patient who reliably presses the event button and keeps an accurate diary is the most sensitive rhythm monitor you have — a captured tracing during symptoms beats a hundred normal recordings on quiet days."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Result</th><th>Interpretation</th></tr>
+          <tr><td>Resting 12-lead ECG</td><td class="hi">Short PR (104 ms) + delta wave</td><td><strong>Pre-excitation (WPW pattern).</strong> The diagnosis is on the first ECG — a manifest accessory pathway.</td></tr>
+          <tr><td>QTc</td><td class="ok-v">418 ms</td><td>Normal — long QT not contributing.</td></tr>
+          <tr><td>TFTs</td><td class="ok-v">Normal</td><td>Excludes thyrotoxicosis as a driver.</td></tr>
+          <tr><td>FBC / Hb</td><td class="ok-v">146 g/L</td><td>Excludes anaemia.</td></tr>
+          <tr><td>U&amp;E / Mg²⁺ / Ca²⁺</td><td class="ok-v">Normal</td><td>No electrolyte trigger.</td></tr>
+          <tr><td>Echocardiogram</td><td class="ok-v">Structurally normal, EF 60%</td><td>No cardiomyopathy/valve disease — the danger here is electrical, not structural.</td></tr>
+          <tr><td>24-hour Holter (done first at referral)</td><td>Normal — sinus rhythm, no episode</td><td><strong>Uninformative, not reassuring:</strong> he simply had no attack that day. Wrong tool for every-few-weeks symptoms.</td></tr>
+          <tr><td>14-day patch recorder</td><td class="hi">Sudden regular narrow-complex tachycardia ~200/min during a logged episode</td><td><strong>Captured the culprit:</strong> paroxysmal SVT correlating with symptoms → consistent with AVRT via the accessory pathway.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A normal monitor on an asymptomatic day is uninformative, not reassuring. The only recording that answers the question is the one running WHEN the patient has symptoms."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why the two tools together crack the case</b>The <strong>resting 12-lead</strong> revealed the substrate (pre-excitation) even between episodes; the <strong>frequency-matched patch</strong> captured the arrhythmia (SVT) the single Holter missed. Neither alone was enough — the ECG told you the danger, the right monitor told you the rhythm. That pairing is the core of the ambulatory palpitations work-up.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 ECG / IMAGING + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🫀 The resting 12-lead — the delta wave that hides in plain sight</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 130" preserveAspectRatio="none" aria-label="Resting ECG showing short PR and delta wave versus a normal complex">
+            <rect width="820" height="130" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="32" x2="820" y2="32"/><line x1="0" y1="65" x2="820" y2="65"/><line x1="0" y1="98" x2="820" y2="98"/></g>
+            <!-- normal-ish P-QRS then pre-excited complexes with slurred delta upstroke -->
+            <polyline fill="none" stroke="#86efac" stroke-width="2.3" points="0,70 30,70 44,62 58,62 72,70 96,70 108,60 118,30 128,92 138,70 190,70 210,70 224,63 238,63 252,70 300,70 312,60 322,30 332,92 342,70 410,70 430,70 442,64 456,64 470,70 500,70 520,58 540,44 552,26 566,90 576,66 590,70 650,70 672,70 686,64 700,64 714,70 744,70 760,58 780,44 792,26 806,90 820,68"/>
+            <text x="120" y="20" fill="#93c5fd" font-size="11">normal PR — sharp QRS</text>
+            <text x="520" y="18" fill="#fca5a5" font-size="11">short PR + slurred delta upstroke (pre-excitation)</text>
+          </svg>
+          <div class="ecg-cap">On the <span style="color:#93c5fd">left</span> a normal complex (clear PR gap, crisp QRS onset). On the <span style="color:#fca5a5">right</span> the PR is short and the QRS begins with a <strong>slurred delta wave</strong> — the WPW fingerprint. This was on the very first ECG.</div>
+        </div>
+
+        <h3>🔎 Resting-ECG clues you must never skip in palpitations</h3>
+        <table class="tbl">
+          <tr><th>Pattern</th><th>Look for</th><th>Meaning</th></tr>
+          <tr><td>⚡ <strong>Pre-excitation (WPW)</strong></td><td>Short PR (&lt;120 ms) + delta wave + wide QRS</td><td>Accessory pathway — risk-stratify (SPERRI/exercise/EP); pre-excited AF can be lethal.</td></tr>
+          <tr><td>📏 <strong>Long QT</strong></td><td>QTc &gt;460–480 ms (longer in women)</td><td>Risk of torsades/syncope/SCD; review QT-prolonging drugs &amp; electrolytes.</td></tr>
+          <tr><td>🪟 <strong>Brugada pattern</strong></td><td>Coved ST elevation V1–V2 (type 1)</td><td>Channelopathy with SCD risk — needs specialist assessment.</td></tr>
+          <tr><td>💪 <strong>LVH / Q waves / T-inversion</strong></td><td>Voltage criteria, pathological Q, deep TWI</td><td>Structural disease — HCM, prior infarct, cardiomyopathy → echo/CMR.</td></tr>
+          <tr><td>🥁 <strong>Frequent ectopy</strong></td><td>PVC/PAC morphology &amp; burden</td><td>Usually benign; a very high PVC burden can cause a reversible cardiomyopathy.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'The resting ECG looks basically normal' is only true if you actually measured the PR and the QT and looked at V1. A delta wave, a long QT and a Brugada V1 are missed by the glance, caught by the read."</div>
+
+        <h3>📟 The monitoring toolbox — pick by symptom frequency</h3>
+        <ul>
+          <li><strong>24–48h Holter:</strong> daily symptoms — captures rhythm only if it happens most days.</li>
+          <li><strong>Patch monitor (7–14 day):</strong> every few days to two weeks — longer wear, higher yield, patient-friendly.</li>
+          <li><strong>External event / loop recorder:</strong> weekly-ish — patient triggers a capture during symptoms.</li>
+          <li><strong>Smartwatch / handheld single-lead ECG:</strong> any frequency — patient records their own symptomatic tracing (confirm with 12-lead).</li>
+          <li><strong>Implantable loop recorder (ILR):</strong> rare but serious events, especially with unexplained syncope — records for up to ~3 years.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The palpitations drug map — what, why, and the traps</h3>
+        <table class="tbl">
+          <tr><th>Drug / step</th><th>Role</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>Vagal manoeuvres</strong> (Valsalva, modified Valsalva)</td><td>First-line to terminate an acute regular SVT</td><td>↑vagal tone → slows AV-node conduction, breaks AV-nodal re-entry. Teach the patient to self-administer.</td></tr>
+          <tr><td><strong>Adenosine</strong> (acute, monitored)</td><td>Terminates AV-node-dependent SVT; diagnostic</td><td>Transient AV block. <span class="hi">Caution in known pre-excitation:</span> can provoke AF, and if pre-excited AF is present it is dangerous — give only with defib/resus to hand.</td></tr>
+          <tr><td><strong>Beta-blockers</strong></td><td>Reduce SVT frequency, rate-limit, symptom control</td><td>Slow AV-node conduction; reasonable in orthodromic AVRT/AVNRT once pre-excited AF risk is understood.</td></tr>
+          <tr><td class="hi"><strong>AV-nodal blockers ALONE in pre-excited AF</strong> (digoxin, verapamil, diltiazem)</td><td>❌ AVOID in WPW with AF/pre-excitation</td><td><span class="hi">Can accelerate conduction down the accessory pathway → faster ventricular rate → VF.</span> The classic lethal error.</td></tr>
+          <tr><td><strong>Flecainide / propafenone</strong> (class Ic)</td><td>Rhythm control / "pill-in-the-pocket" in selected SVT/AVRT</td><td>Slow accessory-pathway &amp; atrial conduction; avoid in structural/ischaemic heart disease.</td></tr>
+          <tr><td><strong>Catheter ablation</strong> (definitive)</td><td>Curative for symptomatic AVRT/AVNRT &amp; risk-bearing WPW</td><td>Ablates the accessory pathway / AVNRT substrate; first-line per 2019 ESC SVT for symptomatic re-entrant SVT.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In pre-excited AF (WPW + irregular broad complexes), AV-nodal blockers — digoxin, verapamil, diltiazem, even adenosine — can be lethal; the safe answer is procainamide/flecainide or synchronised cardioversion, then ablation."</div>
+        <div class="callout danger"><b class="ct">🚫 The 'never in pre-excited AF' list</b>❌ digoxin · ❌ verapamil/diltiazem · ❌ beta-blocker as sole agent · ⚠️ adenosine — because blocking the AV node pushes all the atrial impulses down the fast accessory pathway. Cardiovert if unstable; refer for ablation as the definitive fix.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to record and why — frequency drives the choice</h3>
+        <ul>
+          <li>📆 <strong>Establish the symptom frequency first</strong> — it is the single variable that selects the monitor. Daily → Holter; weekly → patch/event; monthly-or-rarer → implantable loop recorder.</li>
+          <li>📓 <strong>Correlate rhythm with a symptom diary</strong> — a captured tachycardia that coincides with logged symptoms is diagnostic; an incidental rhythm on an asymptomatic day is weaker evidence.</li>
+          <li>⌚ <strong>Empower patient-triggered capture</strong> — event-recorder button, smartwatch single-lead ECG; the patient is often the only one present when the rhythm occurs.</li>
+          <li>😵 <strong>Syncope changes the calculus</strong> — unexplained syncope with suspected arrhythmia favours an implantable loop recorder for its long recording window.</li>
+          <li>⚡ <strong>Pre-excitation adds an exercise/ambulatory question</strong> — abrupt loss of the delta wave with rate suggests a lower-risk pathway; persistent pre-excitation prompts EP study.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Ask one number before you order any monitor: how often does it happen? The answer picks the device. Everything else is detail."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong — the palpitations that turn dangerous</h3>
+        <ul>
+          <li>⚡ <strong>Pre-excited AF → VF / sudden cardiac death</strong> — the feared WPW complication; the accessory pathway conducts AF at a lethal ventricular rate.</li>
+          <li>😵 <strong>Syncope &amp; injury</strong> — arrhythmic syncope during exertion (driving, sport, heights) can be catastrophic.</li>
+          <li>🫀 <strong>PVC-induced cardiomyopathy</strong> — a very high PVC burden (often &gt;10–20%) can cause a reversible fall in EF; "benign" ectopy that isn't monitored can quietly harm.</li>
+          <li>🧬 <strong>Missed channelopathy / cardiomyopathy</strong> — long QT, Brugada, HCM, ARVC presenting as "palpitations" and dismissed as anxiety.</li>
+          <li>🔁 <strong>Incessant / frequent SVT</strong> — tachycardia-mediated cardiomyopathy if left uncontrolled.</li>
+          <li>🩹 <strong>The system complication:</strong> the wrong-tool work-up — a single normal Holter labelled "reassuring," closing the case on a dangerous rhythm never captured.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The deadliest complication of palpitations is not in the heart — it's the falsely reassuring normal monitor that ended the work-up before the rhythm was ever caught."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The palpitations differential — dangerous causes flagged</h3>
+        <table class="tbl">
+          <tr><th>Cause</th><th>Discriminators</th><th>Don't-miss action</th></tr>
+          <tr><td>🥁 <strong>Ectopy (PVCs/PACs)</strong></td><td>"Skipped beats," thumps at rest, isolated; normal ECG</td><td>Usually reassure; quantify burden if frequent (PVC cardiomyopathy).</td></tr>
+          <tr><td>🔁 <strong>SVT (AVNRT / AVRT / atrial tachy)</strong></td><td>Sudden regular fast on/off; AVRT ↔ pre-excitation on resting ECG</td><td>Capture the rhythm; refer for ablation (curative).</td></tr>
+          <tr><td>🌀 <strong>Atrial fibrillation</strong></td><td>Irregularly irregular; stroke risk; ↑ with age/structural disease</td><td>Document; rate/rhythm + anticoagulation assessment.</td></tr>
+          <tr><td>⚡ <strong>Ventricular tachycardia</strong></td><td>Structural disease, syncope, broad-complex; family SCD</td><td>Urgent — structural/EP work-up; never dismiss.</td></tr>
+          <tr><td>🏃 <strong>Sinus tachycardia (physiological)</strong></td><td>Gradual on/off; exercise, fever, anaemia, anxiety, thyrotoxicosis, drugs</td><td>Treat the cause; not primarily an arrhythmia.</td></tr>
+          <tr><td>🧠 <strong>Non-cardiac</strong></td><td>Anxiety/panic, thyrotoxicosis, anaemia, caffeine/stimulants/drugs</td><td>Screen bloods; but exclude a dangerous rhythm first.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Palpitations WITH syncope, on exertion, or in a structurally abnormal heart are dangerous until proven otherwise — never label them 'anxiety' before the ECG and the right monitor."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The Clinic Work-Up"</h3>
+          <div class="hud"><span>❤️ Safety: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">A 26-year-old has sudden regular racing-heart episodes every few weeks, with one exertional onset and a cousin who died suddenly and young. He feels well in front of you. What is your FIRST move?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The work-up plan</h3>
+        <ol>
+          <li>📈 <strong>Resting 12-lead ECG first</strong> — pre-excitation confirmed (short PR + delta wave); QT and Brugada screen done.</li>
+          <li>🚩 <strong>Risk-stratify</strong> — presyncope + exertional onset + family SCD + abnormal ECG = high-risk pathway (urgent, specialist).</li>
+          <li>🫀 <strong>Echo normal</strong> — no structural disease; the risk is electrical.</li>
+          <li>📟 <strong>Frequency-matched monitor</strong> — 14-day patch captured SVT during symptoms; Holter had been uninformative.</li>
+          <li>⚡ <strong>EP referral</strong> — accessory-pathway risk stratification and catheter ablation of the SVT/pathway.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Documented SVT or pre-excitation is not a 'watch and wait' — it earns an electrophysiology referral, because catheter ablation is often curative and removes the danger for good."</div>
+
+        <div class="checklist" id="ckWorkup">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Palpitations work-up checklist (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>📈 Resting 12-lead ECG done &amp; carefully READ — PR, delta wave, QTc, V1 Brugada, structural clues</span></label>
+          <label class="ck"><input type="checkbox"><span>🚩 Red-flag triage — syncope, exertional onset, structural disease, family SCD, abnormal ECG</span></label>
+          <label class="ck"><input type="checkbox"><span>🧪 Reversible causes screened — FBC, TFTs, U&amp;E/Mg/Ca, drugs/caffeine</span></label>
+          <label class="ck"><input type="checkbox"><span>🫀 Echocardiogram if red flags / abnormal ECG / exertional symptoms</span></label>
+          <label class="ck"><input type="checkbox"><span>📟 Ambulatory monitor MATCHED to symptom frequency (not a default 24h Holter)</span></label>
+          <label class="ck"><input type="checkbox"><span>📓 Symptom diary + patient-triggered capture taught (event recorder / smartwatch)</span></label>
+          <label class="ck"><input type="checkbox"><span>⚡ Safety-net + EP referral for pre-excitation or documented SVT/VT</span></label>
+          <div class="ck-progress" data-progress>0 / 7 complete</div>
+        </div>
+
+        <div class="checklist" id="ckEP">
+          <h3 style="margin-top:0">🩺 Procedure Guide — When to refer to electrophysiology</h3>
+          <label class="ck"><input type="checkbox"><span>⚡ Pre-excitation on the resting ECG (WPW pattern) — for risk stratification ± ablation</span></label>
+          <label class="ck"><input type="checkbox"><span>🔁 Documented SVT (AVNRT/AVRT/atrial tachycardia) — for curative catheter ablation</span></label>
+          <label class="ck"><input type="checkbox"><span>💥 Documented or suspected VT / broad-complex tachycardia</span></label>
+          <label class="ck"><input type="checkbox"><span>😵 Palpitations with syncope, or exertional symptoms, or family history of SCD</span></label>
+          <label class="ck"><input type="checkbox"><span>🧬 Suspected channelopathy (long QT, Brugada) or cardiomyopathy on ECG/echo</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">Clinic visit</div>Resting 12-lead read carefully → short PR + delta wave (pre-excitation). Red flags noted (presyncope, exertional onset, family SCD). Echo requested.</div>
+          <div class="t-item"><div class="t-time">Day 3</div>Echo structurally normal, EF 60% — the risk is electrical, not structural.</div>
+          <div class="t-item"><div class="t-time">Weeks 1–2</div>The earlier 24-h Holter was normal (no episode that day) — recognised as uninformative, not reassuring. A <strong>14-day patch</strong> is fitted instead.</div>
+          <div class="t-item"><div class="t-time">Day 11 of patch</div>Patient logs a racing-heart episode; the recorder captures sudden regular narrow-complex tachycardia ~200/min → paroxysmal SVT (AVRT via the accessory pathway).</div>
+          <div class="t-item"><div class="t-time">EP referral</div>Accessory-pathway risk stratification; <strong>catheter ablation</strong> of the pathway — curative. Palpitations resolve; he returns to football, cleared.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>He is cured because someone actually READ the first ECG, refused to accept "anxiety," matched the monitor to his frequency to capture the SVT, and referred pre-excitation to electrophysiology. Ordinary discipline, a life protected before the dangerous rhythm ever declared itself.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 Two very different discharges — cure the dangerous, reassure the benign</h3>
+        <div class="vs">
+          <div class="side a"><h4>⚡ This patient (WPW + documented SVT)</h4><ul><li>Post-ablation follow-up; confirm loss of pre-excitation and no inducible SVT</li><li>Safety-net: recurrence of palpitations, any syncope → re-refer</li><li>Sport/driving guidance per local rules until cleared</li><li>Explain why AV-nodal blockers alone were avoided; document the pathway</li></ul></div>
+          <div class="side b"><h4>🟢 The genuinely benign palpitations</h4><ul><li>Isolated ectopy, normal resting ECG, no red flags, no syncope</li><li>Explain the benign mechanism; reduce caffeine/stimulants; reassure</li><li>Written safety-net: return if syncope, exertional onset, or sustained fast regular palpitations develop</li><li>Minimal/no monitoring; discharge to GP</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Reassurance is a diagnosis you earn — a clean resting ECG, no red flags, and benign-sounding symptoms — never a shortcut you take because the patient looks well and young."</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>📈 Always a resting 12-lead</b>The diagnosis (delta wave, long QT, Brugada) often sits on the ECG between episodes — read it, don't glance.</div>
+          <div class="pearl"><b>📆 Match monitor to frequency</b>Daily → Holter; weekly → patch/event; rare/serious → implantable loop recorder.</div>
+          <div class="pearl"><b>🥁 Regular + sudden = SVT</b>Abrupt-on/off, too-fast-to-tap, regular palpitations suggest re-entrant SVT — refer for ablation.</div>
+          <div class="pearl"><b>⚡ Delta wave = WPW</b>Risk-stratify (SPERRI/exercise/EP) and refer — pre-excited AF can degenerate to VF.</div>
+          <div class="pearl"><b>😵 Red flags upgrade urgency</b>Syncope, exertional onset, structural disease, family SCD, abnormal ECG → echo + specialist.</div>
+          <div class="pearl"><b>🩹 Normal ≠ reassuring</b>A monitor with no symptoms recorded is uninformative — capture the rhythm during symptoms.</div>
+          <div class="pearl"><b>🚫 Beware AV-nodal blockers</b>In pre-excited AF, digoxin/verapamil/diltiazem/adenosine can be lethal — cardiovert, then ablate.</div>
+          <div class="pearl"><b>🫀 Watch the PVC burden</b>Benign ectopy usually, but a very high PVC burden can cause reversible cardiomyopathy.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the pathway</h3>
+          <ul>
+            <li>🧩 <strong>The full differential of palpitations:</strong> ectopy (PVCs/PACs), SVT (AVNRT, AVRT, atrial tachycardia), atrial fibrillation/flutter, VT, physiological sinus tachycardia, and non-cardiac drivers (anxiety/panic, thyrotoxicosis, anaemia, phaeochromocytoma, caffeine/stimulants/salbutamol). The history's <em>regularity, onset/offset, and associated features</em> sort them faster than any test.</li>
+            <li>⚡ <strong>Pre-excitation &amp; accessory-pathway risk:</strong> manifest vs concealed pathways; SPERRI ≤ 250 ms and short antegrade ERP mark high risk; abrupt loss of pre-excitation on exertion suggests a lower-risk pathway; asymptomatic WPW in high-risk occupations/athletes may still warrant EP study (2019 ESC SVT / 2020 ESC sports).</li>
+            <li>📟 <strong>Monitoring technologies:</strong> adhesive patch monitors (extended continuous recording), external and implantable loop recorders, and <em>consumer single-lead ECG / photoplethysmography wearables</em> — high patient-captured yield but requiring confirmatory 12-lead and mindful of false positives.</li>
+            <li>🔥 <strong>Catheter ablation of SVT:</strong> slow-pathway modification for AVNRT and accessory-pathway ablation for AVRT/WPW have high success and low complication rates — first-line curative therapy for symptomatic re-entrant SVT rather than lifelong drugs.</li>
+            <li>🫀 <strong>PVC burden — benign vs harmful:</strong> most ventricular ectopy is benign, but a high burden (commonly &gt;10–20% of beats) can cause <em>PVC-induced cardiomyopathy</em>, which is reversible with suppression or ablation; monitor burden and LV function.</li>
+            <li>🧬 <strong>When palpitations signal a channelopathy or cardiomyopathy:</strong> long QT, Brugada, catecholaminergic polymorphic VT, HCM and ARVC can all present as "palpitations." Exertional symptoms, syncope, and family history of premature SCD should trigger extended ECG interpretation, echo/CMR, exercise testing, and genetic/family evaluation.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The Holter That Missed"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 24-year-old man was referred with occasional racing-heart episodes "every few weeks." In a busy clinic he was booked for the default <strong>single 24-hour Holter</strong>. He happened to have no episode that day, so the Holter was reported <strong>normal</strong> and he was <strong>reassured and discharged</strong> as "probably anxiety." His resting 12-lead had been filed but <strong>never carefully read</strong> — it showed a short PR and a <strong>delta wave</strong> (WPW). Months later he developed an episode of <strong>pre-excited atrial fibrillation</strong>; the accessory pathway conducted the irregular atrial impulses to the ventricle at a lethal rate, degenerated to <strong>ventricular fibrillation</strong>, and he had a cardiac arrest. The diagnosis had been on the first ECG all along, and the right monitor for his infrequent episodes would have caught the SVT that pointed to WPW.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>📈 ECG NOT READ</b>The delta wave on the resting 12-lead was filed but never interpreted.</div>
+            <div class="hole"><b>📟 WRONG MONITOR</b>A 24-h Holter for every-few-weeks symptoms — near-zero yield for his frequency.</div>
+            <div class="hole"><b>🧠 ANCHORING</b>"Young + well = anxiety" label stuck; red flags not weighted.</div>
+            <div class="hole"><b>🩹 FALSE REASSURANCE</b>A normal (asymptomatic-day) Holter was read as "all clear," closing the case.</div>
+            <div class="hole"><b>⚡ NO EP REFERRAL</b>Pre-excitation never risk-stratified, so pre-excited-AF danger was never addressed.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> read every resting 12-lead in a palpitations patient and act on a delta wave; match the monitor to the symptom frequency (a patch or event recorder, not a single Holter); never let a normal asymptomatic-day recording end the work-up; weight red flags (exertional onset, presyncope, family history); and refer documented pre-excitation to electrophysiology for risk stratification and ablation. <strong>This is exactly the discipline that cured the patient in Bed 6.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A normal 24-hour Holter on a symptom-free day has falsely reassured more patients than it has ever diagnosed. The diagnosis was on the first ECG — and the monitor was simply the wrong tool for the frequency."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🩺 Outpatient Clinic · Bed 6 — Palpitations / Ambulatory Rhythm Work-Up<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+    /* ===== SIDEBAR TABS — show one section at a time ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not a high-risk feature'); } if(found===total){ flagResult.textContent='✅ All '+total+' high-risk features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' high-risk features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: symptom-frequency → best monitor & Holter yield ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=(v-1)/(60-1)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<=2){ msg='🟢 Daily symptoms (~every '+v+' day'+(v>1?'s':'')+'). A 24–48h HOLTER will very likely capture an episode — high yield, right tool.'; cls='good'; }
+      else if(v<=14){ msg='🟠 Every few days to ~2 weeks (~'+v+' days). A single 24h Holter often MISSES it — use a 7–14 day PATCH or external event/loop recorder.'; cls='warn-r'; }
+      else if(v<=45){ msg='🟠 Every few weeks (~'+v+' days). A 24h Holter yield is very low (this patient) — a prolonged external LOOP/event recorder is the right tool.'; cls='warn-r'; }
+      else { msg='🔴 Rare — roughly monthly or less (~'+v+' days), especially with syncope. Holter yield is near zero → IMPLANTABLE LOOP RECORDER.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Monitor Matcher'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"A 26-year-old has sudden regular racing-heart episodes every few weeks, with one exertional onset and a cousin who died suddenly and young. He feels well in front of you. What is your FIRST move?",
+      choices:[
+        {t:"😌 Reassure him it's anxiety/benign ectopy and discharge without a careful ECG",good:false,ds:-2,dt:90,xp:0,fb:"☠️ This is the M&M case in S21. The resting ECG hides a delta wave (WPW); reassuring without reading it lets pre-excited AF arrive months later and cause an arrest. Restart.",end:true},
+        {t:"📈 Do and carefully READ a resting 12-lead ECG first, then screen the red flags",good:true,ds:1,dt:6,xp:40,fb:"✅ Exactly. Every palpitation gets a resting 12-lead — and it shows a short PR + delta wave. The diagnosis was sitting there between episodes.",next:"repeat"},
+        {t:"📟 Order a default 24-hour Holter straight away without reading the ECG closely",good:false,ds:-1,dt:10,xp:5,fb:"⚠️ Wrong tool AND you skipped the ECG. For every-few-weeks symptoms a 24h Holter almost always misses the rhythm — and the delta wave is already on the resting trace. Read the ECG, then match the monitor.",next:"repeat"}
+      ]},
+    repeat:{ text:"The resting ECG shows a short PR + delta wave (pre-excitation, WPW). Episodes occur every 2–4 weeks. Echo is normal. What next?",
+      choices:[
+        {t:"📟 Fit a frequency-matched monitor (14-day patch / event recorder), not a 24h Holter, and refer to EP for pre-excitation risk stratification",good:true,ds:1,dt:8,xp:40,fb:"✅ Right. Match the monitor to the frequency to capture the rhythm, and refer documented pre-excitation to electrophysiology.",next:"declare"},
+        {t:"📼 Give a single 24-hour Holter and, if it's normal, reassure him",good:false,ds:-2,dt:30,xp:0,fb:"⚠️ A 24h Holter for every-few-weeks symptoms will be normal simply because he has no episode that day — that is uninformative, not reassuring, and ignores the delta wave.",next:"declare"}
+      ]},
+    declare:{ text:"The patch captures sudden regular narrow-complex tachycardia ~200/min during a logged episode; EP confirms AVRT using the accessory pathway. What now?",
+      choices:[
+        {t:"⚡ Refer to electrophysiology for accessory-pathway risk stratification and catheter ablation; counsel against AV-nodal-blockers alone given pre-excitation",good:true,ds:1,dt:6,xp:45,fb:"🏆 Perfect. Documented SVT + pre-excitation → EP referral; catheter ablation is curative and removes the pre-excited-AF danger. The whole work-up existed to reach this.",end:true},
+        {t:"💊 Start diltiazem alone and continue him in clinic without EP referral",good:false,ds:-1,dt:20,xp:0,fb:"⚠️ Dangerous — an AV-nodal blocker alone in pre-excitation can accelerate accessory-pathway conduction if AF develops. He needs EP referral and ablation, not a lone rate-limiting drug.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='declare'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A well-looking 26-year-old has recurrent sudden-onset regular palpitations every few weeks. The single most important FIRST investigation is:", opts:["A 24-hour Holter monitor","A carefully read resting 12-lead ECG","An exercise tolerance test","A CT coronary angiogram"], correct:1, exp:"Every palpitation gets a resting 12-lead first — it can reveal the diagnosis (pre-excitation, long QT, Brugada) or structural danger between episodes. A 24h Holter is the wrong tool for infrequent symptoms and comes after the ECG." },
+    { q:"His episodes occur every 2–4 weeks. Which ambulatory monitor gives the highest diagnostic yield?", opts:["24-hour Holter","48-hour Holter","A 7–14 day patch or external event/loop recorder","No monitoring — reassure"], correct:2, exp:"Match the monitor to the frequency. A 24–48h Holter only captures rhythms occurring most days; for every-few-weeks symptoms a prolonged patch or external event/loop recorder is far more likely to capture the rhythm." },
+    { q:"The resting ECG shows a short PR interval with a delta wave. This indicates:", opts:["Long QT syndrome","Pre-excitation (WPW) via an accessory pathway","First-degree AV block","Benign early repolarisation"], correct:1, exp:"A short PR (<120 ms) plus a slurred QRS upstroke (delta wave) is pre-excitation — an accessory pathway conducting early to the ventricle (WPW pattern). It warrants risk stratification and EP referral." },
+    { q:"Why is pre-excitation (WPW) potentially dangerous?", opts:["It always causes heart failure","Pre-excited atrial fibrillation can conduct rapidly down the pathway and degenerate into VF","It invariably progresses to complete heart block","It causes long QT"], correct:1, exp:"In WPW, if atrial fibrillation develops the accessory pathway can conduct the fast irregular atrial impulses to the ventricle without the AV node's protective delay, producing a lethal ventricular rate that can degenerate to ventricular fibrillation." },
+    { q:"A single 24-hour Holter in this patient returns normal (sinus rhythm, no episode). This result is best described as:", opts:["Reassuring — arrhythmia excluded","Uninformative — he simply had no episode during the recording","Diagnostic of anxiety","Grounds for immediate discharge"], correct:1, exp:"A normal monitor on an asymptomatic day is uninformative, not reassuring. Only a recording obtained WHILE the patient has symptoms answers the question — hence matching the monitor duration to the symptom frequency." },
+    { q:"Which feature would MOST upgrade palpitations from likely-benign to potentially dangerous?", opts:["Occasional 'skipped beats' at rest with a normal ECG","Palpitations associated with syncope or on exertion","Awareness of the heartbeat when lying quietly","Palpitations only during a febrile illness"], correct:1, exp:"Red flags are syncope/presyncope, exertional onset, structural heart disease/reduced EF, family history of sudden cardiac death, and an abnormal resting ECG. Isolated ectopy at rest with a normal ECG is reassuring." },
+    { q:"A WPW patient develops irregular broad-complex tachycardia (pre-excited AF) and is unstable. Which is CONTRAINDICATED / dangerous?", opts:["Synchronised DC cardioversion","IV verapamil or digoxin","Procainamide","Referral for ablation once stable"], correct:1, exp:"AV-nodal blockers (verapamil, diltiazem, digoxin, and adenosine) can accelerate conduction down the accessory pathway in pre-excited AF and precipitate VF. Use synchronised cardioversion if unstable, or an agent like procainamide/flecainide, then ablation." },
+    { q:"Per the 2019 ESC SVT guideline, the definitive treatment for symptomatic recurrent AVRT/AVNRT is usually:", opts:["Lifelong amiodarone","Catheter ablation","A permanent pacemaker","Reassurance alone"], correct:1, exp:"Catheter ablation (accessory-pathway ablation for AVRT, slow-pathway modification for AVNRT) is first-line curative therapy for symptomatic re-entrant SVT, with high success and low complication rates — preferable to lifelong drug therapy." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you work up palpitations like an electrophysiologist. 🏆':score>=6?'Strong — review the misses and S5/S10 (monitor choice & the delta wave).':'Revisit S5, S6 and S10 — read the resting ECG and match the monitor to the frequency.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>
