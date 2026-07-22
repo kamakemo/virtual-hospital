@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chronic Coronary Syndrome — Stable Angina in Clinic — Virtual Teaching Hospital</title>
+<!-- META
+id: c-clin-ccs-055
+title: Chronic Coronary Syndrome — Stable Angina in Clinic
+hospital: cardiology
+department: cv-clinic
+bednumber: 1
+chiefcomplaint: Exertional chest tightness relieved by rest, referred to clinic for assessment
+system: Cardiology
+severity: stable
+tags: Chronic coronary syndrome, Stable angina, CTCA, ISCHEMIA trial, Anti-anginals, Secondary prevention
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🚨</div>
+      <div>
+        <div class="t1">Emergency Dept</div>
+        <div class="t2">Bed 1 · Chronic Coronary Syndrome</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🏥 Outpatient Clinic · 🛏️ Bed 1</div>
+        <h1>🫀 Chronic Coronary Syndrome — "The Stent That Wasn't the Answer"</h1>
+        <div class="sub">🕙 10:40, cardiology clinic. A 60-year-old describes six months of predictable chest tightness on the hill to the station, gone within two minutes of stopping. His referral letter already asks for "angiography and stenting." Your decision this morning is not whether he has coronary disease — it's whether he needs a cath lab at all, or optimal medical therapy first.</div>
+        <div class="chips">
+          <span class="chip crit">🟢 STABLE · AMBULATORY</span>
+          <span class="chip">🫀 Chronic Coronary Syndrome</span>
+          <span class="chip">🖥️ CTCA First-Line</span>
+          <span class="chip">📚 ISCHEMIA / ORBITA</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital"><div class="v-label">💓 HR</div><div class="v-num">68</div></div>
+        <div class="vital warn"><div class="v-label">🩸 BP</div><div class="v-num">138/84</div></div>
+        <div class="vital"><div class="v-label">🌬️ RR</div><div class="v-num">14</div></div>
+        <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">98%</div></div>
+        <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.6°</div></div>
+        <div class="vital"><div class="v-label">🧠 GCS</div><div class="v-num">15</div></div>
+        <div class="vital warn"><div class="v-label">😖 Angina</div><div class="v-num">CCS II</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout info"><b class="ct">🩺 YOU ARE HERE — 10:40, Cardiology Outpatient Clinic, Room 4</b>A calm, well-looking man sits across the desk in his coat, referral letter in hand. He says: <em>"It's a tight band across the front when I push up the hill — always the same spot on the walk, always eases when I stop for a minute. My GP thinks I need a stent."</em> He is pain-free right now. There is no drama in this room — and that is exactly the point. The decision that changes his next decade is a quiet one made here, not in a resus bay.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>🧔 Name</td><td><strong>Mr. R.C.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>60-year-old male</td></tr>
+          <tr><td>🆔 MRN</td><td>CV-CLIN-0055</td></tr>
+          <tr><td>⚖️ Weight</td><td>88 kg (BMI 28)</td></tr>
+          <tr><td>💼 Occupation</td><td>Accountant — desk-based, walks to the station daily</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 Past history — each line moves the pre-test probability</h3>
+        <ul>
+          <li>🔺 <strong>Hypertension</strong> (on amlodipine, adherent), <strong>dyslipidaemia</strong> (never treated — declined a statin two years ago), <strong>impaired fasting glucose</strong>. The metabolic backdrop of atherosclerosis.</li>
+          <li>🚬 <strong>Ex-smoker</strong>, 20 pack-years, quit 5 years ago.</li>
+          <li>👨‍👦 <strong>Brother had a CABG at 58.</strong> Premature family history of coronary disease.</li>
+          <li>🏃 Reasonably active; symptoms are <em>predictable, exertional and reproducible</em> — the same effort brings the same pain, and rest reliably relieves it. This stability is the whole diagnostic story.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Chronic coronary syndrome is angina that is PREDICTABLE — the same exertion, the same site, relieved by the same rest. Predictability is stability; loss of predictability is an acute coronary syndrome until proven otherwise."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why the clinic is where prognosis is quietly decided</b>Stable angina affects millions and is the ambulatory face of coronary disease. The temptation — from patient and referrer alike — is to equate "blocked artery" with "needs a stent." Yet the modern evidence (ISCHEMIA, COURAGE, ORBITA) says the opposite: in <em>stable</em> disease, it is optimal medical therapy and risk-factor control, not routine revascularisation, that changes the odds of death and MI. The most important intervention in this room may be a statin and a conversation, not a catheter.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 GP referral handover — the clinic "SBAR"</h3>
+        <div class="callout info"><b class="ct">🎙️ Referral letter + focused history (verbatim)</b>
+          <p><strong>S:</strong> "60-year-old man, 6 months of central chest tightness on exertion — climbing the hill to the station, carrying shopping — relieved within 1–2 minutes of rest. No pain at rest, no night pain, not worsening."</p>
+          <p><strong>B:</strong> "Hypertensive, dyslipidaemic (statin declined), ex-smoker, brother had CABG at 58. No prior cardiac events, resting ECG normal in surgery."</p>
+          <p><strong>A:</strong> "I suspect stable angina. Please see for <em>angiography and consideration of stenting.</em> He is keen to 'get it fixed.'"</p>
+          <p><strong>R:</strong> "Started on aspirin and GTN spray, which helps within a minute. Otherwise well, working full-time, walking daily."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A referral asking for a stent is a request, not a diagnosis. Your job is to establish the diagnosis, quantify risk, START optimal medical therapy — and reserve the cath lab for those who actually need it."</div>
+
+        <h3>🚩 Spot-the-Feature — tap each finding that supports CHRONIC coronary syndrome / raises pre-test probability</h3>
+        <p>🎮 <em>Click every feature that fits stable angina or should prompt testing. Each correct = +10 XP. Distractors are things that are NOT CCS.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">🚶 Predictable exertional tightness relieved by rest</button>
+          <button class="btn ghost flag-btn" data-good="1">💨 Relieved within a minute by GTN spray</button>
+          <button class="btn ghost flag-btn" data-good="1">🩺 Multiple risk factors + premature family history</button>
+          <button class="btn ghost flag-btn" data-good="1">📍 Central, retrosternal, radiating to arm/jaw on effort</button>
+          <button class="btn ghost flag-btn" data-good="1">📉 Limiting symptoms despite therapy → prompt testing</button>
+          <button class="btn ghost flag-btn" data-good="0">🧨 New crescendo pain / pain at rest</button>
+          <button class="btn ghost flag-btn" data-good="0">👉 Sharp pain reproduced by pressing the chest wall</button>
+          <button class="btn ghost flag-btn" data-good="0">🍽️ "Clearly just reflux" — burning after meals, worse lying flat</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 What the GP got right — and the one gap</b>Aspirin and GTN are reasonable, and the history is textbook stable angina. The gap: the <strong>statin was declined and never revisited</strong>, and the referral leaps to revascularisation before any trial of optimal medical therapy. Both are fixable this morning.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🧭 Clinic assessment — characterise the pain, then quantify it</h3>
+        <table class="tbl">
+          <tr><th>Step</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>🗣️ Character</td><td>Constricting/tight central discomfort, not sharp, not positional.</td><td>Constricting > sharp/pleuritic favours ischaemia.</td></tr>
+          <tr><td>🏃 Provocation</td><td>Reliably brought on by the same exertion (uphill, hurrying, cold wind, after meals).</td><td>Exertional and reproducible = the hallmark of demand-led ischaemia.</td></tr>
+          <tr><td>😌 Relief</td><td>Relieved by rest within 1–2 min, or GTN within a minute.</td><td>Rapid relief with rest/GTN completes the "typical angina" triad.</td></tr>
+          <tr><td>🫀 Cardiovascular exam</td><td>HR 68 regular, BP 138/84 both arms, normal heart sounds, no murmur, no signs of heart failure, normal peripheral pulses.</td><td>A normal exam is <em>expected</em> in stable angina and does NOT exclude significant coronary disease. Listen for AS — it mimics and complicates angina.</td></tr>
+          <tr><td>🔬 Look for mimics/contributors</td><td>No anaemia, no thyroid signs, BMI 28, no chest-wall tenderness reproducing the pain.</td><td>Anaemia, thyrotoxicosis, AS and tachyarrhythmia can cause or worsen angina — treat these too.</td></tr>
+        </table>
+
+        <div class="callout purple"><b class="ct">🧮 Grade the angina — the Canadian Cardiovascular Society (CCS) class</b>
+          <ul style="margin:6px 0 0">
+            <li><strong>CCS I</strong> — angina only with strenuous/prolonged exertion.</li>
+            <li><strong>CCS II</strong> — slight limitation; angina on walking uphill, hurrying, after meals, in cold. <em>← Our patient.</em></li>
+            <li><strong>CCS III</strong> — marked limitation of ordinary activity (walking 1–2 blocks on the flat).</li>
+            <li><strong>CCS IV</strong> — angina at rest / with any activity.</li>
+          </ul>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Typical angina = (1) constricting front-of-chest/arm/jaw discomfort, (2) precipitated by exertion, (3) relieved by rest or GTN within ~5 minutes. Two of three = atypical; one or none = non-anginal."</div>
+
+        <div class="callout warn"><b class="ct">⚠️ The finding that changes everything — listen for a change in pattern</b>Before you settle on "stable," ask explicitly: is the pain <strong>new, more frequent, coming on at rest, at lower workloads, or lasting longer</strong>? A "yes" converts this from a clinic CCS problem into a same-day acute coronary syndrome. In this patient the pattern is unchanged over six months — genuinely stable — so the outpatient pathway is appropriate.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The cardiology registrar thinks out loud at 10:52:</em></p>
+        <h3>🧠 Frame it as: diagnose, risk-stratify, treat — in that order</h3>
+        <p>"This is typical stable angina with several risk factors. I'm not going to reflexively send him for angiography. First I'll estimate his <strong>pre-test probability</strong> of obstructive disease, then choose the right test — for a low-to-intermediate probability, <strong>coronary CT angiography</strong> is first-line. Crucially, I'll start <strong>optimal medical therapy today</strong> — a high-intensity statin, an anti-anginal, and risk-factor control — regardless of what the imaging shows. The stent question comes LAST, and only if symptoms persist despite therapy or the anatomy is high-risk."</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>🖥️ <strong>Estimate pre-test probability</strong> (age, sex, symptom typicality) — recent ESC estimates are notably LOWER than the old Diamond-Forrester figures (S5).</li>
+          <li>🩻 <strong>Choose the test:</strong> CTCA first-line for low–intermediate probability (superb rule-out); functional/ischaemia imaging (stress echo, perfusion MRI/PET) for higher probability or known disease.</li>
+          <li>💊 <strong>Start OMT now:</strong> high-intensity statin, aspirin, a beta-blocker or CCB for symptoms, GTN for breakthrough, and treat BP/lipids/glucose/smoking.</li>
+          <li>🧾 Baseline: resting ECG, HbA1c, lipid profile, U&amp;E, FBC, TFTs, and an echo (LV function, valves).</li>
+          <li>🩺 Reserve <strong>invasive angiography ± revascularisation</strong> for refractory symptoms on OMT or high-risk anatomy/large ischaemic burden.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In stable angina, optimal medical therapy comes FIRST — a stent relieves symptoms but does not save the stable patient's life (ISCHEMIA). Treat everyone; catheterise the few who need it."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Registrar's self-test</b>The patient asks: "If there's a blockage, shouldn't we just stent it to stop me having a heart attack?" What's the honest answer?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No — not in stable disease.</strong> In stable coronary disease, elective PCI relieves <em>angina</em> but does not reduce death or spontaneous MI compared with optimal medical therapy (ISCHEMIA, COURAGE), and much of its symptom benefit is placebo (ORBITA). Heart attacks arise mostly from <em>non-flow-limiting</em> plaques that rupture — which is why <strong>plaque-stabilising therapy (statins, antiplatelets, risk-factor control)</strong>, not stenting a stenosis, is what changes prognosis. Revascularisation is for symptom relief when OMT fails, or for genuinely high-risk anatomy.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The consultant cardiologist at the desk, 11:05:</em></p>
+        <h3>🧮 Pre-test probability — the gate to sensible testing</h3>
+        <p>The 2019/2024 ESC chronic coronary syndrome guidance replaced the old, inflated Diamond-Forrester probabilities with <strong>substantially lower estimates</strong> — recognising that we had been over-testing and over-diagnosing. Probability is driven by <strong>age, sex and symptom typicality</strong>, then refined by risk factors, resting ECG, LV function and coronary calcium.</p>
+        <table class="tbl">
+          <tr><th>Clinical pre-test probability</th><th>Recommended approach</th></tr>
+          <tr><td class="lo">Very low (&lt; ~5%)</td><td>No routine testing — look for non-cardiac causes.</td></tr>
+          <tr><td>Low–intermediate (~5–15%)</td><td>Consider deferring testing; if testing, <strong>CTCA</strong> excels (very high NPV rules disease out).</td></tr>
+          <tr><td class="hi">Intermediate (~15–50%)</td><td><strong>CTCA</strong> or non-invasive functional imaging, guided by local expertise and the clinical question.</td></tr>
+          <tr><td class="hi">High (&gt; ~50–85%)</td><td>Functional/ischaemia imaging preferred; consider invasive angiography (with physiology) if symptoms are severe or high-risk features.</td></tr>
+        </table>
+        <p>Our patient — 60, male, <em>typical</em> angina, several risk factors — sits at the <strong>intermediate–high</strong> end. CTCA (to define anatomy and rule out) or functional imaging (to quantify ischaemia) are both defensible; either way, <strong>OMT starts today</strong>.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Rule out coronary disease in the low-risk clinic patient with a CT coronary angiogram — its negative predictive value is its superpower. Reserve invasive angiography for those with high probability, refractory symptoms, or high-risk anatomy."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">RCT</span> ISCHEMIA (2020)</td><td>In stable CAD with moderate–severe ischaemia, a routine invasive strategy (angio + revascularisation) did NOT reduce death or MI vs optimal medical therapy over ~3.2 yrs; it improved angina/quality of life in symptomatic patients.</td><td>Don't revascularise stable ischaemia for prognosis — do it for symptoms. OMT first for everyone.</td></tr>
+            <tr><td><span class="lvl">RCT</span> COURAGE (2007)</td><td>PCI + OMT vs OMT alone in stable CAD: no reduction in death/MI; earlier angina relief with PCI that narrowed over time.</td><td>The original signal that PCI is symptom therapy, not life-saving, in stable disease.</td></tr>
+            <tr><td><span class="lvl">RCT</span> ORBITA (2018)</td><td>Placebo-controlled (sham PCI) trial: PCI's improvement in exercise time/angina over a genuine sham procedure was small and not statistically significant on the primary endpoint.</td><td>Much of PCI's "symptom benefit" in stable single-vessel disease is placebo — try OMT properly first.</td></tr>
+            <tr><td><span class="lvl">RCT</span> SCOT-HEART (2018)</td><td>Adding CTCA to standard care in suspected angina clarified the diagnosis and, at 5 yrs, reduced death/non-fatal MI — largely by driving preventive therapy and appropriate treatment.</td><td>CTCA doesn't just diagnose — it changes management and improves outcomes.</td></tr>
+            <tr><td><span class="lvl">META</span> CTT statin meta-analysis</td><td>Each ~1 mmol/L LDL reduction with statins cuts major vascular events ~22%, consistently across baseline risk.</td><td>The high-intensity statin is one of the highest-value acts in this clinic — far more than a stent for prognosis.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The chart that keeps me awake is the man exactly like this one — medication-naive stable angina — who was fast-tracked to angiography and PCI of a moderate lesion before anyone tried a statin or an anti-anginal. He had a peri-procedural complication, gained no prognostic benefit, and his risk factors were never touched. ISCHEMIA and ORBITA warned us, and we didn't listen."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY exertional angina, WHY it's stable (the WHY behind the WHY)</h3>
+        <ol>
+          <li>🧱 <strong>Fixed obstructive stenosis:</strong> a stable, fibrous atheromatous plaque narrows an epicardial artery. At rest, autoregulation keeps distal flow adequate — no symptoms.</li>
+          <li>📉 <strong>Limited coronary flow reserve:</strong> a stenosis becomes flow-limiting once it exceeds ~70% diameter (or is physiologically significant by FFR ≤ 0.80). The vessel can no longer augment flow on demand.</li>
+          <li>🏃 <strong>Demand outstrips supply on exertion:</strong> exercise raises heart rate, contractility and wall stress → myocardial oxygen demand rises → the stenotic territory becomes ischaemic. Anaerobic metabolites (adenosine, lactate) stimulate cardiac afferents → <strong>predictable, exertional, referred angina</strong>.</li>
+          <li>😌 <strong>Rest restores balance:</strong> stop exerting → demand falls → ischaemia resolves within minutes. GTN venodilates (↓preload, ↓wall stress) and dilates coronaries, hastening relief. This reversibility is why it is <em>stable</em>.</li>
+          <li>💥 <strong>Why MI is a different event:</strong> most infarcts arise from <em>rupture of a non-flow-limiting, lipid-rich plaque</em> — not the tight stenosis causing the angina. That is why stenting the stenosis relieves symptoms but does not prevent the future MI; plaque stabilisation does.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The plaque that gives you angina is rarely the plaque that gives you the heart attack. Stents fix the flow-limiter you feel; statins stabilise the vulnerable plaque you don't — which is why prevention, not PCI, saves the stable patient."</div>
+
+        <h3>⚖️ Contrast pair — Chronic coronary syndrome vs Acute coronary syndrome</h3>
+        <div class="vs">
+          <div class="side a"><h4>🟢 Chronic coronary syndrome (stable angina)</h4><ul><li>Predictable, exertional, relieved by rest/GTN, unchanged over weeks–months</li><li>Fixed stenosis, stable plaque, reversible demand ischaemia</li><li>Outpatient work-up; OMT + risk-factor control FIRST; revascularise selectively</li></ul></div>
+          <div class="side b"><h4>🔴 Acute coronary syndrome</h4><ul><li>New, crescendo, at-rest, or prolonged pain — pattern has CHANGED</li><li>Plaque rupture + thrombus; supply suddenly falls</li><li>Emergency: ECG, troponin, antithrombotics, urgent/emergent reperfusion</li></ul></div>
+        </div>
+        <p>💡 The same coronary tree, two utterly different urgencies. The discriminator is the <em>pattern</em>: predictable and stable → clinic; new/crescendo/at rest → emergency.</p>
+
+        <h3>⚖️ Contrast pair — Obstructive epicardial disease vs INOCA/ANOCA</h3>
+        <div class="vs">
+          <div class="side a"><h4>🩸 Obstructive epicardial CAD</h4><ul><li>Flow-limiting stenosis on CTCA/angiography</li><li>Anti-anginals + secondary prevention; revascularise if refractory/high-risk</li></ul></div>
+          <div class="side b"><h4>🔬 INOCA / ANOCA (clean-ish coronaries)</h4><ul><li>Angina with non-obstructive coronaries — microvascular dysfunction or vasospasm</li><li>Diagnose with coronary function testing (CFR, acetylcholine provocation); treat the endotype</li></ul></div>
+        </div>
+        <p>💡 "Clean coronaries" on angiography is not "nothing wrong." Up to half of patients with angina and no obstructive disease have microvascular or vasospastic disease — real, treatable, and prognostically important (S20).</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The Ischaemia-Burden &amp; Symptom Dial</h3>
+          <p style="font-size:13px">Drag the dial to set this patient's <strong>anginal symptom / ischaemic burden despite optimal medical therapy</strong>, and watch how the benefit of ADDING revascularisation over OMT changes. The ISCHEMIA lesson lives in this needle.</p>
+          <label for="kRange">🫀 Symptom &amp; ischaemia burden on OMT (0 = minimal, 100 = severe/high-risk anatomy): <b id="kVal">15</b> / 100</label>
+          <input type="range" id="kRange" min="0" max="100" value="15">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore OMT-first vs adding revascularisation.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 Low burden → OMT alone; revascularisation adds no prognostic benefit and little symptomatically (ISCHEMIA/ORBITA). High burden / refractory symptoms / high-risk anatomy → revascularisation for symptom relief, and prognostic value only for left main / proximal LAD / multivessel + large ischaemia or reduced LV function.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The clinic order set (11:15)</h3>
+        <ul>
+          <li>📈 <strong>Resting 12-lead ECG</strong> (baseline; look for prior MI, LVH, arrhythmia, conduction disease — often normal in stable angina).</li>
+          <li>🩸 <strong>Bloods:</strong> FBC (anaemia), U&amp;E, HbA1c/fasting glucose, <strong>fasting lipid profile</strong>, TFTs, LFTs (statin baseline), and consider Lp(a) once.</li>
+          <li>🖥️ <strong>Coronary CT angiography</strong> (first-line for intermediate probability) ± coronary artery calcium score; <em>or</em> functional imaging (stress echo / perfusion MRI / MPI) if higher probability or known disease.</li>
+          <li>🫀 <strong>Transthoracic echo</strong> — LV systolic function, wall-motion, valves (exclude aortic stenosis / HCM mimicking angina).</li>
+          <li>💊 <strong>Start OMT today</strong> (do not wait for imaging): high-intensity statin, aspirin 75 mg, a first-line anti-anginal (beta-blocker or CCB), GTN spray + how-to-use counselling.</li>
+          <li>🩺 <strong>Risk-factor bundle:</strong> BP target, glucose optimisation, smoking-cessation reinforcement, diet/exercise/weight, influenza vaccination.</li>
+          <li>🚫 <strong>Do NOT</strong> reflexively list for invasive angiography/PCI — defer that decision to response-to-OMT and imaging-defined anatomy.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A statin, an antiplatelet, an anti-anginal and a risk-factor conversation cost pennies and change prognosis; the expensive, lower-value reflex is booking the cath lab before you've tried any of them."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Clinic nursing priorities — the nurse builds the self-management</h3>
+        <ul>
+          <li>💨 <strong>GTN teaching:</strong> sit down, one spray/tablet under the tongue, repeat after 5 min; if pain persists &gt; 10–15 min after a second dose (or is severe/at rest) → <strong>call emergency services</strong> — this may be an ACS. Warn about headache/flushing/postural drop.</li>
+          <li>📒 <strong>Symptom diary:</strong> record what brings on angina, how often, and how it responds — the trend guides anti-anginal escalation and flags any crescendo pattern.</li>
+          <li>💊 <strong>Adherence &amp; side-effects:</strong> reinforce that the statin and antiplatelet are the prognosis-changers; check for statin myalgia, and set expectations honestly to prevent nocebo discontinuation.</li>
+          <li>🩸 Baseline observations, weight, BMI, smoking status; draw the fasting bloods and book the imaging.</li>
+          <li>🏃 <strong>Cardiac rehabilitation / lifestyle referral:</strong> structured exercise reduces angina and events; support smoking cessation and diet.</li>
+          <li>📞 <strong>Red-flag safety-net:</strong> teach the patient exactly when stable angina has become unstable (below) — the single most valuable thing a clinic nurse can hand over.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The clinic nurse who teaches a patient WHEN their angina stops being stable — new, at rest, or not settling with GTN — has installed the alarm that catches the next heart attack early."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><td>Total cholesterol</td><td class="hi">6.4 mmol/L</td><td>Untreated dyslipidaemia — the biggest modifiable prognostic lever here.</td></tr>
+          <tr><td>LDL cholesterol</td><td class="hi">4.2 mmol/L</td><td>Well above target; high-intensity statin indicated aiming LDL &lt; 1.4 mmol/L (and ≥50% reduction) in established/high-risk CAD.</td></tr>
+          <tr><td>HDL cholesterol</td><td class="lo">1.0 mmol/L</td><td>Low — part of the atherogenic profile.</td></tr>
+          <tr><td>HbA1c</td><td class="hi">44 mmol/mol (6.2%)</td><td>Impaired glucose regulation — lifestyle + monitor; contributes to risk.</td></tr>
+          <tr><td>Creatinine / eGFR</td><td class="ok-v">82 µmol/L / &gt;60</td><td>Normal — relevant for CTCA contrast and any future PCI dosing.</td></tr>
+          <tr><td>Hb</td><td class="ok-v">148 g/L</td><td>Excludes anaemia as an angina aggravator.</td></tr>
+          <tr><td>TSH</td><td class="ok-v">2.1 mIU/L</td><td>Normal — excludes thyrotoxicosis as a driver.</td></tr>
+          <tr><td>Resting ECG</td><td>Sinus rhythm, no prior Q waves, no acute changes</td><td>Normal resting ECG is common and does NOT exclude CAD.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A normal resting troponin and a normal resting ECG do not exclude chronic coronary syndrome — CCS is a disease of EXERTION and ANATOMY, diagnosed by imaging and provoked ischaemia, not by a resting snapshot."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why we do NOT routinely order a troponin here</b>Troponin is for suspected <em>acute</em> myocardial injury. In genuinely stable, pain-free clinic angina it is not a diagnostic test — a normal value falsely reassures and an incidental rise (CKD, HF) misleads. Reserve troponin for a <em>change</em> in pattern that raises suspicion of ACS.</div>
+
+        <div class="callout warn"><b class="ct">⚠️ The exercise ECG has fallen down the ladder</b>Plain exercise-ECG stress testing has <em>low sensitivity/specificity</em> and no anatomical or prognostic detail; modern guidelines favour <strong>CTCA (anatomy) or functional imaging (ischaemia)</strong>. Exercise testing retains a role for assessing symptoms, exercise capacity and rhythm response, but not as the primary diagnostic gate.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 ECG / IMAGING + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🫀 The exertional ischaemia concept — read it as a supply–demand curve</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 130" preserveAspectRatio="none" aria-label="Resting ECG normal, exertional ST depression appears">
+            <rect width="820" height="130" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="32" x2="820" y2="32"/><line x1="0" y1="65" x2="820" y2="65"/><line x1="0" y1="98" x2="820" y2="98"/></g>
+            <polyline fill="none" stroke="#86efac" stroke-width="2.3" points="0,70 40,70 52,66 66,40 78,92 90,70 130,70 150,68 168,66 210,70 250,70 262,60 276,34 288,94 300,70 340,70 360,66 380,64 420,70"/>
+            <polyline fill="none" stroke="#fca5a5" stroke-width="2.3" points="420,70 460,78 472,58 486,30 500,100 512,80 520,80 560,80 600,80 612,56 626,28 640,100 652,80 664,80 700,80 740,80 752,56 766,30 780,100 792,80 804,80 820,80"/>
+            <text x="120" y="20" fill="#93c5fd" font-size="11">Rest — normal ST segment</text>
+            <text x="470" y="18" fill="#fca5a5" font-size="11">Exertion — horizontal ST depression (demand ischaemia)</text>
+          </svg>
+          <div class="ecg-cap">At rest the ST segment is on the baseline (<span style="color:#93c5fd">green</span>). On exertion, the ischaemic territory produces <span style="color:#fca5a5">horizontal/down-sloping ST depression</span> that resolves with rest — the electrical signature of reversible demand ischaemia, and why provocation testing (not a resting trace) makes the diagnosis.</div>
+        </div>
+
+        <h3>🔎 The modern imaging menu — anatomy vs ischaemia</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>What it shows</th><th>Best used when</th></tr>
+          <tr><td>🖥️ <strong>Coronary CT angiography (CTCA)</strong></td><td>Coronary <em>anatomy</em>: stenosis severity, plaque burden/type; very high negative predictive value.</td><td><strong>First-line</strong> for low–intermediate probability; superb to rule OUT obstructive CAD (SCOT-HEART).</td></tr>
+          <tr><td>🧮 <strong>Coronary artery calcium (CAC) score</strong></td><td>Burden of calcified atheroma; refines risk (a zero score is reassuring in selected patients).</td><td>Risk-stratification adjunct; often reported with CTCA.</td></tr>
+          <tr><td>💻 <strong>CT-FFR</strong></td><td>Adds functional significance (virtual FFR) to a CTCA stenosis.</td><td>To decide if an intermediate CTCA lesion is actually flow-limiting — avoids unnecessary angiography.</td></tr>
+          <tr><td>🫀 <strong>Stress echo / perfusion MRI / PET / MPI</strong></td><td><em>Ischaemia</em>: inducible wall-motion or perfusion defect; quantifies ischaemic burden.</td><td>Higher pre-test probability, known disease, or to guide revascularisation of a specific territory.</td></tr>
+          <tr><td>🩻 <strong>Invasive angiography + FFR/iFR</strong></td><td>Definitive anatomy + physiology at the same sitting.</td><td>High probability, refractory symptoms, or high-risk non-invasive findings — with physiology to justify any stent.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"CTCA answers 'is there disease and where?'; functional imaging answers 'is it causing ischaemia and how much?' Choose the test that answers the question your patient actually poses — and only stent a lesion proven flow-limiting by physiology."</div>
+
+        <div class="callout info"><b class="ct">🩻 This patient's CTCA result</b>Moderate (50–60%) proximal LAD stenosis, mild plaque elsewhere, no left main or multivessel disease, preserved LV function on echo. CT-FFR across the LAD lesion is 0.84 (not flow-limiting). This is <strong>exactly</strong> the scenario ISCHEMIA/ORBITA address: obstructive-looking but not clearly flow-limiting, in a patient never given a fair trial of OMT. The answer is OMT and risk-factor control — not a reflex stent.</div>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The two pillars — EVENT reduction vs SYMPTOM reduction</h3>
+        <div class="vs">
+          <div class="side b"><h4>🛡️ Pillar 1 — Reduce events (prognosis)</h4><ul><li><strong>High-intensity statin</strong> (atorvastatin 80 / rosuvastatin 20) — LDL target &lt; 1.4 mmol/L &amp; ≥50% ↓; add ezetimibe ± PCSK9i if not at goal</li><li><strong>Antiplatelet</strong> — aspirin 75 mg (clopidogrel if aspirin-intolerant)</li><li><strong>ACE inhibitor / ARB</strong> — if hypertension, diabetes, HF, or LV dysfunction</li><li><strong>Risk-factor control</strong> — BP, glucose, smoking cessation, weight/diet/exercise</li></ul></div>
+          <div class="side a"><h4>💓 Pillar 2 — Reduce symptoms (anti-anginals)</h4><ul><li><strong>First-line:</strong> beta-blocker OR calcium-channel blocker (CCB)</li><li><strong>Add-on / second-line:</strong> long-acting nitrate, ivabradine, ranolazine, nicorandil</li><li><strong>Short-acting GTN</strong> for acute episodes &amp; pre-emptive use before exertion</li></ul></div>
+        </div>
+
+        <h3>💊 Anti-anginal drug map — mechanism &amp; cautions</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Mechanism</th><th>Caution</th></tr>
+          <tr><td><strong>Beta-blocker</strong> (bisoprolol, metoprolol)</td><td>↓HR, ↓contractility → ↓myocardial O₂ demand; first-line, esp. post-MI/LV dysfunction</td><td>Avoid in severe bradycardia/high-grade block; caution in asthma; don't combine with verapamil/diltiazem (bradycardia/block).</td></tr>
+          <tr><td><strong>Calcium-channel blocker</strong> (amlodipine; or verapamil/diltiazem)</td><td>Coronary + peripheral vasodilation (↓afterload); rate-limiting CCBs also ↓HR</td><td>Dihydropyridines → ankle oedema; verapamil/diltiazem → bradycardia, avoid with beta-blocker &amp; in LV dysfunction.</td></tr>
+          <tr><td><strong>Long-acting nitrate</strong> (isosorbide mononitrate)</td><td>Venodilation → ↓preload/wall stress; coronary dilation</td><td>Requires a nitrate-free interval to avoid tolerance; headache; never with PDE5 inhibitors.</td></tr>
+          <tr><td><strong>Ivabradine</strong></td><td>Selective sinus-node I<sub>f</sub> inhibition → pure ↓HR without inotropy effect</td><td>Only in sinus rhythm, HR ≥ 70; visual "phosphenes"; useful when beta-blockers are contraindicated/insufficient.</td></tr>
+          <tr><td><strong>Ranolazine</strong></td><td>Inhibits late Na⁺ current → ↓Ca²⁺ overload/wall tension; no HR/BP effect</td><td>QT prolongation; drug interactions (CYP3A4); useful in INOCA/microvascular angina.</td></tr>
+          <tr><td><strong>Nicorandil</strong></td><td>K<sub>ATP</sub>-channel opener + nitrate action → arterial &amp; venous dilation</td><td>Headache; GI/mucosal ulceration (mouth, anal, GI) with prolonged use.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Every stable angina patient earns the prognosis pillar (statin + antiplatelet + risk-factor control) whether or not they are ever revascularised — and anti-anginals are escalated by symptoms, not by the angiogram."</div>
+        <div class="callout ok"><b class="ct">✅ What we prescribe today</b>Atorvastatin 80 mg, aspirin 75 mg, bisoprolol 2.5 mg (titrate to symptoms/HR), GTN spray PRN + counselling, ramipril for BP, plus a firm plan for lifestyle and glucose. Review in 6 weeks to assess symptom control and statin tolerance before any talk of the cath lab.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to track in ongoing chronic coronary syndrome</h3>
+        <ul>
+          <li>💓 <strong>Symptom burden (CCS class) &amp; GTN use</strong> — the primary gauge of whether anti-anginal therapy needs escalation, or whether refractoriness now warrants revascularisation.</li>
+          <li>🧪 <strong>Lipids to target</strong> — recheck ~6–8 weeks after starting/changing statin; aim LDL &lt; 1.4 mmol/L (and ≥50% reduction); add ezetimibe/PCSK9i if short.</li>
+          <li>🩸 <strong>BP and glucose/HbA1c</strong> — treat to guideline targets; each is a lever on both symptoms and events.</li>
+          <li>🧬 <strong>Statin safety</strong> — baseline and on-treatment ALT; check CK only if myalgia; distinguish true intolerance from nocebo.</li>
+          <li>🫀 <strong>LV function / new signs</strong> — reassess echo if symptoms change, new murmur, or features of heart failure develop.</li>
+          <li>🚩 <strong>Pattern surveillance</strong> — the single most important "monitor": any shift to rest pain, crescendo frequency, or lower-threshold angina = suspected ACS → urgent pathway.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In chronic coronary syndrome the two dials you watch are SYMPTOMS (drives anti-anginal escalation and the revascularisation conversation) and RISK FACTORS to target (drives prognosis) — and you never stop watching for the pattern that turns stable into acute."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong — in the disease and in over-treating it</h3>
+        <ul>
+          <li>🔴 <strong>Progression to acute coronary syndrome</strong> — plaque rupture → unstable angina/MI; the reason risk-factor control and plaque stabilisation matter more than the stenosis.</li>
+          <li>💔 <strong>Ischaemic cardiomyopathy / heart failure</strong> — chronic or repeated ischaemia and prior infarction reduce LV function.</li>
+          <li>⚡ <strong>Arrhythmia / sudden cardiac death</strong> — ischaemic substrate can generate ventricular arrhythmia.</li>
+          <li>💊 <strong>Refractory angina</strong> — symptoms persisting despite maximal OMT and revascularisation; needs specialist add-on therapies (S20).</li>
+          <li>🩹 <strong>Procedural harm from unnecessary revascularisation</strong> — the "complication of over-treatment": peri-procedural MI, bleeding, stroke, contrast nephropathy, stent thrombosis/restenosis — real risks incurred for no prognostic gain when PCI is done reflexively in stable disease (ISCHEMIA/ORBITA).</li>
+          <li>🧠 <strong>Nocebo statin discontinuation</strong> — a "complication" of poor counselling; stopping the statin forfeits the largest prognostic benefit on offer.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In stable coronary disease there are two ways to harm a patient: under-treat the risk factors, or over-treat the stenosis. The reflex stent trades a real procedural risk for a prognostic benefit that isn't there."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The chest-pain-in-clinic differential — is it angina at all?</h3>
+        <table class="tbl">
+          <tr><th>Diagnosis</th><th>Discriminators</th><th>Action</th></tr>
+          <tr><td>🫀 <strong>Chronic coronary syndrome</strong> (this patient)</td><td>Typical exertional angina, relieved by rest/GTN, risk factors, stable over months</td><td>Pre-test probability → CTCA/functional imaging; OMT first.</td></tr>
+          <tr><td>🔴 <strong>Acute coronary syndrome</strong></td><td>New, crescendo, at-rest or prolonged pain; not settling with GTN</td><td>NOT clinic — same-day ECG/troponin, emergency pathway.</td></tr>
+          <tr><td>🔬 <strong>INOCA / ANOCA (microvascular / vasospastic)</strong></td><td>Angina with non-obstructive coronaries; microvascular angina (exertional, slow GTN response) or vasospastic (rest/nocturnal, transient ST shift)</td><td>Coronary function testing (CFR/IMR, acetylcholine provocation); treat endotype.</td></tr>
+          <tr><td>🫁 <strong>Aortic stenosis / HCM</strong></td><td>Exertional angina/syncope, ejection murmur, LVH</td><td>Echo — these cause demand ischaemia with normal coronaries.</td></tr>
+          <tr><td>🦴 <strong>Musculoskeletal / GORD / anxiety</strong></td><td>Chest-wall tenderness reproducing pain; burning, positional, food-related; non-exertional</td><td>Non-cardiac — but don't over-anchor; they coexist with CAD.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Angina with clean coronaries isn't 'nothing' — think microvascular or vasospastic (INOCA/ANOCA) and test coronary function. And angina that is new, at rest, or crescendo isn't stable — it is an acute coronary syndrome until proven otherwise."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The Referral for a Stent"</h3>
+          <div class="hud"><span>❤️ Care quality: <b id="scStab">●●●○○</b></span><span>⏱️ Course: <b id="scTime">0 wk</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">A 60-year-old with 6 months of typical, predictable exertional angina (CCS II), untreated dyslipidaemia and several risk factors, is referred asking for "angiography and a stent." He is medication-naive beyond aspirin and GTN, pain-free in clinic. What is your first move?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The management plan</h3>
+        <ol>
+          <li>🫀 <strong>Diagnosis:</strong> chronic coronary syndrome — typical stable angina, CTCA moderate proximal LAD lesion (CT-FFR 0.84, not flow-limiting), preserved LV function.</li>
+          <li>🛡️ <strong>Secondary prevention (all patients):</strong> high-intensity statin to target, aspirin, ACEi (BP/risk), aggressive risk-factor control, cardiac rehab.</li>
+          <li>💓 <strong>Anti-anginal therapy:</strong> first-line beta-blocker (or CCB), escalate by symptoms; GTN for breakthrough.</li>
+          <li>🕰️ <strong>Trial OMT, then reassess at 6 weeks:</strong> if symptoms well-controlled → continue; if refractory despite optimised OMT → discuss invasive angiography ± revascularisation.</li>
+          <li>🩺 <strong>Revascularisation is reserved for:</strong> symptoms refractory to OMT, OR high-risk anatomy — significant left main, proximal LAD, multivessel disease with large ischaemic burden, or reduced LV function — where it confers prognostic benefit.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Reserve invasive angiography and revascularisation for refractory symptoms or high-risk anatomy (left main, proximal LAD, multivessel + large ischaemia, or LV dysfunction) — everyone else is treated, and improved, medically first."</div>
+
+        <div class="checklist" id="ckWorkup">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Chronic coronary syndrome work-up (pre-test probability, CTCA vs functional test, OMT, secondary prevention)</h3>
+          <label class="ck"><input type="checkbox"><span>🧮 Characterise pain (typical/atypical/non-anginal) &amp; grade CCS class; confirm it is STABLE, not crescendo/rest</span></label>
+          <label class="ck"><input type="checkbox"><span>📊 Estimate clinical pre-test probability (age, sex, symptoms) using updated (lower) ESC estimates</span></label>
+          <label class="ck"><input type="checkbox"><span>🖥️ Choose test: CTCA (first-line, low–intermediate probability) OR functional imaging (higher probability/known disease)</span></label>
+          <label class="ck"><input type="checkbox"><span>🫀 Baseline resting ECG, echo (LV function/valves), FBC, U&amp;E, HbA1c, fasting lipids, TFTs</span></label>
+          <label class="ck"><input type="checkbox"><span>🛡️ Start secondary prevention: high-intensity statin (to LDL target), antiplatelet, ACEi if indicated, risk-factor control</span></label>
+          <label class="ck"><input type="checkbox"><span>💓 Start anti-anginal (beta-blocker or CCB) + GTN with counselling</span></label>
+          <label class="ck"><input type="checkbox"><span>📞 Safety-net: teach red flags for ACS; plan 6-week review of symptoms &amp; statin tolerance before any cath-lab decision</span></label>
+          <div class="ck-progress" data-progress>0 / 7 complete</div>
+        </div>
+
+        <div class="checklist" id="ckAntianginal">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Anti-anginal escalation ladder</h3>
+          <label class="ck"><input type="checkbox"><span>1️⃣ First-line: beta-blocker OR calcium-channel blocker, titrated to symptoms/HR/BP</span></label>
+          <label class="ck"><input type="checkbox"><span>2️⃣ Inadequate control → combine a beta-blocker with a dihydropyridine CCB (avoid BB + verapamil/diltiazem)</span></label>
+          <label class="ck"><input type="checkbox"><span>3️⃣ Add a second-line agent: long-acting nitrate (with nitrate-free interval), ivabradine, ranolazine, or nicorandil</span></label>
+          <label class="ck"><input type="checkbox"><span>4️⃣ Ensure GTN technique + pre-emptive use; reinforce adherence &amp; risk-factor control at each step</span></label>
+          <label class="ck"><input type="checkbox"><span>5️⃣ Symptoms refractory despite optimised OMT → invasive angiography ± revascularisation for symptom relief</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">Clinic visit 1</div>Typical CCS II angina, medication-naive dyslipidaemia. Started atorvastatin 80, aspirin, bisoprolol, GTN + counselling; CTCA and echo requested; NOT listed for angiography.</div>
+          <div class="t-item"><div class="t-time">Week 2</div>CTCA: moderate proximal LAD stenosis, CT-FFR 0.84 (not flow-limiting), no left main/multivessel; echo LV function preserved. Confirms OMT-first strategy.</div>
+          <div class="t-item"><div class="t-time">Week 6 review</div>Angina markedly improved — now only on the steepest hills, GTN use minimal (CCS II → I). LDL falling; statin tolerated. Continue OMT; defer any cath lab.</div>
+          <div class="t-item"><div class="t-time">Month 3</div>LDL 1.3 mmol/L (target met), BP controlled, walking further without symptoms, enrolled in cardiac rehab. No revascularisation needed.</div>
+          <div class="t-item"><div class="t-time">Month 12</div>Event-free, essentially asymptomatic on OMT. Had he been reflex-stented at visit 1, he'd have carried procedural risk for no added benefit — and possibly still no statin.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The quiet win</b>No cath lab, no stent, no complication — and the interventions that actually change his prognosis (statin to target, antiplatelet, risk-factor control, symptom relief) are all in place. Ordinary discipline, extraordinary value. This is what ISCHEMIA and ORBITA look like applied at the bedside.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 Two different worlds — the OMT-managed stable patient vs the post-revascularisation patient</h3>
+        <div class="vs">
+          <div class="side b"><h4>🟢 This patient (OMT-managed CCS)</h4><ul><li>High-intensity statin to LDL target, aspirin, ACEi, anti-anginal; GTN with technique taught</li><li>Cardiac rehab, exercise, diet, weight, glucose &amp; BP control; smoking stays quit</li><li>Symptom diary; clear plan to escalate anti-anginals or reconsider angiography if refractory</li><li>Red flags: new/crescendo pain, rest pain, or pain not settling with GTN → emergency</li></ul></div>
+          <div class="side a"><h4>🩺 If later revascularised (PCI/CABG)</h4><ul><li>DAPT duration per procedure/bleeding risk, then single antiplatelet; statin continues lifelong</li><li>Same secondary prevention — revascularisation does NOT replace risk-factor control</li><li>Structured follow-up for symptom recurrence/restenosis; cardiac rehab</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Whether or not a stable patient is ever revascularised, the prescription that changes their prognosis is the same — statin to target, antiplatelet, and aggressive risk-factor control. The stent is optional; the prevention is not."</div>
+        <div class="callout warn"><b class="ct">🚗 Safety-netting the pattern</b>Give explicit, written instruction: <strong>seek emergency care</strong> if angina becomes more frequent, comes on at rest or with minimal effort, lasts longer, or does not settle after two doses of GTN 5 minutes apart. That single instruction is what converts a missed MI into a treated one.</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>🕰️ OMT comes first</b>In stable angina, optimal medical therapy + risk-factor control precede any stent — ISCHEMIA/COURAGE: no mortality benefit from routine revascularisation.</div>
+          <div class="pearl"><b>💊 Two pillars</b>Events (statin + antiplatelet + risk control) vs symptoms (anti-anginals). Everyone gets pillar 1; escalate pillar 2 by symptoms.</div>
+          <div class="pearl"><b>🖥️ CTCA's superpower</b>First-line for low–intermediate probability; its negative predictive value rules disease out (SCOT-HEART).</div>
+          <div class="pearl"><b>🧱 Wrong plaque</b>The stenosis you feel isn't usually the plaque that ruptures — stabilise plaques, don't just widen lumens.</div>
+          <div class="pearl"><b>🔬 Clean coronaries ≠ nothing</b>Angina + non-obstructive coronaries → think INOCA/ANOCA (microvascular/vasospastic); test coronary function.</div>
+          <div class="pearl"><b>🚩 Stable can turn acute</b>New, crescendo, or rest angina is ACS until proven otherwise — leave the clinic pathway.</div>
+          <div class="pearl"><b>🩺 Reserve the cath lab</b>Revascularise for refractory symptoms or high-risk anatomy (left main, proximal LAD, multivessel + ischaemia, low EF).</div>
+          <div class="pearl"><b>🧪 ORBITA humility</b>Placebo-controlled sham PCI showed much of PCI's angina benefit is placebo — try OMT properly before stenting.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the pathway</h3>
+          <ul>
+            <li>📊 <strong>Pre-test probability, recalibrated:</strong> the 2019/2024 ESC estimates are markedly LOWER than Diamond-Forrester/older CAD-Consortium figures — reducing over-testing. Probability is modulated by risk factors, resting ECG, LV function and coronary calcium; a very low probability warrants deferral, not a stress test.</li>
+            <li>🖥️ <strong>CTCA + CT-FFR + coronary calcium:</strong> CTCA defines anatomy and plaque with very high NPV (SCOT-HEART); CT-FFR adds lesion-specific physiology to avoid unnecessary invasive angiography; CAC scoring refines risk (a zero score is powerfully reassuring in selected patients, though it does not exclude non-calcified plaque in the young).</li>
+            <li>🫀 <strong>Functional imaging:</strong> stress echo, CMR perfusion, and PET/SPECT quantify ischaemic burden and localise the culprit territory; at invasive angiography, <strong>FFR (≤0.80)</strong> or <strong>iFR (≤0.89)</strong> confirm a stenosis is flow-limiting before any stent — physiology-guided PCI (FAME) outperforms angiography-guided.</li>
+            <li>🔬 <strong>INOCA / ANOCA:</strong> angina with non-obstructive coronaries is common (esp. women). Endotypes — <em>microvascular angina</em> (impaired coronary flow reserve/high index of microcirculatory resistance) and <em>vasospastic angina</em> (epicardial/microvascular spasm). Diagnose with <strong>coronary function testing</strong>: CFR/IMR + <strong>intracoronary acetylcholine provocation</strong> (CorMicA showed stratified therapy improves symptoms). Treat by endotype — microvascular: beta-blockers, ranolazine, ACEi; vasospastic: CCBs + nitrates, avoid non-selective beta-blockers.</li>
+            <li>💊 <strong>Anti-anginal mechanisms in depth:</strong> beta-blockers (↓demand), CCBs (vasodilation ± rate control), nitrates (preload/coronary dilation, tolerance), ranolazine (late-Na⁺ current), ivabradine (I<sub>f</sub>/pure HR reduction), nicorandil (K<sub>ATP</sub> opener/nitrate) — mechanism-matched selection (e.g. ivabradine when beta-blockers contraindicated; ranolazine/CCB in microvascular/vasospastic disease).</li>
+            <li>🩺 <strong>Completeness of revascularisation:</strong> when revascularisation is indicated, complete (vs incomplete) revascularisation and physiology-/imaging-guided lesion selection matter; SYNTAX score and Heart Team guide PCI vs CABG in left main/multivessel disease, with CABG favoured in complex anatomy/diabetes/low EF.</li>
+            <li>🔥 <strong>Refractory angina therapies:</strong> for symptoms persisting despite maximal OMT and unsuitable/failed revascularisation — enhanced external counterpulsation (EECP), coronary sinus reducer device, spinal cord stimulation, and specialist pain/rehab programmes.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The Stent Before the Statin"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 60-year-old man with 6 months of typical, predictable exertional angina (CCS II) and untreated dyslipidaemia was referred "for angiography and stenting." He was <strong>medication-naive</strong> — no statin (declined years earlier and never revisited), no anti-anginal, only aspirin and GTN. Rather than trialling optimal medical therapy, he was fast-tracked to invasive angiography, which showed a <strong>moderate proximal LAD lesion</strong>. Without FFR/physiology, an operator stented it "while we're in here." He suffered a <strong>peri-procedural complication</strong> (side-branch occlusion with a small procedural MI, plus an access-site bleed). He gained <strong>no prognostic benefit</strong> — his angina, in a vessel that was never proven flow-limiting, was arguably placebo-responsive anyway (ORBITA) — and his statin, blood pressure and glucose were <em>still never addressed</em>. Months later his LDL remained 4+ mmol/L.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🏃 NO OMT TRIAL</b>Fast-tracked to PCI before any statin or anti-anginal — the exact error ISCHEMIA/COURAGE/ORBITA warn against.</div>
+            <div class="hole"><b>🧪 NO PHYSIOLOGY</b>Moderate lesion stented without FFR/iFR — a lesion never proven to be flow-limiting.</div>
+            <div class="hole"><b>🩹 PROCEDURAL HARM</b>Peri-procedural MI + bleed: real risk incurred for no prognostic gain.</div>
+            <div class="hole"><b>🛡️ PREVENTION IGNORED</b>Statin, BP and glucose never optimised — the actual prognosis levers left untouched.</div>
+            <div class="hole"><b>🧠 ANCHORING</b>"Blockage = stent" reasoning; referral request treated as the diagnosis and the plan.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved him from harm:</strong> treat stable angina with <strong>optimal medical therapy and risk-factor control first</strong>; use pre-test probability and CTCA/CT-FFR to characterise disease non-invasively; if invasive angiography is done, <strong>use FFR/iFR before stenting</strong>; reserve revascularisation for symptoms refractory to OMT or genuinely high-risk anatomy; and never let a stent substitute for the statin. <strong>This is exactly the discipline that protected the patient in Bed 1 — who got the statin, kept his native LAD, and did better.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In stable coronary disease, the stent that impresses the patient rarely helps him, and the statin that bores him usually does. Optimal medical therapy first — the cath lab is for the few, not the reflex."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🏥 Outpatient Clinic · Bed 1 — Chronic Coronary Syndrome / Stable Angina<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+    /* ===== SIDEBAR TABS — show one section at a time ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not a chronic-coronary-syndrome feature'); } if(found===total){ flagResult.textContent='✅ All '+total+' CCS/testing features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: ischaemia-burden / revascularisation benefit ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=(v-0)/(100-0)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<=25){ msg='🟢 Low burden (score '+v+'). Well-controlled angina, small/absent ischaemia → OMT alone. Routine revascularisation adds NO prognostic benefit and little symptomatically (ISCHEMIA/COURAGE/ORBITA).'; cls='good'; }
+      else if(v<=55){ msg='🟠 Moderate burden (score '+v+'). Persistent angina despite starting OMT → optimise/escalate anti-anginals first. Revascularisation is reasonable for SYMPTOM relief, but still no mortality benefit in stable disease.'; cls='warn-r'; }
+      else if(v<=80){ msg='🟠 High burden (score '+v+'). Symptoms refractory to optimised OMT → invasive angiography with FFR/iFR; revascularise proven flow-limiting lesions for symptom control.'; cls='warn-r'; }
+      else { msg='🔴 Severe / high-risk anatomy (score '+v+'). Left main, proximal LAD, multivessel + large ischaemia, or reduced LV function → revascularisation now confers PROGNOSTIC as well as symptomatic benefit. Heart Team + PCI vs CABG.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','ISCHEMIA Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"A 60-year-old with 6 months of typical, predictable exertional angina (CCS II), untreated dyslipidaemia and several risk factors is referred asking for 'angiography and a stent.' Medication-naive beyond aspirin and GTN, pain-free in clinic. First move?",
+      choices:[
+        {t:"🩺 Book invasive angiography and stent whatever significant lesion is found — he wants it 'fixed'",good:false,ds:-2,dt:2,xp:0,fb:"☠️ This is the M&M case in S21. Reflex PCI before any OMT trial, no physiology — ISCHEMIA/COURAGE/ORBITA show no prognostic benefit, and he risks a procedural complication with his statin still never started. Restart.",end:true},
+        {t:"💊 Start optimal medical therapy today (statin, aspirin, anti-anginal, risk-factor control) and choose a non-invasive test based on pre-test probability",good:true,ds:1,dt:1,xp:40,fb:"✅ Exactly right. Treat everyone medically first; characterise the disease non-invasively. The cath lab is a later, selective decision.",next:"testing"},
+        {t:"🙄 Reassure him it's 'probably nothing / just reflux' and discharge without treatment",good:false,ds:-2,dt:3,xp:0,fb:"⚠️ Typical exertional angina with multiple risk factors is NOT non-cardiac. Dismissing it forfeits prognosis-changing therapy and misses real coronary disease. Restart.",end:true}
+      ]},
+    testing:{ text:"You've started OMT. For a 60-year-old man with typical angina at intermediate–high pre-test probability, which test do you choose — and CTCA returns a moderate proximal LAD lesion with CT-FFR 0.84 (not flow-limiting), preserved LV. Next?",
+      choices:[
+        {t:"🖥️ Continue optimised OMT, review symptoms at 6 weeks; angiography only if refractory or high-risk anatomy emerges",good:true,ds:1,dt:6,xp:40,fb:"✅ Perfect. A non-flow-limiting lesion in a patient responding to OMT does not need a stent. Reassess by symptoms, not by the picture.",next:"declare"},
+        {t:"🩺 Send straight for invasive angiography and stent the LAD lesion anyway",good:false,ds:-2,dt:4,xp:0,fb:"⚠️ CT-FFR 0.84 means it is NOT flow-limiting; stenting it adds procedural risk with no benefit (ISCHEMIA/ORBITA, and physiology-guided PCI principles).",next:"declare"}
+      ]},
+    declare:{ text:"At 6 weeks he returns. He mentions his chest tightness is now ALSO coming on at rest, waking him at night, and lasting 15–20 minutes, not settling well with GTN. What now?",
+      choices:[
+        {t:"🚨 Recognise this as a change in pattern — possible acute coronary syndrome. Arrange urgent same-day assessment with ECG and troponin",good:true,ds:1,dt:1,xp:45,fb:"🏆 Correct. Rest pain, crescendo frequency, prolonged episodes not settling with GTN = the pattern has changed — treat as ACS until proven otherwise, not as 'stable angina, escalate the tablets.'",end:true},
+        {t:"💊 Just add a long-acting nitrate and review again in another 6 weeks as stable angina",good:false,ds:-2,dt:6,xp:0,fb:"⚠️ Dangerous — new rest/crescendo pain not relieved by GTN is an acute coronary syndrome, not a stable-angina up-titration. This is the second M&M trap.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' wk'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='declare'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 wk'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 60-year-old man has 6 months of typical, predictable exertional angina with untreated dyslipidaemia. He is medication-naive and asks for 'a stent.' The single most important first step is:", opts:["List for invasive angiography and PCI","Start optimal medical therapy (statin, antiplatelet, anti-anginal, risk-factor control) and select a non-invasive test","Reassure and discharge as non-cardiac","Arrange an exercise ECG as the definitive test"], correct:1, exp:"In stable angina, OMT and risk-factor control come first for everyone (ISCHEMIA/COURAGE). Characterise disease non-invasively; reserve the cath lab for refractory symptoms or high-risk anatomy. Exercise ECG has poor accuracy and is not the primary gate." },
+    { q:"What did the ISCHEMIA trial demonstrate in stable CAD with moderate–severe ischaemia?", opts:["Routine revascularisation reduced all-cause mortality","A routine invasive strategy did NOT reduce death or MI vs OMT, but improved angina/quality of life in symptomatic patients","PCI was harmful in all patients","OMT was inferior to early PCI for symptoms and events"], correct:1, exp:"ISCHEMIA: routine invasive management did not reduce death/MI over ~3.2 years vs OMT; the benefit of revascularisation was symptomatic (angina/QoL) in those with symptoms — hence OMT first, revascularise for symptoms/high-risk anatomy." },
+    { q:"For a patient with suspected stable angina at low-to-intermediate pre-test probability, the recommended first-line test is:", opts:["Invasive coronary angiography","Coronary CT angiography (CTCA)","Resting echocardiogram alone","Exercise ECG"], correct:1, exp:"CTCA is first-line for low–intermediate probability: its very high negative predictive value rules out obstructive CAD, and (SCOT-HEART) it improves diagnosis, drives preventive therapy, and reduces death/MI at 5 years." },
+    { q:"The ORBITA trial is important because it showed that in stable single-vessel disease:", opts:["PCI abolished all angina permanently","Much of PCI's symptomatic benefit was not significantly greater than a placebo (sham) procedure","PCI reduced mortality vs sham","Statins are unnecessary after PCI"], correct:1, exp:"ORBITA was placebo-controlled (sham PCI). PCI's improvement in exercise time/angina over a genuine sham was small and not statistically significant on the primary endpoint — much of the perceived benefit is placebo, reinforcing an OMT-first approach." },
+    { q:"Which patient with stable CAD is MOST likely to gain a PROGNOSTIC (survival/MI) benefit from revascularisation?", opts:["A moderate mid-RCA lesion with CT-FFR 0.86 and mild symptoms","Significant left main disease / proximal LAD / multivessel disease with large ischaemic burden or reduced LV function","Any angiographic stenosis >50%","A patient who simply prefers a stent"], correct:1, exp:"Prognostic benefit from revascularisation concentrates in high-risk anatomy: significant left main, proximal LAD, multivessel disease with large ischaemia, or LV dysfunction. Non-flow-limiting moderate lesions do not warrant reflex stenting." },
+    { q:"A patient has classic exertional angina but coronary angiography shows non-obstructive coronaries. The best next consideration is:", opts:["Reassure that the pain is definitely non-cardiac","INOCA/ANOCA — microvascular or vasospastic angina — assess with coronary function testing (CFR/IMR, acetylcholine provocation)","Immediate CABG","Stop all cardiac medications"], correct:1, exp:"Angina with non-obstructive coronaries is often microvascular or vasospastic (INOCA/ANOCA) — real and treatable. Coronary function testing (CFR/IMR + acetylcholine provocation, e.g. CorMicA) stratifies the endotype and guides therapy." },
+    { q:"Which anti-anginal is a selective sinus-node I(f) inhibitor that lowers heart rate without a negative inotropic effect, useful when beta-blockers are contraindicated?", opts:["Ranolazine","Ivabradine","Nicorandil","Isosorbide mononitrate"], correct:1, exp:"Ivabradine selectively inhibits the I(f) current in the sinus node, reducing heart rate (only in sinus rhythm, HR ≥70) without affecting contractility or BP — a useful anti-anginal when beta-blockers are not tolerated or insufficient." },
+    { q:"A clinic patient with previously stable angina now reports pain at REST, more frequent, lasting 20 minutes and not relieved by GTN. The correct action is:", opts:["Up-titrate his anti-anginal and review in 6 weeks","Treat as suspected acute coronary syndrome — urgent same-day ECG and troponin","Reassure; stable angina often varies","Order an outpatient CTCA in 3 months"], correct:1, exp:"A change in pattern — new rest pain, crescendo frequency, prolonged episodes not relieved by GTN — is an acute coronary syndrome until proven otherwise. It leaves the stable-angina pathway and needs urgent assessment, not elective up-titration." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you manage stable angina like a consultant. 🏆':score>=6?'Strong — review the misses and S5 (ISCHEMIA/ORBITA) and S20.':'Revisit S4, S5 and S6 — the OMT-first logic is the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>
