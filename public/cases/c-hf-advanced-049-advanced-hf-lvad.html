@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Heart Failure — Transplant & LVAD — Virtual Teaching Hospital</title>
+<!-- META
+id: c-hf-advanced-049
+title: Advanced Heart Failure — Transplant & LVAD
+hospital: cardiology
+department: cv-hf
+bednumber: 7
+chiefcomplaint: Recurrent admissions, inotrope dependence and escalating diuretics despite maximal therapy
+system: Cardiology
+severity: critical
+tags: Advanced heart failure, Transplant, LVAD, INTERMACS, Inotrope dependence, Stage D
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🫀</div>
+      <div>
+        <div class="t1">Advanced HF Ward</div>
+        <div class="t2">Bed 7 · Advanced HF · LVAD/Tx</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🫀 Advanced Heart Failure Ward · 🛏️ Bed 7</div>
+        <h1>🫀 Advanced Heart Failure — "The Door That Closes"</h1>
+        <div class="sub">⏳ A 58-year-old with EF 15% is back on the ward for the fifth time this year — inotrope-dependent, diuretic doses climbing, blood pressure too low to tolerate the tablets that are meant to help. The team keeps "getting him through." The real question is the one nobody is asking: <strong>should he already be at a transplant centre?</strong></div>
+        <div class="chips">
+          <span class="chip crit">🔴 CRITICAL · STAGE D</span>
+          <span class="chip">🫀 Transplant Pathway</span>
+          <span class="chip">🔩 Durable LVAD</span>
+          <span class="chip">📊 INTERMACS</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital warn"><div class="v-label">💓 HR</div><div class="v-num">96</div></div>
+        <div class="vital alert"><div class="v-label">🩸 BP</div><div class="v-num">88/64</div></div>
+        <div class="vital alert"><div class="v-label">〰️ Pulse Pr.</div><div class="v-num">24</div></div>
+        <div class="vital warn"><div class="v-label">🫁 SpO₂</div><div class="v-num">94%</div></div>
+        <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.2°</div></div>
+        <div class="vital warn"><div class="v-label">💧 Dobutamine</div><div class="v-num">5</div></div>
+        <div class="vital warn"><div class="v-label">⚖️ BMI</div><div class="v-num">18</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — Bed 7, Advanced HF Ward, admission #5 this year</b>A thin, tired man is propped upright, a dobutamine line running. He says: <em>"They always sort me out and send me home… but I get worse every time, and now I can't even walk to the toilet."</em> His weight is down 9 kg in four months — not fluid, muscle. The team's instinct is to "tune him up and get him home again." That instinct is the trap this case is about. This is a <strong>Stage D / advanced heart failure</strong> patient whose surgical options are quietly expiring.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>🧔 Name</td><td><strong>Mr. R.D.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>58-year-old male</td></tr>
+          <tr><td>🆔 MRN</td><td>CV-HF-0749</td></tr>
+          <tr><td>⚖️ Weight / BMI</td><td>54 kg, BMI 18 — down from 63 kg (cardiac cachexia)</td></tr>
+          <tr><td>💼 Occupation</td><td>Retired warehouse worker; now housebound (NYHA IV)</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 Cardiac history — a failing heart, optimally treated, still losing</h3>
+        <ul>
+          <li>🫀 <strong>Non-ischaemic dilated cardiomyopathy</strong>, LVEF 15%, diagnosed 6 years ago. LVEDD 71 mm, moderate functional MR, severe biventricular dilatation.</li>
+          <li>💊 <strong>On maximal tolerated GDMT that keeps being cut back:</strong> sacubitril/valsartan reduced to a token dose then stopped for symptomatic hypotension; bisoprolol 1.25 mg (can't uptitrate — low output); spironolactone held twice for hyperkalaemia + rising creatinine; SGLT2 inhibitor tolerated.</li>
+          <li>⚡ <strong>CRT-D in situ</strong> (LBBB, QRS 158 ms) — responded partially 4 years ago; now three appropriate ICD shocks in 6 months.</li>
+          <li>🏥 <strong>Recurrent HF hospitalisations:</strong> five in 12 months, each needing IV furosemide and, latterly, dobutamine to wean off.</li>
+          <li>💉 <strong>Inotrope dependence:</strong> fails every attempt to stop dobutamine — BP drops, urine output falls, lactate rises.</li>
+          <li>🩸 <strong>Cardiorenal syndrome:</strong> creatinine drifting 110 → 168 µmol/L; congestive hepatopathy with rising bilirubin.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Advanced heart failure is not 'severe symptoms once' — it is persistent NYHA III–IV, recurrent admissions and intolerance of the very drugs that should help, all despite optimised guideline therapy. Recognising it is the whole game."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why this is the highest-stakes recognition in HF</b>Stage D HF carries a 1-year mortality that rivals or exceeds many metastatic cancers. Yet unlike those cancers it has <strong>two life-transforming surgical answers</strong> — heart transplantation and durable LVAD — that only work if the patient is referred <em>before</em> the other organs fail. Missing the referral window is not a soft error; it removes a survival option that cannot be recovered.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 Ward-to-ward handover — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ Night-team SBAR (verbatim)</b>
+          <p><strong>S:</strong> "58-year-old, non-ischaemic DCM, EF 15%, back again with breathlessness and near-anuria. Fifth admission this year, still on dobutamine from last time — we never fully got him off it."</p>
+          <p><strong>B:</strong> "CRT-D, three shocks recently, GDMT keeps being cut for low BP and rising creatinine. Losing weight, barely eating."</p>
+          <p><strong>A:</strong> "Cold and dry-ish now but was warm-and-wet on arrival. BP 88/64, HR 96, narrow pulse pressure, cool peripheries, creatinine 168, bilirubin 41, lactate 2.6, Na 129."</p>
+          <p><strong>R:</strong> "Plan on the board is 'increase furosemide, continue dobutamine, review in a few days.' Nobody has mentioned the transplant centre."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Recurrent admissions, inotrope dependence and GDMT you can't tolerate because the pressure is too low are the heart shouting for help — listen and refer, don't just re-tune."</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each ADVANCED-HF referral trigger</h3>
+        <p>🎮 <em>Click every feature that should trigger referral to an advanced-HF centre (the "I NEED HELP" markers). Each correct = +10 XP. Distractors that do NOT signal advanced HF score nothing.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">🚶 Persistent NYHA III–IV despite optimised GDMT</button>
+          <button class="btn ghost flag-btn" data-good="1">🏥 ≥2 HF hospitalisations in 12 months</button>
+          <button class="btn ghost flag-btn" data-good="1">💉 Inotrope dependence</button>
+          <button class="btn ghost flag-btn" data-good="1">💧 Escalating diuretic requirement</button>
+          <button class="btn ghost flag-btn" data-good="1">🩸 GDMT intolerance from low BP / worsening renal function</button>
+          <button class="btn ghost flag-btn" data-good="1">🫘 Worsening cardiorenal syndrome</button>
+          <button class="btn ghost flag-btn" data-good="1">⚖️ Cardiac cachexia / progressive weight loss</button>
+          <button class="btn ghost flag-btn" data-good="1">⚡ Recurrent appropriate ICD shocks</button>
+          <button class="btn ghost flag-btn" data-good="0">🟢 First mild HF admission responding well to GDMT</button>
+          <button class="btn ghost flag-btn" data-good="0">🌡️ Fever 38.5°C</button>
+          <button class="btn ghost flag-btn" data-good="0">🤕 Reproducible chest-wall pain</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 The mnemonic to carry</b><strong>"I NEED HELP"</strong> — <strong>I</strong>notropes · <strong>N</strong>YHA III–IV / <strong>N</strong>atriuretic peptides persistently high · <strong>E</strong>nd-organ dysfunction · <strong>E</strong>jection fraction very low (&lt;20%) · <strong>D</strong>efibrillator shocks · <strong>H</strong>ospitalisations (recurrent) · <strong>E</strong>scalating diuretics / <strong>E</strong>dema · <strong>L</strong>ow BP limiting GDMT · <strong>P</strong>rognostic markers worsening. Any of these = pick up the phone to an advanced-HF centre.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🌡️ The two-by-two — warm/cold, wet/dry (the Stevenson profiles)</h3>
+        <p>At the bedside, classify perfusion (warm vs <strong>cold</strong>) and congestion (dry vs wet). This man is drifting <strong>"cold and dry"</strong> — low output with congestion partly wrung out by diuretics and inotropes. Cold-and-dry / cold-and-wet carry the worst prognosis and are the phenotypes that need advanced therapies, not just more furosemide.</p>
+        <table class="tbl">
+          <tr><th>System</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>🧠 Mentation</td><td>Slowed, mildly confused when BP dips.</td><td>Low cerebral perfusion — a marker of critically low cardiac output.</td></tr>
+          <tr><td>🖐️ Peripheries</td><td>Cool hands/feet, mottled knees, thready pulse, <strong>narrow pulse pressure (24 mmHg)</strong>.</td><td>Narrow pulse pressure ≈ low stroke volume. A proportional pulse pressure &lt;25% predicts low cardiac index.</td></tr>
+          <tr><td>🫀 Precordium</td><td>Displaced diffuse apex, S3 gallop, soft pan-systolic MR murmur.</td><td>Dilated, failing LV with functional MR from annular stretch.</td></tr>
+          <tr><td>🫁 Chest / JVP</td><td>JVP mildly elevated, few bibasal crackles, hepatomegaly, trace ankle oedema.</td><td>Residual congestion + congestive hepatopathy (rising bilirubin).</td></tr>
+          <tr><td>🚽 Output</td><td>Urine 15–20 mL/h, diuretic-resistant, creatinine climbing.</td><td>Cardiorenal syndrome — the kidneys are the canary for failing forward flow.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Cold-and-dry or cold-and-wet at rest despite inotropes is end-stage physiology — the answer is a referral, not a bigger dose of the same drip."</div>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of 'he responds every time'</b>Each admission he improves with IV diuretic and inotrope and goes home — so the team reads him as "stable-ish." But the trend is relentlessly down: lower BP, higher creatinine, less muscle, more shocks. <strong>Trajectory, not the last discharge, defines advanced HF.</strong></div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The HF fellow thinks out loud on the morning round:</em></p>
+        <h3>🧠 Reframe: this is not another "tune-up," it is a recognition moment</h3>
+        <p>"On paper we've 'optimised' him — but the truth is his heart no longer lets us give GDMT: every uptitration drops his pressure or his kidneys. He's inotrope-dependent, cachectic, shocking, and admitted five times this year. That is textbook <strong>Stage D / advanced HF</strong>. My job today is not to find a cleverer diuretic — it's to <strong>refer him to the advanced-HF/transplant service now</strong>, while his kidneys, liver and pulmonary vasculature can still recover, and to work him up for transplant versus a durable LVAD."</p>
+
+        <h3>🎯 The fellow's order of operations</h3>
+        <ol>
+          <li>📞 <strong>Refer to the advanced-HF centre TODAY</strong> — inotrope dependence alone is a referral trigger; don't wait for the "right" admission.</li>
+          <li>🩸 <strong>Protect end-organs:</strong> maintain perfusion (careful inotrope/afterload management), avoid nephrotoxins, treat congestion without over-diuresing a low-output kidney.</li>
+          <li>🫀 <strong>Right-heart catheter</strong> to measure filling pressures, cardiac output and — critically — <strong>pulmonary vascular resistance</strong> and its reversibility (candidacy hinges on this).</li>
+          <li>📊 <strong>Assign an INTERMACS profile</strong> to gauge urgency (he is roughly profile 3 — "stable but inotrope-dependent").</li>
+          <li>🗣️ <strong>Begin honest shared decision-making + early palliative-care involvement</strong> in parallel — supporting advanced therapies and comfort are not mutually exclusive.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Refer advanced heart failure EARLY — the door to transplant and LVAD closes once the other organs fail, and you cannot reopen it."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>The consultant asks: "He responded again last night — why refer now rather than after the next admission?"
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>Because candidacy is a moving target that only worsens.</strong> Every week of inotrope-dependent low output nudges his pulmonary vascular resistance up and his renal/hepatic function down. Fixed pulmonary hypertension and irreversible multi-organ failure are <em>absolute barriers</em> to transplant and major risk factors for LVAD. Referring "after the next crash" means referring a patient who may no longer be a candidate. The safest time to refer is the moment you recognise Stage D — which is now.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The advanced-HF consultant at the bedside:</em></p>
+        <h3>📊 INTERMACS profiles — the urgency language of durable MCS</h3>
+        <table class="tbl">
+          <tr><th>Profile</th><th>Shorthand</th><th>Description</th><th>Typical action</th></tr>
+          <tr><td class="hi">1</td><td>"Crash &amp; burn"</td><td>Critical cardiogenic shock, worsening despite escalating inotropes ± temporary MCS</td><td>Emergency — temporary support, salvage decision</td></tr>
+          <tr><td class="hi">2</td><td>"Sliding on inotropes"</td><td>Declining despite inotropes; worsening renal/nutrition</td><td>Urgent durable MCS / transplant work-up</td></tr>
+          <tr><td class="hi">3</td><td>"Stable but inotrope-dependent"</td><td>Stable on inotropes but cannot be weaned <em>(our patient)</em></td><td>Elective-urgent MCS / transplant — <strong>refer now</strong></td></tr>
+          <tr><td>4</td><td>"Frequent flyer"</td><td>Recurrent congestion, resting symptoms, escalating diuretics</td><td>Evaluate for advanced therapies</td></tr>
+          <tr><td>5</td><td>"Housebound"</td><td>Comfortable at rest but exertion-intolerant</td><td>Evaluate; timing individualised</td></tr>
+          <tr><td>6</td><td>"Walking wounded"</td><td>Limited exertion, no congestion at rest</td><td>Monitor; discuss options</td></tr>
+          <tr><td>7</td><td>"Advanced NYHA III"</td><td>Clinically stable, advanced symptoms</td><td>Usually too well for durable MCS yet</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"INTERMACS 1 is dying today, INTERMACS 7 is stable-but-advanced. The sweet spot to fix a patient durably is around profiles 2–4 — before the crash, not during it."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">RCT</span> REMATCH (2001)</td><td>In transplant-<em>ineligible</em> end-stage HF, a durable LVAD roughly halved 1-year mortality vs optimal medical therapy — the birth of "destination therapy."</td><td>For a non-transplant candidate, an LVAD is a survival treatment, not a last gamble.</td></tr>
+            <tr><td><span class="lvl">RCT</span> MOMENTUM 3 (2018–19)</td><td>Fully magnetically-levitated centrifugal <strong>HeartMate 3</strong> vs axial HeartMate II: markedly less pump thrombosis and stroke, better 2-year survival free of disabling stroke/reoperation.</td><td>The modern standard durable LVAD is HeartMate 3 — far fewer device thromboses than older pumps.</td></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> ESC 2021 / AHA-ACC-HFSA 2022</td><td>Define advanced (Stage D) HF and recommend <strong>timely referral</strong> to advanced-HF centres for transplant/MCS evaluation; MCS as bridge-to-transplant, bridge-to-candidacy/decision, or destination therapy.</td><td>Referral is a guideline-directed action — not an optional courtesy.</td></tr>
+            <tr><td><span class="lvl">REGISTRY</span> INTERMACS / STS-Intermacs</td><td>Profiles 1–7 stratify pre-implant risk; profile 1 (crash) has the worst outcomes.</td><td>Refer <em>before</em> profile 1 — outcomes are best when you operate on a stabilised, not crashing, patient.</td></tr>
+            <tr><td><span class="lvl">ALLOCATION</span> Transplant listing</td><td>Best long-term survival of any therapy (median survival &gt;12 years) but donor-limited; needs candidacy work-up and freedom from major contraindications (fixed PH, active malignancy, irreversible other-organ failure, etc.).</td><td>Transplant is the gold standard for suitable candidates — supply, not efficacy, is the limit.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The chart that haunts this ward is the man we 'kept going' on the ward for six months of rising furosemide and dobutamine before anyone phoned us. By then his pulmonary pressures were fixed, his liver and kidneys were failing and he was cachectic. We had to decline him for transplant AND LVAD. He died of a disease that had a surgical answer half a year earlier."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY waiting closes the door (the WHY behind the WHY)</h3>
+        <ol>
+          <li>🫀 <strong>The pump fails forward and backward:</strong> a dilated, weak LV cannot generate stroke volume (low forward output) and cannot empty (high filling pressures back up into lungs, liver, gut, kidneys).</li>
+          <li>🫘 <strong>Cardiorenal cascade:</strong> low forward flow + high venous pressure → renal hypoperfusion and congestion → rising creatinine, diuretic resistance, and inability to tolerate ACEi/ARNI/MRA (they drop BP or K⁺ worsens). The very drugs that treat HF become untakeable.</li>
+          <li>🩸 <strong>Cardiohepatic + gut injury:</strong> congestion causes congestive hepatopathy (rising bilirubin, coagulopathy) and bowel wall oedema → <strong>malabsorption + a catabolic, inflammatory state → cardiac cachexia</strong> (muscle wasting that itself predicts death and worsens surgical candidacy).</li>
+          <li>🫁 <strong>Pulmonary vascular remodelling:</strong> chronically high left-sided pressures drive pulmonary hypertension. Early it is <em>reactive/reversible</em>; left long enough it becomes <strong>fixed (elevated, non-vasoreactive PVR)</strong> — and a right ventricle facing a fixed high-resistance circuit will fail a transplanted heart. Fixed PH is a hard contraindication to transplant.</li>
+          <li>🚪 <strong>The closing door:</strong> once multi-organ failure and fixed PH are established, the patient is no longer a transplant or LVAD candidate. This damage is largely <em>irreversible</em> — so the window for a life-saving operation genuinely closes if you wait.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Advanced HF doesn't just weaken the heart — it slowly disqualifies the patient. Every month of delay converts a fixable problem into an inoperable one."</div>
+
+        <h3>⚖️ Contrast pair — Bridge-to-Transplant vs Destination-Therapy LVAD</h3>
+        <div class="vs">
+          <div class="side a"><h4>🌉 Bridge-to-Transplant (BTT)</h4><ul><li>Patient IS a transplant candidate but too sick / donor not yet available</li><li>LVAD keeps them alive and rehabilitates end-organs <em>while listed</em></li><li>Also "bridge-to-candidacy/decision" — support to reverse a relative contraindication (renal, PH, nutrition) and re-assess</li></ul></div>
+          <div class="side b"><h4>🏁 Destination Therapy (DT)</h4><ul><li>Patient is NOT a transplant candidate (age, comorbidity, fixed PH)</li><li>LVAD is the definitive, permanent therapy (REMATCH concept)</li><li>Modern HeartMate 3 DT survival now approaches earlier transplant-era figures</li></ul></div>
+        </div>
+        <p>💡 The device may be identical — the <em>intent</em> (bridge vs destination) is set by candidacy, and candidacy is set by how early you referred and how well the other organs held up.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The Referral-Timing Dial</h3>
+          <p style="font-size:13px">Drag the dial to set <strong>how many months of ward escalation pass before referral</strong> to an advanced-HF centre. Watch how the candidacy window — and survival — depend on referring <strong>early</strong>, not on how much furosemide and dobutamine you throw at him.</p>
+          <label for="kRange">⏳ Months of ward escalation before referral: <b id="kVal">3</b> months</label>
+          <input type="range" id="kRange" min="0" max="24" value="3">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore candidate vs no-longer-a-candidate.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 Refer EARLY (left, green) while end-organs are intact → an excellent transplant/LVAD candidate. Wait too long (right, red) → fixed pulmonary hypertension, multi-organ failure and cachexia → no longer a candidate, whatever the ward does.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The admission &amp; referral order set</h3>
+        <ul>
+          <li>📞 <strong>Referral to the regional advanced-HF / transplant centre — today.</strong> State the referral triggers explicitly (inotrope dependence, ≥2 admissions, GDMT intolerance, cardiorenal, cachexia).</li>
+          <li>🫀 <strong>Right-heart catheterisation</strong> — filling pressures, cardiac output/index, PVR and vasoreactivity testing (candidacy hinges on reversibility of PH).</li>
+          <li>🩺 <strong>Echo</strong> (LVEF, RV function, MR/AR/TR, LV size), <strong>cardiopulmonary exercise test (peak VO₂)</strong> if able, and 6-minute walk for prognostication.</li>
+          <li>💉 <strong>Continue inotrope (dobutamine/milrinone)</strong> as a bridge to preserve perfusion — but flag that inotrope dependence <em>is itself</em> the referral trigger, not a reason to stay on the ward.</li>
+          <li>💧 <strong>IV loop diuretic</strong> titrated to decongest without crashing the low-output kidney; daily weights, strict fluid balance, U&amp;E.</li>
+          <li>🧪 End-organ panel: U&amp;E, LFTs, bilirubin, INR, lactate, natriuretic peptides, iron studies, nutrition markers (albumin, prealbumin), HbA1c.</li>
+          <li>🦠 <strong>Transplant/LVAD candidacy screen</strong> initiated by the centre: virology/serology, malignancy screening, dental, frailty and psychosocial assessment.</li>
+          <li>🗣️ <strong>Palliative-care referral in parallel</strong> for symptom control and goals-of-care — alongside, not instead of, advanced-therapy work-up.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The single most important order in advanced HF is the phone call to the advanced-HF centre — everything else is supportive care while that referral is processed."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Advanced-HF nursing — perfusion, nutrition and the end-organs</h3>
+        <ul>
+          <li>💉 <strong>Guard the inotrope line and the perfusion:</strong> never let dobutamine/milrinone run dry or bolus; watch for arrhythmia. Cool peripheries, falling urine output and rising lactate are early "output is failing" alarms.</li>
+          <li>🚽 <strong>Hourly urine output &amp; daily weights:</strong> the kidney is the real-time cardiac-output monitor. Report oliguria promptly — cardiorenal deterioration changes candidacy.</li>
+          <li>🍽️ <strong>Nutrition is treatment:</strong> cachexia predicts death and worsens surgical outcomes. Dietitian input, protein-forward small meals, treat nausea from gut congestion.</li>
+          <li>🩹 <strong>Skin, mouth and fall prevention</strong> in a cachectic, low-output patient; meticulous line care (future LVAD/transplant patients cannot afford bloodstream infection).</li>
+          <li>⚡ <strong>Debrief ICD shocks:</strong> they are painful and frightening — psychological support matters and each shock is a referral flag to escalate.</li>
+          <li>🗣️ <strong>Be the honest voice:</strong> nurses often hear the real fears. Support shared decision-making and ensure palliative and advanced-therapy conversations are happening, not deferred.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In advanced HF the nurse watches three organs at once — heart (rhythm/perfusion), kidney (urine), and the whole patient (weight, mood, will). Any one deteriorating is a reason to escalate the referral, not just the diuretic."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board — reading the end-organ toll</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Value</th><th>Interpretation</th></tr>
+          <tr><td>NT-proBNP</td><td class="hi">7,850 ng/L</td><td>Persistently very high → severe wall stress; prognostic and a referral marker.</td></tr>
+          <tr><td>Creatinine / eGFR</td><td class="hi">168 µmol/L / 38</td><td>Worsening cardiorenal syndrome — climbing from 110. Threatens both GDMT tolerance and candidacy.</td></tr>
+          <tr><td>Bilirubin / ALT</td><td class="hi">41 µmol/L / 78</td><td>Congestive hepatopathy — a failing forward-and-backward circuit injures the liver.</td></tr>
+          <tr><td>Sodium</td><td class="lo">129 mmol/L</td><td>Hyponatraemia = neurohormonal activation + poor prognosis in advanced HF.</td></tr>
+          <tr><td>Lactate</td><td class="hi">2.6 mmol/L</td><td>Marginal tissue perfusion despite inotrope — low-output state.</td></tr>
+          <tr><td>Albumin / prealbumin</td><td class="lo">28 g/L / low</td><td>Malnutrition / cardiac cachexia — worsens surgical risk.</td></tr>
+          <tr><td>Peak VO₂ (CPET)</td><td class="hi">10.8 mL/kg/min</td><td>&lt;12–14 → advanced HF, transplant-range functional impairment.</td></tr>
+          <tr><td>RHC: PCWP / CI / PVR</td><td class="hi">28 mmHg / 1.7 / 3.4 WU</td><td>High filling pressure, low cardiac index, rising PVR — <strong>still partly reactive now; will fix if untreated.</strong></td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In advanced HF the coronary or the ECG isn't the headline — the kidney, liver, sodium and pulmonary vascular resistance are. They are the clocks counting down candidacy."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why the right-heart catheter is pivotal</b>Transplant candidacy lives or dies on <strong>pulmonary vascular resistance and its reversibility</strong>. If PVR is high but falls with vasodilator challenge, transplant (or LVAD-then-transplant) is still on the table. If PVR is high and <em>fixed</em>, a naïve donor RV will fail — transplant becomes contraindicated. Measuring this early, before it fixes, is why timing matters.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 ECG / IMAGING + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>〰️ Arterial waveform — low output now, continuous-flow after LVAD</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 130" preserveAspectRatio="none" aria-label="Arterial trace: narrow-pulse-pressure low output then flattened continuous-flow LVAD waveform">
+            <rect width="820" height="130" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="32" x2="820" y2="32"/><line x1="0" y1="65" x2="820" y2="65"/><line x1="0" y1="98" x2="820" y2="98"/></g>
+            <polyline fill="none" stroke="#fca5a5" stroke-width="2.3" points="0,80 30,80 44,58 60,72 90,80 120,80 134,58 150,72 180,80 210,80 224,58 240,72 270,80 300,80 314,58 330,72 360,80"/>
+            <polyline fill="none" stroke="#86efac" stroke-width="2.3" points="420,74 470,71 520,73 560,70 600,73 650,71 700,73 760,71 820,72"/>
+            <line x1="390" y1="16" x2="390" y2="114" stroke="#334155" stroke-width="1.5" stroke-dasharray="4 4"/>
+            <text x="90" y="20" fill="#fca5a5" font-size="11">Native: narrow pulse pressure, low output</text>
+            <text x="470" y="20" fill="#93c5fd" font-size="11">Continuous-flow LVAD: flattened, near-non-pulsatile</text>
+          </svg>
+          <div class="ecg-cap">The <span style="color:#fca5a5">native</span> trace shows a small, narrow-pulse-pressure waveform (low stroke volume). After a <span style="color:#86efac">continuous-flow LVAD</span> the arterial line flattens — pulsatility falls, a palpable pulse and reliable cuff BP may disappear, and a Doppler-derived mean arterial pressure replaces systolic/diastolic readings.</div>
+        </div>
+
+        <h3>🖼️ Imaging &amp; electrical picture in this patient</h3>
+        <table class="tbl">
+          <tr><th>Study</th><th>Finding</th><th>Meaning</th></tr>
+          <tr><td>📈 <strong>ECG</strong></td><td>Sinus tach 96, LBBB, QRS 158 ms, CRT-paced complexes, frequent PVCs</td><td>Wide-QRS DCM; ongoing ventricular ectopy driving ICD shocks.</td></tr>
+          <tr><td>🫀 <strong>Echo (TTE)</strong></td><td>LVEF 15%, LVEDD 71 mm, severe global hypokinesis, moderate functional MR, RV mildly impaired, TAPSE 15 mm</td><td>Severe biventricular disease; RV function is the key LVAD-risk variable.</td></tr>
+          <tr><td>🩻 <strong>CXR</strong></td><td>Cardiomegaly, upper-lobe diversion, small effusions, CRT-D leads in situ</td><td>Chronic congestion on a maximally remodelled heart.</td></tr>
+          <tr><td>🫁 <strong>Right-heart cath</strong></td><td>PCWP 28, CI 1.7, PVR 3.4 WU (partly reversible on challenge)</td><td>Confirms low-output, high-filling physiology; PH still salvageable — refer before it fixes.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After a continuous-flow LVAD there may be no palpable pulse and no cuff BP — a flat arterial line can be entirely normal. Learn LVAD physiology before you 'resuscitate' a well patient who simply has no pulse."</div>
+
+        <div class="callout warn"><b class="ct">⚠️ RV function is the LVAD gatekeeper</b>An LVAD unloads the LEFT ventricle and suddenly increases venous return to the RIGHT — a marginal RV (low TAPSE, high CVP:PCWP ratio, severe TR) can fail acutely after implant. Pre-op RV assessment decides between an isolated LVAD, planned biventricular support, or reconsidering transplant first.</div>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The advanced-HF drug map — and why "maximal GDMT" is itself failing</h3>
+        <table class="tbl">
+          <tr><th>Drug / class</th><th>Role in advanced HF</th><th>Mechanism / the advanced-HF catch</th></tr>
+          <tr><td><strong>ARNI</strong> (sacubitril/valsartan)</td><td>Cornerstone GDMT (PARADIGM-HF)</td><td>Neprilysin inhibition + ARB. <em>Here: stopped — symptomatic hypotension at even low dose.</em> Intolerance IS a referral flag.</td></tr>
+          <tr><td><strong>Beta-blocker</strong> (bisoprolol)</td><td>Mortality benefit, anti-arrhythmic</td><td>Stuck at 1.25 mg — can't uptitrate because output/BP won't allow it; may even need reduction in low-output states.</td></tr>
+          <tr><td><strong>MRA</strong> (spironolactone/eplerenone)</td><td>Mortality benefit (RALES/EMPHASIS)</td><td>Held twice for hyperkalaemia + rising creatinine — the failing kidney vetoes it.</td></tr>
+          <tr><td><strong>SGLT2 inhibitor</strong> (dapagliflozin/empagliflozin)</td><td>Reduces HF hospitalisation/death across EF (DAPA-HF, EMPEROR)</td><td>Usually tolerated even at low BP — keep it going.</td></tr>
+          <tr><td><strong>Loop diuretic</strong> (furosemide, escalating)</td><td>Congestion control</td><td>Escalating dose / diuretic resistance is a cardinal advanced-HF marker — treat the congestion, but read the escalation as a referral trigger.</td></tr>
+          <tr><td><strong>Inotropes</strong> (dobutamine, milrinone)</td><td>Bridge: perfusion &amp; symptom relief; to transplant/LVAD or palliation</td><td>β-agonist / PDE3 inhibitor ↑ contractility. Improve haemodynamics but <strong>increase mortality/arrhythmia long-term</strong> — a bridge, never a destination.</td></tr>
+          <tr><td><strong>IV iron</strong></td><td>Correct iron deficiency</td><td>Improves symptoms/QoL and reduces hospitalisation (AFFIRM-AHF).</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"When the heart is so weak that GDMT drops the pressure or poisons the kidney, 'optimised medical therapy' has become a diagnosis of advanced HF — not a reason to keep titrating."</div>
+        <div class="callout danger"><b class="ct">🚫 Inotropes are a bridge, not a home</b>Chronic outpatient inotropes improve symptoms but shorten life and provoke arrhythmia. They are legitimate as a bridge to transplant/LVAD, or as a palliative comfort measure in a patient who has declined surgery — but "keep him on dobutamine and review" as a long-term ward plan, without referral, is how the door closes.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why — end-organs are the dashboard</h3>
+        <ul>
+          <li>🫀 <strong>Telemetry + device interrogation:</strong> ventricular arrhythmia and ICD shocks are frequent and each is a red flag; check CRT-D function and burden of ectopy.</li>
+          <li>🚽 <strong>Urine output, daily weight, U&amp;E:</strong> the renal trend is the most sensitive real-time index of forward output and of whether you are over- or under-diuresing.</li>
+          <li>🩸 <strong>Lactate, mentation, peripheral temperature:</strong> perfusion markers — a rising lactate on inotrope means the pump is losing, escalate the referral not just the drip.</li>
+          <li>🫁 <strong>Repeat right-heart haemodynamics</strong> on therapy: is PVR falling (still reversible) or fixing? This directly informs transplant candidacy timing.</li>
+          <li>🍽️ <strong>Nutrition &amp; weight trend:</strong> ongoing muscle loss is a prognostic and candidacy alarm — track it deliberately.</li>
+          <li>📞 <strong>Referral status:</strong> monitor that the advanced-HF centre review is actually happening — a referral that stalls in an inbox is the same as no referral.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In advanced HF the monitor's question is not 'is he congested?' but 'are his kidneys, liver and pulmonary vessels still recoverable?' — because that, not the diuretic, decides whether surgery can still save him."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong — of the disease, and of durable LVAD therapy</h3>
+        <h4>🫀 Of untreated advanced HF</h4>
+        <ul>
+          <li>⚡ <strong>Sudden cardiac death / arrhythmic storm</strong> — recurrent VT and ICD shocks.</li>
+          <li>💔 <strong>Progressive cardiogenic shock</strong> and inotrope dependence sliding to INTERMACS 1.</li>
+          <li>🫘 <strong>Multi-organ failure</strong> — cardiorenal, cardiohepatic, cachexia — the very complications that <em>remove candidacy</em>.</li>
+          <li>🫁 <strong>Fixed pulmonary hypertension</strong> — the silent, irreversible disqualifier for transplant.</li>
+        </ul>
+        <h4>🔩 Of a durable continuous-flow LVAD (know these cold)</h4>
+        <ul>
+          <li>🩸 <strong>Bleeding</strong> — acquired von Willebrand syndrome (high shear cleaves vWF multimers) + GI arteriovenous malformations → recurrent GI bleeds; plus anticoagulation-related bleeding.</li>
+          <li>🧱 <strong>Pump thrombosis</strong> — device clot (much rarer with HeartMate 3) → haemolysis, power spikes, heart failure.</li>
+          <li>🦠 <strong>Driveline infection</strong> — the percutaneous lead is a lifelong infection portal; meticulous site care is essential.</li>
+          <li>🧠 <strong>Stroke</strong> — ischaemic (thromboembolic) or haemorrhagic; a leading cause of death/disability on support.</li>
+          <li>🫀 <strong>Right ventricular failure</strong> — after LV unloading increases RV preload; may need inotropes, iNO, or RV assist device.</li>
+          <li>🌊 <strong>Aortic regurgitation (de novo)</strong> — continuous flow across a rarely-opening aortic valve promotes AR over time, worsening effective forward flow.</li>
+          <li>🌀 <strong>Suction events / low-flow alarms</strong> — over-speed or hypovolaemia collapses the LV onto the inflow cannula, triggering arrhythmia.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The modern LVAD (HeartMate 3) is a durable therapy, not a last-ditch gamble — but it bleeds, clots and can fail the right ventricle; know its complications before you refer, so you can consent honestly."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 "Is this really advanced HF?" — the differential of deterioration</h3>
+        <p>Before labelling a patient Stage D, exclude the <strong>reversible causes of apparent refractoriness</strong> — because some are fixable without transplant.</p>
+        <table class="tbl">
+          <tr><th>Consideration</th><th>Discriminators</th><th>Action</th></tr>
+          <tr><td>🔁 <strong>True Stage D advanced HF</strong> (this patient)</td><td>Persistent NYHA III–IV, recurrent admissions, inotrope dependence, GDMT intolerance, end-organ decline despite optimisation</td><td>Refer to advanced-HF centre for transplant/LVAD evaluation.</td></tr>
+          <tr><td>💊 <strong>Suboptimal / non-adherent GDMT</strong></td><td>Never truly uptitrated, missed doses, no MRA/SGLT2i, no device where indicated</td><td>Genuinely optimise first — but do it in parallel with referral if markers present.</td></tr>
+          <tr><td>🔧 <strong>Correctable driver</strong></td><td>Uncontrolled AF/tachycardia, severe primary valve disease, ongoing ischaemia, CRT non-response/lead issue, thyroid, alcohol/toxin, iron deficiency</td><td>Treat the reversible cause — may recover LV function.</td></tr>
+          <tr><td>🫁 <strong>Non-cardiac mimics of "getting worse"</strong></td><td>Anaemia, sepsis, PE, renal failure, deconditioning</td><td>Diagnose and treat; don't mislabel as end-stage.</td></tr>
+          <tr><td>🕊️ <strong>Advanced HF + poor surgical candidate</strong></td><td>Fixed contraindications, patient preference against surgery</td><td>Advanced-HF centre still adds value: symptom-focused, palliative-led plan.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Exclude the fixable (non-adherence, AF, valve, ischaemia, iron) before you call it end-stage — but never let 'ruling out reversibles' become the excuse that delays a referral the markers already justify."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The Fifth Admission"</h3>
+          <div class="hud"><span>❤️ Candidacy: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">Mr. R.D. is back for the fifth time this year: EF 15%, inotrope-dependent, creatinine climbing, cachectic, three ICD shocks recently. The ward round's default plan is "increase furosemide, continue dobutamine, review in a few days." What do you do?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The disposition plan</h3>
+        <ol>
+          <li>🫀 <strong>Diagnosis:</strong> Stage D / advanced HF (non-ischaemic DCM, EF 15%, INTERMACS ≈3, inotrope-dependent, cardiorenal, cachexia). This is a <strong>referral</strong>, not a routine tune-up.</li>
+          <li>📞 <strong>Refer to the advanced-HF/transplant centre now;</strong> complete candidacy work-up (RHC/PVR reversibility, CPET, malignancy/frailty/psychosocial screen).</li>
+          <li>⚖️ <strong>Decide the pathway:</strong> transplant listing if a candidate; durable LVAD as bridge-to-transplant / bridge-to-candidacy, or destination therapy if not transplantable; support end-organs to keep options open.</li>
+          <li>🗣️ <strong>Run palliative care in parallel:</strong> symptom control, advance-care planning, and an honest discussion of prognosis and the trade-offs of each option.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Advanced HF is not 'the ward's problem to keep managing' — it is a time-critical referral in which delay itself is the harm."</div>
+
+        <div class="checklist" id="ckReferral">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Advanced-HF referral triggers &amp; transplant/LVAD evaluation (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>🚩 Referral trigger documented (I NEED HELP): inotropes / NYHA III–IV / end-organ dysfunction / EF &lt;20% / shocks / recurrent hospitalisations / escalating diuretics / low-BP GDMT intolerance / worsening prognostic markers</span></label>
+          <label class="ck"><input type="checkbox"><span>📞 Referral to advanced-HF / transplant centre sent and acknowledged (not just filed)</span></label>
+          <label class="ck"><input type="checkbox"><span>🫀 Right-heart catheter: filling pressures, cardiac index, PVR + vasoreactivity/reversibility</span></label>
+          <label class="ck"><input type="checkbox"><span>🏃 Functional assessment: peak VO₂ (CPET) and/or 6-minute walk documented</span></label>
+          <label class="ck"><input type="checkbox"><span>🩻 RV function, valve disease and end-organ (renal/hepatic/nutrition) status assessed for candidacy</span></label>
+          <label class="ck"><input type="checkbox"><span>🧾 Contraindication screen: fixed PH, active malignancy, irreversible other-organ failure, substance/adherence, psychosocial support</span></label>
+          <label class="ck"><input type="checkbox"><span>🗣️ Shared decision-making + palliative care engaged in parallel</span></label>
+          <div class="ck-progress" data-progress>0 / 7 complete</div>
+        </div>
+
+        <div class="checklist" id="ckLVAD">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Durable LVAD complication surveillance</h3>
+          <label class="ck"><input type="checkbox"><span>🩸 Bleeding watch — acquired von Willebrand + GI AVMs; monitor Hb, stool, manage anticoagulation carefully</span></label>
+          <label class="ck"><input type="checkbox"><span>🧱 Pump thrombosis — LDH/haemolysis, power/flow log spikes, worsening HF; escalate urgently</span></label>
+          <label class="ck"><input type="checkbox"><span>🦠 Driveline infection — daily site inspection, immobilisation/dressing protocol, treat early</span></label>
+          <label class="ck"><input type="checkbox"><span>🧠 Stroke surveillance — neuro checks, BP control (mean arterial pressure target), INR in range</span></label>
+          <label class="ck"><input type="checkbox"><span>🫀 RV failure — CVP, TR, inotrope/iNO need, low-flow signs post-implant</span></label>
+          <label class="ck"><input type="checkbox"><span>🌊 De novo aortic regurgitation — periodic echo of aortic valve opening/AR severity</span></label>
+          <div class="ck-progress" data-progress>0 / 6 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">Day 0</div>Fifth admission recognised as Stage D. Referral to the advanced-HF centre made the same day; inotrope continued as a bridge, end-organs protected.</div>
+          <div class="t-item"><div class="t-time">Day 2</div>Right-heart cath: PCWP 28, CI 1.7, PVR 3.4 WU but <strong>reversible</strong> on vasodilator challenge — transplant still on the table. INTERMACS profile 3.</div>
+          <div class="t-item"><div class="t-time">Day 6</div>Candidacy work-up completed (CPET peak VO₂ 10.8, malignancy/frailty/psychosocial clear). Multidisciplinary transplant meeting: listed for transplant with a durable LVAD planned as <strong>bridge-to-transplant</strong>.</div>
+          <div class="t-item"><div class="t-time">Week 2</div>HeartMate 3 implanted while end-organs still recoverable. Careful RV protection peri-op; no RVAD needed. Weaned off inotropes.</div>
+          <div class="t-item"><div class="t-time">Month 3</div>Rehabilitated at home on the device: creatinine improved, weight regained, off the admission treadmill — waiting on the list in far better shape than at referral.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>He is a candidate — and now bridged — because someone on the fifth admission refused "just re-tune him," recognised Stage D, and referred while his kidneys, liver and pulmonary vessels could still recover. Ordinary recognition, extraordinary difference. Contrast this with S21.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 Two very different destinations — and both start with the referral</h3>
+        <div class="vs">
+          <div class="side a"><h4>🔩 Bridged / on a durable LVAD</h4><ul><li>Anticoagulation (warfarin) + antiplatelet; strict INR/mean-arterial-pressure targets</li><li>Driveline care, controller/battery competence, emergency plan, LVAD-coordinator contact</li><li>Surveillance for bleeding, thrombosis, infection, stroke, RV failure, AR</li><li>Continue GDMT/decongestion as tolerated; cardiac rehab; transplant follow-up if BTT</li></ul></div>
+          <div class="side b"><h4>🕊️ Not a surgical candidate — palliative pathway</h4><ul><li>Symptom-directed care: diuretics, opioids for dyspnoea, anti-emetics, oxygen if hypoxic</li><li>Consider ICD deactivation discussion to avoid distressing shocks at end of life</li><li>Advance-care planning, community HF + palliative teams, carer support</li><li>Honest prognostication — quality of remaining life as the explicit goal</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Every advanced-HF patient deserves the referral — whether it ends in a transplant, a pump, or a well-planned palliative pathway. What no patient deserves is a default of endless ward tune-ups until the choice is made by default."</div>
+        <div class="callout info"><b class="ct">🗣️ Palliative care is active treatment, not defeat</b>When surgery isn't appropriate, high-quality palliative care and honest shared decision-making <em>are</em> the therapy. It runs alongside advanced-therapy evaluation from the start, not only after everything else has failed.</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>🚪 The door closes</b>Refer advanced HF EARLY — transplant/LVAD candidacy is lost once end-organs and pulmonary vessels fail, and it cannot be regained.</div>
+          <div class="pearl"><b>🆘 I NEED HELP</b>Inotropes, NYHA III–IV, End-organ dysfunction, EF very low, Defibrillator shocks, Hospitalisations, Escalating diuretics, Low BP-limited GDMT, Prognostic markers — any one triggers referral.</div>
+          <div class="pearl"><b>💊 GDMT you can't give</b>When the pressure/kidney vetoes ARNI, beta-blocker and MRA, that intolerance IS advanced HF — not a reason to keep titrating.</div>
+          <div class="pearl"><b>📊 INTERMACS 2–4</b>The best time to operate durably is before the crash (profile 1); refer while still profile 2–4.</div>
+          <div class="pearl"><b>🫁 PVR reversibility</b>Fixed pulmonary hypertension contraindicates transplant — measure PVR early, while it is still reactive.</div>
+          <div class="pearl"><b>🔩 HeartMate 3</b>Fully mag-lev continuous-flow pump (MOMENTUM 3): better survival, far less pump thrombosis than older devices.</div>
+          <div class="pearl"><b>🩸 LVAD bleeds &amp; clots</b>Acquired von Willebrand + GI AVMs → bleeding; also thrombosis, driveline infection, stroke, RV failure, de novo AR.</div>
+          <div class="pearl"><b>🕊️ Palliative = therapy</b>If not a surgical candidate, honest shared decision-making and palliative care are the treatment — offered early, not last.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the referral</h3>
+          <ul>
+            <li>📊 <strong>INTERMACS profiles 1–7 in depth:</strong> 1 "crash and burn" (critical shock) → 2 "sliding on inotropes" → 3 "stable but inotrope-dependent" → 4 "resting symptoms / frequent flyer" → 5 "housebound" → 6 "walking wounded" → 7 "advanced NYHA III." Modifiers: temporary MCS (TCS), arrhythmia (A), frequent flyer (FF). Outcomes are worst in profile 1 — the argument for referring <em>before</em> the crash.</li>
+            <li>🎯 <strong>Intent of MCS — BTT vs BTD vs DT:</strong> <em>bridge-to-transplant</em> (already a candidate, supported while listed); <em>bridge-to-candidacy/decision</em> (support to reverse a relative contraindication — renal, PH, nutrition, adherence — then re-evaluate); <em>destination therapy</em> (permanent, for non-transplant candidates, per REMATCH).</li>
+            <li>🔩 <strong>Continuous-flow LVAD physiology:</strong> a rotary pump generates near-continuous flow → reduced pulsatility (often no palpable pulse, unreliable cuff BP; use Doppler MAP). Pump <strong>speed</strong> is set to unload the LV without causing <strong>suction events</strong> (LV collapse onto the inflow cannula → ectopy/arrhythmia). Flow is preload-dependent and afterload-sensitive; hypertension reduces flow and raises stroke risk, so MAP is tightly controlled.</li>
+            <li>🫀 <strong>RV failure after LV unloading:</strong> LVAD raises RV preload and shifts the septum; a marginal RV decompensates. Predict with RV indices (TAPSE, RV:LV ratio, CVP:PCWP, severe TR); manage with volume optimisation, inotropes, pulmonary vasodilators (iNO), or an RVAD/BiVAD.</li>
+            <li>🩸 <strong>Acquired von Willebrand syndrome &amp; GI AVMs:</strong> high shear cleaves large vWF multimers; combined with reduced pulsatility promoting angiodysplasia → recurrent GI bleeding. Balanced against thrombosis risk requiring anticoagulation — a lifelong tightrope.</li>
+            <li>🌊 <strong>De novo aortic regurgitation, pump thrombosis, driveline infection, stroke:</strong> the signature durable-MCS complication set to counsel and surveil for; HeartMate 3's mag-lev design (MOMENTUM 3) sharply cut pump thrombosis and stroke vs axial-flow HeartMate II.</li>
+            <li>🚫 <strong>Transplant contraindications:</strong> fixed/irreversible pulmonary hypertension (high non-vasoreactive PVR), active or recent malignancy, active infection, irreversible major other-organ dysfunction (unless combined-organ transplant), severe frailty, ongoing substance misuse or non-adherence, and inadequate psychosocial support.</li>
+            <li>💊 <strong>Immunosuppression basics (post-transplant):</strong> induction (e.g., basiliximab/ATG) then triple maintenance — a calcineurin inhibitor (tacrolimus/ciclosporin) + antiproliferative (mycophenolate) + corticosteroid; watch for rejection (endomyocardial biopsy surveillance), infection (CMV/PJP prophylaxis), nephrotoxicity, malignancy and cardiac allograft vasculopathy.</li>
+            <li>🕊️ <strong>Palliative care &amp; shared decision-making:</strong> integrated from diagnosis of Stage D; symptom control, advance-care planning, ICD-deactivation conversations, and explicit trade-off discussions (survival vs invasiveness vs quality of life) for every pathway — surgical or not.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The Referral That Came Six Months Too Late"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 58-year-old man with non-ischaemic dilated cardiomyopathy, EF 15%, cycled through the ward every few weeks over half a year. Each admission the team escalated furosemide and gave intermittent dobutamine and "kept him going," proud that he always improved enough to go home. His creatinine crept up, his bilirubin rose, he lost weight, and his pulmonary pressures — never remeasured — quietly fixed. Only when he arrived in florid cardiogenic shock (INTERMACS 1) did anyone finally phone the transplant centre. By then he had <strong>fixed pulmonary hypertension, a failing liver and kidneys, and cardiac cachexia</strong>. He was declined for <strong>both transplant and LVAD</strong> and died a few weeks later. Referred six months earlier, the advanced-HF team agreed, he would have been an <strong>excellent candidate</strong>.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🧠 ANCHORING</b>"He always responds" — improvement each admission masked a relentless downward trajectory.</div>
+            <div class="hole"><b>📞 NO REFERRAL</b>Clear I NEED HELP triggers (inotropes, recurrent admissions, cachexia) never prompted a call to the advanced-HF centre.</div>
+            <div class="hole"><b>🫁 PH LET FIX</b>Pulmonary vascular resistance never remeasured; reversible PH allowed to become fixed and inoperable.</div>
+            <div class="hole"><b>🫘 END-ORGANS IGNORED</b>Rising creatinine and bilirubin read as "expected" rather than as the closing candidacy window.</div>
+            <div class="hole"><b>🗣️ NO PLAN B</b>Neither advanced therapies nor honest palliative planning were ever discussed — a default of endless tune-ups.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> read recurrent admissions + inotrope dependence + cachexia as advanced HF and refer on the <em>first</em> such admission; remeasure PVR and protect end-organs while they are still recoverable; treat the referral as time-critical, not a courtesy; and run honest shared decision-making — transplant, LVAD, or palliative — from the start. <strong>This is exactly the recognition that saved the patient in Bed 7.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"He died of a disease that had a surgical answer months earlier. 'Keeping him going' on the ward without a referral is not care — it is watching the door close in slow motion."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🫀 Advanced Heart Failure Ward · Bed 7 — Advanced Heart Failure / Transplant &amp; LVAD<br>⚠️ Educational use only — not for clinical decision-making. "Refer early — the door only opens once."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+    /* ===== SIDEBAR TABS — show one section at a time ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not an advanced-HF referral trigger'); } if(found===total){ flagResult.textContent='✅ All '+total+' referral triggers found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' referral triggers found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: referral-timing dial ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=(v-0)/(24-0)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<=6){ msg='🟢 Referred EARLY ('+v+' month'+(v===1?'':'s')+'). End-organs intact, PVR still reversible → an excellent transplant/LVAD candidate. The door is wide open.'; cls='good'; }
+      else if(v<=12){ msg='🟠 Referred at '+v+' months. Cardiorenal and cardiohepatic strain building and PVR rising — still likely a candidate, but optimise fast: the window is narrowing.'; cls='warn-r'; }
+      else if(v<=18){ msg='🟠 Referred late ('+v+' months). Worsening renal/liver function, early cachexia, PH close to fixing — candidacy now borderline.'; cls='warn-r'; }
+      else { msg='🔴 Referred too late ('+v+' months). Fixed pulmonary hypertension + multi-organ failure + cachexia → no longer a transplant OR LVAD candidate. The door has closed.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Timing Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"Mr. R.D. is back for the fifth time this year: EF 15%, inotrope-dependent, creatinine climbing, cachectic, three ICD shocks recently. The ward default is 'increase furosemide, continue dobutamine, review in a few days.' What do you do?",
+      choices:[
+        {t:"💧 Keep escalating furosemide + dobutamine on the ward, 'keep him going', don't refer",good:false,ds:-2,dt:90,xp:0,fb:"☠️ This is the M&M case in S21. Endless tune-ups let his PVR fix and his kidneys, liver and nutrition fail — by the time he crashes he is no longer a candidate for transplant OR LVAD. Restart.",end:true},
+        {t:"📞 Recognise Stage D and refer to the advanced-HF/transplant centre TODAY while end-organs are recoverable",good:true,ds:1,dt:8,xp:40,fb:"✅ Exactly. Inotrope dependence + recurrent admissions + cachexia are I-NEED-HELP triggers. Referring now keeps every option open.",next:"evaluate"},
+        {t:"🕊️ Decide 'nothing more to offer' — no referral and no palliative discussion either",good:false,ds:-1,dt:20,xp:5,fb:"⚠️ Premature nihilism. You haven't let an advanced-HF centre assess candidacy, and even non-candidates deserve honest palliative planning. Refer and evaluate first.",next:"evaluate"}
+      ]},
+    evaluate:{ text:"He's accepted for evaluation. Right-heart cath shows PCWP 28, CI 1.7, PVR 3.4 WU but reversible on challenge; peak VO₂ 10.8; INTERMACS profile 3. How do you proceed?",
+      choices:[
+        {t:"🫀 Complete transplant/LVAD work-up, assign INTERMACS profile, protect end-organs and support perfusion",good:true,ds:1,dt:6,xp:40,fb:"✅ Right. Reversible PVR means transplant is still on the table; work him up and keep the organs recoverable while a durable LVAD is planned as a bridge.",next:"declare"},
+        {t:"🛏️ Delay the work-up, keep him on rising inotropes on the ward until he's 'sick enough' to justify surgery",good:false,ds:-2,dt:40,xp:0,fb:"⚠️ Dangerous — waiting for a crash (INTERMACS 1) worsens outcomes and lets reversible PH and end-organ injury become fixed. Operate on a stabilised candidate, not a crashing one.",next:"declare"}
+      ]},
+    declare:{ text:"The multidisciplinary transplant meeting must decide the definitive pathway now. What is the right call?",
+      choices:[
+        {t:"🔩 List for transplant and implant a durable LVAD (HeartMate 3) as bridge-to-transplant, with palliative care alongside",good:true,ds:1,dt:5,xp:45,fb:"🏆 Perfect. Early referral preserved candidacy; a mag-lev HeartMate 3 (MOMENTUM 3) bridges him in good end-organ shape while he waits — and honest shared decision-making runs in parallel.",end:true},
+        {t:"⏳ Keep waiting on inotropes until multi-organ failure and fixed PH set in",good:false,ds:-1,dt:30,xp:0,fb:"⚠️ That is exactly how the door closes — fixed PH and multi-organ failure make him inoperable. Act while he is still a candidate.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='declare'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 58-year-old with EF 15% has had five HF admissions this year, cannot be weaned off dobutamine, and no longer tolerates ARNI or MRA because of low BP and rising creatinine. The single most important next step is:", opts:["Increase furosemide and review in a few days","Refer to an advanced-HF/transplant centre now","Add a second inotrope and continue on the ward indefinitely","Stop all GDMT and discharge"], correct:1, exp:"Inotrope dependence, recurrent admissions and GDMT intolerance are cardinal I-NEED-HELP triggers for Stage D / advanced HF. Timely referral for transplant/LVAD evaluation is the guideline-directed action — ward re-tuning without referral is how candidacy is lost." },
+    { q:"Why does referring advanced HF EARLY matter so much for candidacy?", opts:["Referral is only an administrative formality","Progressive multi-organ failure and fixed pulmonary hypertension become irreversible, removing transplant/LVAD eligibility","Early referral guarantees a donor heart","Late referral improves outcomes"], correct:1, exp:"As HF advances it damages kidneys, liver, nutrition and the pulmonary vasculature. Once PH becomes fixed and other organs fail irreversibly, the patient is no longer a transplant or LVAD candidate — the window closes and cannot be reopened." },
+    { q:"Which trial established that a durable LVAD improves survival over medical therapy in transplant-INELIGIBLE end-stage HF (i.e. destination therapy)?", opts:["PARADIGM-HF","REMATCH","DAPA-HF","ISIS-2"], correct:1, exp:"REMATCH showed LVAD roughly halved 1-year mortality vs optimal medical therapy in non-transplant candidates, establishing the concept of destination therapy. PARADIGM-HF (ARNI) and DAPA-HF (SGLT2i) are GDMT trials." },
+    { q:"MOMENTUM 3 established which device as the current durable-LVAD standard, and why?", opts:["HeartMate II — axial flow, cheaper","HeartMate 3 — fully magnetically levitated centrifugal pump with far less pump thrombosis and stroke and better survival","A pulsatile first-generation device","An intra-aortic balloon pump"], correct:1, exp:"MOMENTUM 3 showed the fully mag-lev HeartMate 3 had markedly less pump thrombosis and stroke and better 2-year survival free of disabling stroke/reoperation than the axial HeartMate II — it is now the standard durable LVAD." },
+    { q:"An INTERMACS profile 3 patient is best described as:", opts:["Critical cardiogenic shock ('crash and burn')","Stable but inotrope-dependent (cannot be weaned)","Advanced NYHA III but clinically stable","Exertion-tolerant with no resting symptoms"], correct:1, exp:"Profile 1 is crash-and-burn shock; profile 3 is 'stable but inotrope-dependent' — exactly this patient. Profiles 2–4 are a favourable window to intervene durably, before the crash of profile 1." },
+    { q:"Which finding, if IRREVERSIBLE, is a contraindication to heart transplantation because the donor right ventricle would fail?", opts:["Reversible mild renal impairment","Fixed (non-vasoreactive) pulmonary hypertension / high PVR","Low peak VO₂ that improves with rehab","Iron deficiency"], correct:1, exp:"A naïve donor RV cannot acutely handle a fixed high-resistance pulmonary circuit and fails after transplant. Fixed PH is a hard contraindication — which is why PVR and its reversibility must be measured early, before it fixes." },
+    { q:"A common bleeding complication specific to continuous-flow LVADs results from:", opts:["Excess platelets","Acquired von Willebrand syndrome (shear-mediated loss of vWF multimers) plus GI arteriovenous malformations","Vitamin K excess","Thrombocytosis from the pump"], correct:1, exp:"High shear in continuous-flow pumps cleaves large vWF multimers (acquired von Willebrand syndrome) and reduced pulsatility promotes GI angiodysplasia/AVMs, causing recurrent GI bleeding — balanced against the thrombosis risk that mandates anticoagulation." },
+    { q:"For a patient with advanced HF who is NOT a candidate for transplant or LVAD, the appropriate management is:", opts:["No further input — nothing can be done","High-quality palliative care and honest shared decision-making, including symptom control and advance-care planning","Mandatory surgery regardless of contraindications","Indefinite ward admission with escalating inotropes and no plan"], correct:1, exp:"When surgery is not appropriate, palliative care and honest shared decision-making ARE the therapy — symptom control, ICD-deactivation discussion, and advance-care planning. It should be offered early and in parallel, not as an afterthought." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you recognise and refer advanced HF like a consultant. 🏆':score>=6?'Strong — review the misses and S20 advanced topics.':'Revisit S4, S5 and S6 — early recognition and referral are the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>

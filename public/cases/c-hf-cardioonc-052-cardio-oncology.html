@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cardio-Oncology — Cancer-Therapy-Related Cardiac Dysfunction — Virtual Teaching Hospital</title>
+<!-- META
+id: c-hf-cardioonc-052
+title: Cardio-Oncology — Cancer-Therapy-Related Cardiac Dysfunction
+hospital: cardiology
+department: cv-hf
+bednumber: 10
+chiefcomplaint: New heart failure during/after cancer chemotherapy
+system: Cardiology
+severity: urgent
+tags: Cardio-oncology, Anthracycline, Trastuzumab, CTRCD, ICI myocarditis, GLS surveillance
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🚨</div>
+      <div>
+        <div class="t1">Emergency Dept</div>
+        <div class="t2">Bed 10 · Cardio-Oncology</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 💔 Heart Failure Ward · 🛏️ Bed 10</div>
+        <h1>🫀 Cardio-Oncology — "The Heart the Cancer Cure Forgot"</h1>
+        <div class="sub">⚡ A 58-year-old woman is halfway through curative breast-cancer treatment — anthracycline, now trastuzumab. Her surveillance echo shows a quietly falling EF and a global longitudinal strain that dropped before anyone was watching. Your job: protect the heart so oncology can keep saving her life — and never miss the checkpoint-inhibitor myocarditis that kills in days.</div>
+        <div class="chips">
+          <span class="chip crit">🟠 URGENT</span>
+          <span class="chip">🫀 CTRCD Pathway</span>
+          <span class="chip">📐 GLS Surveillance</span>
+          <span class="chip">💉 Anthracycline / Trastuzumab</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital warn"><div class="v-label">💓 HR</div><div class="v-num">96</div></div>
+        <div class="vital"><div class="v-label">🩸 BP</div><div class="v-num">112/72</div></div>
+        <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">20</div></div>
+        <div class="vital warn"><div class="v-label">🫁 SpO₂</div><div class="v-num">94%</div></div>
+        <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.9°</div></div>
+        <div class="vital alert"><div class="v-label">🫀 LVEF</div><div class="v-num">45%</div></div>
+        <div class="vital warn"><div class="v-label">📐 GLS</div><div class="v-num">−15%</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — Cardio-Oncology clinic, mid-treatment</b>A woman sits with her oncology folder open, curative HER2-positive breast cancer treatment half-finished. She's a little more breathless climbing stairs than last month. The echo tech quietly flags it: <em>"Her EF's slipped to 45% and the strain's not what it was."</em> There is a fork in the road here. Stop her cancer therapy in a panic and you may cost her the cure. Ignore the falling strain and she'll be back in months with an EF of 25% and overt heart failure. The right answer is neither reflex — it is <strong>protect and monitor</strong>.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>👩 Name</td><td><strong>Mrs. R.H.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>58-year-old female</td></tr>
+          <tr><td>🆔 MRN</td><td>CV-HF-1052</td></tr>
+          <tr><td>⚖️ Weight / BSA</td><td>68 kg · 1.7 m² (BMI 26)</td></tr>
+          <tr><td>🎗️ Diagnosis</td><td>HER2-positive, node-positive breast cancer — <strong>curative intent</strong></td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 Cancer-therapy history — every line changes cardiotoxicity risk</h3>
+        <ul>
+          <li>💉 <strong>Anthracycline (doxorubicin)</strong> — cumulative dose to date ≈ <strong>360 mg/m²</strong>, approaching the traditional 400 mg/m² risk threshold (type-I, dose-dependent, largely irreversible injury).</li>
+          <li>🎯 <strong>Trastuzumab (HER2-targeted)</strong> — now running; adds type-II (usually reversible) dysfunction, risk amplified by preceding anthracycline.</li>
+          <li>🩻 <strong>Left-chest radiotherapy planned</strong> — an additional, additive cardiac hit (radiation heart disease develops over years).</li>
+          <li>🔺 Baseline cardiovascular risk: borderline hypertension, ex-smoker, age ≥ 55 — all raise her ESC cardiovascular-toxicity risk category.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The drug tells you the prognosis: anthracycline damage is cumulative and largely permanent; trastuzumab dysfunction is usually reversible. Read the chart before you read the echo."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why cardio-oncology exists</b>More patients survive cancer than ever — and cardiovascular disease is now a leading cause of death in survivors. The specialty's mission is <strong>not</strong> to cancel oncology treatment but to <strong>enable it</strong>: baseline risk-stratify, surveil the heart, detect subclinical injury early, protect it, and treat dysfunction so the life-saving cancer therapy can continue wherever possible.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 Oncology → Cardio-Oncology handover — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ SBAR (verbatim)</b>
+          <p><strong>S:</strong> "58-year-old woman, HER2-positive breast cancer on curative treatment. Surveillance echo today: LVEF fallen from 62% at baseline to 45%, global longitudinal strain down from −21% to −15% — a relative drop of about 29%."</p>
+          <p><strong>B:</strong> "Had doxorubicin (cumulative ~360 mg/m²), now three cycles into trastuzumab. Mild exertional breathlessness this month. Borderline hypertension, ex-smoker."</p>
+          <p><strong>A:</strong> "Troponin nudged up on the last two draws; NT-proBNP rising. No fever, no chest pain. We paused nothing yet — we want your steer before touching her cancer therapy."</p>
+          <p><strong>R:</strong> "Is this cancer-therapy-related cardiac dysfunction? Do we start heart-failure meds? Do we have to stop her HER2 treatment?"</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Strain falls before the ejection fraction does — a relative GLS drop &gt;15% is the early alarm of cardiotoxicity, sounding while the EF still looks 'fine.'"</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each feature that signals cancer-therapy cardiotoxicity</h3>
+        <p>🎮 <em>Click every feature that RAISES suspicion of CTRCD / ICI myocarditis. Each correct = +10 XP.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">📉 Falling LVEF on serial echo</button>
+          <button class="btn ghost flag-btn" data-good="1">📐 Relative GLS drop &gt;15% during therapy</button>
+          <button class="btn ghost flag-btn" data-good="1">🧪 Rising troponin on treatment</button>
+          <button class="btn ghost flag-btn" data-good="1">🩸 Rising BNP / NT-proBNP on treatment</button>
+          <button class="btn ghost flag-btn" data-good="1">💉 High cumulative anthracycline dose</button>
+          <button class="btn ghost flag-btn" data-good="1">🫁 New HF symptoms during chemo (breathless, orthopnoea)</button>
+          <button class="btn ghost flag-btn" data-good="1">⚡ On a checkpoint inhibitor: troponin rise + new arrhythmia / heart block</button>
+          <button class="btn ghost flag-btn" data-good="0">🟢 Stable, normal echo &amp; strain</button>
+          <button class="btn ghost flag-btn" data-good="0">🌡️ Fever from neutropenic sepsis (unrelated to CTRCD)</button>
+          <button class="btn ghost flag-btn" data-good="0">👉 Reproducible chest-wall pain</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Praise where due</b>The oncology team did exactly right: they had a <strong>baseline</strong> echo and biomarkers, ran <strong>serial surveillance</strong>, spotted the subclinical drop, and — crucially — <strong>asked cardio-oncology before stopping anything</strong>. That single instinct is what keeps curative therapy on track.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🅰️🅱️🅲️ Focused assessment — is there overt heart failure yet?</h3>
+        <table class="tbl">
+          <tr><th>Step</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>🅰️ Airway</td><td>Patent, speaking full sentences.</td><td>No airway compromise; congestion is not yet fulminant.</td></tr>
+          <tr><td>🅱️ Breathing</td><td>RR 20, SpO₂ 94% RA, faint bibasal crackles, mild exertional dyspnoea.</td><td>Early pulmonary congestion — subclinical dysfunction becoming symptomatic. Re-examine serially.</td></tr>
+          <tr><td>🅲️ Circulation</td><td>HR 96, BP 112/72, JVP mildly elevated, no gallop yet, warm peripheries.</td><td>Compensated. A new S3 or rising JVP would signal decompensation.</td></tr>
+          <tr><td>🅳 Disability</td><td>GCS 15, anxious about her cancer treatment.</td><td>Fear of "having to stop chemo" is real — address it; the plan is to continue safely if possible.</td></tr>
+          <tr><td>🅴 Exposure</td><td>Trace ankle oedema, no rash. No reproducible chest-wall tenderness.</td><td>Early fluid retention. Reproducible chest-wall pain would point away from CTRCD.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Baseline before the first dose, surveillance during, and a low threshold to re-image on new symptoms — the cardiotoxicity you catch subclinically is the one you can still reverse."</div>
+
+        <h3>🧭 The three cardio-oncology emergencies you must not miss</h3>
+        <p>Alongside slow-burn CTRCD, keep three time-critical diagnoses in mind: <strong>immune checkpoint inhibitor myocarditis</strong> (fulminant, high mortality — troponin rise, arrhythmia, conduction block), <strong>acute decompensated heart failure / cardiogenic shock</strong> from severe CTRCD, and <strong>VEGF/TKI-driven hypertensive emergency</strong>. One echo, one ECG, troponin and natriuretic peptides triage all three (see S14).</p>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of "the EF is still normal"</b>A normal LVEF does <strong>not</strong> exclude early cardiotoxicity. By the time EF falls, meaningful myocyte injury has already occurred. <strong>Global longitudinal strain</strong> and <strong>biomarkers</strong> detect the injury earlier — a relative GLS fall &gt;15% is abnormal even with a preserved EF.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The cardiology resident thinks out loud:</em></p>
+        <h3>🧠 Frame it as risk + surveillance, not stop/continue</h3>
+        <p>"High cardiotoxicity risk: anthracycline near the threshold dose, trastuzumab on board, planned chest radiotherapy, and baseline CV risk factors. My job isn't a reflex 'stop the chemo' — it's to <strong>define the injury</strong> (echo/GLS, troponin, NT-proBNP), <strong>grade the CTRCD</strong>, <strong>start heart-failure GDMT early</strong>, discuss <strong>cardioprotection</strong>, and sit down with oncology to decide whether HER2 therapy can safely continue under monitoring. And every review I ask myself the ICI question: is she on a checkpoint inhibitor, and could this be myocarditis?"</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>🖼️ <strong>Echo with global longitudinal strain</strong> — compare to baseline; a relative GLS drop &gt;15% or an EF fall defines/grades CTRCD (S5, S9).</li>
+          <li>🧪 <strong>Troponin + natriuretic peptide (NT-proBNP)</strong> — trend against baseline; both rising supports evolving injury.</li>
+          <li>🩺 <strong>Grade the CTRCD</strong> (asymptomatic mild/moderate/severe vs symptomatic) — this drives whether therapy continues, pauses, or stops.</li>
+          <li>💊 <strong>Start HF GDMT early</strong> (ACEi/ARB, beta-blocker ± MRA/SGLT2i) for detected dysfunction — cardioprotective and often EF-recovering.</li>
+          <li>📞 <strong>Joint decision with oncology</strong> on continuing/modifying cancer therapy ± cardioprotection (e.g. dexrazoxane for high-dose anthracycline). <strong>Do not stop curative therapy unilaterally.</strong></li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Cardio-oncology's job is to enable the cancer cure, not to cancel it — monitor and protect the heart so oncology can keep treating."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>Her EF is 45% and asymptomatic-mild; a colleague says "stop the trastuzumab immediately." Correct?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>Not reflexively.</strong> Trastuzumab dysfunction is usually <em>reversible</em> and often manageable: for mild/moderate asymptomatic CTRCD, start HF GDMT, intensify surveillance, and discuss with oncology whether to continue (sometimes with a brief hold and re-echo) — HER2 therapy can frequently be resumed. Unilaterally abandoning curative treatment without cardio-oncology input can cost the cancer cure.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The cardio-oncology consultant at the desk:</em></p>
+        <h3>🧮 Defining &amp; grading CTRCD — the 2022 ESC framework</h3>
+        <table class="tbl">
+          <tr><th>CTRCD category</th><th>LVEF</th><th>GLS / biomarkers</th><th>Symptoms</th></tr>
+          <tr><td><strong>Symptomatic</strong> (mild → very severe)</td><td>Any fall, graded by severity</td><td>—</td><td class="hi">HF symptoms present</td></tr>
+          <tr><td><strong>Asymptomatic — severe</strong></td><td>New LVEF &lt; 40%</td><td>—</td><td>None</td></tr>
+          <tr><td><strong>Asymptomatic — moderate</strong></td><td>LVEF 40–49% with a ≥10-point fall <em>OR</em> LVEF ≥ 50%</td><td>with a &gt;15% relative GLS drop <em>or</em> new biomarker rise</td><td>None</td></tr>
+          <tr><td><strong>Asymptomatic — mild</strong></td><td>LVEF ≥ 50%</td><td>with a &gt;15% relative GLS drop <em>and/or</em> new biomarker rise</td><td>None</td></tr>
+        </table>
+        <p>Our patient — EF 45%, ≥10-point fall from 62%, GLS relative drop ~29%, biomarkers rising, mild symptoms — is <strong>early symptomatic / moderate CTRCD</strong>. That means: <strong>start GDMT now</strong>, intensify surveillance, and a <strong>joint oncology decision</strong> — not an automatic stop.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Grade before you act: mild/moderate asymptomatic CTRCD usually means treat-and-continue-under-monitoring; severe or symptomatic dysfunction shifts the balance toward interrupt — and a checkpoint-inhibitor myocarditis means STOP, always."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> 2022 ESC Cardio-Oncology guideline</td><td>Baseline risk stratification, standardised CTRCD definitions (EF/GLS/biomarkers), and surveillance schedules by drug &amp; risk.</td><td>Risk-stratify at baseline; surveil on schedule; grade dysfunction to guide action.</td></tr>
+            <tr><td><span class="lvl">IMAGING</span> Global longitudinal strain (SUCCOUR &amp; cohorts)</td><td>A relative GLS fall &gt;15% predicts later EF-defined CTRCD; strain-guided cardioprotection may reduce EF decline.</td><td>Strain detects injury before EF drops — act on the strain.</td></tr>
+            <tr><td><span class="lvl">RCT</span> Dexrazoxane cardioprotection</td><td>Reduces anthracycline cardiotoxicity/HF at high cumulative doses without compromising anticancer efficacy.</td><td>Consider dexrazoxane for high cumulative anthracycline exposure.</td></tr>
+            <tr><td><span class="lvl">RCT</span> Cardioprotective GDMT (ACEi/ARB, beta-blocker, MRA, SGLT2i)</td><td>Neurohormonal blockade attenuates/treats CTRCD; many EFs recover with early therapy.</td><td>Start HF meds early for detected dysfunction — recovery is common.</td></tr>
+            <tr><td><span class="lvl">REGISTRY</span> ICI-myocarditis series</td><td>Rare (~1%) but frequently fulminant; high mortality; troponin rise + arrhythmia/block; treated with urgent high-dose steroids + permanent drug cessation.</td><td>Troponin + arrhythmia on immunotherapy = steroids &amp; stop the drug NOW.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The chart that keeps me awake is the woman whose surveillance echoes were 'deferred' during a busy anthracycline-then-trastuzumab course. She came back months later breathless with an EF of 25% — overt heart failure we could have caught subclinically and treated, possibly while safely continuing her HER2 therapy. And the other one: a fulminant checkpoint-inhibitor myocarditis called 'a viral illness' who arrested before anyone gave a steroid."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY these drugs hurt the heart (the WHY behind the WHY)</h3>
+        <ol>
+          <li>💉 <strong>Anthracyclines (type-I):</strong> inhibit <strong>topoisomerase-2β</strong> in cardiomyocytes, generating reactive oxygen species and mitochondrial/DNA damage → <strong>myocyte death</strong>. Injury is <strong>dose-dependent, cumulative, and largely irreversible</strong> — lost myocytes don't come back.</li>
+          <li>🎯 <strong>Trastuzumab (type-II):</strong> blocks HER2/ErbB2 signalling that cardiomyocytes use for stress survival → <strong>functional</strong> dysfunction without much cell death. Usually <strong>reversible</strong>, especially on interruption; risk is amplified by prior anthracycline.</li>
+          <li>🩸 <strong>VEGF inhibitors / TKIs:</strong> impair nitric-oxide/endothelial signalling → <strong>hypertension</strong>, proteinuria (RAS activation), and sometimes LV dysfunction or QT effects.</li>
+          <li>⚡ <strong>Immune checkpoint inhibitors:</strong> release the brakes on T-cells, which can attack myocardium → <strong>myocarditis</strong>: T-cell infiltration, troponin release, conduction-system involvement (block/arrhythmia). Rare but <strong>often fulminant</strong>.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Anthracycline kills myocytes (permanent); trastuzumab stuns them (reversible). Mechanism is prognosis — and it dictates whether you can resume the drug."</div>
+
+        <h3>⚖️ Contrast pair — Type-I vs Type-II cardiotoxicity</h3>
+        <div class="vs">
+          <div class="side a"><h4>💉 Type-I (Anthracycline)</h4><ul><li>Cumulative, dose-dependent, largely <strong>IRREVERSIBLE</strong> (myocyte death)</li><li>Risk climbs steeply with cumulative dose</li><li>Prevent: dose limits, dexrazoxane, surveillance, early GDMT</li></ul></div>
+          <div class="side b"><h4>🎯 Type-II (Trastuzumab)</h4><ul><li>Usually <strong>REVERSIBLE</strong>, functional dysfunction</li><li>Often recovers on interruption; manageable to allow continued therapy</li><li>Manage: GDMT, brief hold + re-echo, frequently resume HER2 therapy</li></ul></div>
+        </div>
+        <p>💡 A falling EF on treatment is not automatically "stop everything" — ask which mechanism, how severe, and whether the heart can be protected while the cancer is still being cured.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The Cumulative Anthracycline Dose Dial</h3>
+          <p style="font-size:13px">Drag the cumulative doxorubicin-equivalent dose and watch how <strong>cardiotoxicity risk rises steeply</strong> — type-I injury is dose-dependent and largely irreversible.</p>
+          <label for="kRange">💉 Cumulative anthracycline dose (doxorubicin-equivalent): <b id="kVal">200</b> mg/m²</label>
+          <input type="range" id="kRange" min="100" max="700" value="200">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore how cumulative dose drives CTRCD risk.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 No anthracycline dose is truly "zero-risk," but risk climbs sharply beyond ~400 mg/m² and steeply beyond ~550 mg/m² — the rationale for dose limits, dexrazoxane, and intensive surveillance.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The order set</h3>
+        <ul>
+          <li>🖼️ <strong>Echo with GLS</strong> now (compare to baseline), then per surveillance schedule; cardiac MRI if images poor or ICI myocarditis suspected.</li>
+          <li>🧪 <strong>Troponin + NT-proBNP</strong> now and serially against baseline; U&amp;E, FBC, TFTs, glucose/HbA1c, lipids.</li>
+          <li>💊 <strong>Start HF GDMT</strong> for detected CTRCD: ACEi/ARB (or ARNI), beta-blocker, ± MRA, ± SGLT2 inhibitor — titrate as tolerated.</li>
+          <li>🛡️ <strong>Cardioprotection discussion</strong>: dexrazoxane for high cumulative anthracycline; optimise BP; treat CV risk factors.</li>
+          <li>📞 <strong>Joint oncology–cardiology decision</strong> on continuing/modifying trastuzumab under monitoring — <strong>do not stop curative therapy unilaterally</strong>.</li>
+          <li>⚡ <strong>ICI safety net:</strong> if on/starting a checkpoint inhibitor and troponin rises with arrhythmia/block → <strong>admit, telemetry, urgent workup, hold the drug</strong>.</li>
+          <li>🩺 12-lead ECG (QTc, conduction), BP log, daily weights; patient education on HF red-flag symptoms.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Start the heart-failure meds early and protect the myocardium — the cheapest way to keep a cancer patient on curative therapy is to treat the heart, not to abandon the oncology."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Cardio-oncology nursing — the surveillance safety net</h3>
+        <ul>
+          <li>📅 <strong>Never let surveillance slip</strong> — chase the scheduled echo/GLS and biomarker draws; a "deferred" surveillance echo is how subclinical injury becomes overt heart failure.</li>
+          <li>🫁 <strong>Screen for HF symptoms each visit</strong> — new breathlessness, orthopnoea, PND, ankle swelling, fatigue; daily weights; a 2 kg jump flags fluid retention.</li>
+          <li>🩸 Draw and <strong>time-stamp troponin / NT-proBNP</strong> precisely; the trend against baseline is what matters.</li>
+          <li>⚡ <strong>On immunotherapy, watch for myocarditis</strong> — palpitations, syncope, new chest discomfort, or an abnormal rhythm strip → escalate immediately; do not wait for the next clinic.</li>
+          <li>💊 Support <strong>GDMT titration</strong> (BP, HR, renal function, symptoms) and adherence; reassure that heart meds are how the cancer treatment continues.</li>
+          <li>🧾 Reinforce that the goal is to <strong>continue curative therapy safely</strong> — reduce the fear that drives patients to abandon treatment.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who protects the surveillance schedule protects both the heart and the cancer cure — a missed echo is a missed chance to catch reversible injury."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Baseline</th><th>Now</th><th>Interpretation</th></tr>
+          <tr><td>LVEF (echo)</td><td class="ok-v">62%</td><td class="hi">45%</td><td><strong>≥10-point fall</strong> into 40–49% → moderate CTRCD by EF alone.</td></tr>
+          <tr><td>Global longitudinal strain</td><td class="ok-v">−21%</td><td class="hi">−15%</td><td><strong>~29% relative drop</strong> (well beyond the &gt;15% threshold) — the early alarm.</td></tr>
+          <tr><td>hs-Troponin</td><td>Normal</td><td class="hi">Rising</td><td>New rise on treatment supports active myocardial injury; a <em>marked</em> rise on immunotherapy demands the ICI-myocarditis workup.</td></tr>
+          <tr><td>NT-proBNP</td><td>Normal</td><td class="hi">Rising</td><td>Wall-stress marker rising with early congestion — supports evolving CTRCD.</td></tr>
+          <tr><td>Cumulative anthracycline</td><td colspan="2" class="hi">~360 mg/m²</td><td>Approaching the 400 mg/m² risk threshold — dose-dependent type-I risk.</td></tr>
+          <tr><td>ECG</td><td colspan="2">Sinus, normal QTc, no block</td><td>Baseline for comparison — new conduction block/arrhythmia on immunotherapy would flag myocarditis.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Interpret every number against the patient's own baseline, not a population 'normal' — the diagnosis of CTRCD lives in the CHANGE from where this heart started."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why baseline + serial matters — and the biomarker trap</b>CTRCD is defined by <em>change</em> from baseline in EF/GLS/biomarkers, so a baseline study before therapy is non-negotiable. The trap: troponin and natriuretic peptides also rise in sepsis, PE, renal impairment and arrhythmia — interpret them inside the clinical story and the imaging, especially in a cancer patient with many competing causes of a raised troponin.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 ECG / IMAGING + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>📐 Serial strain — the injury the EF hasn't shown yet</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 130" preserveAspectRatio="none" aria-label="Strain/EF surveillance: strain falls before EF">
+            <rect width="820" height="130" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="32" x2="820" y2="32"/><line x1="0" y1="65" x2="820" y2="65"/><line x1="0" y1="98" x2="820" y2="98"/></g>
+            <polyline fill="none" stroke="#86efac" stroke-width="2.3" points="0,40 140,42 280,46 420,54 560,72 700,92 820,100"/>
+            <polyline fill="none" stroke="#fca5a5" stroke-width="2.3" points="0,44 140,50 280,60 420,80 560,96 700,104 820,108"/>
+            <text x="20" y="24" fill="#93c5fd" font-size="11">Baseline</text>
+            <text x="150" y="34" fill="#86efac" font-size="11">EF (falls late)</text>
+            <text x="150" y="118" fill="#fca5a5" font-size="11">GLS (falls first)</text>
+          </svg>
+          <div class="ecg-cap">On serial surveillance, <span style="color:#fca5a5">global longitudinal strain</span> deteriorates <strong>before</strong> the <span style="color:#86efac">ejection fraction</span> visibly drops. The earliest evidence of cardiotoxicity lived in the strain curve, months before overt HF.</div>
+        </div>
+
+        <h3>🔎 The imaging &amp; ECG findings you must know cold</h3>
+        <table class="tbl">
+          <tr><th>Modality</th><th>Look for</th><th>Meaning</th></tr>
+          <tr><td>📐 <strong>GLS (echo)</strong></td><td>Relative fall &gt;15% from baseline</td><td>Subclinical cardiotoxicity — abnormal even with a preserved EF.</td></tr>
+          <tr><td>🖼️ <strong>3D / serial EF</strong></td><td>New EF &lt; 50%, or ≥10-point fall</td><td>Defines/grades CTRCD; use the same modality serially.</td></tr>
+          <tr><td>🧲 <strong>Cardiac MRI</strong></td><td>Oedema (T2), late gadolinium enhancement</td><td>Confirms myocarditis (esp. ICI) and quantifies function when echo is limited.</td></tr>
+          <tr><td>⚡ <strong>ECG (on immunotherapy)</strong></td><td>New AV block, arrhythmia, low voltages, ST/T change</td><td>Conduction disease + troponin on a checkpoint inhibitor = myocarditis until proven otherwise.</td></tr>
+          <tr><td>📏 <strong>QTc</strong></td><td>Prolongation on QT-affecting oncology drugs</td><td>Arrhythmia risk — correct electrolytes, review interacting drugs.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Normal EF' is not 'normal heart' — the strain falls first. Learn to read GLS and the biomarkers, or you'll only meet cardiotoxicity once it's irreversible."</div>
+
+        <h3>🩻 Adjunct imaging</h3>
+        <ul>
+          <li><strong>Cardiac MRI:</strong> gold-standard for myocarditis (ICI) and for function when echo windows are poor; tissue characterisation distinguishes oedema/fibrosis.</li>
+          <li><strong>Coronary assessment:</strong> exclude ischaemia as a competing cause of a raised troponin / falling EF, especially post-mediastinal radiotherapy.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The cardio-oncology drug map — protect, treat, and the emergencies</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>ACEi / ARB (or ARNI)</strong></td><td>Foundation GDMT for CTRCD</td><td>Neurohormonal blockade — attenuates and treats dysfunction; watch renal function/K⁺/BP.</td></tr>
+          <tr><td><strong>Beta-blocker</strong> (e.g. carvedilol, bisoprolol)</td><td>Foundation GDMT for CTRCD</td><td>↓demand, anti-remodelling, anti-arrhythmic; carvedilol has cardioprotective data in anthracycline.</td></tr>
+          <tr><td><strong>MRA</strong> (spironolactone/eplerenone)</td><td>Add-on for reduced EF</td><td>Anti-fibrotic, anti-remodelling; monitor K⁺/renal function.</td></tr>
+          <tr><td><strong>SGLT2 inhibitor</strong></td><td>Add-on GDMT / cardio-metabolic protection</td><td>Broad HF benefit; emerging cardioprotective role in cardio-oncology.</td></tr>
+          <tr><td><strong>Dexrazoxane</strong></td><td>Cardioprotection for high-dose anthracycline</td><td>Iron-chelation / topoisomerase-2β modulation → ↓anthracycline cardiotoxicity without compromising anticancer efficacy.</td></tr>
+          <tr><td><strong>High-dose corticosteroids</strong> (± second-line immunosuppression)</td><td>ICI MYOCARDITIS emergency</td><td>Urgent methylprednisolone; add MMF/ATG/abatacept/tocilizumab if refractory — <strong>and permanently stop the checkpoint inhibitor</strong>.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"For CTRCD: start GDMT and protect the myocardium so oncology can keep treating. For checkpoint-inhibitor myocarditis: high-dose steroids and stop the drug — permanently — NOW."</div>
+        <div class="callout danger"><b class="ct">🚫 The immunotherapy emergency box</b>⚡ Troponin rise + arrhythmia/conduction block on a checkpoint inhibitor = <strong>ICI myocarditis</strong>: admit to a monitored bed, <strong>permanently discontinue the ICI</strong>, give <strong>urgent high-dose corticosteroids</strong>, escalate to second-line immunosuppression if not responding. It is rare but frequently fatal — hours matter.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 Surveillance — what to watch and when</h3>
+        <ul>
+          <li>🖼️ <strong>Baseline echo + GLS + biomarkers before therapy</strong>, then <strong>serially</strong> during treatment (schedule set by drug, dose and baseline risk category), and after completion for late toxicity.</li>
+          <li>💉 <strong>Anthracyclines:</strong> surveillance intensifies with cumulative dose and high-risk patients; repeat imaging at higher doses and if symptoms change.</li>
+          <li>🎯 <strong>Trastuzumab:</strong> periodic echo (commonly ~3-monthly) during therapy; act on EF/GLS change with GDMT and a hold/re-echo decision.</li>
+          <li>🩸 <strong>VEGF/TKI:</strong> monitor <strong>blood pressure</strong> closely (frequent early BP checks), plus proteinuria and QTc where relevant.</li>
+          <li>⚡ <strong>Immune checkpoint inhibitors:</strong> baseline troponin/ECG and a low threshold to recheck — any cardiac symptom, arrhythmia or troponin rise triggers the myocarditis pathway.</li>
+          <li>📅 <strong>Survivorship:</strong> long-term cardiovascular follow-up — anthracycline/radiation injury can declare years later.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Surveillance is not paperwork — it's the difference between catching reversible strain change and meeting an EF of 25%. Baseline before, serial during, follow-up after."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong</h3>
+        <ul>
+          <li>💔 <strong>Symptomatic heart failure / cardiogenic shock</strong> — from severe or unrecognised CTRCD (the missed-surveillance endgame).</li>
+          <li>⚡ <strong>Fulminant ICI myocarditis</strong> — arrhythmia, complete heart block, cardiogenic shock, sudden death; the highest-mortality cardio-oncology emergency.</li>
+          <li>🩸 <strong>VEGF/TKI hypertensive emergency</strong>, proteinuria/nephrotic-range renal injury, and rarely arterial thrombotic events.</li>
+          <li>📏 <strong>QT prolongation → torsades</strong> from QT-affecting oncology drugs plus electrolyte disturbance.</li>
+          <li>🩻 <strong>Radiation heart disease</strong> — accelerated coronary disease, valve disease, pericardial constriction, conduction disease (over years).</li>
+          <li>🚫 <strong>The system complication:</strong> reflexively stopping curative cancer therapy without cardio-oncology input — costing the cancer cure to "protect" a heart that could have been treated instead.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Two opposite failures kill in cardio-oncology: missing the heart injury until overt HF, and abandoning the life-saving cancer therapy that a little heart medicine would have let you continue."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The falling-EF / raised-troponin differential in a cancer patient</h3>
+        <table class="tbl">
+          <tr><th>Diagnosis</th><th>Discriminators</th><th>Don't-miss action</th></tr>
+          <tr><td>🫀 <strong>CTRCD</strong> (this patient)</td><td>Falling EF/GLS vs baseline, rising biomarkers, on anthracycline/trastuzumab</td><td>Grade it; start GDMT; cardioprotection; joint decision to continue/modify therapy.</td></tr>
+          <tr><td>⚡ <strong>ICI myocarditis</strong></td><td>On a checkpoint inhibitor; troponin rise + arrhythmia/AV block, MRI oedema/LGE</td><td><strong>Stop the drug + urgent high-dose steroids</strong>; admit, telemetry.</td></tr>
+          <tr><td>🫀 <strong>Ischaemia / ACS</strong></td><td>Ischaemic ECG, regional wall-motion, post-radiation coronary disease</td><td>Assess coronaries; treat ACS on its own pathway.</td></tr>
+          <tr><td>🌡️ <strong>Sepsis / stress cardiomyopathy</strong></td><td>Fever, infection source (neutropenic sepsis), apical ballooning</td><td>Treat sepsis; supportive care — not "CTRCD."</td></tr>
+          <tr><td>🫁 <strong>PE / pericardial disease</strong></td><td>Dyspnoea, RV strain, effusion (malignant or radiation)</td><td>Image (CTPA/echo); treat cause.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In a cancer patient with a raised troponin, always ask: which drug, and is this checkpoint-inhibitor myocarditis? That one question changes the treatment from 'monitor' to 'steroids-and-stop' in an instant."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "Protect the Heart, Save the Cure"</h3>
+          <div class="hud"><span>❤️ Safety: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">Surveillance echo shows EF 45% (from 62%) and a GLS relative drop of ~29%; troponin and NT-proBNP are creeping up. She's mildly breathless but still on curative HER2 therapy. What do you do?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The management plan</h3>
+        <ol>
+          <li>🫀 <strong>Diagnosis:</strong> early symptomatic / moderate CTRCD (EF fall + GLS drop + rising biomarkers) on anthracycline-then-trastuzumab therapy.</li>
+          <li>💊 <strong>Start HF GDMT now</strong> (ACEi/ARB, beta-blocker, ± MRA, ± SGLT2i) and titrate; optimise BP and CV risk factors.</li>
+          <li>🛡️ <strong>Cardioprotection:</strong> consider dexrazoxane for the high cumulative anthracycline exposure; intensify surveillance (echo/GLS, biomarkers).</li>
+          <li>📞 <strong>Joint oncology–cardiology decision:</strong> continue/modify trastuzumab under monitoring where possible — with a hold + re-echo if she decompensates — rather than reflexively abandoning curative therapy.</li>
+          <li>⚡ <strong>Keep the ICI-myocarditis reflex primed</strong> if her regimen changes to a checkpoint inhibitor: troponin + arrhythmia → stop drug + steroids.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Moderate CTRCD is a 'treat-and-continue-under-monitoring' problem, not an automatic stop — but a fulminant checkpoint-inhibitor myocarditis is 'stop and steroids,' every time."</div>
+
+        <div class="checklist" id="ckSurv">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Baseline risk stratification &amp; surveillance during cardiotoxic therapy</h3>
+          <label class="ck"><input type="checkbox"><span>🧮 Baseline cardiovascular-toxicity risk stratification documented (agent, dose, patient CV risk)</span></label>
+          <label class="ck"><input type="checkbox"><span>🖼️ Baseline echo with GLS + baseline troponin &amp; NT-proBNP before therapy</span></label>
+          <label class="ck"><input type="checkbox"><span>📅 Serial surveillance scheduled by drug/dose/risk; no echo "deferred"</span></label>
+          <label class="ck"><input type="checkbox"><span>📐 CTRCD defined &amp; graded vs baseline (EF fall, &gt;15% relative GLS drop, biomarker rise)</span></label>
+          <label class="ck"><input type="checkbox"><span>💊 HF GDMT started early for detected dysfunction; cardioprotection considered</span></label>
+          <label class="ck"><input type="checkbox"><span>📞 Joint oncology–cardiology decision on continuing/modifying therapy (not a unilateral stop)</span></label>
+          <div class="ck-progress" data-progress>0 / 6 complete</div>
+        </div>
+
+        <div class="checklist" id="ckICI">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Immune checkpoint inhibitor myocarditis: recognise &amp; treat</h3>
+          <label class="ck"><input type="checkbox"><span>⚡ Suspect it: troponin rise + arrhythmia/AV block/HF on a checkpoint inhibitor</span></label>
+          <label class="ck"><input type="checkbox"><span>🧪 Confirm: troponin trend, ECG, echo/GLS, cardiac MRI (oedema/LGE) ± endomyocardial biopsy</span></label>
+          <label class="ck"><input type="checkbox"><span>🚫 PERMANENTLY stop the checkpoint inhibitor</span></label>
+          <label class="ck"><input type="checkbox"><span>💊 Urgent high-dose corticosteroids (IV methylprednisolone)</span></label>
+          <label class="ck"><input type="checkbox"><span>📟 Admit to a monitored bed; escalate to second-line immunosuppression if not responding</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">Baseline</div>Pre-chemo echo EF 62%, GLS −21%, troponin/NT-proBNP normal — the reference every later study is measured against.</div>
+          <div class="t-item"><div class="t-time">Mid-treatment</div>Surveillance echo: EF 45%, GLS −15% (~29% relative drop), biomarkers rising, mild exertional dyspnoea → early symptomatic/moderate CTRCD detected <strong>before</strong> overt failure.</div>
+          <div class="t-item"><div class="t-time">Same week</div>HF GDMT started (ACEi + beta-blocker, MRA added); dexrazoxane discussed; surveillance intensified; joint oncology decision to continue HER2 therapy under monitoring.</div>
+          <div class="t-item"><div class="t-time">8 weeks</div>Symptoms resolved; EF recovering toward 52%, GLS improving. Trastuzumab continued safely — the cancer cure stayed on track.</div>
+          <div class="t-item"><div class="t-time">Survivorship</div>Long-term cardiology follow-up arranged for late anthracycline/radiation effects; CV risk factors optimised.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>She kept her heart <strong>and</strong> her cancer cure because someone ran the surveillance, read the strain before the EF collapsed, started GDMT early, and — instead of panicking — worked with oncology to continue therapy under protection. Ordinary discipline, extraordinary outcome.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 Two very different cardio-oncology outcomes</h3>
+        <div class="vs">
+          <div class="side a"><h4>🫀 This patient (CTRCD, treated early)</h4><ul><li>Continue HF GDMT; titrate; repeat echo/GLS + biomarkers on schedule</li><li>Continue HER2 therapy under monitoring per joint plan; cardioprotection considered</li><li>Red flags: worsening breathlessness, orthopnoea/PND, weight gain, syncope → seek help</li><li>Cardiology + oncology shared follow-up; survivorship plan for late effects</li></ul></div>
+          <div class="side b"><h4>⚡ The ICI-myocarditis survivor</h4><ul><li>Checkpoint inhibitor <strong>permanently discontinued</strong>; steroid taper with cardiology oversight</li><li>Rechallenge generally avoided; MDT decision on alternative oncology options</li><li>Explicit "return immediately if palpitations, chest pain, syncope, breathlessness"</li><li>Close monitoring for relapse during steroid taper</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A good cardio-oncology discharge names the diagnosis, the GDMT, the surveillance plan, the joint oncology decision, and a written safety-net — never a vague 'watch the heart.'"</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>📐 Strain falls first</b>A relative GLS drop &gt;15% is the early alarm — it deteriorates before the EF does.</div>
+          <div class="pearl"><b>💉 Drug = prognosis</b>Anthracycline: cumulative, largely irreversible. Trastuzumab: usually reversible. Read the chart.</div>
+          <div class="pearl"><b>🧮 Baseline before dose 1</b>CTRCD is defined by change from baseline — no baseline echo/biomarkers, no early diagnosis.</div>
+          <div class="pearl"><b>💊 Treat early, EF recovers</b>Start GDMT for detected dysfunction — recovery and continued therapy are common.</div>
+          <div class="pearl"><b>🛡️ Protect, don't just stop</b>Dexrazoxane and GDMT let oncology keep treating; a reflex stop can cost the cure.</div>
+          <div class="pearl"><b>⚡ ICI myocarditis = emergency</b>Troponin + arrhythmia on immunotherapy → high-dose steroids + stop the drug NOW.</div>
+          <div class="pearl"><b>🩸 VEGF/TKI = watch the BP</b>Hypertension (± proteinuria, QT) is the signature toxicity — monitor and treat it.</div>
+          <div class="pearl"><b>🤝 Enable the cure</b>Cardio-oncology exists to keep patients on life-saving cancer therapy, not to cancel it.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the pathway</h3>
+          <ul>
+            <li>💉 <strong>Type-I vs type-II toxicity:</strong> anthracycline (topoisomerase-2β-mediated free-radical myocyte <strong>death</strong> — dose-dependent, cumulative, largely <strong>irreversible</strong>) vs trastuzumab (HER2/ErbB2-blockade functional dysfunction — usually <strong>reversible</strong>). Mechanism dictates whether the drug can be resumed.</li>
+            <li>🩸 <strong>VEGF-inhibitor / TKI cardiovascular toxicity:</strong> endothelial NO disruption → hypertension; RAS activation and glomerular injury → proteinuria; some agents prolong QT or depress LV function. Aggressive BP control enables continued therapy.</li>
+            <li>📏 <strong>QT-prolonging oncology drugs:</strong> arsenic trioxide, some TKIs, antiemetics and azoles — cumulative QTc risk with electrolyte disturbance; monitor QTc, correct K⁺/Mg²⁺, review interactions to prevent torsades.</li>
+            <li>🩻 <strong>Radiation heart disease:</strong> a delayed, additive injury over years — accelerated coronary disease, valvular fibrosis/stenosis, constrictive pericarditis, and conduction disease; drives long-term survivorship surveillance.</li>
+            <li>⚡ <strong>ICI myocarditis:</strong> rare (~1%) but often fulminant with very high mortality; troponin rise, arrhythmia/AV block, MRI oedema/LGE, ± myositis/myasthenic overlap. Treat with urgent <strong>high-dose corticosteroids</strong> and <strong>permanent drug cessation</strong>; escalate to second-line immunosuppression (MMF, ATG, abatacept, tocilizumab) if steroid-refractory.</li>
+            <li>📐 <strong>GLS- and biomarker-guided cardioprotection:</strong> strain/biomarker surveillance detects subclinical injury early, allowing pre-emptive GDMT and dexrazoxane before the EF falls — the paradigm shift from "wait for overt HF" to "protect the heart in advance."</li>
+            <li>🤝 <strong>The enabling principle:</strong> the modern goal is to enable life-saving cancer therapy — grade the toxicity, protect and treat the heart, and continue or safely modify oncology treatment through a shared MDT decision, rather than reflexively stopping curative therapy.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The Surveillance That Was Deferred"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 54-year-old woman with HER2-positive breast cancer received doxorubicin then trastuzumab on a busy curative protocol. Her baseline echo was normal, but during a stretched, over-booked treatment course her <strong>surveillance echoes were repeatedly "deferred"</strong> and her biomarkers not trended. She mentioned mild breathlessness twice; it was attributed to "chemo fatigue." Four months later she arrived breathless at rest, orthopnoeic, with an <strong>EF of 25%</strong> and florid heart failure. The subclinical strain change that would have flagged reversible injury months earlier had never been measured. Her HER2 therapy was stopped, her cancer treatment derailed, and despite GDMT her ventricle only partially recovered.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>📅 SURVEILLANCE SKIPPED</b>Scheduled echo/GLS + biomarkers "deferred" — the subclinical injury was never seen.</div>
+            <div class="hole"><b>📐 STRAIN NOT MEASURED</b>GLS would have fallen &gt;15% while the EF still looked acceptable.</div>
+            <div class="hole"><b>🫁 SYMPTOMS DISMISSED</b>Breathlessness labelled "chemo fatigue" instead of early HF.</div>
+            <div class="hole"><b>💊 GDMT TOO LATE</b>Heart-failure meds started only at EF 25% — after irreversible loss.</div>
+            <div class="hole"><b>🎯 THERAPY LOST</b>Curative HER2 treatment abandoned — a stop that early protection might have avoided.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved her:</strong> a baseline study, protected serial surveillance with echo/GLS and biomarkers, treating any new breathlessness as possible HF, starting GDMT and cardioprotection at the first subclinical drop — and quite possibly continuing her HER2 therapy safely under monitoring. <strong>The mirror-image disaster</strong> is the fulminant checkpoint-inhibitor myocarditis mistaken for "a viral illness," sent home, and found in arrest — the antidote there is a troponin, an ECG, and the reflex to give steroids and stop the drug. <strong>This is exactly the discipline that protected the patient in Bed 10.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A 'deferred' surveillance echo has cost more hearts than any single drug — and a checkpoint-inhibitor myocarditis called 'a virus' has cost lives. Measure the strain; check the troponin; act early."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 💔 Heart Failure Ward · Bed 10 — Cardio-Oncology / Cancer-Therapy-Related Cardiac Dysfunction<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+    /* ===== SIDEBAR TABS — show one section at a time ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not a high-risk feature'); } if(found===total){ flagResult.textContent='✅ All '+total+' high-risk features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' high-risk features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: cumulative anthracycline dose → CTRCD risk ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=(v-100)/(700-100)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<300){ msg='🟢 Low cumulative exposure (~1–2% CTRCD risk). Injury is dose-dependent — but no anthracycline dose is truly "zero-risk." Baseline + surveillance still apply.'; cls='good'; }
+      else if(v<400){ msg='🟠 Approaching the traditional 400 mg/m² mark. Risk begins to climb — tighten surveillance (echo/GLS, biomarkers).'; cls='warn-r'; }
+      else if(v<550){ msg='🟠 Above 400 mg/m² — CTRCD risk rising steeply (~5% and climbing). Consider dexrazoxane / cardioprotection and formal cardio-oncology review.'; cls='warn-r'; }
+      else { msg='🔴 High cumulative dose (≥550 mg/m² ~7–26%; ~700 ≈ 48%). Steep, largely IRREVERSIBLE type-I injury — dose-limit, dexrazoxane, intensive surveillance &amp; early GDMT.'; cls='bad'; }
+      kReadout.innerHTML=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Dose-Risk Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"Surveillance echo shows EF 45% (from 62%) and a GLS relative drop of ~29%; troponin and NT-proBNP are creeping up. She's mildly breathless but still on curative HER2 therapy. What do you do?",
+      choices:[
+        {t:"🙈 Reassure her; ignore the falling GLS/rising troponin and review only if she develops overt heart failure",good:false,ds:-2,dt:120,xp:0,fb:"☠️ This is the M&M case in S21. Deferring action until overt HF lets reversible, subclinical injury become an EF of 25%. Restart.",end:true},
+        {t:"🫀 Recognise moderate CTRCD: start HF GDMT now, involve cardio-oncology, discuss continuing therapy under monitoring + cardioprotection",good:true,ds:1,dt:10,xp:40,fb:"✅ Exactly. Early GDMT, cardioprotection and a joint decision protect the heart AND keep curative therapy on track.",next:"repeat"},
+        {t:"✂️ Reflexively stop all cancer therapy today without cardio-oncology input",good:false,ds:-1,dt:20,xp:5,fb:"⚠️ Too blunt — trastuzumab dysfunction is usually reversible and often manageable. Abandoning curative therapy without a joint decision can cost the cure. Grade it and involve cardio-oncology first.",next:"repeat"}
+      ]},
+    repeat:{ text:"Months later her regimen changes to an immune checkpoint inhibitor for metastatic disease. She returns fatigued; the troponin has risen sharply and the monitor shows a new arrhythmia and first-degree AV block. Next best step?",
+      choices:[
+        {t:"⚡ Suspect ICI myocarditis: admit to a monitored bed, telemetry, urgent troponin/ECG/echo/MRI workup, hold the checkpoint inhibitor",good:true,ds:1,dt:8,xp:40,fb:"✅ Right. Troponin + new arrhythmia/conduction disease on immunotherapy is myocarditis until proven otherwise — and it can be fulminant.",next:"declare"},
+        {t:"🤒 Call it 'a viral illness', reassure and send her home to rest",good:false,ds:-2,dt:60,xp:0,fb:"⚠️ Dangerous — this is the mirror-image M&M disaster. Fulminant ICI myocarditis mistaken for a virus arrests before anyone gives a steroid.",next:"declare"}
+      ]},
+    declare:{ text:"Workup confirms fulminant immune checkpoint inhibitor myocarditis. What now?",
+      choices:[
+        {t:"🚨 Permanently STOP the checkpoint inhibitor + give urgent high-dose corticosteroids; monitored bed, escalate to second-line immunosuppression if refractory",good:true,ds:1,dt:5,xp:45,fb:"🏆 Perfect. Stop the drug and hit it with high-dose steroids urgently — this rare toxicity is frequently lethal and hours matter.",end:true},
+        {t:"💊 Give a little diuretic and continue the immunotherapy, rechecking troponin tomorrow",good:false,ds:-1,dt:30,xp:0,fb:"⚠️ This is a cardio-oncology emergency — continuing the drug and waiting loses the patient. Stop it and give steroids now.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='declare'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A woman on anthracycline-then-trastuzumab has EF 62%→ still 55% but a relative GLS drop of 18% and rising troponin. The single most important interpretation is:", opts:["Normal — reassure, the EF is preserved","Subclinical cardiotoxicity — strain falls before EF; start surveillance-guided management","Definite ACS — activate the cath lab","Stop all cancer therapy permanently"], correct:1, exp:"A relative GLS fall >15% with a biomarker rise is early (subclinical) CTRCD even when the EF still looks preserved — strain deteriorates before the EF. Intensify surveillance, start GDMT, and make a joint decision; a preserved EF does not mean a normal heart." },
+    { q:"Which best describes anthracycline (type-I) cardiotoxicity?", opts:["Reversible functional dysfunction","Dose-independent and idiosyncratic","Cumulative, dose-dependent and largely irreversible (myocyte death)","Only occurs after radiotherapy"], correct:2, exp:"Anthracyclines cause topoisomerase-2β-mediated free-radical myocyte death — cumulative, dose-dependent and largely irreversible. This is why dose limits, dexrazoxane and surveillance matter." },
+    { q:"How does trastuzumab (type-II) cardiotoxicity typically differ?", opts:["It is usually reversible/functional and often allows continued or resumed therapy","It is always permanent","It never affects the heart","It requires immediate lifelong pacing"], correct:0, exp:"Trastuzumab causes usually reversible functional dysfunction (HER2/ErbB2 blockade), often recovering on interruption and manageable to allow continued therapy — the opposite prognosis to anthracycline." },
+    { q:"A patient on an immune checkpoint inhibitor develops a rising troponin with a new arrhythmia and AV block. The correct action is:", opts:["Continue the drug and recheck in a week","Give diuretics and reassure","Permanently stop the checkpoint inhibitor and give urgent high-dose corticosteroids","Start an anthracycline"], correct:2, exp:"Troponin rise + arrhythmia/conduction block on a checkpoint inhibitor is ICI myocarditis — rare but often fulminant and lethal. Permanently stop the drug and give urgent high-dose steroids, with second-line immunosuppression if refractory." },
+    { q:"Global longitudinal strain (GLS) is valued in cardio-oncology mainly because:", opts:["It replaces the need for any echo","A relative fall >15% detects injury before the EF drops","It is only useful after overt heart failure","It measures coronary stenosis"], correct:1, exp:"A relative GLS fall >15% from baseline predicts later EF-defined CTRCD and detects subclinical injury before the ejection fraction falls — enabling earlier, pre-emptive management." },
+    { q:"What is the role of dexrazoxane?", opts:["It treats ICI myocarditis","It cardioprotects against high cumulative anthracycline doses without compromising anticancer efficacy","It is a HER2-targeted chemotherapy","It prolongs the QT interval deliberately"], correct:1, exp:"Dexrazoxane reduces anthracycline cardiotoxicity at high cumulative doses (iron-chelation / topoisomerase-2β modulation) without compromising anticancer efficacy — a cardioprotective strategy, not a cancer or myocarditis treatment." },
+    { q:"For detected moderate, mildly symptomatic CTRCD on trastuzumab, the guideline-concordant approach is generally to:", opts:["Immediately abandon all cancer therapy without discussion","Start HF GDMT early and make a joint oncology–cardiology decision on continuing/modifying therapy","Ignore it until EF < 20%","Give steroids"], correct:1, exp:"Start HF GDMT early, intensify surveillance and consider cardioprotection, then make a joint decision with oncology about continuing (often under monitoring, sometimes with a brief hold + re-echo) — rather than reflexively abandoning curative therapy." },
+    { q:"CTRCD is defined and graded principally by:", opts:["A single population 'normal' troponin","Change from the patient's own baseline in EF, GLS and biomarkers","The chemotherapy brand name alone","Chest X-ray findings"], correct:1, exp:"CTRCD is defined by change from baseline in LVEF, GLS and cardiac biomarkers (per the 2022 ESC framework) — which is exactly why a baseline study before therapy and serial surveillance are essential." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you protect the heart and the cancer cure like a cardio-oncologist. 🏆':score>=6?'Strong — review the misses and S5 CTRCD grading + S11 ICI myocarditis.':'Revisit S5, S6 and S10 — CTRCD definitions, type-I vs type-II, and the ICI emergency are the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>

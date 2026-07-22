@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Comorbidities that Decide Heart-Failure Outcomes — Virtual Teaching Hospital</title>
+<!-- META
+id: c-hf-comorbid-054
+title: The Comorbidities that Decide Heart-Failure Outcomes
+hospital: cardiology
+department: cv-hf
+bednumber: 12
+chiefcomplaint: HFrEF with iron deficiency, atrial fibrillation and diabetes limiting recovery
+system: Cardiology
+severity: urgent
+tags: Iron deficiency, IV iron, Atrial fibrillation, SGLT2i, Comorbidities, Hyperkalaemia
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">❤️</div>
+      <div>
+        <div class="t1">Heart Failure Ward</div>
+        <div class="t2">Bed 12 · HF Comorbidities</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🫀 Heart Failure Ward · 🛏️ Bed 12</div>
+        <h1>🫀 The Comorbidities that Decide Heart-Failure Outcomes</h1>
+        <div class="sub">🩺 Ward round, Bed 12. EF 32%, on triple therapy, yet still exhausted and breathless after a few steps. His pump is "optimised." So why isn't he better? The answer is in his iron, his atrial fibrillation, his diabetes and his potassium — the comorbidities that quietly decide who does well.</div>
+        <div class="chips">
+          <span class="chip crit">🟠 URGENT</span>
+          <span class="chip">🧲 Iron Deficiency</span>
+          <span class="chip">🫀 AF + HFrEF</span>
+          <span class="chip">🧪 SGLT2i · K⁺ Binders</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital warn"><div class="v-label">💓 HR (AF)</div><div class="v-num">96</div></div>
+        <div class="vital"><div class="v-label">🩸 BP</div><div class="v-num">112/74</div></div>
+        <div class="vital"><div class="v-label">🌬️ RR</div><div class="v-num">18</div></div>
+        <div class="vital warn"><div class="v-label">🫁 SpO₂</div><div class="v-num">94%</div></div>
+        <div class="vital alert"><div class="v-label">🫀 LVEF</div><div class="v-num">32%</div></div>
+        <div class="vital warn"><div class="v-label">🧲 Ferritin</div><div class="v-num">60</div></div>
+        <div class="vital warn"><div class="v-label">🔩 TSAT</div><div class="v-num">15%</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout warn"><b class="ct">🩺 YOU ARE HERE — 09:40, HF Ward, Bed 12</b>A tired-looking man sits propped on two pillows, catching his breath after walking to the toilet and back. He says: <em>"The tablets are all in, doctor — the pump's meant to be sorted — but I've no energy at all, and my heart keeps racing and skipping."</em> His EF is 32% on maximal-tolerated triple therapy, yet his NYHA class hasn't budged. The temptation is to shrug: "that's just his heart failure." It isn't. It's his <strong>comorbidities</strong> — and every one of them is correctable.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>🧔 Name</td><td><strong>Mr. R.H.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>68-year-old male</td></tr>
+          <tr><td>🆔 MRN</td><td>CV-HF-1204</td></tr>
+          <tr><td>⚖️ Weight</td><td>84 kg (BMI 27)</td></tr>
+          <tr><td>💼 Occupation</td><td>Retired warehouse supervisor — housebound by fatigue this year</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 Past history — each line is a comorbidity that decides his outcome</h3>
+        <ul>
+          <li>🫀 <strong>HFrEF, EF 32%</strong> (ischaemic; prior anterior MI, DES to LAD 4 years ago). On sacubitril/valsartan, bisoprolol, and — until recently — an MRA.</li>
+          <li>💢 <strong>Permanent atrial fibrillation</strong>, rate 90–110, on apixaban. Lost his atrial kick; often feels the irregular racing.</li>
+          <li>🩸 <strong>Type 2 diabetes</strong> (HbA1c 7.9%) on metformin — <em>no SGLT2 inhibitor yet</em>.</li>
+          <li>🧪 <strong>CKD stage 3b</strong> (eGFR 38). His MRA was stopped 6 weeks ago for a potassium of 5.4 — and never restarted.</li>
+          <li>🧲 <strong>Iron studies (today):</strong> ferritin 60 µg/L, TSAT 15%, Hb 118 g/L. <em>Iron deficient</em> — and it has never been treated.</li>
+          <li>😴 Bed-partner reports loud snoring, pauses in breathing, and daytime somnolence — <strong>possible sleep-disordered breathing</strong>.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"When an 'optimised' heart-failure patient still can't function, stop staring at the ejection fraction and start counting the comorbidities — iron, rhythm, sugar, kidney, sleep. That's where the outcome is decided."</div>
+
+        <div class="callout info"><b class="ct">🔎 Why comorbidities dominate the HF story</b>Modern HFrEF care has four pillars (ARNI/ACEi-ARB, beta-blocker, MRA, SGLT2i) that transform prognosis — but two-thirds of HF patients carry three or more comorbidities, and those comorbidities drive most hospitalisations, symptoms and deaths. Iron deficiency alone is present in roughly <strong>half</strong> of HF patients. The pump is often the easy part; the comorbidities are the difference between a life reclaimed and a revolving door.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 Overnight team handover — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ Ward handover (verbatim)</b>
+          <p><strong>S:</strong> "68-year-old man, HFrEF EF 32%, admitted with worsening fatigue and exertional breathlessness — NYHA III despite full triple therapy."</p>
+          <p><strong>B:</strong> "Permanent AF, type 2 diabetes, CKD 3b. His MRA (spironolactone) was stopped by the GP six weeks ago for K⁺ 5.4 and never restarted. No SGLT2 inhibitor. Iron never checked until this admission."</p>
+          <p><strong>A:</strong> "He's euvolaemic — this isn't decompensated overload, it's <em>persistent symptoms</em>. Today's bloods: ferritin 60, TSAT 15%, Hb 118, K⁺ 5.1, eGFR 38, HbA1c 7.9%. AF rate 90–110."</p>
+          <p><strong>R:</strong> "Please review the comorbidity bundle — iron, rate/rhythm, diabetes, potassium/GDMT, and screen his snoring."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Optimised on triple therapy' but still breathless is not a dead end — it's a prompt to hunt the correctable comorbidity. Persistent symptoms without congestion means look beyond the diuretic."</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each correctable, outcome-changing comorbidity</h3>
+        <p>🎮 <em>Click every feature that is a CORRECTABLE comorbidity worsening his heart failure. Each correct = +10 XP.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">🧲 Iron deficiency (ferritin 60; or 100–299 with TSAT &lt;20%), anaemia or not</button>
+          <button class="btn ghost flag-btn" data-good="1">💢 AF with poor rate control (90–110) worsening filling &amp; output</button>
+          <button class="btn ghost flag-btn" data-good="1">🩸 Type 2 diabetes (an SGLT2i indication in HF)</button>
+          <button class="btn ghost flag-btn" data-good="1">🧪 CKD/hyperkalaemia limiting RAASi/MRA up-titration</button>
+          <button class="btn ghost flag-btn" data-good="1">🚶 Poor functional capacity from a correctable comorbidity</button>
+          <button class="btn ghost flag-btn" data-good="0">✅ A completely normal iron panel</button>
+          <button class="btn ghost flag-btn" data-good="0">🌡️ Fever from an intercurrent infection</button>
+          <button class="btn ghost flag-btn" data-good="0">🤕 Reproducible, positional chest-wall pain</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Good catch by the GP — and the miss</b>The GP rightly noticed the potassium of 5.4 — but stopping the life-saving MRA outright, rather than using a potassium binder to keep him on it, traded a number for a prognosis. And nobody had ever checked his iron. Both are fixable today.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🩻 Focused HF + comorbidity assessment</h3>
+        <table class="tbl">
+          <tr><th>Domain</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>🫀 Congestion</td><td>JVP not raised, no oedema, chest clear, weight stable.</td><td><strong>Euvolaemic.</strong> Symptoms are NOT from overload — diuretic escalation won't help. Think comorbidity.</td></tr>
+          <tr><td>💢 Rhythm</td><td>Irregularly irregular, apical rate 96–110, pulse deficit present.</td><td>Poorly rate-controlled AF: loss of atrial kick + fast irregular filling cut cardiac output in a stiff, failing ventricle.</td></tr>
+          <tr><td>🚶 Function</td><td>Breathless after ~30 m; can't manage stairs; exhausted by mid-morning.</td><td>Disproportionate to congestion — the classic signature of untreated <strong>iron deficiency</strong> sapping muscle energetics.</td></tr>
+          <tr><td>🧲 Pallor/energy</td><td>Mild pallor, fatigue out of proportion, borderline Hb 118.</td><td>Iron deficiency impairs capacity <em>even before anaemia</em> — mitochondria run on iron.</td></tr>
+          <tr><td>😴 Sleep</td><td>Loud snoring, witnessed apnoeas, daytime somnolence.</td><td>Sleep-disordered breathing (obstructive vs central) worsens HF — but the treatment differs, and one option (ASV in central SA) is harmful.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In the euvolaemic heart-failure patient who is still symptomatic, the diuretic is not the answer — the iron panel, the rhythm strip, the potassium and the sleep history are."</div>
+
+        <h3>🧭 The comorbidity checklist you run at every HF review</h3>
+        <p>Every HFrEF review deserves a systematic sweep of the outcome-deciders: <strong>iron studies</strong> (ferritin + TSAT), <strong>rhythm &amp; rate</strong> (AF control), <strong>glycaemia</strong> (SGLT2i status), <strong>renal function &amp; potassium</strong> (are the RAASi/MRA at target?), and <strong>sleep-disordered breathing</strong>. Add depression, frailty and polypharmacy — each independently worsens prognosis.</p>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of "that's just his heart failure"</b>Attributing every symptom to the pump is how correctable comorbidities go untreated for years. Fatigue "from heart failure" is often iron deficiency; palpitations "from heart failure" are often rate-uncontrolled AF; a stopped MRA "because of the kidneys" is often a fixable potassium problem. Name the comorbidity, then treat it.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The cardiology SHO thinks out loud at 09:55:</em></p>
+        <h3>🧠 Frame it as five correctable comorbidities, not one failing pump</h3>
+        <p>"He's euvolaemic, so this isn't a diuretic problem — it's a comorbidity problem. My list: (1) <strong>iron deficiency</strong> — ferritin 60, TSAT 15%: give <em>IV</em> iron, not oral. (2) <strong>AF, rate 90–110</strong> — optimise the beta-blocker, and because his EF is 32% think about <em>rhythm control / AF ablation</em> — but absolutely <strong>no verapamil or diltiazem</strong>. (3) <strong>Diabetes + HF</strong> — start an <strong>SGLT2 inhibitor</strong>, it helps both. (4) His <strong>MRA is off for a potassium of 5.4</strong> — I'd restart it with a <strong>potassium binder</strong> rather than abandon a life-saving drug. (5) Screen the <strong>snoring</strong> — but if it's central sleep apnoea I will not reach for ASV."</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>🧲 <strong>Confirm iron deficiency</strong> (ferritin &lt;100, or 100–299 with TSAT &lt;20%) → schedule <strong>IV ferric carboxymaltose/derisomaltose</strong>.</li>
+          <li>💢 <strong>Rate/rhythm plan for AF</strong> — beta-blocker (a pillar already) titrated; cardiology view on <strong>AF ablation</strong> (EF 32%). Never a non-DHP CCB.</li>
+          <li>🩸 <strong>Start SGLT2 inhibitor</strong> (dapagliflozin/empagliflozin) — diabetes and HF benefit together.</li>
+          <li>🧪 <strong>Restart the MRA with a potassium binder</strong> (patiromer/SZC) to keep GDMT at target despite CKD.</li>
+          <li>😴 <strong>Sleep study</strong> to define obstructive vs central; CPAP for OSA, and <em>avoid ASV</em> in central SA with reduced EF.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Every heart-failure patient earns an iron panel, an honest look at their rhythm, an SGLT2 inhibitor if diabetic, and a potassium binder before you ever surrender the ACE inhibitor or MRA."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>She's tempted to prescribe <em>oral</em> ferrous sulfate "because it's simpler and cheaper." Correct in HF?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No.</strong> Oral iron does not work in heart failure — the <em>IRONOUT-HF</em> trial showed high-dose oral iron failed to improve exercise capacity or replete iron stores. The inflammatory HF state raises <strong>hepcidin</strong>, which blocks gut iron absorption and iron release from stores. Correct HF iron deficiency with <strong>intravenous</strong> iron (ferric carboxymaltose/derisomaltose).</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The HF consultant at the bedside, 10:10:</em></p>
+        <h3>🧲 Defining iron deficiency in heart failure — the numbers that trigger IV iron</h3>
+        <table class="tbl">
+          <tr><th>Pattern</th><th>Ferritin</th><th>TSAT</th><th>This patient</th></tr>
+          <tr><td><strong>Absolute</strong> deficiency</td><td>&lt; 100 µg/L</td><td>Any</td><td class="hi">Ferritin 60 → qualifies</td></tr>
+          <tr><td><strong>Functional</strong> deficiency</td><td>100–299 µg/L</td><td>&lt; 20%</td><td class="hi">TSAT 15% (would also qualify)</td></tr>
+          <tr><td>Anaemia required?</td><td colspan="2">No — treat regardless of Hb</td><td class="hi">Hb 118, but iron matters anyway</td></tr>
+        </table>
+        <p>He meets the HF definition on ferritin alone (60 &lt; 100), and his TSAT of 15% underlines a functional component. <strong>Anaemia is not required</strong> — iron deficiency impairs muscle and mitochondrial energetics before the haemoglobin ever falls.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Ferritin under 100, OR 100–299 with a transferrin saturation under 20% — that is iron deficiency in heart failure, anaemia or not, and it earns intravenous iron."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">RCT</span> FAIR-HF &amp; CONFIRM-HF</td><td>IV ferric carboxymaltose improved symptoms, NYHA class, 6-minute-walk distance and quality of life in iron-deficient HFrEF (with or without anaemia).</td><td>IV iron gives symptomatic, functional patients their legs back.</td></tr>
+            <tr><td><span class="lvl">RCT</span> AFFIRM-AHF &amp; IRONMAN</td><td>IV iron reduced HF hospitalisations (AFFIRM-AHF post-acute; IRONMAN with ferric derisomaltose over longer follow-up).</td><td>IV iron is not just symptom relief — it cuts admissions.</td></tr>
+            <tr><td><span class="lvl">RCT</span> IRONOUT-HF</td><td>High-dose <em>oral</em> iron did NOT improve exercise capacity or replete stores in HFrEF.</td><td>Oral iron is ineffective in HF (hepcidin) — use IV.</td></tr>
+            <tr><td><span class="lvl">RCT</span> CASTLE-AF</td><td>AF <strong>ablation</strong> in HFrEF reduced death and HF hospitalisation vs medical rate/rhythm control.</td><td>Consider ablation for AF in selected HFrEF patients.</td></tr>
+            <tr><td><span class="lvl">RCT</span> SERVE-HF</td><td>Adaptive servo-ventilation <strong>increased</strong> all-cause and cardiovascular mortality in predominant <em>central</em> sleep apnoea with HFrEF.</td><td>Do NOT use ASV for central sleep apnoea in reduced EF — it harms.</td></tr>
+            <tr><td><span class="lvl">RCT</span> DAPA-HF / EMPEROR-Reduced</td><td>SGLT2 inhibitors cut CV death/HF hospitalisation in HFrEF, with and without diabetes.</td><td>Start an SGLT2i — it treats the diabetes and the heart failure at once.</td></tr>
+            <tr><td><span class="lvl">RCT</span> Potassium binders (patiromer OPAL-HK/DIAMOND; SZC)</td><td>Binders control hyperkalaemia and enable continuation/up-titration of RAASi/MRA.</td><td>Bind the potassium, keep the life-saving drug.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The chart that haunts me is the fatigued man with an EF of 30% and AF whom someone rate-controlled with <strong>verapamil</strong>. Within days his ventricle gave out and he arrived in frank pulmonary oedema. His iron was never checked, and his ACE inhibitor had been quietly stopped for a potassium of 5.4 a binder would have fixed. Three correctable comorbidities undid him."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY iron deficiency saps a heart-failure patient (the WHY behind the WHY)</h3>
+        <ol>
+          <li>⚙️ <strong>Iron is the engine's spark:</strong> iron is a cofactor in mitochondrial electron-transport enzymes and myoglobin. Cardiac and skeletal muscle are iron-hungry, high-energy tissues.</li>
+          <li>🔋 <strong>Deficiency starves the mitochondria:</strong> without adequate iron, oxidative phosphorylation falters — muscles fatigue early, contractile and skeletal-muscle energetics fall, exercise capacity drops. This happens <em>before</em> anaemia.</li>
+          <li>🩸 <strong>Absolute vs functional:</strong> <em>absolute</em> = empty stores (low ferritin). <em>Functional</em> = adequate stores but iron locked away and unavailable (normal-ish ferritin, low TSAT) — driven by inflammation.</li>
+          <li>🚪 <strong>Why oral fails:</strong> HF is an inflammatory state → high <strong>hepcidin</strong> → ferroportin degraded → gut absorption blocked and stored iron trapped in macrophages. Swallowed iron simply cannot get in. IV iron bypasses the gate.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Iron runs the mitochondria of the failing heart and its muscles — deficiency drains the patient even with a normal haemoglobin, and only intravenous iron can refill the tank."</div>
+
+        <h3>⚖️ Contrast pair — IV iron vs oral iron in HF</h3>
+        <div class="vs">
+          <div class="side a"><h4>🚫 Oral iron (ineffective in HF)</h4><ul><li>Blocked by hepcidin in the inflammatory HF state</li><li>IRONOUT-HF: no gain in exercise capacity or iron stores</li><li>GI side-effects, poor adherence</li></ul></div>
+          <div class="side b"><h4>✅ IV iron (works)</h4><ul><li>Ferric carboxymaltose / derisomaltose bypasses gut absorption</li><li>FAIR-HF/CONFIRM-HF: better symptoms, 6MWT, QoL</li><li>AFFIRM-AHF/IRONMAN: fewer HF hospitalisations</li></ul></div>
+        </div>
+        <p>💡 In heart failure, the route is the therapy. "Iron" written on a chart means nothing unless it goes in a vein.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The Iron-Repletion Dial</h3>
+          <p style="font-size:13px">Drag the dial from iron-deficient toward fully replete and watch how correcting iron drives <strong>functional capacity, quality of life and HF-hospitalisation risk</strong> — the outcomes IV iron improves.</p>
+          <label for="kRange">🧲 Iron repletion after IV ferric carboxymaltose: <b id="kVal">15</b> % toward target</label>
+          <input type="range" id="kRange" min="0" max="100" value="15">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout bad" id="kReadout">Set the dial to explore how iron repletion changes symptoms, 6-minute walk and admissions.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 The needle tracks residual symptom &amp; HF-hospitalisation risk. As iron repletes it slides from red (deficient, breathless, high-risk) toward green (replete, better 6MWT/QoL, fewer admissions). Remember: only IV iron gets you across — oral would leave you stuck (IRONOUT).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The comorbidity order set (10:20)</h3>
+        <ul>
+          <li>🧲 <strong>IV iron</strong> — ferric carboxymaltose (or derisomaltose), dose by weight/Hb deficit; recheck iron studies before repeat dosing. <em>Not</em> oral iron.</li>
+          <li>💢 <strong>AF rate/rhythm:</strong> optimise bisoprolol; cardiology referral for <strong>AF ablation</strong> assessment (EF 32%). <strong>Do NOT prescribe verapamil/diltiazem.</strong> Digoxin only if needed and cautiously.</li>
+          <li>🩸 <strong>SGLT2 inhibitor</strong> (dapagliflozin 10 mg or empagliflozin 10 mg) — for HF and diabetes; counsel on sick-day rules/euglycaemic DKA.</li>
+          <li>🧪 <strong>Restart the MRA</strong> (spironolactone/eplerenone) with a <strong>potassium binder</strong> (patiromer or sodium zirconium cyclosilicate); repeat U&amp;E in 3–7 days.</li>
+          <li>😴 <strong>Refer for sleep study</strong>; CPAP if obstructive. <strong>No adaptive servo-ventilation</strong> if central sleep apnoea + reduced EF (SERVE-HF).</li>
+          <li>🧾 Confirm the four HFrEF pillars are all present and up-titrated to maximum tolerated; continue apixaban for AF.</li>
+          <li>📞 HF nurse follow-up; screen for depression, frailty and polypharmacy.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The cheapest wins in heart failure are often an iron infusion, an SGLT2 tablet, and a potassium binder that keeps the MRA on board — not another loop-diuretic dose."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ HF-ward priorities — the nurse runs the comorbidity safety net</h3>
+        <ul>
+          <li>🧲 <strong>Administer IV iron safely:</strong> observe for infusion reactions, watch the cannula site (extravasation of ferric carboxymaltose causes brown skin staining), have anaphylaxis kit to hand, document the dose and next-due.</li>
+          <li>💢 <strong>Apical–radial pulse for AF:</strong> count the apical rate (a radial-only count misses the pulse deficit) and report rates persistently &gt;110 or symptomatic palpitations.</li>
+          <li>🧪 <strong>Track potassium and renal function</strong> around MRA restart + binder; flag K⁺ trends before they force a drug stop.</li>
+          <li>🩸 <strong>SGLT2i counselling:</strong> genital hygiene, sick-day rules, recognise euglycaemic DKA symptoms; a small early dip in eGFR is expected and not a reason to stop.</li>
+          <li>🚶 <strong>Functional baseline:</strong> record a 6-minute-walk / how-far-can-you-go before IV iron so improvement is measurable.</li>
+          <li>😴 Take a sleep history from patient and bed-partner (snoring, apnoeas, somnolence); support CPAP set-up if prescribed.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who counts the apical rate, watches the potassium, and measures how far he can walk before and after his iron is tracking the comorbidities that actually decide his year."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Value</th><th>Interpretation</th></tr>
+          <tr><td>Ferritin</td><td class="hi">60 µg/L</td><td><strong>&lt; 100 → absolute iron deficiency</strong> in HF. Treat with IV iron regardless of Hb.</td></tr>
+          <tr><td>Transferrin saturation (TSAT)</td><td class="hi">15%</td><td>&lt; 20% confirms functionally unavailable iron — reinforces the diagnosis.</td></tr>
+          <tr><td>Haemoglobin</td><td>118 g/L</td><td>Only mildly low — iron deficiency matters <em>even without</em> anaemia. Don't wait for Hb to fall.</td></tr>
+          <tr><td>Potassium</td><td class="hi">5.1 mmol/L</td><td>Was 5.4 (MRA stopped). Mild — a candidate for a binder + MRA restart, not permanent RAASi withdrawal.</td></tr>
+          <tr><td>eGFR / creatinine</td><td>38 mL/min · 158 µmol/L</td><td>CKD 3b — dose-adjust, but not a reason to abandon GDMT; SGLT2i still indicated down to low eGFR.</td></tr>
+          <tr><td>HbA1c</td><td class="hi">7.9%</td><td>Diabetes + HF → SGLT2 inhibitor is the priority glucose-lowering agent.</td></tr>
+          <tr><td>NT-proBNP</td><td>1,850 ng/L</td><td>Confirms HF; useful for trend, but his symptoms are driven by comorbidity, not fresh congestion.</td></tr>
+          <tr><td>TSH · CRP</td><td>Normal · mildly raised</td><td>Exclude thyroid contribution to AF/fatigue; low-grade inflammation drives hepcidin (why oral iron fails).</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Ferritin and transferrin saturation belong on every heart-failure blood panel — the one test set that most often reveals a treatable cause of fatigue nobody had looked for."</div>
+
+        <div class="callout info"><b class="ct">🧠 Reading iron studies in HF — the trap</b>Ferritin is an acute-phase reactant, so inflammation falsely raises it — which is exactly why HF uses a <strong>higher</strong> ferritin threshold (&lt;100, or &lt;300 with low TSAT) than the general population. A "normal-looking" ferritin of 150 with a TSAT of 12% is still deficient. Always read ferritin <em>with</em> the TSAT.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 ECG / IMAGING + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🫀 The rhythm strip — atrial fibrillation, and why it hurts a failing heart</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 130" preserveAspectRatio="none" aria-label="Atrial fibrillation: irregularly irregular, no P waves, fibrillatory baseline">
+            <rect width="820" height="130" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="32" x2="820" y2="32"/><line x1="0" y1="65" x2="820" y2="65"/><line x1="0" y1="98" x2="820" y2="98"/></g>
+            <polyline fill="none" stroke="#fca5a5" stroke-width="2.3" points="0,66 30,64 44,67 60,63 78,66 96,62 110,66 118,60 128,30 138,96 150,66 176,64 190,67 210,63 232,66 250,64 266,60 276,32 286,94 298,66 320,64 340,67 366,63 384,66 402,64 420,60 430,34 440,95 452,66 470,64 492,67 510,63 528,66 546,64 560,60 570,30 580,96 592,66 612,64 632,67 650,63 668,66 686,62 700,66 710,60 720,32 730,95 742,66 766,64 786,67 806,63 820,66"/>
+            <text x="140" y="20" fill="#93c5fd" font-size="11">no P waves · irregular R–R</text>
+            <text x="560" y="118" fill="#93c5fd" font-size="11">fibrillatory baseline</text>
+          </svg>
+          <div class="ecg-cap">Atrial fibrillation: <span style="color:#93c5fd">absent P waves</span>, an irregularly irregular R–R, and a fine fibrillatory baseline. Lose the atrial kick and let the rate run fast and irregular, and a stiff failing ventricle fills and ejects even less.</div>
+        </div>
+
+        <h3>🔎 The AF–HF vicious cycle you must know cold</h3>
+        <table class="tbl">
+          <tr><th>Mechanism</th><th>Effect on the failing heart</th><th>Implication</th></tr>
+          <tr><td>💔 <strong>Loss of atrial kick</strong></td><td>Up to ~20% of ventricular filling lost — worse in a stiff/failing ventricle dependent on late diastolic filling</td><td>Rhythm control may recover meaningful output.</td></tr>
+          <tr><td>🏃 <strong>Fast, irregular rate</strong></td><td>Shortened diastole cuts filling and coronary perfusion; irregularity itself impairs stroke volume</td><td>Rate-control target, but not with negative inotropes.</td></tr>
+          <tr><td>🔁 <strong>Tachycardia-mediated cardiomyopathy</strong></td><td>Chronic uncontrolled rates can themselves depress EF — sometimes reversible</td><td>Restoring rhythm/rate can improve EF.</td></tr>
+          <tr><td>🩸 <strong>Thromboembolism</strong></td><td>Stasis in fibrillating atria → stroke risk</td><td>Anticoagulate per CHA₂DS₂-VASc (he is on apixaban).</td></tr>
+          <tr><td>🚫 <strong>Non-DHP CCB trap</strong></td><td>Verapamil/diltiazem add negative inotropy to a failing ventricle</td><td><strong>Contraindicated</strong> in HFrEF — use beta-blockers ± cautious digoxin.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Atrial fibrillation and heart failure feed each other — control the rhythm or rate wisely, consider ablation when the EF is low, and never rate-control with verapamil or diltiazem."</div>
+
+        <h3>🩻 Adjunct imaging</h3>
+        <ul>
+          <li><strong>Echocardiogram:</strong> EF 32%, dilated LV, moderate functional MR, LA enlargement (the substrate for AF) — no new regional change or effusion.</li>
+          <li><strong>CXR:</strong> cardiomegaly, no acute pulmonary oedema — consistent with euvolaemia and chronic disease.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The HF-comorbidity drug map — what, why, and the traps</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>IV iron</strong> (ferric carboxymaltose / derisomaltose)</td><td>Iron deficiency in HF (ferritin &lt;100, or &lt;300 + TSAT &lt;20%)</td><td>Bypasses hepcidin-blocked gut absorption. Watch hypophosphataemia (FCM), infusion reactions, skin staining. NOT oral.</td></tr>
+          <tr><td><strong>SGLT2 inhibitor</strong> (dapagliflozin / empagliflozin)</td><td>HFrEF (± diabetes) and type 2 diabetes</td><td>↓CV death/HF hospitalisation. Expect small early eGFR dip; sick-day rules; euglycaemic DKA risk; genital mycotic infections.</td></tr>
+          <tr><td><strong>Beta-blocker</strong> (bisoprolol/carvedilol)</td><td>HFrEF pillar + AF rate control</td><td>Negative chronotrope, prognostic. The <em>correct</em> rate-control drug in HFrEF AF.</td></tr>
+          <tr><td><strong>MRA</strong> (spironolactone/eplerenone) + <strong>K⁺ binder</strong></td><td>HFrEF pillar; binder enables it despite hyperkalaemia</td><td>Don't abandon for mild K⁺ rise — patiromer/SZC keep it on board (OPAL-HK, DIAMOND).</td></tr>
+          <tr><td><strong>ARNI / ACEi / ARB</strong></td><td>HFrEF pillar</td><td>Same rule: a fixable potassium rise is not a reason to surrender neurohormonal blockade.</td></tr>
+          <tr><td class="hi"><strong>Verapamil / diltiazem</strong> ⛔</td><td>❌ Do NOT use for AF rate control in HFrEF</td><td><strong>Negative inotropy decompensates the failing ventricle — contraindicated.</strong></td></tr>
+          <tr><td class="hi"><strong>Adaptive servo-ventilation</strong> ⛔</td><td>❌ Do NOT use for central sleep apnoea + reduced EF</td><td>SERVE-HF: increased mortality. CPAP is for obstructive sleep apnoea.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"IV iron, an SGLT2 inhibitor, and a potassium binder to protect the MRA are additions that change outcomes; verapamil for AF and ASV for central apnoea are the two things you must never add in HFrEF."</div>
+        <div class="callout danger"><b class="ct">🚫 The 'never in HFrEF' shortlist</b>❌ non-dihydropyridine CCBs (verapamil/diltiazem) for AF · ❌ adaptive servo-ventilation for central sleep apnoea · ❌ oral iron as HF iron therapy · ⚠️ stopping RAASi/MRA outright for a mild, bindable potassium rise.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why</h3>
+        <ul>
+          <li>🧲 <strong>Iron studies</strong> — recheck ferritin/TSAT before repeat IV dosing (typically re-evaluate at ~8–12 weeks); track symptoms and 6-minute-walk for response.</li>
+          <li>🧪 <strong>Potassium &amp; renal function</strong> — after MRA restart + binder and after SGLT2i start; a small eGFR dip with SGLT2i is expected, not a stop signal.</li>
+          <li>💢 <strong>Heart rate/rhythm</strong> — apical rate in AF; assess for symptomatic tachycardia and response to beta-blocker/ablation.</li>
+          <li>🩸 <strong>Glucose/HbA1c</strong> and sick-day education for the SGLT2 inhibitor.</li>
+          <li>😴 <strong>Sleep-study result</strong> — obstructive (CPAP) vs central (avoid ASV); daytime somnolence and overnight oximetry as follow-up markers.</li>
+          <li>📉 <strong>NT-proBNP &amp; weight</strong> — trend for decompensation; screen mood and frailty at each review.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After you treat the comorbidities, the monitor's question becomes: is his iron staying up, his potassium safe on the MRA, his rate controlled, and his walk getting longer?"</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong — comorbidity edition</h3>
+        <ul>
+          <li>💥 <strong>Decompensation from a non-DHP CCB</strong> — verapamil/diltiazem given for AF rate control tip a failing ventricle into pulmonary oedema (the M&amp;M case).</li>
+          <li>🫁 <strong>Excess mortality from ASV</strong> in central sleep apnoea + reduced EF (SERVE-HF) — a "treatment" that harms.</li>
+          <li>📉 <strong>GDMT withdrawal spiral</strong> — stopping RAASi/MRA for a mild potassium rise loses prognostic benefit; the patient deteriorates from under-treatment.</li>
+          <li>🧲 <strong>Untreated iron deficiency</strong> — persistent fatigue, poor exercise capacity, avoidable HF hospitalisations.</li>
+          <li>🩸 <strong>Hyperkalaemia</strong> from RAASi/MRA in CKD — real, but manageable with binders, diet and monitoring rather than drug abandonment.</li>
+          <li>💊 <strong>SGLT2i-related</strong> euglycaemic DKA and genital infections; <strong>polypharmacy</strong> interactions and adherence failure as the silent system complication.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The deadliest complications here are iatrogenic — the wrong AF drug, the wrong sleep device, and the life-saving drug stopped for a number that a binder would have fixed."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 Why is this "optimised" HF patient still symptomatic? — the differential of persistent symptoms</h3>
+        <table class="tbl">
+          <tr><th>Cause</th><th>Discriminators</th><th>Action</th></tr>
+          <tr><td>🧲 <strong>Iron deficiency</strong> (this patient)</td><td>Fatigue out of proportion, low ferritin/TSAT, euvolaemic</td><td>IV iron (not oral); recheck at 8–12 weeks.</td></tr>
+          <tr><td>💢 <strong>Rate-uncontrolled / new AF</strong></td><td>Palpitations, irregular pulse, fast rate, lost atrial kick</td><td>Beta-blocker; consider AF ablation; never verapamil/diltiazem.</td></tr>
+          <tr><td>🧪 <strong>Under-treated GDMT</strong></td><td>MRA/RAASi stopped or sub-target (often for K⁺/eGFR)</td><td>Restart with potassium binder; up-titrate the four pillars.</td></tr>
+          <tr><td>😴 <strong>Sleep-disordered breathing</strong></td><td>Snoring, apnoeas, daytime somnolence</td><td>Sleep study; CPAP for OSA; avoid ASV in central SA + low EF.</td></tr>
+          <tr><td>💧 <strong>True congestion / progression</strong></td><td>Raised JVP, oedema, weight gain, rising NT-proBNP</td><td>Diuretic adjustment; advanced HF pathways if refractory.</td></tr>
+          <tr><td>🧠 <strong>Depression / frailty / deconditioning</strong></td><td>Low mood, sarcopenia, social isolation</td><td>Screen and treat; cardiac rehab.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"When an optimised heart-failure patient is still struggling, run the same short list every time: iron, rhythm, GDMT gaps, sleep, congestion, mood — the answer is almost always a comorbidity you can fix."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The Comorbidity Fork"</h3>
+          <div class="hud"><span>❤️ Stability: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">Bed 12: EF 32%, euvolaemic but exhausted, permanent AF at 90–110, ferritin 60 / TSAT 15%, HbA1c 7.9%, K⁺ 5.1 (MRA stopped 6 weeks ago for K⁺ 5.4). The covering registrar says: "Just slow his AF with verapamil and leave the potassium alone." What do you do first?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The comorbidity plan</h3>
+        <ol>
+          <li>🧲 <strong>Iron:</strong> confirmed deficiency (ferritin 60, TSAT 15%) → <strong>IV ferric carboxymaltose/derisomaltose</strong>; recheck and re-dose to target.</li>
+          <li>💢 <strong>AF:</strong> optimise beta-blocker; cardiology for <strong>AF ablation</strong> (EF 32%, CASTLE-AF); continue apixaban; never a non-DHP CCB.</li>
+          <li>🩸 <strong>Diabetes + HF:</strong> start an <strong>SGLT2 inhibitor</strong>.</li>
+          <li>🧪 <strong>Potassium/GDMT:</strong> restart MRA with a <strong>potassium binder</strong>; confirm all four HFrEF pillars at max-tolerated dose.</li>
+          <li>😴 <strong>Sleep:</strong> study to define OSA vs central; CPAP for OSA; <strong>no ASV</strong> in central SA + low EF.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A great heart-failure plan optimises the pump and then hunts every comorbidity — iron, rhythm, sugar, potassium, sleep — because that is where the extra years and the better days actually come from."</div>
+
+        <div class="checklist" id="ckBundle">
+          <h3 style="margin-top:0">🩺 Procedure Guide — HF comorbidity screen &amp; bundle (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>🧲 Iron studies sent (ferritin + TSAT) and interpreted against HF thresholds</span></label>
+          <label class="ck"><input type="checkbox"><span>💢 AF rate/rhythm assessed; beta-blocker optimised; ablation considered (EF low); no non-DHP CCB</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 Diabetes reviewed; SGLT2 inhibitor started/confirmed</span></label>
+          <label class="ck"><input type="checkbox"><span>🧪 Renal function &amp; potassium checked; GDMT preserved (binder if K⁺ high) — all four pillars at target</span></label>
+          <label class="ck"><input type="checkbox"><span>😴 Sleep-disordered breathing screened; study arranged; ASV avoided in central SA + low EF</span></label>
+          <label class="ck"><input type="checkbox"><span>🧠 Depression, frailty and polypharmacy reviewed; anticoagulation confirmed for AF</span></label>
+          <div class="ck-progress" data-progress>0 / 6 complete</div>
+        </div>
+
+        <div class="checklist" id="ckIron">
+          <h3 style="margin-top:0">🩺 Procedure Guide — IV iron administration &amp; who qualifies</h3>
+          <label class="ck"><input type="checkbox"><span>✅ Confirm HF iron deficiency: ferritin &lt;100 µg/L, OR 100–299 with TSAT &lt;20% (anaemia not required)</span></label>
+          <label class="ck"><input type="checkbox"><span>🚫 Exclude active infection; oral iron is NOT the answer (IRONOUT) — use IV</span></label>
+          <label class="ck"><input type="checkbox"><span>💉 Choose agent &amp; weight/Hb-based dose (ferric carboxymaltose or derisomaltose)</span></label>
+          <label class="ck"><input type="checkbox"><span>⚠️ Consent &amp; monitor for infusion reaction; anaphylaxis kit available; protect against extravasation/skin staining</span></label>
+          <label class="ck"><input type="checkbox"><span>🧪 Plan follow-up: recheck iron studies (± phosphate with FCM) and re-dose to target at 8–12 weeks</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">Day 0</div>Euvolaemic but NYHA III. Iron deficiency identified (ferritin 60, TSAT 15%); MRA found stopped for K⁺ 5.4; no SGLT2i; AF 90–110.</div>
+          <div class="t-item"><div class="t-time">Day 0</div>IV ferric carboxymaltose given. SGLT2 inhibitor started. MRA restarted with a potassium binder. Beta-blocker up-titrated; verapamil explicitly avoided.</div>
+          <div class="t-item"><div class="t-time">Day 3</div>K⁺ 4.6 on binder + MRA — GDMT preserved. Rate better controlled; feels less breathless. Sleep study booked.</div>
+          <div class="t-item"><div class="t-time">Week 6</div>Sleep study: predominantly obstructive → CPAP (ASV correctly NOT used). Cardiology lists him for AF ablation assessment.</div>
+          <div class="t-item"><div class="t-time">Week 10</div>Iron replete on recheck; 6-minute-walk up ~50 m; NYHA II; QoL markedly better. No HF admission.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The win</b>Nothing exotic happened to his pump. Someone checked his iron and gave it IV, kept his MRA on board with a binder, started an SGLT2 inhibitor, controlled his rhythm the safe way, and chose the right sleep therapy. Ordinary comorbidity discipline, extraordinary difference.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 Two ways to leave hospital — the comorbidities managed vs missed</h3>
+        <div class="vs">
+          <div class="side a"><h4>❌ The missed-comorbidity discharge</h4><ul><li>Iron never checked; fatigue blamed on "his heart failure"</li><li>AF "rate-controlled" with verapamil; MRA left stopped for a mild K⁺</li><li>No SGLT2i; snoring ignored or ASV started</li><li>Back within weeks, breathless — the revolving door</li></ul></div>
+          <div class="side b"><h4>✅ This patient (comorbidities managed)</h4><ul><li>IV iron given; iron-study follow-up booked</li><li>Four HFrEF pillars at target; MRA preserved with a binder</li><li>SGLT2i started; AF ablation pathway; CPAP for OSA</li><li>HF-nurse follow-up; mood, frailty, adherence addressed</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A safe heart-failure discharge isn't just 'euvolaemic and home' — it's iron checked and treated, GDMT preserved, an SGLT2 inhibitor started, the rhythm handled safely, and the sleep sorted."</div>
+        <div class="callout info"><b class="ct">📌 Discharge red flags to teach the patient</b>Increasing breathlessness, weight gain &gt; 2 kg in 2–3 days, ankle swelling, or new/worsening palpitations → contact the HF team. Continue the SGLT2 inhibitor except during acute illness (sick-day rules), and don't stop the MRA/ACE inhibitor without a blood test and a plan.</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>🧲 Check the iron in everyone</b>Ferritin &lt;100, or 100–299 with TSAT &lt;20% = iron deficiency in HF — treat even without anaemia.</div>
+          <div class="pearl"><b>💉 IV, never oral</b>Oral iron fails in HF (IRONOUT/hepcidin). IV ferric carboxymaltose/derisomaltose improves symptoms &amp; cuts admissions.</div>
+          <div class="pearl"><b>🚫 No verapamil/diltiazem</b>Non-DHP CCBs decompensate HFrEF — rate-control AF with a beta-blocker, ± cautious digoxin.</div>
+          <div class="pearl"><b>🔥 Consider AF ablation</b>In HFrEF, ablation improved mortality/HF hospitalisation (CASTLE-AF) — refer selected patients.</div>
+          <div class="pearl"><b>🩸 SGLT2i does double duty</b>One tablet treats the diabetes and the heart failure (DAPA-HF/EMPEROR).</div>
+          <div class="pearl"><b>🧪 Bind the potassium, keep the drug</b>Don't abandon RAASi/MRA for a mild K⁺ rise — add patiromer/SZC.</div>
+          <div class="pearl"><b>😴 ASV harms in central SA</b>SERVE-HF: adaptive servo-ventilation increased mortality in central SA + low EF. CPAP is for OSA.</div>
+          <div class="pearl"><b>🧠 The comorbidities decide outcomes</b>Optimise the pump, then hunt iron, rhythm, sugar, potassium and sleep — that's where the years are.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the pathway</h3>
+          <ul>
+            <li>🧲 <strong>Iron deficiency — definition &amp; mechanism:</strong> <em>absolute</em> (depleted stores, low ferritin) vs <em>functional</em> (adequate stores but iron sequestered, normalish ferritin + low TSAT). Iron is central to mitochondrial electron transport, myoglobin and aconitase in cardiac and skeletal muscle — deficiency impairs oxidative energetics and exercise capacity <em>before</em> anaemia, which is why symptoms and 6MWT improve with repletion independent of Hb.</li>
+            <li>🚪 <strong>Why IV not oral:</strong> HF is a chronic inflammatory state → IL-6 drives hepatic <strong>hepcidin</strong> → ferroportin internalised → enteral absorption and macrophage iron release blocked. Oral iron cannot overcome this (IRONOUT-HF). IV iron delivers directly to transferrin/stores. Watch FCM-induced hypophosphataemia (FGF23 effect).</li>
+            <li>💢 <strong>AF–HF interplay:</strong> rate vs rhythm control; <strong>AF ablation</strong> in HFrEF (CASTLE-AF mortality/HF-hospitalisation benefit; CASTLE-HTx in advanced HF/transplant candidates). Avoid non-DHP CCBs (negative inotropy); be cautious with <strong>digoxin</strong> (narrow therapeutic index, observational mortality signals) — reserve as add-on. Rule out tachycardia-mediated cardiomyopathy.</li>
+            <li>🩸 <strong>SGLT2 inhibitors across the spectrum:</strong> benefit in HFrEF and HFpEF, in diabetes and CKD (DAPA-CKD/EMPA-KIDNEY), and post-acute HF (SOLOIST/EMPULSE). Mechanisms beyond glucose: natriuresis, improved cardiac energetics, reduced preload/afterload.</li>
+            <li>🧪 <strong>Hyperkalaemia management to preserve GDMT:</strong> the MRA and RAASi are prognostic — abandoning them for a mild K⁺ rise costs lives. <strong>Potassium binders</strong> (patiromer, sodium zirconium cyclosilicate) plus dietary counselling and loop diuretics enable up-titration (OPAL-HK, DIAMOND). Distinguish spurious/haemolysed samples.</li>
+            <li>😴 <strong>Sleep-disordered breathing:</strong> obstructive (upper-airway collapse → CPAP helps) vs central/Cheyne–Stokes (unstable ventilatory control in HF). <strong>ASV is harmful</strong> in predominant central SA with reduced EF (SERVE-HF increased mortality) — do not use. Optimise HF therapy first.</li>
+            <li>🧩 <strong>The rest of the comorbidity burden:</strong> depression (worsens adherence/outcomes — screen and treat), frailty and sarcopenia (cardiac rehab, nutrition), and polypharmacy (deprescribe, check interactions) — each independently shapes prognosis.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The Rate-Control That Drowned Him"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 66-year-old man with ischaemic HFrEF (EF 30%) and permanent atrial fibrillation attended clinic exhausted, with a rate in the 100s. To "control the rate," he was started on <strong>verapamil</strong>. Within days his failing ventricle — now burdened by the drug's <strong>negative inotropy</strong> — decompensated, and he was admitted in frank <strong>pulmonary oedema</strong>. On review: his <strong>iron had never been checked</strong> (ferritin 22, severely deficient), and his <strong>ACE inhibitor had been quietly down-titrated then stopped</strong> months earlier for a potassium of 5.4 — a level a <strong>potassium binder</strong> would have solved. Three correctable comorbidities — iron, the wrong rate-control drug, and hyperkalaemia-driven GDMT withdrawal — had together undone him.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🚫 WRONG DRUG</b>Verapamil (non-DHP CCB) for AF in HFrEF — negative inotropy floods the lungs. Contraindicated.</div>
+            <div class="hole"><b>🧲 IRON IGNORED</b>Severe iron deficiency never checked — untreated fatigue and vulnerability.</div>
+            <div class="hole"><b>🧪 GDMT ABANDONED</b>ACE inhibitor stopped for K⁺ 5.4 instead of adding a binder — prognostic drug lost.</div>
+            <div class="hole"><b>🩸 NO SGLT2i</b>An easy pillar with proven benefit never started.</div>
+            <div class="hole"><b>🧠 PUMP-ONLY THINKING</b>Everything blamed on "the heart failure"; the comorbidities went unexamined.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> rate-control AF in HFrEF with a <strong>beta-blocker</strong> (never verapamil/diltiazem); <strong>check iron</strong> in every HF patient and give it <strong>IV</strong>; treat a mild potassium rise with a <strong>binder</strong> and keep the RAASi/MRA; and start an <strong>SGLT2 inhibitor</strong>. <strong>This is exactly the discipline that turned the patient in Bed 12 around.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Never slow atrial fibrillation in a failing heart with verapamil, never let a bindable potassium rob a patient of their ACE inhibitor, and never forget to check the iron — the comorbidities decide the outcome."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🫀 Heart Failure Ward · Bed 12 — The Comorbidities that Decide Heart-Failure Outcomes<br>⚠️ Educational use only — not for clinical decision-making. "Optimise the pump, then win with the comorbidities."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+    /* ===== SIDEBAR TABS — show one section at a time ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not a correctable comorbidity here'); } if(found===total){ flagResult.textContent='✅ All '+total+' correctable comorbidities found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' correctable comorbidities found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: iron-repletion dial ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=100-((v-0)/(100-0)*100); kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<20){ msg='🔴 Severe iron deficiency (ferritin <100, or 100–299 with TSAT <20%). Short 6-minute walk, breathless on minimal effort, worst QoL and highest HF-hospitalisation risk. IV iron indicated.'; cls='bad'; }
+      else if(v<50){ msg='🟠 Partial repletion after one IV dose. Symptoms and 6-minute-walk starting to improve (FAIR-HF / CONFIRM-HF) — recheck iron studies and top up toward target.'; cls='warn-r'; }
+      else if(v<80){ msg='🟠 Near target. Functional capacity and QoL climbing, NYHA class often falls a step; AFFIRM-AHF / IRONMAN — HF-hospitalisation risk falling.'; cls='warn-r'; }
+      else { msg='🟢 Iron replete. Best 6-minute-walk distance and quality of life, lowest HF-hospitalisation risk. Note: oral iron would NOT have got you here (IRONOUT) — it took IV iron.'; cls='good'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Iron Repletion Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"Bed 12: EF 32%, euvolaemic but exhausted, permanent AF at 90–110, ferritin 60 / TSAT 15%, HbA1c 7.9%, K⁺ 5.1 (MRA stopped 6 weeks ago for K⁺ 5.4). The covering registrar says: 'Just slow his AF with verapamil and leave the potassium alone.' What do you do first?",
+      choices:[
+        {t:"⛔ Prescribe verapamil to rate-control his AF",good:false,ds:-2,dt:0,xp:0,fb:"☠️ This is the M&M case in S21. Verapamil's negative inotropy decompensates an EF-32% ventricle — contraindicated in HFrEF. He floods his lungs. Restart.",end:true},
+        {t:"✅ Run the comorbidity bundle: IV iron, optimise the beta-blocker for AF, start an SGLT2 inhibitor, and plan to restart the MRA safely",good:true,ds:1,dt:10,xp:40,fb:"✅ Exactly. Treat the iron IV, rate-control AF with the beta-blocker (never a non-DHP CCB), add SGLT2i for diabetes+HF, and protect the GDMT. Now handle the rhythm and sleep.",next:"rhythm"},
+        {t:"💊 Give ORAL ferrous sulfate for the iron and review in 3 months",good:false,ds:-1,dt:20,xp:5,fb:"⚠️ Oral iron doesn't work in HF (IRONOUT — hepcidin blocks absorption). You've lost months. Use IV iron, and don't ignore the rhythm and potassium.",next:"rhythm"}
+      ]},
+    rhythm:{ text:"IV iron is arranged and an SGLT2 inhibitor started. His AF stays symptomatic despite an optimised beta-blocker, and his bed-partner describes loud snoring with witnessed pauses. How do you handle rhythm and sleep?",
+      choices:[
+        {t:"🔥 Refer for AF ablation assessment (EF 32%, CASTLE-AF) and arrange a sleep study before choosing any device",good:true,ds:1,dt:8,xp:40,fb:"✅ Right. Ablation improved outcomes in HFrEF (CASTLE-AF); and you must characterise the sleep-disordered breathing (obstructive vs central) before reaching for any ventilation.",next:"potassium"},
+        {t:"😴 Start adaptive servo-ventilation (ASV) empirically for the sleep pauses",good:false,ds:-2,dt:20,xp:0,fb:"⚠️ Dangerous — ASV increased mortality in central sleep apnoea with reduced EF (SERVE-HF). Never start it empirically in HFrEF; define OSA vs central first.",next:"potassium"}
+      ]},
+    potassium:{ text:"His iron, rhythm and sleep are being handled. His K⁺ is 5.1 and his life-saving MRA is still switched off from that potassium of 5.4 six weeks ago. Final decision?",
+      choices:[
+        {t:"🧪 Restart the MRA with a potassium binder (patiromer/SZC) and monitor U&E — keep him on guideline therapy",good:true,ds:1,dt:6,xp:45,fb:"🏆 Perfect. A mild, bindable potassium rise is no reason to surrender a prognostic drug. Bind the potassium, keep the MRA — the comorbidities are now all managed.",end:true},
+        {t:"🚫 Leave the MRA off permanently 'to be safe' with the kidneys",good:false,ds:-1,dt:20,xp:0,fb:"⚠️ This abandons a life-saving drug for a fixable number. A binder would have kept him on GDMT — under-treatment is its own harm.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='declare'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 68-year-old with HFrEF (EF 32%), euvolaemic but fatigued, has ferritin 60 µg/L, TSAT 15%, Hb 118 g/L. The best management of his iron status is:", opts:["No action — Hb is nearly normal","Oral ferrous sulfate for 3 months","IV iron (ferric carboxymaltose/derisomaltose)","Blood transfusion"], correct:2, exp:"Ferritin <100 (or 100–299 with TSAT <20%) is iron deficiency in HF, treated regardless of anaemia. IV iron improves symptoms, 6MWT and QoL (FAIR-HF/CONFIRM-HF) and cuts admissions (AFFIRM-AHF/IRONMAN). Oral iron fails in HF (IRONOUT)." },
+    { q:"Why does oral iron fail to correct iron deficiency in heart failure?", opts:["Patients forget to take it","Inflammation raises hepcidin, blocking gut absorption and iron release","It is destroyed by stomach acid","It is only licensed for renal patients"], correct:1, exp:"The inflammatory HF state raises hepcidin, which degrades ferroportin and blocks enteral iron absorption and mobilisation from stores. IRONOUT-HF confirmed oral iron does not improve exercise capacity or replete stores — use IV iron." },
+    { q:"He has permanent AF at 90–110 and EF 32%. Which rate-control agent is CONTRAINDICATED?", opts:["Bisoprolol","Verapamil","Carvedilol","Cautious low-dose digoxin as add-on"], correct:1, exp:"Non-dihydropyridine calcium-channel blockers (verapamil, diltiazem) are negatively inotropic and decompensate HFrEF — contraindicated. Use a beta-blocker (a pillar), with cautious digoxin as an add-on if needed." },
+    { q:"Which trial supports AF ablation to improve outcomes in patients with HFrEF?", opts:["SERVE-HF","CASTLE-AF","IRONOUT-HF","DETO2X-AMI"], correct:1, exp:"CASTLE-AF showed catheter ablation of AF in HFrEF reduced death and HF hospitalisation versus medical therapy. Consider ablation in selected HFrEF patients." },
+    { q:"His MRA was stopped 6 weeks ago for a potassium of 5.4 and never restarted (now K⁺ 5.1). The best approach is:", opts:["Leave the MRA off permanently","Restart the MRA with a potassium binder and monitor U&E","Switch the MRA to a loop diuretic","Halve every heart-failure drug"], correct:1, exp:"Abandoning a prognostic MRA/RAASi for a mild, bindable potassium rise costs benefit. Potassium binders (patiromer, sodium zirconium cyclosilicate) control K⁺ and enable continuation/up-titration of GDMT (OPAL-HK, DIAMOND)." },
+    { q:"A HFrEF patient with predominant CENTRAL sleep apnoea and reduced EF should NOT be treated with:", opts:["Optimised guideline HF therapy","Adaptive servo-ventilation (ASV)","Treatment of nasal congestion","Weight management"], correct:1, exp:"SERVE-HF showed adaptive servo-ventilation increased all-cause and cardiovascular mortality in predominant central sleep apnoea with reduced EF — it is harmful. CPAP is used for obstructive sleep apnoea." },
+    { q:"His type 2 diabetes and HFrEF are both best served by adding:", opts:["A sulfonylurea","An SGLT2 inhibitor (dapagliflozin/empagliflozin)","Pioglitazone","A non-DHP calcium-channel blocker"], correct:1, exp:"SGLT2 inhibitors reduce CV death/HF hospitalisation in HFrEF (DAPA-HF, EMPEROR-Reduced) and lower glucose — treating the diabetes and the heart failure together. Pioglitazone causes fluid retention and is avoided in HF." },
+    { q:"Which single statement about iron deficiency in heart failure is TRUE?", opts:["It only matters once anaemia develops","It impairs functional capacity even without anaemia via muscle/mitochondrial energetics","It is defined by the same thresholds as the general population","It is best treated with dietary advice alone"], correct:1, exp:"Iron is essential for mitochondrial energetics in cardiac and skeletal muscle, so deficiency impairs symptoms, 6MWT and QoL even with a normal Hb. HF uses higher ferritin thresholds (ferritin acts as an acute-phase reactant), and treatment is IV iron." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you manage the comorbidities like a HF consultant. 🏆':score>=6?'Strong — review the misses and S5/S6 (iron & the AF traps).':'Revisit S5, S6 and S11 — the comorbidity logic is the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>
