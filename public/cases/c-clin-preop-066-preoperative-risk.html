@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preoperative Cardiac Risk Assessment for Non-Cardiac Surgery — Virtual Teaching Hospital</title>
+<!-- META
+id: c-clin-preop-066
+title: Preoperative Cardiac Risk Assessment for Non-Cardiac Surgery
+hospital: cardiology
+department: cv-clinic
+bednumber: 12
+chiefcomplaint: Referred for cardiac clearance before elective non-cardiac surgery
+system: Cardiology
+severity: stable
+tags: Preoperative assessment, RCRI, Functional capacity, Perioperative, DAPT timing, Beta-blockers
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🚨</div>
+      <div>
+        <div class="t1">Emergency Dept</div>
+        <div class="t2">Bed 12 · Preoperative Cardiac Risk</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>ECG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🩺 Cardiovascular Clinic · 🛏️ Bed 12</div>
+        <h1>🫀 Preoperative Cardiac Risk — "Cleared for Surgery?"</h1>
+        <div class="sub">🩺 Outpatient cardiology clinic. A 68-year-old with coronary stents, insulin-treated diabetes and a fresh drug-eluting stent has been sent for "cardiac clearance" before major elective abdominal surgery. Your job is to estimate his risk, optimise him, and — critically — decide whether the operation should proceed <em>now</em> or wait for the stent's antiplatelet window to pass, without ordering a single test that won't change the plan.</div>
+        <div class="chips">
+          <span class="chip crit">🟢 STABLE · ELECTIVE</span>
+          <span class="chip">🧮 RCRI</span>
+          <span class="chip">🚶 Functional Capacity (METs)</span>
+          <span class="chip">🩹 DAPT Timing</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital"><div class="v-label">💓 HR</div><div class="v-num">70</div></div>
+        <div class="vital warn"><div class="v-label">🩸 BP</div><div class="v-num">134/80</div></div>
+        <div class="vital"><div class="v-label">🌬️ RR</div><div class="v-num">14</div></div>
+        <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">97%</div></div>
+        <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.6°</div></div>
+        <div class="vital"><div class="v-label">🧠 GCS</div><div class="v-num">15</div></div>
+        <div class="vital warn"><div class="v-label">🚶 METs</div><div class="v-num">~4</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout info"><b class="ct">🩺 YOU ARE HERE — Cardiology clinic, Bed 12, 10:40</b>A composed, well man sits with a thick surgical referral: <em>"Please provide cardiac clearance before elective surgery."</em> He feels well today, has no chest pain, and is keen to get his operation over with. The surgical team have pencilled him in for two weeks' time. Your task is not to "clear" or "block" — it is to <strong>estimate perioperative cardiac risk, reduce what can be reduced, and time the operation safely</strong> — without a cascade of tests that only delays care.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>🧔 Name</td><td><strong>Mr. R.M.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>68-year-old male</td></tr>
+          <tr><td>🆔 MRN</td><td>CV-CLIN-1206</td></tr>
+          <tr><td>⚖️ Weight</td><td>88 kg (BMI 30)</td></tr>
+          <tr><td>💼 Occupation</td><td>Retired warehouse supervisor — largely sedentary</td></tr>
+          <tr><td>🔪 Planned surgery</td><td><strong>Elective open repair of a large incisional hernia + bowel adhesiolysis</strong> (major intraperitoneal surgery), booked in 2 weeks</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 Past history — every line moves the perioperative risk</h3>
+        <ul>
+          <li>🫀 <strong>Ischaemic heart disease:</strong> inferior NSTEMI, <strong>PCI with a drug-eluting stent (DES) to the RCA <u>4 months ago</u></strong>. On <strong>dual antiplatelet therapy (aspirin + clopidogrel)</strong>.</li>
+          <li>💉 <strong>Type 2 diabetes — insulin-treated</strong> (HbA1c 7.9%). Counts for the RCRI.</li>
+          <li>🧠 <strong>Prior TIA</strong> 2 years ago (cerebrovascular disease) — another RCRI factor.</li>
+          <li>🩸 <strong>Chronic kidney disease</strong>, creatinine 185 µmol/L (≈2.1 mg/dL, eGFR ~34) — meets the RCRI renal criterion.</li>
+          <li>🔺 <strong>Hypertension</strong>, <strong>dyslipidaemia</strong>. On ramipril, bisoprolol, atorvastatin, aspirin, clopidogrel, insulin, empagliflozin.</li>
+          <li>🚶 <strong>Functional capacity is limited</strong> — breathless and stops after ~one flight of stairs; does not walk uphill briskly. Estimated <strong>&lt; 4 METs</strong>.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Preoperative assessment is not a rubber-stamp 'clearance' — it is a risk estimate, an optimisation plan, and a timing decision. There is no such thing as 'cleared'; there is only 'risk characterised and reduced.'"</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why the pre-op clinic is where risk is won or lost</b>Perioperative myocardial infarction and cardiac death are among the commonest serious complications of major non-cardiac surgery. Most of the leverage is here, in clinic — recognising the fresh stent, continuing the right chronic drugs, avoiding harmful acute drugs, and, above all, <strong>timing the operation</strong>. The two classic failures are equal and opposite: <em>over-testing/over-delaying a fit patient</em>, and <em>rushing a patient with a fresh stent to theatre by stopping antiplatelets</em>.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 Referral handover — SBAR from the surgical team</h3>
+        <div class="callout info"><b class="ct">🎙️ Surgical referral (verbatim)</b>
+          <p><strong>S:</strong> "68-year-old man for elective open incisional hernia repair with adhesiolysis. Please give cardiac clearance — he has a heart history and we don't want a surprise on the table."</p>
+          <p><strong>B:</strong> "Known coronary disease with a recent stent, diabetic on insulin, previous mini-stroke, kidney impairment. He's on blood thinners; can he stop them for surgery?"</p>
+          <p><strong>A:</strong> "He's well today, no chest pain, no breathlessness at rest. But he's not very active — gets puffed on the stairs. BP 134/80, HR 70. We'd like to operate in two weeks if you're happy."</p>
+          <p><strong>R:</strong> "Please advise on fitness, whether he needs any heart tests first, what to do with his medications, and the timing."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Please clear for surgery' is the wrong question. The right questions are: how big is the cardiac risk, can I lower it, and — with a fresh stent — should this <em>elective</em> operation wait? Answer those and 'clearance' takes care of itself."</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each feature that RAISES perioperative cardiac risk / demands a timing or optimisation decision</h3>
+        <p>🎮 <em>Click every feature that increases risk or forces a "needs optimisation / timing" decision. Each correct = +10 XP. Distractors that do NOT raise perioperative cardiac risk are traps.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">🚶 Poor functional capacity (&lt; 4 METs — one flight of stairs)</button>
+          <button class="btn ghost flag-btn" data-good="1">🫀 Ischaemic heart disease (recent NSTEMI + PCI)</button>
+          <button class="btn ghost flag-btn" data-good="1">🩹 Drug-eluting stent placed only 4 months ago, still on DAPT</button>
+          <button class="btn ghost flag-btn" data-good="1">🧠 Prior TIA (cerebrovascular disease — an RCRI factor)</button>
+          <button class="btn ghost flag-btn" data-good="1">💉 Insulin-treated diabetes (an RCRI factor)</button>
+          <button class="btn ghost flag-btn" data-good="1">🩸 Renal impairment, creatinine 185 µmol/L (an RCRI factor)</button>
+          <button class="btn ghost flag-btn" data-good="1">🔪 Major intraperitoneal (high-risk) surgery</button>
+          <button class="btn ghost flag-btn" data-good="1">💔 If he had active/unstable angina or decompensated HF → optimise first</button>
+          <button class="btn ghost flag-btn" data-good="0">💪 A fit patient (&gt;10 METs) for low-risk cataract surgery needing NO tests</button>
+          <button class="btn ghost flag-btn" data-good="0">🌡️ Today's temperature 36.6°C</button>
+          <button class="btn ghost flag-btn" data-good="0">🤕 Reproducible chest-wall tenderness on palpation</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Credit where due</b>The surgeons referred early (not the night before), flagged the stent and the antiplatelets, and asked the right operational questions. Early referral is exactly what lets timing and optimisation actually happen — a last-minute referral leaves no room to wait out a stent's DAPT window.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🧭 The two axes of perioperative cardiac risk</h3>
+        <p>Every preoperative estimate is the product of <strong>two axes</strong>: the <strong>PATIENT</strong> (clinical risk factors + functional capacity) and the <strong>SURGERY</strong> (low vs intermediate vs high risk). Neither alone decides — a fit patient tolerates high-risk surgery; a frail patient with poor capacity may struggle even with intermediate surgery.</p>
+        <table class="tbl">
+          <tr><th>Axis</th><th>This patient</th><th>Why it matters</th></tr>
+          <tr><td>🧮 Clinical risk (RCRI)</td><td class="hi">High — IHD, cerebrovascular disease, insulin diabetes, renal impairment, high-risk surgery</td><td>Multiple RCRI factors → elevated estimated major cardiac event rate.</td></tr>
+          <tr><td>🚶 Functional capacity</td><td class="hi">Poor — &lt; 4 METs (stops after one flight)</td><td>The single most useful patient variable; poor/unknown capacity + high-risk surgery is the only combination where further testing is even considered.</td></tr>
+          <tr><td>🔪 Surgical risk</td><td class="hi">High — major open intraperitoneal surgery</td><td>Estimated 30-day cardiac risk &gt; 5% for the surgery category.</td></tr>
+          <tr><td>🩹 Antithrombotic constraint</td><td class="hi">DES 4 months ago, on DAPT</td><td>The highest-stakes issue — stopping DAPT early on a fresh stent risks stent thrombosis; the elective operation may need to wait.</td></tr>
+          <tr><td>💊 Chronic cardiac drugs</td><td>Beta-blocker + statin + ACEi + SGLT2i</td><td>Continue beta-blocker/statin; individualise ACEi; hold SGLT2i peri-operatively.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"If the patient can climb two flights of stairs, they can usually climb through surgery — good functional capacity (≥ 4 METs) beats most stress tests. Ask about the stairs before you order anything."</div>
+
+        <h3>🔎 Focused examination today</h3>
+        <ul>
+          <li>❤️ Comfortable at rest, no chest pain, JVP not raised, no S3, chest clear — <strong>no active/unstable cardiac condition today</strong> (no unstable angina, decompensated HF, significant arrhythmia, or severe symptomatic valve disease).</li>
+          <li>🩺 No new murmur; well-controlled BP and rate on his beta-blocker/ACEi.</li>
+          <li>🚶 History pins functional capacity below the crucial <strong>4-MET</strong> threshold — the one number that most shapes the plan.</li>
+        </ul>
+
+        <div class="callout danger"><b class="ct">🚨 The gate that comes first: active/unstable conditions</b>Before any risk score, screen for an <strong>active cardiac condition</strong> — unstable/severe angina, acute or decompensated heart failure, significant arrhythmia, or severe symptomatic valvular disease (e.g., critical aortic stenosis). Any of these means <strong>postpone elective surgery and treat the condition first</strong>. Our patient has none today — so we move to risk-stratification, not cancellation.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The cardiology registrar thinks out loud:</em></p>
+        <h3>🧠 Frame it as an estimate-and-optimise problem, not "yes/no clearance"</h3>
+        <p>"He has no active cardiac condition today, so I don't cancel outright. I'll compute an <strong>RCRI</strong>, anchor everything on his <strong>functional capacity</strong>, and match it to the <strong>surgical risk</strong>. I will <em>not</em> reflexively order a stress test — I only test if the result would change management. His chronic <strong>beta-blocker and statin continue</strong>. The dominant issue is the <strong>4-month-old drug-eluting stent on DAPT</strong> — I will not stop his antiplatelets to hit a surgical date; I'll talk timing with the surgeons."</p>
+
+        <h3>🎯 The registrar's order of operations</h3>
+        <ol>
+          <li>🚦 <strong>Screen for active/unstable conditions</strong> — none today → proceed to stratify (S3).</li>
+          <li>🧮 <strong>RCRI</strong> (± NSQIP-MICA/Gupta) to estimate the major cardiac event rate (S5).</li>
+          <li>🚶 <strong>Functional capacity</strong> (METs / DASI) — the pivot for whether any further testing is even considered (S6).</li>
+          <li>🧪 <strong>Reserve stress imaging</strong> for poor/unknown capacity + high-risk surgery <em>and only if it would change management</em>; consider a <strong>pre-op BNP</strong> and plan <strong>post-op troponin surveillance</strong> (S9).</li>
+          <li>💊 <strong>Continue beta-blocker &amp; statin</strong>; individualise ACEi/ARB; <strong>hold SGLT2 inhibitor</strong>; do <strong>NOT</strong> start acute high-dose beta-blockade (S11).</li>
+          <li>🩹 <strong>Do not stop DAPT early on a fresh DES</strong> → discuss <strong>delaying the elective operation</strong> until the mandatory antiplatelet window has passed (S15).</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Only order the pre-op test if the result would change what you do — otherwise you're just delaying the operation and generating false trails."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>The surgeon asks the registrar to "start a beta-blocker today to protect the heart during surgery." Should she?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No.</strong> <em>Continue</em> his existing chronic bisoprolol, but do <strong>NOT</strong> start high-dose beta-blockade acutely around surgery. The <em>POISE</em> trial showed that starting metoprolol succinate perioperatively cut non-fatal MI but caused <strong>more strokes and more total deaths</strong> (through hypotension and bradycardia). Chronic beta-blockade is protective and should not be stopped; <em>acutely initiated</em> high-dose beta-blockade is harmful.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The consultant cardiologist reviews at the bedside:</em></p>
+        <h3>🧮 The Revised Cardiac Risk Index (RCRI / Lee index) — the workhorse score</h3>
+        <table class="tbl">
+          <tr><th>RCRI factor (1 point each)</th><th>Present?</th></tr>
+          <tr><td>🔪 High-risk surgery (intraperitoneal, intrathoracic, or suprainguinal vascular)</td><td class="hi">✔ Yes (major open abdominal)</td></tr>
+          <tr><td>🫀 History of ischaemic heart disease</td><td class="hi">✔ Yes (prior NSTEMI/PCI)</td></tr>
+          <tr><td>💔 History of congestive heart failure</td><td class="ok-v">�’No</td></tr>
+          <tr><td>🧠 History of cerebrovascular disease (stroke/TIA)</td><td class="hi">✔ Yes (prior TIA)</td></tr>
+          <tr><td>💉 Insulin-treated diabetes mellitus</td><td class="hi">✔ Yes</td></tr>
+          <tr><td>🩸 Creatinine &gt; 177 µmol/L (2.0 mg/dL)</td><td class="hi">✔ Yes (185 µmol/L)</td></tr>
+        </table>
+        <p><strong>RCRI = 5.</strong> With ≥ 3 factors the estimated 30-day risk of major cardiac events is high (roughly &gt; 10% in the original derivation cohorts). This is an <strong>elevated-risk</strong> patient — but "elevated risk" triggers <em>optimisation and careful timing</em>, not automatic cancellation or a blanket stress test.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"RCRI counts six things — high-risk surgery, ischaemic heart disease, heart failure, stroke/TIA, insulin diabetes, and renal impairment. Three or more means high risk; but the score tells you to <em>optimise and time</em>, not to reflexively test."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner (2022 ESC · 2024 ACC/AHA)</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> 2022 ESC &amp; 2024 ACC/AHA perioperative</td><td>Stepwise pathway: active conditions → functional capacity → surgical &amp; clinical risk → test only if it changes management.</td><td>Anchor on active conditions, then METs, then surgery — not on reflex testing.</td></tr>
+            <tr><td><span class="lvl">SCORE</span> RCRI (Lee)</td><td>Six-factor index predicting perioperative major cardiac events; ≥3 factors = high risk.</td><td>A validated, memorable estimate of patient-side risk.</td></tr>
+            <tr><td><span class="lvl">DIAGNOSTIC</span> Functional capacity (METs / DASI)</td><td>≥4 METs predicts good tolerance; the <em>METS study</em> found subjective assessment imperfect — DASI/CPET add objectivity.</td><td>Ask about stairs; use DASI/CPET when capacity is genuinely unclear and it would change the plan.</td></tr>
+            <tr><td><span class="lvl">RCT</span> POISE</td><td>Acute high-dose metoprolol perioperatively: fewer MIs but MORE strokes and MORE deaths.</td><td>Continue chronic beta-blockers; NEVER start high-dose beta-blockade acutely on the day of surgery.</td></tr>
+            <tr><td><span class="lvl">RCT</span> CARP / DECREASE-V</td><td>Routine coronary revascularisation before non-cardiac surgery did NOT improve outcomes.</td><td>Don't revascularise just to "get through" surgery — treat the coronary disease on its own indication.</td></tr>
+            <tr><td><span class="lvl">COHORT</span> VISION / MINS</td><td>Post-op troponin rises (often silent) — MINS — strongly predict 30-day mortality.</td><td>In high-risk patients, plan troponin surveillance; a silent rise is prognostic, not noise.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The chart that haunts me is the man whose fresh drug-eluting stent had its dual antiplatelet therapy stopped so an elective hernia could go ahead on schedule. He thrombosed the stent on the second post-op day and had a large infarct. The operation was elective — it should simply have waited."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY surgery stresses the heart (the WHY behind the WHY)</h3>
+        <ol>
+          <li>⚡ <strong>Surgical stress response:</strong> tissue injury, pain, catecholamine and cortisol surges → tachycardia, hypertension, and increased myocardial oxygen <em>demand</em>.</li>
+          <li>🩸 <strong>Supply threats:</strong> anaemia from blood loss, hypotension, hypoxia and fluid shifts reduce myocardial oxygen <em>supply</em>. The result is a demand–supply mismatch — the substrate for a <strong>Type 2 peri-operative MI</strong>.</li>
+          <li>🧱 <strong>Prothrombotic, pro-inflammatory state:</strong> surgery activates platelets and coagulation and inflames vulnerable plaques → plaque rupture and thrombosis (<strong>Type 1 MI</strong>). On a <em>fresh stent</em> with antiplatelets withdrawn, this is exactly how <strong>stent thrombosis</strong> occurs.</li>
+          <li>🤫 <strong>Silent by design:</strong> anaesthesia and analgesia mask ischaemic pain — hence peri-operative injury is often <strong>MINS</strong>, detected only by troponin surveillance, not by symptoms.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Surgery is a stress test you can't cancel mid-way. Good functional capacity says the heart already passed a tougher one — poor capacity plus a big operation is where the mismatch bites."</div>
+
+        <h3>⚖️ Contrast pair — good capacity vs poor capacity + high-risk surgery</h3>
+        <div class="vs">
+          <div class="side a"><h4>🟢 Good functional capacity (≥ 4 METs)</h4><ul><li>Climbs two flights / walks uphill briskly without stopping</li><li>Tolerates surgery well; further cardiac testing NOT indicated</li><li>Proceed with optimisation — don't delay for tests</li></ul></div>
+          <div class="side b"><h4>🟠 Poor / unknown capacity + high-risk surgery + clinical risk</h4><ul><li>Stops after one flight; multiple RCRI factors; major surgery</li><li>Consider biomarkers ± stress imaging — <strong>only if</strong> it would change management</li><li>This is the one box where a test can earn its place</li></ul></div>
+        </div>
+        <p>💡 A pre-op stress test is not a ritual — it is only useful if a positive result would lead you to do something different (optimise medically, alter the anaesthetic plan, or — rarely — revascularise on its own indication). If the answer wouldn't change, the test just delays the operation.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The Functional-Capacity &amp; Surgical-Risk Dial</h3>
+          <p style="font-size:13px">Drag the patient's estimated <strong>functional capacity (METs)</strong>. Assume high-risk surgery with clinical risk factors (as in this case). Watch how capacity — not the score alone — drives whether further evaluation is even worth ordering.</p>
+          <label for="kRange">🚶 Estimated functional capacity: <b id="kVal">4</b> METs</label>
+          <input type="range" id="kRange" min="1" max="14" value="4">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore proceed vs optimise/test.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 High METs (needle to the left / green) → proceed, no further cardiac testing. Poor capacity (needle to the right / red) + high-risk surgery + clinical risk → consider optimisation/testing ONLY if it changes management. Testing that won't change the plan just delays care.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The pre-op clinic order set</h3>
+        <ul>
+          <li>🚦 <strong>Document absence of active/unstable cardiac conditions</strong> (no unstable angina, decompensated HF, significant arrhythmia, severe symptomatic valve disease).</li>
+          <li>🧮 <strong>Calculate &amp; record RCRI</strong> (± NSQIP-MICA / Gupta) and <strong>functional capacity (METs / DASI)</strong>.</li>
+          <li>📈 <strong>Resting 12-lead ECG</strong> (baseline for comparison — not a screening ritual in the well, low-risk patient).</li>
+          <li>🩸 <strong>Baseline bloods:</strong> FBC (anaemia optimisation), U&amp;E (CKD), HbA1c/glucose; <strong>consider pre-op BNP/NT-proBNP</strong> in this elevated-risk patient.</li>
+          <li>🩺 <strong>Plan post-op high-sensitivity troponin surveillance</strong> (e.g., days 1–3) given elevated risk — to detect MINS.</li>
+          <li>🚫 <strong>No routine stress imaging</strong> unless poor/unknown capacity + high-risk surgery AND the result would change management.</li>
+          <li>💊 <strong>Continue beta-blocker &amp; statin</strong>; individualise ACEi/ARB on the day; <strong>hold SGLT2 inhibitor</strong> ~3–4 days pre-op (euglycaemic DKA risk).</li>
+          <li>🩹 <strong>Antithrombotic plan:</strong> do NOT stop DAPT to meet the surgical date on a 4-month DES → <strong>coordinate delaying the elective operation</strong>; if surgery were ever truly non-deferrable, continue aspirin and manage in a heart-team/anaesthetic discussion.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The cheapest, highest-value pre-op 'tests' are two questions and a calendar: 'How many stairs?' and 'When was the stent?' They decide more than any scan."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Pre-op clinic &amp; peri-operative nursing priorities</h3>
+        <ul>
+          <li>💊 <strong>Medication reconciliation is the safety net</strong> — confirm exactly which drugs continue, which hold, and when. Flag the DAPT and the SGLT2 inhibitor explicitly.</li>
+          <li>🩹 <strong>Guard the antiplatelets</strong> — question any instruction to stop DAPT before the stent's window has passed; a fresh-stent patient who "held his blood thinners for surgery" is a red alert.</li>
+          <li>🚶 <strong>Elicit functional capacity plainly</strong> — "Can you climb two flights without stopping? Walk up a hill? Do the garden?" Nurses often get the truest activity history.</li>
+          <li>🩸 Draw baseline bloods; ensure anaemia and glucose are optimised before a major operation.</li>
+          <li>🧾 <strong>Clear written instructions</strong> for the patient: which tablets to take on the morning of surgery, which to omit, and the agreed surgical date/timing.</li>
+          <li>🩺 <strong>Post-op:</strong> ensure the planned troponin surveillance and pain control happen; report new hypotension, tachycardia, or breathlessness promptly (may be silent ischaemia/MINS).</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who spots 'stop all blood thinners for surgery' on a fresh-stent patient and questions it prevents a stent thrombosis before it happens."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board — and what NOT to order</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Result</th><th>Interpretation</th></tr>
+          <tr><td>Resting 12-lead ECG</td><td>Sinus rhythm 70, old inferior Q waves, no acute change</td><td>Baseline for post-op comparison; stable, no active ischaemia.</td></tr>
+          <tr><td>Creatinine / eGFR</td><td class="hi">185 µmol/L / ~34</td><td>CKD — RCRI factor; affects contrast, drug dosing, and MINS risk.</td></tr>
+          <tr><td>Haemoglobin</td><td class="lo">115 g/L</td><td>Mild anaemia — <strong>optimise before major surgery</strong> (anaemia worsens the peri-op demand–supply mismatch).</td></tr>
+          <tr><td>HbA1c</td><td>7.9%</td><td>Reasonable diabetic control; SGLT2i to be held peri-op.</td></tr>
+          <tr><td>NT-proBNP (pre-op)</td><td class="hi">Mildly elevated</td><td>Adds prognostic information in elevated-risk patients; supports post-op troponin surveillance.</td></tr>
+          <tr><td>Stress imaging</td><td>Not ordered (yet)</td><td>Only justified if poor/unknown capacity + high-risk surgery AND the result would change management — decide deliberately, not reflexively.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A pre-op troponin/BNP is for <em>prognosis and surveillance planning</em>; a pre-op stress test is for <em>changing management</em>. If neither will alter what you do, don't send them and don't delay the operation."</div>
+
+        <div class="callout info"><b class="ct">🧠 Biomarkers, used well</b><strong>Pre-op BNP/NT-proBNP</strong> refines risk in elevated-risk patients and flags who most benefits from <strong>post-op troponin surveillance</strong>. High-sensitivity troponin rises after surgery — <strong>MINS (myocardial injury after non-cardiac surgery)</strong> — are frequently silent but carry real 30-day mortality weight (VISION). The point is to <em>plan surveillance</em>, not to blanket-test the fit.</p></div>
+      </div>
+    </section>
+
+    <!-- ============ S10 ECG / IMAGING + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ECG / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🫀 The pre-op ECG — a baseline, not a crystal ball</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 130" preserveAspectRatio="none" aria-label="Resting pre-op ECG: sinus rhythm with old inferior Q waves, no acute change">
+            <rect width="820" height="130" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="32" x2="820" y2="32"/><line x1="0" y1="65" x2="820" y2="65"/><line x1="0" y1="98" x2="820" y2="98"/></g>
+            <polyline fill="none" stroke="#86efac" stroke-width="2.3" points="0,70 40,70 52,66 66,44 78,88 90,70 130,70 150,68 210,70 250,70 262,62 276,42 288,88 300,70 340,70 380,68 420,70 460,70 472,60 486,42 500,88 512,66 560,70 600,70 612,60 626,42 640,88 652,66 700,70 740,70 752,60 766,42 780,88 792,66 820,70"/>
+            <text x="120" y="20" fill="#93c5fd" font-size="11">Clinic — sinus 70, stable</text>
+            <text x="470" y="20" fill="#93c5fd" font-size="11">Old inferior Q waves, no acute change</text>
+          </svg>
+          <div class="ecg-cap">A resting pre-op ECG gives a <span style="color:#93c5fd">baseline</span> for post-operative comparison. In a well patient for low-risk surgery it is not a mandatory ritual — its value is as a reference if MINS is later suspected.</div>
+        </div>
+
+        <h3>🔎 What each pre-op investigation is actually for</h3>
+        <table class="tbl">
+          <tr><th>Investigation</th><th>Use it when…</th><th>Don't use it when…</th></tr>
+          <tr><td>📈 Resting ECG</td><td>Known CVD / elevated risk / higher-risk surgery — as a baseline</td><td>Reflexively in the young, well patient for low-risk surgery</td></tr>
+          <tr><td>🫀 Resting echo</td><td>Dyspnoea of unknown cause, new murmur, suspected significant valve disease or LV dysfunction</td><td>Routine "screening" of the asymptomatic with a normal exam</td></tr>
+          <tr><td>🏃 Stress imaging</td><td>Poor/unknown capacity + high-risk surgery AND result would change management</td><td>Good capacity, or when the result won't alter the plan</td></tr>
+          <tr><td>🧪 Pre-op BNP</td><td>Elevated-risk patient — refines prognosis, guides troponin surveillance</td><td>As a stand-alone "pass/fail" gate</td></tr>
+          <tr><td>🩸 Post-op troponin</td><td>Elevated-risk patients — surveillance for silent MINS</td><td>Low-risk patients with no clinical concern</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Every pre-op investigation must earn its place by changing a decision. 'Routine because they're having surgery' is not an indication."</div>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The peri-operative medication map — continue, hold, and never-start</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Peri-op action</th><th>Mechanism / rationale / caution</th></tr>
+          <tr><td><strong>Beta-blocker</strong> (his bisoprolol)</td><td class="ok-v">CONTINUE</td><td>Chronic beta-blockade is protective; abrupt withdrawal causes rebound ischaemia/arrhythmia. <strong>Never START high-dose acutely (POISE — more strokes/deaths).</strong></td></tr>
+          <tr><td><strong>Statin</strong> (atorvastatin)</td><td class="ok-v">CONTINUE</td><td>Plaque stabilisation, pleiotropic benefit; continue throughout the peri-op period.</td></tr>
+          <tr><td><strong>Aspirin</strong></td><td>Usually CONTINUE (esp. with coronary stent)</td><td>On a recent stent, aspirin is generally maintained; stopping it adds thrombotic risk.</td></tr>
+          <tr><td><strong>P2Y₁₂ inhibitor</strong> (clopidogrel)</td><td class="hi">DO NOT stop early on a fresh DES</td><td>Second antiplatelet agent protecting the stent; premature cessation → <strong>stent thrombosis</strong>. Delay elective surgery until the DAPT window passes.</td></tr>
+          <tr><td><strong>ACE inhibitor / ARB</strong> (ramipril)</td><td>INDIVIDUALISE (often held morning of surgery)</td><td>Holding reduces intra-op hypotension/vasoplegia; the hold-vs-continue debate is unsettled — decide with anaesthesia.</td></tr>
+          <tr><td><strong>SGLT2 inhibitor</strong> (empagliflozin)</td><td class="hi">HOLD ~3–4 days pre-op</td><td>Risk of <strong>euglycaemic diabetic ketoacidosis</strong> peri-operatively.</td></tr>
+          <tr><td><strong>Anticoagulant</strong> (if present, e.g., DOAC/warfarin)</td><td>Interrupt ± bridge per bleeding/thrombotic risk</td><td>Time interruption to drug &amp; renal function; bridge only when thrombotic risk is high.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Continue the chronic beta-blocker, but never START high-dose beta-blockade on the morning of surgery (POISE). Continue the statin. Hold the SGLT2 inhibitor. And do not touch the fresh stent's antiplatelets."</div>
+        <div class="callout danger"><b class="ct">🚫 The 'never do this to a fresh stent' rule</b>❌ Do not stop dual antiplatelet therapy to operate on a recent coronary stent. The correct move for an <strong>elective</strong> operation is to <strong>DELAY the surgery</strong> until the mandatory DAPT period has elapsed — longer for drug-eluting than bare-metal stents. Stopping DAPT early to keep a surgical date is how stent thrombosis and peri-op MI happen.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch peri-operatively and why</h3>
+        <ul>
+          <li>🩸 <strong>Blood pressure &amp; heart rate:</strong> avoid intra-op hypotension and tachycardia — both drive the demand–supply mismatch behind Type 2 MI.</li>
+          <li>🩺 <strong>Post-op high-sensitivity troponin surveillance</strong> (e.g., days 1–3) in elevated-risk patients — to detect <strong>silent MINS</strong>, which anaesthesia and analgesia mask.</li>
+          <li>🫁 <strong>Oxygenation &amp; haemoglobin:</strong> treat hypoxia and significant anaemia; both reduce myocardial oxygen supply.</li>
+          <li>💧 <strong>Fluid balance:</strong> avoid extremes — hypovolaemia and overload both stress the heart, especially with renal impairment.</li>
+          <li>🩹 <strong>Antithrombotic continuity:</strong> ensure aspirin/agreed antiplatelet plan is honoured; watch for any inadvertent early cessation on a stented patient.</li>
+          <li>📈 <strong>ECG</strong> for new symptoms or a troponin rise — compare against the pre-op baseline.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After surgery the ischaemia is usually silent — the monitor is the troponin, not the patient's complaint. A rise without chest pain (MINS) is still prognostically loud."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong peri-operatively</h3>
+        <ul>
+          <li>🩹 <strong>Stent thrombosis</strong> — the catastrophic complication of stopping DAPT too early on a fresh stent; presents as acute MI, often with the operation barely finished.</li>
+          <li>🫀 <strong>Peri-operative MI</strong> — Type 1 (plaque rupture) or Type 2 (demand–supply mismatch); frequently <strong>silent (MINS)</strong>.</li>
+          <li>🧠 <strong>Stroke</strong> — a specific harm of acutely-initiated high-dose beta-blockade (POISE) and of poorly managed antithrombotics.</li>
+          <li>💔 <strong>Heart failure / arrhythmia</strong> from fluid shifts, ischaemia, or electrolyte derangement.</li>
+          <li>🩸 <strong>Bleeding</strong> — the flip-side risk that tempts premature antiplatelet cessation; managed by <em>timing</em>, not by stripping a fresh stent of protection.</li>
+          <li>🕳️ <strong>The system complications:</strong> <em>over-testing/over-delaying a fit patient</em> (needless stress tests that delay urgent surgery) and <em>rushing a fresh-stent patient</em> (stopping DAPT) — equal and opposite failures.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The two peri-op disasters are mirror images: delaying the fit patient who never needed a test, and rushing the fresh-stent patient who needed to wait. Good assessment avoids both."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The pre-op "differential" — which pathway does this patient belong on?</h3>
+        <table class="tbl">
+          <tr><th>Scenario</th><th>Discriminators</th><th>Correct action</th></tr>
+          <tr><td>🚦 <strong>Active/unstable cardiac condition</strong></td><td>Unstable angina, decompensated HF, significant arrhythmia, severe symptomatic AS</td><td>Postpone elective surgery; treat the condition first.</td></tr>
+          <tr><td>🟢 <strong>Good functional capacity</strong> (≥4 METs)</td><td>Climbs two flights / walks uphill briskly, no active condition</td><td>Proceed with optimisation; no further cardiac testing.</td></tr>
+          <tr><td>🟠 <strong>Poor/unknown capacity + high-risk surgery + clinical risk</strong> (this patient)</td><td>&lt;4 METs, multiple RCRI factors, major surgery</td><td>Optimise; test only if it changes management; plan surveillance.</td></tr>
+          <tr><td>🩹 <strong>Recent coronary stent on DAPT</strong> (this patient)</td><td>DES 4 months ago, elective surgery</td><td>DELAY elective surgery until DAPT window passes; don't stop antiplatelets.</td></tr>
+          <tr><td>🏃 <strong>Fit patient, low-risk surgery</strong></td><td>&gt;10 METs, cataract/minor surgery</td><td>No cardiac testing — proceed; over-testing only delays care.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Sort every pre-op patient with three questions: Is there an active condition? How many stairs can they climb? Is there a fresh stent? Those three answers place almost everyone on the right pathway."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "Cleared for Surgery?"</h3>
+          <div class="hud"><span>❤️ Safety: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">Mr R.M. — no active cardiac condition today, but RCRI 5, functional capacity &lt; 4 METs, booked for major open abdominal surgery in two weeks, and a drug-eluting stent placed 4 months ago on aspirin + clopidogrel. The surgeon wants him "cleared and off the blood thinners" to operate on schedule. What do you do first?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The disposition plan</h3>
+        <ol>
+          <li>🚦 <strong>No active/unstable cardiac condition</strong> → do not cancel outright; stratify and optimise.</li>
+          <li>🧮 <strong>Estimate risk:</strong> RCRI 5 (high), poor functional capacity, high-risk surgery. Elevated risk → optimise, plan surveillance; <strong>no reflex stress test</strong> unless it would change management.</li>
+          <li>💊 <strong>Medications:</strong> continue beta-blocker &amp; statin; individualise ACEi; hold SGLT2i; do NOT start acute high-dose beta-blockade.</li>
+          <li>🩹 <strong>Timing (the key decision):</strong> the DES is only 4 months old — <strong>DELAY the elective operation</strong> until the mandatory DAPT period has passed (ideally ≥6 months for a DES for elective surgery), keeping antiplatelets on board. Do not stop DAPT to meet a date.</li>
+          <li>🤝 <strong>Coordinate:</strong> surgeon + anaesthetist + cardiologist agree the new date, surveillance plan, and medication instructions; optimise anaemia and glycaemia meanwhile.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Never stop dual antiplatelet therapy to operate on a fresh coronary stent — delay the elective surgery, or risk stent thrombosis. The calendar is the treatment."</div>
+
+        <div class="checklist" id="ckPreop">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Perioperative cardiac risk pathway (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>🚦 Screen for &amp; document absence of active/unstable cardiac conditions</span></label>
+          <label class="ck"><input type="checkbox"><span>🚶 Assess functional capacity (METs / DASI) — is it ≥4 METs?</span></label>
+          <label class="ck"><input type="checkbox"><span>🧮 Calculate RCRI (± NSQIP-MICA/Gupta) and note surgical risk category</span></label>
+          <label class="ck"><input type="checkbox"><span>🧪 Order further cardiac testing ONLY if poor/unknown capacity + high-risk surgery AND it changes management</span></label>
+          <label class="ck"><input type="checkbox"><span>💊 Continue beta-blocker &amp; statin; individualise ACEi; hold SGLT2i; do NOT start acute high-dose beta-blockade</span></label>
+          <label class="ck"><input type="checkbox"><span>🩺 Optimise anaemia/glycaemia; plan post-op troponin surveillance for MINS</span></label>
+          <label class="ck"><input type="checkbox"><span>🤝 Communicate a clear plan to surgeon, anaesthetist &amp; patient</span></label>
+          <div class="ck-progress" data-progress>0 / 7 complete</div>
+        </div>
+
+        <div class="checklist" id="ckStent">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Timing of elective surgery after PCI/stent &amp; DAPT management</h3>
+          <label class="ck"><input type="checkbox"><span>🩹 Identify stent type &amp; date (bare-metal vs drug-eluting; how many months ago)</span></label>
+          <label class="ck"><input type="checkbox"><span>📅 For ELECTIVE surgery, defer until the mandatory DAPT window has passed (longer for DES)</span></label>
+          <label class="ck"><input type="checkbox"><span>🚫 Do NOT stop dual antiplatelet therapy early just to meet a surgical date</span></label>
+          <label class="ck"><input type="checkbox"><span>💊 Where interruption is unavoidable, continue aspirin if possible &amp; minimise the off-therapy window (heart-team decision)</span></label>
+          <label class="ck"><input type="checkbox"><span>🤝 Confirm the plan with cardiology, surgery &amp; anaesthesia; give the patient written instructions</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">Clinic visit</div>No active cardiac condition; RCRI 5; functional capacity &lt;4 METs; DES 4 months ago on DAPT. Surgery high-risk.</div>
+          <div class="t-item"><div class="t-time">Decision</div>Elective operation <strong>deferred ~2 months</strong> to complete the stent's antiplatelet window; DAPT continued unchanged. No stress test ordered — it would not have changed management.</div>
+          <div class="t-item"><div class="t-time">Interim</div>Anaemia optimised, glycaemia reviewed, SGLT2i hold plan documented; beta-blocker &amp; statin continued; post-op troponin surveillance arranged.</div>
+          <div class="t-item"><div class="t-time">Surgery day</div>Operates at ~6 months post-stent on aspirin; ACEi held that morning; no acute beta-blocker started; intra-op BP &amp; HR kept controlled.</div>
+          <div class="t-item"><div class="t-time">Post-op</div>Uneventful; surveillance troponins flat (no MINS); discharged on full DAPT and secondary prevention. Stent intact, operation done — safely, just later.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>He came through because someone refused to stop a fresh stent's antiplatelets, declined a stress test that wouldn't have changed anything, continued the right chronic drugs, and moved the calendar instead of the risk. Patience, not a scan, was the intervention.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge / Clinic Outcome</h2></div>
+      <div class="section-content">
+        <h3>📋 Two pre-op patients, two very different letters</h3>
+        <div class="vs">
+          <div class="side a"><h4>🟠 This patient (elevated risk, fresh stent)</h4><ul><li>Elective surgery <strong>deferred</strong> until the DES DAPT window is complete</li><li>Continue beta-blocker, statin, aspirin; hold SGLT2i; individualise ACEi; NEVER acute high-dose beta-blockade</li><li>Optimise anaemia/glycaemia; post-op troponin surveillance planned</li><li>Clear written medication &amp; timing instructions; heart-team/surgeon/anaesthetist agreement</li></ul></div>
+          <div class="side b"><h4>🟢 The genuinely low-risk pre-op patient</h4><ul><li>Good functional capacity (≥4 METs), no active condition, low-risk surgery</li><li><strong>No cardiac testing</strong> — proceed; testing would only delay care</li><li>Continue chronic cardiac drugs; simple instructions</li><li>"Fit for surgery from a cardiac standpoint" — a risk statement, not a guarantee</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A good pre-op letter states the estimated risk, the optimisation done, the medication plan, and the timing — never the empty word 'cleared.' You characterise risk; you don't abolish it."</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>🚶 Stairs beat scans</b>≥4 METs (two flights / uphill briskly) predicts good tolerance — good functional capacity beats most stress tests.</div>
+          <div class="pearl"><b>🧮 RCRI counts six</b>High-risk surgery, IHD, HF, stroke/TIA, insulin diabetes, renal impairment; ≥3 = high risk.</div>
+          <div class="pearl"><b>🧪 Test to change management</b>Only order the pre-op test if the result would change what you do — otherwise it just delays care.</div>
+          <div class="pearl"><b>🩹 Never strip a fresh stent</b>Don't stop DAPT to operate on a recent stent — delay the elective surgery instead.</div>
+          <div class="pearl"><b>💊 Continue, don't start (β-blocker)</b>Continue chronic beta-blockers; NEVER start high-dose beta-blockade acutely (POISE — strokes/deaths).</div>
+          <div class="pearl"><b>🧴 Statin stays</b>Continue statins throughout the peri-operative period.</div>
+          <div class="pearl"><b>🍬 Hold the SGLT2i</b>Stop SGLT2 inhibitors a few days before surgery — euglycaemic DKA risk.</div>
+          <div class="pearl"><b>🩺 Watch for silent MINS</b>Post-op troponin rises are often painless but strongly prognostic — plan surveillance.</div>
+          <div class="pearl"><b>🚫 CARP lesson</b>Routine pre-op coronary revascularisation doesn't improve outcomes — revascularise only on its own indication.</div>
+          <div class="pearl"><b>🚦 Active conditions first</b>Unstable angina, decompensated HF, big arrhythmia, severe symptomatic AS → postpone &amp; treat.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the pathway</h3>
+          <ul>
+            <li>🧮 <strong>Risk calculators beyond RCRI:</strong> the <em>NSQIP-MICA</em> (Gupta) calculator and the ACS-NSQIP Surgical Risk Calculator use procedure-specific data and often outperform RCRI for absolute risk, but RCRI remains the memorable bedside index. Use a calculator to give patients a real number for shared decision-making.</li>
+            <li>🚶 <strong>Functional capacity, objectively:</strong> subjective METs are imperfect — the <em>METS study</em> showed clinician gestalt poorly predicted objective capacity and outcomes. <strong>DASI</strong> (Duke Activity Status Index) and <strong>CPET</strong> (cardiopulmonary exercise testing, anaerobic threshold / VO₂ peak) add objectivity when capacity is genuinely unclear and would change the plan.</li>
+            <li>🧪 <strong>Biomarker-based strategy:</strong> pre-op <strong>BNP/NT-proBNP</strong> refines risk; structured <strong>post-op high-sensitivity troponin surveillance</strong> detects <strong>MINS</strong> (VISION) — silent injury that predicts 30-day mortality. Management of MINS (intensifying secondary prevention; the MANAGE trial of dabigatran) remains an evolving area.</li>
+            <li>💊 <strong>Medication nuance:</strong> continue statins &amp; chronic beta-blockers; the <strong>ACEi/ARB hold-vs-continue debate</strong> (vasoplegia &amp; intra-op hypotension vs rebound) is individualised; <strong>hold SGLT2 inhibitors</strong> for euglycaemic DKA; antiplatelet/anticoagulation <strong>bridging</strong> decisions weigh thrombotic vs bleeding risk (bridging rarely helps and often harms in low-risk AF).</li>
+            <li>🩹 <strong>Timing after coronary stents:</strong> defer elective surgery — historically ≥6 weeks after bare-metal and ≥6 months (minimum 3 months if surgery cannot wait) after drug-eluting stents — keeping DAPT intact; newer-generation DES and shortened-DAPT data are shifting these thresholds, but the principle (don't operate mid-DAPT electively) holds.</li>
+            <li>🫀 <strong>Revascularisation before surgery:</strong> <em>CARP</em> and <em>DECREASE-V</em> showed routine pre-op coronary revascularisation does NOT improve non-cardiac surgical outcomes — revascularise only for standard indications, not "to get through surgery."</li>
+            <li>🧓 <strong>Frailty &amp; the meta-principle:</strong> frailty independently predicts poor surgical outcomes and complements cardiac risk assessment. Overarching all of it: <strong>do not delay or over-test when it won't change management</strong> — a needless test cascade harms by delaying needed (sometimes cancer) surgery.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The Stent That Couldn't Wait"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 64-year-old man had a <strong>drug-eluting stent implanted six weeks earlier</strong> and was booked for an <strong>elective inguinal hernia repair</strong>. To "reduce bleeding," his <strong>dual antiplatelet therapy was stopped five days before the operation</strong> and the surgery went ahead on schedule. On the <strong>second post-operative day</strong> he developed crushing chest pain, hypotension and anterior ST elevation — <strong>acute stent thrombosis with a large peri-operative myocardial infarction</strong>. The stent's mandatory antiplatelet window had not passed. The operation was entirely <strong>elective</strong> — it should simply have been <strong>postponed</strong>, and the antiplatelet therapy never interrupted.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>📅 TIMING IGNORED</b>Elective surgery scheduled well inside a fresh DES's DAPT window.</div>
+            <div class="hole"><b>🩹 DAPT STOPPED</b>Antiplatelets ceased to "reduce bleeding" — stripping the stent of protection.</div>
+            <div class="hole"><b>🗣️ POOR COMMUNICATION</b>No heart-team conversation between surgeon, anaesthetist &amp; cardiologist.</div>
+            <div class="hole"><b>⏱️ SCHEDULE OVER SAFETY</b>The surgical date drove the decision instead of the stent's biology.</div>
+            <div class="hole"><b>🤫 SILENT RISK UNDERWEIGHTED</b>Peri-op stent thrombosis wasn't anticipated or surveilled for.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> recognise a fresh drug-eluting stent as an absolute reason to <strong>delay elective surgery</strong> until the DAPT window passes; <strong>never stop dual antiplatelet therapy</strong> to keep a surgical date; convene a heart-team discussion; and continue aspirin if any interruption is ever unavoidable. <strong>Contrast this with the opposite failure</strong> — a fit patient sent through a needless cascade of stress tests that delayed urgent cancer surgery. Both errors share one root: a decision that did not match the biology in front of it. <strong>The patient in Bed 12 avoided both.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Never stop dual antiplatelet therapy to operate on a fresh coronary stent — and never delay urgent surgery for a test that won't change the plan. Match the decision to the biology, not to the calendar or the checklist."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🩺 Cardiovascular Clinic · Bed 12 — Preoperative Cardiac Risk Assessment for Non-Cardiac Surgery<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+    /* ===== SIDEBAR TABS — show one section at a time ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not a high-risk feature'); } if(found===total){ flagResult.textContent='✅ All '+total+' high-risk features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' high-risk features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: functional capacity + surgical risk dial ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=(14-v)/(14-1)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v>=10){ msg='🟢 Excellent capacity ('+v+' METs — runs, climbs several flights). Surgery well tolerated; NO further cardiac testing regardless of surgical risk.'; cls='good'; }
+      else if(v>=4){ msg='🟢 Adequate capacity (≥4 METs — two flights of stairs / brisk uphill walk). Generally proceed with medical optimisation; routine stress testing NOT indicated.'; cls='good'; }
+      else if(v>=2){ msg='🟠 Poor / limited capacity (<4 METs). For HIGH-risk surgery with clinical risk factors, consider biomarkers ± stress imaging — but ONLY if the result would change management.'; cls='warn-r'; }
+      else { msg='🔴 Very poor / near bed-bound (<2 METs) facing high-risk surgery with multiple RCRI factors. Multidisciplinary optimisation; test only to change management; never delay truly needed surgery for tests that won\'t.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Capacity dial'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"Mr R.M. — no active cardiac condition today, but RCRI 5, functional capacity <4 METs, booked for major open abdominal surgery in two weeks, and a drug-eluting stent placed 4 months ago on aspirin + clopidogrel. The surgeon wants him 'cleared and off the blood thinners' to operate on schedule. What do you do first?",
+      choices:[
+        {t:"🧮 Assess functional capacity & RCRI, screen for active conditions, and reserve any further testing for when it would change management",good:true,ds:1,dt:10,xp:40,fb:"✅ Exactly. Estimate risk from clinical factors + functional capacity + surgery, and only test if the result changes the plan. No reflex stress test here.",next:"meds"},
+        {t:"🏃 Book a cascade of stress tests 'to be safe' before any decision",good:false,ds:-2,dt:45,xp:0,fb:"⚠️ This is the opposite failure — needless testing that delays care and generates false trails. A stress test only earns its place if it would change management. Restart.",end:true},
+        {t:"🩹 Tell the surgeon to stop the clopidogrel now so they can operate in two weeks",good:false,ds:-2,dt:15,xp:0,fb:"☠️ This is the M&M case in S21 — stopping DAPT on a fresh stent risks stent thrombosis. The elective operation should wait instead. Restart.",end:true}
+      ]},
+    meds:{ text:"Risk is characterised: elevated (RCRI 5, poor capacity, high-risk surgery). The surgeon now asks you to 'start a beta-blocker on the morning of surgery to protect the heart' and to advise on his other drugs. What's your medication plan?",
+      choices:[
+        {t:"💊 Continue his chronic beta-blocker & statin, individualise the ACEi, hold the SGLT2 inhibitor — and do NOT start high-dose beta-blockade acutely",good:true,ds:1,dt:8,xp:40,fb:"✅ Right. POISE showed acutely-started high-dose beta-blockade causes more strokes and deaths; continue the chronic drugs, hold the SGLT2i (euglycaemic DKA).",next:"declare"},
+        {t:"💥 Start high-dose metoprolol on the day of surgery for cardioprotection",good:false,ds:-2,dt:20,xp:0,fb:"⚠️ Harmful — POISE: acutely initiated high-dose beta-blockade increases strokes and total mortality. Continue chronic beta-blockade; never start it acutely.",next:"declare"}
+      ]},
+    declare:{ text:"The decisive question remains: the drug-eluting stent is only 4 months old and he is on DAPT, and this operation is ELECTIVE. What is your recommendation on timing and antithrombotics?",
+      choices:[
+        {t:"📅 DELAY the elective surgery until the mandatory DAPT window has passed, keep antiplatelets on board, and coordinate the new date with surgery/anaesthesia",good:true,ds:1,dt:6,xp:45,fb:"🏆 Perfect. On a fresh DES you delay the elective operation rather than stop DAPT — the calendar is the treatment. Stent protected, surgery still happens, just safely later.",end:true},
+        {t:"✂️ Stop the DAPT five days before and proceed on schedule to reduce bleeding",good:false,ds:-2,dt:25,xp:0,fb:"☠️ This is precisely the M&M disaster — stent thrombosis and peri-op MI. The elective operation should have been postponed, the antiplatelets never interrupted.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='declare'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A patient can climb two flights of stairs without stopping before major intermediate-risk surgery and has no active cardiac condition. The best next step is:", opts:["Order a stress echocardiogram","Proceed with surgery — no further cardiac testing needed","Cancel surgery for coronary angiography","Start a beta-blocker on the day of surgery"], correct:1, exp:"Functional capacity ≥4 METs (two flights of stairs) predicts good peri-operative tolerance; with no active condition, further cardiac testing is not indicated and would only delay care." },
+    { q:"Which is NOT one of the six Revised Cardiac Risk Index (RCRI) factors?", opts:["High-risk (e.g., intraperitoneal) surgery","Insulin-treated diabetes","Reproducible chest-wall tenderness","History of cerebrovascular disease"], correct:2, exp:"RCRI = high-risk surgery, ischaemic heart disease, heart failure, cerebrovascular disease, insulin-treated diabetes, and creatinine >177 µmol/L. Reproducible chest-wall tenderness is not an RCRI factor (and points away from cardiac pain)." },
+    { q:"What did the POISE trial show about perioperative beta-blockade?", opts:["Routine high-dose beta-blockade started acutely reduced overall mortality","Acutely started high-dose beta-blockade reduced MI but caused more strokes and more deaths","Beta-blockers should be stopped before all surgery","Beta-blockers had no effect on any outcome"], correct:1, exp:"POISE: acutely initiated high-dose metoprolol lowered non-fatal MI but increased strokes and total mortality (via hypotension/bradycardia). Continue chronic beta-blockers; never START high-dose beta-blockade acutely." },
+    { q:"A drug-eluting stent was placed 6 weeks ago. The patient needs ELECTIVE hernia repair. The correct approach is:", opts:["Stop dual antiplatelet therapy and operate now","Delay the elective surgery until the mandatory DAPT period has passed","Proceed on DAPT ignoring bleeding risk","Replace clopidogrel with warfarin and operate"], correct:1, exp:"On a fresh DES, elective surgery should be delayed until the mandatory DAPT window has elapsed; stopping DAPT early risks catastrophic stent thrombosis. The calendar, not cessation, is the treatment." },
+    { q:"Which pre-operative test is most appropriate before major surgery in an elevated-risk patient to guide prognosis and surveillance?", opts:["Routine coronary angiography","Pre-op BNP/NT-proBNP with planned post-op troponin surveillance","Routine exercise stress test for everyone","D-dimer"], correct:1, exp:"Pre-op BNP refines risk and identifies who benefits from post-op high-sensitivity troponin surveillance for MINS. Routine angiography/stress testing is not indicated without a management-changing question." },
+    { q:"MINS (myocardial injury after non-cardiac surgery) is best described as:", opts:["A benign, meaningless troponin rise","An often-silent post-op troponin elevation that predicts 30-day mortality","Always accompanied by chest pain","Only relevant after cardiac surgery"], correct:1, exp:"MINS is frequently silent (masked by anaesthesia/analgesia) but carries real prognostic weight (VISION) — hence structured troponin surveillance in elevated-risk patients." },
+    { q:"The CARP trial demonstrated that routine coronary revascularisation BEFORE non-cardiac surgery:", opts:["Dramatically reduces peri-op mortality","Does NOT improve non-cardiac surgical outcomes","Should be done for all patients with any CAD","Is safer than medical therapy in everyone"], correct:1, exp:"CARP (and DECREASE-V) found no outcome benefit from routine pre-op revascularisation. Revascularise only for standard indications — not merely to 'get through' surgery." },
+    { q:"Which peri-operative medication instruction is correct for this patient?", opts:["Stop the statin the week before surgery","Continue the statin; hold the SGLT2 inhibitor a few days pre-op","Double the ACE inhibitor on the morning of surgery","Stop aspirin permanently because of the stent"], correct:1, exp:"Continue statins throughout; hold SGLT2 inhibitors a few days pre-op to avoid euglycaemic DKA. ACEi is individualised (often held the morning of surgery); aspirin is generally continued, especially with a coronary stent." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you risk-stratify like a consultant. 🏆':score>=6?'Strong — review the misses and S5/S11 on RCRI and medication timing.':'Revisit S3, S5, S6 and S15 — functional capacity, RCRI, and stent timing are the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>
