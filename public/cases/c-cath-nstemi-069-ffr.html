@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NSTEMI — Early Invasive Strategy &amp; FFR-Guided PCI of an Intermediate LAD Lesion — Virtual Teaching Hospital</title>
+<!-- META
+id: c-cath-nstemi-069
+title: NSTEMI — Early Invasive Strategy &amp; FFR-Guided PCI of an Intermediate LAD Lesion
+hospital: cardiology
+department: cv-cath
+bednumber: 7
+chiefcomplaint: Rest angina, dynamic ST depression, rising troponin — NSTEMI, GRACE high risk, early invasive
+system: Cardiology
+severity: high
+tags: NSTEMI, Early invasive, FFR, iFR, Intermediate lesion, Physiology-guided PCI, Cath lab
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9; --sbw:246px; --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#7c3aed,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:24px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--violet)}
+  .navlink.active{background:linear-gradient(135deg,#7c3aed,#e11d48); color:#fff; border-color:#7c3aed}
+  .navlink.active .s-id{color:#e9d5ff}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+  @media(max-width:860px){
+    :root{--sbw:58px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#4c1d95 0%,#7c3aed 45%,#e11d48 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .crumbs{font-size:12.5px; opacity:.85}
+  .hero h1{margin:8px 0 6px; font-size:clamp(22px,3.3vw,33px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#7c3aed}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(115px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:19px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:220px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#7c3aed,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS (tabs) ===== */
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:18.5px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#4c1d95,#e11d48); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(124,58,237,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#7c3aed,#e11d48); color:#fff; box-shadow:0 4px 12px rgba(124,58,237,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--violet); color:var(--violet)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--violet)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#ef4444,#f59e0b,#10b981); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+
+  /* ===== MEDIA ===== */
+  .media-fig{margin:14px 0; border-radius:14px; overflow:hidden; border:1px solid var(--line); background:var(--slate-soft)}
+  .media-fig img{width:100%; display:block; background:#fff}
+  .media-fig .cap{font-size:12px; color:var(--ink2); padding:8px 12px; background:#fff}
+  .media-fig a.src{color:var(--violet); text-decoration:none; font-weight:700}
+  .ang-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0}
+  .ang-fig svg{width:100%; height:auto; display:block}
+  .ang-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+  .video-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; margin:14px 0}
+  .video-card{display:block; text-decoration:none; color:inherit; border:1px solid var(--line); border-radius:14px; overflow:hidden; background:#fff; transition:all .15s}
+  .video-card:hover{transform:translateY(-3px); box-shadow:0 8px 20px rgba(15,23,42,.12); border-color:var(--violet)}
+  .video-card .thumb{position:relative; height:104px; background:linear-gradient(135deg,#312e81,#7c3aed); display:flex; align-items:center; justify-content:center}
+  .video-card .thumb .play{width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,.92); display:flex; align-items:center; justify-content:center; font-size:18px; color:#e11d48}
+  .video-card .thumb .em{position:absolute; top:8px; left:10px; font-size:22px}
+  .video-card .vc-body{padding:9px 11px}
+  .video-card .vc-t{font-size:13px; font-weight:700; line-height:1.25}
+  .video-card .vc-s{font-size:11px; color:var(--ink2); margin-top:3px}
+  .linkrow{display:flex; flex-wrap:wrap; gap:8px; margin:12px 0}
+  .linkchip{display:inline-flex; align-items:center; gap:6px; text-decoration:none; font-size:12.5px; font-weight:700; padding:7px 12px; border-radius:999px; border:1px solid var(--line); background:#fff; color:var(--ink)}
+  .linkchip:hover{border-color:var(--violet); color:var(--violet)}
+
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; margin-bottom:3px}
+
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+  .scorebig{font-size:40px; font-weight:800; background:linear-gradient(135deg,#7c3aed,#e11d48); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🩻</div>
+      <div><div class="t1">Cath Lab</div><div class="t2">Bed 7 · NSTEMI / FFR</div></div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🚨</span><span>Presentation &amp; Triage</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">📋</span><span>Pre-Procedure Workup</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩸</span><span>Vascular Access &amp; Setup</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">📽️</span><span>Angiography &amp; Views</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🔬</span><span>Lesion Assessment</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🎬</span><span>Strategy &amp; Decision</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">🛠️</span><span>Intervention Steps</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">✅</span><span>Result &amp; Optimization</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">🏠</span><span>Post-Procedure Care</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">📚</span><span>Evidence-Based Medicine</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">🔭</span><span>Advanced Topics</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">🎥</span><span>Multimedia Library</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">👨‍👩‍👦</span><span>Family &amp; Journey</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">🎮</span><span>Interactive Sim</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">🏆</span><span>Score &amp; Takeaways</span><span class="s-id">S19</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <div class="content">
+  <main>
+    <header class="hero">
+      <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🩻 Cath Lab · 🛏️ Bed 7</div>
+      <h1>🩻 NSTEMI — Early Invasive Strategy &amp; FFR-Guided PCI of an Intermediate LAD Lesion</h1>
+      <div class="sub">⚡ 14:20, day 1. A 64-year-old woman has had three bouts of rest angina overnight; the monitor caught 1.5 mm of dynamic ST depression that came and went with the pain, and her high-sensitivity troponin is climbing. GRACE score is 148 — high risk. The plan: early invasive angiography within 24 hours. On the table you meet an ambiguous 50–70% LAD lesion. Do not eyeball it — <em>measure</em> it.</div>
+      <div class="chips">
+        <span class="chip crit">🟠 HIGH RISK</span>
+        <span class="chip">🫀 NSTEMI</span>
+        <span class="chip">⏱️ Early invasive &lt;24 h</span>
+        <span class="chip">📏 FFR / iFR-guided</span>
+        <span class="chip">🎮 Physiology decision</span>
+        <span class="chip">🖐️ Radial-first</span>
+      </div>
+    </header>
+
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital warn"><div class="v-label">💓 HR</div><div class="v-num">88</div></div>
+        <div class="vital"><div class="v-label">🩸 BP</div><div class="v-num">138/84</div></div>
+        <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">97%</div></div>
+        <div class="vital alert"><div class="v-label">📉 ST↓ V4–V6</div><div class="v-num">1.5 mm</div></div>
+        <div class="vital warn"><div class="v-label">🧪 hs-Trop</div><div class="v-num">↑ rising</div></div>
+        <div class="vital alert"><div class="v-label">📊 GRACE</div><div class="v-num">148</div></div>
+      </div>
+    </div>
+
+    <!-- S1 PRESENTATION & TRIAGE -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🚨 Clinical Presentation &amp; Triage</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 14:20, Coronary Care Unit</b>She presses a fist to her sternum: <em>"It came again at 3 a.m., doctor — like a weight, going into my jaw."</em> The ST segments dipped 1.5 mm during the pain and drifted back when it eased. The registrar looks up from the troponin trend: "It is rising. GRACE is 148. This is a high-risk NSTEMI — she needs the lab within 24 hours. What is our strategy once we are in there?"</div>
+
+        <h3>🫀 The vignette</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>👩 Patient</td><td>Mrs. R.K., 64, female · type-2 diabetes · hypertension · ex-smoker · dyslipidaemia</td></tr>
+          <tr><td>💥 Onset</td><td>Recurrent <strong>rest angina</strong> over 12 h — the last episode woke her; pain radiates to the jaw, with nausea</td></tr>
+          <tr><td>📉 ECG</td><td><strong>Dynamic ST depression 1.5 mm V4–V6</strong> during pain, T-wave flattening, normalising between episodes — no persistent ST elevation</td></tr>
+          <tr><td>🧪 Troponin</td><td>hs-troponin with a <strong>significant rise-and-fall</strong> (0 h → 1 h delta above threshold) → myocardial injury with ischaemia = <strong>NSTEMI</strong></td></tr>
+          <tr><td>📊 Risk</td><td><strong>GRACE 2.0 = 148</strong> (&gt;140 = high risk) → early invasive strategy within 24 h (2023 ESC ACS)</td></tr>
+          <tr><td>💊 Given</td><td>Aspirin 300 mg loaded; anticoagulation (fondaparinux/heparin) started; P2Y₁₂ choice deferred to angiographic anatomy</td></tr>
+        </table>
+
+        <div class="media-fig">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Blausen_0463_HeartAttack.png" alt="Myocardial infarction — coronary plaque and ischaemia" loading="lazy" onerror="this.closest('.media-fig').style.display='none'">
+          <div class="cap">🫀 Non-occlusive plaque with sub-total flow limitation → subendocardial ischaemia (NSTEMI). Source: <a class="src" href="https://commons.wikimedia.org/wiki/File:Blausen_0463_HeartAttack.png" target="_blank" rel="noopener">Wikimedia Commons (Blausen)</a></div>
+        </div>
+
+        <h3>🚦 STEMI vs NSTEMI — the fork that sets the clock</h3>
+        <p>NSTEMI is myocardial injury (rising troponin) with ischaemia but <strong>without persistent ST elevation</strong> — the culprit is usually a <em>sub-totally</em> occluded or dynamically obstructing vessel rather than a fixed TIMI-0 occlusion. Reperfusion is <strong>not</strong> a 90-minute emergency; instead, the patient is <strong>risk-stratified</strong> and the <em>timing of invasive angiography</em> is chosen by risk. High-risk features (GRACE &gt;140, rise/fall of troponin, dynamic ST/T change) earn an <strong>early invasive</strong> approach within 24 h. Very-high-risk features (haemodynamic instability, refractory angina, life-threatening arrhythmia, mechanical complication) earn an <strong>immediate</strong> (&lt;2 h) strategy.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"STEMI is a stopwatch; NSTEMI is a triage. In NSTEMI you do not race the clock to a balloon — you grade the risk and let it choose how fast the angiogram happens."</div>
+
+        <h3>🚩 Spot-the-High-Risk-Feature — tap each finding that pushes toward EARLY invasive angiography (+10 XP each)</h3>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">📉 Dynamic ST depression with pain</button>
+          <button class="btn ghost flag-btn" data-good="1">🧪 Rising hs-troponin (rise-and-fall)</button>
+          <button class="btn ghost flag-btn" data-good="1">😖 Recurrent rest angina</button>
+          <button class="btn ghost flag-btn" data-good="1">📊 GRACE score 148 (&gt;140)</button>
+          <button class="btn ghost flag-btn" data-good="0">🌡️ Temperature 36.6°C</button>
+          <button class="btn ghost flag-btn" data-good="0">🍽️ "Might just be indigestion"</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+      </div>
+    </section>
+
+    <!-- S2 PRE-PROCEDURE WORKUP -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>📋 Pre-Procedure Workup &amp; Planning</h2></div>
+      <div class="section-content">
+        <h3>🧾 Risk-stratify FIRST, then plan the timing</h3>
+        <table class="tbl">
+          <tr><th>Risk tier</th><th>Trigger features</th><th>Invasive timing (2023 ESC ACS)</th></tr>
+          <tr><td class="hi">🔴 Very high</td><td>Haemodynamic instability / cardiogenic shock, refractory/recurrent angina despite treatment, life-threatening arrhythmia, mechanical complication, acute heart failure, recurrent dynamic ST changes</td><td><strong>Immediate &lt; 2 h</strong> (like a STEMI)</td></tr>
+          <tr><td class="hi">🟠 High</td><td>Established NSTEMI (rise/fall troponin), dynamic ST/T changes, <strong>GRACE &gt; 140</strong></td><td><strong>Early invasive &lt; 24 h</strong> ← our patient</td></tr>
+          <tr><td class="lo">🟢 Low</td><td>No recurrent symptoms, no high-risk features</td><td>Selective invasive / non-invasive testing first</td></tr>
+        </table>
+        <p>Note: the 2023 ESC ACS guideline <strong>downgraded</strong> the old "routine &lt;24 h" for merely GRACE-elevated patients to a IIa recommendation, but for a genuinely high-risk NSTEMI (our case) an early invasive approach remains the standard. The randomized signal for very-early timing is strongest in the <em>highest-risk</em> patients (TIMACS subgroup, VERDICT high-GRACE subgroup).</p>
+
+        <h3>🧾 The pre-catheter checklist</h3>
+        <ul>
+          <li>✍️ <strong>Consent</strong> — elective/urgent (not peri-arrest); document bleeding, stroke, dissection, contrast nephropathy, need for revascularisation, and the possibility of <em>deferral</em> if physiology is negative.</li>
+          <li>🧪 <strong>Antiplatelet strategy</strong> — aspirin loaded; hold the P2Y₁₂ <em>pre-treatment</em> in NSTEMI when early angiography is planned and anatomy is unknown (2023 ESC: routine pretreatment not recommended if going to the lab promptly — it may be surgical disease).</li>
+          <li>🫘 <strong>Renal function &amp; contrast plan</strong> — diabetic + possible multivessel disease means higher contrast load; hydrate, minimise dye.</li>
+          <li>💊 <strong>Adenosine readiness</strong> — you plan FFR; confirm no severe reactive airways disease / high-grade AV block, and that IV adenosine and a giving set are ready (or plan a resting index such as iFR).</li>
+          <li>🖐️ <strong>Access assessment</strong> — Barbeau/Allen of the radial; femoral back-up.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In NSTEMI, do not blindly pre-load the P2Y₁₂ before you know the anatomy — the intermediate lesion you are about to measure might turn out to be three-vessel disease heading to CABG."</div>
+
+        <div class="checklist" id="ckPreproc">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Pre-catheter safety checklist (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>✍️ Consent obtained; deferral-if-negative-physiology discussed</span></label>
+          <label class="ck"><input type="checkbox"><span>📊 Risk tier confirmed (GRACE 148 → high risk → early invasive &lt;24 h)</span></label>
+          <label class="ck"><input type="checkbox"><span>💊 Aspirin loaded; P2Y₁₂ pretreatment deferred pending anatomy</span></label>
+          <label class="ck"><input type="checkbox"><span>💉 Adenosine + giving set ready (no severe asthma/high-grade AV block); iFR fallback planned</span></label>
+          <label class="ck"><input type="checkbox"><span>🫘 Renal function noted; low-contrast plan for possible multivessel disease</span></label>
+          <label class="ck"><input type="checkbox"><span>🖐️ Radial patency confirmed (Barbeau); femoral back-up marked</span></label>
+          <div class="ck-progress" data-progress>0 / 6 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- S3 ACCESS -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩸 Vascular Access &amp; Setup</h2></div>
+      <div class="section-content">
+        <h3>🖐️ Radial vs femoral — radial wins in ACS</h3>
+        <div class="vs">
+          <div class="side b"><h4>🖐️ Radial (default)</h4><ul><li>Fewer access-site bleeds &amp; vascular complications</li><li><strong>Lower mortality in ACS</strong> (MATRIX, RIVAL ACS subgroup)</li><li>Early ambulation, comfort — ideal for a stable NSTEMI who may be deferred</li><li>Confirm patency first (Barbeau/Allen)</li></ul></div>
+          <div class="side a"><h4>🦵 Femoral (bail-out)</h4><ul><li>When radial fails / spasm / small vessel / need for large-bore support</li><li>Higher bleeding — micropuncture + ultrasound guidance</li></ul></div>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Radial-first in ACS — a post-procedure bleed roughly doubles mortality, and the NSTEMI patient is often on triple therapy. Protect the wrist, protect the patient."</div>
+
+        <h3>💉 Sheath, anticoagulation &amp; the pressure-wire mindset</h3>
+        <ul>
+          <li>🔧 <strong>Sheath:</strong> 6 Fr radial (hydrophilic); intra-arterial "radial cocktail" (verapamil ± nitrate ± heparin) to prevent spasm — a spastic radial ruins the smooth wire handling physiology demands.</li>
+          <li>🩸 <strong>Procedural anticoagulation:</strong> unfractionated heparin (70–100 U/kg to an <strong>ACT ~250 s</strong>) for PCI; a pure diagnostic-plus-physiology run still needs adequate anticoagulation before a pressure wire crosses the coronary.</li>
+          <li>🧭 <strong>Guide catheter:</strong> for the <strong>LAD</strong> → an <strong>EBU/XB left guide</strong>; note that <em>deep-seating</em> or a <em>damped</em> guide will corrupt the aortic (Pa) pressure and invalidate your FFR — keep the guide coaxial and disengage side-holes if used.</li>
+          <li>💉 <strong>Nitrate before physiology:</strong> give intracoronary GTN to abolish epicardial spasm before any FFR/iFR — spasm mimics a fixed stenosis.</li>
+        </ul>
+
+        <div class="checklist" id="ckAccess">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Radial access &amp; physiology setup</h3>
+          <label class="ck"><input type="checkbox"><span>🖐️ Barbeau A–C confirmed; wrist dorsiflexed on a roll</span></label>
+          <label class="ck"><input type="checkbox"><span>🧼 Sterile prep &amp; drape; local anaesthetic; 6 Fr sheath; radial cocktail given</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 Anticoagulate to ACT ~250 s before crossing with a pressure wire</span></label>
+          <label class="ck"><input type="checkbox"><span>🧭 Left guide (EBU/XB) coaxial, not deep-seated (protects the Pa signal)</span></label>
+          <label class="ck"><input type="checkbox"><span>💉 Intracoronary nitrate given to abolish spasm before FFR/iFR</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- S4 ANGIOGRAPHY & VIEWS -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>📽️ Diagnostic Angiography &amp; Views</h2></div>
+      <div class="section-content">
+        <h3>🗺️ The coronary tree — and the ambiguous lesion</h3>
+        <div class="media-fig">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Coronary_arteries.svg" alt="Coronary artery anatomy diagram" loading="lazy" onerror="this.closest('.media-fig').style.display='none'">
+          <div class="cap">🫀 Coronary artery anatomy. Source: <a class="src" href="https://commons.wikimedia.org/wiki/File:Coronary_arteries.svg" target="_blank" rel="noopener">Wikimedia Commons</a> · Atlas: <a class="src" href="https://radiopaedia.org/articles/coronary-arteries" target="_blank" rel="noopener">Radiopaedia</a></div>
+        </div>
+
+        <h3>📐 Which projection shows what</h3>
+        <table class="tbl">
+          <tr><th>View</th><th>Best displays</th></tr>
+          <tr><td>🔵 <strong>LAO caudal ("spider")</strong></td><td>Left main bifurcation, ostial LAD &amp; LCx, proximal LCx</td></tr>
+          <tr><td>🟢 <strong>RAO caudal</strong></td><td>Proximal/mid LCx, obtuse marginals</td></tr>
+          <tr><td>🟡 <strong>RAO cranial</strong></td><td>Mid–distal LAD, septals/diagonals — key for our mid-LAD lesion</td></tr>
+          <tr><td>🟠 <strong>LAO cranial</strong></td><td>Proximal–mid LAD, LAD/diagonal ostia; RCA mid/distal &amp; crux</td></tr>
+          <tr><td>🔴 <strong>AP cranial</strong></td><td>Mid–distal LAD, LAD bifurcations</td></tr>
+        </table>
+
+        <div class="ang-fig">
+          <svg viewBox="0 0 720 200" preserveAspectRatio="xMidYMid meet" aria-label="Schematic left coronary system with an intermediate mid-LAD stenosis">
+            <rect width="720" height="200" fill="#0b1220"/>
+            <text x="20" y="26" fill="#93c5fd" font-size="13" font-weight="700">Left coronary system (schematic)</text>
+            <!-- Left main -->
+            <path d="M120,60 L200,80" stroke="#e5e7eb" stroke-width="10" fill="none" stroke-linecap="round"/>
+            <text x="118" y="52" fill="#cbd5e1" font-size="11">LM</text>
+            <!-- LAD (flow preserved, narrowed segment) -->
+            <path d="M200,80 L300,90 L420,120 L560,150" stroke="#f59e0b" stroke-width="9" fill="none" stroke-linecap="round"/>
+            <text x="470" y="140" fill="#fcd34d" font-size="11">LAD</text>
+            <!-- intermediate stenosis marker -->
+            <circle cx="360" cy="105" r="12" fill="none" stroke="#facc15" stroke-width="3"/>
+            <text x="300" y="86" fill="#facc15" font-size="11" font-weight="700">intermediate 50–70% (mid LAD)</text>
+            <!-- diagonal -->
+            <path d="M300,90 L360,50" stroke="#60a5fa" stroke-width="6" fill="none" stroke-linecap="round"/>
+            <text x="360" y="46" fill="#93c5fd" font-size="11">D1</text>
+            <!-- LCx -->
+            <path d="M200,80 L260,130 L340,170 L440,185" stroke="#34d399" stroke-width="8" fill="none" stroke-linecap="round"/>
+            <text x="360" y="182" fill="#6ee7b7" font-size="11">LCx</text>
+          </svg>
+          <div class="ang-cap">The dilemma: a <span style="color:#fcd34d">mid-LAD lesion of 50–70%</span> with preserved distal flow — is this the culprit that needs a stent, or an innocent bystander to be deferred? The eye cannot tell. <strong>Physiology decides.</strong></div>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"An intermediate stenosis is the most dangerous number in the cath lab — too tight to ignore, too mild to trust. Two orthogonal views to define it, then a pressure wire to judge it. Never treat a silhouette."</div>
+
+        <div class="linkrow">
+          <a class="linkchip" href="https://www.youtube.com/results?search_query=coronary+angiography+standard+views+explained" target="_blank" rel="noopener">▶️ Angiographic views — video search</a>
+          <a class="linkchip" href="https://radiopaedia.org/search?q=coronary+artery+disease" target="_blank" rel="noopener">📚 Radiopaedia: CAD</a>
+          <a class="linkchip" href="https://www.incathlab.com/en/search?q=intermediate+lesion+FFR" target="_blank" rel="noopener">🎓 inCathLab library</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- S5 LESION ASSESSMENT -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🔬 Lesion Assessment — Physiology &amp; Imaging</h2></div>
+      <div class="section-content">
+        <div class="callout info"><b class="ct">📏 This is the teaching core</b>The LAD lesion is <strong>intermediate</strong> and the culprit is <strong>ambiguous</strong>. Angiographic diameter stenosis correlates poorly with ischaemia in the 40–70% range. The answer is <strong>coronary physiology</strong>: a pressure wire tells you whether this narrowing actually limits flow enough to cause ischaemia — and therefore whether a stent will help or merely add risk.</p></div>
+
+        <h3>📏 The physiology indices — know the thresholds cold</h3>
+        <table class="tbl">
+          <tr><th>Index</th><th>How measured</th><th>Ischaemic cut-off</th></tr>
+          <tr><td>📉 <strong>FFR</strong> (fractional flow reserve)</td><td>Pd/Pa at <strong>maximal hyperaemia</strong> (IV/IC adenosine)</td><td class="hi"><strong>≤ 0.80 = treat</strong> · &gt;0.80 = defer</td></tr>
+          <tr><td>🌊 <strong>iFR</strong> (instantaneous wave-free ratio)</td><td>Resting Pd/Pa in the wave-free diastolic window — <strong>no adenosine</strong></td><td class="hi"><strong>≤ 0.89 = treat</strong> · &gt;0.89 = defer</td></tr>
+          <tr><td>💤 <strong>Resting Pd/Pa · RFR · DFR</strong></td><td>Whole-cycle or diastolic resting ratios, no hyperaemia</td><td>Broadly track iFR (~0.89–0.92 zones)</td></tr>
+        </table>
+        <p>FFR is the gold standard with the largest outcome evidence (DEFER, FAME, FAME-2). iFR is a validated, adenosine-free alternative (DEFINE-FLAIR, iFR-SWEDEHEART) — equivalent outcomes, faster, and it spares patients the flush, dyspnoea, and AV block of adenosine.</p>
+
+        <!-- SIM (FFR) -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The FFR Pressure-Wire Pullback (the intermediate LAD)</h3>
+          <p style="font-size:13px">You have crossed the mid-LAD lesion with a pressure wire and given adenosine to reach maximal hyperaemia. Drag the FFR value the wire reads distal to the lesion and decide: <strong>treat or defer?</strong> The 0.80 line is everything.</p>
+          <label for="kRange">📏 FFR (distal Pd/Pa at hyperaemia): <b id="kVal">0.80</b></label>
+          <input type="range" id="kRange" min="60" max="98" value="80">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout warn-r" id="kReadout">Set the dial to explore treat-vs-defer.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 FFR ≤ 0.80 → the lesion limits flow enough to cause ischaemia → <strong>PCI</strong> (FAME/FAME-2). &gt; 0.80 → <strong>defer</strong> and treat medically — deferring a &gt;0.80 lesion is safe (DEFER). During pullback, a <em>step-up</em> in FFR across one segment localises the flow-limiting spot; a gradual gradient over a diffuse vessel warns you a stent may not fix it.</p>
+        </div>
+
+        <div class="callout warn"><b class="ct">⚠️ The FFR pitfalls that fool trainees</b>
+        <ul style="margin:6px 0 0">
+          <li>📉 <strong>Pressure drift</strong> — always re-equalise Pd=Pa with the sensor at the guide tip at the end; a drifted wire reading 0.78 may truly be 0.83. Verify before you stent.</li>
+          <li>🔗 <strong>Serial (tandem) lesions</strong> — one lesion shields the other; a single crossing-lesion FFR is unreliable. Do a <em>pullback</em> to see which lesion carries the gradient.</li>
+          <li>🫀 <strong>Microvascular disease / prior MI</strong> — blunted hyperaemia raises FFR falsely (less flow, smaller gradient) and can under-call a lesion; the diabetic microcirculation here is relevant.</li>
+          <li>🫁 <strong>Aortic stenosis / LVH</strong> — altered haemodynamics and adenosine response make FFR less certain; interpret with imaging.</li>
+          <li>💨 <strong>Sub-maximal hyperaemia</strong> — inadequate adenosine dose/route gives a falsely high FFR. Ensure true maximal hyperaemia (central line preferred for IV).</li>
+        </ul></div>
+
+        <h3>🖥️ Intravascular imaging — the complement to physiology</h3>
+        <div class="vs">
+          <div class="side b"><h4>🔵 IVUS</h4><ul><li>Ultrasound — sizes the vessel, quantifies plaque burden, sees behind calcium</li><li>MLA thresholds (e.g., left main) help when physiology is borderline; guides stent sizing</li></ul></div>
+          <div class="side a"><h4>🟠 OCT</h4><ul><li>Light — ultra-high resolution; superb for thrombus, plaque rupture vs erosion, edge dissection, apposition</li><li>Clarifies an <em>ambiguous culprit</em> — a ruptured plaque or thrombus outs the true offender</li></ul></div>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Physiology tells you WHETHER to treat; imaging tells you WHAT and HOW. FFR ≤ 0.80 or iFR ≤ 0.89 makes the intermediate lesion a target — above the line, the kindest stent is no stent."</div>
+
+        <div class="linkrow">
+          <a class="linkchip" href="https://www.youtube.com/results?search_query=FFR+iFR+coronary+physiology+pullback+tutorial" target="_blank" rel="noopener">▶️ FFR/iFR explained</a>
+          <a class="linkchip" href="https://www.youtube.com/results?search_query=IVUS+OCT+intravascular+imaging+coronary" target="_blank" rel="noopener">▶️ IVUS/OCT imaging</a>
+          <a class="linkchip" href="https://www.incathlab.com/en/search?q=FFR+pullback" target="_blank" rel="noopener">🎓 inCathLab: FFR</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- S6 STRATEGY (branching 1) -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🎬 Strategy &amp; Decision Point — "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <p>The pressure wire is at the lesion. Now the branching core — let physiology, not the eye, choose the pathway. And once you have treated the ischaemic lesion, decide how far to go: culprit-only or functionally complete revascularisation. Correct calls score; wrong calls teach.</p>
+        <div class="scenario" id="scenarioBox1">
+          <h3>🎬 Strategy Path — treat vs defer the intermediate LAD</h3>
+          <div class="hud"><span>🫀 Ischaemia burden: <b id="sc1Stab">0</b></span><span>⏱️ Elapsed: <b id="sc1Time">0 min</b></span><span>⚡ Path XP: <b id="sc1XP">0</b></span></div>
+          <div class="scene-text" id="sc1Text">The mid-LAD lesion looks 50–70% by eye — an ambiguous culprit. Flow is preserved, no thrombus is obvious. What is your first move?</div>
+          <div class="choices" id="sc1Choices"></div>
+          <div class="feedback" id="sc1Feedback"></div>
+          <button class="btn primary" id="sc1Restart" style="display:none; margin-top:12px">🔄 Replay path</button>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Defer what physiology clears and treat what it condemns. FAME-2 stented the ischaemic lesions and won; DEFER left the &gt;0.80 lesions alone and they did fine. The oculostenotic reflex — stenting because it 'looks tight' — is how you harm a patient who did not need a stent."</div>
+      </div>
+    </section>
+
+    <!-- S7 INTERVENTION STEPS -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>🛠️ Intervention — Step-by-Step Execution</h2></div>
+      <div class="section-content">
+        <div class="media-fig">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Blausen_0034_Angioplasty_Stent_01.png" alt="Coronary angioplasty and stent deployment" loading="lazy" onerror="this.closest('.media-fig').style.display='none'">
+          <div class="cap">🎈 Balloon angioplasty &amp; stent deployment. Source: <a class="src" href="https://commons.wikimedia.org/wiki/File:Blausen_0034_Angioplasty_Stent_01.png" target="_blank" rel="noopener">Wikimedia Commons (Blausen)</a></div>
+        </div>
+
+        <h3>🪜 The sequence — when FFR says treat (FFR 0.75)</h3>
+        <ol>
+          <li>💊 <strong>Load the P2Y₁₂ now</strong> — anatomy is known and PCI is committed (aspirin already on board; ticagrelor/prasugrel preferred in ACS).</li>
+          <li>🧵 <strong>Wire the LAD</strong> — a workhorse guidewire across the intermediate lesion into the distal true lumen (confirm in two views).</li>
+          <li>📏 <strong>Lesion prep &amp; sizing</strong> — predilate a fibrocalcific lesion; size the stent <strong>1:1 to the reference vessel</strong> (IVUS/OCT or online QCA — the diabetic vessel may be diffusely diseased, so pick healthy landing zones).</li>
+          <li>🩹 <strong>Deploy a drug-eluting stent</strong> covering the flow-limiting segment your pullback identified — not necessarily the whole hazy vessel.</li>
+          <li>🎈 <strong>Post-dilate</strong> — non-compliant balloon to full expansion and apposition (under-expansion is the #1 cause of stent thrombosis/restenosis).</li>
+          <li>📉 <strong>Re-measure physiology if needed</strong> — a post-PCI FFR &lt; 0.88 predicts worse outcomes and may reveal a residual gradient (in-stent under-expansion or a second lesion).</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Stent the gradient the pullback showed you, size 1:1, post-dilate — then measure again. A post-PCI FFR under 0.88 means the job is not done, not that the wire is lying."</div>
+
+        <div class="checklist" id="ckIntervention">
+          <h3 style="margin-top:0">🩺 Procedure Guide — FFR-positive PCI execution</h3>
+          <label class="ck"><input type="checkbox"><span>💊 P2Y₁₂ loaded now that PCI is committed (anatomy known)</span></label>
+          <label class="ck"><input type="checkbox"><span>🧵 Guidewire in the distal true lumen (confirmed in 2 views)</span></label>
+          <label class="ck"><input type="checkbox"><span>📏 Reference vessel sized; DES chosen 1:1; healthy landing zones picked</span></label>
+          <label class="ck"><input type="checkbox"><span>🩹 DES deployed across the flow-limiting segment; 🎈 post-dilated to full expansion</span></label>
+          <label class="ck"><input type="checkbox"><span>📉 Post-PCI physiology / imaging confirms an optimal result (FFR ≥ 0.88)</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+
+        <div class="linkrow">
+          <a class="linkchip" href="https://www.youtube.com/results?search_query=FFR+guided+PCI+technique" target="_blank" rel="noopener">▶️ FFR-guided PCI technique</a>
+          <a class="linkchip" href="https://www.youtube.com/results?search_query=post+PCI+FFR+optimization" target="_blank" rel="noopener">▶️ Post-PCI physiology</a>
+          <a class="linkchip" href="https://www.incathlab.com/en/search?q=DES+implantation" target="_blank" rel="noopener">🎓 inCathLab procedures</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- S8 RESULT & OPTIMIZATION -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>✅ Result Assessment &amp; Optimization</h2></div>
+      <div class="section-content">
+        <h3>📊 The final check — angiographic + physiologic</h3>
+        <table class="tbl">
+          <tr><th>Metric</th><th>Target</th><th>Why</th></tr>
+          <tr><td>🌊 <strong>TIMI flow</strong></td><td>TIMI 3 (brisk)</td><td>Confirms epicardial patency after stenting the flow-limiting lesion</td></tr>
+          <tr><td>📉 <strong>Residual stenosis</strong></td><td>&lt; 10–20%</td><td>Significant residual → under-expansion or a missed serial lesion</td></tr>
+          <tr><td>📏 <strong>Post-PCI FFR</strong></td><td>≥ 0.88 (higher is better)</td><td>A residual gradient predicts events (DEFINE-PCI, FFR-SEARCH) — chase under-expansion or a second lesion</td></tr>
+          <tr><td>🔎 <strong>Stent expansion/apposition</strong> (IVUS/OCT)</td><td>Full expansion, well-apposed</td><td>Under-expansion is the strongest predictor of stent thrombosis &amp; restenosis</td></tr>
+          <tr><td>🫀 <strong>Deferred lesions logged</strong></td><td>FFR &gt;0.80 / iFR &gt;0.89 documented</td><td>A deferred lesion is a decision, not an oversight — record the number so the next operator trusts it</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Do not leave the lab on a pretty picture — leave on a good number. Post-PCI FFR ≥ 0.88 with full expansion is a finished job; a residual gradient over a 'perfect' angiogram is a future event."</div>
+
+        <div class="callout ok"><b class="ct">✅ Result</b>Mid-LAD FFR was 0.75 → DES deployed across the flow-limiting segment, post-dilated, post-PCI FFR 0.92, full expansion on OCT. The 50% RCA lesion measured FFR 0.88 and was <strong>deferred</strong>. Functionally complete revascularisation achieved without an unnecessary stent.</div>
+      </div>
+    </section>
+
+    <!-- S9 COMPLICATIONS (branching 2) -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>⚠️ Complication Recognition &amp; Management</h2></div>
+      <div class="section-content">
+        <h3>💀 The physiology-specific complications you must recognise instantly</h3>
+        <table class="tbl">
+          <tr><th>Clue</th><th>Complication</th><th>Action</th></tr>
+          <tr><td>Transient AV block / bradycardia + flushing + chest tightness + dyspnoea during hyperaemia</td><td>💉 <strong>Adenosine effect</strong></td><td><strong>Stop the adenosine infusion</strong> — half-life is seconds; it self-resolves. Reassure; avoid over-treating</td></tr>
+          <tr><td>Bronchospasm/wheeze after adenosine in an asthmatic</td><td>🫁 <strong>Adenosine bronchospasm</strong></td><td>Stop adenosine; aminophylline (competitive antagonist), bronchodilators, O₂; prefer iFR next time</td></tr>
+          <tr><td>Resistance + a distal filling defect / staining as the wire tip advances</td><td>🩸 <strong>Distal wire perforation</strong></td><td>Stop advancing; angiogram in 2 views; prolonged proximal balloon, reverse anticoagulation, coil/fat embolisation if it persists; echo for effusion</td></tr>
+          <tr><td>New distal cut-off / spiral haziness after wiring</td><td>🧱 <strong>Wire-induced dissection</strong></td><td>Keep wire distal for access, re-confirm true lumen (IVUS/OCT), stent the dissection if flow-limiting</td></tr>
+          <tr><td>Pressure wire reads implausibly low after crossing</td><td>📉 <strong>Drift / spasm / guide damping</strong></td><td>Give IC nitrate, disengage the guide, re-equalise Pd=Pa — do not stent a drifted number</td></tr>
+        </table>
+
+        <div class="scenario" id="scenarioBox2">
+          <h3>🎬 Complication Drill — "Something Just Went Wrong During Physiology"</h3>
+          <div class="hud"><span>❤️ Stability: <b id="sc2Stab">●●●○○</b></span><span>⏱️ Elapsed: <b id="sc2Time">0 s</b></span><span>⚡ Path XP: <b id="sc2XP">0</b></span></div>
+          <div class="scene-text" id="sc2Text">Seconds into the IV adenosine infusion for FFR, the monitor shows sudden bradycardia dropping into transient AV block, the BP dips, and the patient calls out that she feels flushed and short of breath. What is happening, and what do you do FIRST?</div>
+          <div class="choices" id="sc2Choices"></div>
+          <div class="feedback" id="sc2Feedback"></div>
+          <button class="btn primary" id="sc2Restart" style="display:none; margin-top:12px">🔄 Replay drill</button>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Adenosine frightens the monitor, not the patient — its half-life is seconds. Stop the infusion and it stops. Reach for atropine and the arrest team only if the rhythm does not recover once the drug is off."</div>
+      </div>
+    </section>
+
+    <!-- S10 POST-PROCEDURE -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>🏠 Post-Procedure Care, Debrief &amp; Assessment</h2></div>
+      <div class="section-content">
+        <h3>🩹 Access-site care</h3>
+        <ul>
+          <li>🖐️ Radial: patent-haemostasis compression band; watch for radial artery occlusion &amp; bleeding.</li>
+          <li>🦵 Femoral: manual pressure/closure device; watch for haematoma, pseudoaneurysm, retroperitoneal bleed (unexplained hypotension + back/flank pain).</li>
+        </ul>
+
+        <h3>💊 Secondary prevention &amp; antithrombotics (start day 1)</h3>
+        <ul>
+          <li><strong>DAPT</strong> — aspirin + a potent P2Y₁₂ inhibitor (<strong>ticagrelor or prasugrel</strong> preferred over clopidogrel in ACS; PLATO/TRITON) for 12 months by default, then individualise. High bleeding risk → consider shortened DAPT (1–3 months) then P2Y₁₂ monotherapy; high ischaemic/low bleeding risk → consider extension.</li>
+          <li><strong>The deferred lesion still gets medical therapy</strong> — a &gt;0.80 FFR lesion is treated with the same aggressive risk-factor control, not forgotten.</li>
+          <li><strong>High-intensity statin</strong> (atorvastatin 80 mg) regardless of LDL; add ezetimibe/PCSK9i to target (LDL &lt; 1.4 mmol/L, ≥50% reduction).</li>
+          <li><strong>ACE inhibitor / ARB</strong> (diabetic, hypertensive), <strong>beta-blocker</strong> if reduced EF/ongoing ischaemia, <strong>SGLT2 inhibitor</strong> for the diabetes with CV benefit, and tight glycaemic control.</li>
+          <li>🏃 Cardiac rehab, smoking-cessation reinforcement, echo for EF.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The stent treated one lesion; the pills treat the whole atherosclerotic patient. A deferred FFR-negative lesion is a promise to treat it medically — not permission to ignore it."</div>
+
+        <div class="callout info"><b class="ct">🧪 Mini-quiz &amp; score</b>Head to <strong>S18 (MCQs)</strong> for the case assessment and <strong>S19</strong> for your procedure score and the key takeaways.</div>
+      </div>
+    </section>
+
+    <!-- S11 EBM -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>📚 Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <div class="ebm">
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">RCT</span> DEFER</td><td>Deferring PCI of lesions with FFR &gt; 0.75–0.80 was safe; stenting them added no benefit and some risk over 5 y.</td><td>A functionally non-significant lesion is safely left alone.</td></tr>
+            <tr><td><span class="lvl">RCT</span> FAME</td><td>FFR-guided PCI (treat only FFR ≤ 0.80) beat angiography-guided PCI in multivessel disease — fewer events, fewer stents, less contrast.</td><td>Measure, then stent only the ischaemic lesions.</td></tr>
+            <tr><td><span class="lvl">RCT</span> FAME-2</td><td>In stable CAD with FFR ≤ 0.80, PCI + OMT reduced urgent revascularisation vs OMT alone.</td><td>An ischaemic (FFR+) lesion benefits from PCI.</td></tr>
+            <tr><td><span class="lvl">RCT</span> DEFINE-FLAIR / iFR-SWEDEHEART</td><td>iFR-guided deferral was non-inferior to FFR for outcomes, with fewer adverse procedural symptoms and no adenosine.</td><td>iFR ≤ 0.89 is a valid, adenosine-free alternative.</td></tr>
+            <tr><td><span class="lvl">RCT</span> RIPCORD / RIPCORD-2</td><td>Routine FFR of all vessels changed the management plan/vessel-level decisions in a substantial minority vs angiography alone.</td><td>Physiology re-writes the plan more often than you expect.</td></tr>
+            <tr><td><span class="lvl">RCT</span> FUTURE</td><td>Trial of FFR-guided strategy in multivessel disease (stopped early for a safety signal) — a caution that broad routine physiology needs judgement.</td><td>Use physiology thoughtfully, not reflexively, in complex disease.</td></tr>
+            <tr><td><span class="lvl">RCT</span> COMPLETE</td><td>After STEMI, staged complete revascularisation of significant non-culprit lesions reduced hard events vs culprit-only.</td><td>Treat significant bystander disease — completeness matters, guided by significance.</td></tr>
+            <tr><td><span class="lvl">GL</span> 2023 ESC ACS / 2021 ESC-EACTS revasc</td><td>Early invasive &lt; 24 h for high-risk NSTEMI (GRACE &gt; 140); FFR/iFR to guide intermediate lesions (Class I); no routine P2Y₁₂ pretreatment before known anatomy.</td><td>The whole spine of this case.</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- S12 ADVANCED -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>🔭 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <ul>
+            <li>🌊 <strong>Coronary flow reserve (CFR) &amp; index of microvascular resistance (IMR):</strong> when FFR is normal but angina persists, look for microvascular dysfunction (low CFR, high IMR) — the CorMicA-style diagnosis of ANOCA/INOCA; the diabetic microcirculation is a classic setting.</li>
+            <li>📉 <strong>FFR pullback &amp; the pullback pressure gradient (PPG):</strong> distinguishes focal (stent-treatable) from diffuse disease; a high PPG focal lesion responds beautifully to a stent, a low PPG diffuse vessel may not.</li>
+            <li>🔗 <strong>Serial-lesion physiology:</strong> the true FFR of each lesion is coupled; hyperaemic pullback (or the classic prediction equations) separates them — never trust a single crossing-lesion number in tandem disease.</li>
+            <li>🧮 <strong>Angiography-derived physiology:</strong> QFR, FFR<sub>angio</sub>, vFFR — computational FFR from the angiogram without a wire (FAVOR III); useful but validate against wire in ambiguous cases.</li>
+            <li>🫀 <strong>Post-PCI physiology:</strong> DEFINE-PCI showed a large minority have a residual post-PCI gradient; a low post-PCI FFR predicts events and flags under-expansion or a missed lesion to fix on the table.</li>
+            <li>🖥️ <strong>Imaging-guided PCI:</strong> IVUS/OCT-guided stenting improves outcomes vs angiography alone (ULTIMATE, RENOVATE-COMPLEX-PCI); pairs naturally with physiology in ambiguous intermediate disease.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- S13 MULTIMEDIA LIBRARY -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>🎥 Real Multimedia Library</h2></div>
+      <div class="section-content">
+        <p>🎬 <em>Click a card to open the most relevant procedural videos (YouTube search), or jump to atlas &amp; procedural-library resources. Links open in a new tab.</em></p>
+        <div class="video-grid">
+          <a class="video-card" href="https://www.youtube.com/results?search_query=NSTEMI+management+early+invasive+strategy" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">🫀</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">NSTEMI — Early Invasive Strategy</div><div class="vc-s">Risk stratification &amp; timing</div></div>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/results?search_query=FFR+fractional+flow+reserve+tutorial+cardiology" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">📏</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">FFR Physiology</div><div class="vc-s">Pressure-wire &amp; the 0.80 threshold</div></div>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/results?search_query=iFR+instantaneous+wave+free+ratio+coronary" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">🌊</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">iFR — Adenosine-Free</div><div class="vc-s">Resting index, ≤0.89</div></div>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/results?search_query=FFR+pullback+serial+lesion+interpretation" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">📉</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">FFR Pullback</div><div class="vc-s">Focal vs diffuse, serial lesions</div></div>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/results?search_query=intermediate+coronary+lesion+assessment+FFR+IVUS" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">🔬</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">The Intermediate Lesion</div><div class="vc-s">FFR vs IVUS decision-making</div></div>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/results?search_query=adenosine+FFR+side+effects+AV+block" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">💉</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">Adenosine &amp; Hyperaemia</div><div class="vc-s">Side effects &amp; pitfalls</div></div>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/results?search_query=radial+access+coronary+angiography+technique+Barbeau" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">🖐️</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">Radial Access Technique</div><div class="vc-s">Barbeau &amp; sheath insertion</div></div>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/results?search_query=complete+vs+culprit+only+revascularization+FFR" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">🎯</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">Complete vs Culprit-Only</div><div class="vc-s">FAME / COMPLETE logic</div></div>
+          </a>
+        </div>
+
+        <h3>📚 Atlas &amp; procedural-library links</h3>
+        <div class="linkrow">
+          <a class="linkchip" href="https://www.incathlab.com/en/search?q=FFR+intermediate+lesion" target="_blank" rel="noopener">🎓 inCathLab — physiology video library</a>
+          <a class="linkchip" href="https://radiopaedia.org/articles/coronary-arteries" target="_blank" rel="noopener">📖 Radiopaedia: coronary arteries</a>
+          <a class="linkchip" href="https://radiopaedia.org/search?q=NSTEMI&scope=cases" target="_blank" rel="noopener">🖼️ Radiopaedia: NSTEMI cases</a>
+          <a class="linkchip" href="https://commons.wikimedia.org/wiki/Category:Coronary_angiography" target="_blank" rel="noopener">🗂️ Wikimedia: angiography images</a>
+        </div>
+        <p style="font-size:12px; color:var(--ink2)">🔎 Tip: search links always resolve to current results; direct video IDs age out, so the library uses live searches for the freshest teaching cases.</p>
+      </div>
+    </section>
+
+    <!-- S14 FAMILY & JOURNEY -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>👨‍👩‍👦 Family &amp; Patient Journey</h2></div>
+      <div class="section-content">
+        <div class="journey">
+          <div class="j-card"><div class="j-who">👩 The patient</div><p>"They told me one narrowing needed a stent and the other one did not — and that they knew because they measured the pressure inside my artery. It made sense that not every narrowing needs fixing."</p></div>
+          <div class="j-card"><div class="j-who">🧔 Her husband</div><p>"I kept asking why they were not just stenting everything they saw. The doctor explained that a stent you do not need still carries risk. I trusted the number."</p></div>
+          <div class="j-card"><div class="j-who">🩻 The operator</div><p>"Radial access, FFR the ambiguous LAD — 0.75, so I treated it; the RCA came back 0.88, so I deferred it. Functionally complete, one stent, no bravado."</p></div>
+          <div class="j-card"><div class="j-who">🎓 The takeaway</div><p>"NSTEMI is not a race to a balloon — it is a graded decision. Risk-stratify, go early when high-risk, and let physiology, not the eye, choose which lesion gets a stent."</p></div>
+        </div>
+        <div class="callout pink"><b class="ct">💗 The human thread</b>The hardest thing to explain to a frightened family is <em>why you did NOT stent something</em>. Naming the number — "the pressure across it was normal, so a stent would add risk without benefit" — turns restraint into reassurance.</div>
+      </div>
+    </section>
+
+    <!-- S15 M&M -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The 0.78 That Was Really 0.84"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A mid-LAD intermediate lesion was crossed with a pressure wire. Adenosine was given; the FFR read <strong>0.78</strong> and the operator, satisfied it was ischaemic, stented it. He <strong>skipped the end-of-run re-equalisation</strong>. What he never saw was that the wire had <strong>drifted</strong> during the case — the true FFR was <strong>0.84</strong>, a lesion that should have been deferred. The stent went into a diffusely diseased vessel with poor landing zones; weeks later it presented with an edge restenosis and a further procedure. A second lesion that had actually been ischaemic on pullback was never appreciated because no pullback was done. The patient was harmed by an <em>unnecessary stent</em> placed on a <em>drifted number</em>, and by a <em>missed real lesion</em>.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>📉 NO DRIFT CHECK</b>The wire was never re-equalised at the guide tip — a drifted 0.78 was really 0.84.</div>
+            <div class="hole"><b>👁️ TRUSTED ONE NUMBER</b>A single crossing-lesion FFR, no pullback, in a diffusely diseased vessel.</div>
+            <div class="hole"><b>💨 SUB-MAXIMAL DOUBT</b>No confirmation of true maximal hyperaemia before committing.</div>
+            <div class="hole"><b>🩹 STENTED A NON-LESION</b>An unnecessary DES in poor landing zones invited restenosis.</div>
+            <div class="hole"><b>🔗 MISSED THE REAL ONE</b>No pullback meant the truly ischaemic segment was never found.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved this:</strong> confirm maximal hyperaemia, then <em>always re-equalise Pd = Pa at the guide tip at the end of every case</em> to exclude drift; do a <em>pullback</em> in any diffusely diseased or borderline vessel to localise the gradient; and respect the 0.80 line in both directions — a drifted 0.78 that is truly 0.84 deserves deferral, not a stent. Measure well, or do not measure at all.</p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A pressure wire is only as honest as your drift check. Re-equalise at the end, pull back through the vessel, and never let a number you did not verify talk you into a stent."</div>
+      </div>
+    </section>
+
+    <!-- S16 INTERACTIVE SIM -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>🎮 Interactive Simulation</h2></div>
+      <div class="section-content">
+        <div class="sim" id="dtbSim">
+          <h3 style="margin-top:0">🎮 Simulation — The Invasive-Timing Clock (NSTEMI, by risk)</h3>
+          <p style="font-size:13px">Our patient is high-risk (GRACE 148). Drag the time from admission to angiography and see whether it matches the guideline window. In NSTEMI the "clock" is graded by risk, not fixed like a STEMI.</p>
+          <label for="dtbRange">⏱️ Admission-to-angiography: <b id="dtbVal">18</b> hours</label>
+          <input type="range" id="dtbRange" min="0" max="72" value="18">
+          <div class="gauge"><div class="needle" id="dtbNeedle"></div></div>
+          <div class="readout good" id="dtbReadout">Set the clock to explore.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 Very-high-risk NSTEMI (instability, refractory angina, life-threatening arrhythmia) → <strong>immediate &lt; 2 h</strong>. High-risk (GRACE &gt; 140, rise/fall troponin, dynamic ST) → <strong>early invasive &lt; 24 h</strong> ← our patient. Low-risk → selective/&lt;72 h. For a GRACE-148 patient, &gt;24 h is too slow.</p>
+        </div>
+        <p style="font-size:12.5px; color:var(--ink2)">👉 The FFR pressure-wire pullback dial lives in <strong>S5</strong>; the two branching decision engines are in <strong>S6</strong> (treat-vs-defer strategy) and <strong>S9</strong> (physiology complication).</p>
+      </div>
+    </section>
+
+    <!-- S17 PEARLS -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>📊 Risk sets the clock</b>NSTEMI is triaged, not raced: GRACE &gt;140 → early invasive &lt;24 h; instability → immediate &lt;2 h.</div>
+          <div class="pearl"><b>📏 FFR ≤ 0.80 = treat</b>Above 0.80, defer safely (DEFER/FAME). The number, not the eye, decides.</div>
+          <div class="pearl"><b>🌊 iFR ≤ 0.89 = treat</b>Adenosine-free, equivalent outcomes (DEFINE-FLAIR / iFR-SWEDEHEART).</div>
+          <div class="pearl"><b>📉 Always check drift</b>Re-equalise Pd=Pa at the end; a drifted 0.78 may be a true 0.84.</div>
+          <div class="pearl"><b>🔗 Pullback tandem lesions</b>One lesion shields another — never trust a single crossing-lesion number.</div>
+          <div class="pearl"><b>🫀 Beware the microcirculation</b>Prior MI / diabetes blunt hyperaemia and can under-call FFR.</div>
+          <div class="pearl"><b>💉 Adenosine is transient</b>AV block/flushing? Stop the infusion — half-life is seconds. Prefer iFR in asthma.</div>
+          <div class="pearl"><b>🎯 Functionally complete</b>Treat the ischaemic lesions, defer the rest — completeness by significance, not by count.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- S18 MCQs -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers score toward your S19 total.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- S19 SCORE & TAKEAWAYS -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>🏆 Score Summary &amp; Key Takeaways</h2></div>
+      <div class="section-content">
+        <div style="text-align:center; margin:10px 0 18px">
+          <div class="scorebig" id="finalXP">0</div>
+          <div style="font-size:13px; color:var(--ink2)">total XP earned this case</div>
+        </div>
+        <table class="tbl">
+          <tr><th>Metric</th><th>Value</th></tr>
+          <tr><td>📚 Sections read</td><td id="sumVisit">0 / 19</td></tr>
+          <tr><td>🧠 MCQ score</td><td id="sumMcq">0 / 8</td></tr>
+          <tr><td>🩺 Checklists completed</td><td id="sumCk">0 / 4</td></tr>
+          <tr><td>🎬 Decision paths solved</td><td id="sumPath">0 / 2</td></tr>
+        </table>
+        <h3>🎯 The five things to carry out of this case</h3>
+        <ol>
+          <li>📊 <strong>Risk-stratify the NSTEMI</strong> — GRACE &gt;140 / dynamic ST / rise-fall troponin = high risk → early invasive &lt;24 h; instability → immediate &lt;2 h.</li>
+          <li>📏 <strong>Measure the intermediate lesion</strong> — FFR ≤ 0.80 or iFR ≤ 0.89 → treat; above the line → defer safely. Do not stent a silhouette.</li>
+          <li>📉 <strong>Respect the pitfalls</strong> — drift, serial lesions, microvascular disease, sub-maximal hyperaemia, aortic stenosis. Re-equalise and pull back.</li>
+          <li>🎯 <strong>Functionally complete revascularisation</strong> — treat the ischaemic lesions, defer the FFR-negative ones (FAME/DEFER/COMPLETE logic).</li>
+          <li>💉 <strong>Know the physiology complications</strong> — adenosine AV block resolves on stopping the drug; wire perforation → balloon, reverse, echo.</li>
+        </ol>
+        <div class="callout ok"><b class="ct">✅ You let physiology decide</b>High-risk NSTEMI taken early; the ambiguous LAD measured 0.75 and was stented, the RCA measured 0.88 and was deferred — functionally complete, one stent, no unnecessary metal. Now DAPT, a high-intensity statin, and risk-factor control finish the job.</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🩻 Cath Lab · Bed 7 — NSTEMI, Early Invasive, FFR-Guided PCI<br>⚠️ Educational use only — not for clinical decision-making. External links open in a new tab. "Simple enough to remember, impossible to forget."</div>
+  </main>
+  </div>
+</div>
+
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Triage</span>
+      <span class="badge" id="bdg-strategy">🎯 Strategy</span>
+      <span class="badge" id="bdg-complic">🩸 Complication</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Score by spotting high-risk features, running the sims, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  var XP=0, XP_MAX=1400, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; var fx=document.getElementById('finalXP'); if(fx) fx.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+  /* ===== SIDEBAR TABS ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 19'; var sv=document.getElementById('sumVisit'); if(sv) sv.textContent=n+' / 19'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=19){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'High-risk feature'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not a high-risk feature'); } if(found===total){ flagResult.textContent='✅ All '+total+' early-invasive high-risk features found'+(wrong?' (with '+wrong+' wrong)':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Triage badge'); } else { flagResult.textContent=found+' / '+total+' high-risk features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Reveal'); } }); });
+
+  /* ===== SIM 1: FFR PULLBACK ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10)/100; kVal.textContent=v.toFixed(2); var pct=(parseInt(kRange.value,10)-60)/(98-60)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<=0.75){ msg='🔴 FFR '+v.toFixed(2)+' — clearly ischaemic. This intermediate LAD limits flow → treat with PCI (FAME/FAME-2).'; cls='bad'; }
+      else if(v<=0.80){ msg='🟠 FFR '+v.toFixed(2)+' — at/below the 0.80 threshold → ischaemic → treat. (Verify drift first.)'; cls='warn-r'; }
+      else if(v<=0.85){ msg='🟠 FFR '+v.toFixed(2)+' — just above threshold → generally DEFER and treat medically (grey zone — re-check drift, use judgement).'; cls='warn-r'; }
+      else { msg='🟢 FFR '+v.toFixed(2)+' — not flow-limiting → DEFER safely (DEFER/FAME). Medical therapy, no stent.'; cls='good'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ffrsim','FFR Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== SIM 2: invasive timing ===== */
+  var dtb=document.getElementById('dtbRange'), dtbVal=document.getElementById('dtbVal'), dtbNeedle=document.getElementById('dtbNeedle'), dtbReadout=document.getElementById('dtbReadout');
+  if(dtb){ var dtbUsed=false;
+    function updateDtb(){ var v=parseInt(dtb.value,10); dtbVal.textContent=v; var pct=(v-0)/(72-0)*100; dtbNeedle.style.left=(100-pct)+'%'; var msg,cls;
+      if(v<=2){ msg='🟢 '+v+' h — immediate strategy. Correct for VERY-high-risk (instability/refractory angina); for our high-risk patient it is safe but reserved for the sickest.'; cls='good'; }
+      else if(v<=24){ msg='🟢 '+v+' h — early invasive window. This is the target for our high-risk NSTEMI (GRACE 148 >140).'; cls='good'; }
+      else if(v<=72){ msg='🟠 '+v+' h — acceptable only for LOWER-risk NSTEMI. For a GRACE-148 patient this is too slow.'; cls='warn-r'; }
+      else { msg='🔴 '+v+' h — too slow for any acute NSTEMI; a high-risk patient left this long risks recurrent ischaemia/infarction.'; cls='bad'; }
+      dtbReadout.textContent=msg; dtbReadout.className='readout '+cls; if(!dtbUsed){ dtbUsed=true; addXP(15,'dtbsim','Timing-by-risk'); } }
+    dtb.addEventListener('input', updateDtb); updateDtb();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; var sc=document.getElementById('sumCk'); if(sc) sc.textContent=ckDone+' / '+totalCk; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-quiz'); addXP(20,'allck','All checklists'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== GENERIC SCENARIO ENGINE (two instances) ===== */
+  var pathsSolved=0;
+  function initScenario(cfg){
+    var box=document.getElementById(cfg.box); if(!box) return;
+    var elText=document.getElementById(cfg.text), elChoices=document.getElementById(cfg.choices), elFb=document.getElementById(cfg.feedback),
+        elRestart=document.getElementById(cfg.restart), elStab=document.getElementById(cfg.stab), elTime=document.getElementById(cfg.time), elXP=document.getElementById(cfg.xp);
+    var pXP=0, stab=cfg.stab0, elapsed=0;
+    function renderStab(){ if(cfg.dots){ var s=Math.max(0,Math.min(5,stab)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); elStab.textContent=d; } else { elStab.textContent=stab; } }
+    function render(key){ var st=cfg.steps[key]; elText.textContent=st.text; elFb.className='feedback'; elFb.style.display='none'; elChoices.innerHTML='';
+      st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pXP+=ch.xp; elXP.textContent=pXP; elapsed+=ch.dt; elTime.textContent=elapsed+cfg.unit; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Decision'); elFb.textContent=ch.fb; elFb.className='feedback '+(ch.good?'good':'bad'); elFb.style.display='block'; [].slice.call(elChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ elRestart.style.display='inline-block'; if(ch.good && key===cfg.winKey){ earnBadge(cfg.badge); pathsSolved++; var sp=document.getElementById('sumPath'); if(sp) sp.textContent=pathsSolved+' / 2'; addXP(20,cfg.box+'-win','Path solved'); } } else if(ch.next){ setTimeout(function(){ render(ch.next); },1400); } }); elChoices.appendChild(b); }); }
+    elRestart.addEventListener('click', function(){ pXP=0; stab=cfg.stab0; elapsed=0; elXP.textContent=0; elTime.textContent='0'+cfg.unit; renderStab(); elRestart.style.display='none'; render('start'); });
+    renderStab(); render('start');
+  }
+
+  initScenario({ box:'scenarioBox1', text:'sc1Text', choices:'sc1Choices', feedback:'sc1Feedback', restart:'sc1Restart', stab:'sc1Stab', time:'sc1Time', xp:'sc1XP', badge:'bdg-strategy', winKey:'declare', dots:false, stab0:0, unit:' min',
+    steps:{
+      start:{ text:"The mid-LAD lesion looks 50-70% by eye — an ambiguous culprit. Flow is preserved, no thrombus is obvious. What is your first move?",
+        choices:[
+          {t:"📏 Interrogate it with a pressure wire (FFR/iFR) before deciding — give IC nitrate, then measure",good:true,ds:1,dt:5,xp:40,fb:"✅ Correct. An intermediate lesion is judged by physiology, not by eye. Nitrate abolishes spasm, then measure FFR/iFR to decide treat vs defer.",next:"prep"},
+          {t:"🩹 Stent it now — it looks tight enough on the angiogram",good:false,ds:-1,dt:8,xp:0,fb:"⚠️ The oculostenotic reflex. Angiographic diameter correlates poorly with ischaemia at 50-70%. Measure first — a stent on a non-ischaemic lesion adds risk without benefit.",next:"prep"},
+          {t:"🚪 Defer everything and send her home on medical therapy without measuring",good:false,ds:-1,dt:10,xp:0,fb:"⚠️ You cannot defer a symptomatic high-risk NSTEMI culprit blindly. If physiology is positive it needs treating. Measure, then decide.",next:"prep"}
+        ]},
+      prep:{ text:"You give intracoronary nitrate, reach maximal hyperaemia with adenosine, and the FFR reads 0.75 (drift-checked). What now?",
+        choices:[
+          {t:"🩹 FFR 0.75 ≤ 0.80 = ischaemic → PCI the LAD with a DES, sized 1:1, post-dilated",good:true,ds:1,dt:5,xp:40,fb:"✅ Perfect. Below 0.80 the lesion limits flow and benefits from revascularisation (FAME/FAME-2). Treat the ischaemic lesion.",next:"declare"},
+          {t:"🚪 Defer it anyway — it is only 50-70% on the angiogram",good:false,ds:-1,dt:8,xp:0,fb:"⚠️ You measured 0.75 — that IS ischaemic. Deferring a positive FFR contradicts the physiology you just did. Treat it.",next:"declare"},
+          {t:"🎯 Stent the LAD AND immediately stent every other narrowing you can see",good:false,ds:-1,dt:12,xp:0,fb:"⚠️ Treat the ischaemic lesion, but do not stent bystanders on appearance. Measure the others first — completeness is by significance, not by count.",next:"declare"}
+        ]},
+      declare:{ text:"There is also a 50% RCA lesion. You measure it: FFR 0.88. What is your final strategy?",
+        choices:[
+          {t:"✅ Defer the RCA (FFR 0.88 > 0.80) and stop — functionally complete revascularisation of the ischaemic lesion only",good:true,ds:1,dt:4,xp:45,fb:"🏆 Excellent. Treat what physiology condemns (LAD 0.75), defer what it clears (RCA 0.88). That is functionally complete revascularisation — DEFER shows the 0.88 lesion is safe left alone.",end:true},
+          {t:"🩹 Stent the RCA too, to be thorough",good:false,ds:-1,dt:8,xp:0,fb:"⚠️ FFR 0.88 is above the 0.80 line — this lesion is not flow-limiting. Stenting it adds risk without benefit (DEFER). Defer it and treat medically.",end:true}
+        ]}
+    }});
+
+  initScenario({ box:'scenarioBox2', text:'sc2Text', choices:'sc2Choices', feedback:'sc2Feedback', restart:'sc2Restart', stab:'sc2Stab', time:'sc2Time', xp:'sc2XP', badge:'bdg-complic', winKey:'declare', dots:true, stab0:2, unit:' s',
+    steps:{
+      start:{ text:"Seconds into the IV adenosine infusion for FFR, the monitor shows sudden bradycardia dropping into transient AV block, the BP dips, and the patient feels flushed and short of breath. What is happening, and what do you do FIRST?",
+        choices:[
+          {t:"💉 This is the expected ADENOSINE effect — STOP the adenosine infusion; it is short-acting (half-life seconds) and will self-resolve",good:true,ds:1,dt:3,xp:45,fb:"✅ Right. Transient AV block, flushing and dyspnoea are classic adenosine effects. Stop the infusion and the rhythm recovers within seconds — no drug reverses it, time does.",next:"reverse"},
+          {t:"🚑 Call the arrest team, give atropine and start transcutaneous pacing immediately",good:false,ds:-2,dt:20,xp:0,fb:"☠️ Over-reaction. Adenosine AV block is transient — stopping the infusion resolves it in seconds. Escalate only if the block persists AFTER the drug is off. You just paced a self-limiting effect.",end:true},
+          {t:"💊 Push MORE adenosine to complete the reading before the effect wears off",good:false,ds:-2,dt:15,xp:0,fb:"☠️ Never chase a reading through a symptomatic AV block. More adenosine deepens the block. Stop the drug first, let her recover, then reconsider (iFR needs no adenosine).",end:true}
+        ]},
+      reverse:{ text:"You stop the adenosine and the rhythm and BP recover within seconds. Resuming, as you reposition the pressure wire distally you feel resistance and a small distal filling defect appears. Next?",
+        choices:[
+          {t:"🛑 Suspect a distal WIRE PERFORATION — stop advancing, take an angiogram in 2 views, keep the wire distal for access",good:true,ds:1,dt:6,xp:40,fb:"✅ Exactly. Wire resistance plus a distal defect/staining means possible perforation. Stop, image in orthogonal views, and keep wire access across the site — do not yank blindly.",next:"declare"},
+          {t:"🏃 Rapidly pull the pressure wire all the way out to get a clean picture",good:false,ds:-1,dt:12,xp:0,fb:"⚠️ Withdrawing the wire from a distal perforation removes your access and can let it bleed unopposed. Keep the wire distal and image first.",next:"declare"}
+        ]},
+      declare:{ text:"The angiogram confirms a small distal wire perforation (Ellis type I) with faint myocardial staining, no brisk extravasation. Definitive management?",
+        choices:[
+          {t:"🎈 Prolonged low-pressure proximal balloon inflation, reverse anticoagulation if needed, echo to exclude effusion; coil/fat embolisation only if it persists — most distal wire perforations settle conservatively",good:true,ds:1,dt:5,xp:45,fb:"🏆 Perfect. A small distal (Ellis I) wire perforation is usually managed conservatively — tamponade with a proximal balloon, correct coagulation, monitor with echo, and embolise (coil/fat) only if leakage continues. She stabilises.",end:true},
+          {t:"⏳ Ignore it and keep manipulating the wire to finish the physiology run",good:false,ds:-1,dt:15,xp:0,fb:"⚠️ Continuing to manipulate a perforated distal wire risks extending the tear into a tamponade. Stop, tamponade, image with echo, and treat conservatively.",end:true}
+        ]}
+    }});
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 64-year-old woman has an NSTEMI with dynamic ST depression, a rising troponin, and a GRACE score of 148. What is the recommended timing of invasive angiography?", opts:["Immediate (<2 h), like a STEMI","Early invasive within 24 h","Selective/ischaemia-guided, no routine angiography","Within 72 h is adequate"], correct:1, exp:"High-risk NSTEMI (GRACE >140, rise/fall troponin, dynamic ST changes) warrants an early invasive strategy within 24 h (2023 ESC ACS). Immediate <2 h is reserved for VERY-high-risk features (instability, refractory angina, life-threatening arrhythmia, mechanical complication)." },
+    { q:"On angiography there is an ambiguous 50-70% mid-LAD lesion with preserved flow. The best way to decide whether to stent it is:", opts:["Stent it because it looks significant","Measure physiology — FFR ≤0.80 or iFR ≤0.89 defines an ischaemic lesion to treat","Defer all intermediate lesions automatically","Repeat the angiogram in more views and eyeball it"], correct:1, exp:"Angiographic diameter correlates poorly with ischaemia at 40-70%. FFR ≤0.80 (or iFR ≤0.89) identifies a flow-limiting lesion that benefits from PCI (FAME/FAME-2); above the threshold, deferral is safe (DEFER)." },
+    { q:"You measure FFR across an intermediate lesion and it reads 0.82 (drift-checked, true maximal hyperaemia). The correct action is:", opts:["Stent it — it is close to the threshold","Defer it and treat medically","Give more adenosine to push it lower","Automatically stent because the patient has diabetes"], correct:1, exp:"FFR >0.80 indicates the lesion is not flow-limiting; deferral is safe (DEFER, FAME). 0.82 is above the line — treat medically and do not stent. The threshold is respected in both directions." },
+    { q:"Which statement about iFR (instantaneous wave-free ratio) is correct?", opts:["It requires adenosine-induced hyperaemia","It is a resting index with an ischaemic cut-off of ≤0.89 and needs no adenosine","It is only valid in the left main","It has worse outcomes than FFR"], correct:1, exp:"iFR is a resting diastolic wave-free index; ≤0.89 = significant. It needs no adenosine and gave non-inferior outcomes to FFR with fewer procedural symptoms (DEFINE-FLAIR, iFR-SWEDEHEART)." },
+    { q:"Which clinical setting most makes an FFR value UNRELIABLE / prone to being falsely high (under-calling a lesion)?", opts:["Young patient with a focal lesion","Blunted hyperaemia from microvascular disease or prior MI, or sub-maximal adenosine","A single discrete lesion in a large vessel","Normal LV function"], correct:1, exp:"FFR depends on achieving maximal hyperaemia. Microvascular disease/prior MI blunt the flow response, and sub-maximal adenosine gives a smaller gradient — both raise FFR falsely and can under-call a lesion. Serial lesions, drift, and aortic stenosis are other classic pitfalls." },
+    { q:"During adenosine infusion for FFR the patient develops transient high-grade AV block, flushing and dyspnoea. Your FIRST action is:", opts:["Give atropine and start pacing","Stop the adenosine infusion — its half-life is seconds and the effect self-resolves","Push more adenosine to finish the reading","Cardiovert"], correct:1, exp:"Adenosine has a half-life of seconds; transient AV block, flushing and dyspnoea are expected and resolve on stopping the infusion. Escalate to atropine/pacing only if block persists AFTER the drug is off. In asthmatics prefer a resting index (iFR)." },
+    { q:"After stenting the FFR-positive LAD lesion (FFR was 0.75), the RCA has a 50% lesion measuring FFR 0.88. The correct strategy is:", opts:["Stent the RCA too for completeness","Defer the RCA — it is not flow-limiting; treat only the ischaemic lesion (functionally complete)","Stent every visible lesion","Refer for CABG"], correct:1, exp:"Functionally complete revascularisation means treating the ischaemic (FFR ≤0.80) lesions and deferring the non-significant ones (FFR >0.80). An FFR-0.88 lesion is safely left alone (DEFER); stenting it adds risk without benefit." },
+    { q:"Why is a drift check (re-equalising Pd = Pa at the guide tip at the end of the run) essential before acting on an FFR?", opts:["It speeds up the procedure","Pressure-sensor drift can shift the reading, so a drifted 0.78 may truly be 0.84 (or vice versa)","It is only needed with iFR","It reverses adenosine effects"], correct:1, exp:"Pressure wires can drift during a case. Re-equalising Pd=Pa at the guide tip confirms the reading; without it you may stent a lesion that was actually above threshold, or defer one that was truly ischaemic. Always verify drift, and pull back through diffusely diseased vessels." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length; var sm=document.getElementById('sumMcq'); if(sm) sm.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you let physiology run the cath lab. 🏆':score>=6?'Strong — review the misses and S11 EBM.':'Revisit S1, S5, S6 and S9 — the risk-timing and physiology logic is the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>
