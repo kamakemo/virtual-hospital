@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coronary Bifurcation PCI — LAD/Diagonal (Provisional vs 2-Stent) — Virtual Teaching Hospital</title>
+<!-- META
+id: c-cath-bifurcation-071
+title: Coronary Bifurcation PCI — LAD/Diagonal True Bifurcation (Provisional vs 2-Stent)
+hospital: cardiology
+department: cv-cath
+bednumber: 7
+chiefcomplaint: Crescendo angina — LAD/diagonal true bifurcation (Medina 1,1,1); provisional vs 2-stent decision
+system: Cardiology
+severity: high
+tags: Bifurcation PCI, Medina, Provisional stenting, DK crush, Culotte, POT, Kissing balloon, Jailed wire, Cath lab
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9; --sbw:246px; --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#7c3aed,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:24px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--violet)}
+  .navlink.active{background:linear-gradient(135deg,#7c3aed,#e11d48); color:#fff; border-color:#7c3aed}
+  .navlink.active .s-id{color:#e9d5ff}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+  @media(max-width:860px){
+    :root{--sbw:58px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#4c1d95 0%,#7c3aed 45%,#e11d48 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🔱"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .crumbs{font-size:12.5px; opacity:.85}
+  .hero h1{margin:8px 0 6px; font-size:clamp(22px,3.3vw,33px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#7c3aed}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(115px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:19px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:220px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#7c3aed,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS (tabs) ===== */
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:18.5px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#4c1d95,#e11d48); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(124,58,237,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#7c3aed,#e11d48); color:#fff; box-shadow:0 4px 12px rgba(124,58,237,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--violet); color:var(--violet)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--violet)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#ef4444,#f59e0b,#10b981); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+
+  /* ===== MEDIA ===== */
+  .media-fig{margin:14px 0; border-radius:14px; overflow:hidden; border:1px solid var(--line); background:var(--slate-soft)}
+  .media-fig img{width:100%; display:block; background:#fff}
+  .media-fig .cap{font-size:12px; color:var(--ink2); padding:8px 12px; background:#fff}
+  .media-fig a.src{color:var(--violet); text-decoration:none; font-weight:700}
+  .ang-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0}
+  .ang-fig svg{width:100%; height:auto; display:block}
+  .ang-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+  .video-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; margin:14px 0}
+  .video-card{display:block; text-decoration:none; color:inherit; border:1px solid var(--line); border-radius:14px; overflow:hidden; background:#fff; transition:all .15s}
+  .video-card:hover{transform:translateY(-3px); box-shadow:0 8px 20px rgba(15,23,42,.12); border-color:var(--violet)}
+  .video-card .thumb{position:relative; height:104px; background:linear-gradient(135deg,#312e81,#7c3aed); display:flex; align-items:center; justify-content:center}
+  .video-card .thumb .play{width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,.92); display:flex; align-items:center; justify-content:center; font-size:18px; color:#e11d48}
+  .video-card .thumb .em{position:absolute; top:8px; left:10px; font-size:22px}
+  .video-card .vc-body{padding:9px 11px}
+  .video-card .vc-t{font-size:13px; font-weight:700; line-height:1.25}
+  .video-card .vc-s{font-size:11px; color:var(--ink2); margin-top:3px}
+  .linkrow{display:flex; flex-wrap:wrap; gap:8px; margin:12px 0}
+  .linkchip{display:inline-flex; align-items:center; gap:6px; text-decoration:none; font-size:12.5px; font-weight:700; padding:7px 12px; border-radius:999px; border:1px solid var(--line); background:#fff; color:var(--ink)}
+  .linkchip:hover{border-color:var(--violet); color:var(--violet)}
+
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; margin-bottom:3px}
+
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+  .scorebig{font-size:40px; font-weight:800; background:linear-gradient(135deg,#7c3aed,#e11d48); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🔱</div>
+      <div><div class="t1">Cath Lab</div><div class="t2">Bed 7 · Bifurcation PCI</div></div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🚨</span><span>Presentation &amp; Triage</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">📋</span><span>Pre-Procedure Workup</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩸</span><span>Vascular Access &amp; Setup</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">📽️</span><span>Angiography &amp; Views</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🔬</span><span>Lesion Assessment</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🎬</span><span>Strategy &amp; Decision</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">🛠️</span><span>Intervention Steps</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">✅</span><span>Result &amp; Optimization</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">🏠</span><span>Post-Procedure Care</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">📚</span><span>Evidence-Based Medicine</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">🔭</span><span>Advanced Topics</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">🎥</span><span>Multimedia Library</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">👨‍👩‍👦</span><span>Family &amp; Journey</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">🎮</span><span>Interactive Sim</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">🏆</span><span>Score &amp; Takeaways</span><span class="s-id">S19</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <div class="content">
+  <main>
+    <header class="hero">
+      <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🩻 Cath Lab · 🛏️ Bed 7</div>
+      <h1>🔱 Coronary Bifurcation PCI — LAD/Diagonal True Bifurcation</h1>
+      <div class="sub">⚡ 10:40. A 60-year-old with crescendo angina is on the table. The angiogram shows an LAD/diagonal <strong>true bifurcation — Medina 1,1,1</strong> with a big diagonal you cannot afford to lose. One wire, one balloon, one wrong move can close that branch and give him an infarct on your table. Provisional or two stents? Protect the branch, then decide.</div>
+      <div class="chips">
+        <span class="chip crit">🔷 COMPLEX PCI</span>
+        <span class="chip">🔱 Bifurcation · Medina 1,1,1</span>
+        <span class="chip">📈 LAD / Diagonal</span>
+        <span class="chip">🧵 Provisional-first</span>
+        <span class="chip">🎮 Interactive Procedure</span>
+        <span class="chip">🛡️ Protect the side branch</span>
+      </div>
+    </header>
+
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital"><div class="v-label">💓 HR</div><div class="v-num">78</div></div>
+        <div class="vital warn"><div class="v-label">🩸 BP</div><div class="v-num">150/86</div></div>
+        <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">97%</div></div>
+        <div class="vital alert"><div class="v-label">🔱 Medina</div><div class="v-num">1,1,1</div></div>
+        <div class="vital warn"><div class="v-label">📏 Diagonal</div><div class="v-num">2.75 mm</div></div>
+        <div class="vital warn"><div class="v-label">📐 Bifurcation ∠</div><div class="v-num">~55°</div></div>
+      </div>
+    </div>
+
+    <!-- S1 PRESENTATION & TRIAGE -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🚨 Clinical Presentation &amp; Triage</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 10:40, Cath Lab</b>The angiogram is up on the screen. The interventional cardiologist points: <em>"Proximal LAD disease running straight into a big first diagonal — and the diagonal ostium is diseased too. That is a true bifurcation. If we stent the LAD and lose that branch, he infarcts on the table. What is our strategy?"</em></div>
+
+        <h3>🫀 The vignette</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>🧔 Patient</td><td>Mr. B.K., 60, male · hypertension · dyslipidaemia · ex-smoker · type 2 diabetes</td></tr>
+          <tr><td>💥 Presentation</td><td>Two weeks of crescendo exertional chest tightness, now at rest this morning; troponin mildly elevated → <strong>NSTEMI</strong>, referred for invasive angiography</td></tr>
+          <tr><td>📈 ECG</td><td>Dynamic T-wave inversion V2–V5, no ST elevation; haemodynamically stable, pain-free on nitrate infusion</td></tr>
+          <tr><td>🎯 Culprit anatomy</td><td>Proximal–mid LAD 80% stenosis continuing into the ostium of a large first diagonal (D1, ~2.75 mm), with 70% ostial D1 disease → <strong>Medina 1,1,1 true bifurcation</strong></td></tr>
+          <tr><td>💊 Given</td><td>Aspirin 300 mg + ticagrelor 180 mg loaded; heparin per protocol; statin; on the table for planned PCI</td></tr>
+        </table>
+
+        <div class="media-fig">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Blausen_0260_CoronaryVessels.png" alt="Coronary vessels and branches" loading="lazy" onerror="this.closest('.media-fig').style.display='none'">
+          <div class="cap">🫀 Coronary vessels and their branches — bifurcations are everywhere in the tree. Source: <a class="src" href="https://commons.wikimedia.org/wiki/File:Blausen_0260_CoronaryVessels.png" target="_blank" rel="noopener">Wikimedia Commons (Blausen)</a></div>
+        </div>
+
+        <h3>🚦 Why this lesion is different — the bifurcation problem</h3>
+        <p>A <strong>coronary bifurcation</strong> is where a main vessel divides and gives off a side branch of meaningful size. Roughly <strong>15–20% of all PCIs</strong> involve one. The trouble is mechanical: when you stent the main vessel across the origin of the side branch, you can shift plaque and shift the <strong>carina</strong> (the flow divider) into the side-branch ostium — pinching or occluding a branch that was open a minute ago. The bigger the branch and the more diseased its ostium, the higher the stakes.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Every bifurcation is a trap for the side branch: stent the main vessel and the carina shifts. Keep provisional simple, protect the branch you cannot afford to lose, and only add metal when the branch earns it."</div>
+
+        <h3>🚩 Spot-the-Risk — tap each feature that flags a HIGH-RISK bifurcation where you must protect the side branch (+10 XP each)</h3>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">📏 Large diagonal ≥ 2.5 mm supplying real myocardium</button>
+          <button class="btn ghost flag-btn" data-good="1">🔱 Significant ostial side-branch disease (Medina _,_,1)</button>
+          <button class="btn ghost flag-btn" data-good="1">📐 Angle/anatomy that makes re-access difficult if the branch is lost</button>
+          <button class="btn ghost flag-btn" data-good="1">🩸 Branch feeds a large territory / collaterals</button>
+          <button class="btn ghost flag-btn" data-good="0">🌡️ Temperature 36.6°C</button>
+          <button class="btn ghost flag-btn" data-good="0">🫧 A tiny 1.0 mm twig with no downstream territory</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+      </div>
+    </section>
+
+    <!-- S2 PRE-PROCEDURE WORKUP -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>📋 Pre-Procedure Workup &amp; Planning</h2></div>
+      <div class="section-content">
+        <h3>🧾 Planning a bifurcation before you touch the wire</h3>
+        <ul>
+          <li>🗺️ <strong>Define the anatomy first</strong> — main-vessel reference diameters (proximal and distal segments differ — remember they are NOT equal), side-branch diameter, ostial SB disease, and the bifurcation angle. This is what drives provisional vs 2-stent.</li>
+          <li>🔱 <strong>Classify it</strong> — apply the Medina classification (proximal main, distal main, side branch → each 1 if diseased). A <strong>true bifurcation</strong> = the side branch is diseased (1,1,1 / 0,1,1 / 1,0,1).</li>
+          <li>🛡️ <strong>Decide the default</strong> — provisional single-stent (stent the main vessel, keep the option to treat the SB) is the default for the vast majority. Plan an upfront 2-stent technique only for specific complex true bifurcations (large SB, long/severe ostial SB disease, unfavourable re-access).</li>
+          <li>🧰 <strong>Kit check</strong> — two guidewires (main + side-branch protection), appropriately sized stent, short non-compliant balloons for POT and kissing, and a mental algorithm for bail-out to a 2-stent technique.</li>
+          <li>💊 <strong>Antithrombotics</strong> — DAPT loaded (aspirin + potent P2Y₁₂); procedural anticoagulation as in S3; complex/longer bifurcation work means more contrast and more time — plan for both.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Name the bifurcation before you cross it: main-vessel proximal and distal diameters are different, and the Medina number tells you whether the side branch is in play. Anatomy chosen the strategy long before the stent did."</div>
+
+        <div class="checklist" id="ckPreproc">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Pre-bifurcation planning checklist (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>🗺️ Main-vessel proximal &amp; distal reference diameters and SB diameter measured</span></label>
+          <label class="ck"><input type="checkbox"><span>🔱 Medina classification assigned; true vs pseudo-bifurcation decided</span></label>
+          <label class="ck"><input type="checkbox"><span>🛡️ Default = provisional; explicit criteria noted for upfront 2-stent</span></label>
+          <label class="ck"><input type="checkbox"><span>🧰 Two wires, POT/kissing balloons and stent sizes on the table</span></label>
+          <label class="ck"><input type="checkbox"><span>💊 DAPT loaded; anticoagulation and contrast plan set for a longer case</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- S3 ACCESS -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩸 Vascular Access &amp; Setup</h2></div>
+      <div class="section-content">
+        <h3>🖐️ Radial vs femoral — and the extra support a bifurcation needs</h3>
+        <div class="vs">
+          <div class="side b"><h4>🖐️ Radial (default)</h4><ul><li>Fewer access-site bleeds &amp; vascular complications; lower mortality in ACS (MATRIX)</li><li>Comfortable for a longer, two-wire bifurcation case</li><li>Confirm patency first (Barbeau/Allen); consider distal radial</li></ul></div>
+          <div class="side a"><h4>🦵 Femoral (when you need more)</h4><ul><li>Bigger-bore support for demanding 2-stent work, complex re-access, or if radial fails/spasms</li><li>Higher bleeding — micropuncture + ultrasound guidance, avoid a high/low stick</li></ul></div>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A bifurcation is a two-wire, sometimes two-stent job — set up for support and space. Radial-first, but pick a guide that will still deliver a second stent and a kissing balloon when the plan changes mid-case."</div>
+
+        <h3>💉 Guide, sheath &amp; the room to work</h3>
+        <ul>
+          <li>🔧 <strong>Sheath:</strong> 6 Fr radial handles provisional and most 2-stent techniques; a <strong>7 Fr</strong> (radial or femoral) gives room for simultaneous two-stent delivery (e.g., DK crush, culotte) and comfortable kissing balloons.</li>
+          <li>🧭 <strong>Guide catheter:</strong> for the <strong>LAD/diagonal (left system)</strong> → a supportive <strong>EBU/XB left guide</strong>. Good back-up support lets you deliver a second stent and re-cross without losing position.</li>
+          <li>🩸 <strong>Anticoagulation:</strong> unfractionated heparin (70–100 U/kg, <strong>ACT ~250–300 s</strong>) or bivalirudin. A longer bifurcation case means re-checking the ACT.</li>
+          <li>🧵 <strong>Wires:</strong> a workhorse for the main vessel and a second wire to protect/jail the side branch (polymer-jacketed wires re-cross struts more easily but watch for subintimal entry).</li>
+        </ul>
+
+        <div class="checklist" id="ckAccess">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Bifurcation access &amp; setup</h3>
+          <label class="ck"><input type="checkbox"><span>🖐️ Barbeau A–C confirmed; 6–7 Fr sheath sized for the planned technique</span></label>
+          <label class="ck"><input type="checkbox"><span>🧭 Supportive left guide (EBU/XB) engaged in the left main</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 Anticoagulated to ACT 250–300 s (heparin) or bivalirudin infusion</span></label>
+          <label class="ck"><input type="checkbox"><span>🧵 Main-vessel wire + side-branch protection wire ready/placed</span></label>
+          <label class="ck"><input type="checkbox"><span>🧰 POT/kissing balloons and a bail-out 2-stent kit within reach</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- S4 ANGIOGRAPHY & VIEWS -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>📽️ Diagnostic Angiography &amp; Views</h2></div>
+      <div class="section-content">
+        <h3>🗺️ The coronary tree — and how to open up a bifurcation on screen</h3>
+        <div class="media-fig">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Coronary_arteries.svg" alt="Coronary artery anatomy diagram" loading="lazy" onerror="this.closest('.media-fig').style.display='none'">
+          <div class="cap">🫀 Coronary artery anatomy. Source: <a class="src" href="https://commons.wikimedia.org/wiki/File:Coronary_arteries.svg" target="_blank" rel="noopener">Wikimedia Commons</a> · Atlas: <a class="src" href="https://radiopaedia.org/articles/coronary-arteries" target="_blank" rel="noopener">Radiopaedia</a></div>
+        </div>
+
+        <h3>📐 Which projection un-foreshortens the LAD/diagonal split</h3>
+        <table class="tbl">
+          <tr><th>View</th><th>Best displays</th></tr>
+          <tr><td>🟠 <strong>LAO cranial</strong></td><td>Proximal–mid LAD and the <strong>LAD/diagonal ostia</strong> — a workhorse for this bifurcation</td></tr>
+          <tr><td>🔴 <strong>AP / RAO cranial</strong></td><td>Mid–distal LAD, septal vs diagonal separation, opens LAD bifurcations</td></tr>
+          <tr><td>🔵 <strong>LAO caudal ("spider")</strong></td><td>Left main bifurcation, ostial LAD &amp; LCx — for a left main bifurcation case</td></tr>
+          <tr><td>🟢 <strong>RAO caudal</strong></td><td>Proximal LCx / obtuse marginal bifurcations</td></tr>
+          <tr><td>🎯 <strong>Two orthogonal views</strong></td><td>Confirm the true ostial SB angle and the carina — never size a bifurcation from one silhouette</td></tr>
+        </table>
+
+        <div class="ang-fig">
+          <svg viewBox="0 0 720 210" preserveAspectRatio="xMidYMid meet" aria-label="Schematic LAD/diagonal true bifurcation, Medina 1,1,1">
+            <rect width="720" height="210" fill="#0b1220"/>
+            <text x="20" y="26" fill="#93c5fd" font-size="13" font-weight="700">LAD / diagonal bifurcation — Medina 1,1,1 (schematic)</text>
+            <!-- Left main -->
+            <path d="M110,70 L190,88" stroke="#e5e7eb" stroke-width="10" fill="none" stroke-linecap="round"/>
+            <text x="104" y="60" fill="#cbd5e1" font-size="11">LM</text>
+            <!-- proximal main (LAD) diseased -->
+            <path d="M190,88 L300,104" stroke="#f87171" stroke-width="9" fill="none" stroke-linecap="round"/>
+            <text x="205" y="126" fill="#fca5a5" font-size="11">prox LAD (1)</text>
+            <!-- distal main (LAD) diseased -->
+            <path d="M330,110 L470,140 L590,158" stroke="#f87171" stroke-width="8" fill="none" stroke-linecap="round"/>
+            <text x="470" y="176" fill="#fca5a5" font-size="11">distal LAD (1)</text>
+            <!-- carina / bifurcation point -->
+            <circle cx="315" cy="107" r="7" fill="#facc15"/>
+            <text x="300" y="98" fill="#facc15" font-size="10" font-weight="700">carina</text>
+            <!-- side branch (diagonal) with ostial disease -->
+            <path d="M315,107 L400,58" stroke="#60a5fa" stroke-width="7" fill="none" stroke-linecap="round"/>
+            <circle cx="345" cy="90" r="8" fill="none" stroke="#f87171" stroke-width="3"/>
+            <text x="360" y="52" fill="#93c5fd" font-size="11">D1 (2.75 mm)</text>
+            <text x="330" y="150" fill="#fca5a5" font-size="11">ostial D1 (1)</text>
+            <!-- LCx for context -->
+            <path d="M190,88 L250,150 L340,188 L440,198" stroke="#34d399" stroke-width="7" fill="none" stroke-linecap="round"/>
+            <text x="360" y="196" fill="#6ee7b7" font-size="11">LCx</text>
+          </svg>
+          <div class="ang-cap">Three segments diseased: <span style="color:#f87171">proximal main</span>, <span style="color:#f87171">distal main</span> and the <span style="color:#f87171">side-branch ostium</span> → Medina <strong>1,1,1</strong>, a true bifurcation with a large diagonal at risk.</div>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Un-foreshorten the split before you commit — an LAO/AP cranial view that separates the LAD from the diagonal is worth more than any device. You cannot protect a branch whose ostium you cannot see."</div>
+
+        <div class="linkrow">
+          <a class="linkchip" href="https://www.youtube.com/results?search_query=coronary+bifurcation+angiography+views+LAD+diagonal" target="_blank" rel="noopener">▶️ Bifurcation views — video search</a>
+          <a class="linkchip" href="https://radiopaedia.org/articles/coronary-arteries" target="_blank" rel="noopener">📚 Radiopaedia: coronary arteries</a>
+          <a class="linkchip" href="https://www.incathlab.com/en/search?q=bifurcation" target="_blank" rel="noopener">🎓 inCathLab: bifurcation</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- S5 LESION ASSESSMENT -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🔬 Lesion Assessment — Physiology &amp; Imaging</h2></div>
+      <div class="section-content">
+        <div class="callout info"><b class="ct">🔱 The Medina classification — the shorthand every operator speaks</b>Score three segments as (<strong>proximal main, distal main, side branch</strong>), each <strong>1 if diseased, 0 if not</strong>. Examples: <strong>1,1,1</strong> = disease in all three (a true bifurcation, our case); <strong>1,1,0</strong> = main-vessel disease sparing the SB ostium (a pseudo/non-true bifurcation — provisional is easy); <strong>0,0,1</strong> = isolated ostial SB disease (notoriously hard to treat well). "True bifurcation" = the SB ostium is diseased (the last digit is 1).</div>
+
+        <h3>📏 Physiology of the JAILED side branch — do not over-treat what looks bad</h3>
+        <ul>
+          <li>An angiographically "pinched" side-branch ostium after main-vessel stenting <strong>looks</strong> worse than it behaves. Most jailed side branches with preserved TIMI-3 flow are <strong>not</strong> functionally significant.</li>
+          <li><strong>FFR of the jailed side branch</strong> is the tie-breaker: the majority of angiographically threatened side branches have <strong>FFR &gt; 0.80</strong> and can be safely left alone (do not stent for cosmetics).</li>
+          <li>Treat the side branch (rewire + kissing balloon, or bail-out 2-stent) when it is <strong>flow-limited (TIMI &lt; 3), symptomatic/ischaemic, FFR ≤ 0.80, or a large territory is genuinely threatened.</strong></li>
+        </ul>
+
+        <!-- SIM (FFR of jailed side branch) -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — FFR of the Jailed Side Branch</h3>
+          <p style="font-size:13px">The diagonal ostium looks pinched after the main-vessel stent. Put a pressure wire down it and decide: treat the side branch, or leave it?</p>
+          <label for="kRange">📏 Side-branch FFR: <b id="kVal">0.80</b></label>
+          <input type="range" id="kRange" min="60" max="98" value="80">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout warn-r" id="kReadout">Set the dial to explore treat-vs-leave.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 FFR ≤ 0.80 → the jailed branch is truly ischaemic → treat it. &gt; 0.80 → leave it. Most angiographically threatened side branches are &gt; 0.80 and need nothing.</p>
+        </div>
+
+        <h3>🖥️ Intravascular imaging — indispensable in bifurcations</h3>
+        <div class="vs">
+          <div class="side b"><h4>🔵 IVUS</h4><ul><li>Sizes the proximal &amp; distal main vessel (they differ!), quantifies plaque, guides POT balloon size and stent expansion</li><li>Confirms the wire re-crossed the DISTAL cell and the SB is well apposed</li></ul></div>
+          <div class="side a"><h4>🟠 OCT</h4><ul><li>Ultra-high resolution — shows the exact stent-strut re-cross point, malapposition, and carina; 3D-OCT confirms distal-cell rewiring</li><li>Superb for optimising the final kissing/POT result</li></ul></div>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A jailed side branch that looks awful on angiography usually has an FFR above 0.80 — do not stent a picture. Measure flow, not fear, before you add metal to a bifurcation."</div>
+
+        <div class="linkrow">
+          <a class="linkchip" href="https://www.youtube.com/results?search_query=jailed+side+branch+FFR+bifurcation+PCI" target="_blank" rel="noopener">▶️ Jailed side-branch FFR</a>
+          <a class="linkchip" href="https://www.youtube.com/results?search_query=IVUS+OCT+bifurcation+PCI+optimization" target="_blank" rel="noopener">▶️ IVUS/OCT in bifurcation</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- S6 STRATEGY (branching 1) -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🎬 Strategy &amp; Decision Point — "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <p>The wires are near the bifurcation. Now the branching core — choose provisional vs 2-stent and execute it cleanly. Correct calls score; wrong calls teach.</p>
+        <div class="scenario" id="scenarioBox1">
+          <h3>🎬 Strategy Path — the LAD/diagonal true bifurcation</h3>
+          <div class="hud"><span>❤️ SB flow: <b id="sc1Stab">0</b></span><span>⏱️ Elapsed: <b id="sc1Time">0 min</b></span><span>⚡ Path XP: <b id="sc1XP">0</b></span></div>
+          <div class="scene-text" id="sc1Text">A large diagonal (2.75 mm) with a 70% ostial lesion (Medina 1,1,1). The main-vessel disease is not heavily calcified and the angle is favourable. What is your default strategy?</div>
+          <div class="choices" id="sc1Choices"></div>
+          <div class="feedback" id="sc1Feedback"></div>
+          <button class="btn primary" id="sc1Restart" style="display:none; margin-top:12px">🔄 Replay path</button>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Provisional is the default for almost every bifurcation — one stent in the main vessel, a protection wire in the branch, and only escalate to a second stent when the side branch truly needs it (Nordic/EBC). Two stents is a decision, not a reflex."</div>
+      </div>
+    </section>
+
+    <!-- S7 INTERVENTION STEPS -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>🛠️ Intervention — Step-by-Step Execution</h2></div>
+      <div class="section-content">
+        <div class="media-fig">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Blausen_0034_Angioplasty_Stent_01.png" alt="Coronary angioplasty and stent deployment" loading="lazy" onerror="this.closest('.media-fig').style.display='none'">
+          <div class="cap">🎈 Balloon angioplasty &amp; stent deployment — the building blocks of every bifurcation technique. Source: <a class="src" href="https://commons.wikimedia.org/wiki/File:Blausen_0034_Angioplasty_Stent_01.png" target="_blank" rel="noopener">Wikimedia Commons (Blausen)</a></div>
+        </div>
+
+        <h3>🪜 The provisional sequence — the default, step by step</h3>
+        <ol>
+          <li>🧵 <strong>Wire both branches</strong> — main-vessel wire into the distal LAD, a second <strong>protection ("jailed") wire</strong> into the diagonal. The jailed wire keeps the ostium tented open and marks the branch if it closes.</li>
+          <li>🎈 <strong>Prep the main vessel</strong> — predilate the main-vessel lesion; predilate the SB only if it will not otherwise cross (avoid dissecting the SB ostium).</li>
+          <li>🩹 <strong>Stent the main vessel</strong> across the SB origin, sized 1:1 to the <strong>distal</strong> main reference.</li>
+          <li>🎯 <strong>POT — Proximal Optimisation Technique</strong> — a short non-compliant balloon sized to the <strong>proximal</strong> main reference, inflated up to the carina. POT apposes the proximal stent, corrects the step-up in diameter, and opens the cell facing the side branch so you can rewire it distally.</li>
+          <li>🧵 <strong>Rewire the SB through the DISTAL cell</strong> — re-cross into the branch through the most distal stent strut (distal-cell crossing keeps the struts against the wall; proximal-cell crossing lifts and malapposes the stent). Remove the jailed wire.</li>
+          <li>🎈 <strong>Kissing-balloon inflation (only if the SB needs it)</strong> — simultaneous main + SB balloons to open the SB ostium and restore geometry; then a <strong>final re-POT</strong> to fix any proximal distortion from kissing.</li>
+        </ol>
+
+        <div class="callout purple"><b class="ct">🔧 If you must place two stents — the named techniques</b>
+          <ul style="margin-bottom:0">
+            <li><strong>DK crush (double-kissing crush):</strong> SB stent first, crush, first kiss, rewire, then second kiss — the most reproducible 2-stent technique, best evidence for complex true / left-main bifurcations (DKCRUSH-II/V).</li>
+            <li><strong>Culotte:</strong> both branches fully covered with overlapping stents — good for similar-sized branches; more metal at the proximal segment.</li>
+            <li><strong>T / TAP (T-and-protrusion):</strong> SB stent placed at the ostium (TAP leaves a small protrusion into the main vessel) — simplest bail-out when the SB is compromised after provisional, best for near-90° angles.</li>
+          </ul>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"POT, rewire the distal cell, kiss, re-POT — the four moves that make bifurcation stenting reproducible. Skip the POT and you cannot rewire cleanly; rewire the proximal cell and you malappose the stent you just placed."</div>
+
+        <div class="checklist" id="ckIntervention">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Provisional bifurcation execution</h3>
+          <label class="ck"><input type="checkbox"><span>🧵 Both branches wired; protection (jailed) wire in the diagonal</span></label>
+          <label class="ck"><input type="checkbox"><span>🩹 Main-vessel stent deployed 1:1 to the distal reference across the SB</span></label>
+          <label class="ck"><input type="checkbox"><span>🎯 POT performed (proximal-sized NC balloon up to the carina)</span></label>
+          <label class="ck"><input type="checkbox"><span>🧵 SB rewired through the DISTAL cell; jailed wire removed</span></label>
+          <label class="ck"><input type="checkbox"><span>🎈 Kissing balloon (if SB needs it) then FINAL re-POT</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+
+        <div class="linkrow">
+          <a class="linkchip" href="https://www.youtube.com/results?search_query=provisional+stenting+bifurcation+POT+kissing+balloon" target="_blank" rel="noopener">▶️ Provisional + POT technique</a>
+          <a class="linkchip" href="https://www.youtube.com/results?search_query=DK+crush+bifurcation+technique+step+by+step" target="_blank" rel="noopener">▶️ DK crush step-by-step</a>
+          <a class="linkchip" href="https://www.incathlab.com/en/search?q=bifurcation+stenting" target="_blank" rel="noopener">🎓 inCathLab procedures</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- S8 RESULT & OPTIMIZATION -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>✅ Result Assessment &amp; Optimization</h2></div>
+      <div class="section-content">
+        <h3>📊 The final check — both branches, plus the proximal segment</h3>
+        <table class="tbl">
+          <tr><th>Metric</th><th>Target</th><th>Why</th></tr>
+          <tr><td>🌊 <strong>Flow in BOTH branches</strong></td><td>TIMI 3 in main vessel and side branch</td><td>A pinched but TIMI-3 side branch is usually fine; TIMI &lt; 3 in a large SB threatens infarct</td></tr>
+          <tr><td>🎯 <strong>Final POT done</strong></td><td>Proximal segment apposed, cells restored</td><td>Kissing balloon distorts the proximal main — a final re-POT corrects it; skipping it leaves malapposition</td></tr>
+          <tr><td>📉 <strong>Residual stenosis</strong></td><td>&lt; 10–20% main; acceptable SB ostium</td><td>Do not chase a perfect SB ostium if FFR &gt; 0.80 / TIMI-3 — over-treatment adds risk</td></tr>
+          <tr><td>🔎 <strong>Stent expansion/apposition</strong> (IVUS/OCT)</td><td>Full expansion, distal-cell rewire confirmed, well apposed</td><td>Under-expansion &amp; proximal-cell rewiring predict thrombosis/restenosis in bifurcations</td></tr>
+          <tr><td>🩹 <strong>Edge / carina dissection</strong></td><td>None flow-limiting</td><td>A flow-limiting SB-ostial or edge dissection may force a bail-out SB stent (TAP)</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Finish with a POT, not with a kiss — the last thing your balloon touches should be the proximal main vessel. A beautiful kissing shot over a distorted, malapposed proximal segment is a future stent thrombosis."</div>
+
+        <div class="callout ok"><b class="ct">✅ Result</b>Provisional single stent to the LAD across the diagonal, POT → distal-cell rewire → the diagonal stayed TIMI-3 with only a mild ostial pinch (FFR 0.86), so no SB stent needed → final re-POT. One stent, both branches open, no complication.</div>
+      </div>
+    </section>
+
+    <!-- S9 COMPLICATIONS (branching 2) -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>⚠️ Complication Recognition &amp; Management</h2></div>
+      <div class="section-content">
+        <h3>💀 The bifurcation complications you must recognise instantly</h3>
+        <table class="tbl">
+          <tr><th>Clue</th><th>Complication</th><th>Action</th></tr>
+          <tr><td>Side branch abruptly goes TIMI 0–1 after main-vessel stenting</td><td>🚫 <strong>Side-branch occlusion (carina/plaque shift)</strong></td><td>Rewire the SB through the DISTAL cell, balloon/kissing to restore flow; if it will not stay open, bail out to TAP/culotte</td></tr>
+          <tr><td>You did NOT keep a protection wire and now cannot re-enter the SB</td><td>🧵 <strong>Lost wire access to the side branch</strong></td><td>Reshape wire, use a polymer-jacketed/angulated wire, microcatheter support, dual-angle views; consider 3D-OCT to find the ostium</td></tr>
+          <tr><td>Stent lifts off the wall after rewiring/ballooning</td><td>🧱 <strong>Stent malapposition / proximal distortion</strong></td><td>Rewire the correct (distal) cell, POT/re-POT; IVUS/OCT to confirm apposition</td></tr>
+          <tr><td>New dissection at the SB ostium or main-vessel edge</td><td>🩹 <strong>Ostial/edge dissection</strong></td><td>Cover with a stent (TAP for SB ostium); confirm with imaging</td></tr>
+          <tr><td>Wire buckles into the wall, no distal flow after "recross"</td><td>⚠️ <strong>Subintimal SB rewire</strong></td><td>Do NOT balloon — re-cross into the true lumen first (imaging-guided), then treat</td></tr>
+        </table>
+
+        <div class="scenario" id="scenarioBox2">
+          <h3>🎬 Complication Drill — "The Diagonal Just Went Dark"</h3>
+          <div class="hud"><span>❤️ Stability: <b id="sc2Stab">●●●○○</b></span><span>⏱️ Elapsed: <b id="sc2Time">0 s</b></span><span>⚡ Path XP: <b id="sc2XP">0</b></span></div>
+          <div class="scene-text" id="sc2Text">Right after the main-vessel stent and POT, the large diagonal abruptly goes TIMI-0. The patient has chest pain, fresh T-wave changes and ventricular ectopy — and you did NOT keep a protection wire in that branch. What do you do FIRST?</div>
+          <div class="choices" id="sc2Choices"></div>
+          <div class="feedback" id="sc2Feedback"></div>
+          <button class="btn primary" id="sc2Restart" style="display:none; margin-top:12px">🔄 Replay drill</button>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"An occluded large side branch is a periprocedural MI in progress — rewire it through the distal cell and restore flow. The cheapest insurance against this whole disaster was the protection wire you should have jailed in the first place."</div>
+      </div>
+    </section>
+
+    <!-- S10 POST-PROCEDURE -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>🏠 Post-Procedure Care, Debrief &amp; Assessment</h2></div>
+      <div class="section-content">
+        <h3>🩹 Access-site &amp; early monitoring</h3>
+        <ul>
+          <li>🖐️ Radial: patent-haemostasis band, watch for radial artery occlusion &amp; bleeding after a longer case.</li>
+          <li>🫀 Watch for <strong>periprocedural MI</strong> — a compromised side branch can raise troponin and cause a regional wall-motion abnormality; repeat ECG and troponin, echo if symptomatic.</li>
+        </ul>
+
+        <h3>💊 Secondary prevention (start day 1)</h3>
+        <ul>
+          <li><strong>DAPT</strong> — aspirin + a P2Y₁₂ inhibitor; complex bifurcation / 2-stent work leans toward a full 12-month DAPT course (individualise by bleeding risk) given higher stent thrombosis risk.</li>
+          <li><strong>High-intensity statin</strong> (atorvastatin 80 mg) regardless of LDL; add ezetimibe/PCSK9i to target; tight <strong>diabetes</strong> and blood-pressure control.</li>
+          <li><strong>Beta-blocker / ACE inhibitor</strong> as indicated; cardiac rehab, smoking-cessation reinforcement, risk-factor control.</li>
+          <li>🖥️ Document the technique (provisional vs 2-stent, POT/kissing performed, imaging findings) — it matters for any future re-intervention.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Two stents and a diabetic vessel means you protect the result with DAPT and the patient with statins and risk-factor control. The elegant kissing shot is undone by an untreated LDL and an uncontrolled sugar."</div>
+
+        <div class="callout info"><b class="ct">🧪 Mini-quiz &amp; score</b>Head to <strong>S18 (MCQs)</strong> for the case assessment and <strong>S19</strong> for your procedure score and the key takeaways.</div>
+      </div>
+    </section>
+
+    <!-- S11 EBM -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>📚 Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <div class="ebm">
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">RCT</span> Nordic Bifurcation (I)</td><td>Provisional single-stent = complex 2-stent for clinical outcomes in most bifurcations, with less procedure time/contrast.</td><td>Provisional is the default strategy.</td></tr>
+            <tr><td><span class="lvl">RCT</span> BBC ONE / BBK</td><td>Simple (provisional) strategy matched or beat systematic 2-stent for most non-left-main bifurcations.</td><td>Keep it simple unless the SB demands more.</td></tr>
+            <tr><td><span class="lvl">RCT</span> DKCRUSH-II</td><td>When a 2-stent is chosen, DK crush reduced TVR/restenosis vs provisional in complex true bifurcations.</td><td>If two stents, DK crush is the benchmark technique.</td></tr>
+            <tr><td><span class="lvl">RCT</span> DKCRUSH-V</td><td>In distal left-main true bifurcations, planned DK crush beat provisional (TLF, stent thrombosis).</td><td>Complex LM/true bifurcations favour upfront DK crush.</td></tr>
+            <tr><td><span class="lvl">RCT</span> EBC MAIN</td><td>In left-main bifurcations, a stepwise provisional approach was non-inferior to systematic 2-stent.</td><td>Even in LM, start provisional in many; escalate as needed.</td></tr>
+            <tr><td><span class="lvl">Study</span> Jailed side-branch FFR</td><td>Most angiographically threatened jailed side branches have FFR &gt; 0.80 and do not need treatment.</td><td>Do not stent a jailed SB for angiographic appearance alone.</td></tr>
+            <tr><td><span class="lvl">GL</span> 2021 ESC/EACTS revasc + EBC consensus</td><td>Provisional single-stent recommended as default; POT, distal-cell rewiring and final kissing are core steps.</td><td>Technique fundamentals: POT → rewire distal cell → kiss → re-POT.</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- S12 ADVANCED -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>🔭 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <ul>
+            <li>🎯 <strong>POT geometry:</strong> the proximal main vessel obeys Murray/Finet law (proximal diameter ≈ 0.678 × [main + side]) — POT with a proximal-sized balloon corrects the step-up and prevents proximal malapposition; POT-side-POT is a rewiring aid.</li>
+            <li>🧵 <strong>Distal- vs proximal-cell rewiring:</strong> distal-cell re-cross keeps struts against the SB ostial wall; proximal-cell re-cross lifts the stent and leaves metal across the ostium — 3D-OCT confirms the cell.</li>
+            <li>🔧 <strong>DK crush nuances:</strong> the two kissing inflations and adequate crush length drive its superiority; balloon crush vs stent crush; step-crush variations.</li>
+            <li>🔩 <strong>Culotte vs T/TAP vs DK crush:</strong> culotte for similar-caliber branches, TAP for near-90° angles as a bail-out, DK crush for large-SB complex true / left-main bifurcations.</li>
+            <li>🫀 <strong>Left main bifurcation:</strong> IVUS-mandatory; MADS classification of strategies; DKCRUSH-V vs EBC MAIN debate — provisional-first vs upfront DK crush by complexity.</li>
+            <li>🖥️ <strong>Imaging-guided bifurcation PCI:</strong> IVUS/OCT improves outcomes; OCT bifurcation software identifies the rewire cell and carina; final MSA and apposition are the quality metrics.</li>
+            <li>🪨 <strong>Calcium at the bifurcation:</strong> unprepared calcium ruins expansion and rewiring — modify with NC/scoring balloons, atherectomy or intravascular lithotripsy before stenting.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- S13 MULTIMEDIA LIBRARY -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>🎥 Real Multimedia Library</h2></div>
+      <div class="section-content">
+        <p>🎬 <em>Click a card to open the most relevant procedural videos (YouTube search), or jump to atlas &amp; procedural-library resources. Links open in a new tab.</em></p>
+        <div class="video-grid">
+          <a class="video-card" href="https://www.youtube.com/results?search_query=coronary+bifurcation+PCI+provisional+stenting+live+case" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">🔱</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">Provisional Bifurcation PCI</div><div class="vc-s">Live-case video search</div></div>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/results?search_query=Medina+classification+coronary+bifurcation" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">🧭</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">Medina Classification</div><div class="vc-s">Reading a bifurcation</div></div>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/results?search_query=proximal+optimization+technique+POT+bifurcation" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">🎯</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">POT Technique</div><div class="vc-s">Proximal optimisation</div></div>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/results?search_query=kissing+balloon+inflation+bifurcation+PCI" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">💋</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">Kissing Balloon</div><div class="vc-s">Final kiss &amp; re-POT</div></div>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/results?search_query=DK+crush+technique+bifurcation+step+by+step" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">🔧</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">DK Crush</div><div class="vc-s">Double-kissing crush</div></div>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/results?search_query=culotte+stenting+bifurcation+technique" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">🩹</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">Culotte Stenting</div><div class="vc-s">Two-stent technique</div></div>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/results?search_query=side+branch+occlusion+bifurcation+PCI+rewire" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">🚫</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">Side-Branch Occlusion</div><div class="vc-s">Rewire &amp; rescue</div></div>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/results?search_query=left+main+bifurcation+PCI+DKCRUSH+EBC+MAIN" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">🫀</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">Left Main Bifurcation</div><div class="vc-s">DKCRUSH-V vs EBC MAIN</div></div>
+          </a>
+        </div>
+
+        <h3>📚 Atlas &amp; procedural-library links</h3>
+        <div class="linkrow">
+          <a class="linkchip" href="https://www.incathlab.com/en/search?q=bifurcation" target="_blank" rel="noopener">🎓 inCathLab — bifurcation library</a>
+          <a class="linkchip" href="https://radiopaedia.org/articles/coronary-arteries" target="_blank" rel="noopener">📖 Radiopaedia: coronary arteries</a>
+          <a class="linkchip" href="https://radiopaedia.org/search?q=coronary%20artery%20disease&scope=cases" target="_blank" rel="noopener">🖼️ Radiopaedia: CAD cases</a>
+          <a class="linkchip" href="https://commons.wikimedia.org/wiki/Category:Coronary_angiography" target="_blank" rel="noopener">🗂️ Wikimedia: angiography images</a>
+        </div>
+        <p style="font-size:12px; color:var(--ink2)">🔎 Tip: search links always resolve to current results; direct video IDs age out, so the library uses live searches for the freshest teaching cases.</p>
+      </div>
+    </section>
+
+    <!-- S14 FAMILY & JOURNEY -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>👨‍👩‍👦 Family &amp; Patient Journey</h2></div>
+      <div class="section-content">
+        <div class="journey">
+          <div class="j-card"><div class="j-who">🧔 The patient</div><p>"They explained there was a fork in the artery, and the tricky part was not blocking the smaller branch while they fixed the big one. I woke up with no pain and one stent — they said the branch stayed open on its own."</p></div>
+          <div class="j-card"><div class="j-who">👩 His wife</div><p>"The doctor drew the Y-shape on paper — one road splitting into two — and said the plan was to use one stent if they could, two only if they had to. It made the waiting bearable to understand it."</p></div>
+          <div class="j-card"><div class="j-who">🩻 The operator</div><p>"True bifurcation, big diagonal, Medina 1,1,1. We kept a protection wire in the branch, stented the LAD, did a POT, rewired the distal cell — the diagonal held with an FFR of 0.86, so we left it. One stent, done."</p></div>
+          <div class="j-card"><div class="j-who">🎓 The takeaway</div><p>"Provisional first, protect the branch, POT and rewire the distal cell, and measure the branch before you stent it. Restraint is a technique."</p></div>
+        </div>
+        <div class="callout pink"><b class="ct">💗 The human thread</b>A bifurcation decision is invisible to the patient but decides whether he leaves with one stent and an open branch — or an infarct from a lost diagonal. Explain the fork, the plan, and why "one stent" is often the better, braver answer.</div>
+      </div>
+    </section>
+
+    <!-- S15 M&M -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The Diagonal Nobody Protected"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> An LAD/diagonal true bifurcation with a <strong>large 2.75 mm first diagonal</strong>. Running behind, the operator chose provisional but skipped the protection wire — "it is only a diagonal." He stented the LAD across the ostium and did a quick POT. The next cine showed the diagonal was <strong>TIMI-0</strong> — carina and plaque shift had slammed the ostium shut. With no jailed wire to mark the branch, repeated attempts to rewire it went <strong>subintimal</strong>; the ostium could not be found across the fresh stent struts. Twenty minutes of ischaemia later the diagonal was still occluded. The patient developed a large <strong>periprocedural MI</strong>, a new anterolateral wall-motion abnormality and a troponin in the thousands, and left the lab in heart failure.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🧵 NO PROTECTION WIRE</b>The jailed wire that would have marked the branch and eased re-access was skipped to save time.</div>
+            <div class="hole"><b>📏 UNDERRATED THE BRANCH</b>A 2.75 mm diagonal supplies real myocardium — it was treated as disposable.</div>
+            <div class="hole"><b>🎯 NO EARLY POT/PLAN</b>No stepwise provisional plan to rewire and kiss if the branch pinched.</div>
+            <div class="hole"><b>⚠️ SUBINTIMAL REWIRE</b>Without a marker wire, re-access failed and went subintimal — then time ran out.</div>
+            <div class="hole"><b>⏱️ TIME PRESSURE</b>Rushing turned a routine provisional into an infarct.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> <em>jail a protection wire in any side branch you cannot afford to lose.</em> If the branch then closes, the wire marks the ostium and tents it open so you can rewire the distal cell, kiss, and re-POT within minutes. Size the branch and respect it: a 2.75 mm diagonal is not disposable. This is exactly the drill rehearsed in S9.</p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The wire you were too rushed to jail is the wire you will beg for when the branch closes. Protect first, stent second — a marked ostium is rescuable, a lost one is an infarct."</div>
+      </div>
+    </section>
+
+    <!-- S16 INTERACTIVE SIM -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>🎮 Interactive Simulation</h2></div>
+      <div class="section-content">
+        <div class="sim" id="dtbSim">
+          <h3 style="margin-top:0">🎮 Simulation — The Side-Branch Jeopardy Meter</h3>
+          <p style="font-size:13px">After the main-vessel stent and POT, drag the degree of side-branch ostial compromise and decide: leave it, assess it, or rescue it. Higher compromise = more jeopardy to a large diagonal.</p>
+          <label for="dtbRange">🚧 Side-branch ostial compromise: <b id="dtbVal">40</b> %</label>
+          <input type="range" id="dtbRange" min="0" max="100" value="40">
+          <div class="gauge"><div class="needle" id="dtbNeedle"></div></div>
+          <div class="readout good" id="dtbReadout">Set the meter to explore.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 &lt; 50% with TIMI-3 → leave it (provisional success). 50–75% → assess flow/FFR (leave if FFR &gt; 0.80). &gt; 75% or TIMI &lt; 3 → rewire distal cell + kissing balloon, escalate to TAP/culotte if it will not stay open.</p>
+        </div>
+        <p style="font-size:12.5px; color:var(--ink2)">👉 The jailed side-branch FFR dial lives in <strong>S5</strong>; the two branching decision engines are in <strong>S6</strong> (provisional vs 2-stent strategy) and <strong>S9</strong> (side-branch occlusion / lost wire).</p>
+      </div>
+    </section>
+
+    <!-- S17 PEARLS -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>🛡️ Provisional is the default</b>One stent in the main vessel; escalate only when the SB truly needs it (Nordic/EBC/BBC ONE).</div>
+          <div class="pearl"><b>🔱 Medina in three digits</b>Proximal main, distal main, side branch — last digit 1 = true bifurcation.</div>
+          <div class="pearl"><b>🧵 Jail the wire</b>Protect any branch you cannot afford to lose — it marks and tents the ostium if it closes.</div>
+          <div class="pearl"><b>🎯 Always POT</b>Proximal-sized balloon to the carina — apposes the proximal stent and opens the cell to rewire.</div>
+          <div class="pearl"><b>🧵 Rewire the DISTAL cell</b>Distal-cell re-cross keeps struts on the wall; proximal-cell re-cross malapposes the stent.</div>
+          <div class="pearl"><b>📏 Do not stent a picture</b>Most jailed SBs have FFR &gt; 0.80 — measure flow before adding metal.</div>
+          <div class="pearl"><b>🔧 If two stents → DK crush</b>Best evidence for complex true / left-main bifurcations (DKCRUSH-II/V).</div>
+          <div class="pearl"><b>💋 Finish with a POT, not a kiss</b>Re-POT after kissing corrects proximal distortion/malapposition.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- S18 MCQs -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers score toward your S19 total.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- S19 SCORE & TAKEAWAYS -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>🏆 Score Summary &amp; Key Takeaways</h2></div>
+      <div class="section-content">
+        <div style="text-align:center; margin:10px 0 18px">
+          <div class="scorebig" id="finalXP">0</div>
+          <div style="font-size:13px; color:var(--ink2)">total XP earned this case</div>
+        </div>
+        <table class="tbl">
+          <tr><th>Metric</th><th>Value</th></tr>
+          <tr><td>📚 Sections read</td><td id="sumVisit">0 / 19</td></tr>
+          <tr><td>🧠 MCQ score</td><td id="sumMcq">0 / 8</td></tr>
+          <tr><td>🩺 Checklists completed</td><td id="sumCk">0 / 4</td></tr>
+          <tr><td>🎬 Decision paths solved</td><td id="sumPath">0 / 2</td></tr>
+        </table>
+        <h3>🎯 The five things to carry out of this case</h3>
+        <ol>
+          <li>🛡️ <strong>Provisional first</strong> — one stent in the main vessel is the default for the vast majority of bifurcations.</li>
+          <li>🧵 <strong>Protect the branch</strong> — jail a wire in any side branch you cannot afford to lose; it is your cheapest insurance.</li>
+          <li>🎯 <strong>POT → rewire distal cell → kiss → re-POT</strong> — the four moves that make bifurcation stenting reproducible.</li>
+          <li>📏 <strong>Measure, do not cosmetic-stent</strong> — most jailed side branches have FFR &gt; 0.80 and need nothing.</li>
+          <li>🔧 <strong>If two stents, DK crush</strong> — best evidence for complex true and left-main bifurcations.</li>
+        </ol>
+        <div class="callout ok"><b class="ct">✅ You protected the branch and kept it simple</b>One drug-eluting stent to the LAD, protection wire in the diagonal, POT and distal-cell rewire, SB held with FFR 0.86 — no second stent, no complication. Now finish with DAPT, a high-intensity statin, and tight risk-factor control.</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🩻 Cath Lab · Bed 7 — Coronary Bifurcation PCI, LAD/Diagonal<br>⚠️ Educational use only — not for clinical decision-making. External links open in a new tab. "Simple enough to remember, impossible to forget."</div>
+  </main>
+  </div>
+</div>
+
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Risk-Spot</span>
+      <span class="badge" id="bdg-strategy">🎯 Strategy</span>
+      <span class="badge" id="bdg-complic">🩸 Complication</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Score by spotting risks, running the sims, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  var XP=0, XP_MAX=1400, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; var fx=document.getElementById('finalXP'); if(fx) fx.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+  /* ===== SIDEBAR TABS ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 19'; var sv=document.getElementById('sumVisit'); if(sv) sv.textContent=n+' / 19'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=19){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'High-risk feature'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not a high-risk feature'); } if(found===total){ flagResult.textContent='✅ All '+total+' high-risk bifurcation features found'+(wrong?' (with '+wrong+' wrong)':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Risk-Spot badge'); } else { flagResult.textContent=found+' / '+total+' high-risk features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Reveal'); } }); });
+
+  /* ===== SIM 1: FFR of jailed side branch ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10)/100; kVal.textContent=v.toFixed(2); var pct=(parseInt(kRange.value,10)-60)/(98-60)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<=0.75){ msg='🔴 FFR '+v.toFixed(2)+' — the jailed side branch is truly ischaemic. Treat it (rewire + kissing balloon, or bail out to TAP/DK crush).'; cls='bad'; }
+      else if(v<=0.80){ msg='🟠 FFR '+v.toFixed(2)+' — at/below the 0.80 threshold → ischaemic → treat the side branch.'; cls='warn-r'; }
+      else if(v<=0.85){ msg='🟠 FFR '+v.toFixed(2)+' — just above threshold → generally LEAVE the jailed branch (grey zone, use judgement).'; cls='warn-r'; }
+      else { msg='🟢 FFR '+v.toFixed(2)+' — not flow-limiting → LEAVE the jailed side branch. Most angiographically threatened SBs sit here and need nothing.'; cls='good'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ffrsim','SB-FFR Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== SIM 2: side-branch ostial compromise ===== */
+  var dtb=document.getElementById('dtbRange'), dtbVal=document.getElementById('dtbVal'), dtbNeedle=document.getElementById('dtbNeedle'), dtbReadout=document.getElementById('dtbReadout');
+  if(dtb){ var dtbUsed=false;
+    function updateDtb(){ var v=parseInt(dtb.value,10); dtbVal.textContent=v; var pct=(v-0)/(100-0)*100; dtbNeedle.style.left=(100-pct)+'%'; var msg,cls;
+      if(v<50){ msg='🟢 '+v+'% ostial compromise with TIMI-3 flow — provisional success. Leave the jailed side branch, pull the wire, final POT, done.'; cls='good'; }
+      else if(v<=75){ msg='🟠 '+v+'% compromise — assess flow/physiology. If TIMI-3 and FFR > 0.80, leave it; low threshold to rewire the distal cell + kiss.'; cls='warn-r'; }
+      else { msg='🔴 '+v+'% compromise / TIMI < 3 — the large diagonal is jeopardised. Rewire the DISTAL cell, kissing-balloon inflate, escalate to TAP/culotte if it will not stay open.'; cls='bad'; }
+      dtbReadout.textContent=msg; dtbReadout.className='readout '+cls; if(!dtbUsed){ dtbUsed=true; addXP(15,'dtbsim','Side-branch triage'); } }
+    dtb.addEventListener('input', updateDtb); updateDtb();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; var sc=document.getElementById('sumCk'); if(sc) sc.textContent=ckDone+' / '+totalCk; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-quiz'); addXP(20,'allck','All checklists'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== GENERIC SCENARIO ENGINE (two instances) ===== */
+  var pathsSolved=0;
+  function initScenario(cfg){
+    var box=document.getElementById(cfg.box); if(!box) return;
+    var elText=document.getElementById(cfg.text), elChoices=document.getElementById(cfg.choices), elFb=document.getElementById(cfg.feedback),
+        elRestart=document.getElementById(cfg.restart), elStab=document.getElementById(cfg.stab), elTime=document.getElementById(cfg.time), elXP=document.getElementById(cfg.xp);
+    var pXP=0, stab=cfg.stab0, elapsed=0;
+    function renderStab(){ if(cfg.dots){ var s=Math.max(0,Math.min(5,stab)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); elStab.textContent=d; } else { elStab.textContent=stab; } }
+    function render(key){ var st=cfg.steps[key]; elText.textContent=st.text; elFb.className='feedback'; elFb.style.display='none'; elChoices.innerHTML='';
+      st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pXP+=ch.xp; elXP.textContent=pXP; elapsed+=ch.dt; elTime.textContent=elapsed+cfg.unit; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Decision'); elFb.textContent=ch.fb; elFb.className='feedback '+(ch.good?'good':'bad'); elFb.style.display='block'; [].slice.call(elChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ elRestart.style.display='inline-block'; if(ch.good && key===cfg.winKey){ earnBadge(cfg.badge); pathsSolved++; var sp=document.getElementById('sumPath'); if(sp) sp.textContent=pathsSolved+' / 2'; addXP(20,cfg.box+'-win','Path solved'); } } else if(ch.next){ setTimeout(function(){ render(ch.next); },1400); } }); elChoices.appendChild(b); }); }
+    elRestart.addEventListener('click', function(){ pXP=0; stab=cfg.stab0; elapsed=0; elXP.textContent=0; elTime.textContent='0'+cfg.unit; renderStab(); elRestart.style.display='none'; render('start'); });
+    renderStab(); render('start');
+  }
+
+  initScenario({ box:'scenarioBox1', text:'sc1Text', choices:'sc1Choices', feedback:'sc1Feedback', restart:'sc1Restart', stab:'sc1Stab', time:'sc1Time', xp:'sc1XP', badge:'bdg-strategy', winKey:'declare', dots:false, stab0:0, unit:' min',
+    steps:{
+      start:{ text:"A large diagonal (2.75 mm) with a 70% ostial lesion (Medina 1,1,1). The main-vessel disease is not heavily calcified and the angle is favourable. What is your default strategy?",
+        choices:[
+          {t:"🛡️ Provisional: keep a jailed protection wire in the diagonal, stent the LAD across the ostium, then POT",good:true,ds:1,dt:5,xp:40,fb:"✅ Correct. Provisional single-stent is the default for the vast majority of bifurcations (Nordic/BBC ONE/EBC). Protect the branch, stent the main vessel, POT — escalate only if the SB demands it.",next:"prep"},
+          {t:"🔧 Upfront DK crush for this lesion regardless — two stents is more thorough",good:false,ds:0,dt:12,xp:0,fb:"⚠️ Not the default. Systematic 2-stent for a run-of-the-mill true bifurcation adds metal, time and stent-thrombosis risk without benefit. Reserve upfront DK crush for complex true / left-main bifurcations. Provisional first.",next:"prep"},
+          {t:"🎈 Kissing-balloon both branches with NO stent to save time",good:false,ds:-1,dt:10,xp:0,fb:"⚠️ Balloon-only has high recoil/re-occlusion in significant disease — a drug-eluting stent in the main vessel is standard. Do the provisional properly.",next:"prep"}
+        ]},
+      prep:{ text:"You stented the LAD across the diagonal and did a POT — but the diagonal ostium now looks pinched with TIMI-2 flow. Next move?",
+        choices:[
+          {t:"🧵 Rewire the SB through the DISTAL stent cell, kissing-balloon inflate, then re-POT",good:true,ds:1,dt:5,xp:40,fb:"✅ Perfect. Distal-cell rewiring keeps the struts against the wall; kissing opens the ostium; the final re-POT corrects proximal distortion. That is the provisional bail-out done right.",next:"declare"},
+          {t:"↩️ Rewire through the PROXIMAL cell and balloon the ostium",good:false,ds:-1,dt:8,xp:0,fb:"⚠️ Proximal-cell rewiring lifts and malapposes the stent you just placed, leaving metal floating across the ostium. Always re-cross the DISTAL cell.",next:"declare"},
+          {t:"😴 Pull the jailed wire and finish — it is only a diagonal",good:false,ds:-1,dt:6,xp:0,fb:"⚠️ A pinched large diagonal with TIMI-2 can progress to occlusion and a periprocedural MI (see S15). Assess it and rewire/kiss if it is genuinely compromised.",next:"declare"}
+        ]},
+      declare:{ text:"After kissing + re-POT the diagonal is TIMI-3 with a mild residual ostial pinch; SB-FFR reads 0.86. Final call?",
+        choices:[
+          {t:"✅ Provisional succeeded — leave the SB (FFR > 0.80), confirm expansion/apposition on IVUS/OCT, final POT, done",good:true,ds:1,dt:4,xp:45,fb:"🏆 Excellent. One stent, both branches TIMI-3, a functionally non-significant SB left alone, proximal segment optimised. A complete, restrained result.",end:true},
+          {t:"🔩 Convert to a culotte anyway for a 'complete' two-stent look",good:false,ds:-1,dt:9,xp:0,fb:"⚠️ Unnecessary. Adding a second stent to a well-functioning SB (FFR 0.86, TIMI-3) only adds metal, overlap and stent-thrombosis risk. Do not stent a picture.",end:true}
+        ]}
+    }});
+
+  initScenario({ box:'scenarioBox2', text:'sc2Text', choices:'sc2Choices', feedback:'sc2Feedback', restart:'sc2Restart', stab:'sc2Stab', time:'sc2Time', xp:'sc2XP', badge:'bdg-complic', winKey:'declare', dots:true, stab0:2, unit:' s',
+    steps:{
+      start:{ text:"Right after the main-vessel stent and POT, the large diagonal abruptly goes TIMI-0. The patient has chest pain, fresh T-wave changes and ventricular ectopy — and you did NOT keep a protection wire in that branch. What do you do FIRST?",
+        choices:[
+          {t:"🧵 Rewire the occluded diagonal through the DISTAL stent cell and restore flow with a balloon",good:true,ds:1,dt:6,xp:45,fb:"✅ Right. An occluded large side branch is a periprocedural MI in progress — re-access it through the distal cell and get flow back now. (A jailed wire would have made this far easier.)",next:"reverse"},
+          {t:"😴 Accept the occlusion — it is only a diagonal — and finish the case",good:false,ds:-2,dt:20,xp:0,fb:"☠️ This is the M&M case. A 2.75 mm diagonal supplies real myocardium — abandoning it causes a periprocedural MI and a new wall-motion abnormality. Restart.",end:true},
+          {t:"🎈 Aggressively high-pressure post-dilate the main stent to 'push' the branch open",good:false,ds:-2,dt:15,xp:0,fb:"☠️ Over-dilating the main vessel worsens carina shift and buries the ostium further — it does not open the branch. Restart.",end:true}
+        ]},
+      reverse:{ text:"You re-cross the diagonal (distal cell) and a balloon restores some flow, but the ostium is tight and distorted. Next?",
+        choices:[
+          {t:"🎈 Kissing-balloon inflation + re-POT to correct the carina shift and re-appose the proximal stent",good:true,ds:1,dt:6,xp:40,fb:"✅ Exactly. Kissing balloons restore the bifurcation geometry and open the SB ostium; the re-POT fixes the proximal distortion from kissing.",next:"declare"},
+          {t:"🩹 Just deploy another main-vessel stent over everything and ignore the ostium",good:false,ds:-1,dt:10,xp:0,fb:"⚠️ More main-vessel metal does not fix a jeopardised side-branch ostium — kiss and re-POT, and bail to TAP if it will not hold.",next:"declare"}
+        ]},
+      declare:{ text:"The diagonal is now TIMI-3, ostium acceptable, ectopy settling. Definitive close-out?",
+        choices:[
+          {t:"✅ Confirm TIMI-3 in both branches + apposition on IVUS/OCT, final POT, and log the lesson: jail the wire next time",good:true,ds:1,dt:5,xp:45,fb:"🏆 Perfect. Flow restored, geometry optimised, imaging confirmed — and the real fix was upstream: a protection wire would have prevented the whole scare. The patient recovers.",end:true},
+          {t:"⏳ Wait and hope the ostium remodels on its own",good:false,ds:-1,dt:15,xp:0,fb:"⚠️ A threatened large-SB ostium does not reliably recover by waiting — optimise now with kissing/POT and confirm on imaging.",end:true}
+        ]}
+    }});
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 60-year-old has an LAD/diagonal lesion with disease in the proximal main vessel, the distal main vessel, and the side-branch ostium. The Medina classification is:", opts:["0,0,1","1,1,0","1,1,1","1,0,0"], correct:2, exp:"Medina scores (proximal main, distal main, side branch), each 1 if diseased. Disease in all three segments = 1,1,1 — a true bifurcation (the side-branch ostium is diseased)." },
+    { q:"For the majority of coronary bifurcation lesions, the default strategy is:", opts:["Systematic two-stent (DK crush) in all","Provisional single-stent of the main vessel","Balloon angioplasty only, no stent","CABG referral"], correct:1, exp:"Nordic, BBC ONE and EBC data support provisional single-stent as the default for most bifurcations — fewer stents, less contrast/time, equivalent or better outcomes. Escalate to a 2-stent technique only when the side branch truly demands it." },
+    { q:"During provisional stenting, why keep a jailed (protection) wire in the side branch?", opts:["It anticoagulates the branch","It marks and tents the ostium so you can rewire it if the branch closes","It measures FFR automatically","It prevents the need for a stent"], correct:1, exp:"A jailed wire keeps the side-branch ostium tented open and marks its location. If the branch is compromised after main-vessel stenting, the marked ostium is far easier to rewire — a lost, unmarked ostium can be unrecoverable (see the M&M)." },
+    { q:"The proximal optimisation technique (POT) uses a short non-compliant balloon sized to the:", opts:["Distal main-vessel reference","Side-branch diameter","Proximal main-vessel reference, inflated up to the carina","Guide catheter diameter"], correct:2, exp:"POT uses a proximal-sized NC balloon inflated to the carina. It apposes the proximal stent, corrects the proximal-to-distal diameter step-up, and opens the cell facing the side branch to enable clean distal-cell rewiring." },
+    { q:"When rewiring the side branch through the main-vessel stent, you should cross the:", opts:["Proximal cell","Distal cell","Either cell, it makes no difference","The strut nearest the guide"], correct:1, exp:"Distal-cell rewiring keeps the stent struts apposed against the side-branch ostial wall. Proximal-cell rewiring lifts the stent and leaves metal malapposed across the ostium." },
+    { q:"A jailed side branch looks angiographically pinched after main-vessel stenting but has TIMI-3 flow. Pressure-wire FFR is 0.88. You should:", opts:["Stent the side branch for a better picture","Leave the side branch — it is not flow-limiting","Perform DK crush","Post-dilate the main vessel to 20 atm"], correct:1, exp:"Most angiographically threatened jailed side branches have FFR > 0.80 and do not need treatment. An FFR of 0.88 with TIMI-3 flow means leave it — do not stent a cosmetic appearance." },
+    { q:"If a planned two-stent technique is required for a complex true / distal left-main bifurcation, the technique with the best supporting evidence is:", opts:["T-stent only","Culotte only","DK crush (DKCRUSH-II/V)","Balloon-only kissing"], correct:2, exp:"DKCRUSH-II showed less restenosis/TVR than provisional in complex true bifurcations, and DKCRUSH-V favoured planned DK crush over provisional in distal left-main bifurcations. DK crush is the benchmark 2-stent technique." },
+    { q:"After main-vessel stenting of an LAD/diagonal true bifurcation with NO protection wire, the large diagonal goes TIMI-0 and the patient develops chest pain and ST changes. The best first move is:", opts:["Accept the occlusion and finish","Rewire the diagonal through the distal cell and restore flow with a balloon","Reverse heparin and remove all wires","High-pressure post-dilate the main stent to force the branch open"], correct:1, exp:"An occluded large side branch is a periprocedural MI in progress — rewire it (distal cell) and restore flow, then kiss and re-POT. Aggressive main-vessel dilation worsens carina shift; abandoning a large diagonal causes infarction. The whole event is best prevented by jailing a protection wire." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length; var sm=document.getElementById('sumMcq'); if(sm) sm.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you run a bifurcation like a consultant. 🏆':score>=6?'Strong — review the misses and S11 EBM.':'Revisit S5, S6, S7 and S9 — provisional logic, POT/distal-cell rewiring and the side-branch rescue are the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCAD — When NOT to Stent (Spontaneous Coronary Artery Dissection) — Virtual Teaching Hospital</title>
+<!-- META
+id: c-cath-scad-078
+title: SCAD — When NOT to Stent (Spontaneous Coronary Artery Dissection, mid-LAD)
+hospital: cardiology
+department: cv-cath
+bednumber: 3
+chiefcomplaint: Postpartum woman, anterior MI with troponin rise — angiography shows a long smooth tapering mid-LAD narrowing (SCAD)
+system: Cardiology
+severity: critical
+tags: SCAD, Spontaneous coronary artery dissection, Conservative management, FMD, Postpartum MI, OCT, Cath lab
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9; --sbw:246px; --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#7c3aed,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:24px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--violet)}
+  .navlink.active{background:linear-gradient(135deg,#7c3aed,#e11d48); color:#fff; border-color:#7c3aed}
+  .navlink.active .s-id{color:#e9d5ff}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+  @media(max-width:860px){
+    :root{--sbw:58px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#4c1d95 0%,#7c3aed 45%,#e11d48 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .crumbs{font-size:12.5px; opacity:.85}
+  .hero h1{margin:8px 0 6px; font-size:clamp(22px,3.3vw,33px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#7c3aed}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(115px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:19px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:220px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#7c3aed,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS (tabs) ===== */
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:18.5px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#4c1d95,#e11d48); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(124,58,237,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#7c3aed,#e11d48); color:#fff; box-shadow:0 4px 12px rgba(124,58,237,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--violet); color:var(--violet)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--violet)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#ef4444,#f59e0b,#10b981); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+
+  /* ===== MEDIA ===== */
+  .media-fig{margin:14px 0; border-radius:14px; overflow:hidden; border:1px solid var(--line); background:var(--slate-soft)}
+  .media-fig img{width:100%; display:block; background:#fff}
+  .media-fig .cap{font-size:12px; color:var(--ink2); padding:8px 12px; background:#fff}
+  .media-fig a.src{color:var(--violet); text-decoration:none; font-weight:700}
+  .ang-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0}
+  .ang-fig svg{width:100%; height:auto; display:block}
+  .ang-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+  .video-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; margin:14px 0}
+  .video-card{display:block; text-decoration:none; color:inherit; border:1px solid var(--line); border-radius:14px; overflow:hidden; background:#fff; transition:all .15s}
+  .video-card:hover{transform:translateY(-3px); box-shadow:0 8px 20px rgba(15,23,42,.12); border-color:var(--violet)}
+  .video-card .thumb{position:relative; height:104px; background:linear-gradient(135deg,#312e81,#7c3aed); display:flex; align-items:center; justify-content:center}
+  .video-card .thumb .play{width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,.92); display:flex; align-items:center; justify-content:center; font-size:18px; color:#e11d48}
+  .video-card .thumb .em{position:absolute; top:8px; left:10px; font-size:22px}
+  .video-card .vc-body{padding:9px 11px}
+  .video-card .vc-t{font-size:13px; font-weight:700; line-height:1.25}
+  .video-card .vc-s{font-size:11px; color:var(--ink2); margin-top:3px}
+  .linkrow{display:flex; flex-wrap:wrap; gap:8px; margin:12px 0}
+  .linkchip{display:inline-flex; align-items:center; gap:6px; text-decoration:none; font-size:12.5px; font-weight:700; padding:7px 12px; border-radius:999px; border:1px solid var(--line); background:#fff; color:var(--ink)}
+  .linkchip:hover{border-color:var(--violet); color:var(--violet)}
+
+  .journey{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0}
+  .j-card{background:var(--pink-soft); border:1px solid var(--pink-line); border-radius:14px; padding:14px}
+  .j-card .j-who{font-weight:800; font-size:13px; color:var(--pink)}
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; margin-bottom:3px}
+
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+  .scorebig{font-size:40px; font-weight:800; background:linear-gradient(135deg,#7c3aed,#e11d48); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🩻</div>
+      <div><div class="t1">Cath Lab</div><div class="t2">Bed 3 · SCAD</div></div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🚨</span><span>Presentation &amp; Triage</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">📋</span><span>Pre-Procedure Workup</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩸</span><span>Vascular Access &amp; Setup</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">📽️</span><span>Angiography &amp; Views</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🔬</span><span>Lesion Assessment</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🎬</span><span>Strategy &amp; Decision</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">🛠️</span><span>Intervention Steps</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">✅</span><span>Result &amp; Optimization</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">🏠</span><span>Post-Procedure Care</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">📚</span><span>Evidence-Based Medicine</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">🔭</span><span>Advanced Topics</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">🎥</span><span>Multimedia Library</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">👨‍👩‍👦</span><span>Family &amp; Journey</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">🎮</span><span>Interactive Sim</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">🏆</span><span>Score &amp; Takeaways</span><span class="s-id">S19</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <div class="content">
+  <main>
+    <header class="hero">
+      <div class="crumbs">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🩻 Cath Lab · 🛏️ Bed 3</div>
+      <h1>🩻 SCAD — When NOT to Stent (Spontaneous Coronary Artery Dissection)</h1>
+      <div class="sub">⚡ 04:20. A 41-year-old woman, three weeks postpartum, clutches her chest. 2 mm of ST elevation across the anterior leads, troponin climbing — yet no smoking, no diabetes, no cholesterol problem. The angiogram is about to show a long, smooth, tapering narrowing of the mid-LAD with no atheroma. This is a dissection, not a plaque — and the deadliest reflex in the room is to reach for a stent.</div>
+      <div class="chips">
+        <span class="chip crit">🔴 CRITICAL</span>
+        <span class="chip">🫀 SCAD · mid-LAD</span>
+        <span class="chip">🤰 Postpartum MI</span>
+        <span class="chip">🛑 Conservative-first</span>
+        <span class="chip">🎮 Interactive Decisions</span>
+        <span class="chip">🧬 Screen for FMD</span>
+      </div>
+    </header>
+
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital warn"><div class="v-label">💓 HR</div><div class="v-num">98</div></div>
+        <div class="vital"><div class="v-label">🩸 BP</div><div class="v-num">124/78</div></div>
+        <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">97%</div></div>
+        <div class="vital alert"><div class="v-label">📈 ST↑ V2–V4</div><div class="v-num">2 mm</div></div>
+        <div class="vital warn"><div class="v-label">😖 Pain</div><div class="v-num">6/10</div></div>
+        <div class="vital alert"><div class="v-label">🧪 hs-Troponin</div><div class="v-num">↑↑</div></div>
+      </div>
+    </div>
+
+    <!-- S1 PRESENTATION & TRIAGE -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🚨 Clinical Presentation &amp; Triage</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 04:20, Cath Lab</b>A young mother, 3 weeks postpartum, grips the table: <em>"It came on while I was feeding the baby — a tearing tightness that will not let go."</em> The monitor shows anterior ST elevation, troponin is rising. The interventional cardiologist looks at the angiogram, then at you: "No plaque anywhere. This is a smooth, tapering mid-LAD. Before your hand moves toward a stent — what IS this?"</div>
+
+        <h3>🫀 The vignette</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>👩 Patient</td><td>Ms. R.K., 41, female · <strong>3 weeks postpartum</strong> · no diabetes, no smoking, normal lipids · migraines, prior "unexplained" fainting</td></tr>
+          <tr><td>💥 Onset</td><td>Sudden chest tightness after an emotional-physical stress (broken sleep, lifting), radiating to the jaw; nausea</td></tr>
+          <tr><td>📈 ECG</td><td>ST elevation 1–2 mm V2–V4 → <strong>anterior MI, mid-LAD territory</strong></td></tr>
+          <tr><td>🧪 Troponin</td><td>hs-troponin clearly rising → confirms myocardial infarction (type 1 by dissection, not atherothrombosis)</td></tr>
+          <tr><td>🩻 Angiography</td><td>Long, smooth, <strong>tapering</strong> narrowing of the mid-LAD, no calcification, no irregular plaque elsewhere → <strong>SCAD</strong></td></tr>
+        </table>
+
+        <div class="media-fig">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Blausen_0463_HeartAttack.png" alt="Myocardial infarction — coronary artery compromise" loading="lazy" onerror="this.closest('.media-fig').style.display='none'">
+          <div class="cap">🫀 Myocardial infarction from an occluded coronary — but in SCAD the mechanism is a dissection, not a ruptured plaque. Source: <a class="src" href="https://commons.wikimedia.org/wiki/File:Blausen_0463_HeartAttack.png" target="_blank" rel="noopener">Wikimedia Commons (Blausen)</a></div>
+        </div>
+
+        <h3>🚦 Why SCAD is a different animal</h3>
+        <p><strong>Spontaneous coronary artery dissection (SCAD)</strong> is a non-atherosclerotic, non-traumatic separation of the coronary artery wall. It causes <strong>1–4% of all acute MI overall, but up to 25–35% of MI in women under 50</strong>, and is the leading cause of pregnancy-associated MI. The diagnosis is easy to miss precisely because these patients lack the classic risk-factor story — and the treatment reflexes learned for atherosclerotic STEMI can be actively harmful here.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A young woman, few risk factors, peripartum or after intense stress, with a smooth tapering artery and no plaque — think SCAD, and think TWICE before you wire it."</div>
+
+        <h3>🚩 Spot-the-SCAD — tap each feature that points to dissection rather than atheroma (+10 XP each)</h3>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">🤰 Female, 41, three weeks postpartum</button>
+          <button class="btn ghost flag-btn" data-good="1">🧬 No diabetes, no smoking, normal lipids</button>
+          <button class="btn ghost flag-btn" data-good="1">😣 Onset after intense emotional-physical stress</button>
+          <button class="btn ghost flag-btn" data-good="1">🩻 Long smooth tapering stenosis, no atheroma</button>
+          <button class="btn ghost flag-btn" data-good="0">🚬 40 pack-year smoking history</button>
+          <button class="btn ghost flag-btn" data-good="0">🥓 LDL 220 mg/dL with corneal arcus</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+      </div>
+    </section>
+
+    <!-- S2 PRE-PROCEDURE WORKUP -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>📋 Pre-Procedure Workup &amp; Planning</h2></div>
+      <div class="section-content">
+        <h3>🧾 The pre-angiography mindset in a suspected SCAD</h3>
+        <ul>
+          <li>🧠 <strong>Have the diagnosis in mind BEFORE the catheter engages.</strong> If the story fits SCAD, plan for the gentlest possible diagnostic study and a low threshold to STOP at diagnosis — do not drift into reflex intervention.</li>
+          <li>💊 <strong>Antithrombotic caution:</strong> aspirin is reasonable; potent dual antiplatelet loading and full anticoagulation are debated in SCAD (an intramural haematoma is a bruise in the wall, not a luminal clot — aggressive antithrombotics can theoretically worsen bleeding). Load thoughtfully, not reflexively.</li>
+          <li>🚫 <strong>Do NOT give thrombolysis.</strong> If the mechanism is a dissection with intramural haematoma, lytics can propagate the dissection and cause catastrophic extension. This is a core SCAD safety rule.</li>
+          <li>🫘 <strong>Renal &amp; contrast planning:</strong> minimise contrast and forceful injections — a hard hand injection can itself extend a dissection.</li>
+          <li>🧬 <strong>Set up downstream screening:</strong> flag the patient for head-to-pelvis imaging for fibromuscular dysplasia (FMD) and note connective-tissue features.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In SCAD the artery is bruised, not clogged. Thrombolysis and rough injections do not open it — they tear it further."</div>
+
+        <div class="checklist" id="ckPreproc">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Suspected-SCAD pre-angiography checklist (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>🧠 SCAD explicitly on the differential (young woman, peripartum/low-risk, stress trigger)</span></label>
+          <label class="ck"><input type="checkbox"><span>💊 Aspirin given; potent DAPT/anticoagulation considered cautiously, not reflexively</span></label>
+          <label class="ck"><input type="checkbox"><span>🚫 Thrombolysis explicitly withheld (dissection mechanism)</span></label>
+          <label class="ck"><input type="checkbox"><span>🖐️ Plan for gentle diagnostic angiography, minimal/soft contrast injections</span></label>
+          <label class="ck"><input type="checkbox"><span>🛑 Team agreement to STOP at diagnosis unless high-risk features mandate intervention</span></label>
+          <label class="ck"><input type="checkbox"><span>🧬 FMD / connective-tissue screening flagged for after stabilisation</span></label>
+          <div class="ck-progress" data-progress>0 / 6 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- S3 ACCESS -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩸 Vascular Access &amp; Setup</h2></div>
+      <div class="section-content">
+        <h3>🖐️ Radial vs femoral — and a SCAD-specific caveat</h3>
+        <div class="vs">
+          <div class="side b"><h4>🖐️ Radial (default)</h4><ul><li>Fewer access-site bleeds &amp; vascular complications</li><li>Lower mortality in ACS generally</li><li>Early ambulation, comfort — useful in a young patient</li></ul></div>
+          <div class="side a"><h4>🧬 SCAD caveat: fragile arteries</h4><ul><li>SCAD associates with <strong>FMD and arteriopathy</strong> — radial/iliac vessels can be tortuous, spastic, or themselves prone to <strong>iatrogenic dissection</strong></li><li>Engage gently; catheter-induced dissection of an already-fragile aorta/coronary is a real hazard</li></ul></div>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The SCAD patient has fragile arteries everywhere. Every catheter movement should be gentle — you can dissect the very vessel you are trying to diagnose."</div>
+
+        <h3>💉 Guide catheter &amp; the gentle-engagement principle</h3>
+        <ul>
+          <li>🔧 <strong>Diagnostic-first mindset:</strong> use a diagnostic catheter for the study; do NOT reflexively swap to an aggressive guide catheter unless you have committed to intervention for high-risk anatomy.</li>
+          <li>🕊️ <strong>Non-aggressive engagement:</strong> avoid deep-seating or forceful guide manipulation — catheter-induced dissection can propagate an existing SCAD retrograde into the left main.</li>
+          <li>🧭 <strong>Guide choice if you must intervene:</strong> for the <strong>LAD (left system)</strong>, a supportive left guide (EBU/XB) — but recognise that support that helps in atherosclerotic PCI can also transmit force that extends a dissection.</li>
+          <li>🩸 <strong>Anticoagulation:</strong> heparin to a working ACT is standard for instrumentation, but keep the overall antithrombotic footprint conservative given the bruised-wall mechanism.</li>
+        </ul>
+
+        <div class="checklist" id="ckAccess">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Gentle access &amp; engagement</h3>
+          <label class="ck"><input type="checkbox"><span>🖐️ Access obtained atraumatically; tortuosity/spasm anticipated (arteriopathy)</span></label>
+          <label class="ck"><input type="checkbox"><span>🧼 Diagnostic catheter used first; no reflexive upgrade to aggressive guide</span></label>
+          <label class="ck"><input type="checkbox"><span>🕊️ Gentle, non-deep engagement of the coronary ostium (avoid catheter-induced dissection)</span></label>
+          <label class="ck"><input type="checkbox"><span>🥤 Soft, controlled contrast injections (a hard injection can extend the tear)</span></label>
+          <label class="ck"><input type="checkbox"><span>🛑 Ready to stop at diagnosis; intervention deferred unless high-risk criteria met</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- S4 ANGIOGRAPHY & VIEWS -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>📽️ Diagnostic Angiography &amp; Views</h2></div>
+      <div class="section-content">
+        <h3>🗺️ The coronary tree — and the SCAD signature</h3>
+        <div class="media-fig">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Coronary_arteries.svg" alt="Coronary artery anatomy diagram" loading="lazy" onerror="this.closest('.media-fig').style.display='none'">
+          <div class="cap">🫀 Coronary artery anatomy — SCAD most often strikes the mid-to-distal LAD and its branches. Source: <a class="src" href="https://commons.wikimedia.org/wiki/File:Coronary_arteries.svg" target="_blank" rel="noopener">Wikimedia Commons</a> · Atlas: <a class="src" href="https://radiopaedia.org/articles/spontaneous-coronary-artery-dissection" target="_blank" rel="noopener">Radiopaedia</a></div>
+        </div>
+
+        <h3>🔎 The Yip–Saw (Saw) angiographic classification</h3>
+        <table class="tbl">
+          <tr><th>Type</th><th>Angiographic look</th><th>Notes</th></tr>
+          <tr><td>1️⃣ <strong>Type 1</strong></td><td>Classic <strong>contrast staining of the arterial wall</strong> with multiple radiolucent lumens</td><td>The pathognomonic look — but the minority of cases</td></tr>
+          <tr><td>2️⃣ <strong>Type 2</strong></td><td><strong>Diffuse, long (&gt; 20 mm), smooth stenosis</strong> — abrupt change in calibre</td><td><strong>The most common type</strong> — our patient. 2A: normal segments both ends; 2B: extends to the apex</td></tr>
+          <tr><td>3️⃣ <strong>Type 3</strong></td><td>Focal/tubular stenosis that <strong>mimics atherosclerosis</strong></td><td>The great impostor — needs OCT/IVUS to unmask; look for absence of atheroma elsewhere</td></tr>
+          <tr><td>4️⃣ <strong>Type 4</strong></td><td><strong>Total occlusion</strong>, usually distal vessel</td><td>Mimics a thrombotic occlusion; the trap is to treat it like atherothrombosis</td></tr>
+        </table>
+
+        <div class="ang-fig">
+          <svg viewBox="0 0 720 200" preserveAspectRatio="xMidYMid meet" aria-label="Schematic left coronary system with a long tapering mid-LAD dissection and intramural haematoma">
+            <rect width="720" height="200" fill="#0b1220"/>
+            <text x="20" y="26" fill="#93c5fd" font-size="13" font-weight="700">Left coronary system — SCAD of the mid-LAD (schematic)</text>
+            <!-- Left main -->
+            <path d="M120,60 L200,80" stroke="#e5e7eb" stroke-width="10" fill="none" stroke-linecap="round"/>
+            <text x="118" y="52" fill="#cbd5e1" font-size="11">LM</text>
+            <!-- LAD proximal healthy -->
+            <path d="M200,80 L300,95" stroke="#f87171" stroke-width="9" fill="none" stroke-linecap="round"/>
+            <!-- LAD mid dissected (tapering thin true lumen) -->
+            <path d="M300,95 L420,118 L500,132" stroke="#f87171" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+            <!-- intramural haematoma (false lumen) shading -->
+            <path d="M300,95 L420,118 L500,132" stroke="#7c3aed" stroke-width="11" fill="none" stroke-linecap="round" opacity="0.35"/>
+            <!-- LAD distal reconstitutes -->
+            <path d="M500,132 L560,150" stroke="#f87171" stroke-width="8" fill="none" stroke-linecap="round"/>
+            <text x="360" y="150" fill="#fca5a5" font-size="11">mid-LAD (long taper)</text>
+            <text x="300" y="80" fill="#c4b5fd" font-size="11" font-weight="700">intramural haematoma → false lumen</text>
+            <!-- diagonal -->
+            <path d="M300,95 L360,55" stroke="#60a5fa" stroke-width="6" fill="none" stroke-linecap="round"/>
+            <text x="360" y="50" fill="#93c5fd" font-size="11">D1</text>
+            <!-- LCx -->
+            <path d="M200,80 L260,130 L340,170 L440,185" stroke="#34d399" stroke-width="8" fill="none" stroke-linecap="round"/>
+            <text x="360" y="182" fill="#6ee7b7" font-size="11">LCx</text>
+          </svg>
+          <div class="ang-cap">Diagnosis: a <span style="color:#c4b5fd">false lumen / intramural haematoma</span> compresses the true lumen into a long, smooth <span style="color:#f87171">taper</span> of the mid-LAD — a <strong>Yip–Saw Type 2</strong> SCAD. No atheroma, no calcium, no plaque elsewhere.</div>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Type 2 SCAD is a long smooth taper; Type 3 mimics a plaque; Type 4 mimics a clot. When the artery is smooth and the patient is a young low-risk woman, the classification you must not miss is dissection."</div>
+
+        <div class="linkrow">
+          <a class="linkchip" href="https://www.youtube.com/results?search_query=spontaneous+coronary+artery+dissection+angiography+classification" target="_blank" rel="noopener">▶️ SCAD angiography — video search</a>
+          <a class="linkchip" href="https://radiopaedia.org/articles/spontaneous-coronary-artery-dissection" target="_blank" rel="noopener">📚 Radiopaedia: SCAD</a>
+          <a class="linkchip" href="https://www.incathlab.com/en/search?q=spontaneous%20coronary%20artery%20dissection" target="_blank" rel="noopener">🎓 inCathLab: SCAD</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- S5 LESION ASSESSMENT -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🔬 Lesion Assessment — Physiology &amp; Imaging</h2></div>
+      <div class="section-content">
+        <div class="callout info"><b class="ct">🫀 The mechanism — the WHY behind the WHY</b>In SCAD, a tear in the intima and/or bleeding from the vasa vasorum creates an <strong>intramural haematoma in the medial layer — a false lumen</strong>. Because the false lumen is a pressurised pocket in the wall, it <strong>compresses the true lumen</strong>. Any force that adds to that pocket — a wire in the wrong plane, a balloon, a rough injection, thrombolysis — can propagate the haematoma up and down the vessel: the <strong>vicious cycle of SCAD propagation</strong>. This single mechanism is why the treatment philosophy inverts: leave it alone and it usually heals; poke it and it can extend.</div>
+
+        <h3>⚠️ Physiology &amp; imaging in SCAD — help vs harm</h3>
+        <ul>
+          <li><strong>Pressure wire (FFR/iFR):</strong> the numbers below teach the general ischaemia threshold, but in an <em>acute SCAD</em> passing a pressure wire risks entering the false lumen and extending the dissection. Physiology is reserved for ambiguous non-SCAD/bystander lesions or healed segments — <strong>not the acute dissection.</strong></li>
+          <li><strong>OCT / IVUS:</strong> can confirm the diagnosis (intramural haematoma, double lumen, intimal flap) when angiography is ambiguous (especially Type 3) — but <strong>use with great caution</strong>: the imaging catheter itself, and the contrast flush for OCT, can extend the dissection. Image only if it will change management.</li>
+        </ul>
+
+        <!-- SIM (FFR) -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The FFR Pressure-Wire Dial (general threshold — use with SCAD caution)</h3>
+          <p style="font-size:13px">This dial teaches the universal ischaemia threshold. Remember: in an <em>acute SCAD</em> you generally do NOT pressure-wire the dissected segment — the wire can enter the false lumen and propagate the tear.</p>
+          <label for="kRange">📏 FFR value: <b id="kVal">0.80</b></label>
+          <input type="range" id="kRange" min="60" max="98" value="80">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout warn-r" id="kReadout">Set the dial to explore the ischaemia threshold.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 FFR ≤ 0.80 → flow-limiting ischaemia (general rule). In SCAD, let the clinical picture (ongoing ischaemia, flow, instability) drive decisions — not a wire in a fragile artery.</p>
+        </div>
+
+        <h3>🖥️ Intravascular imaging — IVUS vs OCT in SCAD</h3>
+        <div class="vs">
+          <div class="side b"><h4>🔵 IVUS</h4><ul><li>Ultrasound — deeper penetration, sees the full vessel wall and the intramural haematoma</li><li>No contrast flush needed (a safety advantage in a fragile vessel)</li></ul></div>
+          <div class="side a"><h4>🟠 OCT</h4><ul><li>Light — ultra-high resolution; superb for the <strong>intimal flap, double lumen, and haematoma</strong> that confirm SCAD</li><li>Needs a contrast flush → an additional propagation risk; reserve for when it changes management</li></ul></div>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In acute SCAD, the safest wire is the one you never pass. Image only to answer a question that changes management — and even then, gently."</div>
+
+        <div class="linkrow">
+          <a class="linkchip" href="https://www.youtube.com/results?search_query=OCT+spontaneous+coronary+artery+dissection+intramural+hematoma" target="_blank" rel="noopener">▶️ OCT in SCAD</a>
+          <a class="linkchip" href="https://www.youtube.com/results?search_query=SCAD+intramural+hematoma+false+lumen+mechanism" target="_blank" rel="noopener">▶️ SCAD mechanism</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- S6 STRATEGY (branching 1) -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🎬 Strategy &amp; Decision Point — "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <p>The diagnosis is SCAD of the mid-LAD, Type 2, with preserved distal flow and a now-stable, pain-settling patient. This is the branching core — conservative vs PCI vs CABG. Reward the call that most SCAD needs: <strong>leave it to heal.</strong></p>
+        <div class="scenario" id="scenarioBox1">
+          <h3>🎬 Strategy Path — the stable mid-LAD SCAD</h3>
+          <div class="hud"><span>❤️ True-lumen flow: <b id="sc1Stab">0</b></span><span>⏱️ Elapsed: <b id="sc1Time">0 min</b></span><span>⚡ Path XP: <b id="sc1XP">0</b></span></div>
+          <div class="scene-text" id="sc1Text">Angiography confirms a long tapering mid-LAD (Type 2 SCAD), TIMI-2/3 flow preserved, the patient is now pain-free and haemodynamically stable, and the vessel is mid/distal. What is your management?</div>
+          <div class="choices" id="sc1Choices"></div>
+          <div class="feedback" id="sc1Feedback"></div>
+          <button class="btn primary" id="sc1Restart" style="display:none; margin-top:12px">🔄 Replay path</button>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Most SCAD heals on its own within weeks. Conservative management is the default; PCI is reserved for ongoing ischaemia, instability, left-main or proximal-vessel jeopardy — not for a stable, well-perfused taper."</div>
+      </div>
+    </section>
+
+    <!-- S7 INTERVENTION STEPS -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>🛠️ Intervention — When It IS Required, Step-by-Step</h2></div>
+      <div class="section-content">
+        <div class="callout warn"><b class="ct">⚠️ Read this first</b>For most SCAD the "intervention" is <strong>conservative management</strong> (S10). This section is what to do <em>only</em> when high-risk criteria force your hand: ongoing ischaemia, haemodynamic instability, VT/VF, left-main or proximal-vessel dissection with threatened flow. PCI in SCAD has <strong>lower success and higher complication rates</strong> than atherosclerotic PCI — go in knowing it is hard.</div>
+
+        <div class="media-fig">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Blausen_0034_Angioplasty_Stent.png" alt="Coronary angioplasty and stent deployment" loading="lazy" onerror="this.closest('.media-fig').style.display='none'">
+          <div class="cap">🎈 Stenting — a standard tool in atherosclerotic PCI, but a high-risk, last-resort manoeuvre in SCAD. Source: <a class="src" href="https://commons.wikimedia.org/wiki/File:Blausen_0034_Angioplasty_Stent.png" target="_blank" rel="noopener">Wikimedia Commons (Blausen)</a></div>
+        </div>
+
+        <h3>🪜 The cautious SCAD-PCI sequence (only if truly indicated)</h3>
+        <ol>
+          <li>🧵 <strong>Wire the TRUE lumen — and prove it.</strong> The cardinal error is wiring the false lumen. Confirm distal true-lumen position with imaging (OCT/IVUS) and/or contralateral injection before you do anything else.</li>
+          <li>🩹 <strong>Seal the entry / cover long.</strong> Consider cutting-balloon fenestration of the haematoma or stenting the entry point; dissections extend beyond the visible narrowing, so <strong>plan longer stents / cover both ends</strong> into healthy segments.</li>
+          <li>🫧 <strong>Gentle everything.</strong> Low-pressure, minimal manipulation — every extra push risks extending the haematoma proximally toward the left main.</li>
+          <li>🖥️ <strong>Image to confirm true-lumen stenting</strong> and adequate coverage — under-recognised haematoma at the stent edges re-obstructs.</li>
+          <li>🫀 <strong>Escalate early if it fails.</strong> If PCI cannot restore flow to a large jeopardised territory (especially left main / proximal LAD), consider <strong>CABG</strong> as a bail-out and mechanical support (Impella/IABP/ECMO) for instability.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"If you must stent a SCAD: prove you are in the true lumen, cover long into healthy vessel at both ends, and be gentle — because the dissection is longer than the picture shows."</div>
+
+        <div class="checklist" id="ckIntervention">
+          <h3 style="margin-top:0">🩺 Procedure Guide — High-risk SCAD-PCI checklist</h3>
+          <label class="ck"><input type="checkbox"><span>🚩 A genuine high-risk indication confirmed (ischaemia/instability/LM/proximal)</span></label>
+          <label class="ck"><input type="checkbox"><span>🧵 True-lumen wire position proven (imaging and/or contralateral injection)</span></label>
+          <label class="ck"><input type="checkbox"><span>📏 Long coverage planned into healthy segments both ends (haematoma extends beyond view)</span></label>
+          <label class="ck"><input type="checkbox"><span>🕊️ Gentle, low-pressure technique; minimal manipulation</span></label>
+          <label class="ck"><input type="checkbox"><span>🫀 CABG / mechanical-support back-up on stand-by if PCI fails</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+
+        <div class="linkrow">
+          <a class="linkchip" href="https://www.youtube.com/results?search_query=SCAD+PCI+technique+true+lumen+stenting" target="_blank" rel="noopener">▶️ SCAD PCI technique</a>
+          <a class="linkchip" href="https://www.youtube.com/results?search_query=cutting+balloon+fenestration+SCAD+intramural+hematoma" target="_blank" rel="noopener">▶️ Cutting-balloon fenestration</a>
+          <a class="linkchip" href="https://www.incathlab.com/en/search?q=SCAD" target="_blank" rel="noopener">🎓 inCathLab: SCAD procedures</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- S8 RESULT & OPTIMIZATION -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>✅ Result Assessment &amp; Optimization</h2></div>
+      <div class="section-content">
+        <h3>📊 What "a good result" means in SCAD — usually NO metal</h3>
+        <table class="tbl">
+          <tr><th>Metric</th><th>Target</th><th>Why</th></tr>
+          <tr><td>🌊 <strong>Distal flow (TIMI)</strong></td><td>Preserved TIMI 2–3</td><td>Preserved flow in a stable patient is the green light for conservative management — no intervention needed</td></tr>
+          <tr><td>😌 <strong>Symptoms</strong></td><td>Settling chest pain, no recurrent ischaemia</td><td>Ongoing/recurrent ischaemia is the trigger to escalate — otherwise, observe</td></tr>
+          <tr><td>📉 <strong>Haemodynamics / rhythm</strong></td><td>Stable, no VT/VF</td><td>Instability or malignant arrhythmia justifies intervention despite the risk</td></tr>
+          <tr><td>🕊️ <strong>No iatrogenic extension</strong></td><td>No new dissection from the catheter/wire</td><td>The best angiographic "result" in SCAD is often the study you kept minimal</td></tr>
+          <tr><td>🩹 <strong>If stented: true-lumen coverage</strong> (OCT/IVUS)</td><td>Stent in true lumen, edges in healthy vessel</td><td>Edge haematoma / false-lumen stenting re-obstructs — imaging confirms</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In SCAD, the finest result on the table is frequently the one where you diagnosed, stabilised, and left the artery to heal itself."</div>
+
+        <div class="callout ok"><b class="ct">✅ Result</b>Type 2 mid-LAD SCAD with preserved TIMI-3 distal flow, pain settled, no arrhythmia. <strong>Managed conservatively</strong> — admitted to a monitored bed, beta-blocker started, FMD screening arranged. No stent, no wire in the dissection. The bruise will heal.</div>
+      </div>
+    </section>
+
+    <!-- S9 COMPLICATIONS (branching 2) -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>⚠️ Complication Recognition &amp; Management</h2></div>
+      <div class="section-content">
+        <h3>💀 The complications that stalk SCAD intervention</h3>
+        <table class="tbl">
+          <tr><th>Clue</th><th>Complication</th><th>Action</th></tr>
+          <tr><td>Wire advances easily but distal position looks "off"; balloon does not restore flow</td><td>🧵 <strong>False-lumen wiring</strong></td><td>Stop, re-confirm true lumen (OCT/IVUS, contralateral injection); do NOT balloon a false lumen</td></tr>
+          <tr><td>Narrowing lengthens on serial cines; new proximal haziness</td><td>🌊 <strong>Dissection propagation</strong></td><td>Stop instrumentation; cover/seal entry if a large territory is threatened; escalate</td></tr>
+          <tr><td>Sudden loss of flow after balloon/stent attempt; chest pain, ST rise</td><td>🧱 <strong>Iatrogenic abrupt closure</strong></td><td>Re-wire true lumen, stent long into healthy vessel, consider CABG / mechanical support</td></tr>
+          <tr><td>Haematoma pushed retrograde into the LM</td><td>🫀 <strong>Left-main extension</strong></td><td>Emergency — bail-out stenting vs CABG; mechanical support; a catastrophe to avoid by NOT starting</td></tr>
+          <tr><td>Recurrent chest pain days later, new ECG change</td><td>🔁 <strong>Early recurrence/extension</strong></td><td>Re-angiography; most still managed conservatively unless high-risk</td></tr>
+        </table>
+
+        <div class="scenario" id="scenarioBox2">
+          <h3>🎬 Complication Drill — "The Stent You Should Not Have Started"</h3>
+          <div class="hud"><span>❤️ Stability: <b id="sc2Stab">●●●○○</b></span><span>⏱️ Elapsed: <b id="sc2Time">0 s</b></span><span>⚡ Path XP: <b id="sc2XP">0</b></span></div>
+          <div class="scene-text" id="sc2Text">Intervention was attempted on the mid-LAD SCAD. After balloon inflation the vessel abruptly closes, the narrowing lengthens PROXIMALLY toward the left main, and the BP drops with new ST elevation. What is happening, and what do you do FIRST?</div>
+          <div class="choices" id="sc2Choices"></div>
+          <div class="feedback" id="sc2Feedback"></div>
+          <button class="btn primary" id="sc2Restart" style="display:none; margin-top:12px">🔄 Replay drill</button>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"When a SCAD extends under your wire, the first fix is to stop making it worse — confirm the true lumen, then seal long. The best complication management is the intervention you did not start."</div>
+      </div>
+    </section>
+
+    <!-- S10 POST-PROCEDURE -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>🏠 Post-Procedure Care, Debrief &amp; Assessment</h2></div>
+      <div class="section-content">
+        <h3>🛌 Conservative management — the active treatment</h3>
+        <ul>
+          <li>📟 <strong>Monitored admission 3–5 days.</strong> Early SCAD can propagate or re-infarct in the first days — telemetry and observation are the real intervention. Do not discharge too early.</li>
+          <li>💊 <strong>Beta-blocker</strong> — associated with reduced recurrence; continue long-term. Treat hypertension.</li>
+          <li>💊 <strong>Antiplatelets</strong> — aspirin is commonly continued; the duration/role of DAPT is individualised and debated (no routine prolonged potent DAPT as in atherosclerotic ACS).</li>
+          <li>🚫 <strong>Statin NOT routine</strong> unless another indication — SCAD is not an atherosclerotic disease; do not reflexively start high-intensity statin.</li>
+          <li>🏃 <strong>Cardiac rehab</strong> — dedicated SCAD-aware rehab improves outcomes and addresses the substantial anxiety/PTSD burden in these young patients.</li>
+        </ul>
+
+        <h3>🧬 The screen that must not be forgotten — FMD, head to pelvis</h3>
+        <p>Up to ~50–80% of SCAD patients have <strong>fibromuscular dysplasia (FMD)</strong> somewhere in the arterial tree. Screen <strong>head-to-pelvis</strong> (CT or MR angiography of brain-to-pelvis) for FMD, aneurysms, and dissections. Consider connective-tissue and screening for associated arteriopathies.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"SCAD is treated with time, a beta-blocker, and a search for FMD from head to pelvis — not with a statin and a stent."</div>
+
+        <div class="callout info"><b class="ct">🧪 Mini-quiz &amp; score</b>Head to <strong>S18 (MCQs)</strong> for the case assessment and <strong>S19</strong> for your score and the key takeaways.</div>
+      </div>
+    </section>
+
+    <!-- S11 EBM -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>📚 Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <div class="ebm">
+          <table class="tbl">
+            <tr><th>Evidence / Guideline</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">GUIDE</span> 2018 AHA Scientific Statement on SCAD</td><td>Framed SCAD as a distinct entity; endorsed <strong>conservative management</strong> as default with PCI reserved for high-risk features.</td><td>Default to observe; intervene selectively.</td></tr>
+            <tr><td><span class="lvl">GUIDE</span> 2023 ESC ACS Guideline</td><td>Recognises SCAD as a cause of ACS; advises a conservative approach where feasible given the hazards of PCI.</td><td>SCAD ACS is not managed like atherothrombotic ACS.</td></tr>
+            <tr><td><span class="lvl">COHORT</span> Mayo / Vancouver SCAD registries (Saw, Tweet, Hayes)</td><td>The majority of SCAD <strong>heals spontaneously</strong>; PCI carries high technical failure and dissection-extension rates.</td><td>Most heal; PCI often makes it worse.</td></tr>
+            <tr><td><span class="lvl">OBS</span> PCI-in-SCAD series</td><td>Lower procedural success, frequent dissection propagation and long-segment stenting compared with atherosclerotic PCI.</td><td>Stenting SCAD is technically hard and hazardous.</td></tr>
+            <tr><td><span class="lvl">ASSOC</span> SCAD–FMD studies</td><td>High prevalence of FMD and extracoronary arteriopathy in SCAD patients.</td><td>Screen head-to-pelvis for FMD.</td></tr>
+            <tr><td><span class="lvl">OBS</span> Beta-blocker &amp; recurrence data</td><td>Beta-blocker use and BP control associated with lower recurrence.</td><td>Beta-blocker + BP control long-term.</td></tr>
+            <tr><td><span class="lvl">SAFETY</span> Thrombolysis-in-SCAD reports</td><td>Case reports of catastrophic dissection extension with fibrinolysis.</td><td>Avoid thrombolysis in suspected SCAD.</td></tr>
+            <tr><td><span class="lvl">OBS</span> Pregnancy-associated SCAD</td><td>SCAD is a leading cause of pregnancy-related MI; high recurrence and pregnancy-risk implications.</td><td>Counsel on future pregnancy risk.</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- S12 ADVANCED -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>🔭 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <ul>
+            <li>🧬 <strong>Predisposing arteriopathies:</strong> FMD (most common association), connective-tissue disorders (Marfan, Loeys–Dietz, vascular Ehlers–Danlos), systemic inflammatory disease, and a growing list of genetic loci — SCAD is increasingly seen as an arteriopathy, not a coincidence.</li>
+            <li>⚡ <strong>Precipitants:</strong> hormonal (pregnancy, postpartum, exogenous hormones), intense emotional or physical stress, Valsalva, sympathomimetics — the "hormonal + shear stress" hit on a fragile wall.</li>
+            <li>🩻 <strong>Diagnostic pitfalls:</strong> Type 3 SCAD mimics atherosclerosis and Type 4 mimics thrombus; low-threshold OCT/IVUS (used gently) unmasks the intramural haematoma and intimal flap when the angiogram is ambiguous.</li>
+            <li>🔧 <strong>PCI techniques when forced:</strong> cutting-balloon fenestration to decompress the haematoma, long single or overlapping stents covering both ends, bioresorbable-scaffold debate, and the deliberate distal-first true-lumen wiring strategy.</li>
+            <li>🫀 <strong>Mechanical support &amp; surgery:</strong> Impella/IABP/VA-ECMO for instability; CABG as a bail-out for failed PCI or left-main SCAD (though grafts to a healing native vessel may later compete/occlude).</li>
+            <li>🔁 <strong>Recurrence &amp; long-term:</strong> significant recurrence risk (roughly 10–30% over years), often in a different vessel; pregnancy counseling, avoidance of triggers, beta-blockade, BP control, and SCAD-specific psychological support.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- S13 MULTIMEDIA LIBRARY -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>🎥 Real Multimedia Library</h2></div>
+      <div class="section-content">
+        <p>🎬 <em>Click a card to open the most relevant teaching videos (YouTube search), or jump to atlas &amp; procedural-library resources. Links open in a new tab.</em></p>
+        <div class="video-grid">
+          <a class="video-card" href="https://www.youtube.com/results?search_query=spontaneous+coronary+artery+dissection+SCAD+overview" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">🫀</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">SCAD — Overview</div><div class="vc-s">Pathophysiology &amp; management search</div></div>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/results?search_query=SCAD+angiography+Yip+Saw+classification+types" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">🔎</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">Yip–Saw Classification</div><div class="vc-s">Types 1–4 on angiography</div></div>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/results?search_query=SCAD+intramural+hematoma+false+lumen+mechanism" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">🧬</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">Intramural Haematoma</div><div class="vc-s">False-lumen mechanism</div></div>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/results?search_query=SCAD+conservative+management+when+not+to+stent" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">🛑</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">Conservative Management</div><div class="vc-s">When NOT to stent</div></div>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/results?search_query=OCT+SCAD+intravascular+imaging+coronary+dissection" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">🖥️</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">OCT in SCAD</div><div class="vc-s">Flap, double lumen, haematoma</div></div>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/results?search_query=fibromuscular+dysplasia+FMD+screening+angiography" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">🧬</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">Fibromuscular Dysplasia</div><div class="vc-s">Head-to-pelvis screening</div></div>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/results?search_query=SCAD+PCI+complication+dissection+extension" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">⚠️</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">PCI Complications</div><div class="vc-s">Dissection extension</div></div>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/results?search_query=pregnancy+associated+SCAD+postpartum+myocardial+infarction" target="_blank" rel="noopener">
+            <div class="thumb"><span class="em">🤰</span><span class="play">▶</span></div>
+            <div class="vc-body"><div class="vc-t">Pregnancy-associated SCAD</div><div class="vc-s">Postpartum MI</div></div>
+          </a>
+        </div>
+
+        <h3>📚 Atlas &amp; procedural-library links</h3>
+        <div class="linkrow">
+          <a class="linkchip" href="https://www.incathlab.com/en/search?q=spontaneous%20coronary%20artery%20dissection" target="_blank" rel="noopener">🎓 inCathLab — SCAD library</a>
+          <a class="linkchip" href="https://radiopaedia.org/articles/spontaneous-coronary-artery-dissection" target="_blank" rel="noopener">📖 Radiopaedia: SCAD</a>
+          <a class="linkchip" href="https://radiopaedia.org/search?q=spontaneous%20coronary%20artery%20dissection&scope=cases" target="_blank" rel="noopener">🖼️ Radiopaedia: SCAD cases</a>
+          <a class="linkchip" href="https://commons.wikimedia.org/wiki/Category:Coronary_angiography" target="_blank" rel="noopener">🗂️ Wikimedia: angiography images</a>
+        </div>
+        <p style="font-size:12px; color:var(--ink2)">🔎 Tip: search links always resolve to current results; direct video IDs age out, so the library uses live searches for the freshest teaching cases.</p>
+      </div>
+    </section>
+
+    <!-- S14 FAMILY & JOURNEY -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>👨‍👩‍👦 Family &amp; Patient Journey</h2></div>
+      <div class="section-content">
+        <div class="journey">
+          <div class="j-card"><div class="j-who">👩 The patient</div><p>"I am 41, I have a three-week-old baby, and I was told I had a heart attack. What terrified me most was hearing they decided NOT to do a stent — until they explained that leaving it alone was the safer, kinder thing for my artery."</p></div>
+          <div class="j-card"><div class="j-who">👨 Her partner</div><p>"I kept asking why they were not 'fixing' it. The doctor drew the bruise-in-the-wall picture for me and said the artery heals itself if we do not disturb it. That changed how I understood the whole night."</p></div>
+          <div class="j-card"><div class="j-who">🩻 The operator</div><p>"The hardest skill in SCAD is restraint. Diagnose it, keep her stable, screen her for FMD, and let time do the healing. The wrong reflex is a stent that extends the tear."</p></div>
+          <div class="j-card"><div class="j-who">🎓 The takeaway</div><p>"Conservative, monitored, beta-blocker, FMD screen, pregnancy counseling, and SCAD-aware rehab. We treated a young mother, not just an angiogram."</p></div>
+        </div>
+        <div class="callout pink"><b class="ct">💗 The human thread</b>SCAD hits young women in the middle of their lives — new mothers, careers, small children. The anxiety and recurrence fear are real. Naming the plan, explaining why "doing less" is right, and connecting them to SCAD-aware support is part of the treatment.</div>
+      </div>
+    </section>
+
+    <!-- S15 M&M -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The SCAD That Was Reflexively Stented"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 38-year-old woman, 6 weeks postpartum, presented with an anterior NSTEMI. Angiography showed a long, smooth, tapering mid-LAD with <strong>preserved TIMI-3 distal flow</strong> and no atheroma — a textbook <strong>Type 2 SCAD</strong>. She was pain-free and stable. Running the atherosclerotic STEMI reflex, the operator wired the lesion and inflated a balloon. The wire had tracked into the <strong>false lumen</strong>; the balloon <strong>propagated the intramural haematoma proximally into the left main.</strong> The LAD and LM abruptly closed. Emergency stenting failed to restore flow, she went into cardiogenic shock, and despite a bail-out CABG she suffered a large anterior infarct with severe LV dysfunction. A stable, self-healing dissection became a devastated ventricle.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🧠 WRONG MENTAL MODEL</b>Treated a dissection as if it were an atherosclerotic occlusion.</div>
+            <div class="hole"><b>🛑 IGNORED PRESERVED FLOW</b>Stable patient with TIMI-3 distal flow — the exact profile to leave alone.</div>
+            <div class="hole"><b>🧵 FALSE-LUMEN WIRING</b>Wire position was never confirmed with imaging before ballooning.</div>
+            <div class="hole"><b>🎈 BALLOON PROPAGATION</b>Inflation extended the haematoma retrograde into the left main.</div>
+            <div class="hole"><b>⚡ REFLEX OVER RESTRAINT</b>No pause to ask "does this SCAD actually need intervention?"</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved her:</strong> recognise SCAD from the smooth taper and the low-risk young postpartum profile; because she had <em>preserved flow and was stable</em>, choose <strong>conservative management</strong> — monitored admission, beta-blocker, FMD screening, and time. Most SCAD heals. The intervention that harmed her was the one that never should have started. This is the drill in S9.</p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A stable SCAD with preserved flow is a trap for the reflex hand. Before you wire, ask: does this dissection NEED me — or does it just need time?"</div>
+      </div>
+    </section>
+
+    <!-- S16 INTERACTIVE SIM -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>🎮 Interactive Simulation</h2></div>
+      <div class="section-content">
+        <div class="sim" id="dtbSim">
+          <h3 style="margin-top:0">🎮 Simulation — The Spontaneous-Healing Clock</h3>
+          <p style="font-size:13px">Drag the weeks since presentation and watch a conservatively-managed SCAD heal itself. "Leave it alone and it mends" made visible.</p>
+          <label for="dtbRange">🗓️ Weeks since SCAD: <b id="dtbVal">5</b> weeks</label>
+          <input type="range" id="dtbRange" min="0" max="12" value="5">
+          <div class="gauge"><div class="needle" id="dtbNeedle"></div></div>
+          <div class="readout good" id="dtbReadout">Set the clock to explore spontaneous healing.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 The acute phase (first days–1 week) carries the highest propagation/recurrence risk — monitor inpatient, do not instrument. By ~4–6 weeks the majority of SCAD has healed angiographically; repeat imaging only if symptoms recur.</p>
+        </div>
+        <p style="font-size:12.5px; color:var(--ink2)">👉 The FFR pressure-wire dial (with its SCAD caution) lives in <strong>S5</strong>; the two branching decision engines are in <strong>S6</strong> (strategy) and <strong>S9</strong> (complication).</p>
+      </div>
+    </section>
+
+    <!-- S17 PEARLS -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>👩 Think SCAD</b>Young woman, few risk factors, peripartum/stress trigger, smooth taper, no atheroma.</div>
+          <div class="pearl"><b>🩸 Bruise, not clot</b>Intramural haematoma / false lumen compresses the true lumen — a vicious cycle of propagation.</div>
+          <div class="pearl"><b>🔎 Yip–Saw types</b>1 = wall staining; 2 = long smooth taper; 3 = mimics plaque; 4 = mimics clot (occlusion).</div>
+          <div class="pearl"><b>🛑 Conservative-first</b>Most SCAD heals in weeks; PCI is high-risk and often makes it worse.</div>
+          <div class="pearl"><b>🚩 Intervene only if</b>Ongoing ischaemia, instability, VT/VF, left-main or proximal jeopardy.</div>
+          <div class="pearl"><b>🚫 No thrombolysis</b>Lytics can propagate the dissection catastrophically.</div>
+          <div class="pearl"><b>🧬 Screen for FMD</b>Head-to-pelvis imaging; SCAD is an arteriopathy, not a plaque.</div>
+          <div class="pearl"><b>🔁 High recurrence</b>Beta-blocker, BP control, avoid triggers, pregnancy counseling, SCAD-aware rehab.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- S18 MCQs -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers score toward your S19 total.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- S19 SCORE & TAKEAWAYS -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>🏆 Score Summary &amp; Key Takeaways</h2></div>
+      <div class="section-content">
+        <div style="text-align:center; margin:10px 0 18px">
+          <div class="scorebig" id="finalXP">0</div>
+          <div style="font-size:13px; color:var(--ink2)">total XP earned this case</div>
+        </div>
+        <table class="tbl">
+          <tr><th>Metric</th><th>Value</th></tr>
+          <tr><td>📚 Sections read</td><td id="sumVisit">0 / 19</td></tr>
+          <tr><td>🧠 MCQ score</td><td id="sumMcq">0 / 8</td></tr>
+          <tr><td>🩺 Checklists completed</td><td id="sumCk">0 / 4</td></tr>
+          <tr><td>🎬 Decision paths solved</td><td id="sumPath">0 / 2</td></tr>
+        </table>
+        <h3>🎯 The five things to carry out of this case</h3>
+        <ol>
+          <li>👩 <strong>Recognise SCAD</strong> — young low-risk woman, peripartum/stress, smooth taper, no atheroma; up to a third of MI in women under 50.</li>
+          <li>🩸 <strong>Understand the mechanism</strong> — intramural haematoma / false lumen compressing the true lumen; anything that adds to it propagates the tear.</li>
+          <li>🛑 <strong>Conservative-first</strong> — most SCAD heals; PCI is high-risk and reserved for ischaemia, instability, left-main or proximal jeopardy.</li>
+          <li>🚫 <strong>Avoid the harms</strong> — no thrombolysis, no reflex stent, no rough wiring of a fragile artery.</li>
+          <li>🧬 <strong>Finish the workup</strong> — screen head-to-pelvis for FMD, beta-blocker, pregnancy counseling, SCAD-aware rehab; expect meaningful recurrence risk.</li>
+        </ol>
+        <div class="callout ok"><b class="ct">✅ You resisted the reflex and let the artery heal</b>Diagnosed a Type 2 mid-LAD SCAD in a stable postpartum woman, chose conservative management with preserved flow, screened for FMD, and avoided the stent that would have propagated the dissection. Restraint was the intervention.</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · ❤️ Cardiology · 🩻 Cath Lab · Bed 3 — SCAD, When NOT to Stent<br>⚠️ Educational use only — not for clinical decision-making. External links open in a new tab. "Simple enough to remember, impossible to forget."</div>
+  </main>
+  </div>
+</div>
+
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 19</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🔍 SCAD Spot</span>
+      <span class="badge" id="bdg-strategy">🧭 Strategy</span>
+      <span class="badge" id="bdg-complic">⚠️ Complication</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Score by spotting SCAD, running the sims, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  var XP=0, XP_MAX=1400, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; var fx=document.getElementById('finalXP'); if(fx) fx.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+  /* ===== SIDEBAR TABS ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 19'; var sv=document.getElementById('sumVisit'); if(sv) sv.textContent=n+' / 19'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=19){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'SCAD clue'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ That points to atherosclerosis'); } if(found===total){ flagResult.textContent='✅ All '+total+' SCAD-suggestive features found'+(wrong?' (with '+wrong+' wrong)':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','SCAD Spot badge'); } else { flagResult.textContent=found+' / '+total+' SCAD clues found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Reveal'); } }); });
+
+  /* ===== SIM 1: FFR ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10)/100; kVal.textContent=v.toFixed(2); var pct=(parseInt(kRange.value,10)-60)/(98-60)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<=0.75){ msg='🔴 FFR '+v.toFixed(2)+' — clearly ischaemic in general terms. In SCAD, do NOT wire the acute dissection to prove this; judge by flow and symptoms.'; cls='bad'; }
+      else if(v<=0.80){ msg='🟠 FFR '+v.toFixed(2)+' — at/below the 0.80 threshold → ischaemic (general rule). In SCAD, physiology is for ambiguous non-dissected/bystander lesions only.'; cls='warn-r'; }
+      else if(v<=0.85){ msg='🟠 FFR '+v.toFixed(2)+' — just above threshold → generally defer/medical (grey zone, judgement).'; cls='warn-r'; }
+      else { msg='🟢 FFR '+v.toFixed(2)+' — not flow-limiting → defer safely. In a stable SCAD with preserved flow, this favours conservative management.'; cls='good'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ffrsim','Physiology'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== SIM 2: spontaneous-healing clock ===== */
+  var dtb=document.getElementById('dtbRange'), dtbVal=document.getElementById('dtbVal'), dtbNeedle=document.getElementById('dtbNeedle'), dtbReadout=document.getElementById('dtbReadout');
+  if(dtb){ var dtbUsed=false;
+    function updateDtb(){ var v=parseInt(dtb.value,10); dtbVal.textContent=v; var pct=(v-0)/(12-0)*100; dtbNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<=1){ msg='🔴 Week '+v+' — acute phase. Highest risk of propagation/recurrence; monitor inpatient and do NOT instrument the dissection.'; cls='bad'; }
+      else if(v<=4){ msg='🟠 Week '+v+' — healing underway. The intramural haematoma is resorbing; continue conservative therapy and a beta-blocker.'; cls='warn-r'; }
+      else { msg='🟢 Week '+v+' — by ~4–6 weeks the majority of SCAD has healed angiographically. Repeat imaging only if symptoms recur.'; cls='good'; }
+      dtbReadout.textContent=msg; dtbReadout.className='readout '+cls; if(!dtbUsed){ dtbUsed=true; addXP(15,'dtbsim','Heals-with-time'); } }
+    dtb.addEventListener('input', updateDtb); updateDtb();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; var sc=document.getElementById('sumCk'); if(sc) sc.textContent=ckDone+' / '+totalCk; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-quiz'); addXP(20,'allck','All checklists'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== GENERIC SCENARIO ENGINE (two instances) ===== */
+  var pathsSolved=0;
+  function initScenario(cfg){
+    var box=document.getElementById(cfg.box); if(!box) return;
+    var elText=document.getElementById(cfg.text), elChoices=document.getElementById(cfg.choices), elFb=document.getElementById(cfg.feedback),
+        elRestart=document.getElementById(cfg.restart), elStab=document.getElementById(cfg.stab), elTime=document.getElementById(cfg.time), elXP=document.getElementById(cfg.xp);
+    var pXP=0, stab=cfg.stab0, elapsed=0;
+    function renderStab(){ if(cfg.dots){ var s=Math.max(0,Math.min(5,stab)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); elStab.textContent=d; } else { elStab.textContent=stab; } }
+    function render(key){ var st=cfg.steps[key]; elText.textContent=st.text; elFb.className='feedback'; elFb.style.display='none'; elChoices.innerHTML='';
+      st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pXP+=ch.xp; elXP.textContent=pXP; elapsed+=ch.dt; elTime.textContent=elapsed+cfg.unit; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Decision'); elFb.textContent=ch.fb; elFb.className='feedback '+(ch.good?'good':'bad'); elFb.style.display='block'; [].slice.call(elChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ elRestart.style.display='inline-block'; if(ch.good && key===cfg.winKey){ earnBadge(cfg.badge); pathsSolved++; var sp=document.getElementById('sumPath'); if(sp) sp.textContent=pathsSolved+' / 2'; addXP(20,cfg.box+'-win','Path solved'); } } else if(ch.next){ setTimeout(function(){ render(ch.next); },1400); } }); elChoices.appendChild(b); }); }
+    elRestart.addEventListener('click', function(){ pXP=0; stab=cfg.stab0; elapsed=0; elXP.textContent=0; elTime.textContent='0'+cfg.unit; renderStab(); elRestart.style.display='none'; render('start'); });
+    renderStab(); render('start');
+  }
+
+  initScenario({ box:'scenarioBox1', text:'sc1Text', choices:'sc1Choices', feedback:'sc1Feedback', restart:'sc1Restart', stab:'sc1Stab', time:'sc1Time', xp:'sc1XP', badge:'bdg-strategy', winKey:'declare', dots:false, stab0:0, unit:' min',
+    steps:{
+      start:{ text:"Angiography confirms a long tapering mid-LAD (Type 2 SCAD), TIMI-2/3 flow preserved, the patient is now pain-free and haemodynamically stable, and the vessel is mid/distal. What is your management?",
+        choices:[
+          {t:"🛑 Conservative management — admit to a monitored bed, beta-blocker, avoid instrumenting the dissection",good:true,ds:1,dt:5,xp:40,fb:"✅ Correct. A stable SCAD with preserved distal flow is the textbook profile to leave alone. Most heal spontaneously in weeks. Flow preserved.",next:"prep"},
+          {t:"🧵 Reflexively wire and stent the mid-LAD like an atherosclerotic STEMI",good:false,ds:-1,dt:12,xp:0,fb:"⚠️ This is the trap. PCI in SCAD is high-risk — you can wire the false lumen and propagate the dissection. Reserve PCI for high-risk features only.",next:"prep"},
+          {t:"💉 Give thrombolysis to dissolve the 'clot'",good:false,ds:-2,dt:15,xp:0,fb:"☠️ There is no clot to lyse — it is an intramural haematoma. Thrombolysis can propagate the dissection catastrophically. Never in suspected SCAD.",next:"prep"}
+        ]},
+      prep:{ text:"You are leaning conservative. Which single feature would legitimately flip you toward revascularisation?",
+        choices:[
+          {t:"🚩 Ongoing ischaemia, haemodynamic instability, VT/VF, or left-main / proximal-vessel jeopardy",good:true,ds:1,dt:5,xp:40,fb:"✅ Exactly. These high-risk features are the accepted indications to intervene despite the hazards of SCAD-PCI.",next:"declare"},
+          {t:"📏 The lesion is long (over 20 mm) on angiography",good:false,ds:-1,dt:8,xp:0,fb:"⚠️ Length alone is not an indication — Type 2 SCAD is characteristically long and smooth. Stable, well-perfused length is still managed conservatively.",next:"declare"},
+          {t:"🎂 The patient is young, so fix it definitively now",good:false,ds:-1,dt:8,xp:0,fb:"⚠️ Youth is a reason for MORE restraint, not less — you want the fragile artery to heal, not to carry high-risk metal for life.",next:"declare"}
+        ]},
+      declare:{ text:"For THIS stable patient with preserved distal flow, make the final call before you close.",
+        choices:[
+          {t:"✅ Continue conservative management, monitor 3–5 days, arrange FMD screening and SCAD-aware rehab, follow up",good:true,ds:1,dt:4,xp:45,fb:"🏆 Excellent. Diagnose, stabilise, screen head-to-pelvis for FMD, beta-blocker, and let the artery heal. Restraint is the intervention.",end:true},
+          {t:"🩹 Proceed to PCI anyway 'to be safe'",good:false,ds:-2,dt:10,xp:0,fb:"⚠️ 'To be safe' is exactly how a stable SCAD becomes a propagated dissection and a large infarct — see the M&M. Do not stent a stable, well-perfused SCAD.",end:true}
+        ]}
+    }});
+
+  initScenario({ box:'scenarioBox2', text:'sc2Text', choices:'sc2Choices', feedback:'sc2Feedback', restart:'sc2Restart', stab:'sc2Stab', time:'sc2Time', xp:'sc2XP', badge:'bdg-complic', winKey:'declare', dots:true, stab0:2, unit:' s',
+    steps:{
+      start:{ text:"Intervention was attempted on the mid-LAD SCAD. After balloon inflation the vessel abruptly closes, the narrowing lengthens PROXIMALLY toward the left main, and the BP drops with new ST elevation. What is happening, and what do you do FIRST?",
+        choices:[
+          {t:"🧵 Iatrogenic dissection extension / false-lumen wiring — STOP instrumenting and confirm the true lumen (OCT/IVUS or contralateral injection) before anything else",good:true,ds:1,dt:5,xp:45,fb:"✅ Right. You have extended the dissection. The first move is to stop making it worse and prove where the true lumen is before any further action.",next:"reverse"},
+          {t:"🎈 Keep inflating longer to force the vessel open",good:false,ds:-2,dt:20,xp:0,fb:"☠️ More ballooning drives the haematoma further and extends the dissection into the left main. This is how a stable SCAD becomes cardiogenic shock. Restart.",end:true},
+          {t:"💉 Give thrombolysis to open the 'occlusion'",good:false,ds:-2,dt:18,xp:0,fb:"☠️ There is no thrombus — lytics propagate the dissection. Catastrophic in SCAD. Restart.",end:true}
+        ]},
+      reverse:{ text:"Imaging shows the wire was in the false lumen and a large anterior territory is now threatened with poor flow. Next?",
+        choices:[
+          {t:"🧵 Re-wire the TRUE lumen distally with a soft wire under imaging guidance, ready to seal the dissection if flow cannot be restored",good:true,ds:1,dt:6,xp:40,fb:"✅ Correct. Regain the true lumen and prepare to bail out — because a large territory is now at risk, you must restore flow.",next:"declare"},
+          {t:"🚪 Pull all equipment and just observe, ignoring the poor flow and instability",good:false,ds:-1,dt:12,xp:0,fb:"⚠️ Conservative management is for STABLE patients with preserved flow. This patient is now unstable with a threatened large territory — observing loses the myocardium.",next:"declare"}
+        ]},
+      declare:{ text:"The dissection now involves the proximal LAD and left main with ongoing ischaemia and instability. Definitive move?",
+        choices:[
+          {t:"🩹 Bail-out stent the TRUE lumen long into healthy vessel to restore flow, add mechanical support, and involve surgery (CABG) for left-main / failed PCI",good:true,ds:1,dt:5,xp:45,fb:"🏆 Correct. Once you have iatrogenically extended into the LM with instability, you must rescue: true-lumen stenting, support, and surgical back-up. The lesson stands — this is why you do not start on a stable SCAD.",end:true},
+          {t:"⏳ Continue conservative observation and hope it heals",good:false,ds:-1,dt:15,xp:0,fb:"⚠️ An unstable, propagating left-main dissection will not be salvaged by watching — this needs definitive rescue now.",end:true}
+        ]}
+    }});
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 41-year-old woman, 3 weeks postpartum, no cardiovascular risk factors, has an anterior MI. Angiography shows a long, smooth, tapering mid-LAD narrowing with no atheroma anywhere. The most likely diagnosis is:", opts:["Atherosclerotic plaque rupture","Spontaneous coronary artery dissection (SCAD)","Coronary vasospasm (Prinzmetal)","Takotsubo cardiomyopathy"], correct:1, exp:"A young low-risk woman, peripartum, with a long smooth tapering stenosis and no atheroma is the classic SCAD profile. SCAD causes up to 25 to 35 percent of MI in women under 50 and is the leading cause of pregnancy-associated MI." },
+    { q:"For a stable SCAD of the mid-LAD with preserved TIMI-3 distal flow and settling symptoms, the preferred management is:", opts:["Immediate PCI with stenting","Conservative management with monitored admission","Thrombolysis","Urgent CABG"], correct:1, exp:"Most SCAD heals spontaneously within weeks. Conservative management is the default for stable patients with preserved flow; PCI is high-risk and reserved for high-risk features." },
+    { q:"On the Yip–Saw (Saw) classification, a diffuse, long (over 20 mm), smooth stenosis is:", opts:["Type 1","Type 2","Type 3","Type 4"], correct:1, exp:"Type 2 is the diffuse long smooth stenosis and is the most common pattern. Type 1 is wall contrast staining, Type 3 mimics atherosclerosis, and Type 4 is a total (usually distal) occlusion." },
+    { q:"After stabilising a SCAD patient, which screening is specifically recommended?", opts:["Coronary calcium scoring","Head-to-pelvis arterial imaging for fibromuscular dysplasia (FMD)","Routine thrombophilia panel only","Echocardiographic bubble study only"], correct:1, exp:"Up to 50 to 80 percent of SCAD patients have FMD somewhere in the arterial tree. Head-to-pelvis CT or MR angiography screens for FMD, aneurysms, and dissections." },
+    { q:"Why is PCI considered high-risk in acute SCAD?", opts:["Stents are contraindicated in all women","The wire can enter the false lumen and balloon/stent can propagate the dissection, with poor stent results","Contrast is nephrotoxic only in SCAD","SCAD lesions are always calcified"], correct:1, exp:"In SCAD the wire may track into the false lumen and any added force can extend the intramural haematoma. PCI has lower success and higher complication rates than atherosclerotic PCI, so it is reserved for high-risk features." },
+    { q:"Which therapy should be AVOIDED in suspected SCAD?", opts:["Beta-blocker","Thrombolysis","Aspirin","Blood pressure control"], correct:1, exp:"Thrombolysis can propagate the dissection catastrophically because the mechanism is an intramural haematoma, not a luminal thrombus. It is contraindicated in suspected SCAD." },
+    { q:"Which of the following is an accepted indication to intervene (PCI/CABG) in SCAD rather than manage conservatively?", opts:["A long lesion on angiography","Ongoing ischaemia, haemodynamic instability, VT/VF, or left-main / proximal-vessel jeopardy","Young patient age","Postpartum status"], correct:1, exp:"Revascularisation is reserved for high-risk features: ongoing ischaemia, haemodynamic instability, malignant arrhythmia, or left-main / proximal-vessel involvement with threatened flow. Lesion length, youth, and peripartum status are not, by themselves, indications." },
+    { q:"Regarding long-term SCAD management, which statement is correct?", opts:["Recurrence is rare and needs no follow-up","There is meaningful recurrence risk; beta-blockade, BP control, trigger avoidance, and pregnancy counseling are advised","High-intensity statin is mandatory for all","Future pregnancy carries no additional risk"], correct:1, exp:"SCAD carries a significant recurrence risk (roughly 10 to 30 percent over years), often in a different vessel. Beta-blockers, BP control, avoiding triggers, pregnancy counseling, and SCAD-aware rehab are recommended; statins are not routine unless otherwise indicated." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length; var sm=document.getElementById('sumMcq'); if(sm) sm.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you know when NOT to stent. 🏆':score>=6?'Strong — review the misses and S11 EBM.':'Revisit S5, S6, S9 and S10 — the mechanism and the conservative-first logic are the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>
