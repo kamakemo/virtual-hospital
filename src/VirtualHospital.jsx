@@ -2558,6 +2558,7 @@ function Landing({ navigate, cases, progress, userRole }) {
           className="min-h-[560px] sm:min-h-[620px]"
         >
           <div className="absolute inset-0 hero-scrim" />
+          <div className="absolute inset-0 text-scrim-left" />
           {/* floating glass vitals chips for depth */}
           <div className="hidden lg:block absolute top-24 right-16 float-slow">
             <div className="glass rounded-2xl border border-white/20 px-4 py-3 depth-shadow text-white w-52">
