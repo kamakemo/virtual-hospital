@@ -24,3 +24,86 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .page-transition { animation: none; }
 }
+
+/* ============================================================
+   Immersive redesign — depth, motion, glass (lightweight, CSS-only)
+   ============================================================ */
+
+/* Slow cinematic zoom for hero / banner photos */
+@keyframes kenBurns {
+  from { transform: scale(1.06) translate3d(0, 0, 0); }
+  to   { transform: scale(1.2) translate3d(-1.5%, -1.5%, 0); }
+}
+.ken-burns { animation: kenBurns 26s ease-in-out infinite alternate; will-change: transform; }
+
+/* Gentle float for floating chips / cards */
+@keyframes floatSlow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+.float-slow  { animation: floatSlow 6s ease-in-out infinite; }
+.float-slow2 { animation: floatSlow 8s ease-in-out infinite; animation-delay: -2s; }
+
+/* Shine sweep on hover (buttons / photo cards) */
+@keyframes shineSweep { 0% { transform: translateX(-130%) skewX(-18deg); } 60%, 100% { transform: translateX(240%) skewX(-18deg); } }
+.shine { position: relative; overflow: hidden; }
+.shine::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(105deg, transparent 32%, rgba(255,255,255,0.45) 48%, transparent 64%);
+  transform: translateX(-130%) skewX(-18deg);
+}
+.shine:hover::after { animation: shineSweep 1.05s ease; }
+
+/* Scroll reveal */
+@keyframes revealUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+.reveal { opacity: 0; }
+.reveal.reveal-in { animation: revealUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* CSS 3D cursor tilt — JS sets --rx / --ry / --tz */
+.tilt { perspective: 1100px; }
+.tilt-inner {
+  transition: transform 0.16s ease-out, box-shadow 0.16s ease-out;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  will-change: transform;
+}
+.tilt-pop { transform: translateZ(38px); transform-style: preserve-3d; }
+.tilt-pop-sm { transform: translateZ(20px); transform-style: preserve-3d; }
+
+/* Glassmorphism */
+.glass { background: rgba(255,255,255,0.55); backdrop-filter: blur(14px) saturate(150%); -webkit-backdrop-filter: blur(14px) saturate(150%); }
+:root[data-theme="dark"] .glass, .dark .glass { background: rgba(15,23,42,0.5); }
+
+/* Layered depth shadow */
+.depth-shadow { box-shadow: 0 10px 30px -14px rgba(2,6,23,0.45), 0 34px 64px -34px rgba(2,6,23,0.4); }
+
+/* Photo scrim so text stays legible over imagery */
+.hero-scrim { background: linear-gradient(to top, rgba(2,6,23,0.88) 0%, rgba(2,6,23,0.5) 42%, rgba(2,6,23,0.28) 72%, rgba(2,6,23,0.12) 100%); }
+.card-scrim { background: linear-gradient(to top, rgba(2,6,23,0.85) 0%, rgba(2,6,23,0.28) 55%, transparent 100%); }
+
+/* Monitor scanline for ward / department ambiance */
+@keyframes scanMove { 0% { transform: translateY(-120%); } 100% { transform: translateY(520%); } }
+.scanline { position: relative; overflow: hidden; }
+.scanline::after {
+  content: ''; position: absolute; left: 0; right: 0; height: 22%;
+  background: linear-gradient(to bottom, transparent, rgba(56,189,248,0.14), transparent);
+  animation: scanMove 5.5s linear infinite; pointer-events: none;
+}
+
+/* Animated ECG trace stroke (SVG) */
+@keyframes ecgFlow { to { stroke-dashoffset: -600; } }
+.ecg-trace { stroke-dasharray: 6 0; animation: ecgFlow 4.5s linear infinite; }
+
+/* Soft gradient drift for hero backdrops */
+@keyframes gradientDrift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+.gradient-drift { background-size: 200% 200%; animation: gradientDrift 16s ease infinite; }
+
+/* Smart image fade-in once the real photo loads */
+.smart-photo { opacity: 0; transition: opacity 0.8s ease; }
+.smart-photo.loaded { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ken-burns, .float-slow, .float-slow2, .gradient-drift { animation: none !important; }
+  .scanline::after, .ecg-trace { animation: none !important; }
+  .reveal { opacity: 1 !important; }
+  .reveal.reveal-in { animation: none !important; }
+  .shine:hover::after { animation: none !important; }
+  .tilt-inner { transition: none !important; }
+}

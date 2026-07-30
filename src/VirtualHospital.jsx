@@ -2423,6 +2423,124 @@ VITE_SUPABASE_ANON_KEY=eyJ...your-anon-public-key...`}</pre>
   );
 }
 
+// ============== IMMERSIVE MEDIA + HELPERS ==============
+// Real photos are progressive enhancement only. Every surface renders a themed
+// gradient "scene" underneath via SmartImage, so a blocked/404 photo never breaks
+// the layout — it simply shows the illustrated backdrop instead.
+const HOSPITAL_MEDIA = {
+  cardiology:  { grad: 'from-rose-600 via-pink-600 to-red-700',    photo: 'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?auto=format&fit=crop&w=1600&q=70', wing: 'Heart & Vascular Tower',    floor: 'Levels 1–4' },
+  internal:    { grad: 'from-sky-600 via-blue-600 to-indigo-700',  photo: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1600&q=70', wing: 'General Medicine Tower',   floor: 'Levels 1–5' },
+  prehospital: { grad: 'from-amber-500 via-orange-500 to-red-600', photo: 'https://images.unsplash.com/photo-1587745416684-47953f16f02f?auto=format&fit=crop&w=1600&q=70', wing: 'Field & EMS Operations',   floor: 'Bay & Dispatch' },
+};
+const LANDING_HERO_PHOTO = 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?auto=format&fit=crop&w=2000&q=72';
+// Per-department photo attempts (enhancement; gradient scene is the guaranteed base).
+const DEPT_PHOTO = {
+  'cv-ed': 'https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?auto=format&fit=crop&w=1400&q=70',
+  'cv-ccu': 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1400&q=70',
+  'cv-cath': 'https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&w=1400&q=70',
+  'cv-imaging': 'https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?auto=format&fit=crop&w=1400&q=70',
+  'im-icu': 'https://images.unsplash.com/photo-1584982751601-97dcc096659c?auto=format&fit=crop&w=1400&q=70',
+  'im-resp': 'https://images.unsplash.com/photo-1583912267550-d6c2ac3196c0?auto=format&fit=crop&w=1400&q=70',
+  'ph-trauma': 'https://images.unsplash.com/photo-1587745416684-47953f16f02f?auto=format&fit=crop&w=1400&q=70',
+};
+
+// A photo layer with a guaranteed themed gradient backdrop + blueprint grid + soft glows.
+function SmartImage({ src, alt = '', gradient = 'from-slate-700 to-slate-900', className = '', kenBurns = false, children }) {
+  const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
+  return (
+    <div className={cx('relative overflow-hidden', className)}>
+      <div className={cx('absolute inset-0 bg-gradient-to-br gradient-drift', gradient)} />
+      <div className="absolute inset-0 opacity-[0.13]" style={{
+        backgroundImage: 'linear-gradient(rgba(255,255,255,.65) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.65) 1px,transparent 1px)',
+        backgroundSize: '26px 26px'
+      }} />
+      <div className="absolute -top-16 -right-10 w-64 h-64 rounded-full bg-white/25 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-24 -left-12 w-80 h-80 rounded-full bg-black/25 blur-3xl pointer-events-none" />
+      <svg className="absolute right-5 bottom-4 w-20 h-20 opacity-[0.12]" viewBox="0 0 24 24" fill="white" aria-hidden="true">
+        <path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" />
+      </svg>
+      {src && !failed && (
+        <img
+          src={src} alt={alt} loading="lazy" decoding="async"
+          onLoad={() => setLoaded(true)} onError={() => setFailed(true)}
+          className={cx('absolute inset-0 w-full h-full object-cover smart-photo', loaded && 'loaded', kenBurns && 'ken-burns')}
+        />
+      )}
+      {children}
+    </div>
+  );
+}
+
+// CSS 3D cursor-tilt wrapper (no dependencies).
+function Tilt3D({ max = 8, className = '', innerClassName = '', children, onClick, style }) {
+  const ref = useRef(null);
+  const reset = () => { const el = ref.current; if (el) { el.style.setProperty('--rx', '0deg'); el.style.setProperty('--ry', '0deg'); } };
+  const move = (e) => {
+    const el = ref.current; if (!el) return;
+    const r = el.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    el.style.setProperty('--ry', `${(px * max).toFixed(2)}deg`);
+    el.style.setProperty('--rx', `${(-py * max).toFixed(2)}deg`);
+  };
+  return (
+    <div className={cx('tilt', className)} onMouseMove={move} onMouseLeave={reset} onClick={onClick} style={style}>
+      <div ref={ref} className={cx('tilt-inner', innerClassName)}>{children}</div>
+    </div>
+  );
+}
+
+// Scroll-reveal wrapper via IntersectionObserver.
+function Reveal({ className = '', delay = 0, children }) {
+  const ref = useRef(null);
+  const [seen, setSeen] = useState(false);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setSeen(true); io.disconnect(); } }, { threshold: 0.12 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return <div ref={ref} className={cx('reveal', seen && 'reveal-in', className)} style={{ animationDelay: `${delay}ms` }}>{children}</div>;
+}
+
+// Animated count-up for stat numbers.
+function useCountUp(target, dur = 1200) {
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    let raf; const to = Number(target) || 0; let startT = null;
+    const tick = (t) => {
+      if (startT === null) startT = t;
+      const p = Math.min(1, (t - startT) / dur);
+      setVal(Math.round(to * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, dur]);
+  return val;
+}
+
+// Live ward clock (updates each second).
+function LiveClock() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => { const id = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(id); }, []);
+  const hh = String(now.getHours()).padStart(2, '0');
+  const mm = String(now.getMinutes()).padStart(2, '0');
+  const ss = String(now.getSeconds()).padStart(2, '0');
+  return <span className="tabular-nums font-mono">{hh}:{mm}<span className="opacity-50">:{ss}</span></span>;
+}
+
+// A tiny animated ECG monitor line (SVG) for department ambiance.
+function PulseTrace({ className = '' }) {
+  return (
+    <svg viewBox="0 0 240 40" preserveAspectRatio="none" className={className} aria-hidden="true">
+      <polyline className="ecg-trace" fill="none" stroke="currentColor" strokeWidth="2"
+        points="0,20 30,20 38,20 44,6 50,34 56,20 90,20 98,20 104,10 110,30 116,20 150,20 158,20 164,6 170,34 176,20 210,20 218,20 224,12 230,28 236,20 240,20" />
+    </svg>
+  );
+}
+
 // ============== LANDING ==============
 function Landing({ navigate, cases, progress, userRole }) {
   const cardiologyCases = cases.filter(c => c.hospital === 'cardiology');
@@ -2430,55 +2548,72 @@ function Landing({ navigate, cases, progress, userRole }) {
 
   return (
     <div className="relative">
-      {/* Hero */}
-      <section className="relative overflow-hidden grid-bg">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-teal-400/20 dark:bg-teal-500/10 blur-[120px] rounded-full pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-6 pt-16 pb-20 relative">
-          <div className="flex items-center gap-2 mb-6">
-            <span className="relative inline-flex">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 text-emerald-500 pulse-dot relative" />
-            </span>
-            <span className="text-xs uppercase tracking-[0.25em] text-slate-600 dark:text-slate-400 font-semibold">
-              Live · Clinical Simulation
-            </span>
+      {/* Hero — cinematic photo band with depth + parallax */}
+      <section className="relative">
+        <SmartImage
+          src={LANDING_HERO_PHOTO}
+          alt="Virtual teaching hospital"
+          gradient="from-teal-700 via-slate-800 to-slate-950"
+          kenBurns
+          className="min-h-[560px] sm:min-h-[620px]"
+        >
+          <div className="absolute inset-0 hero-scrim" />
+          {/* floating glass vitals chips for depth */}
+          <div className="hidden lg:block absolute top-24 right-16 float-slow">
+            <div className="glass rounded-2xl border border-white/20 px-4 py-3 depth-shadow text-white w-52">
+              <div className="flex items-center justify-between text-[10px] uppercase tracking-wider text-teal-200 font-bold mb-1">
+                <span>Bed 5 · Monitor</span><span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />live</span>
+              </div>
+              <PulseTrace className="w-full h-8 text-emerald-300" />
+              <div className="flex items-end justify-between mt-1"><span className="text-2xl font-bold leading-none">88</span><span className="text-[10px] text-white/60 mb-0.5">HR bpm</span></div>
+            </div>
+          </div>
+          <div className="hidden lg:block absolute bottom-28 right-40 float-slow2">
+            <div className="glass rounded-xl border border-white/20 px-3 py-2 depth-shadow text-white flex items-center gap-2">
+              <span className="w-8 h-8 rounded-lg bg-rose-500/90 flex items-center justify-center"><HeartPulse size={16} className="text-white" /></span>
+              <div><div className="text-[9px] uppercase tracking-wider text-white/60">Triage</div><div className="text-sm font-bold">3 critical</div></div>
+            </div>
           </div>
 
-          <h1 className="display-font text-5xl sm:text-6xl md:text-7xl font-black leading-[0.95] tracking-tight max-w-4xl">
-            Step into the <span className="italic text-teal-600 dark:text-teal-400">ward</span>.
-            <br />Reason like a <span className="italic">consultant</span>.
-          </h1>
-          <p className="mt-6 text-lg text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed">
-            A bilingual virtual teaching hospital for medical students, residents, and postgraduates.
-            Walk through real clinical workflows — from EMS handover to discharge — across {STAGES.length} structured stages.
-          </p>
+          <div className="relative max-w-7xl mx-auto px-6 h-full flex flex-col justify-center py-20 min-h-[560px] sm:min-h-[620px]">
+            <div className="flex items-center gap-2 mb-6">
+              <span className="relative inline-flex text-emerald-400"><span className="w-2 h-2 rounded-full bg-emerald-400 pulse-dot relative" /></span>
+              <span className="text-xs uppercase tracking-[0.25em] text-teal-200 font-semibold">Live · Clinical Simulation</span>
+            </div>
+            <h1 className="display-font text-5xl sm:text-6xl md:text-7xl font-black leading-[0.95] tracking-tight max-w-4xl text-white drop-shadow-xl">
+              Step into the <span className="italic text-teal-300">ward</span>.
+              <br />Reason like a <span className="italic">consultant</span>.
+            </h1>
+            <p className="mt-6 text-lg text-slate-200 max-w-2xl leading-relaxed">
+              A bilingual virtual teaching hospital for medical students, residents, and postgraduates.
+              Walk through real clinical workflows — from EMS handover to discharge — across {STAGES.length} structured stages.
+            </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <button
-              onClick={() => {
-                const el = document.getElementById('hospitals');
-                el?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="group inline-flex items-center gap-2 px-6 py-3 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-semibold shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all"
-            >
-              Choose a hospital
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button
-              onClick={() => navigate({ name: 'dashboard' })}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-900 font-semibold"
-            >
-              <BarChart3 size={16} />
-              View progress
-            </button>
-          </div>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <button
+                onClick={() => { document.getElementById('hospitals')?.scrollIntoView({ behavior: 'smooth' }); }}
+                className="shine group inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-slate-900 font-semibold shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all"
+              >
+                Choose a hospital
+                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+              <button
+                onClick={() => navigate({ name: 'dashboard' })}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white/40 text-white hover:bg-white/10 font-semibold backdrop-blur-sm"
+              >
+                <BarChart3 size={16} />
+                View progress
+              </button>
+            </div>
 
-          <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl">
-            <Stat icon={Layers} value={cases.length} label="Clinical cases" />
-            <Stat icon={ClipboardList} value={STAGES.length} label="Workflow stages" />
-            <Stat icon={Brain} value={cases.reduce((s, c) => s + (c.mcqs?.length || 0), 0)} label="MCQ assessments" />
-            <Stat icon={Trophy} value={progress.xp} label="Your XP" />
+            <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl">
+              <Stat icon={Layers} value={cases.length} label="Clinical cases" />
+              <Stat icon={ClipboardList} value={STAGES.length} label="Workflow stages" />
+              <Stat icon={Brain} value={cases.reduce((s, c) => s + (c.mcqs?.length || 0), 0)} label="MCQ assessments" />
+              <Stat icon={Trophy} value={progress.xp} label="Your XP" />
+            </div>
           </div>
-        </div>
+        </SmartImage>
       </section>
 
       {/* Hospital cards */}
@@ -2577,11 +2712,12 @@ function Landing({ navigate, cases, progress, userRole }) {
 }
 
 function Stat({ icon: Icon, value, label }) {
+  const shown = useCountUp(value);
   return (
-    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/40 backdrop-blur p-4">
-      <Icon size={16} className="text-teal-600 dark:text-teal-400 mb-2" />
-      <div className="display-font text-3xl font-bold leading-none">{value}</div>
-      <div className="text-[11px] uppercase tracking-wider text-slate-500 mt-1">{label}</div>
+    <div className="glass rounded-2xl border border-white/20 p-4 depth-shadow">
+      <Icon size={16} className="text-teal-300 mb-2" />
+      <div className="display-font text-3xl font-bold leading-none text-white tabular-nums">{shown}</div>
+      <div className="text-[11px] uppercase tracking-wider text-slate-300 mt-1">{label}</div>
     </div>
   );
 }
@@ -2594,39 +2730,47 @@ function HospitalCard({ tone, icon: Icon, title, tagline, cases, onClick }) {
   }[tone];
 
   const sevCount = (s) => cases.filter(c => c.severity === s).length;
+  const hospitalKey = tone === 'rose' ? 'cardiology' : tone === 'blue' ? 'internal' : 'prehospital';
+  const media = HOSPITAL_MEDIA[hospitalKey];
 
   return (
-    <button
-      onClick={onClick}
-      className={cx(
-        'group text-left relative overflow-hidden rounded-3xl border bg-white dark:bg-slate-900 transition-all hover:shadow-2xl hover:-translate-y-1',
+    <Tilt3D max={7} className="cursor-pointer" onClick={onClick}>
+      <div className={cx(
+        'group text-left relative overflow-hidden rounded-3xl border bg-white dark:bg-slate-900 transition-shadow hover:shadow-2xl depth-shadow',
         tones.border
-      )}
-    >
-      <div className={cx('absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-br transition-opacity', tones.from, tones.to)} style={{ opacity: 0.06 }} />
-      <div className="relative p-7">
-        <div className="flex items-start justify-between mb-6">
-          <div className={cx('w-14 h-14 rounded-2xl bg-gradient-to-br flex items-center justify-center shadow-lg', tones.from, tones.to)}>
-            <Icon className="text-white" size={26} />
+      )}>
+        {/* Photo header */}
+        <SmartImage src={media.photo} alt={title} gradient={cx('bg-gradient-to-br', tones.from, tones.to)} kenBurns className="h-40">
+          <div className="absolute inset-0 card-scrim" />
+          <div className="absolute inset-0 p-5 flex flex-col justify-between">
+            <div className="flex items-start justify-between">
+              <div className={cx('tilt-pop-sm w-14 h-14 rounded-2xl bg-gradient-to-br flex items-center justify-center shadow-lg ring-1 ring-white/30', tones.from, tones.to)}>
+                <Icon className="text-white" size={26} />
+              </div>
+              <span className="glass rounded-full px-2.5 py-1 text-[10px] font-bold text-white border border-white/20 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> {media.wing}
+              </span>
+            </div>
+            <div className="text-white">
+              <div className="display-font text-2xl sm:text-3xl font-bold leading-none drop-shadow-md tilt-pop-sm">{title}</div>
+            </div>
           </div>
-          <ArrowRight className="text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white group-hover:translate-x-1 transition-all" size={20} />
-        </div>
+        </SmartImage>
 
-        <div className="display-font text-2xl sm:text-3xl font-bold mb-1">{title}</div>
-        <div className={cx('text-sm font-medium mb-6', tones.text)}>{tagline}</div>
-
-        <div className="grid grid-cols-3 gap-2 mb-5">
-          <SevPill label="Stable" count={sevCount('stable')} color="emerald" />
-          <SevPill label="Urgent" count={sevCount('urgent')} color="amber" />
-          <SevPill label="Critical" count={sevCount('critical')} color="red" />
-        </div>
-
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-slate-500">{cases.length} active case{cases.length !== 1 ? 's' : ''}</span>
-          <span className={cx('font-semibold', tones.text)}>{tones.label}</span>
+        <div className="relative p-6">
+          <div className={cx('text-sm font-medium mb-5', tones.text)}>{tagline}</div>
+          <div className="grid grid-cols-3 gap-2 mb-5">
+            <SevPill label="Stable" count={sevCount('stable')} color="emerald" />
+            <SevPill label="Urgent" count={sevCount('urgent')} color="amber" />
+            <SevPill label="Critical" count={sevCount('critical')} color="red" />
+          </div>
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-slate-500">{cases.length} active case{cases.length !== 1 ? 's' : ''}</span>
+            <span className={cx('font-semibold inline-flex items-center gap-1 group-hover:gap-2 transition-all', tones.text)}>{tones.label}</span>
+          </div>
         </div>
       </div>
-    </button>
+    </Tilt3D>
   );
 }
 
@@ -2673,79 +2817,121 @@ function HospitalView({ hospital, cases, navigate, progress }) {
     ? { title: 'Prehospital Field',           tagline: 'Choose a module to explore EMS cases',   icon: Ambulance,   tone: 'amber'  }
     : { title: 'Internal Medicine Hospital', tagline: 'Choose a department to enter the ward',  icon: Stethoscope, tone: 'blue'   };
   const Icon = meta.icon;
+  const media = HOSPITAL_MEDIA[hospital] || HOSPITAL_MEDIA.internal;
+  const totalCritical = departments.reduce((s, d) => s + cases.filter(c => c.department === d.id && c.severity === 'critical').length, 0);
+  const totalCases = departments.reduce((s, d) => s + cases.filter(c => c.department === d.id).length, 0);
+  const wayLabel = hospital === 'prehospital' ? 'Module' : 'Ward';
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
-      <button onClick={() => navigate({ name: 'landing' })} className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white mb-4">
-        <ChevronLeft size={14} /> Back to lobby
-      </button>
-
-      <div className="flex items-center gap-4 mb-8">
-        <div className={cx('w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg',
-          meta.tone === 'rose'  ? 'bg-gradient-to-br from-rose-500 to-pink-600' :
-          meta.tone === 'amber' ? 'bg-gradient-to-br from-amber-500 to-orange-600' :
-                                   'bg-gradient-to-br from-blue-500 to-indigo-600')}>
-          <Icon className="text-white" size={26} />
-        </div>
-        <div>
-          <p className="text-xs uppercase tracking-[0.25em] text-slate-500 font-semibold mb-1">Hospital directory</p>
-          <h1 className="display-font text-3xl sm:text-4xl font-bold">{meta.title}</h1>
-          <p className="text-sm text-slate-600 dark:text-slate-400">{meta.tagline}</p>
-        </div>
-      </div>
-
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {departments.map((d, i) => {
-          const deptCases = cases.filter(c => c.department === d.id);
-          const occupied = deptCases.length;
-          const occupancyPct = hospital === 'prehospital'
-            ? Math.min(occupied * 20, 100)
-            : Math.min(occupied * 8, 100);   // visual indicator only — 12+ cases = full bar
-          const accent = ACCENT_CLASSES[d.accent];
-          const DIcon = d.icon;
-          const critical = deptCases.filter(c => c.severity === 'critical').length;
-
-          return (
-            <button
-              key={d.id}
-              onClick={() => navigate({ name: 'department', hospital, departmentId: d.id })}
-              className={cx(
-                'group fade-up text-left relative overflow-hidden rounded-2xl border bg-white dark:bg-slate-900 p-5 transition-all hover:shadow-xl hover:-translate-y-0.5',
-                accent.border
-              )}
-              style={{ animationDelay: `${i * 40}ms` }}
-            >
-              <div className={cx('absolute -top-12 -right-12 w-32 h-32 rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition-opacity bg-gradient-to-br', accent.grad)} />
-              <div className="relative">
-                <div className="flex items-start justify-between mb-4">
-                  <div className={cx('w-11 h-11 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-md', accent.grad, accent.glow)}>
-                    <DIcon className="text-white" size={20} />
-                  </div>
-                  {critical > 0 && (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-red-500 text-white text-[9px] font-bold">
-                      <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                      {critical} critical
-                    </span>
-                  )}
-                </div>
-
-                <h3 className="display-font text-lg font-bold leading-tight mb-1">{d.label}</h3>
-                <p className={cx('text-[11px] font-semibold mb-3 uppercase tracking-wider', accent.text)}>
-                  {d.short} · {occupied > 0 ? `${occupied} case${occupied !== 1 ? 's' : ''}` : 'No cases yet'}
-                </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 line-clamp-2">{d.desc}</p>
-
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-slate-500">Cases</span>
-                  <span className={cx('font-bold', accent.text)}>{occupied}</span>
-                </div>
-                <div className="mt-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
-                  <div className={cx('h-full bg-gradient-to-r transition-all', accent.grad)} style={{ width: `${occupancyPct}%` }} />
-                </div>
+    <div>
+      {/* Photo hero banner for the hospital */}
+      <SmartImage src={media.photo} alt={meta.title} gradient={cx('bg-gradient-to-br', media.grad)} kenBurns className="h-72 sm:h-80">
+        <div className="absolute inset-0 hero-scrim" />
+        <div className="relative max-w-7xl mx-auto px-6 h-full flex flex-col justify-between py-7">
+          <button onClick={() => navigate({ name: 'landing' })} className="self-start flex items-center gap-1 text-sm text-white/80 hover:text-white">
+            <ChevronLeft size={14} /> Back to lobby
+          </button>
+          <div className="flex items-end justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-4">
+              <div className={cx('w-16 h-16 rounded-2xl bg-gradient-to-br flex items-center justify-center shadow-2xl ring-1 ring-white/30 float-slow',
+                meta.tone === 'rose' ? 'from-rose-500 to-pink-600' : meta.tone === 'amber' ? 'from-amber-500 to-orange-600' : 'from-blue-500 to-indigo-600')}>
+                <Icon className="text-white" size={30} />
               </div>
-            </button>
-          );
-        })}
+              <div className="text-white">
+                <p className="text-[11px] uppercase tracking-[0.25em] text-white/70 font-semibold mb-1">{media.wing} · {media.floor}</p>
+                <h1 className="display-font text-3xl sm:text-5xl font-bold leading-none drop-shadow-lg">{meta.title}</h1>
+                <p className="text-sm text-white/80 mt-1.5">{meta.tagline}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="glass rounded-xl border border-white/20 px-4 py-2 text-white text-center">
+                <div className="display-font text-2xl font-bold leading-none">{departments.length}</div>
+                <div className="text-[10px] uppercase tracking-wider text-white/60 mt-0.5">{wayLabel}s</div>
+              </div>
+              <div className="glass rounded-xl border border-white/20 px-4 py-2 text-white text-center">
+                <div className="display-font text-2xl font-bold leading-none">{totalCases}</div>
+                <div className="text-[10px] uppercase tracking-wider text-white/60 mt-0.5">Cases</div>
+              </div>
+              {totalCritical > 0 && (
+                <div className="rounded-xl border border-red-400/40 bg-red-500/25 backdrop-blur px-4 py-2 text-white text-center">
+                  <div className="display-font text-2xl font-bold leading-none text-red-100">{totalCritical}</div>
+                  <div className="text-[10px] uppercase tracking-wider text-red-100/80 mt-0.5">Critical</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </SmartImage>
+
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Wayfinding directory board */}
+        <div className="mb-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-900 dark:bg-slate-900 text-white overflow-hidden">
+          <div className="flex items-center gap-2 px-4 py-2 bg-black/30 border-b border-white/10">
+            <MapPin size={13} className="text-teal-300" />
+            <span className="text-[11px] uppercase tracking-[0.2em] font-bold text-teal-200">Directory · Wayfinding</span>
+            <span className="ml-auto text-[11px] text-white/50 font-mono flex items-center gap-1.5"><Clock size={11} /><LiveClock /></span>
+          </div>
+          <div className="flex flex-wrap gap-x-6 gap-y-1.5 px-4 py-3 text-sm">
+            {departments.map((d, i) => (
+              <button key={d.id} onClick={() => navigate({ name: 'department', hospital, departmentId: d.id })}
+                className="group inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors">
+                <span className={cx('w-1.5 h-1.5 rounded-full', ACCENT_CLASSES[d.accent].bg)} />
+                <span className="font-medium">{d.label}</span>
+                <ChevronRight size={13} className="text-white/30 group-hover:text-teal-300 group-hover:translate-x-0.5 transition-all" />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {departments.map((d, i) => {
+            const deptCases = cases.filter(c => c.department === d.id);
+            const occupied = deptCases.length;
+            const occupancyPct = hospital === 'prehospital' ? Math.min(occupied * 20, 100) : Math.min(occupied * 8, 100);
+            const accent = ACCENT_CLASSES[d.accent];
+            const DIcon = d.icon;
+            const critical = deptCases.filter(c => c.severity === 'critical').length;
+
+            return (
+              <Reveal key={d.id} delay={i * 55}>
+                <Tilt3D max={9} className="h-full cursor-pointer" innerClassName="h-full"
+                  onClick={() => navigate({ name: 'department', hospital, departmentId: d.id })}>
+                  <div className={cx('group h-full text-left relative overflow-hidden rounded-2xl border bg-white dark:bg-slate-900 depth-shadow transition-shadow hover:shadow-2xl', accent.border)}>
+                    {/* Photo strip */}
+                    <SmartImage src={DEPT_PHOTO[d.id]} alt={d.label} gradient={cx('bg-gradient-to-br', accent.grad)} className="h-28">
+                      <div className="absolute inset-0 card-scrim" />
+                      <div className="absolute inset-0 p-3 flex items-start justify-between">
+                        <div className={cx('tilt-pop-sm w-11 h-11 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-md ring-1 ring-white/30', accent.grad)}>
+                          <DIcon className="text-white" size={20} />
+                        </div>
+                        {critical > 0 && (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-red-500 text-white text-[9px] font-bold">
+                            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />{critical} critical
+                          </span>
+                        )}
+                      </div>
+                      <div className="absolute bottom-2 left-3 right-3">
+                        <span className="text-[10px] uppercase tracking-wider font-bold text-white/90 glass px-1.5 py-0.5 rounded border border-white/20">{d.short}</span>
+                      </div>
+                    </SmartImage>
+
+                    <div className="relative p-4">
+                      <h3 className="display-font text-lg font-bold leading-tight mb-1">{d.label}</h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-3 line-clamp-2">{d.desc}</p>
+                      <div className="flex items-center justify-between text-[11px] mb-1.5">
+                        <span className="text-slate-500">{occupied > 0 ? `${occupied} case${occupied !== 1 ? 's' : ''}` : 'No cases yet'}</span>
+                        <span className={cx('font-bold', accent.text)}>{occupancyPct >= 96 ? 'Full' : `${Math.round(occupancyPct)}%`}</span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+                        <div className={cx('h-full bg-gradient-to-r transition-all', accent.grad)} style={{ width: `${occupancyPct}%` }} />
+                      </div>
+                    </div>
+                  </div>
+                </Tilt3D>
+              </Reveal>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -2809,35 +2995,53 @@ function DepartmentView({ hospital, departmentId, cases, navigate, progress }) {
         <ChevronLeft size={14} /> Back to {hospital === 'cardiology' ? 'Cardiology' : hospital === 'prehospital' ? 'Prehospital Field' : 'Internal Medicine'} hospital
       </button>
 
-      {/* Department banner */}
-      <div className={cx('relative overflow-hidden rounded-3xl border p-6 mb-6 bg-gradient-to-br', accent.border, 'from-slate-900 via-slate-900 to-slate-950 text-white')}>
+      {/* Department banner — photo backdrop + nurse-station strip */}
+      <div className={cx('relative overflow-hidden rounded-3xl border mb-6 text-white', accent.border)}>
+        <SmartImage src={DEPT_PHOTO[dept.id]} alt={dept.label} gradient={cx('bg-gradient-to-br', accent.grad)} kenBurns className="absolute inset-0 w-full h-full" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/70 to-slate-950/40" />
         <div className={cx('absolute -top-20 -right-20 w-80 h-80 rounded-full blur-[80px] opacity-30 bg-gradient-to-br', accent.grad)} />
-        <div className="absolute inset-0 opacity-[0.03]" style={{
-          backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
-          backgroundSize: '24px 24px'
-        }} />
-        <div className="relative flex flex-wrap items-center gap-4 justify-between">
-          <div className="flex items-center gap-4">
-            <div className={cx('w-14 h-14 rounded-2xl bg-gradient-to-br flex items-center justify-center shadow-2xl', accent.grad, accent.glow)}>
-              <DIcon className="text-white" size={26} />
+        <div className="relative p-6">
+          <div className="flex flex-wrap items-center gap-4 justify-between">
+            <div className="flex items-center gap-4">
+              <div className={cx('w-14 h-14 rounded-2xl bg-gradient-to-br flex items-center justify-center shadow-2xl ring-1 ring-white/25 float-slow', accent.grad, accent.glow)}>
+                <DIcon className="text-white" size={26} />
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.25em] text-slate-300 font-semibold mb-1">{dept.short} · {hospital === 'cardiology' ? 'Cardiology Tower' : hospital === 'prehospital' ? 'Field Operations' : 'Medicine Tower'}</p>
+                <h1 className="display-font text-3xl font-bold leading-tight drop-shadow">{dept.label}</h1>
+                <p className="text-sm text-slate-300 mt-0.5">{dept.desc}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.25em] text-slate-400 font-semibold mb-1">{dept.short}</p>
-              <h1 className="display-font text-3xl font-bold leading-tight">{dept.label}</h1>
-              <p className="text-sm text-slate-300 mt-0.5">{dept.desc}</p>
+            <div className="flex items-center gap-3">
+              <div className="text-center px-3 py-2 rounded-xl glass border border-white/15">
+                <div className="display-font text-xl font-bold">{occupied}</div>
+                <div className="text-[10px] uppercase tracking-wider opacity-70">Cases</div>
+              </div>
+              {critical > 0 && (
+                <div className="text-center px-3 py-2 rounded-xl bg-red-500/25 border border-red-500/40">
+                  <div className="display-font text-xl font-bold text-red-100">{critical}</div>
+                  <div className="text-[10px] uppercase tracking-wider text-red-100/80">Critical</div>
+                </div>
+              )}
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="text-center px-3 py-2 rounded-xl bg-white/5 border border-white/10">
-              <div className="display-font text-xl font-bold">{occupied}</div>
-              <div className="text-[10px] uppercase tracking-wider opacity-70">Cases</div>
-            </div>
-            {critical > 0 && (
-              <div className="text-center px-3 py-2 rounded-xl bg-red-500/20 border border-red-500/40">
-                <div className="display-font text-xl font-bold text-red-200">{critical}</div>
-                <div className="text-[10px] uppercase tracking-wider text-red-200/80">Critical</div>
-              </div>
-            )}
+
+          {/* Nurse-station strip */}
+          <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 pt-4 border-t border-white/10 text-[11px]">
+            <span className="inline-flex items-center gap-1.5 text-white/70"><Clock size={12} className="text-teal-300" /> <LiveClock /></span>
+            <span className="inline-flex items-center gap-1.5 text-white/70"><Activity size={12} className="text-emerald-300" /> Occupancy <b className="text-white">{occupied}/{beds.length}</b></span>
+            <span className="inline-flex items-center gap-1.5 text-white/70">
+              <Users size={12} className="text-sky-300" /> On shift
+              <span className="flex -space-x-1.5 ml-1">
+                {['E','M','R'].map((s, i) => (
+                  <span key={i} className={cx('w-5 h-5 rounded-full ring-2 ring-slate-900 flex items-center justify-center text-[9px] font-bold text-white bg-gradient-to-br', ['from-teal-500 to-emerald-600','from-sky-500 to-blue-600','from-violet-500 to-fuchsia-600'][i])}>{s}</span>
+                ))}
+              </span>
+            </span>
+            <span className="ml-auto inline-flex items-center gap-2 text-white/50">
+              <PulseTrace className="w-16 h-4 text-emerald-300" />
+              <span className="inline-flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> monitoring</span>
+            </span>
           </div>
         </div>
       </div>
