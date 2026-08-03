@@ -3256,58 +3256,108 @@ function PrehospitalDepartmentView({ departmentId, cases, navigate, progress }) 
 }
 
 // ============== WARD FLOOR (3D BEDS) ==============
-function WardFloor({ beds, dept, accent, hoveredBed, setHoveredBed, navigate, progress }) {
+// A window with vertical blinds — part of the ward-room backdrop.
+function WardWindow() {
   return (
-    <div className={cx(
-      'relative rounded-3xl border-2 p-6 sm:p-10 overflow-hidden',
-      'border-slate-300 dark:border-slate-700',
-      'bg-gradient-to-b from-slate-100 via-white to-slate-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950'
-    )}>
-      {/* Floor pattern */}
-      <div className="absolute inset-0 opacity-30 dark:opacity-20" style={{
-        backgroundImage: `
-          linear-gradient(rgba(100,116,139,0.15) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(100,116,139,0.15) 1px, transparent 1px),
-          linear-gradient(135deg, rgba(100,116,139,0.05) 25%, transparent 25%, transparent 75%, rgba(100,116,139,0.05) 75%)
-        `,
-        backgroundSize: '40px 40px, 40px 40px, 80px 80px'
+    <div className="w-40 h-28 rounded-md border-4 border-slate-200/90 dark:border-slate-700 shadow-inner overflow-hidden relative"
+      style={{ background: 'linear-gradient(180deg,#cfe7fb 0%,#eaf5ff 60%,#f6fbff 100%)' }}>
+      <div className="absolute inset-0" style={{
+        backgroundImage: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.85) 0 10px, rgba(203,225,246,0.55) 10px 13px)'
+      }} />
+      <div className="absolute top-0 left-0 right-0 h-2 bg-slate-200/90 dark:bg-slate-600" />
+    </div>
+  );
+}
+
+// A detailed hospital bed drawn as inline SVG (blue frame, pale-blue linen,
+// side rail, articulated chrome base with castors) — matches a real ward bed.
+function WardBedSVG({ occupied }) {
+  const hb = occupied ? '#3f5e93' : '#94a3b8';
+  const hbPanel = occupied ? '#dbe6f7' : '#e2e8f0';
+  const mattress = occupied ? '#eaf2fc' : '#e6e9ef';
+  const rail = occupied ? '#4f6ea6' : '#9aa6b6';
+  return (
+    <svg viewBox="0 0 260 150" className="w-full h-auto" style={{ maxWidth: 300 }} aria-hidden="true">
+      <ellipse cx="132" cy="141" rx="112" ry="8" fill="rgba(15,23,42,0.16)" />
+      {[46, 96, 166, 216].map((x, i) => (
+        <g key={i}><circle cx={x} cy="133" r="8" fill="#2f3948" /><circle cx={x} cy="133" r="3.2" fill="#aeb7c4" /></g>
+      ))}
+      <path d="M50,132 L96,112 M96,132 L50,112 M166,132 L216,112 M216,132 L166,112" stroke="#9aa6b6" strokeWidth="5" strokeLinecap="round" />
+      <rect x="44" y="105" width="178" height="9" rx="4" fill="#c3cbd6" />
+      <rect x="44" y="105" width="178" height="4" rx="2" fill="#e2e7ee" />
+      {/* footboard */}
+      <rect x="212" y="66" width="20" height="46" rx="6" fill={hb} />
+      <rect x="216" y="72" width="12" height="28" rx="4" fill={hbPanel} />
+      {/* headboard */}
+      <rect x="28" y="42" width="22" height="70" rx="7" fill={hb} />
+      <rect x="32" y="52" width="14" height="42" rx="5" fill={hbPanel} />
+      <rect x="34" y="46" width="10" height="6" rx="3" fill={occupied ? '#2c4670' : '#7c8aa0'} />
+      {/* mattress platform + mattress */}
+      <rect x="46" y="86" width="172" height="12" rx="4" fill="#8fa3c2" />
+      <rect x="48" y="69" width="168" height="21" rx="9" fill={mattress} stroke="#cfe0f5" strokeWidth="2" />
+      {occupied && (
+        <>
+          {/* blanket over lower half */}
+          <path d="M128,71 h82 a8,8 0 0 1 8,8 v5 a4,4 0 0 1 -4,4 h-86 z" fill="#b9d2f0" />
+          <path d="M128,71 v17" stroke="#a6c3e8" strokeWidth="2" />
+          {/* pillow, raised head */}
+          <g transform="rotate(-8 80 64)"><rect x="52" y="56" width="54" height="18" rx="8" fill="#ffffff" stroke="#e2e8f0" strokeWidth="1.5" /></g>
+        </>
+      )}
+      {/* near side rail */}
+      <rect x="58" y="73" width="154" height="16" rx="6" fill={rail} />
+      <rect x="58" y="75" width="154" height="5" rx="2.5" fill={occupied ? '#c8d8f0' : '#d5dbe4'} />
+      {[74, 97, 120, 143, 166, 189].map((x, i) => (<rect key={i} x={x} y="79" width="4" height="9" rx="2" fill={occupied ? '#35507f' : '#7c8aa0'} />))}
+    </svg>
+  );
+}
+
+function WardFloor({ beds, dept, accent, hoveredBed, setHoveredBed, navigate, progress }) {
+  const occupied = beds.filter(b => b.case).length;
+  return (
+    <div className="relative rounded-3xl border-2 border-slate-300 dark:border-slate-700 overflow-hidden">
+      {/* Room wall + window band (backdrop) */}
+      <div className="absolute inset-x-0 top-0 h-52 bg-gradient-to-b from-sky-100 via-slate-50 to-transparent dark:from-slate-800 dark:via-slate-900 dark:to-transparent" />
+      <div className="absolute top-7 left-0 right-0 hidden md:flex justify-center gap-8 pointer-events-none opacity-95">
+        <WardWindow /><WardWindow /><WardWindow />
+      </div>
+      {/* Curtain track hint */}
+      <div className="absolute top-[150px] left-0 right-0 h-px bg-slate-300/70 dark:bg-slate-700 hidden md:block" />
+      {/* Tiled floor */}
+      <div className="absolute inset-0 top-40 bg-gradient-to-b from-slate-100 to-slate-200/70 dark:from-slate-900 dark:to-slate-950" />
+      <div className="absolute inset-x-0 bottom-0 top-40 opacity-40 dark:opacity-25" style={{
+        backgroundImage: 'linear-gradient(rgba(100,116,139,.22) 1px,transparent 1px),linear-gradient(90deg,rgba(100,116,139,.22) 1px,transparent 1px)',
+        backgroundSize: '34px 34px'
       }} />
 
-      {/* Nurse station */}
-      <div className="relative mb-8 mx-auto max-w-md">
-        <div className={cx(
-          'rounded-2xl py-3 px-6 text-center text-white shadow-lg bg-gradient-to-br',
-          accent.grad, accent.glow
-        )}>
-          <div className="flex items-center justify-center gap-2">
-            <Radio size={14} className="opacity-80" />
-            <span className="text-xs uppercase tracking-[0.25em] font-bold">Nurse Station · {dept.short}</span>
-          </div>
+      {/* Content */}
+      <div className="relative p-5 sm:p-8">
+        <div className="mb-6 flex justify-center">
+          <span className="glass rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-white border border-white/20 flex items-center gap-2 depth-shadow">
+            <Radio size={12} className="text-teal-300" /> {dept.label} Ward · {occupied}/{beds.length} beds
+          </span>
         </div>
-        <div className="h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-slate-700 to-transparent mt-4" />
-      </div>
-
-      {/* Beds grid */}
-      <div className="relative grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
-        {beds.map(({ bedNumber, case: c }) => (
-          <Bed3D
-            key={bedNumber}
-            bedNumber={bedNumber}
-            caseData={c}
-            accent={accent}
-            isHovered={hoveredBed === bedNumber}
-            onHover={(v) => setHoveredBed(v ? bedNumber : null)}
-            onClick={() => c && navigate({ name: 'case', caseId: c.id })}
-            progress={progress}
-          />
-        ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-7">
+          {beds.map(({ bedNumber, case: c }) => (
+            <WardBay
+              key={bedNumber}
+              bedNumber={bedNumber}
+              caseData={c}
+              accent={accent}
+              isHovered={hoveredBed === bedNumber}
+              onHover={(v) => setHoveredBed(v ? bedNumber : null)}
+              onClick={() => c && navigate({ name: 'case', caseId: c.id })}
+              progress={progress}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
 }
 
-// ============== 3D BED ==============
-function Bed3D({ bedNumber, caseData, accent, isHovered, onHover, onClick, progress }) {
+// ============== WARD BAY (realistic bed) ==============
+function WardBay({ bedNumber, caseData, accent, isHovered, onHover, onClick, progress }) {
   const c = caseData;
   const sev = c ? SEVERITY[c.severity] : null;
   // Rich HTML cases use a single boolean completion flag, not per-stage progress
@@ -3320,10 +3370,7 @@ function Bed3D({ bedNumber, caseData, accent, isHovered, onHover, onClick, progr
   const pct = c ? Math.round((completed / totalStages) * 100) : 0;
   const isComplete = isRichComplete || pct === 100;
 
-  // Severity-based colors for the bed
-  const sevColor = c?.severity === 'critical' ? 'rose'
-    : c?.severity === 'urgent' ? 'amber'
-    : c?.severity === 'stable' ? 'emerald' : null;
+  const monitorColor = c?.severity === 'critical' ? '#f43f5e' : c?.severity === 'urgent' ? '#f59e0b' : '#10b981';
 
   return (
     <div
@@ -3345,24 +3392,14 @@ function Bed3D({ bedNumber, caseData, accent, isHovered, onHover, onClick, progr
             <h4 className="font-bold text-sm leading-tight mb-1">{c.title}</h4>
             <p className="text-[11px] text-slate-300 mb-2 line-clamp-2">{c.chiefComplaint}</p>
             <div className="grid grid-cols-3 gap-1 text-[10px] mb-2">
-              <div className="bg-white/5 rounded px-1.5 py-1">
-                <div className="text-slate-400">HR</div>
-                <div className="font-bold">{c.vitals?.hr || '—'}</div>
-              </div>
-              <div className="bg-white/5 rounded px-1.5 py-1">
-                <div className="text-slate-400">BP</div>
-                <div className="font-bold">{c.vitals?.bp || '—'}</div>
-              </div>
-              <div className="bg-white/5 rounded px-1.5 py-1">
-                <div className="text-slate-400">SpO2</div>
-                <div className="font-bold">{c.vitals?.spo2 || '—'}%</div>
-              </div>
+              <div className="bg-white/5 rounded px-1.5 py-1"><div className="text-slate-400">HR</div><div className="font-bold">{c.vitals?.hr || '—'}</div></div>
+              <div className="bg-white/5 rounded px-1.5 py-1"><div className="text-slate-400">BP</div><div className="font-bold">{c.vitals?.bp || '—'}</div></div>
+              <div className="bg-white/5 rounded px-1.5 py-1"><div className="text-slate-400">SpO2</div><div className="font-bold">{c.vitals?.spo2 || '—'}%</div></div>
             </div>
             <div className="flex items-center justify-between text-[10px] text-slate-400">
               <span>{c.profile?.age || '—'}{c.profile?.sex?.[0] || ''} · {c.profile?.name || 'Patient'}</span>
               <span className="font-bold text-emerald-400">{pct}% done</span>
             </div>
-            {/* Tooltip arrow */}
             <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-slate-900 dark:bg-slate-800 rotate-45 border-r border-b border-white/10" />
           </div>
         </div>
@@ -3372,115 +3409,104 @@ function Bed3D({ bedNumber, caseData, accent, isHovered, onHover, onClick, progr
         onClick={onClick}
         disabled={!c}
         className={cx(
-          'relative w-full block transition-all duration-300',
-          c ? 'cursor-pointer hover:-translate-y-2' : 'cursor-default opacity-50',
-          isHovered && c && '-translate-y-2 z-10'
+          'relative w-full block text-left rounded-2xl overflow-hidden border transition-all duration-300 depth-shadow',
+          'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800',
+          c ? 'cursor-pointer hover:-translate-y-1.5 hover:shadow-2xl' : 'cursor-default opacity-70',
+          isHovered && c && '-translate-y-1.5 z-10'
         )}
-        style={{ perspective: '600px' }}
       >
-        {/* Bed number label */}
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
-          <div className={cx(
-            'px-2 py-0.5 rounded-md text-[10px] font-mono font-bold border-2',
-            c ? cx(accent.bg, 'text-white border-white dark:border-slate-900') : 'bg-slate-300 text-slate-600 border-slate-200 dark:bg-slate-700 dark:text-slate-400 dark:border-slate-800'
-          )}>
-            BED {String(bedNumber).padStart(2, '0')}
-          </div>
-        </div>
-
-        {/* The bed itself - 3D isometric */}
-        <div className="relative" style={{ transformStyle: 'preserve-3d', transform: 'rotateX(20deg) rotateZ(-2deg)' }}>
-          {/* Bed shadow */}
-          <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-[90%] h-3 bg-black/20 dark:bg-black/40 blur-md rounded-full" />
-
-          {/* Headboard / monitor */}
-          <div className={cx(
-            'h-14 rounded-t-xl border-2 border-b-0 flex items-center justify-center relative overflow-hidden',
-            c ? 'bg-slate-800 dark:bg-slate-950 border-slate-700' : 'bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-700'
-          )}>
+        {/* Headwall — medical gas panel + patient monitor */}
+        <div className="relative flex items-center gap-2 px-3 py-2 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-b from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-900">
+          <div className="rounded-md bg-slate-950 px-1.5 py-1 w-16 border" style={{ borderColor: monitorColor }}>
             {c ? (
               <>
-                {/* Monitor screen */}
-                <div className="w-full px-2">
-                  <MiniECG severity={c.severity} />
-                  <div className="flex justify-between text-[8px] font-mono mt-0.5">
-                    <span className="text-emerald-400">HR {c.vitals?.hr || '--'}</span>
-                    <span className="text-cyan-400">SpO {c.vitals?.spo2 || '--'}</span>
-                  </div>
+                <MiniECG severity={c.severity} />
+                <div className="text-[7px] font-mono leading-none mt-0.5 flex justify-between">
+                  <span style={{ color: monitorColor }}>{c.vitals?.hr || '--'}</span>
+                  <span className="text-cyan-400">{c.vitals?.spo2 || '--'}%</span>
                 </div>
               </>
             ) : (
-              <div className="text-[10px] text-slate-400 font-semibold">EMPTY</div>
+              <div className="text-[7px] font-mono text-slate-500 text-center py-1.5">STANDBY</div>
             )}
           </div>
-
-          {/* Mattress */}
-          <div className={cx(
-            'h-20 border-2 border-t-0 border-b-0 relative overflow-hidden',
-            c ? cx(
-                'bg-gradient-to-b',
-                sevColor === 'rose' ? 'from-rose-100 to-rose-50 dark:from-rose-950/40 dark:to-rose-900/20 border-rose-300 dark:border-rose-800' :
-                sevColor === 'amber' ? 'from-amber-100 to-amber-50 dark:from-amber-950/40 dark:to-amber-900/20 border-amber-300 dark:border-amber-800' :
-                'from-emerald-100 to-emerald-50 dark:from-emerald-950/40 dark:to-emerald-900/20 border-emerald-300 dark:border-emerald-800'
-              )
-            : 'bg-slate-100 dark:bg-slate-800/50 border-slate-300 dark:border-slate-700'
-          )}>
-            {c && (
-              <>
-                {/* Pillow */}
-                <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-[60%] h-4 bg-white dark:bg-slate-200 rounded-md shadow-sm" />
-                {/* Patient body */}
-                <div className="absolute top-7 left-1/2 -translate-x-1/2 w-[50%] h-2 rounded-full bg-slate-300/70 dark:bg-slate-600/70" />
-                {/* Blanket fold */}
-                <div className={cx(
-                  'absolute bottom-0 left-0 right-0 h-8',
-                  sevColor === 'rose' ? 'bg-gradient-to-b from-rose-200 to-rose-300 dark:from-rose-900/60 dark:to-rose-800/40' :
-                  sevColor === 'amber' ? 'bg-gradient-to-b from-amber-200 to-amber-300 dark:from-amber-900/60 dark:to-amber-800/40' :
-                  'bg-gradient-to-b from-emerald-200 to-emerald-300 dark:from-emerald-900/60 dark:to-emerald-800/40'
-                )} />
-                {/* Severity pulse */}
-                {c.severity === 'critical' && (
-                  <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-lg shadow-red-500/50" />
-                )}
-                {isComplete && (
-                  <div className="absolute top-2 left-2 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg">
-                    <Check size={12} className="text-white" />
-                  </div>
-                )}
-              </>
-            )}
+          {/* gas/vac outlets */}
+          <div className="ml-auto flex items-center gap-1.5">
+            <span className="w-3.5 h-3.5 rounded-sm bg-white border border-slate-300" title="O₂" />
+            <span className="w-3.5 h-3.5 rounded-sm bg-slate-800 border border-slate-600" title="Air" />
+            <span className="w-3.5 h-3.5 rounded-sm bg-yellow-400 border border-yellow-500" title="Vac" />
           </div>
+          {c?.severity === 'critical' && (
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 animate-pulse shadow shadow-red-500/50" />
+          )}
+        </div>
 
-          {/* Footboard / IV pole base */}
-          <div className={cx(
-            'h-6 rounded-b-xl border-2 border-t-0 flex items-center justify-between px-2',
-            c ? 'bg-slate-700 dark:bg-slate-900 border-slate-600 dark:border-slate-800' : 'bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-700'
-          )}>
+        {/* Bed scene on tiled floor */}
+        <div className="relative px-3 pt-4 pb-3 bg-slate-100 dark:bg-slate-800/40">
+          <div className="absolute inset-0 opacity-40 dark:opacity-20 pointer-events-none" style={{
+            backgroundImage: 'linear-gradient(rgba(100,116,139,.25) 1px,transparent 1px),linear-gradient(90deg,rgba(100,116,139,.25) 1px,transparent 1px)',
+            backgroundSize: '20px 20px'
+          }} />
+          {/* IV pole */}
+          {c && (
+            <div className="absolute left-2 bottom-3 flex flex-col items-center pointer-events-none">
+              <span className="w-3 h-4 rounded-sm bg-sky-200/90 border border-sky-300" />
+              <span className="w-0.5 h-16 bg-slate-400" />
+              <span className="w-4 h-1 bg-slate-400 rounded-full" />
+            </div>
+          )}
+          {/* bedside cabinet */}
+          <div className="absolute right-2 bottom-3 w-8 pointer-events-none">
+            <div className="h-10 rounded-md bg-slate-200 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 flex flex-col justify-around px-1 py-1">
+              <span className="h-1 rounded-full bg-slate-400/70" /><span className="h-1 rounded-full bg-slate-400/70" />
+            </div>
+          </div>
+          <div className="relative mx-auto max-w-[300px]">
+            <WardBedSVG occupied={!!c} />
+          </div>
+          {/* completion check */}
+          {isComplete && (
+            <div className="absolute top-2 left-2 w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg ring-2 ring-white dark:ring-slate-900">
+              <Check size={13} className="text-white" />
+            </div>
+          )}
+          {/* enter hint */}
+          {c && (
+            <div className="absolute bottom-2 right-2 flex items-center gap-1 text-[10px] font-bold text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">
+              Open case <ArrowRight size={11} />
+            </div>
+          )}
+        </div>
+
+        {/* Label placard */}
+        <div className="px-3 py-2.5 border-t border-slate-200 dark:border-slate-800">
+          <div className="flex items-center justify-between mb-1">
+            <span className={cx('px-1.5 py-0.5 rounded text-[10px] font-mono font-bold text-white', c ? accent.bg : 'bg-slate-400 dark:bg-slate-600')}>
+              BED {String(bedNumber).padStart(2, '0')}
+            </span>
             {c ? (
-              <>
-                <div className="flex items-center gap-1">
-                  <div className="w-1 h-3 bg-slate-500 dark:bg-slate-600 rounded-sm" />
-                  <div className="text-[9px] text-slate-300 font-mono">{c.profile?.age || '?'}{c.profile?.sex?.[0] || '?'}</div>
-                </div>
-                {/* Progress bar */}
-                <div className="flex-1 mx-2 h-1 rounded-full bg-slate-600 dark:bg-slate-800 overflow-hidden">
+              <span className={cx('inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border', sev.chip)}>
+                <span className={cx('w-1 h-1 rounded-full', sev.dot)} /> {sev.label}
+              </span>
+            ) : (
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Available</span>
+            )}
+          </div>
+          {c ? (
+            <>
+              <div className="text-[9px] uppercase tracking-wider text-slate-500 font-semibold">{c.tags?.[0] || c.system}</div>
+              <div className="font-bold text-sm leading-tight line-clamp-1">{c.title}</div>
+              <div className="mt-2 flex items-center gap-2">
+                <div className="flex-1 h-1 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
                   <div className="h-full bg-emerald-400" style={{ width: `${pct}%` }} />
                 </div>
-                <div className="text-[9px] text-emerald-400 font-mono font-bold">{pct}%</div>
-              </>
-            ) : (
-              <div className="w-full text-center text-[9px] text-slate-400">— Available —</div>
-            )}
-          </div>
+                <span className="text-[9px] text-emerald-500 font-mono font-bold">{pct}%</span>
+              </div>
+            </>
+          ) : (
+            <div className="text-sm text-slate-400 italic">Empty bed</div>
+          )}
         </div>
-
-        {/* Patient title under bed */}
-        {c && (
-          <div className="mt-3 text-center px-1">
-            <div className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">{c.tags?.[0] || c.system}</div>
-            <div className="font-bold text-sm leading-tight line-clamp-1">{c.title}</div>
-          </div>
-        )}
       </button>
     </div>
   );
