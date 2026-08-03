@@ -3206,51 +3206,147 @@ function PrehospitalDepartmentView({ departmentId, cases, navigate, progress }) 
           </p>
         </div>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {deptCases.map((c, i) => {
-            const isCompleted = completedIds.includes(c.id) || completedIds.includes(`rich:${c.id}`);
-            const sevColor = c.severity === 'critical' ? 'bg-red-500' : c.severity === 'urgent' ? 'bg-amber-500' : 'bg-emerald-500';
-            return (
-              <button
-                key={c.id}
-                onClick={() => navigate({ name: 'case', caseId: c.id })}
-                className="group fade-up text-left rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 hover:shadow-xl hover:-translate-y-0.5 transition-all"
-                style={{ animationDelay: `${i * 40}ms` }}
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className={cx('w-2 h-2 rounded-full flex-shrink-0 mt-0.5', sevColor)} />
-                    <span className="text-[10px] uppercase tracking-wider font-bold text-slate-500 capitalize">{c.severity}</span>
-                    {c.caseType === 'rich-html' && (
-                      <span className="text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300">Rich</span>
-                    )}
-                  </div>
-                  {isCompleted && (
-                    <CheckCircle2 size={16} className="text-emerald-500 flex-shrink-0" />
-                  )}
-                </div>
-                <h3 className="font-bold text-base leading-tight mb-1 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors line-clamp-2">
-                  {c.title}
-                </h3>
-                {c.chiefComplaint && (
-                  <p className="text-xs text-slate-500 mb-2 line-clamp-1">{c.chiefComplaint}</p>
-                )}
-                {c.tags?.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {c.tags.slice(0, 3).map(t => (
-                      <span key={t} className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">{t}</span>
-                    ))}
-                  </div>
-                )}
-                <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-                  <span className="text-xs text-slate-400">{c.system || dept.short}</span>
-                  <ArrowRight size={14} className="text-slate-400 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </button>
-            );
-          })}
-        </div>
+        <AmbulanceBay cases={deptCases} dept={dept} accent={accent} navigate={navigate} completedIds={completedIds} />
       )}
+    </div>
+  );
+}
+
+// ============== EMS STATION (realistic ambulance bays) ==============
+// A garage roller-door — part of the station backdrop.
+function RollerDoor() {
+  return (
+    <div className="w-36 h-24 rounded-t-md border-4 border-b-0 border-slate-300/80 dark:border-slate-700 overflow-hidden relative"
+      style={{ background: 'repeating-linear-gradient(180deg,#e2e8f0 0 8px,#cbd5e1 8px 11px)' }}>
+      <div className="absolute inset-x-0 top-0 h-2 bg-slate-400/80 dark:bg-slate-600" />
+    </div>
+  );
+}
+
+// Side-view ambulance drawn as inline SVG; the stripe + light bar take the case's
+// severity colour, the body stays realistic white.
+function AmbulanceSVG({ severity }) {
+  const stripe = severity === 'critical' ? '#ef4444' : severity === 'urgent' ? '#f59e0b' : '#10b981';
+  return (
+    <svg viewBox="0 0 300 150" className="w-full h-auto" style={{ maxWidth: 320 }} aria-hidden="true">
+      <ellipse cx="152" cy="140" rx="132" ry="8" fill="rgba(15,23,42,0.16)" />
+      {/* box body */}
+      <rect x="96" y="44" width="188" height="70" rx="8" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="2" />
+      {/* cab */}
+      <path d="M96,58 L46,58 Q30,58 26,74 L22,96 Q22,114 34,114 L96,114 Z" fill="#f1f5f9" stroke="#cbd5e1" strokeWidth="2" />
+      <path d="M54,63 L42,63 Q34,65 31,79 L29,90 L58,90 L58,63 Z" fill="#bfe3f5" stroke="#94a3b8" strokeWidth="1.5" />
+      {/* rear door line + window */}
+      <line x1="242" y1="48" x2="242" y2="110" stroke="#cbd5e1" strokeWidth="2" />
+      <rect x="250" y="56" width="26" height="20" rx="3" fill="#bfe3f5" stroke="#94a3b8" strokeWidth="1.5" />
+      {/* battenburg stripe */}
+      <rect x="96" y="80" width="188" height="16" fill={stripe} opacity="0.9" />
+      {[100, 124, 148, 172, 196, 220, 244, 268].map((x, i) => (
+        <rect key={i} x={x} y="80" width="12" height="16" fill="#ffffff" opacity={i % 2 ? 0.85 : 0} />
+      ))}
+      {/* medical cross emblem */}
+      <g transform="translate(150,60)">
+        <rect x="-4" y="-12" width="8" height="24" rx="1.5" fill="#ef4444" />
+        <rect x="-12" y="-4" width="24" height="8" rx="1.5" fill="#ef4444" />
+      </g>
+      <text x="205" y="108" textAnchor="middle" fontSize="11" fontWeight="800" fill="#334155" fontFamily="system-ui" letterSpacing="1">AMBULANCE</text>
+      {/* light bar */}
+      <rect x="150" y="35" width="80" height="10" rx="3" fill="#1e293b" />
+      <rect x="154" y="37" width="34" height="6" rx="2" fill="#ef4444" />
+      <rect x="192" y="37" width="34" height="6" rx="2" fill="#3b82f6" />
+      {/* wheels */}
+      {[70, 236].map((x, i) => (
+        <g key={i}><circle cx={x} cy="116" r="20" fill="#1f2937" /><circle cx={x} cy="116" r="9" fill="#9aa6b6" /><circle cx={x} cy="116" r="3" fill="#4b5563" /></g>
+      ))}
+      <rect x="19" y="106" width="13" height="12" rx="2" fill="#94a3b8" />
+    </svg>
+  );
+}
+
+// One ambulance bay = a dispatch header + the ambulance parked on tarmac + a labelled placard.
+function EMSUnit({ c, i, dept, accent, navigate, completed }) {
+  const sev = SEVERITY[c.severity];
+  const isRich = c.caseType === 'rich-html';
+  return (
+    <button
+      onClick={() => navigate({ name: 'case', caseId: c.id })}
+      className="group fade-up text-left rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 depth-shadow hover:-translate-y-1.5 hover:shadow-2xl transition-all"
+      style={{ animationDelay: `${i * 40}ms` }}
+    >
+      {/* Dispatch header */}
+      <div className="relative flex items-center gap-2 px-3 py-2 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-b from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-900">
+        <span className={cx('w-2 h-2 rounded-full', sev.dot, c.severity === 'critical' && 'animate-pulse')} />
+        <span className="text-[10px] uppercase tracking-wider font-bold text-slate-500">Unit {String(i + 1).padStart(2, '0')} · {dept.short}</span>
+        <span className="ml-auto flex items-center gap-1.5">
+          {isRich && <span className="text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300">Rich</span>}
+          {completed && <CheckCircle2 size={15} className="text-emerald-500" />}
+        </span>
+      </div>
+
+      {/* Bay scene on tarmac */}
+      <div className="relative px-3 pt-5 pb-3 bg-slate-500 dark:bg-slate-800">
+        <div className="absolute inset-2 border-2 border-dashed border-amber-300/40 rounded pointer-events-none" />
+        <div className="absolute inset-0 opacity-30 pointer-events-none" style={{
+          backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,.25) 1px, transparent 0)',
+          backgroundSize: '14px 14px'
+        }} />
+        <div className="relative mx-auto max-w-[300px]">
+          <AmbulanceSVG severity={c.severity} />
+        </div>
+        <div className="absolute bottom-2 right-2 flex items-center gap-1 text-[10px] font-bold text-white/80 opacity-0 group-hover:opacity-100 transition-opacity">
+          Respond <ArrowRight size={11} />
+        </div>
+      </div>
+
+      {/* Placard */}
+      <div className="px-3 py-2.5 border-t border-slate-200 dark:border-slate-800">
+        <div className="flex items-center justify-between mb-1">
+          <span className={cx('px-1.5 py-0.5 rounded text-[10px] font-mono font-bold text-white', accent.bg)}>
+            UNIT {String(i + 1).padStart(2, '0')}
+          </span>
+          <span className={cx('inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border', sev.chip)}>
+            <span className={cx('w-1 h-1 rounded-full', sev.dot)} /> {sev.label}
+          </span>
+        </div>
+        <h3 className="font-bold text-sm leading-tight line-clamp-2 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">{c.title}</h3>
+        {c.chiefComplaint && <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">{c.chiefComplaint}</p>}
+        {c.tags?.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-2">
+            {c.tags.slice(0, 3).map(t => (
+              <span key={t} className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">{t}</span>
+            ))}
+          </div>
+        )}
+      </div>
+    </button>
+  );
+}
+
+// The EMS station apron holding the ambulance bays.
+function AmbulanceBay({ cases, dept, accent, navigate, completedIds }) {
+  return (
+    <div className="relative rounded-3xl border-2 border-slate-300 dark:border-slate-700 overflow-hidden">
+      {/* Sky + station building backdrop */}
+      <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-sky-200 via-sky-100 to-transparent dark:from-slate-800 dark:via-slate-900 dark:to-transparent" />
+      <div className="absolute top-6 left-0 right-0 hidden md:flex justify-center gap-8 pointer-events-none opacity-90">
+        <RollerDoor /><RollerDoor /><RollerDoor />
+      </div>
+      {/* Tarmac apron */}
+      <div className="absolute inset-0 top-32 bg-gradient-to-b from-slate-400/50 to-slate-500/40 dark:from-slate-900 dark:to-slate-950" />
+      <div className="absolute inset-x-0 top-[132px] h-1 bg-amber-300/50 hidden md:block" />
+
+      <div className="relative p-5 sm:p-8">
+        <div className="mb-6 flex justify-center">
+          <span className="glass rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-white border border-white/20 flex items-center gap-2 depth-shadow">
+            <Ambulance size={13} className="text-amber-300" /> {dept.label} · EMS Station · {cases.length} unit{cases.length !== 1 ? 's' : ''}
+          </span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-7">
+          {cases.map((c, i) => (
+            <EMSUnit key={c.id} c={c} i={i} dept={dept} accent={accent} navigate={navigate}
+              completed={completedIds.includes(c.id) || completedIds.includes(`rich:${c.id}`)} />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
