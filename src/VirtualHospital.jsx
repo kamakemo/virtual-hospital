@@ -3223,41 +3223,119 @@ function RollerDoor() {
   );
 }
 
-// Side-view ambulance drawn as inline SVG; the stripe + light bar take the case's
-// severity colour, the body stays realistic white.
-function AmbulanceSVG({ severity }) {
-  const stripe = severity === 'critical' ? '#ef4444' : severity === 'urgent' ? '#f59e0b' : '#10b981';
+// Detailed side-view ambulance (SVG): white body, Battenburg + reflective stripe,
+// blue Star of Life, beacon light bar, headlight, mirror, alloy wheels.
+function AmbulanceSVG({ severity, className }) {
+  const stripe = severity === 'critical' ? '#ef4444' : severity === 'urgent' ? '#f59e0b' : '#22c55e';
   return (
-    <svg viewBox="0 0 300 150" className="w-full h-auto" style={{ maxWidth: 320 }} aria-hidden="true">
-      <ellipse cx="152" cy="140" rx="132" ry="8" fill="rgba(15,23,42,0.16)" />
+    <svg viewBox="0 0 320 162" className={className || 'w-full h-auto'} aria-hidden="true">
+      <ellipse cx="162" cy="146" rx="146" ry="9" fill="rgba(15,23,42,0.18)" />
+      <rect x="26" y="112" width="270" height="10" rx="4" fill="#334155" />
       {/* box body */}
-      <rect x="96" y="44" width="188" height="70" rx="8" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="2" />
+      <rect x="104" y="38" width="194" height="80" rx="10" fill="#f9fafb" stroke="#cbd5e1" strokeWidth="2" />
       {/* cab */}
-      <path d="M96,58 L46,58 Q30,58 26,74 L22,96 Q22,114 34,114 L96,114 Z" fill="#f1f5f9" stroke="#cbd5e1" strokeWidth="2" />
-      <path d="M54,63 L42,63 Q34,65 31,79 L29,90 L58,90 L58,63 Z" fill="#bfe3f5" stroke="#94a3b8" strokeWidth="1.5" />
-      {/* rear door line + window */}
-      <line x1="242" y1="48" x2="242" y2="110" stroke="#cbd5e1" strokeWidth="2" />
-      <rect x="250" y="56" width="26" height="20" rx="3" fill="#bfe3f5" stroke="#94a3b8" strokeWidth="1.5" />
-      {/* battenburg stripe */}
-      <rect x="96" y="80" width="188" height="16" fill={stripe} opacity="0.9" />
-      {[100, 124, 148, 172, 196, 220, 244, 268].map((x, i) => (
-        <rect key={i} x={x} y="80" width="12" height="16" fill="#ffffff" opacity={i % 2 ? 0.85 : 0} />
+      <path d="M104,54 L52,54 Q34,54 29,73 L24,100 Q24,118 38,118 L104,118 Z" fill="#f1f5f9" stroke="#cbd5e1" strokeWidth="2" />
+      <path d="M60,59 L46,59 Q37,61 34,77 L32,92 L64,92 L64,59 Z" fill="#cbe8f7" stroke="#94a3b8" strokeWidth="1.5" />
+      <line x1="64" y1="59" x2="64" y2="92" stroke="#94a3b8" strokeWidth="1.2" />
+      {/* headlight, bumper, mirror */}
+      <rect x="24" y="95" width="10" height="11" rx="2" fill="#fde68a" stroke="#f59e0b" />
+      <rect x="19" y="108" width="17" height="12" rx="2" fill="#94a3b8" />
+      <path d="M60,64 h9 a3,3 0 0 1 3,3 v6 a3,3 0 0 1 -3,3 h-9 z" fill="#475569" />
+      {/* rear door seam + window */}
+      <line x1="254" y1="42" x2="254" y2="116" stroke="#cbd5e1" strokeWidth="2" />
+      <rect x="262" y="50" width="28" height="22" rx="3" fill="#cbe8f7" stroke="#94a3b8" strokeWidth="1.5" />
+      {/* Battenburg stripe + checks */}
+      <rect x="104" y="80" width="194" height="18" fill={stripe} opacity="0.92" />
+      {[108, 132, 156, 180, 204, 228, 252, 276].map((x, i) => (
+        <rect key={i} x={x} y="80" width="12" height="18" fill="#ffffff" opacity={i % 2 ? 0.9 : 0} />
       ))}
-      {/* medical cross emblem */}
-      <g transform="translate(150,60)">
-        <rect x="-4" y="-12" width="8" height="24" rx="1.5" fill="#ef4444" />
-        <rect x="-12" y="-4" width="24" height="8" rx="1.5" fill="#ef4444" />
+      {/* reflective lower line */}
+      <rect x="104" y="100" width="186" height="4" fill="#a3e635" opacity="0.85" />
+      {/* Star of Life (blue) */}
+      <g transform="translate(150,58)" fill="#2563eb">
+        <polygon points="0,-13 3.2,-4.5 12,-6.5 6,0 12,6.5 3.2,4.5 0,13 -3.2,4.5 -12,6.5 -6,0 -12,-6.5 -3.2,-4.5" />
+        <rect x="-1.3" y="-9" width="2.6" height="18" fill="#fff" opacity="0.85" />
       </g>
-      <text x="205" y="108" textAnchor="middle" fontSize="11" fontWeight="800" fill="#334155" fontFamily="system-ui" letterSpacing="1">AMBULANCE</text>
-      {/* light bar */}
-      <rect x="150" y="35" width="80" height="10" rx="3" fill="#1e293b" />
-      <rect x="154" y="37" width="34" height="6" rx="2" fill="#ef4444" />
-      <rect x="192" y="37" width="34" height="6" rx="2" fill="#3b82f6" />
-      {/* wheels */}
-      {[70, 236].map((x, i) => (
-        <g key={i}><circle cx={x} cy="116" r="20" fill="#1f2937" /><circle cx={x} cy="116" r="9" fill="#9aa6b6" /><circle cx={x} cy="116" r="3" fill="#4b5563" /></g>
+      <text x="212" y="112" textAnchor="middle" fontSize="11" fontWeight="800" fill="#334155" fontFamily="system-ui" letterSpacing="1">AMBULANCE</text>
+      {/* beacon light bar */}
+      <rect x="150" y="29" width="98" height="11" rx="3" fill="#1e293b" />
+      <rect x="155" y="31" width="27" height="7" rx="2" fill="#3b82f6" />
+      <rect x="186" y="31" width="27" height="7" rx="2" fill="#ef4444" />
+      <rect x="217" y="31" width="27" height="7" rx="2" fill="#3b82f6" />
+      {/* alloy wheels */}
+      {[80, 252].map((x, i) => (
+        <g key={i}>
+          <circle cx={x} cy="120" r="22" fill="#1f2937" />
+          <circle cx={x} cy="120" r="11.5" fill="#cbd5e1" />
+          {[0, 72, 144, 216, 288].map((a, j) => (
+            <rect key={j} x={x - 1.5} y="111" width="3" height="9" rx="1.5" fill="#94a3b8" transform={`rotate(${a} ${x} 120)`} />
+          ))}
+          <circle cx={x} cy="120" r="3" fill="#475569" />
+        </g>
       ))}
-      <rect x="19" y="106" width="13" height="12" rx="2" fill="#94a3b8" />
+    </svg>
+  );
+}
+
+// Cutaway of the ambulance patient compartment — the "back of the rig" where
+// prehospital care happens: EMS cot + patient, wall monitor/defib, cabinets,
+// grab rail, IV drip, oxygen, jump bag, rear doors.
+function AmbulanceInteriorSVG({ severity }) {
+  const trace = severity === 'critical' ? '#f43f5e' : severity === 'urgent' ? '#f59e0b' : '#10b981';
+  const blanket = severity === 'critical' ? '#ef4444' : severity === 'urgent' ? '#f59e0b' : '#3b82f6';
+  return (
+    <svg viewBox="0 0 320 190" className="w-full h-auto" aria-hidden="true">
+      {/* shell */}
+      <rect x="0" y="0" width="320" height="190" rx="10" fill="#eef2f7" />
+      <rect x="0" y="0" width="320" height="20" fill="#dbe3ec" />
+      <rect x="118" y="6" width="92" height="8" rx="4" fill="#f8fafc" />
+      {/* grab rail */}
+      <rect x="30" y="26" width="242" height="5" rx="2.5" fill="#c3cbd6" />
+      {[42, 152, 262].map((x, i) => (<rect key={i} x={x} y="22" width="4" height="10" rx="2" fill="#9aa6b6" />))}
+      {/* overhead cabinets */}
+      <rect x="14" y="36" width="152" height="34" rx="4" fill="#dfe6ee" stroke="#c3cbd6" strokeWidth="1.5" />
+      {[20, 72, 124].map((x, i) => (
+        <g key={i}><rect x={x} y="40" width="46" height="26" rx="3" fill="#eef2f7" stroke="#cbd5e1" /><rect x={x + 34} y="50" width="8" height="3" rx="1.5" fill="#94a3b8" /></g>
+      ))}
+      {/* monitor / defibrillator */}
+      <rect x="176" y="36" width="60" height="46" rx="5" fill="#334155" />
+      <rect x="181" y="41" width="50" height="30" rx="3" fill="#0b1220" />
+      <polyline points="183,57 191,57 195,49 199,65 203,45 207,61 211,57 231,57" fill="none" stroke={trace} strokeWidth="1.6" />
+      <rect x="181" y="73" width="50" height="5" rx="2" fill="#1e293b" />
+      <circle cx="186" cy="75.5" r="1.6" fill={trace} />
+      {/* oxygen flowmeter / suction */}
+      <rect x="244" y="36" width="20" height="46" rx="4" fill="#dfe6ee" stroke="#c3cbd6" strokeWidth="1.5" />
+      <rect x="249" y="40" width="10" height="24" rx="3" fill="#bfe3f5" />
+      <circle cx="254" cy="73" r="4" fill="#e2e8f0" stroke="#94a3b8" />
+      {/* rear doors */}
+      <rect x="270" y="20" width="50" height="150" fill="#e2e8f0" stroke="#c3cbd6" strokeWidth="1.5" />
+      <line x1="295" y1="20" x2="295" y2="170" stroke="#c3cbd6" strokeWidth="2" />
+      <rect x="276" y="30" width="15" height="40" rx="3" fill="#cbe8f7" stroke="#94a3b8" />
+      <rect x="299" y="30" width="15" height="40" rx="3" fill="#cbe8f7" stroke="#94a3b8" />
+      <rect x="291" y="92" width="6" height="18" rx="3" fill="#94a3b8" />
+      {/* IV bag + line */}
+      <rect x="96" y="30" width="14" height="20" rx="3" fill="#cfeafe" stroke="#93c5fd" />
+      <path d="M103,50 C103,74 122,86 140,93" fill="none" stroke="#93c5fd" strokeWidth="1.5" />
+      {/* floor */}
+      <rect x="0" y="150" width="270" height="40" fill="#aeb7c4" />
+      <g stroke="#94a3b8" strokeWidth="1">
+        {[10, 40, 70, 100, 130, 160, 190, 220, 250].map((x, i) => (<line key={i} x1={x} y1="152" x2={x} y2="188" />))}
+      </g>
+      {/* jump bag */}
+      <rect x="20" y="150" width="34" height="26" rx="5" fill="#dc2626" />
+      <rect x="30" y="150" width="14" height="6" rx="3" fill="#b91c1c" />
+      <rect x="35" y="156" width="4" height="16" fill="#fff" /><rect x="29" y="162" width="16" height="4" fill="#fff" />
+      {/* EMS cot + patient */}
+      {[96, 224].map((x, i) => (<g key={i}><line x1={x} y1="150" x2={x} y2="132" stroke="#9aa6b6" strokeWidth="5" /><circle cx={x} cy="152" r="6" fill="#1f2937" /></g>))}
+      <line x1="96" y1="150" x2="128" y2="134" stroke="#c3cbd6" strokeWidth="3" />
+      <line x1="224" y1="150" x2="192" y2="134" stroke="#c3cbd6" strokeWidth="3" />
+      <rect x="86" y="124" width="150" height="12" rx="5" fill="#eab308" />
+      <rect x="90" y="111" width="142" height="17" rx="7" fill="#dbeafe" stroke="#bfdbfe" />
+      <path d="M150,113 h74 a8,8 0 0 1 8,8 v3 a4,4 0 0 1 -4,4 h-78 z" fill={blanket} opacity="0.92" />
+      <rect x="96" y="103" width="30" height="14" rx="6" fill="#fff" stroke="#e2e8f0" />
+      <circle cx="120" cy="106" r="7" fill="#f3d3b5" />
+      <rect x="176" y="111" width="6" height="17" fill="#334155" opacity="0.7" />
+      <rect x="92" y="117" width="138" height="4" rx="2" fill="#ca9a04" />
     </svg>
   );
 }
@@ -3282,17 +3360,13 @@ function EMSUnit({ c, i, dept, accent, navigate, completed }) {
         </span>
       </div>
 
-      {/* Bay scene on tarmac */}
-      <div className="relative px-3 pt-5 pb-3 bg-slate-500 dark:bg-slate-800">
-        <div className="absolute inset-2 border-2 border-dashed border-amber-300/40 rounded pointer-events-none" />
-        <div className="absolute inset-0 opacity-30 pointer-events-none" style={{
-          backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,.25) 1px, transparent 0)',
-          backgroundSize: '14px 14px'
-        }} />
-        <div className="relative mx-auto max-w-[300px]">
-          <AmbulanceSVG severity={c.severity} />
+      {/* Patient-compartment scene (looking into the back of the rig) */}
+      <div className="relative px-3 pt-3 pb-3 bg-gradient-to-b from-slate-300 to-slate-400 dark:from-slate-800 dark:to-slate-950">
+        <div className="rounded-lg border-[3px] border-slate-700/70 dark:border-slate-600 overflow-hidden shadow-inner">
+          <AmbulanceInteriorSVG severity={c.severity} />
         </div>
-        <div className="absolute bottom-2 right-2 flex items-center gap-1 text-[10px] font-bold text-white/80 opacity-0 group-hover:opacity-100 transition-opacity">
+        <span className="absolute top-4 left-4 text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-900/70 text-white/90">Patient compartment</span>
+        <div className="absolute bottom-5 right-5 flex items-center gap-1 text-[10px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900/75 px-1.5 py-0.5 rounded">
           Respond <ArrowRight size={11} />
         </div>
       </div>
@@ -3335,10 +3409,14 @@ function AmbulanceBay({ cases, dept, accent, navigate, completedIds }) {
       <div className="absolute inset-x-0 top-[132px] h-1 bg-amber-300/50 hidden md:block" />
 
       <div className="relative p-5 sm:p-8">
-        <div className="mb-6 flex justify-center">
+        <div className="mb-3 flex justify-center">
           <span className="glass rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-white border border-white/20 flex items-center gap-2 depth-shadow">
             <Ambulance size={13} className="text-amber-300" /> {dept.label} · EMS Station · {cases.length} unit{cases.length !== 1 ? 's' : ''}
           </span>
+        </div>
+        {/* Hero ambulance parked on the apron */}
+        <div className="mb-7 flex justify-center">
+          <div className="w-64 sm:w-80 float-slow drop-shadow-xl"><AmbulanceSVG severity="urgent" /></div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-7">
           {cases.map((c, i) => (
