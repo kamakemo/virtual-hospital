@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motor Neurone Disease (ALS) — Virtual Teaching Hospital</title>
+<!-- META
+id: c-neuro-mnd-108
+title: Motor Neurone Disease — Mixed UMN + LMN Signs
+hospital: neurology
+department: neuro-acute
+bednumber: 8
+chiefcomplaint: Progressive limb weakness, wasting and fasciculations, now with slurred speech and choking on fluids
+system: Neurology
+severity: critical
+tags: MND, ALS, Motor neurone disease, Riluzole, NIV, Bulbar, Fasciculations, Dysphagia, Neurology
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🧠</div>
+      <div>
+        <div class="t1">Neurology Dept</div>
+        <div class="t2">Bed 8 · Motor Neurone Disease</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">⚡</span><span>EMG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · 🧠 Neurology · 🚨 Acute Assessment · 🛏️ Bed 8</div>
+        <h1>🧠 Motor Neurone Disease — "The Diagnosis Written in Mixed Signs"</h1>
+        <div class="sub">⚡ 10:20. A 58-year-old with a year of creeping weakness and a wasted, twitching hand now slurs his words and choked on his tea this morning. His reflexes are brisk in a wasted limb — upper and lower motor neurone signs in the same body. The clock that matters here is his breathing.</div>
+        <div class="chips">
+          <span class="chip crit">🔴 SERIOUS</span>
+          <span class="chip">🔀 UMN + LMN signs</span>
+          <span class="chip">🗣️ Bulbar onset</span>
+          <span class="chip">🫁 Watch the FVC</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital"><div class="v-label">💓 HR</div><div class="v-num">92</div></div>
+        <div class="vital"><div class="v-label">🩸 BP</div><div class="v-num">132/80</div></div>
+        <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">22</div></div>
+        <div class="vital warn"><div class="v-label">🫁 SpO₂</div><div class="v-num">94%</div></div>
+        <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.9°</div></div>
+        <div class="vital"><div class="v-label">🧠 GCS</div><div class="v-num">15</div></div>
+        <div class="vital alert"><div class="v-label">🫁 FVC</div><div class="v-num">58%</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 10:20, Neurology Assessment Bay 8</b>A fit-looking 58-year-old sits upright but breathless after walking in. His right hand is visibly wasted, the thumb muscle scooped out, and fine ripples of muscle twitch under the skin at rest. His speech is slurred and slightly nasal; he tells you — carefully, effortfully — <em>"I keep… choking on my tea, and my chest feels tight when I lie flat."</em> The referral says "?stroke, ?carpal tunnel." But the reflexes are brisk in that wasted arm. This is the pattern that clinches a diagnosis nobody wants to say out loud.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>🧔 Name</td><td><strong>Mr. A.L.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>58-year-old male</td></tr>
+          <tr><td>🆔 MRN</td><td>NEU-0808</td></tr>
+          <tr><td>⚖️ Weight</td><td>71 kg (down 6 kg over 6 months — bulbar weight loss)</td></tr>
+          <tr><td>💼 Occupation</td><td>Retired electrician; lives with wife</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 History of the presenting problem — a relentless, painless march</h3>
+        <ul>
+          <li>💪 <strong>12 months of progressive weakness</strong> starting in the right hand (dropping tools, weak grip), then the right leg (tripping, foot-drop). <em>Painless, purely motor.</em></li>
+          <li>🌊 <strong>Fasciculations</strong> — visible muscle twitching, worse when tired; wife noticed them months ago. Plus wasting and cramps.</li>
+          <li>🗣️ <strong>Now bulbar:</strong> slurred, nasal speech (dysarthria), choking on fluids (dysphagia), drooling — over the last 6 weeks.</li>
+          <li>🫁 <strong>Orthopnoea + breathlessness</strong> — tight lying flat, disturbed sleep, morning headaches. The <em>respiratory</em> red flag that decides survival.</li>
+          <li>🧠 <strong>No sensory symptoms, no bladder/bowel disturbance, eye movements normal.</strong> The crucial negatives that point away from mimics.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Upper AND lower motor neurone signs in the SAME patient, with NO sensory loss and NO sphincter or eye-movement involvement — that pattern is motor neurone disease until proven otherwise."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why this is easy to mislabel for months</b>Early MND masquerades as carpal tunnel, a "trapped nerve", cervical spondylosis, or even a stroke. The mean diagnostic delay is ~10–16 months. The tragedy is that the delay eats into the short window where riluzole, NIV, and multidisciplinary care make the most difference. The pattern — <strong>mixed UMN + LMN, no sensory signs</strong> — is what shortens that delay.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 GP / triage handover — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ Referral SBAR (verbatim)</b>
+          <p><strong>S:</strong> "58-year-old man, a year of progressive right arm and leg weakness with wasting and twitching, now slurred speech and choking on fluids."</p>
+          <p><strong>B:</strong> "Previously fit electrician. Seen for ?carpal tunnel, then ?stroke — but the weakness kept spreading and never fitted one nerve or one vascular territory."</p>
+          <p><strong>A:</strong> "Speaking is effortful and nasal, coughing on his own saliva. Breathless, worse lying flat, morning headaches. SpO₂ 94%, RR 22. Wasted right hand with fasciculations, brisk reflexes."</p>
+          <p><strong>R:</strong> "Sending for urgent neurology assessment — worried about his swallow and his breathing."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In MND, respiratory failure and aspiration are what kill — not the limb weakness. The moment there is bulbar dysfunction or orthopnoea, the swallow and the FVC become the priorities."</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each feature pointing to MND (and away from a mimic)</h3>
+        <p>🎮 <em>Click every feature that supports MND / signals danger. Each correct = +10 XP.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">🔀 Brisk reflexes in a wasted, twitching limb (UMN + LMN)</button>
+          <button class="btn ghost flag-btn" data-good="1">🌊 Fasciculations + progressive wasting</button>
+          <button class="btn ghost flag-btn" data-good="1">🗣️ Dysarthria + dysphagia (bulbar involvement)</button>
+          <button class="btn ghost flag-btn" data-good="1">🫁 Orthopnoea + morning headaches (respiratory)</button>
+          <button class="btn ghost flag-btn" data-good="1">🧠 NO sensory loss, NO sphincter or eye signs</button>
+          <button class="btn ghost flag-btn" data-good="0">✋ "Just carpal tunnel of the right hand"</button>
+          <button class="btn ghost flag-btn" data-good="0">🩹 Numbness and pins-and-needles in the feet</button>
+          <button class="btn ghost flag-btn" data-good="0">🚽 New urinary incontinence</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Credit where due</b>The GP recognised that spreading weakness fitting neither one nerve nor one stroke territory needs urgent neurology — and flagged the swallow and breathing. That referral, made on pattern rather than a single label, is what gets the patient into a specialist MDT while interventions still help.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🅰️🅱️🅲️ Assessment — airway/breathing first in bulbar disease</h3>
+        <table class="tbl">
+          <tr><th>Step</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>🅰️ Airway</td><td>Wet, gurgly voice; pooling saliva; weak cough.</td><td>Bulbar weakness = aspiration risk. A weak cough cannot clear secretions — the setup for pneumonia.</td></tr>
+          <tr><td>🅱️ Breathing</td><td>RR 22, SpO₂ 94% RA, orthopnoea, <strong>FVC 58%</strong>, weak sniff.</td><td>Diaphragm/intercostal weakness → hypoventilation, worst when supine. This is the survival-limiting system.</td></tr>
+          <tr><td>🅲️ Circulation</td><td>HR 92, BP 132/80, well perfused.</td><td>Cardiovascular system is spared — MND is a motor disease.</td></tr>
+          <tr><td>🅳 Disability</td><td>GCS 15, alert; may have subtle frontal/executive change (ALS-FTD spectrum).</td><td>Cognition is usually preserved, but screen for frontotemporal features.</td></tr>
+          <tr><td>🅴 Exposure</td><td>Wasted right hand + forearm, fasciculations across limbs and tongue, brisk reflexes, extensor plantars, NO sensory loss.</td><td>The signature: LMN wasting/fasciculation + UMN brisk reflexes/upgoing plantars, sensation intact.</td></tr>
+        </table>
+
+        <h3>🧭 Demonstrating mixed UMN + LMN — the exam that clinches it</h3>
+        <div class="vs">
+          <div class="side a"><h4>⬇️ Lower motor neurone signs</h4><ul><li>Muscle <strong>wasting</strong> (thenar, first dorsal interosseous)</li><li><strong>Fasciculations</strong> (limbs + tongue)</li><li>Reduced tone, cramps</li></ul></div>
+          <div class="side b"><h4>⬆️ Upper motor neurone signs</h4><ul><li><strong>Brisk reflexes</strong> in wasted limbs (a striking combination)</li><li><strong>Extensor plantars</strong> (Babinski)</li><li>Spasticity, spastic dysarthria, brisk jaw jerk</li></ul></div>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A brisk reflex in a wasted, fasciculating muscle is almost pathognomonic of MND — it is the meeting of upper and lower motor neurone damage in one place."</div>
+
+        <div class="callout warn"><b class="ct">⚠️ The negatives that protect the diagnosis</b>No sensory level, no numbness, normal eye movements, and continent bladder/bowel. If any of these are present, actively hunt for a mimic — a cord compression, a neuropathy, myasthenia, or a brainstem lesion — before settling on MND.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The neurology resident thinks out loud at 10:28:</em></p>
+        <h3>🧠 Frame it as pattern + exclusion + protect the patient</h3>
+        <p>"This is mixed UMN and LMN across multiple regions — hand, leg, and now bulbar — with sparing of sensation, sphincters and eye movements. That pattern is MND. My job is threefold: <strong>confirm the pattern with EMG</strong>, <strong>exclude the treatable mimics</strong> (cervical myelopathy, myasthenia, GBS, Kennedy's), and — most urgently — <strong>assess and protect his breathing and swallow</strong>. Respiratory failure is what will kill him, not his grip."</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>🫁 <strong>Respiratory assessment now</strong> — sitting AND supine FVC, sniff nasal inspiratory pressure (SNIP), morning symptoms; refer for NIV assessment early.</li>
+          <li>🍽️ <strong>Swallow assessment (SALT)</strong> — nil-by-mouth if unsafe; discuss PEG feeding before he becomes malnourished or respiratory-compromised.</li>
+          <li>⚡ <strong>EMG + nerve conduction studies</strong> — look for widespread active + chronic denervation with normal sensory conduction.</li>
+          <li>🧲 <strong>MRI brain + whole spine</strong> — exclude cervical myelopathy/structural mimic; bloods (including for mimics).</li>
+          <li>🤝 <strong>Refer to the specialist MND multidisciplinary team</strong> — neurologist, respiratory, SALT, dietitian, physio/OT, specialist nurse, palliative care.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Diagnose the pattern, exclude the mimics, but never let the work-up delay the two interventions that change survival — NIV and swallow safety."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>His SpO₂ is 94% and he seems comfortable at rest. Is his breathing fine to leave for the clinic in 6 weeks?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No.</strong> In neuromuscular respiratory failure, SpO₂ stays normal until very late — the problem is <em>ventilation</em> (rising CO₂), not oxygenation. Orthopnoea, morning headaches, disturbed sleep and a falling FVC/SNIP are the early warnings. Assess respiratory function urgently and refer for NIV — do NOT be reassured by a normal saturation.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The consultant neurologist at the bedside, 10:40:</em></p>
+        <h3>🧬 The phenotypes of MND — same disease, different doors</h3>
+        <table class="tbl">
+          <tr><th>Phenotype</th><th>Signs</th><th>Notes</th></tr>
+          <tr><td>🔀 <strong>Amyotrophic lateral sclerosis (ALS)</strong></td><td>Mixed UMN + LMN in the same regions</td><td>Commonest form (~85%); this patient. Median survival ~3 years.</td></tr>
+          <tr><td>🗣️ <strong>Progressive bulbar palsy</strong></td><td>Bulbar-onset dysarthria/dysphagia dominant</td><td>Worse prognosis; earlier respiratory/aspiration risk.</td></tr>
+          <tr><td>⬆️ <strong>Primary lateral sclerosis (PLS)</strong></td><td>Pure UMN (spasticity, brisk reflexes)</td><td>Slowest course; better prognosis; a diagnosis of exclusion over time.</td></tr>
+          <tr><td>⬇️ <strong>Progressive muscular atrophy (PMA)</strong></td><td>Pure LMN (wasting, fasciculations)</td><td>Intermediate prognosis; may evolve to ALS.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"ALS is mixed, PLS is pure upper, PMA is pure lower, and progressive bulbar palsy leads with speech and swallow — but all four are the same relentless motor neurone degeneration."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence / Guidance</th><th>What it shows</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> NICE NG42 (MND)</td><td>Coordinated specialist MDT, early NIV assessment, proactive nutrition/gastrostomy, riluzole, and advance care planning.</td><td>Care is multidisciplinary and anticipatory — not a single drug.</td></tr>
+            <tr><td><span class="lvl">RCT</span> Riluzole (Bensimon 1994)</td><td>Anti-glutamate agent prolongs survival by ~2–3 months / delays tracheostomy.</td><td>Offer riluzole to all — a modest but real survival benefit.</td></tr>
+            <tr><td><span class="lvl">RCT</span> NIV (Bourke 2006)</td><td>Non-invasive ventilation improved survival (by months) and quality of life, especially with preserved bulbar function.</td><td>NIV is the single biggest quality/survival intervention — refer early.</td></tr>
+            <tr><td><span class="lvl">RCT</span> Edaravone (MCI186)</td><td>Free-radical scavenger slowed functional decline in a selected early subgroup (available in some countries).</td><td>An option in selected patients; benefit is modest and selective.</td></tr>
+            <tr><td><span class="lvl">CRITERIA</span> El Escorial / Awaji</td><td>Research/diagnostic framework requiring UMN + LMN signs in multiple regions with progression and exclusion of mimics.</td><td>Diagnosis is clinical + EMG; imaging/bloods exclude mimics.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The death that haunts our MDT is the bulbar patient whose orthopnoea and morning headaches were logged as 'anxiety', whose swallow was never formally assessed, and who was admitted one night with aspiration pneumonia and type 2 respiratory failure — with no NIV in place and no ceiling-of-care conversation ever had. We were caught flat-footed by a decline we could have anticipated for months."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY mixed signs, WHY relentless (the WHY behind the WHY)</h3>
+        <ol>
+          <li>⬇️ <strong>Lower motor neurones die</strong> — the anterior horn cells of the spinal cord and the motor cranial nuclei of the brainstem degenerate. Denervated muscle wastes, twitches (fasciculations) and weakens: the LMN signs.</li>
+          <li>⬆️ <strong>Upper motor neurones die too</strong> — the corticospinal (pyramidal) tracts and Betz cells degenerate. Loss of descending inhibition leaves brisk reflexes, spasticity and extensor plantars: the UMN signs. Both levels failing together in one body is the fingerprint of MND.</li>
+          <li>🚫 <strong>Why sensation, eyes and sphincters are spared:</strong> the disease targets the motor system. Sensory pathways, the oculomotor nuclei (relatively resistant), and Onuf's nucleus (sphincter control) are characteristically preserved — which is exactly why their involvement should make you doubt the diagnosis.</li>
+          <li>🧪 <strong>Molecular drivers:</strong> TDP-43 protein aggregation, glutamate excitotoxicity (the target of riluzole), oxidative stress, and mitochondrial dysfunction; ~10% familial (e.g. C9orf72 repeat expansion, SOD1).</li>
+          <li>🫁 <strong>Why it kills:</strong> as motor neurones to the diaphragm and bulbar muscles die, ventilation fails and the airway can no longer be protected — respiratory failure and aspiration, not the limb weakness, end life.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"MND is a pure motor catastrophe — up and down the motor pathway at once — that spares the senses, the eyes and the bladder, and eventually takes the breath."</div>
+
+        <h3>⚖️ Contrast pair — MND vs its great mimic (myasthenia gravis)</h3>
+        <div class="vs">
+          <div class="side a"><h4>🧠 Motor neurone disease</h4><ul><li>Mixed UMN + LMN, wasting, fasciculations</li><li><strong>Progressive, not fatigable</strong>; asymmetric onset</li><li>EMG: denervation; sensation normal</li><li>Relentless, incurable</li></ul></div>
+          <div class="side b"><h4>🔋 Myasthenia gravis</h4><ul><li>Pure <strong>fatigable</strong> weakness, ptosis, diplopia (eyes involved!)</li><li>No wasting/fasciculation early; reflexes normal</li><li>AChR/MuSK antibodies; decrement on repetitive stimulation</li><li>Treatable — do not miss it</li></ul></div>
+        </div>
+        <p>💡 The eyes are the giveaway: prominent ptosis/diplopia points to myasthenia, not MND, where eye movements are classically spared.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The FVC / Respiratory-Reserve Dial</h3>
+          <p style="font-size:13px">In MND, the number that tracks survival is the <strong>forced vital capacity</strong>. Drag the dial to set his FVC (% predicted) and see when NIV and escalation decisions are triggered.</p>
+          <label for="kRange">🫁 Forced vital capacity (% predicted): <b id="kVal">58</b> %</label>
+          <input type="range" id="kRange" min="20" max="100" value="58">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore the NIV thresholds.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 Normal saturations can hide a falling FVC — ventilation fails before oxygenation. Trend FVC/SNIP and act on symptoms + numbers, not on SpO₂.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The order set (10:30)</h3>
+        <ul>
+          <li>🫁 <strong>Respiratory function:</strong> sitting + supine FVC, SNIP/MIP, overnight oximetry/capnography; <strong>refer for NIV assessment now</strong>.</li>
+          <li>🍽️ <strong>SALT swallow assessment</strong> today; keep nil-by-mouth for thin fluids until assessed; consider thickened fluids; discuss PEG/RIG early.</li>
+          <li>⚡ <strong>EMG + nerve conduction studies</strong> to confirm widespread denervation with normal sensory studies.</li>
+          <li>🧲 <strong>MRI brain + cervical/whole spine</strong> to exclude cervical myelopathy and structural mimics.</li>
+          <li>🩸 <strong>Bloods:</strong> FBC, U&amp;E, LFT, CK (mildly high), TFTs, glucose, B12, ESR/CRP, ± anti-AChR/MuSK, ± genetic testing where indicated.</li>
+          <li>💊 <strong>Start riluzole</strong> (with LFT monitoring); symptom control for cramps, spasticity, secretions.</li>
+          <li>🤝 <strong>Refer to specialist MND MDT</strong> and <strong>palliative care early</strong>; begin advance care planning discussions sensitively.</li>
+          <li>🥄 Dietitian for nutrition/weight; physio/OT for mobility, aids and communication.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The orders that change how long and how well this man lives are the NIV referral and the swallow assessment — riluzole matters, but breathing and eating matter more."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Bedside priorities — protect breathing, swallow and dignity</h3>
+        <ul>
+          <li>🫁 <strong>Position upright</strong>, monitor respiratory rate and work of breathing; escalate early signs of hypoventilation (rising drowsiness, headache, confusion = CO₂ retention).</li>
+          <li>🍽️ <strong>Swallow safety</strong> — NBM until SALT clears; supervise meals, suction to hand, thickened fluids as advised; watch for coughing/wet voice = aspiration.</li>
+          <li>💧 <strong>Secretion management</strong> — suction, antimuscarinics for drooling, positioning; a weak cough cannot clear secretions.</li>
+          <li>🛌 <strong>Pressure area &amp; mobility care</strong> — immobile, wasted patient; falls precautions; support communication (weak, dysarthric speech — allow time, use aids/boards).</li>
+          <li>🧠 <strong>Emotional support</strong> — this is a devastating diagnosis; involve family, specialist nurse and palliative team; support advance care planning conversations.</li>
+          <li>😢 <strong>Watch for emotional lability</strong> (pseudobulbar affect) and distinguish it from depression.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who spots the wet voice, the weak cough and the morning headache is the early-warning system for the two things that kill in MND — aspiration and respiratory failure."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Value</th><th>Interpretation</th></tr>
+          <tr><td>Sitting / supine FVC</td><td class="hi">58% / 44%</td><td><strong>Reduced, worse supine</strong> — diaphragmatic weakness. Trigger for NIV assessment.</td></tr>
+          <tr><td>SNIP (sniff pressure)</td><td class="hi">Low</td><td>Sensitive early marker of inspiratory (diaphragm) weakness.</td></tr>
+          <tr><td>ABG / capnography</td><td class="hi">Rising pCO₂, morning desaturations</td><td>Ventilatory (type 2) failure — oxygenation preserved until late.</td></tr>
+          <tr><td>Creatine kinase</td><td class="hi">Mildly raised (~500)</td><td>Denervation; not the huge rise of primary myopathy.</td></tr>
+          <tr><td>Anti-AChR / MuSK antibodies</td><td class="ok-v">Negative</td><td>Helps exclude myasthenia gravis.</td></tr>
+          <tr><td>B12, TFT, ESR, glucose</td><td class="ok-v">Normal</td><td>Screen for reversible mimics/contributors.</td></tr>
+          <tr><td>MRI brain + whole spine</td><td class="ok-v">No cord compression</td><td>Excludes cervical myelopathy — a key treatable mimic.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"There is no single blood test for MND — the investigations mostly serve to EXCLUDE the treatable mimics while EMG confirms the denervation. Do not miss a cervical myelopathy."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why the FVC can lie — and how to unmask it</b>A resting SpO₂ and even a sitting FVC can look reassuring while the diaphragm is failing. Always measure <strong>supine FVC</strong> (falls with diaphragm weakness), <strong>SNIP</strong>, and screen for nocturnal hypoventilation (overnight oximetry/capnography, morning headaches, poor sleep). Ventilation fails before oxygenation does.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 EMG / IMAGING ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>⚡ EMG / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>⚡ Electromyography — denervation is the confirmation</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="EMG schematic: fibrillations and fasciculations at rest, then large polyphasic motor units on effort">
+            <rect width="820" height="150" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="45" x2="820" y2="45"/><line x1="0" y1="100" x2="820" y2="100"/></g>
+            <text x="20" y="26" fill="#93c5fd" font-size="11">At rest — fibrillations &amp; fasciculations (should be silent)</text>
+            <polyline fill="none" stroke="#86efac" stroke-width="2" points="20,45 60,45 66,36 72,45 120,45 126,54 132,45 210,45 250,45 256,33 262,45 330,45 336,55 342,45 400,45"/>
+            <text x="20" y="82" fill="#fca5a5" font-size="11">On effort — large-amplitude, long-duration polyphasic units (reinnervation)</text>
+            <polyline fill="none" stroke="#fca5a5" stroke-width="2.2" points="20,120 70,120 84,80 98,150 112,120 150,120 168,74 186,150 204,120 260,120 278,78 296,150 314,120 380,120 398,80 416,150 434,120 500,120 518,78 536,150 554,120 640,120 658,80 676,150 694,120 780,120"/>
+          </svg>
+          <div class="ecg-cap"><span style="color:#93c5fd">At rest</span>: spontaneous fibrillations/fasciculations (active denervation). <span style="color:#fca5a5">On effort</span>: large polyphasic motor units (chronic reinnervation). Sensory conduction is normal. Schematic — for teaching only.</div>
+        </div>
+
+        <h3>🔎 What each test contributes</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Findings in MND</th><th>Role</th></tr>
+          <tr><td>⚡ <strong>EMG</strong></td><td>Active denervation (fibrillations, fasciculations, positive sharp waves) + chronic reinnervation (large polyphasic units) across multiple regions</td><td><strong>Confirms LMN pathology widely</strong>; supports El Escorial/Awaji criteria.</td></tr>
+          <tr><td>🔌 <strong>Nerve conduction studies</strong></td><td><strong>Normal sensory</strong> responses; motor amplitudes may fall</td><td>Excludes neuropathy/conduction block (e.g. multifocal motor neuropathy).</td></tr>
+          <tr><td>🧲 <strong>MRI brain + spine</strong></td><td>Usually normal; sometimes corticospinal tract signal</td><td>Excludes cervical myelopathy and structural mimics.</td></tr>
+          <tr><td>🫁 <strong>Respiratory tests</strong></td><td>Low FVC (worse supine), low SNIP, nocturnal hypoventilation</td><td>Drives NIV timing — the survival-critical test.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"EMG shows the denervation, MRI rules out the myelopathy, and the FVC decides the ventilator — three tests, three jobs, and only one of them buys time."</div>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The MND drug map — disease-modifying and symptomatic</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>Riluzole</strong> 50 mg BD</td><td>Disease-modifying — offer to all</td><td>Reduces glutamate excitotoxicity; ~2–3 month survival benefit. Monitor LFTs; can cause nausea, fatigue.</td></tr>
+          <tr><td><strong>Edaravone</strong></td><td>Disease-modifying (selected patients, some countries)</td><td>Free-radical scavenger; modest slowing of decline in early/selected disease.</td></tr>
+          <tr><td><strong>Antimuscarinics</strong> (glycopyrronium, hyoscine, amitriptyline)</td><td>Drooling / secretions</td><td>Reduce saliva; watch anticholinergic burden and thickened secretions.</td></tr>
+          <tr><td><strong>Baclofen / tizanidine</strong></td><td>Spasticity &amp; cramps</td><td>Reduce tone; avoid over-weakening; titrate carefully.</td></tr>
+          <tr><td><strong>Quinine</strong></td><td>Muscle cramps</td><td>Symptomatic relief of painful cramps.</td></tr>
+          <tr><td><strong>Opioids + benzodiazepines</strong></td><td>Breathlessness &amp; distress (palliative)</td><td>Low-dose morphine ± benzodiazepine for dyspnoea/anxiety, especially end of life.</td></tr>
+          <tr><td><strong>SSRIs / dextromethorphan-quinidine</strong></td><td>Pseudobulbar affect / mood</td><td>Treat emotional lability and depression.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Riluzole is the only drug that touches survival, and only modestly — the real 'medicine' in MND is NIV, nutrition, symptom control and honest planning delivered by the whole team."</div>
+        <div class="callout danger"><b class="ct">🚫 The care that outweighs any pill</b>Do NOT let drug prescribing distract from the interventions that matter most: <strong>NIV, PEG feeding, secretion/spasticity control, communication support, and advance care planning</strong>. Under-recognised respiratory failure and aspiration are what kill — no tablet fixes that.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why</h3>
+        <ul>
+          <li>🫁 <strong>Respiratory function (FVC + SNIP/MIP)</strong> — the survival-critical trend; falling values and orthopnoea/morning headaches trigger NIV. Do NOT rely on SpO₂.</li>
+          <li>🍽️ <strong>Swallow &amp; weight</strong> — regular SALT/dietitian review; falling weight or unsafe swallow prompts PEG before respiratory decline makes it high-risk.</li>
+          <li>📉 <strong>ALSFRS-R functional score</strong> — tracks progression across limb, bulbar and respiratory domains.</li>
+          <li>😴 <strong>Nocturnal hypoventilation</strong> — sleep quality, morning headache, daytime somnolence; overnight oximetry/capnography.</li>
+          <li>💧 <strong>Secretions, spasticity, mood, communication</strong> — reassess symptom control at every visit.</li>
+          <li>🤝 <strong>Advance care plan</strong> — revisit wishes, ceiling of care, preferred place of death as disease progresses.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Monitor the breathing and the swallow relentlessly — in MND the FVC is the vital sign that predicts survival, and PEG timing hinges on getting there before the lungs are too weak."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What goes wrong — and what kills</h3>
+        <ul>
+          <li>🫁 <strong>Respiratory failure</strong> — progressive ventilatory (type 2) failure; the commonest cause of death. NIV is the key intervention.</li>
+          <li>🥄 <strong>Aspiration pneumonia</strong> — from bulbar weakness and unsafe swallow; a frequent terminal event and a preventable crisis.</li>
+          <li>📉 <strong>Malnutrition &amp; weight loss</strong> — dysphagia; late PEG (after FVC falls) is riskier — hence early timing.</li>
+          <li>🚶 <strong>Immobility complications</strong> — falls, contractures, pressure sores, VTE.</li>
+          <li>🗣️ <strong>Communication loss &amp; social isolation</strong> — anarthria; needs augmentative communication.</li>
+          <li>🧠 <strong>Cognitive/behavioural change</strong> — up to ~15% develop frontotemporal dementia (ALS-FTD); pseudobulbar affect distresses patient and family.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The two complications that end life in MND — respiratory failure and aspiration — are the two you can most anticipate and soften with early NIV, swallow assessment and planning."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The mimics you MUST exclude (many are treatable)</h3>
+        <table class="tbl">
+          <tr><th>Diagnosis</th><th>Discriminators</th><th>Don't-miss action</th></tr>
+          <tr><td>🧠 <strong>MND / ALS</strong> (this patient)</td><td>Mixed UMN + LMN, no sensory/sphincter/eye signs, progressive; EMG denervation</td><td>Confirm pattern + EMG; protect breathing/swallow.</td></tr>
+          <tr><td>🦴 <strong>Cervical myelopathy / cord compression</strong></td><td>UMN legs + LMN arms BUT <strong>sensory level</strong> + neck/bladder involvement</td><td>MRI whole spine — the classic treatable mimic. Never miss it.</td></tr>
+          <tr><td>🔋 <strong>Myasthenia gravis</strong></td><td>Fatigable weakness, <strong>ptosis/diplopia</strong>, no wasting/UMN signs; AChR/MuSK Ab</td><td>Antibodies + repetitive stimulation; treatable.</td></tr>
+          <tr><td>🪢 <strong>Guillain–Barré / CIDP</strong></td><td>Areflexia, sensory involvement, often ascending; demyelination on NCS</td><td>NCS + CSF; GBS is an emergency, treatable.</td></tr>
+          <tr><td>🧬 <strong>Kennedy's disease (SBMA)</strong></td><td>X-linked, gynaecomastia, sensory involvement, slowly progressive, bulbar</td><td>Genetic test (androgen receptor CAG repeat).</td></tr>
+          <tr><td>🔌 <strong>Multifocal motor neuropathy</strong></td><td>Pure LMN, conduction block on NCS, anti-GM1</td><td>NCS — importantly TREATABLE with IVIG.</td></tr>
+          <tr><td>💪 <strong>Inclusion body myositis</strong></td><td>Asymmetric wasting (quads, finger flexors), no UMN signs, high-ish CK</td><td>EMG/biopsy.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Before you say MND, image the cervical cord, check for fatigability and eye signs, and look for conduction block — a myelopathy, a myasthenia, or a multifocal motor neuropathy are the treatable diagnoses you cannot afford to miss."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The Breathing You Cannot Ignore"</h3>
+          <div class="hud"><span>🫁 Reserve: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">Mixed UMN + LMN signs, bulbar dysarthria, choking on fluids, orthopnoea and morning headaches. SpO₂ is 94% and he looks comfortable sitting up. What is your priority?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The management plan</h3>
+        <ol>
+          <li>🧠 <strong>Diagnosis:</strong> ALS-type MND (mixed UMN + LMN across regions, bulbar involvement; EMG denervation; mimics excluded).</li>
+          <li>🫁 <strong>Respiratory:</strong> urgent NIV assessment and initiation for symptomatic ventilatory failure; secretion and cough support.</li>
+          <li>🍽️ <strong>Nutrition:</strong> SALT-guided swallow safety; timely PEG/RIG before FVC falls too far; dietitian input.</li>
+          <li>💊 Riluzole started; symptom control (spasticity, cramps, drooling, mood, pain, breathlessness).</li>
+          <li>🤝 <strong>Multidisciplinary + palliative:</strong> specialist MND team, physio/OT, communication aids, early palliative care and honest advance care planning.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"MND management is multidisciplinary and anticipatory — the wins are NIV, nutrition, symptom control and planning delivered ahead of the crisis, not a single prescription."</div>
+
+        <div class="checklist" id="ckMND">
+          <h3 style="margin-top:0">🩺 Procedure Guide — MND multidisciplinary pathway (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>🔀 Confirm mixed UMN + LMN pattern; exclude treatable mimics (MRI spine, antibodies, NCS)</span></label>
+          <label class="ck"><input type="checkbox"><span>🫁 Respiratory assessment (FVC sitting/supine, SNIP) + early NIV referral</span></label>
+          <label class="ck"><input type="checkbox"><span>🍽️ SALT swallow assessment; plan timely PEG/RIG before FVC too low</span></label>
+          <label class="ck"><input type="checkbox"><span>💊 Riluzole started with LFT monitoring; symptom control prescribed</span></label>
+          <label class="ck"><input type="checkbox"><span>🤝 Specialist MND MDT + early palliative care referral</span></label>
+          <label class="ck"><input type="checkbox"><span>🗣️ Communication aids + dietitian + physio/OT arranged</span></label>
+          <label class="ck"><input type="checkbox"><span>📜 Advance care planning discussion documented (ceiling of care, wishes)</span></label>
+          <div class="ck-progress" data-progress>0 / 7 complete</div>
+        </div>
+
+        <div class="checklist" id="ckResp">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Respiratory / NIV safety checklist</h3>
+          <label class="ck"><input type="checkbox"><span>😴 Screen for nocturnal hypoventilation (orthopnoea, morning headache, poor sleep)</span></label>
+          <label class="ck"><input type="checkbox"><span>📉 Trend FVC + SNIP; do NOT be reassured by normal SpO₂</span></label>
+          <label class="ck"><input type="checkbox"><span>🫁 Initiate NIV when symptomatic / FVC or SNIP thresholds met</span></label>
+          <label class="ck"><input type="checkbox"><span>💧 Cough augmentation + secretion management in place</span></label>
+          <label class="ck"><input type="checkbox"><span>📜 Agree escalation ceiling BEFORE an acute respiratory crisis</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">Day 0</div>Mixed UMN + LMN pattern recognised; NIV referral and SALT assessment made same day; mimics excluded on MRI/NCS.</div>
+          <div class="t-item"><div class="t-time">Week 1</div>EMG confirms widespread denervation; riluzole started; thickened fluids and secretion control in place.</div>
+          <div class="t-item"><div class="t-time">Week 3</div>NIV commenced for nocturnal hypoventilation — sleep, morning headaches and daytime function improve; quality of life gains.</div>
+          <div class="t-item"><div class="t-time">Month 2</div>PEG placed electively while respiratory reserve still adequate; weight stabilises; communication aids provided.</div>
+          <div class="t-item"><div class="t-time">Ongoing</div>MDT + palliative care follow-up; advance care plan agreed with patient and family, including preferred place of care.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The difference good care makes</b>MND remains incurable, but recognising the pattern early, getting NIV and a safe swallow in place, and planning honestly gave this man more time, better sleep, safer eating, and control over his care. That is the whole point of the MDT.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 Anticipatory care vs the avoidable crisis — two trajectories</h3>
+        <div class="vs">
+          <div class="side a"><h4>🧠 This patient (anticipatory care)</h4><ul><li>NIV in place, PEG timed early, riluzole + symptom control</li><li>MDT + palliative follow-up; carer support; communication aids</li><li>Advance care plan, ceiling of care and preferred place agreed</li><li>Red flags: worsening breathlessness, choking, chest infection → agreed plan, not blind escalation</li></ul></div>
+          <div class="side b"><h4>💥 The avoidable crisis (missed anticipation)</h4><ul><li>No NIV, no swallow plan, no advance planning</li><li>Emergency admission with aspiration + type 2 respiratory failure</li><li>Rushed, uninformed decisions at 3 am</li><li>The scenario in S21 — the one to prevent</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Every MND discharge should leave with a breathing plan, a feeding plan and a ceiling-of-care conversation — so the next respiratory event is met by a plan, not a panic."</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>🔀 Mixed UMN + LMN</b>Both motor levels failing in one body, with no sensory/eye/sphincter signs — the pattern that clinches MND.</div>
+          <div class="pearl"><b>💪 Brisk reflex, wasted limb</b>A brisk jerk in a wasted, fasciculating muscle is nearly pathognomonic.</div>
+          <div class="pearl"><b>🫁 Ventilation fails first</b>SpO₂ stays normal late — trend FVC/SNIP and act on symptoms, not saturations.</div>
+          <div class="pearl"><b>🩺 NIV is the biggest win</b>Non-invasive ventilation is the single largest quality/survival intervention — refer early.</div>
+          <div class="pearl"><b>🍽️ PEG before it is risky</b>Time gastrostomy while FVC is still adequate, not after it falls.</div>
+          <div class="pearl"><b>💊 Riluzole is modest</b>~2–3 month survival benefit — offer it, but do not overstate it.</div>
+          <div class="pearl"><b>🦴 Exclude the myelopathy</b>Cervical cord compression is the classic treatable mimic — MRI the spine.</div>
+          <div class="pearl"><b>🤝 MDT + honesty</b>Care is multidisciplinary, supportive and anticipatory, with early palliative involvement.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the diagnosis</h3>
+          <ul>
+            <li>🧬 <strong>ALS-FTD spectrum &amp; genetics:</strong> up to ~50% have some cognitive/behavioural change and ~15% frank frontotemporal dementia; the <strong>C9orf72</strong> hexanucleotide repeat expansion links familial ALS and FTD, alongside SOD1, TARDBP and FUS mutations. TDP-43 pathology unites most cases.</li>
+            <li>⚡ <strong>Diagnostic criteria evolution:</strong> El Escorial → revised Airlie House → <strong>Awaji</strong> (giving fasciculation potentials the weight of fibrillations, improving early sensitivity) → the newer <strong>Gold Coast</strong> criteria (progressive motor impairment with UMN and/or LMN dysfunction in ≥1 region, plus exclusion of mimics) which further simplify and sensitise diagnosis.</li>
+            <li>🫁 <strong>Respiratory science:</strong> NIV timing guided by symptomatic hypoventilation, FVC (&lt;~50% predicted), SNIP/MIP, and nocturnal desaturation/hypercapnia; diaphragm pacing has not shown benefit and may harm. Bulbar-predominant patients tolerate NIV less well — a key nuance.</li>
+            <li>💊 <strong>Emerging therapy:</strong> <strong>tofersen</strong> (an antisense oligonucleotide) for SOD1-ALS lowers neurofilament and is approved in some settings; sodium phenylbutyrate–taurursodiol and other agents have mixed/withdrawn evidence — a fast-moving field.</li>
+            <li>🩺 <strong>Neurofilament light (NfL):</strong> emerging blood/CSF biomarker of axonal degeneration for diagnosis, prognosis and trial monitoring.</li>
+            <li>📜 <strong>Ethics of ventilation:</strong> the difference between NIV (revocable comfort/survival benefit) and tracheostomy ventilation (prolongs life but into the locked-in stages) makes early, honest advance care planning essential — decisions must be made before the crisis.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The Breathing Nobody Watched"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 62-year-old man with bulbar-onset MND was managed in a general clinic. Over three months he reported <strong>orthopnoea, disrupted sleep and morning headaches</strong> — repeatedly recorded as "anxiety" — and his wife mentioned he was coughing on meals. His <strong>swallow was never formally assessed by SALT</strong>, no NIV referral was made, and his FVC was never measured supine (the sitting value "looked okay"). No advance care planning conversation had ever taken place. One night he was rushed in with <strong>aspiration pneumonia and type 2 respiratory failure</strong>. With no NIV in place, no documented ceiling of care, and a family who had never been prepared, he was intubated in extremis and died in ICU days later after a distressing, uninformed escalation — exactly the ending anticipatory care exists to prevent.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🫁 RESPIRATORY MISSED</b>Orthopnoea + morning headaches labelled "anxiety"; ventilation failing unnoticed.</div>
+            <div class="hole"><b>📉 FVC LIED</b>Sitting FVC "okay"; supine FVC + SNIP never measured; normal SpO₂ falsely reassured.</div>
+            <div class="hole"><b>🍽️ NO SWALLOW ASSESSMENT</b>Choking ignored; no SALT, no PEG plan — aspiration set up.</div>
+            <div class="hole"><b>🩺 NO NIV</b>No respiratory referral; the biggest survival/quality intervention never offered.</div>
+            <div class="hole"><b>📜 NO PLANNING</b>No advance care plan; crisis decisions made in extremis at 3 am.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved him from this ending:</strong> treat orthopnoea and morning headaches in MND as respiratory failure until proven otherwise; measure supine FVC and SNIP and never trust a normal SpO₂; refer early for NIV and formal swallow assessment; time a PEG before respiratory reserve is lost; and have honest advance care planning conversations early, so a respiratory crisis is met by an agreed plan rather than a panicked escalation. <strong>This is exactly the anticipatory care that helped the patient in Bed 8.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In MND, the limb weakness is what you see, but the breathing and the swallow are what kill — watch them relentlessly, plan for them early, and never be reassured by a normal oxygen saturation."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · 🧠 Neurology · 🚨 Acute Assessment · Bed 8 — Motor Neurone Disease (ALS)<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+    /* ===== SIDEBAR TABS — show one section at a time ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Points away from MND'); } if(found===total){ flagResult.textContent='✅ All '+total+' MND features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' MND features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: FVC / respiratory-reserve dial ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=(100-v)/(100-20)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v>=80){ msg='🟢 FVC '+v+'%. Respiratory reserve adequate — but keep trending FVC/SNIP and screen for nocturnal symptoms; SpO₂ can stay normal while it falls.'; cls='good'; }
+      else if(v>=50){ msg='🟠 FVC '+v+'%. Approaching the NIV threshold — assess symptoms, SNIP and overnight ventilation; plan PEG NOW while reserve allows.'; cls='warn-r'; }
+      else if(v>=30){ msg='🔴 FVC '+v+'%. Symptomatic ventilatory failure — NIV is indicated. PEG becomes higher-risk below this point; escalate and plan.'; cls='bad'; }
+      else { msg='🔴 FVC '+v+'%. Severe respiratory failure. NIV-dependent; ensure advance care plan and ceiling of care are already agreed.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Reserve Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"Mixed UMN + LMN signs, bulbar dysarthria, choking on fluids, orthopnoea and morning headaches. SpO₂ is 94% and he looks comfortable sitting up. What is your priority?",
+      choices:[
+        {t:"😌 SpO₂ is fine — reassure and review in the routine clinic in 6 weeks",good:false,ds:-2,dt:60,xp:0,fb:"☠️ This is the S21 M&M trap. In neuromuscular disease SpO₂ stays normal until late — his orthopnoea and morning headaches ARE ventilatory failure. He returns with aspiration and type 2 failure. Restart.",end:true},
+        {t:"🫁 Urgent respiratory assessment (supine FVC, SNIP), early NIV referral, and same-day SALT swallow assessment",good:true,ds:1,dt:8,xp:40,fb:"✅ Exactly. Breathing and swallow are the survival-critical priorities — assess ventilation properly and protect the airway now.",next:"repeat"},
+        {t:"💊 Just start riluzole and book routine follow-up",good:false,ds:-1,dt:20,xp:5,fb:"⚠️ Riluzole is worth starting but its benefit is modest — it does NOT address the breathing and swallow that will actually harm him. Assess those urgently.",next:"repeat"}
+      ]},
+    repeat:{ text:"Supine FVC is 44%, SNIP is low, and he has nocturnal hypoventilation. SALT finds an unsafe swallow with aspiration on thin fluids. What next?",
+      choices:[
+        {t:"🫁 Start NIV and arrange a PEG now, while respiratory reserve still allows it",good:true,ds:1,dt:6,xp:40,fb:"✅ Right. NIV is the biggest quality/survival intervention, and gastrostomy is safest done BEFORE FVC falls further. Anticipate, do not wait for the crisis.",next:"declare"},
+        {t:"⏳ Wait until his FVC is much lower before considering NIV or PEG",good:false,ds:-2,dt:30,xp:0,fb:"⚠️ Dangerous — delaying PEG until FVC is low makes it high-risk, and withholding NIV forfeits its survival/quality benefit. Act early.",next:"declare"}
+      ]},
+    declare:{ text:"NIV and PEG are in place and he is more comfortable. The family ask what happens if his breathing gets much worse. Your approach?",
+      choices:[
+        {t:"🤝 Involve palliative care early and hold an honest advance care planning conversation about escalation and ceiling of care",good:true,ds:1,dt:5,xp:45,fb:"🏆 Perfect. Honest, early planning means a future respiratory crisis is met by an agreed plan rather than a panicked 3 am escalation.",end:true},
+        {t:"🙈 Avoid the topic so as not to upset them; deal with it if it happens",good:false,ds:-1,dt:20,xp:0,fb:"⚠️ Avoidance leads to the S21 ending — crisis decisions made in extremis. Plan honestly and early.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='declare'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 58-year-old has a wasted, fasciculating right hand with BRISK reflexes, plus dysarthria and dysphagia, and no sensory loss. The finding that most clinches motor neurone disease is:", opts:["Sensory loss in a glove distribution","Mixed upper AND lower motor neurone signs in the same patient with no sensory involvement","Fatigable ptosis","A sensory level on the trunk"], correct:1, exp:"The hallmark of MND is mixed UMN + LMN signs together, with NO sensory, sphincter or eye-movement involvement. A brisk reflex in a wasted, fasciculating limb is nearly pathognomonic." },
+    { q:"Which finding should make you doubt MND and actively hunt for a mimic?", opts:["Fasciculations","Brisk reflexes with extensor plantars","A definite sensory level and new urinary incontinence","Progressive painless weakness"], correct:2, exp:"MND spares sensation and sphincters. A sensory level and bladder involvement point to a mimic such as cervical myelopathy/cord compression — image the spine before settling on MND." },
+    { q:"In MND, the single intervention with the greatest impact on survival and quality of life is:", opts:["Riluzole","Non-invasive ventilation (NIV)","High-dose steroids","Physiotherapy alone"], correct:1, exp:"NIV improves both survival (by months) and quality of life, especially with preserved bulbar function (Bourke 2006). Riluzole helps but only modestly (~2–3 months)." },
+    { q:"Why is a normal SpO₂ falsely reassuring in a breathless MND patient?", opts:["The pulse oximeter is unreliable in MND","Neuromuscular respiratory failure is a ventilation problem (rising CO₂); oxygenation is preserved until late","MND does not affect breathing","Oxygen saturation rises in respiratory failure"], correct:1, exp:"In neuromuscular disease the problem is ventilation, not oxygenation — pCO₂ rises while SpO₂ stays normal until late. Trend FVC/SNIP and act on orthopnoea, morning headaches and poor sleep." },
+    { q:"Which is the classic TREATABLE mimic of MND that must be excluded with imaging?", opts:["Cervical myelopathy / cord compression","Migraine","Essential tremor","Bell's palsy"], correct:0, exp:"Cervical myelopathy can produce UMN legs and LMN arms and is treatable — MRI of the whole spine is essential before diagnosing MND. Myasthenia and multifocal motor neuropathy are other treatable mimics." },
+    { q:"On EMG in MND you would expect:", opts:["Normal studies","Widespread active denervation (fibrillations, fasciculations) with chronic reinnervation and NORMAL sensory conduction","A demyelinating sensory neuropathy","A decremental response on repetitive stimulation"], correct:1, exp:"EMG shows widespread denervation and reinnervation with normal sensory studies, supporting the LMN component across regions. A decrement suggests myasthenia; demyelinating sensory changes suggest neuropathy." },
+    { q:"Regarding riluzole, which statement is correct?", opts:["It cures MND","It is an anti-glutamate agent giving a modest survival benefit of roughly 2–3 months and requires LFT monitoring","It reverses weakness","It should be avoided in all patients"], correct:1, exp:"Riluzole reduces glutamate excitotoxicity and prolongs survival by ~2–3 months / delays tracheostomy; monitor LFTs. It is offered to all but its effect is modest." },
+    { q:"When should gastrostomy (PEG) feeding ideally be arranged in MND with an unsafe swallow?", opts:["Only when the patient is close to death","Early, while respiratory reserve (FVC) is still adequate, before the procedure becomes high-risk","Never — it does not help","Only after tracheostomy"], correct:1, exp:"PEG/RIG is timed EARLY, before FVC falls too far, because the procedure becomes higher-risk as respiratory reserve declines. Anticipatory timing protects nutrition and safety." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you manage MND like a consultant. 🏆':score>=6?'Strong — review the misses and S6 mechanism.':'Revisit S3, S5 and S6 — the mixed-signs pattern and the breathing are the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>

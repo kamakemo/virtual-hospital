@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Herpes Simplex (Viral) Encephalitis — Virtual Teaching Hospital</title>
+<!-- META
+id: c-neuro-encephalitis-102
+title: Herpes Simplex Encephalitis — Start Aciclovir on Suspicion
+hospital: neurology
+department: neuro-ed
+bednumber: 2
+chiefcomplaint: Fever, confusion, personality change, dysphasia, then a focal seizure
+system: Neurology
+severity: critical
+tags: HSV encephalitis, Aciclovir, Temporal lobe, EEG PLEDs, CSF PCR, Anti-NMDAR
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🧠</div>
+      <div>
+        <div class="t1">Neurology / ED</div>
+        <div class="t2">Bed 2 · HSV Encephalitis</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>MRI / EEG / LP</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · 🧠 Neurology · 🚨 Emergency Department · 🛏️ Bed 2</div>
+        <h1>🧠 Herpes Simplex Encephalitis — "The Brain on Fire You Cannot Wait to Treat"</h1>
+        <div class="sub">⚡ 14:20. A 45-year-old teacher has been feverish and "not himself" for two days — confused, strangely disinhibited, struggling to find words. He has just had a focal seizure of the right arm. A colleague suggests "waiting for the PCR before starting aciclovir." Every hour of delay is temporal lobe you do not get back.</div>
+        <div class="chips">
+          <span class="chip crit">🔴 CRITICAL</span>
+          <span class="chip">🧠 Encephalitis Pathway</span>
+          <span class="chip">💉 Aciclovir NOW</span>
+          <span class="chip">🧲 Temporal Lobe MRI</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital warn"><div class="v-label">💓 HR</div><div class="v-num">106</div></div>
+        <div class="vital"><div class="v-label">🩸 BP</div><div class="v-num">138/84</div></div>
+        <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">20</div></div>
+        <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">97%</div></div>
+        <div class="vital alert"><div class="v-label">🌡️ Temp</div><div class="v-num">38.9°</div></div>
+        <div class="vital warn"><div class="v-label">🧠 GCS</div><div class="v-num">13</div></div>
+        <div class="vital alert"><div class="v-label">⚡ Seizure</div><div class="v-num">Focal</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 14:20, Resus 2</b>A middle-aged man sits propped up, glancing around the bay, unable to name the month or find the word for "watch." His wife is frightened: <em>"For two days he has been hot and confused — and yesterday he said the strangest, out-of-character things. Just now his right arm started jerking."</em> This is the exact moment herpes simplex encephalitis is either treated on suspicion or fatally delayed for a test. Not today.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>🧑 Name</td><td><strong>Mr. D.R.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>45-year-old male</td></tr>
+          <tr><td>🆔 MRN</td><td>NEU-ED-1102</td></tr>
+          <tr><td>⚖️ Weight</td><td>84 kg (relevant — aciclovir is dosed by weight)</td></tr>
+          <tr><td>👨‍🏫 Occupation</td><td>Secondary-school teacher — the personality change was noticed at work</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 History — the story that points at the temporal lobe</h3>
+        <ul>
+          <li>🔥 <strong>48-hour prodrome:</strong> fever, headache and malaise, then <strong>confusion, personality/behavioural change and word-finding difficulty (dysphasia)</strong> — cortical, parenchymal signs.</li>
+          <li>⚡ <strong>New focal seizure</strong> of the right arm today — a hallmark of a focal encephalitic process.</li>
+          <li>🧠 <strong>Immunocompetent adult</strong> — HSV encephalitis notoriously strikes the previously well; it is <em>not</em> a disease only of the immunocompromised.</li>
+          <li>🌡️ No recent travel, tick bites, or unusual exposures noted — but HSV-1 is endemic and the commonest cause of sporadic fatal encephalitis worldwide.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Fever + altered behaviour/confusion + focal signs or seizures = encephalitis until proven otherwise — and that means IV aciclovir NOW, before the MRI, before the PCR, before you are sure."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why HSV encephalitis is the do-not-delay neuro-emergency</b>Untreated HSV-1 encephalitis kills ~70% and leaves most survivors devastated. Prompt aciclovir cuts mortality to ~10–20% — but the outcome is exquisitely time-dependent: the biggest predictor of a poor outcome is <strong>delay to aciclovir</strong>. The entire game is to treat empirically on suspicion and let the tests catch up.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 Paramedic handover — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ Pre-hospital SBAR (verbatim)</b>
+          <p><strong>S:</strong> "45-year-old man, two days of fever and headache, increasingly confused and behaving oddly, struggling to speak, and he had a focal seizure of the right arm about 20 minutes ago that stopped on its own."</p>
+          <p><strong>B:</strong> "Previously fit teacher, no regular meds, no known immunosuppression, no recent travel. Wife says the personality change is completely out of character."</p>
+          <p><strong>A:</strong> "GCS 13 — E3 V4 M6, temp 38.9, HR 106, BP 138/84, SpO₂ 97%. Post-ictal and disorientated. No rash. Glucose normal at 6.1."</p>
+          <p><strong>R:</strong> "We flagged ?meningitis ?encephalitis — he needs urgent neuro assessment and imaging."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Meningitis irritates the MENINGES (headache, neck stiffness, photophobia); encephalitis inflames the BRAIN (altered behaviour, confusion, focal deficits, seizures). When the brain itself is misbehaving, add aciclovir — do not just think 'meningitis.'"</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each encephalitic feature</h3>
+        <p>🎮 <em>Click every feature that points to ENCEPHALITIS (brain-parenchyma involvement). Each correct = +10 XP.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">🧠 New confusion + personality change</button>
+          <button class="btn ghost flag-btn" data-good="1">🗣️ Dysphasia (word-finding difficulty)</button>
+          <button class="btn ghost flag-btn" data-good="1">⚡ New focal seizure</button>
+          <button class="btn ghost flag-btn" data-good="1">🌡️ Fever + 48-hour prodrome</button>
+          <button class="btn ghost flag-btn" data-good="1">🎭 Out-of-character behaviour</button>
+          <button class="btn ghost flag-btn" data-good="0">😴 "He was a bit tired"</button>
+          <button class="btn ghost flag-btn" data-good="0">🩸 Normal blood glucose</button>
+          <button class="btn ghost flag-btn" data-good="0">✈️ No recent travel</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Praise where due</b>The crew recognised that altered behaviour + focal seizure + fever is not "just confusion" — it is a brain-parenchyma emergency, and they pre-alerted for imaging. The one thing still missing is the drug: the moment encephalitis is suspected, aciclovir cannot wait for the scanner.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🅰️🅱️🅲️ Primary survey — protect the airway, treat the brain</h3>
+        <table class="tbl">
+          <tr><th>Step</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>🅰️ Airway</td><td>Patent post-ictally; drowsy, monitor closely.</td><td>Recurrent seizures or a falling GCS threaten the airway — GCS ≤ 8 means intubate.</td></tr>
+          <tr><td>🅱️ Breathing</td><td>RR 20, SpO₂ 97% RA, chest clear.</td><td>Watch for aspiration around seizures; hypoxia worsens neuronal injury.</td></tr>
+          <tr><td>🅲️ Circulation</td><td>HR 106, BP 138/84, well perfused, no rash.</td><td>No septic shock or purpura (contrast the meningococcal case) — the emergency here is the brain, not the circulation.</td></tr>
+          <tr><td>🅳 Disability</td><td>GCS 13, disorientated, <strong>expressive dysphasia</strong>, mild right arm drift, post-ictal.</td><td>Focal cortical signs + seizure localise to the (usually temporal/frontal) parenchyma — the HSV signature.</td></tr>
+          <tr><td>🅴 Exposure</td><td>Temp 38.9°C, no rash, no neck rigidity, glucose 6.1.</td><td>Check glucose in every confused patient; the absence of a rash does not lower encephalitis probability.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In any febrile, confused adult with focal signs or seizures, IV aciclovir is part of the resuscitation — start it within the first hour, alongside covering for bacterial meningitis until you have excluded it."</div>
+
+        <h3>🧭 The bedside test that reframes the case</h3>
+        <p>The combination of <strong>fever + altered mental state + a focal cortical sign (dysphasia) + a focal seizure</strong> should snap your differential from "delirium/UTI" to <strong>encephalitis</strong>. Confusion with a focal neurological sign and fever is encephalitis until proven otherwise.</p>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of "confusion = infection screen and wait"</b>Treating this as routine delirium — send a urine dip, start ward antibiotics, "review the confusion tomorrow" — is exactly how HSV encephalitis is missed. Fever + focal cortical dysfunction demands urgent neuroimaging, LP, EEG AND empirical aciclovir, not a next-day review.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The medical resident thinks out loud at 14:24:</em></p>
+        <h3>🧠 Frame it as "start aciclovir now, confirm later"</h3>
+        <p>"Fever, personality change, dysphasia and a focal seizure — this is encephalitis, most likely HSV-1 hitting the temporal lobes, until I prove otherwise. My priority is <strong>IV aciclovir 10 mg/kg three times daily started now</strong>, weight-based (about 840 mg per dose at 84 kg), with good hydration. I will get an urgent MRI, an EEG, and an LP for CSF including HSV PCR — but the drug does not wait for any of them. I will also cover for bacterial meningitis (ceftriaxone) until the CSF clears it, because the two overlap."</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>💉 <strong>IV aciclovir 10 mg/kg tds immediately</strong> (weight-based), with generous IV fluids to protect the kidneys.</li>
+          <li>🦠 <strong>Add empirical ceftriaxone ± dexamethasone</strong> until bacterial meningitis is excluded — the pictures overlap.</li>
+          <li>🧲 <strong>Urgent MRI brain</strong> (temporal-lobe changes) and <strong>EEG</strong> (periodic lateralised discharges); CT first only if MRI is delayed or herniation risk suggests it.</li>
+          <li>💧 <strong>LP</strong> (once safe): lymphocytic CSF, raised protein, <strong>HSV PCR</strong> — with the crucial caveat that a NEGATIVE early PCR does not exclude HSV.</li>
+          <li>⚡ <strong>Treat seizures</strong> and arrange EEG; senior neurology + critical-care review.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Draw the CSF if you safely can — but if the LP, the MRI or the PCR will take time, GIVE THE ACICLOVIR FIRST. The test confirms the diagnosis; the drug saves the brain."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>The night team suggests holding aciclovir until the CSF HSV PCR result is back "to avoid over-treating." Agree?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No.</strong> Start aciclovir empirically on suspicion. A <em>negative early HSV PCR</em> (within the first ~72 hours) does NOT exclude encephalitis — false negatives are well described very early — so you continue aciclovir and <strong>repeat the LP/PCR in 3–7 days</strong>. Aciclovir is comparatively safe (mainly renal — hydrate and dose-adjust); the risk of withholding it is catastrophic, irreversible temporal-lobe necrosis. This is exactly the S21 M&amp;M error.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The neurology consultant at the bedside, 14:32:</em></p>
+        <h3>🧠 Why the temporal lobes — and why that matters</h3>
+        <p>HSV-1 has a striking predilection for the <strong>medial temporal lobes, insula and orbitofrontal cortex</strong> (thought to reach the CNS via the olfactory/trigeminal routes). That anatomy explains the syndrome: <strong>memory disturbance, personality/behavioural change, dysphasia, olfactory/gustatory hallucinations and focal (often temporal-lobe) seizures</strong>. Recognising the temporal-lobe syndrome lets you treat before any test returns.</p>
+        <table class="tbl">
+          <tr><th>Feature</th><th>What it reflects</th><th>This patient</th></tr>
+          <tr><td>🧠 Personality/behaviour change</td><td>Orbitofrontal/temporal involvement</td><td class="hi">PRESENT</td></tr>
+          <tr><td>🗣️ Dysphasia</td><td>Dominant temporal lobe</td><td class="hi">PRESENT</td></tr>
+          <tr><td>⚡ Focal seizure</td><td>Cortical irritation (temporal)</td><td class="hi">PRESENT</td></tr>
+          <tr><td>🌡️ Fever + headache</td><td>Encephalitic inflammation</td><td class="hi">PRESENT</td></tr>
+          <tr><td>🧲 MRI temporal-lobe change</td><td>HSV necrotising encephalitis</td><td class="hi">Confirms (S10)</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Fever + a temporal-lobe syndrome (memory, behaviour, dysphasia, temporal seizures) = HSV encephalitis until proven otherwise. Aciclovir first; the MRI, EEG and PCR confirm what the syndrome already told you."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">RCT</span> Whitley (NEJM 1986) — vidarabine vs aciclovir</td><td>Aciclovir cut HSE mortality from ~70% to ~19% and improved outcomes.</td><td>Aciclovir is the treatment; start it early and empirically.</td></tr>
+            <tr><td><span class="lvl">COHORT</span> Delay-to-aciclovir studies</td><td>Time from admission to aciclovir is an independent predictor of poor outcome; every hour counts.</td><td>Do not wait for imaging/PCR — treat on suspicion.</td></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> UK joint (ABN/BIA) &amp; IDSA encephalitis guidance</td><td>Start IV aciclovir 10 mg/kg tds in any suspected viral encephalitis; investigate around it.</td><td>Empirical aciclovir is the standard of care.</td></tr>
+            <tr><td><span class="lvl">DIAGNOSTIC</span> CSF HSV PCR</td><td>High sensitivity/specificity overall, but false negatives in the first ~72 h and after prolonged illness — repeat if early and suspicion remains.</td><td>A negative early PCR does NOT stop aciclovir; repeat the LP.</td></tr>
+            <tr><td><span class="lvl">RCT</span> Aciclovir duration / relapse</td><td>Treat 14–21 days; shorter courses and CSF-PCR-positive relapse informed a repeat-LP-guided stop.</td><td>14–21 days IV, guided by clinical course ± repeat CSF PCR.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The chart that keeps me awake is the 'confusion, ?UTI' who waited on a ward for two days for the LP and the PCR while the aciclovir sat unprescribed. When the MRI finally showed bilateral temporal necrosis, the damage was done. He survived with a dense amnesia and refractory epilepsy. The drug was never the risk — the wait was."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY the temporal lobes, WHY the urgency (the WHY behind the WHY)</h3>
+        <ol>
+          <li>🦠 <strong>Reactivation and spread:</strong> HSV-1 (usually a reactivation of latent virus in the trigeminal ganglion, sometimes primary) reaches the CNS via the olfactory or trigeminal nerve routes, seeding the <strong>medial temporal and orbitofrontal cortex</strong>.</li>
+          <li>🔥 <strong>Necrotising inflammation:</strong> viral replication in neurons and the host immune response cause a <strong>haemorrhagic, necrotising encephalitis</strong> — oedema, neuronal death and, on imaging, swollen, bright temporal lobes.</li>
+          <li>⚡ <strong>Cortical irritation and mass effect:</strong> the inflamed cortex generates <strong>focal seizures</strong>; progressive oedema raises ICP, drops the GCS, and can cause herniation.</li>
+          <li>💀 <strong>Irreversible loss:</strong> necrosis of memory-critical structures (hippocampi) produces the classic surviving deficit — dense <strong>anterograde amnesia</strong> and epilepsy. Aciclovir halts viral replication; it cannot regrow dead cortex — hence "time is brain."</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Aciclovir stops the virus replicating; it cannot resurrect necrosed temporal lobe. The neurons you save are the ones still alive when the drug goes in — which is why the drug goes in first."</div>
+
+        <h3>⚖️ Contrast pair — Encephalitis vs Meningitis</h3>
+        <div class="vs">
+          <div class="side a"><h4>🧠 Encephalitis (brain parenchyma)</h4><ul><li>Altered behaviour/personality, confusion, focal deficits, seizures</li><li>Problem is inflamed BRAIN tissue</li><li>Empirical IV aciclovir is the emergency drug</li></ul></div>
+          <div class="side b"><h4>🦠 Meningitis (the meninges)</h4><ul><li>Headache, neck stiffness, photophobia, fever</li><li>Problem is inflamed MENINGES</li><li>Empirical ceftriaxone (± dexamethasone) is the emergency drug</li></ul></div>
+        </div>
+        <p>💡 They overlap ("meningoencephalitis") — so in the febrile confused patient, cover BOTH: aciclovir for the brain and ceftriaxone for the meninges until the work-up separates them.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The Door-to-Aciclovir Clock</h3>
+          <p style="font-size:13px">The strongest modifiable predictor of outcome in HSV encephalitis is <strong>time to aciclovir</strong>. Drag the dial and watch how delay — usually spent "waiting for the MRI, the LP or the PCR" — costs temporal lobe.</p>
+          <label for="kRange">⏱️ Hours from arrival to first aciclovir dose: <b id="kVal">2</b> h</label>
+          <input type="range" id="kRange" min="0" max="48" value="2">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore how delay changes outcome.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 Within a couple of hours = ideal. Delay almost always comes from insisting on confirmation first. Start aciclovir on suspicion, THEN image, tap and await PCR.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The order set (14:26)</h3>
+        <ul>
+          <li>💉 <strong>IV aciclovir 10 mg/kg three times daily</strong> immediately (weight-based, ~840 mg/dose at 84 kg), with <strong>generous IV fluids</strong> to protect renal function; adjust dose for renal impairment.</li>
+          <li>🦠 <strong>IV ceftriaxone 2 g ± dexamethasone</strong> as empirical cover for bacterial meningitis until CSF excludes it (overlapping picture).</li>
+          <li>🧲 <strong>Urgent MRI brain</strong> (temporal-lobe signal change); CT head first if MRI delayed or herniation risk suspected before LP.</li>
+          <li>💧 <strong>LP once safe:</strong> opening pressure, cell count/differential, protein, glucose (paired serum), <strong>HSV-1/2 PCR</strong>, enterovirus/VZV PCR, and save CSF for autoimmune antibodies.</li>
+          <li>🧠 <strong>EEG</strong> — periodic lateralised epileptiform discharges (PLEDs) over the temporal region support the diagnosis and detect non-convulsive seizures.</li>
+          <li>⚡ <strong>Anti-seizure medication</strong> for the focal seizure; bloods (FBC, U&amp;E, LFTs, glucose, cultures), consider autoimmune/paraneoplastic screen (anti-NMDAR) if picture fits.</li>
+          <li>📟 Continuous monitoring, seizure precautions, neuro-obs, senior neurology + critical-care review.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Aciclovir first, then MRI, then LP, then EEG — and keep bacterial cover running until the CSF clears it. The order of the tests is negotiable; the timing of the aciclovir is not."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Resus-bay priorities — the nurse runs the safety net</h3>
+        <ul>
+          <li>💉 <strong>Get the aciclovir in the room FAST</strong> — calculate the weight-based dose, run it with fluids, and challenge any plan that sends him to MRI with the drug unprescribed. The nurse who asks "shall I start the aciclovir now?" saves temporal lobe.</li>
+          <li>💧 <strong>Generous IV hydration + monitor renal function/urine output</strong> — aciclovir can crystallise in the tubules; hydration and correct dosing prevent nephrotoxicity.</li>
+          <li>⚡ <strong>Seizure precautions</strong> — padded sides, suction and oxygen to hand, time and describe any seizure; watch for subtle non-convulsive seizures (staring, automatisms).</li>
+          <li>📟 Frequent GCS, pupils and neuro-obs — a falling GCS from cerebral oedema needs urgent escalation and re-imaging.</li>
+          <li>🛡️ Orientate and reassure a confused, frightened patient and family; a calm, low-stimulus environment reduces agitation.</li>
+          <li>🩹 Aspiration precautions post-ictally; nil by mouth until swallow is safe.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who refuses to move a suspected-encephalitis patient to the scanner before aciclovir is started is the single most effective safety barrier in the department."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Value</th><th>Interpretation</th></tr>
+          <tr><td>CSF appearance / opening pressure</td><td>Clear; mildly raised</td><td>Consistent with viral encephalitis (contrast the turbid CSF of bacterial meningitis).</td></tr>
+          <tr><td>CSF white cells</td><td class="lo">Lymphocytic pleocytosis (e.g. 80 ×10⁶/L, lymphocytes)</td><td>Viral pattern; may include red cells from the haemorrhagic/necrotising process.</td></tr>
+          <tr><td>CSF protein</td><td class="hi">Raised (e.g. 0.9 g/L)</td><td>Inflammatory; supports encephalitis.</td></tr>
+          <tr><td>CSF:serum glucose ratio</td><td class="ok-v">Normal (&gt;0.6)</td><td>Normal glucose argues AGAINST bacterial; low glucose would suggest bacterial/TB/fungal.</td></tr>
+          <tr><td>CSF HSV-1 PCR (early)</td><td class="lo">Negative at 24 h — repeat planned</td><td><strong>A negative early PCR does NOT exclude HSV.</strong> Continue aciclovir and repeat the LP in 3–7 days.</td></tr>
+          <tr><td>Bloods</td><td>Neutrophils normal/mildly raised; renal function baseline</td><td>Baseline renal function guides aciclovir dosing and monitors nephrotoxicity.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A negative early HSV PCR is a reason to REPEAT the test, not to STOP the drug. False negatives cluster in the first 72 hours — keep aciclovir running until you have truly excluded HSV."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why CSF PCR revolutionised HSE — and its early blind spot</b>CSF HSV PCR replaced brain biopsy as the diagnostic standard: highly sensitive and specific overall. But sensitivity is lower <strong>very early (first ~72 h)</strong> and after prolonged illness — so a single early negative cannot rule it out. Interpret the PCR with the MRI, EEG and clinical syndrome, and repeat it if suspicion persists.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 MRI / EEG / LP + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 MRI / EEG / LP + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🧠 The EEG — periodic lateralised epileptiform discharges (PLEDs)</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 130" preserveAspectRatio="none" aria-label="EEG showing periodic lateralised epileptiform discharges over the temporal region">
+            <rect width="820" height="130" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="32" x2="820" y2="32"/><line x1="0" y1="65" x2="820" y2="65"/><line x1="0" y1="98" x2="820" y2="98"/></g>
+            <polyline fill="none" stroke="#86efac" stroke-width="2.3" points="0,65 60,64 90,66 120,20 140,110 160,64 220,65 260,64 300,66 320,22 340,108 360,64 420,65 470,64 500,66 520,20 540,110 560,64 620,65 660,64 700,66 720,22 740,108 760,64 820,65"/>
+            <text x="120" y="16" fill="#fca5a5" font-size="11">periodic sharp complex</text>
+            <text x="500" y="16" fill="#fca5a5" font-size="11">~every 2–3 s, lateralised (temporal)</text>
+          </svg>
+          <div class="ecg-cap">Stereotyped <span style="color:#fca5a5">periodic lateralised epileptiform discharges</span> recurring every 2–3 seconds over the temporal region — a classic (though not specific) EEG signature of HSV encephalitis.</div>
+        </div>
+
+        <h3>🧲 MRI — the temporal-lobe signature</h3>
+        <table class="tbl">
+          <tr><th>Modality</th><th>Finding in HSV encephalitis</th><th>Note</th></tr>
+          <tr><td>🧲 <strong>MRI (T2/FLAIR, DWI)</strong></td><td>Hyperintensity + swelling of the <strong>medial temporal lobes, insula, orbitofrontal cortex</strong>, often asymmetric ± haemorrhage/restricted diffusion</td><td>Most sensitive imaging; may be normal very early — do NOT let a normal early MRI stop aciclovir.</td></tr>
+          <tr><td>🖥️ <strong>CT head</strong></td><td>Often normal early; later temporal-lobe hypodensity ± haemorrhage</td><td>Useful to exclude a mass/bleed before LP, but insensitive early — never a reason to withhold treatment.</td></tr>
+          <tr><td>🧠 <strong>EEG</strong></td><td>Focal temporal slowing + PLEDs; detects non-convulsive seizures</td><td>Supports localisation; complements MRI.</td></tr>
+          <tr><td>💧 <strong>LP / CSF PCR</strong></td><td>Lymphocytic pleocytosis, high protein, normal glucose; HSV PCR (repeat if early-negative)</td><td>Diagnostic gold standard — but treat before the result returns.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Bilateral, asymmetric temporal-lobe signal change on MRI in a febrile, confused, seizing adult is HSV encephalitis until proven otherwise. But a NORMAL early MRI does not exclude it — the syndrome, not the scan, starts the aciclovir."</div>
+
+        <h3>🔎 Putting the tests together</h3>
+        <ul>
+          <li><strong>MRI temporal-lobe change</strong> + <strong>EEG temporal PLEDs</strong> + <strong>lymphocytic CSF</strong> together strongly support HSE — often before the PCR confirms.</li>
+          <li>If all point to HSE but the early PCR is negative, <strong>continue aciclovir and repeat the LP</strong> — the tests can lag the disease.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The encephalitis drug map — what, why, and the traps</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>Aciclovir</strong> 10 mg/kg IV tds</td><td>Empirical first-line — start the instant HSV encephalitis is suspected</td><td>Guanosine analogue → inhibits viral DNA polymerase. Nephrotoxic (crystal nephropathy) — HYDRATE and dose-adjust for renal function. Do NOT wait for the PCR/MRI.</td></tr>
+          <tr><td><strong>Duration 14–21 days</strong></td><td>Full IV course for confirmed HSE</td><td>Under-treatment risks relapse; some units repeat CSF PCR to guide stopping.</td></tr>
+          <tr><td><strong>Ceftriaxone (± dexamethasone)</strong></td><td>Empirical cover for bacterial meningitis until excluded</td><td>The febrile confused patient may have meningoencephalitis — cover both until the CSF separates them.</td></tr>
+          <tr><td><strong>Anti-seizure medication</strong></td><td>Focal/generalised seizures</td><td>Treat seizures; EEG to detect non-convulsive status.</td></tr>
+          <tr><td><strong>IV fluids</strong></td><td>Renal protection + euvolaemia</td><td>Essential alongside aciclovir; monitor U&amp;E and urine output.</td></tr>
+          <tr><td><strong>Immunotherapy</strong> (if autoimmune)</td><td>If anti-NMDAR/autoimmune encephalitis confirmed</td><td>Steroids/IVIg/plasma exchange ± tumour removal — a different treatment paradigm (S14, S20).</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Aciclovir the moment you suspect it, weight-based, with fluids; keep it running through an early-negative PCR; treat for the full 14–21 days; and never forget the autoimmune mimic if the virology stays negative."</div>
+        <div class="callout danger"><b class="ct">🚫 The 'do not delay / do not stop' list</b>❌ Do NOT wait for MRI/LP/PCR before aciclovir · ❌ Do NOT stop aciclovir on a single early-negative PCR · ❌ Do NOT under-dose (weight-based) or forget renal-protective fluids · ❌ Do NOT forget the anti-NMDAR/autoimmune differential if HSV testing is negative.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why</h3>
+        <ul>
+          <li>🧠 <strong>Serial GCS, pupils and neuro-obs</strong> — cerebral oedema from necrotising encephalitis can raise ICP; a falling GCS demands re-imaging and critical-care escalation.</li>
+          <li>⚡ <strong>Seizure monitoring ± EEG</strong> — watch for recurrent focal seizures and non-convulsive status (unexplained persistent low GCS).</li>
+          <li>🩺 <strong>Renal function + urine output</strong> — the key aciclovir toxicity; keep well hydrated and adjust the dose.</li>
+          <li>🧪 <strong>Repeat LP / HSV PCR</strong> if the early PCR was negative and suspicion persists, and to help guide duration of therapy.</li>
+          <li>💧 <strong>Sodium / fluid balance</strong> — SIADH can complicate CNS infection and worsen oedema/seizures.</li>
+          <li>🧠 <strong>Autoimmune reassessment</strong> — if virology stays negative or a relapsing/psychiatric-movement picture emerges, send anti-NMDAR antibodies and reconsider the diagnosis.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After aciclovir is running, the monitor's questions become: is the ICP rising (GCS/pupils), are there hidden seizures (EEG), and are the kidneys tolerating the drug (U&amp;E/urine output)? Those three trends drive the next 24 hours."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong</h3>
+        <ul>
+          <li>🧠 <strong>Cerebral oedema + raised ICP / herniation</strong> — the acute killer in fulminant necrotising encephalitis.</li>
+          <li>⚡ <strong>Status epilepticus / non-convulsive seizures</strong> — from cortical irritation; may need EEG to detect.</li>
+          <li>🧩 <strong>Dense anterograde amnesia</strong> — hippocampal necrosis leaves the classic Korsakoff-like memory deficit, the commonest surviving disability.</li>
+          <li>🎭 <strong>Personality/behavioural change &amp; dysphasia</strong> — may persist as long-term sequelae.</li>
+          <li>♻️ <strong>Relapse</strong> — clinical relapse (sometimes immune-mediated, including post-HSV anti-NMDAR encephalitis) days-to-weeks after treatment.</li>
+          <li>💊 <strong>Aciclovir nephrotoxicity</strong> — preventable with hydration and correct dosing.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"HSV encephalitis kills through the ICP and disables through the hippocampus. And beware the second illness — a post-HSV anti-NMDAR relapse that returns weeks later with new psychiatric and movement symptoms."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The febrile-encephalopathy differential — brain-parenchyma first</h3>
+        <table class="tbl">
+          <tr><th>Diagnosis</th><th>Discriminators</th><th>Don't-miss action</th></tr>
+          <tr><td>🧠 <strong>HSV encephalitis</strong> (this patient)</td><td>Fever + behaviour change/dysphasia + temporal-lobe seizures; MRI temporal change; CSF lymphocytosis + HSV PCR</td><td>IV aciclovir empirically NOW; MRI/EEG/LP around the drug.</td></tr>
+          <tr><td>🦠 <strong>Bacterial meningitis</strong></td><td>Neck stiffness, photophobia, ± non-blanching rash; turbid CSF, neutrophils, low glucose</td><td>Ceftriaxone + dexamethasone; cover in parallel until CSF clears it (see companion case).</td></tr>
+          <tr><td>🧬 <strong>Autoimmune encephalitis (anti-NMDAR)</strong></td><td>Younger, often female; psychiatric prodrome, then movement disorder (orofacial dyskinesia), autonomic instability, seizures; ovarian teratoma</td><td>Antibody testing, tumour screen (ovarian teratoma), immunotherapy.</td></tr>
+          <tr><td>🩸 <strong>Other infective encephalitides</strong></td><td>VZV, enterovirus, arboviruses (travel), TB/listerial rhombencephalitis</td><td>Targeted CSF PCR/serology + travel history.</td></tr>
+          <tr><td>⚗️ <strong>Metabolic / toxic / non-convulsive status</strong></td><td>Hypoglycaemia, hyponatraemia, Wernicke, drugs; NCSE on EEG</td><td>Glucose, electrolytes, thiamine, EEG — the reversible mimics.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"When the brain misbehaves with fever, ask three things: is it VIRAL (aciclovir + temporal MRI), is it MENINGEAL/bacterial (ceftriaxone), or is it AUTOIMMUNE — young, psychiatric prodrome, movement disorder, teratoma (immunotherapy)? Cover the treatable while you test."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The First Two Hours"</h3>
+          <div class="hud"><span>❤️ Brain reserve: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">A 45-year-old with fever, confusion, personality change, dysphasia and a focal seizure. The night team says "let us wait for the MRI and the CSF HSV PCR before we commit to aciclovir — no point over-treating." What do you do?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The management plan</h3>
+        <ol>
+          <li>🧠 <strong>Diagnosis:</strong> suspected HSV-1 encephalitis (fever, temporal-lobe syndrome, focal seizure). Empirical IV aciclovir started within minutes; bacterial cover in parallel.</li>
+          <li>🧲 <strong>Confirm around the drug:</strong> MRI (temporal change), EEG (PLEDs), LP with HSV PCR — repeat LP if early PCR negative.</li>
+          <li>⚡ <strong>Treat seizures</strong>, manage ICP/oedema, protect renal function with fluids and correct aciclovir dosing.</li>
+          <li>🧬 <strong>Keep the autoimmune differential open</strong> — if virology negative or a relapsing/psychiatric-movement picture emerges, send anti-NMDAR antibodies and screen for teratoma.</li>
+          <li>🏥 Admit to HDU/ICU as needed; neurology; complete 14–21 days IV aciclovir; plan neuro-rehab for cognitive/behavioural sequelae.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The plan is one sentence: aciclovir now, cover the meninges, confirm with MRI/EEG/LP, treat the seizures, and never close the door on autoimmune encephalitis. Anything that reorders 'aciclovir' to later is the mistake."</div>
+
+        <div class="checklist" id="ckAcv">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Suspected encephalitis first-hour checklist</h3>
+          <label class="ck"><input type="checkbox"><span>💉 IV aciclovir 10 mg/kg tds started (weight-based) with generous IV fluids — before MRI/LP/PCR</span></label>
+          <label class="ck"><input type="checkbox"><span>🦠 Empirical bacterial-meningitis cover (ceftriaxone ± dexamethasone) until CSF excludes it</span></label>
+          <label class="ck"><input type="checkbox"><span>🧲 Urgent MRI brain requested (temporal lobes); CT first only if MRI delayed / herniation risk</span></label>
+          <label class="ck"><input type="checkbox"><span>💧 LP planned: cell count, protein, glucose (paired), HSV PCR + save CSF for autoimmune Ab</span></label>
+          <label class="ck"><input type="checkbox"><span>🧠 EEG requested; anti-seizure medication given for the seizure</span></label>
+          <label class="ck"><input type="checkbox"><span>🩺 Baseline + serial renal function; hydration to prevent aciclovir nephrotoxicity</span></label>
+          <label class="ck"><input type="checkbox"><span>📞 Neurology + critical-care review; seizure precautions in place</span></label>
+          <div class="ck-progress" data-progress>0 / 7 complete</div>
+        </div>
+
+        <div class="checklist" id="ckPCR">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Handling an early-negative HSV PCR</h3>
+          <label class="ck"><input type="checkbox"><span>🔁 CONTINUE aciclovir — a negative early PCR does not exclude HSV</span></label>
+          <label class="ck"><input type="checkbox"><span>🗓️ Repeat the LP / HSV PCR in 3–7 days if suspicion persists</span></label>
+          <label class="ck"><input type="checkbox"><span>🧲 Correlate with MRI (temporal change) and EEG (temporal PLEDs)</span></label>
+          <label class="ck"><input type="checkbox"><span>🧬 If virology stays negative, send anti-NMDAR antibodies + screen for teratoma</span></label>
+          <label class="ck"><input type="checkbox"><span>📝 Document the rationale for continuing empirical treatment</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">14:20</div>Arrival: fever 38.9, confusion, dysphasia, post focal seizure, GCS 13.</div>
+          <div class="t-item"><div class="t-time">14:40</div><strong>IV aciclovir 10 mg/kg started (~20 min door-to-drug)</strong> with fluids; empirical ceftriaxone added; anti-seizure medication given.</div>
+          <div class="t-item"><div class="t-time">16:10</div>MRI: left medial temporal + insular T2/FLAIR hyperintensity with swelling. EEG: left temporal PLEDs. LP: lymphocytic pleocytosis, protein 0.9 g/L, normal glucose.</div>
+          <div class="t-item"><div class="t-time">Day 1</div>Early CSF HSV PCR NEGATIVE — aciclovir CONTINUED (not stopped); repeat LP planned. Bacterial cultures negative → ceftriaxone stopped.</div>
+          <div class="t-item"><div class="t-time">Day 3</div>Repeat CSF HSV-1 PCR POSITIVE — diagnosis confirmed. Continue IV aciclovir to complete 14–21 days; neuro-rehab planned for memory/behaviour.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>His temporal lobes were largely preserved because someone started aciclovir within twenty minutes on suspicion — and, crucially, did NOT stop it when the early PCR came back negative. Treat on the syndrome; let the tests catch up.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 Recovery, rehab, and the relapse safety-net — the after-story</h3>
+        <div class="vs">
+          <div class="side a"><h4>🧠 The patient (recovering HSE)</h4><ul><li>Complete the full 14–21 day IV aciclovir course</li><li>Neuro-rehabilitation for memory, language and behaviour; neuropsychology input</li><li>Epilepsy follow-up (many need ongoing anti-seizure medication) and driving advice per local rules</li><li>Return red flags: recurrent fever, new confusion, seizures, worsening behaviour</li></ul></div>
+          <div class="side b"><h4>♻️ The relapse safety-net</h4><ul><li>Warn about post-HSV relapse — including immune-mediated <strong>anti-NMDAR encephalitis</strong> weeks later (new psychiatric/movement symptoms, dyskinesias)</li><li>Low threshold to re-investigate (repeat MRI/LP, antibody testing) if symptoms return</li><li>Clear written information for patient and family</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Surviving the acute illness is only half the story — HSV encephalitis leaves an amnestic, epileptic aftermath needing rehab, and can trigger a delayed autoimmune (anti-NMDAR) relapse. Safety-net for both before you discharge."</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>⏱️ Aciclovir cannot wait</b>Start IV aciclovir 10 mg/kg tds the moment you suspect encephalitis — before the MRI, LP or PCR. Delay costs brain and lives.</div>
+          <div class="pearl"><b>🧠 Brain vs meninges</b>Encephalitis = altered behaviour, confusion, focal signs, seizures; meningitis = neck stiffness, photophobia. Overlap? Cover both.</div>
+          <div class="pearl"><b>🧲 Temporal lobes</b>HSV-1 loves the medial temporal/orbitofrontal cortex — memory, personality, dysphasia, temporal seizures.</div>
+          <div class="pearl"><b>🔁 Negative early PCR ≠ excluded</b>False negatives cluster in the first 72 h — continue aciclovir and repeat the LP.</div>
+          <div class="pearl"><b>🖥️ Normal early scan ≠ excluded</b>Early MRI/CT can be normal; the syndrome, not the scan, starts the drug.</div>
+          <div class="pearl"><b>💧 Weight-based + hydrate</b>Dose by weight, run with fluids, monitor renal function — aciclovir can be nephrotoxic.</div>
+          <div class="pearl"><b>🗓️ 14–21 days</b>Full IV course; some units repeat CSF PCR to guide stopping and avoid relapse.</div>
+          <div class="pearl"><b>🧬 Autoimmune mimic</b>Anti-NMDAR: young, psychiatric prodrome, movement disorder, ovarian teratoma — and a post-HSV relapse.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the pathway</h3>
+          <ul>
+            <li>🧬 <strong>Post-HSV anti-NMDAR encephalitis:</strong> a well-described immune-mediated relapse weeks after HSE — new psychiatric symptoms, movement disorder and choreoathetosis, often PCR-negative; treat with immunotherapy, not more aciclovir. A key reason to keep the autoimmune door open.</li>
+            <li>🧫 <strong>Aciclovir resistance &amp; alternatives:</strong> rare thymidine-kinase-deficient HSV (mainly immunocompromised) may need foscarnet; recognise treatment failure vs immune relapse vs under-dosing.</li>
+            <li>🧠 <strong>Refractory raised ICP in necrotising encephalitis:</strong> neuro-critical-care measures, osmotherapy, and the rare role of decompressive craniectomy in fulminant temporal-lobe swelling.</li>
+            <li>💊 <strong>Adjunctive corticosteroids in HSE:</strong> biologically plausible (dampening oedema/immunopathology) and studied (e.g. the DexEnceph question) but not established standard — a live evidence gap.</li>
+            <li>🧾 <strong>Duration &amp; repeat-PCR-guided therapy:</strong> the 14–21 day standard, and protocols that repeat CSF HSV PCR at the end of treatment before stopping to reduce relapse.</li>
+            <li>🌍 <strong>The wider encephalitis differential:</strong> autoimmune (anti-NMDAR, LGI1, GABA-B), paraneoplastic, VZV vasculopathy, arboviral and, in the immunocompromised, opportunistic causes — structured antibody and PCR panels with a tumour screen where indicated.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The Aciclovir That Waited for the PCR"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 52-year-old man was admitted with two days of fever and "confusion, ?UTI." He was disinhibited and dysphasic, and a nurse noted brief arm-twitching. The plan was sensible on paper — MRI, LP, CSF HSV PCR — but the team decided to <strong>wait for the PCR result before starting aciclovir</strong> "to avoid unnecessary treatment." The LP was delayed to the next day; the PCR took another day. Aciclovir was finally started <strong>~48 hours after arrival</strong>. By then MRI showed extensive bilateral temporal-lobe necrosis. He survived with a dense, permanent amnesia and refractory temporal-lobe epilepsy — unable to return to work or live independently.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>💉 ACICLOVIR DELAYED</b>Drug withheld pending PCR — the single decision that cost his temporal lobes.</div>
+            <div class="hole"><b>🧠 ANCHORING</b>"Confusion, ?UTI" label hid a brain-parenchyma emergency.</div>
+            <div class="hole"><b>🔁 PCR MISUNDERSTOOD</b>Team believed they needed the PCR to start; it only confirms — and can be early-negative.</div>
+            <div class="hole"><b>🏥 SYSTEM DELAY</b>LP and PCR spread over two days while the drug waited.</div>
+            <div class="hole"><b>⚡ FOCAL SIGNS MISSED</b>Dysphasia + focal seizure not recognised as encephalitic red flags.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> start IV aciclovir empirically the moment encephalitis is suspected — MRI, EEG, LP and PCR are done <em>around</em> the drug, never before it; treat fever + confusion + focal signs/seizures as encephalitis, not "confusion, ?UTI"; and understand that the PCR confirms but never gates treatment, and can be falsely negative early. <strong>This is exactly the discipline that saved the patient in Bed 2 — twenty minutes to the drug, and it stayed running through an early-negative PCR.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'We will start aciclovir once the PCR is back' has destroyed more temporal lobes than the virus itself. The drug is the resuscitation — the PCR is confirmation you can afford to wait for; the treatment is not."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · 🧠 Neurology · 🚨 Emergency Department · Bed 2 — Herpes Simplex (Viral) Encephalitis<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+    /* ===== SIDEBAR TABS — show one section at a time ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not an encephalitic red flag'); } if(found===total){ flagResult.textContent='✅ All '+total+' encephalitic features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' encephalitic features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: door-to-aciclovir clock ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=(v-0)/(48-0)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<=6){ msg='🟢 '+v+' h to aciclovir. Ideal — treated on suspicion, tests done around the drug. Best survival, most temporal lobe preserved.'; cls='good'; }
+      else if(v<=12){ msg='🟠 '+v+' h. Still reasonable but slipping — usually time lost waiting for the MRI or LP. Start the drug first next time.'; cls='warn-r'; }
+      else if(v<=24){ msg='🟠 '+v+' h. Delay-to-aciclovir is an independent predictor of poor outcome — the "waiting for the PCR" trap is biting.'; cls='warn-r'; }
+      else { msg='🔴 '+v+' h. Dangerous delay — bilateral temporal necrosis, amnesia and epilepsy become likely. This is the S21 M&M error.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Time-to-Drug'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"A 45-year-old with fever, confusion, personality change, dysphasia and a focal seizure. The night team says 'let us wait for the MRI and the CSF HSV PCR before we commit to aciclovir — no point over-treating.' What do you do?",
+      choices:[
+        {t:"🧲 Wait for the MRI and CSF PCR, then start aciclovir if positive",good:false,ds:-2,dt:2880,xp:0,fb:"☠️ This is the M&M case in S21. The LP and PCR spread over two days; by the time aciclovir starts, bilateral temporal necrosis is done. Restart.",end:true},
+        {t:"💉 Start IV aciclovir 10 mg/kg tds now on suspicion, with fluids, and add bacterial cover — then arrange MRI/EEG/LP",good:true,ds:1,dt:20,xp:40,fb:"✅ Exactly. Treat on the syndrome; the tests come around the drug. You built the safety net and saved temporal lobe.",next:"pcr"},
+        {t:"💊 Start aciclovir but skip bacterial cover to 'keep it clean'",good:false,ds:0,dt:25,xp:10,fb:"⚠️ You treated the virus fast — good — but the febrile confused patient can have bacterial meningoencephalitis too. Cover both until CSF clears it.",next:"pcr"}
+      ]},
+    pcr:{ text:"Aciclovir is running. MRI shows left temporal change, EEG shows temporal PLEDs — but the Day-1 CSF HSV PCR comes back NEGATIVE. What now?",
+      choices:[
+        {t:"🔁 Continue aciclovir and repeat the LP/PCR in a few days — an early-negative PCR does not exclude HSV",good:true,ds:1,dt:10,xp:40,fb:"✅ Right. False negatives cluster in the first 72 hours; with a temporal MRI and PLEDs you keep treating and repeat the test.",next:"auto"},
+        {t:"🛑 Stop aciclovir — the PCR is negative so it is not HSV",good:false,ds:-2,dt:30,xp:0,fb:"⚠️ Dangerous. A single early-negative PCR does NOT exclude HSV. Stopping now risks devastating necrosis. Continue and repeat the LP.",next:"auto"}
+      ]},
+    auto:{ text:"The repeat PCR confirms HSV-1 and he improves on a full course. Weeks later he returns with new psychiatric symptoms and orofacial dyskinesias. What must you consider?",
+      choices:[
+        {t:"🧬 Post-HSV anti-NMDAR (autoimmune) encephalitis — send antibodies, screen for teratoma, consider immunotherapy",good:true,ds:1,dt:5,xp:45,fb:"🏆 Perfect. A post-HSV immune-mediated relapse is well described — this needs immunotherapy, not more aciclovir. You kept the autoimmune door open.",end:true},
+        {t:"🔁 Just restart aciclovir and do nothing else",good:false,ds:-1,dt:15,xp:0,fb:"⚠️ A relapsing psychiatric/movement picture after HSE is classically autoimmune (anti-NMDAR). More aciclovir alone misses it — test and treat the autoimmune process.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='auto'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 45-year-old has fever, confusion, personality change, dysphasia and a focal seizure. The single most important immediate action is:", opts:["Wait for the MRI and CSF PCR before treating","Start IV aciclovir 10 mg/kg tds empirically now","Send a urine dip and review the confusion tomorrow","Give oral aciclovir and discharge"], correct:1, exp:"Fever + a temporal-lobe syndrome + focal seizure is HSV encephalitis until proven otherwise. Start IV aciclovir 10 mg/kg tds on suspicion — the MRI, EEG, LP and PCR are done around the drug, never before it." },
+    { q:"What best distinguishes encephalitis from meningitis clinically?", opts:["Encephalitis has neck stiffness; meningitis does not","Encephalitis affects brain parenchyma (altered behaviour, confusion, focal signs, seizures); meningitis irritates the meninges (neck stiffness, photophobia)","They are identical","Only meningitis causes fever"], correct:1, exp:"Encephalitis is inflammation of the brain parenchyma — altered mentation/behaviour, focal deficits and seizures. Meningitis is meningeal irritation — headache, neck stiffness, photophobia. They overlap (meningoencephalitis), so cover both when unsure." },
+    { q:"Which brain region does HSV-1 encephalitis characteristically involve?", opts:["The cerebellum","The medial temporal and orbitofrontal cortex","The spinal cord","The occipital lobes"], correct:1, exp:"HSV-1 has a predilection for the medial temporal lobes, insula and orbitofrontal cortex — explaining memory disturbance, personality change, dysphasia and temporal-lobe seizures. MRI shows temporal-lobe signal change." },
+    { q:"The Day-1 CSF HSV PCR is negative but MRI shows temporal change and EEG shows temporal PLEDs. What should you do?", opts:["Stop aciclovir — HSV is excluded","Continue aciclovir and repeat the LP/PCR in 3–7 days","Switch to oral antivirals","Discharge the patient"], correct:1, exp:"A negative early PCR (first ~72 h) does NOT exclude HSV — false negatives are well described. With supportive MRI/EEG, continue aciclovir and repeat the LP. The PCR confirms; it does not gate treatment." },
+    { q:"What is the correct empirical treatment and typical duration for HSV encephalitis?", opts:["Oral aciclovir for 5 days","IV aciclovir 10 mg/kg three times daily for 14–21 days","A single IV dose","IV ceftriaxone only"], correct:1, exp:"IV aciclovir 10 mg/kg tds for 14–21 days is standard; shorter courses risk relapse. Dose by weight, hydrate to prevent nephrotoxicity, and some units repeat CSF PCR to guide stopping." },
+    { q:"Which EEG finding supports HSV encephalitis?", opts:["Generalised alpha rhythm","Periodic lateralised epileptiform discharges (PLEDs) over the temporal region","A completely normal EEG","Triphasic waves only"], correct:1, exp:"Temporal periodic lateralised epileptiform discharges (PLEDs) with focal temporal slowing are a classic (though not specific) EEG signature and also detect non-convulsive seizures." },
+    { q:"A young woman has a psychiatric prodrome, then orofacial dyskinesias, seizures and autonomic instability, with an ovarian teratoma. The likely diagnosis is:", opts:["HSV encephalitis","Anti-NMDAR (autoimmune) encephalitis","Bacterial meningitis","Migraine"], correct:1, exp:"Anti-NMDAR encephalitis — often young women — presents with a psychiatric prodrome, movement disorder (orofacial dyskinesia), seizures and autonomic instability, and is associated with ovarian teratoma. It needs antibody testing, tumour screen and immunotherapy — and can occur as a post-HSV relapse." },
+    { q:"Why must aciclovir be dosed by weight and given with generous fluids?", opts:["It has no side effects","Because it can crystallise in the renal tubules and cause nephrotoxicity","To improve the taste","Because it is excreted by the liver"], correct:1, exp:"Aciclovir can precipitate in the renal tubules causing crystal nephropathy. Weight-based dosing, generous IV hydration, renal-function monitoring and dose adjustment for renal impairment prevent this — but the risk never justifies withholding the drug." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you treat encephalitis like a consultant. 🏆':score>=6?'Strong — review the misses and S10 MRI/EEG/PCR.':'Revisit S4, S5 and S10 — the treat-on-suspicion logic is the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>
