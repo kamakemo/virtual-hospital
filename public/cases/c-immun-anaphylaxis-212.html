@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anaphylaxis & Hereditary Angioedema — Virtual Teaching Hospital</title>
+<!-- META
+id: c-immun-anaphylaxis-212
+title: Anaphylaxis & Hereditary Angioedema — Adrenaline First
+hospital: rheumatology
+department: rheum-immunology
+bednumber: 2
+chiefcomplaint: Urticaria, wheeze, throat tightness & hypotension minutes after a nut exposure
+system: Rheumatology & Immunology
+severity: critical
+tags: Anaphylaxis, Adrenaline, IgE, Mast cell, Angioedema, C1-INH, Bradykinin, Tryptase, Emergency
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🚨</div>
+      <div>
+        <div class="t1">Rheum & Immunology</div>
+        <div class="t2">Bed 2 · Anaphylaxis</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>Imaging / Immunology</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · 🧬 Rheumatology &amp; Immunology · 🚨 Emergency Department · 🛏️ Bed 2</div>
+        <h1>🐝 Anaphylaxis — "The One Where You Reach for Adrenaline, Not the Antihistamine"</h1>
+        <div class="sub">⚡ 13:47. A 25-year-old ate a friend's brownie, and three minutes later broke out in hives, started wheezing, and now says her throat is "closing." Her BP is 82/50. The trolley next to you has a box of chlorphenamine and hydrocortisone. Neither will save her. The adrenaline in the thigh will.</div>
+        <div class="chips">
+          <span class="chip crit">🔴 CRITICAL</span>
+          <span class="chip">💉 IM Adrenaline First</span>
+          <span class="chip">🧫 IgE / Mast Cell</span>
+          <span class="chip">🧬 vs Hereditary Angioedema</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital alert"><div class="v-label">💓 HR</div><div class="v-num">128</div></div>
+        <div class="vital alert"><div class="v-label">🩸 BP</div><div class="v-num">82/50</div></div>
+        <div class="vital warn"><div class="v-label">🌬️ RR</div><div class="v-num">28</div></div>
+        <div class="vital alert"><div class="v-label">🫁 SpO₂</div><div class="v-num">89%</div></div>
+        <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.8°</div></div>
+        <div class="vital warn"><div class="v-label">🧠 GCS</div><div class="v-num">14</div></div>
+        <div class="vital alert"><div class="v-label">😰 Airway</div><div class="v-num">Stridor</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 13:47, Resus 2</b>A young woman is sitting bolt upright, clawing at her collar, lips and tongue visibly swelling. Blotchy raised weals are spreading across her neck and chest. She rasps: <em>"I can't… my throat… it's closing."</em> Each breath is a high-pitched wheeze with audible stridor. A well-meaning nurse is drawing up chlorphenamine. This is the exact moment a preventable anaphylactic death happens — because someone gave the antihistamine and "waited to see." Not today. <strong>Adrenaline. Intramuscular. Now.</strong></div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>🧑 Name</td><td><strong>Ms. A.N.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>25-year-old female</td></tr>
+          <tr><td>🆔 MRN</td><td>RH-IMM-0212</td></tr>
+          <tr><td>⚖️ Weight</td><td>62 kg</td></tr>
+          <tr><td>💼 Occupation</td><td>Postgraduate student — at a friend's birthday lunch</td></tr>
+          <tr><td>🚫 Allergies</td><td><strong>Tree nuts (known)</strong> — one prior "mild" lip-tingling reaction, never fully worked up. No auto-injector prescribed.</td></tr>
+        </table>
+
+        <h3>📜 Past history — every line shifts the risk</h3>
+        <ul>
+          <li>🌿 <strong>Atopy:</strong> childhood eczema, allergic rhinitis, and mild <strong>asthma</strong> (uses a salbutamol inhaler occasionally). Asthma is the single biggest risk factor for a <em>fatal</em> anaphylactic reaction.</li>
+          <li>🥜 <strong>Known tree-nut allergy</strong> — but the reaction was previously mild, so it was never taken seriously. <em>Past mild reactions do NOT predict future severity.</em></li>
+          <li>💊 No regular medications. Crucially — <strong>NOT on a beta-blocker or ACE inhibitor</strong> (both change the game; see S11 &amp; S14).</li>
+          <li>👨‍👩‍👧 No family history of recurrent unexplained swelling — an important negative that helps distinguish this from hereditary angioedema (S14).</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"There is no such thing as a reliably 'mild' nut allergy. The severity of the last reaction does NOT predict the next one — the next exposure can be the fatal one."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why anaphylaxis is the immunology emergency that kills fast</b>Anaphylaxis can progress from first symptom to cardiorespiratory arrest in <strong>minutes</strong> — food reactions kill fastest through airway compromise (median ~30 min to arrest), stings and drugs through circulatory collapse (~5–15 min). Fatalities cluster around one avoidable error: <strong>delayed or omitted adrenaline</strong>. The whole case is one reflex — recognise, and inject.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 First-responder handover — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ Pre-hospital SBAR (verbatim)</b>
+          <p><strong>S:</strong> "25-year-old woman, ate a brownie with hidden walnut about 10 minutes ago. Immediate hives all over, then wheeze, now throat tightness and a hoarse voice. She feels faint."</p>
+          <p><strong>B:</strong> "Known nut allergy, asthmatic, atopic. No adrenaline auto-injector at the scene."</p>
+          <p><strong>A:</strong> "We gave one dose of IM adrenaline 500 micrograms in the thigh en route — she picked up a bit but the wheeze and swelling are creeping back. HR 128, BP 82/50, SpO₂ 89% on 15 L. Second dose due now."</p>
+          <p><strong>R:</strong> "Pre-alerted as anaphylaxis. She is frightened, tugging at her throat. Bring her straight to Resus."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A response to the first adrenaline that then fades is NOT a cure — it is your cue to repeat the dose after 5 minutes and prepare for refractory anaphylaxis. Adrenaline wears off; the reaction may not."</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each feature that says "anaphylaxis, give adrenaline"</h3>
+        <p>🎮 <em>Click every feature that RAISES the probability of true anaphylaxis needing adrenaline. Each correct = +10 XP.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">⏱️ Onset within minutes of a nut exposure</button>
+          <button class="btn ghost flag-btn" data-good="1">🌬️ Wheeze + stridor + throat tightness (Airway/Breathing)</button>
+          <button class="btn ghost flag-btn" data-good="1">🩸 BP 82/50 — hypotension (Circulation)</button>
+          <button class="btn ghost flag-btn" data-good="1">🐝 Widespread urticaria &amp; angioedema</button>
+          <button class="btn ghost flag-btn" data-good="1">😱 Sense of impending doom</button>
+          <button class="btn ghost flag-btn" data-good="0">🌡️ Temperature 36.8°C</button>
+          <button class="btn ghost flag-btn" data-good="0">🐌 Painless facial swelling creeping over 2 days, no itch</button>
+          <button class="btn ghost flag-btn" data-good="0">💊 "Let's just try the chlorphenamine first"</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Praise where due</b>The crew got the essentials right: <strong>IM adrenaline into the anterolateral thigh, high-flow oxygen, a pre-alert, and a plan to repeat</strong>. That single injection is the intervention with the clearest mortality benefit in the whole event — antihistamines and steroids do not save airways.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🅰️🅱️🅲️ Primary survey — anaphylaxis is an ABC diagnosis</h3>
+        <table class="tbl">
+          <tr><th>Step</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>🅰️ Airway</td><td>Hoarse voice, tongue &amp; lip swelling, <strong>stridor</strong>, sensation of throat closing.</td><td>Laryngeal oedema is the food-anaphylaxis killer. Stridor = imminent airway loss → adrenaline now, call anaesthetics/ENT early for a potential difficult airway.</td></tr>
+          <tr><td>🅱️ Breathing</td><td>RR 28, <strong>widespread wheeze</strong>, SpO₂ 89% on high-flow O₂, accessory muscle use.</td><td>Bronchospasm + mucus. Her asthma amplifies this and raises fatal risk. High-flow O₂ + adrenaline (± nebulised bronchodilator as adjunct).</td></tr>
+          <tr><td>🅲️ Circulation</td><td>HR 128, <strong>BP 82/50</strong>, cool clammy peripheries, faint.</td><td>Massive mast-cell mediator release → vasodilation + capillary leak (up to 35% of plasma volume can shift in minutes) → distributive shock. Needs adrenaline + IV fluid bolus + legs up.</td></tr>
+          <tr><td>🅳 Disability</td><td>GCS 14, anxious, "sense of impending doom".</td><td>Falling conscious level = cerebral hypoperfusion / hypoxia — a late, ominous sign.</td></tr>
+          <tr><td>🅴 Exposure</td><td>Confluent <strong>urticarial weals</strong> and flushing over trunk and limbs; peri-orbital angioedema.</td><td>Skin/mucosal changes are present in ~80–90% of anaphylaxis — helpful when present, but their ABSENCE does NOT exclude it.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Anaphylaxis = ACUTE ONSET + life-threatening Airway and/or Breathing and/or Circulation problem, usually (not always) with skin/mucosal changes. If A, B or C is threatened after an exposure — that IS anaphylaxis. Inject."</div>
+
+        <h3>🧭 The diagnosis is CLINICAL — do not wait for a test</h3>
+        <p>There is <strong>no blood test that diagnoses anaphylaxis in real time</strong>. Tryptase is drawn to <em>confirm retrospectively</em>, never to decide treatment. The bedside definition (acute onset + ABC compromise ± skin changes) is all you need to justify adrenaline. Hesitating for a test, a second opinion, or "to see if the antihistamine works" is how people die.</p>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of "but there's no rash"</b>Up to <strong>1 in 5 anaphylaxis cases have NO skin signs</strong> — especially rapidly progressive ones and those already in shock (skin is under-perfused). Isolated collapse or isolated stridor after an exposure is still anaphylaxis. Do not let a normal-looking skin exam talk you out of the adrenaline.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The medical resident thinks out loud at 13:49:</em></p>
+        <h3>🧠 Frame it as one reflex, not a differential</h3>
+        <p>"Acute onset after a nut, threatened airway, wheeze, and shock — this is textbook anaphylaxis. My first action is not a history and not a cannula — it is <strong>IM adrenaline 500 micrograms into the anterolateral thigh</strong>, repeated after 5 minutes if she does not improve. THEN oxygen, lie her flat with legs raised, two large-bore cannulae and a fluid bolus. Antihistamine and steroid are afterthoughts, not treatments for the airway."</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>💉 <strong>IM adrenaline 0.5 mg (0.5 mL of 1:1000) anterolateral thigh</strong> — repeat every 5 min if no improvement. This is step one, before anything else.</li>
+          <li>🛬 <strong>Position:</strong> lie flat with legs elevated (sit up only if breathing is the dominant problem; keep flat if hypotensive). <strong>Never let her stand or sit up suddenly.</strong></li>
+          <li>🫁 <strong>High-flow oxygen</strong> 15 L via non-rebreathe; nebulised salbutamol/adrenaline as an adjunct for bronchospasm.</li>
+          <li>💧 <strong>IV crystalloid bolus</strong> (e.g. 500–1000 mL rapidly, titrated) for hypotension; large-bore access ×2.</li>
+          <li>📞 <strong>Call for help early:</strong> anaesthetics/ICU for the airway, and think ahead to refractory anaphylaxis (adrenaline infusion).</li>
+          <li>💊 Antihistamine and steroid ONLY after the emergency is controlled — and never instead of adrenaline.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The right first drug in anaphylaxis is adrenaline, the right route is intramuscular, and the right site is the anterolateral thigh. IV adrenaline boluses on the ward cause arrhythmias and death — save the IV route for the ICU infusion."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>The intern reaches for IV adrenaline "because she's shocked." Should she give an IV bolus of 1:1000 on the resus trolley?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No — that can kill her.</strong> The out-of-hospital / ward route is <em>intramuscular</em> 1:1000. IV adrenaline is reserved for <strong>refractory anaphylaxis</strong>, given as a carefully titrated <strong>infusion</strong> (or tiny 20–50 microgram aliquots of 1:100,000) by someone experienced with cardiac monitoring. An IV bolus of concentrated adrenaline causes severe hypertension, myocardial ischaemia and malignant arrhythmias. <strong>IM thigh first, every time.</strong></p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The immunology/EM consultant at the bedside, 13:55:</em></p>
+        <h3>💉 The adrenaline numbers you must know cold</h3>
+        <table class="tbl">
+          <tr><th>Age band</th><th>IM adrenaline dose (1:1000)</th><th>Volume</th></tr>
+          <tr><td><strong>Adult &amp; child &gt;12 yr</strong></td><td class="hi">500 micrograms (0.5 mg)</td><td>0.5 mL</td></tr>
+          <tr><td>Child 6–12 yr</td><td>300 micrograms</td><td>0.3 mL</td></tr>
+          <tr><td>Child 6 months–6 yr</td><td>150 micrograms</td><td>0.15 mL</td></tr>
+          <tr><td>Infant &lt;6 months</td><td>100–150 micrograms</td><td>0.1–0.15 mL</td></tr>
+          <tr><td><strong>Repeat</strong></td><td colspan="2" class="hi">Same dose IM after 5 minutes if no improvement</td></tr>
+        </table>
+        <p>Our 25-year-old gets <strong>500 micrograms (0.5 mL of 1:1000) IM into the anterolateral thigh</strong>, repeated at 5 minutes. She has already had one pre-hospital dose that faded — so a second IM dose goes in <em>now</em>, and if a third is needed she meets the definition of <strong>refractory anaphylaxis</strong> → adrenaline infusion + ICU.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"0.5 mg IM = 0.5 mL of 1:1000 in the adult thigh, repeat at 5 minutes. Two-plus doses with no improvement = refractory anaphylaxis: start an adrenaline infusion, give more fluid, and get the patient to ICU."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> Resuscitation Council UK 2021 / WAO / EAACI</td><td>IM adrenaline is first-line; antihistamines &amp; steroids are downgraded and NOT for initial resuscitation.</td><td>Adrenaline first, every time; do not lead with chlorphenamine or hydrocortisone.</td></tr>
+            <tr><td><span class="lvl">PHARMACOKINETIC</span> Simons IM-vs-SC studies</td><td>IM into the thigh (vastus lateralis) gives faster, higher peak plasma adrenaline than SC or IM deltoid.</td><td>Anterolateral thigh is the site; never subcutaneous, never the arm.</td></tr>
+            <tr><td><span class="lvl">COHORT</span> Fatal-anaphylaxis registries (Pumphrey; Bock)</td><td>Deaths correlate with delayed/absent adrenaline; upright posture linked to fatal "empty ventricle" collapse.</td><td>Inject early; keep the shocked patient flat with legs raised.</td></tr>
+            <tr><td><span class="lvl">RCT/REVIEW</span> Cochrane: steroids in anaphylaxis</td><td>No good evidence steroids prevent biphasic reactions or change outcome; routine use is falling out of favour.</td><td>Do not rely on steroids to prevent the second phase — observe instead.</td></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> HAE (WAO/EAACI): C1-INH concentrate / icatibant</td><td>Bradykinin-mediated angioedema responds to C1-INH replacement or a bradykinin B2-receptor antagonist, NOT adrenaline.</td><td>If it is HAE/ACE-i angioedema, adrenaline/antihistamine/steroid will fail — reach for C1-INH or icatibant.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The death that haunts our M&amp;M was a teenager given hydrocortisone and chlorphenamine while the adrenaline sat in a locked cupboard. Everyone was 'treating the allergy.' Nobody treated the airway. She arrested before the adrenaline ever left the drawer."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY the crisis (the WHY behind the WHY)</h3>
+        <ol>
+          <li>🧫 <strong>Sensitisation (first exposure):</strong> the allergen (nut protein) is presented to T-helper cells → B cells class-switch and make <strong>allergen-specific IgE</strong>, which coats mast cells and basophils via high-affinity <strong>FcεRI</strong> receptors. This first hit is silent.</li>
+          <li>🔗 <strong>Re-exposure &amp; cross-linking:</strong> the allergen bridges two adjacent IgE molecules on the mast-cell surface. This <strong>cross-linking</strong> is the trigger that flips the switch.</li>
+          <li>💥 <strong>Degranulation:</strong> mast cells explosively release <strong>histamine, tryptase, prostaglandins, leukotrienes and platelet-activating factor</strong>. Preformed mediators act in seconds; newly synthesised ones sustain and amplify.</li>
+          <li>🌊 <strong>The systemic effects:</strong> histamine &amp; leukotrienes → <strong>vasodilation</strong> (flushing, hypotension), <strong>capillary leak</strong> (angioedema, distributive shock), <strong>bronchoconstriction</strong> (wheeze) and <strong>increased mucus</strong>. A vicious cycle: hypoperfusion → hypoxia → more mediator release → more collapse.</li>
+        </ol>
+        <p>💡 Adrenaline reverses every arm of this at once: <strong>α1</strong> → vasoconstriction (reverses hypotension &amp; mucosal oedema), <strong>β1</strong> → inotropy/chronotropy, <strong>β2</strong> → bronchodilation AND stabilises mast cells to switch off further degranulation. No other drug touches all four.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Antihistamines block ONE mediator (histamine) at ONE receptor, arriving late. Adrenaline reverses the vasodilation, the leak, the bronchospasm AND stops the mast cell — that is why it is the drug and they are not."</div>
+
+        <h3>⚖️ Contrast pair — Anaphylaxis vs Hereditary Angioedema</h3>
+        <div class="vs">
+          <div class="side a"><h4>🐝 Anaphylaxis (mast cell / histamine)</h4><ul><li>IgE-mediated mast-cell degranulation, <strong>histamine</strong></li><li><strong>Urticaria + itch</strong>, wheeze, shock; onset in minutes</li><li><strong>RESPONDS to adrenaline</strong> — that is the treatment</li></ul></div>
+          <div class="side b"><h4>🧬 Hereditary Angioedema (bradykinin)</h4><ul><li>C1-esterase inhibitor deficiency, <strong>bradykinin</strong></li><li><strong>NO urticaria, NO itch</strong>; family history; recurrent; slower over hours</li><li><strong>Does NOT respond to adrenaline/antihistamine/steroid</strong> — needs C1-INH or icatibant</li></ul></div>
+        </div>
+        <p>💡 Same-looking swollen lip, completely different disease and drug cupboard. The presence of <em>itchy hives</em> and the <em>speed</em> point to histamine; a <em>painless, non-itchy, recurrent, familial</em> swelling points to bradykinin.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The "Time-to-Adrenaline" Dial</h3>
+          <p style="font-size:13px">Anaphylaxis kills on a clock. Drag the dial to set how many minutes pass before the first IM adrenaline is given, and watch the outcome change. Earlier is everything.</p>
+          <label for="kRange">⏱️ Minutes from onset to first IM adrenaline: <b id="kVal">0</b> min</label>
+          <input type="range" id="kRange" min="0" max="30" value="0">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to see how delay drives outcome.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 Prompt IM adrenaline aborts the reaction. Every minute of delay — reaching for the antihistamine, "waiting to see", drawing up an IV — lets the airway and circulation slide toward arrest.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The order set (13:48)</h3>
+        <ul>
+          <li>💉 <strong>IM adrenaline 500 micrograms (0.5 mL of 1:1000) anterolateral thigh — NOW</strong>; repeat every 5 min if no improvement.</li>
+          <li>🛬 <strong>Position:</strong> lie flat, legs elevated (sit up only if breathing dominates; do NOT stand or sit up suddenly).</li>
+          <li>🫁 <strong>High-flow oxygen</strong> 15 L non-rebreathe; nebulised salbutamol ± nebulised adrenaline for bronchospasm/stridor.</li>
+          <li>💧 <strong>IV crystalloid bolus</strong> 500–1000 mL stat, repeat/titrate to BP; two large-bore cannulae.</li>
+          <li>📞 <strong>Call anaesthetics/ICU early</strong> for airway and for possible <strong>adrenaline infusion</strong> (refractory anaphylaxis).</li>
+          <li>🩸 <strong>Serial mast-cell tryptase</strong>: at presentation (once treatment underway), at 1–2 h, and a baseline at ≥24 h (or in clinic).</li>
+          <li>💊 <strong>Adjuncts AFTER the emergency:</strong> non-sedating antihistamine for skin symptoms; steroids are no longer routine (do NOT delay adrenaline for either).</li>
+          <li>🧾 If NOT responding to adrenaline and NO urticaria/itch → <strong>reconsider bradykinin angioedema</strong> (HAE / ACE-inhibitor) → C1-INH concentrate or icatibant.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The order that saves the life takes ten seconds to give and needs no result to justify it: adrenaline, IM, thigh, now. Everything else on the list supports that one line."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Resus-bay priorities — the nurse guards the airway and the clock</h3>
+        <ul>
+          <li>💉 <strong>Draw up and be ready to give IM adrenaline immediately</strong>; know where the auto-injector / 1:1000 ampoules live — locked-away adrenaline has killed patients.</li>
+          <li>🛬 <strong>Keep her flat with legs raised</strong>; do NOT let her stand, walk to a chair, or sit up suddenly — sudden upright posture in a vasodilated patient can cause fatal "empty-ventricle" arrest.</li>
+          <li>⏱️ <strong>Time-stamp every adrenaline dose</strong> and prompt the team at 5 minutes for a repeat if no improvement. Nurses run the 5-minute clock.</li>
+          <li>📟 Continuous monitoring — SpO₂, ECG, non-invasive BP; watch for arrhythmia if IV adrenaline is used.</li>
+          <li>🩸 Cannulate ×2, run the fluid bolus, and draw the <strong>tryptase samples at the right times</strong> (presentation, 1–2 h, baseline ≥24 h) — the timing is the whole value of the test.</li>
+          <li>🧾 Keep her informed and calm; document the trigger, timings, and every intervention. Plan for the <strong>observation period</strong> — biphasic reactions can recur hours later.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who keeps the patient flat and pushes for the 5-minute repeat dose is doing the two things most likely to prevent an anaphylactic death."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board — remember: you treat BEFORE any of this returns</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Value</th><th>Interpretation</th></tr>
+          <tr><td>Mast-cell tryptase (presentation)</td><td class="hi">24 µg/L</td><td><strong>Elevated</strong> — supports mast-cell activation. Peaks ~1–2 h after onset.</td></tr>
+          <tr><td>Mast-cell tryptase (baseline, day 2)</td><td class="ok-v">4 µg/L</td><td>A dynamic rise then fall to normal <strong>confirms anaphylaxis retrospectively</strong>. A persistently raised baseline → screen for mastocytosis.</td></tr>
+          <tr><td>C1 esterase inhibitor (level &amp; function)</td><td class="ok-v">Normal</td><td>Correctly checked to EXCLUDE hereditary angioedema — normal here, consistent with mast-cell anaphylaxis.</td></tr>
+          <tr><td>Venous gas / lactate</td><td class="hi">Lactate 3.8</td><td>Reflects hypoperfusion from distributive shock; should clear with adrenaline + fluids.</td></tr>
+          <tr><td>ECG</td><td>Sinus tachycardia</td><td>Baseline; watch for ischaemia/arrhythmia especially if IV adrenaline used.</td></tr>
+          <tr><td>Specific IgE / skin-prick (allergy clinic)</td><td>Deferred</td><td>Done LATER in clinic (not acutely) to confirm the trigger and guide avoidance.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Tryptase confirms the story after the fact — it never decides the treatment. A normal tryptase does NOT exclude anaphylaxis (it can be normal, especially in food reactions). Treat the patient, not the tube."</div>
+
+        <div class="callout info"><b class="ct">🧠 How to use tryptase properly — the 3-sample rule</b>Draw it (1) as soon as feasible after resuscitation has begun, (2) at 1–2 hours (the peak), and (3) a baseline at ≥24 hours or in clinic. It is the <em>dynamic rise-and-fall</em> that confirms mast-cell degranulation. A high, unchanging baseline hints at underlying <strong>mastocytosis / hereditary alpha-tryptasaemia</strong>, a risk factor for severe reactions.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 IMAGING / IMMUNOLOGY + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 Imaging / Immunology Labs + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>📉 The tryptase curve — read it like a movie</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Serum tryptase rising after onset then falling to baseline over 24 hours">
+            <rect width="820" height="150" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="40" x2="820" y2="40"/><line x1="0" y1="80" x2="820" y2="80"/><line x1="0" y1="120" x2="820" y2="120"/></g>
+            <line x1="0" y1="120" x2="820" y2="120" stroke="#334155" stroke-width="1.5"/>
+            <polyline fill="none" stroke="#fca5a5" stroke-width="2.6" points="0,118 120,118 200,60 300,38 420,66 560,102 700,116 820,118"/>
+            <line x1="0" y1="118" x2="820" y2="118" stroke="#22c55e" stroke-width="1.4" stroke-dasharray="6 5"/>
+            <text x="150" y="30" fill="#fca5a5" font-size="12">Peak tryptase ~1–2 h</text>
+            <text x="590" y="112" fill="#86efac" font-size="12">Returns to baseline by 24 h</text>
+            <text x="10" y="135" fill="#93c5fd" font-size="11">onset</text>
+          </svg>
+          <div class="ecg-cap">The <span style="color:#fca5a5">tryptase</span> rises to a peak around 1–2 hours, then falls back to the <span style="color:#86efac">baseline</span> by ~24 hours. It is the RISE-AND-FALL, sampled at the right times, that confirms anaphylaxis — not any single value.</div>
+        </div>
+
+        <h3>🔎 The bradykinin angioedema patterns you must know cold (they do NOT itch)</h3>
+        <table class="tbl">
+          <tr><th>Pattern</th><th>Look for</th><th>Meaning / action</th></tr>
+          <tr><td>🧬 <strong>Hereditary angioedema (HAE)</strong></td><td>Recurrent painless non-itchy swelling, family history, abdominal attacks, NO urticaria; low C4</td><td>C1-INH deficiency (types 1/2). Treat with <strong>C1-INH concentrate</strong> or <strong>icatibant</strong>; adrenaline will fail.</td></tr>
+          <tr><td>💊 <strong>ACE-inhibitor angioedema</strong></td><td>Tongue/lip/laryngeal swelling in someone on an ACE inhibitor; can start months–years after starting; NO urticaria</td><td>Bradykinin accumulation. STOP the ACE inhibitor; supportive airway; icatibant/C1-INH considered.</td></tr>
+          <tr><td>🌀 <strong>Acquired C1-INH deficiency</strong></td><td>Late-onset (older adults), no family history; associated with lymphoproliferative/autoimmune disease; low C1q</td><td>Same bradykinin mechanism; treat the underlying disorder + acute bradykinin therapy.</td></tr>
+          <tr><td>🐝 <strong>Allergic (histaminergic) angioedema</strong></td><td>WITH urticaria &amp; itch, rapid onset after a trigger</td><td>Part of the anaphylaxis spectrum — <strong>this one DOES respond to adrenaline/antihistamine</strong>.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Itchy, hivey, fast, adrenaline-responsive = histamine. Non-itchy, recurrent, familial or ACE-inhibitor, adrenaline-resistant = bradykinin. Reading which one you are looking at chooses the drug that works."</div>
+
+        <h3>🩻 Adjunct assessment</h3>
+        <ul>
+          <li><strong>Airway assessment (nasendoscopy by ENT/anaesthetics):</strong> to gauge laryngeal oedema and plan a definitive airway if needed.</li>
+          <li><strong>Complement panel (C4, C1-INH level &amp; function, C1q):</strong> the immunology workup that separates the bradykinin causes when angioedema recurs without urticaria.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The anaphylaxis drug map — what, why, and the traps</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>Adrenaline 0.5 mg IM (1:1000)</strong></td><td><strong>FIRST-LINE, for everyone</strong> — repeat at 5 min</td><td>α1 vasoconstriction, β1 inotropy, β2 bronchodilation + mast-cell stabilisation. Anterolateral thigh. Never IV bolus on the ward.</td></tr>
+          <tr><td><strong>Oxygen</strong> (high-flow 15 L)</td><td>All patients</td><td>Corrects hypoxia from bronchospasm &amp; shock.</td></tr>
+          <tr><td><strong>IV crystalloid bolus</strong></td><td>Hypotension / shock</td><td>Refills the leaking, dilated circulation. Titrate to BP; large volumes may be needed.</td></tr>
+          <tr><td><strong>Adrenaline INFUSION</strong> (IV, titrated)</td><td><strong>Refractory anaphylaxis</strong> (≥2 IM doses, still unwell)</td><td>ICU-level care with continuous cardiac monitoring; NOT a ward bolus.</td></tr>
+          <tr><td><strong>Glucagon</strong> 1–2 mg IV</td><td>Patient on a <strong>beta-blocker</strong> not responding to adrenaline</td><td>Bypasses the beta-receptor to raise cAMP directly — restores response when β-blockade blunts adrenaline.</td></tr>
+          <tr><td><strong>Nebulised salbutamol / adrenaline</strong></td><td>Adjunct for bronchospasm / upper-airway oedema</td><td>Supports, never replaces, IM adrenaline.</td></tr>
+          <tr><td><strong>Antihistamine</strong> (e.g. cetirizine)</td><td>AFTER stabilisation — skin symptoms only</td><td>Treats itch/urticaria; does NOTHING for airway or shock. Not a resuscitation drug.</td></tr>
+          <tr><td><strong>Corticosteroid</strong></td><td>No longer routine</td><td>Slow onset; evidence does not support preventing biphasic reactions. Never delay adrenaline for it.</td></tr>
+          <tr><td><strong>C1-INH concentrate / icatibant</strong></td><td><strong>Bradykinin angioedema</strong> (HAE / ACE-i)</td><td>For the adrenaline-RESISTANT angioedema — the wrong-diagnosis rescue (see S14).</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Adrenaline for everyone; fluids and oxygen alongside; glucagon if a beta-blocker is blocking your adrenaline; and C1-INH/icatibant the moment you realise the 'anaphylaxis' is actually bradykinin."</div>
+        <div class="callout danger"><b class="ct">🚫 The 'never do this' list</b>❌ Do NOT give antihistamine or steroid <em>instead of</em> or <em>before</em> adrenaline · ❌ Do NOT give IV adrenaline boluses on the ward/resus trolley · ❌ Do NOT sit a hypotensive patient up or let them stand · ❌ Do NOT keep giving adrenaline to a non-itchy, adrenaline-resistant angioedema — it is bradykinin, reach for C1-INH/icatibant.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why</h3>
+        <ul>
+          <li>🌬️ <strong>Airway &amp; work of breathing continuously</strong> — the food-anaphylaxis killer is laryngeal oedema; a rising stridor or falling voice means the airway is closing.</li>
+          <li>🩸 <strong>BP &amp; HR every few minutes</strong> — response to adrenaline and fluids; persistent hypotension = refractory reaction → infusion + ICU.</li>
+          <li>🫁 <strong>SpO₂ and RR</strong> — bronchospasm resolution; her asthma makes this the second front.</li>
+          <li>📈 <strong>Continuous ECG</strong> — especially if IV adrenaline is used (ischaemia, arrhythmia).</li>
+          <li>⏱️ <strong>The 5-minute clock</strong> — every IM dose triggers a reassessment at 5 min for a repeat.</li>
+          <li>🕐 <strong>The observation period</strong> — plan the monitored watch for a <strong>biphasic reaction</strong> (see S13); severity of the first phase and need for repeat adrenaline guide how long.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After the first adrenaline, the monitor's question changes from 'is this anaphylaxis?' to 'is she responding, and will it come back?' — the answers are the airway, the blood pressure, and the clock."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong</h3>
+        <ul>
+          <li>🌬️ <strong>Complete airway obstruction</strong> from laryngeal oedema — the commonest cause of anaphylactic death; may need emergency intubation or a surgical airway.</li>
+          <li>🩸 <strong>Refractory anaphylaxis / cardiovascular collapse</strong> — not responding to ≥2 IM doses → adrenaline infusion, aggressive fluids, ICU; consider glucagon if beta-blocked.</li>
+          <li>🔁 <strong>Biphasic reaction</strong> — symptoms recur (typically within 1–12 h, occasionally up to 72 h) after apparent resolution, WITHOUT re-exposure. This is why we observe.</li>
+          <li>💔 <strong>Kounis syndrome</strong> — allergic acute coronary syndrome (coronary spasm/thrombosis from mast-cell mediators); and adrenaline-related myocardial ischaemia/arrhythmia.</li>
+          <li>🧠 <strong>Hypoxic-ischaemic brain injury / arrest</strong> from prolonged shock or airway loss.</li>
+          <li>🩹 <strong>The system complication:</strong> discharge without an adrenaline auto-injector, an allergy referral, or a plan — leaving the patient primed for a fatal repeat.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Two enemies come AFTER you think it is over: the biphasic reaction hours later, and the discharge with no auto-injector. Anticipate both, or the save unravels at home."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The swelling / collapse differential — the wrong diagnosis chooses the wrong drug</h3>
+        <table class="tbl">
+          <tr><th>Diagnosis</th><th>Discriminators</th><th>Don't-miss action</th></tr>
+          <tr><td>🐝 <strong>Anaphylaxis</strong> (this patient)</td><td>Acute onset post-exposure, urticaria + itch, wheeze, hypotension, ABC threatened</td><td>IM adrenaline now; fluids, O₂, flat with legs up.</td></tr>
+          <tr><td>🧬 <strong>Hereditary angioedema (C1-INH deficiency)</strong></td><td>Recurrent, painless, NON-itchy swelling; family history; abdominal attacks; low C4; NO urticaria</td><td>C1-INH concentrate or icatibant — <strong>adrenaline/antihistamine/steroid do NOT work</strong>.</td></tr>
+          <tr><td>💊 <strong>ACE-inhibitor angioedema</strong></td><td>On an ACE inhibitor; tongue/laryngeal swelling; NO urticaria; bradykinin-mediated</td><td>Stop the ACE inhibitor; secure airway; icatibant/C1-INH considered.</td></tr>
+          <tr><td>😮‍💨 <strong>Severe asthma attack</strong></td><td>Wheeze &amp; dyspnoea WITHOUT urticaria, angioedema or a clear trigger</td><td>Bronchodilators/steroids — but if any doubt with an exposure, treat as anaphylaxis.</td></tr>
+          <tr><td>😳 <strong>Vasovagal syncope / panic</strong></td><td>Bradycardia + pallor (vagal) or tingling + hyperventilation (panic); no airway/skin signs</td><td>Reassure, lie flat — but never mislabel true anaphylaxis as "just anxiety".</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Ask three questions of every swollen airway: is it ITCHY (histamine → adrenaline), is there a FAMILY history or ACE inhibitor (bradykinin → C1-INH/icatibant), and is it RECURRENT without hives (bradykinin again)? The itch and the family tree pick the drug."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The First Five Minutes"</h3>
+          <div class="hud"><span>❤️ Stability: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">A 25-year-old with a known nut allergy has hives, wheeze, throat tightness and BP 82/50, three minutes after eating a walnut brownie. A nurse is holding a syringe of chlorphenamine and a vial of hydrocortisone, asking which to give first. What do you do?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The management plan</h3>
+        <ol>
+          <li>🐝 <strong>Diagnosis:</strong> anaphylaxis (acute onset post-nut, ABC compromise, urticaria). Treat first, confirm with serial tryptase later.</li>
+          <li>💉 <strong>IM adrenaline</strong> given and repeated at 5 min; second pre-hospital-plus-ED dose controlled the airway and BP; ready to escalate to an infusion if it recurs.</li>
+          <li>💧 O₂ + fluid bolus + flat with legs raised → BP recovers; nebulised bronchodilator for residual wheeze.</li>
+          <li>🕐 <strong>Observe</strong> for a biphasic reaction on a monitored bed; then <strong>discharge with a plan</strong>: two adrenaline auto-injectors + training, written emergency plan, allergy-clinic referral, serial tryptase arranged.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Anaphylaxis is not finished when the hives fade — it is finished when the patient leaves with two auto-injectors, a written plan, and an allergy appointment. Treatment includes preventing the next one."</div>
+
+        <div class="checklist" id="ckACS">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Anaphylaxis resuscitation checklist (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>💉 IM adrenaline 0.5 mg (0.5 mL 1:1000) anterolateral thigh given — and repeated at 5 min if no improvement</span></label>
+          <label class="ck"><input type="checkbox"><span>🛬 Patient lying flat with legs raised (or sitting only if breathing is dominant); NOT stood up</span></label>
+          <label class="ck"><input type="checkbox"><span>🫁 High-flow oxygen applied; airway team (anaesthetics/ENT) called early</span></label>
+          <label class="ck"><input type="checkbox"><span>💧 Two large-bore cannulae; IV crystalloid bolus running, titrated to BP</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 Serial mast-cell tryptase drawn (presentation, 1–2 h, baseline ≥24 h)</span></label>
+          <label class="ck"><input type="checkbox"><span>🕐 Monitored observation planned for biphasic reaction</span></label>
+          <label class="ck"><input type="checkbox"><span>🏠 Two auto-injectors + training + written plan + allergy referral before discharge</span></label>
+          <div class="ck-progress" data-progress>0 / 7 complete</div>
+        </div>
+
+        <div class="checklist" id="ckSTEMI">
+          <h3 style="margin-top:0">🩺 Procedure Guide — If it is REFRACTORY or actually BRADYKININ angioedema</h3>
+          <label class="ck"><input type="checkbox"><span>🔁 No improvement after ≥2 IM doses → declare refractory anaphylaxis</span></label>
+          <label class="ck"><input type="checkbox"><span>💉 Start IV adrenaline INFUSION with continuous monitoring; ICU involved</span></label>
+          <label class="ck"><input type="checkbox"><span>🧪 If on a beta-blocker &amp; not responding → give IV glucagon 1–2 mg</span></label>
+          <label class="ck"><input type="checkbox"><span>🧬 If NO urticaria/itch &amp; adrenaline-resistant → reconsider bradykinin (HAE / ACE-i) → C1-INH concentrate or icatibant</span></label>
+          <label class="ck"><input type="checkbox"><span>🌬️ Secure a definitive airway early if laryngeal oedema is progressing</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">13:37</div>Ate a brownie with hidden walnut; hives, wheeze and throat tightness within 3 minutes.</div>
+          <div class="t-item"><div class="t-time">13:44</div>Crew gives IM adrenaline 500 mcg in the thigh + high-flow O₂; partial improvement, then symptoms creep back.</div>
+          <div class="t-item"><div class="t-time">13:48</div>Resus: second IM adrenaline, lie flat with legs raised, fluid bolus; anaesthetics at bedside. Airway holds.</div>
+          <div class="t-item"><div class="t-time">14:05</div>BP 108/68, SpO₂ 96%, wheeze settling. Tryptase drawn (24 µg/L). Non-sedating antihistamine for residual hives.</div>
+          <div class="t-item"><div class="t-time">14:20–20:20</div>Monitored observation for a biphasic reaction — none. Baseline tryptase falls to 4 µg/L, confirming anaphylaxis. C1-INH normal (HAE excluded).</div>
+          <div class="t-item"><div class="t-time">Discharge</div>Two adrenaline auto-injectors + training, written emergency plan, allergy-clinic referral, GP letter.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>She is alive because someone reached past the antihistamine for the adrenaline, kept her flat, and repeated the dose. Simple, disciplined, and exactly what the M&amp;M patient in S21 never got.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 Two very different discharges — anaphylaxis vs hereditary angioedema</h3>
+        <div class="vs">
+          <div class="side a"><h4>🐝 This patient (anaphylaxis)</h4><ul><li><strong>Two adrenaline auto-injectors</strong> + hands-on training; carry at all times</li><li>Written personalised anaphylaxis emergency plan; allergen avoidance advice</li><li><strong>Allergy-clinic referral</strong> to confirm the trigger (specific IgE/skin-prick) and baseline tryptase</li><li>Red flags: any airway/breathing/circulation symptom after exposure → auto-injector + 999</li><li>Asthma optimised (asthma worsens outcomes)</li></ul></div>
+          <div class="side b"><h4>🧬 If it had been hereditary angioedema</h4><ul><li>NO role for auto-injector adrenaline — it does not work</li><li>Immunology follow-up; confirm with C4, C1-INH level &amp; function</li><li><strong>On-demand C1-INH / icatibant</strong> for attacks; consider prophylaxis</li><li>Avoid ACE inhibitors and oestrogens; family screening</li><li>Written plan for bradykinin-specific rescue therapy</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Never discharge anaphylaxis without an auto-injector, a plan, and an allergy referral — and never discharge recurrent non-itchy angioedema with an auto-injector that will fail. The right diagnosis dictates the right take-home drug."</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>💉 Adrenaline FIRST</b>IM 0.5 mg (0.5 mL 1:1000) in the thigh, repeat at 5 min. Not the antihistamine, not the steroid.</div>
+          <div class="pearl"><b>🩺 Diagnosis is clinical</b>Acute onset + Airway/Breathing/Circulation compromise ± skin changes. No test needed to treat.</div>
+          <div class="pearl"><b>🛬 Lie flat, legs up</b>Sit up only if breathing dominates; never stand or sit up suddenly — empty-ventricle arrest.</div>
+          <div class="pearl"><b>🧫 IgE mast-cell mechanism</b>Allergen cross-links IgE on mast cells → histamine et al. Adrenaline reverses every arm.</div>
+          <div class="pearl"><b>🔁 Biphasic reactions</b>Can recur hours later without re-exposure — observe on a monitor.</div>
+          <div class="pearl"><b>🩸 Tryptase confirms, later</b>Serial samples (presentation, 1–2 h, baseline). Never delays treatment; can be normal.</div>
+          <div class="pearl"><b>🧬 HAE = bradykinin</b>No urticaria, no itch, family history, recurrent; adrenaline fails → C1-INH or icatibant.</div>
+          <div class="pearl"><b>💊 Know the modifiers</b>Beta-blocker → add glucagon; ACE inhibitor → think bradykinin angioedema, stop the drug.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the reflex</h3>
+          <ul>
+            <li>🧫 <strong>Non-IgE and mixed mechanisms:</strong> direct mast-cell activation via <strong>MRGPRX2</strong> (opioids, vancomycin "red man", quinolones, neuromuscular blockers), complement-mediated reactions, and IgG-mediated pathways — anaphylaxis without classic sensitisation.</li>
+            <li>🧬 <strong>Mastocytosis &amp; hereditary alpha-tryptasaemia:</strong> a raised BASELINE tryptase flags an expanded mast-cell burden or extra copies of the <em>TPSAB1</em> gene, both predisposing to severe/idiopathic anaphylaxis and Hymenoptera-venom reactions.</li>
+            <li>🐝 <strong>Venom immunotherapy &amp; food desensitisation:</strong> subcutaneous venom immunotherapy is highly protective for sting anaphylaxis; oral immunotherapy (e.g. for peanut) and anti-IgE (omalizumab) raise reaction thresholds.</li>
+            <li>🍑 <strong>Cofactors &amp; the "summation" model:</strong> exercise, alcohol, NSAIDs, infection and menstruation lower the reaction threshold — classically <strong>food-dependent exercise-induced anaphylaxis</strong> (often omega-5-gliadin/wheat).</li>
+            <li>🥩 <strong>Alpha-gal syndrome:</strong> tick-bite–acquired IgE to galactose-α-1,3-galactose causing <strong>delayed</strong> (3–6 h) anaphylaxis to mammalian meat — breaks the "minutes" rule.</li>
+            <li>🧬 <strong>The bradykinin cascade in depth:</strong> C1-INH normally brakes the contact (kallikrein-kinin) system; its deficiency lets bradykinin accumulate. Newer HAE therapy targets this directly — <strong>lanadelumab</strong> (anti-kallikrein) and <strong>berotralstat</strong> (oral kallikrein inhibitor) for prophylaxis, icatibant (B2-antagonist) for attacks.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The Antihistamine That Killed"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 17-year-old with a known peanut allergy ate a takeaway satay and within minutes developed hives, wheeze and a hoarse voice. In the busy ED, the plan was to "give piriton and hydrocortisone and see how she settles" — the adrenaline stayed in a locked medication cupboard while a nurse hunted for the key. Chlorphenamine and IV hydrocortisone went in; her wheeze eased briefly, so everyone relaxed. Ten minutes later her voice was gone and her SpO₂ crashed as her larynx swelled shut. By the time IM adrenaline was finally given she was peri-arrest; a difficult airway could not be secured in time. She died of hypoxic airway obstruction — a reaction that <strong>one prompt injection would almost certainly have aborted</strong>.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>💊 WRONG FIRST DRUG</b>Antihistamine + steroid given as if they treat the airway — they do not.</div>
+            <div class="hole"><b>🔒 ADRENALINE DELAYED</b>Locked away and unavailable at the critical moment; no one owned the injection.</div>
+            <div class="hole"><b>🧠 FALSE REASSURANCE</b>Transient easing of wheeze read as "improving" — the airway was still closing.</div>
+            <div class="hole"><b>🌬️ AIRWAY HELP LATE</b>Anaesthetics called only once she was peri-arrest, too late for a difficult airway.</div>
+            <div class="hole"><b>🏥 SYSTEM</b>No immediate-access adrenaline in resus; unclear anaphylaxis protocol.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved her:</strong> treat any acute onset of airway/breathing/circulation compromise after an exposure as anaphylaxis and give <strong>IM adrenaline into the thigh immediately</strong>; keep adrenaline instantly accessible in every clinical area; never lead with antihistamine or steroid; call the airway team early; and never mistake a brief improvement for resolution. <strong>This is exactly the discipline that saved the patient in Bed 2.</strong></p>
+        </div>
+        <div class="callout danger"><b class="ct">🧬 …and the mirror-image error</b>The other way to kill: treating a <strong>hereditary angioedema</strong> or <strong>ACE-inhibitor</strong> airway swelling as allergic anaphylaxis — piling on adrenaline, antihistamine and steroid while the non-itchy, bradykinin-driven larynx obstructs. If it does not itch, keeps recurring, runs in the family, or the patient is on an ACE inhibitor, and it is NOT responding — stop repeating adrenaline and give <strong>C1-INH concentrate or icatibant</strong>.</div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'We gave the antihistamine first' has killed more anaphylaxis patients than the allergen ever did. Adrenaline, intramuscular, thigh, now — and if it does not respond and does not itch, think bradykinin."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · 🧬 Rheumatology &amp; Immunology · 🚨 Emergency Department · Bed 2 — Anaphylaxis &amp; Hereditary Angioedema<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+    /* ===== SIDEBAR TABS — show one section at a time ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not an adrenaline-now feature'); } if(found===total){ flagResult.textContent='✅ All '+total+' anaphylaxis features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' anaphylaxis features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: time to adrenaline ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=v/30*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<=5){ msg='🟢 Adrenaline within '+v+' min. The reaction is aborted — airway holds, BP recovers. THIS is the win.'; cls='good'; }
+      else if(v<=10){ msg='🟠 '+v+' min delay. Still recoverable, but the airway is swelling and she has slid deeper into shock — you are now chasing the reaction.'; cls='warn-r'; }
+      else if(v<=20){ msg='🔴 '+v+' min delay (chlorphenamine given first, "waiting to see"). Laryngeal oedema is advancing; this is where preventable deaths happen.'; cls='bad'; }
+      else { msg='🔴 '+v+' min — this is the M&M case in S21. The larynx has obstructed and she is peri-arrest before adrenaline is finally given. Too late.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Clock Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"A 25-year-old with a known nut allergy has hives, wheeze, throat tightness and BP 82/50, three minutes after a walnut brownie. A nurse is holding chlorphenamine and hydrocortisone, asking which to give first. What do you do?",
+      choices:[
+        {t:"💊 Give the chlorphenamine and hydrocortisone first and see if she settles",good:false,ds:-2,dt:15,xp:0,fb:"☠️ This is the M&M case in S21. Antihistamine and steroid do NOTHING for the airway or shock; while you wait, the larynx swells shut and she arrests. Restart.",end:true},
+        {t:"💉 Give IM adrenaline 500 micrograms (0.5 mL 1:1000) into the anterolateral thigh NOW",good:true,ds:1,dt:1,xp:40,fb:"✅ Exactly. Adrenaline is the ONLY drug that reverses the airway, the bronchospasm and the shock — and it stabilises the mast cell. Everything else is an adjunct.",next:"position"},
+        {t:"💉 Draw up IV adrenaline 1:1000 and give a bolus because she is shocked",good:false,ds:-1,dt:5,xp:5,fb:"⚠️ Dangerous — an IV bolus of 1:1000 on the resus trolley causes malignant arrhythmias and myocardial ischaemia. The route is INTRAMUSCULAR into the thigh; IV is only a titrated infusion in ICU for refractory cases.",next:"position"}
+      ]},
+    position:{ text:"Adrenaline is in. She is still hypotensive at 84/52 and feels faint. She tries to stand up to 'get some air'. What now?",
+      choices:[
+        {t:"🛬 Keep her lying FLAT with legs raised, high-flow O₂, and run an IV fluid bolus",good:true,ds:1,dt:2,xp:40,fb:"✅ Right. Standing/sitting a vasodilated, empty-ventricle patient up can cause fatal collapse. Flat with legs up + fluids supports the circulation while the adrenaline works.",next:"repeat"},
+        {t:"🪑 Sit her upright in a chair so she can breathe more easily",good:false,ds:-2,dt:6,xp:0,fb:"⚠️ With this blood pressure, sudden upright posture risks 'empty-ventricle' cardiac arrest. Keep the hypotensive patient flat with legs raised; sit up ONLY if breathing is the dominant problem.",next:"repeat"}
+      ]},
+    repeat:{ text:"Five minutes on, the wheeze and throat tightness are creeping back and BP is still low despite the first two IM doses and fluids. Next best step?",
+      choices:[
+        {t:"🚨 Declare refractory anaphylaxis: call ICU, start a titrated IV adrenaline INFUSION, more fluid, secure the airway",good:true,ds:1,dt:4,xp:45,fb:"🏆 Perfect. Two-plus IM doses without improvement = refractory anaphylaxis → infusion + ICU + airway plan (and glucagon if she were beta-blocked). This is the escalation that prevents the arrest.",end:true},
+        {t:"💊 Now add the steroid and antihistamine and wait — they should kick in",good:false,ds:-1,dt:12,xp:0,fb:"⚠️ Steroids are slow and do not treat the airway or shock; antihistamines only touch the itch. Waiting on them while she deteriorates loses the patient. Escalate the adrenaline, not the adjuncts.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='repeat'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 25-year-old develops hives, wheeze, throat tightness and BP 82/50 minutes after eating a nut. The single most important first action is:", opts:["Give IV chlorphenamine","IM adrenaline 0.5 mg (0.5 mL 1:1000) into the anterolateral thigh","IV hydrocortisone","Send an urgent tryptase and wait for the result"], correct:1, exp:"Anaphylaxis is a clinical diagnosis (acute onset + ABC compromise ± skin changes) and IM adrenaline is first-line — it reverses vasodilation, capillary leak and bronchospasm and stabilises mast cells. Antihistamines/steroids do not treat the airway or shock, and you never wait for a test to treat." },
+    { q:"The correct adult IM adrenaline dose in anaphylaxis is:", opts:["50 micrograms of 1:10,000 IV","500 micrograms (0.5 mL of 1:1000) IM, repeat after 5 min if no improvement","1 mg of 1:1000 IV bolus","300 micrograms subcutaneously in the arm"], correct:1, exp:"Adults get 500 micrograms = 0.5 mL of 1:1000 IM into the anterolateral thigh, repeated after 5 minutes if there is no improvement. IV boluses of 1:1000 cause dangerous arrhythmias; the SC/deltoid route absorbs too slowly." },
+    { q:"A hypotensive anaphylaxis patient wants to sit up. The correct positioning advice is:", opts:["Sit fully upright in a chair","Lie flat with legs raised; sit up only if breathing is the main problem, and never stand suddenly","Place head-down in steep Trendelenburg for 30 minutes","Whatever position the patient prefers"], correct:1, exp:"Sudden upright posture in a vasodilated, volume-depleted patient can cause fatal 'empty-ventricle' arrest. Keep the shocked patient flat with legs raised; sit up only if breathing dominates, and never let them stand up suddenly." },
+    { q:"Which statement about antihistamines and steroids in acute anaphylaxis is correct?", opts:["They are the first-line treatment","They should be given before adrenaline","They are adjuncts only and must NEVER delay or replace adrenaline","Steroids reliably prevent biphasic reactions"], correct:2, exp:"Antihistamines treat only itch/urticaria and steroids are slow with no good evidence they prevent biphasic reactions. Both are adjuncts given after adrenaline and resuscitation — giving them first is a classic fatal error." },
+    { q:"Serum mast-cell tryptase in suspected anaphylaxis is best used to:", opts:["Decide whether to give adrenaline","Confirm the diagnosis retrospectively via a rise-and-fall on serial samples","Exclude anaphylaxis if a single value is normal","Replace the clinical diagnosis"], correct:1, exp:"Tryptase peaks ~1–2 h then falls; serial samples (presentation, 1–2 h, baseline ≥24 h) confirm mast-cell degranulation after the fact. It never guides acute treatment, and a normal value does not exclude anaphylaxis (often normal in food reactions)." },
+    { q:"A patient with recurrent painless, NON-itchy facial and laryngeal swelling, a family history, and no urticaria fails to respond to repeated adrenaline, antihistamine and steroid. The most likely diagnosis and treatment is:", opts:["Anaphylaxis — give more adrenaline","Hereditary angioedema (C1-INH deficiency) — give C1-INH concentrate or icatibant","Panic attack — reassure","Asthma — give nebulisers"], correct:1, exp:"Non-itchy, recurrent, familial angioedema that does not respond to adrenaline is bradykinin-mediated hereditary angioedema from C1-esterase inhibitor deficiency. It is treated with C1-INH concentrate or the bradykinin B2-antagonist icatibant — adrenaline/antihistamine/steroid do not work." },
+    { q:"Which drug causes bradykinin-mediated angioedema that can mimic anaphylaxis but will not respond to adrenaline?", opts:["Beta-blocker","ACE inhibitor","Aspirin","Metformin"], correct:1, exp:"ACE inhibitors reduce bradykinin breakdown, causing angioedema (often tongue/laryngeal, without urticaria) that can start months to years after starting the drug. Management is to stop the ACE inhibitor, secure the airway, and consider icatibant/C1-INH — not adrenaline." },
+    { q:"An anaphylaxis patient on a beta-blocker is not responding to repeated IM adrenaline. The most appropriate additional agent is:", opts:["A second antihistamine","IV glucagon 1–2 mg","IV calcium gluconate","Oral prednisolone"], correct:1, exp:"Beta-blockade blunts the response to adrenaline. IV glucagon raises intracellular cAMP independently of the beta-receptor, restoring inotropy and bronchodilation, and is the recommended add-on in beta-blocked, adrenaline-resistant anaphylaxis." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you reach for adrenaline like a consultant. 🏆':score>=6?'Strong — review the misses and S14 bradykinin differentials.':'Revisit S4, S5 and S14 — adrenaline-first and the HAE contrast are the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>
