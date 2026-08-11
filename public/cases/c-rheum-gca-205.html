@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giant Cell Arteritis & Polymyalgia Rheumatica — Virtual Teaching Hospital</title>
+<!-- META
+id: c-rheum-gca-205
+title: Giant Cell Arteritis & PMR — the Sight-Threatening Emergency
+hospital: rheumatology
+department: rheum-immunology
+bednumber: 5
+chiefcomplaint: New temporal headache, scalp tenderness, jaw claudication and transient visual loss in a 72-year-old
+system: Rheumatology & Immunology
+severity: critical
+tags: GCA, Temporal arteritis, PMR, AION, ESR/CRP, Steroids, Tocilizumab, Emergency
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🩸</div>
+      <div>
+        <div class="t1">Rheumatology &amp; Immunology</div>
+        <div class="t2">Bed 5 · GCA / PMR</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">🔬</span><span>Imaging / Biopsy</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · 🩸 Rheumatology &amp; Immunology · 🚨 Urgent Referral · 🛏️ Bed 5</div>
+        <h1>👁️ Giant Cell Arteritis — "The Headache That Steals Sight"</h1>
+        <div class="sub">⚡ 09:40. A 72-year-old woman describes a new left temporal headache, a tender scalp she cannot bear to brush, and jaw pain when she chews. Twice this morning her vision "greyed out" for a minute. The clock to save her sight is measured in hours, not days — and the treatment starts BEFORE the biopsy.</div>
+        <div class="chips">
+          <span class="chip crit">🔴 SIGHT-THREATENING</span>
+          <span class="chip">👁️ GCA Pathway</span>
+          <span class="chip">🧪 ESR / CRP</span>
+          <span class="chip">💊 Steroids NOW</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital"><div class="v-label">💓 HR</div><div class="v-num">84</div></div>
+        <div class="vital warn"><div class="v-label">🩸 BP</div><div class="v-num">158/86</div></div>
+        <div class="vital"><div class="v-label">🌬️ RR</div><div class="v-num">16</div></div>
+        <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">97%</div></div>
+        <div class="vital warn"><div class="v-label">🌡️ Temp</div><div class="v-num">37.6°</div></div>
+        <div class="vital"><div class="v-label">🧠 GCS</div><div class="v-num">15</div></div>
+        <div class="vital alert"><div class="v-label">😖 Head Pain</div><div class="v-num">8/10</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 09:40, Rheumatology day-unit assessment room</b>A 72-year-old woman sits with a hand pressed to her left temple. She says: <em>"The comb feels like it is dragging over a bruise, my jaw aches after a few mouthfuls, and this morning the world went grey for a minute — twice."</em> Her GP letter says "likely tension headache, trial of amitriptyline." One transient monocular blackout in this patient is a fire alarm for the optic nerve. Move now.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>👩 Name</td><td><strong>Mrs. E.G.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>72-year-old female</td></tr>
+          <tr><td>🆔 MRN</td><td>RHEU-0505</td></tr>
+          <tr><td>⚖️ Weight</td><td>64 kg (BMI 24)</td></tr>
+          <tr><td>💼 Background</td><td>Retired teacher, independent, drives, reads avidly</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 Past history — every line shifts the pre-test probability</h3>
+        <ul>
+          <li>🎯 <strong>Age &gt; 50 (here 72)</strong> — GCA is almost never diagnosed under 50; incidence climbs steeply after 70. Age itself is a diagnostic criterion.</li>
+          <li>💪 <strong>Six weeks of shoulder- and hip-girdle stiffness</strong>, worst on waking, "cannot lift my arms to hang washing" — a textbook <strong>polymyalgia rheumatica (PMR)</strong> prodrome. 40–60% of GCA patients have PMR, and ~15% of PMR develops GCA.</li>
+          <li>📉 <strong>Weight loss, low-grade fevers, malaise, night sweats</strong> — GCA is a systemic inflammatory illness, not just a headache.</li>
+          <li>👩 <strong>Female, Northern-European ancestry</strong> — both raise risk (female:male ~3:1).</li>
+          <li>🩺 No prior migraine, no cluster pattern. This headache is <em>new</em> in a 72-year-old — a red flag by itself.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A NEW headache in anyone over 50 with a raised ESR is giant cell arteritis until a specialist proves otherwise — and you treat first, prove later."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why this is the rheumatology equivalent of a STEMI</b>Untreated GCA can cause <strong>irreversible blindness within hours to days</strong> from anterior ischaemic optic neuropathy (AION). Once one eye is lost, the fellow eye is at high risk within 1–2 weeks without treatment. There is no "clinic in a few days" option — clinical suspicion alone is the trigger to start high-dose steroids.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 GP / triage handover — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ Referral SBAR (verbatim)</b>
+          <p><strong>S:</strong> "72-year-old woman, three weeks of new left-sided temporal headache, scalp tenderness, jaw pain on chewing, and two episodes of transient visual loss in the left eye this morning."</p>
+          <p><strong>B:</strong> "Six weeks of proximal shoulder and hip stiffness, weight loss, low-grade fevers. No migraine history. On amlodipine for BP only."</p>
+          <p><strong>A:</strong> "Left temporal artery looks prominent and is tender, pulse hard to feel. ESR sent, awaited. I started her on nothing — wanted your advice first."</p>
+          <p><strong>R:</strong> "Sent her straight in as ?GCA. She is frightened her sight is going."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Jaw claudication and transient visual loss are the two symptoms that most raise the odds of a positive temporal artery biopsy — take either one as a mandate to start steroids the moment you suspect GCA."</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each high-risk feature</h3>
+        <p>🎮 <em>Click every feature that RAISES the probability of GCA. Each correct = +10 XP.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">🦷 Jaw claudication on chewing</button>
+          <button class="btn ghost flag-btn" data-good="1">👁️ Transient monocular visual loss</button>
+          <button class="btn ghost flag-btn" data-good="1">🧠 New headache age &gt; 50</button>
+          <button class="btn ghost flag-btn" data-good="1">🧴 Scalp tenderness on combing</button>
+          <button class="btn ghost flag-btn" data-good="1">💪 Proximal girdle stiffness (PMR)</button>
+          <button class="btn ghost flag-btn" data-good="1">📈 Prominent, tender, pulseless temporal artery</button>
+          <button class="btn ghost flag-btn" data-good="0">📱 "Probably screen-time tension headache"</button>
+          <button class="btn ghost flag-btn" data-good="0">😴 "Amitriptyline should settle it"</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Where the GP got it right</b>Recognising a NEW headache with jaw claudication and visual symptoms in a 72-year-old, and sending her in the same day rather than to a routine clinic, is exactly right. The only miss: high-dose steroids should have started at the first suspicion — you never hold them waiting for the ESR or the biopsy.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🅰️🅱️🅲️ Focused survey — the "GCA-in-90-seconds"</h3>
+        <table class="tbl">
+          <tr><th>Step</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>👁️ Vision</td><td>Acuity 6/9 both eyes now; two episodes of amaurosis fugax left eye earlier; RAPD not yet present.</td><td>Amaurosis is the warning shot BEFORE fixed AION. A relative afferent pupillary defect would signal established optic nerve ischaemia.</td></tr>
+          <tr><td>🔎 Fundoscopy</td><td>Left optic disc mildly pale and swollen; a few cotton-wool spots.</td><td>Pallid ("chalky-white") disc swelling is the hallmark of arteritic AION — distinct from the hyperaemic disc of non-arteritic AION.</td></tr>
+          <tr><td>🧴 Temporal arteries</td><td>Left artery thickened, beaded, tender, <strong>non-pulsatile</strong>; scalp tender.</td><td>A pulseless, tender, hardened temporal artery is one of the most specific bedside signs.</td></tr>
+          <tr><td>🦷 Jaw / tongue</td><td>Pain in masseters after chewing; no tongue claudication.</td><td>Jaw claudication reflects ischaemia of the muscles of mastication — highly suggestive of GCA.</td></tr>
+          <tr><td>💪 Girdles</td><td>Reduced active shoulder abduction from stiffness/pain, no true weakness; hips stiff.</td><td>PMR pattern: pain and stiffness limit movement, but power is preserved (distinguishes from myopathy).</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Every transient visual loss over 50 gets an immediate temporal-artery exam, an ESR/CRP, and — if GCA is plausible — high-dose steroids the same hour. The clock started this morning, not at your clinic."</div>
+
+        <h3>🧭 The three sight-robbers you weigh at the bedside</h3>
+        <p>For "new headache + visual symptoms in an older adult," your reflex differential is <strong>GCA</strong> (arteritic AION), <strong>non-arteritic AION</strong> (small crowded disc, no systemic features), and <strong>retinal artery occlusion / embolic amaurosis</strong> (carotid, cardiac source). GCA is the one that is both treatable and bilateral-blinding if missed (see S14).</p>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of "the ESR/CRP is not back yet"</b>Do NOT wait for inflammatory markers to start treatment when suspicion is high. Up to ~4% of biopsy-proven GCA has a normal ESR; CRP raises sensitivity but is not perfect. Markers <em>support</em> and monitor — they do not gate the first steroid dose.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The rheumatology resident thinks out loud at 09:48:</em></p>
+        <h3>🧠 Frame it as an emergency, not an outpatient puzzle</h3>
+        <p>"New headache, jaw claudication, scalp tenderness, transient visual loss, a PMR prodrome and a pulseless temporal artery in a 72-year-old — this is GCA until proven otherwise, and she has <strong>visual symptoms</strong>. My job is NOT to wait for the biopsy. I start <strong>high-dose glucocorticoids immediately</strong> — because she has visual involvement, that means <strong>IV methylprednisolone</strong>. Then I arrange the temporal artery biopsy and vascular ultrasound, both of which stay informative for days after steroids begin."</p>
+
+        <h3>🎯 His order of operations</h3>
+        <ol>
+          <li>💊 <strong>IV methylprednisolone 500–1000 mg daily for 3 days</strong> (visual symptoms present) → then oral prednisolone 40–60 mg/day. Do NOT wait for biopsy or markers.</li>
+          <li>🧪 <strong>ESR + CRP now</strong> (before steroids blunt them if possible, but never delay treatment), FBC, U&amp;E, LFTs, glucose, bone profile.</li>
+          <li>🔬 <strong>Temporal artery ultrasound</strong> today (halo sign) and <strong>biopsy within ~1–2 weeks</strong> — yield persists for days–weeks after steroids start.</li>
+          <li>💊 Start <strong>bone protection, PPI, and gastric/glucose vigilance</strong> alongside steroids from day one.</li>
+          <li>👁️ Same-day <strong>ophthalmology</strong> review; aspirin considered case-by-case.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Treat the patient, not the biopsy. Steroids do not meaningfully lower biopsy yield for 1–2 weeks — so there is never a reason to leave a suspected-GCA eye unprotected while you wait for a pathologist."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>He wonders whether to hold steroids until the biopsy "so the pathology is not masked." Right call?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No — start now.</strong> Temporal artery biopsy remains positive for at least 1–2 weeks after steroids begin (arteritic changes and giant cells persist). Delaying treatment to "protect the biopsy" risks irreversible blindness for no diagnostic gain. Book the biopsy within ~1–2 weeks and treat in the meantime.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The rheumatology consultant at the bedside, 10:05:</em></p>
+        <h3>🧮 The 2022 ACR/EULAR classification thinking — a probability, not a checklist</h3>
+        <table class="tbl">
+          <tr><th>Domain</th><th>Feature</th><th>Weight (illustrative)</th><th>This patient</th></tr>
+          <tr><td>🎂 Entry</td><td>Age ≥ 50 (mandatory)</td><td>Required</td><td class="hi">Met (72)</td></tr>
+          <tr><td>🦷 Cranial</td><td>Jaw / tongue claudication</td><td>High</td><td class="hi">Present</td></tr>
+          <tr><td>🧴 Cranial</td><td>Scalp tenderness / abnormal temporal artery</td><td>High</td><td class="hi">Present</td></tr>
+          <tr><td>👁️ Ocular</td><td>Sudden visual loss / AION</td><td>High</td><td class="hi">Amaurosis + pallid disc</td></tr>
+          <tr><td>🧪 Labs</td><td>Raised ESR / CRP</td><td>Supportive</td><td class="hi">ESR 88, CRP 96</td></tr>
+          <tr><td>💪 Systemic</td><td>PMR / constitutional features</td><td>Supportive</td><td class="hi">Girdle stiffness, weight loss</td></tr>
+        </table>
+        <p>The probability is overwhelming even before the biopsy. This is a <strong>treat-immediately</strong> patient — classification criteria are for research consistency, not permission to delay therapy.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In GCA, ESR/CRP and biopsy confirm and monitor; jaw claudication + visual loss + a new headache over 50 command. Never let a pending test out-vote a threatened optic nerve."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">RCT</span> GiACTA (Stone, NEJM 2017)</td><td>Tocilizumab (IL-6R blockade) + steroid taper achieved far higher sustained remission and large cumulative steroid sparing vs steroids alone.</td><td>Add tocilizumab for relapsing/refractory GCA or to limit steroid toxicity.</td></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> BSR / ACR-EULAR GCA</td><td>Start high-dose glucocorticoids on clinical suspicion; IV methylprednisolone if visual involvement; do not delay for biopsy.</td><td>Suspicion = treatment. Confirm with US/biopsy afterwards.</td></tr>
+            <tr><td><span class="lvl">DIAGNOSTIC</span> TABUL study (ultrasound vs biopsy)</td><td>Temporal/axillary artery ultrasound (halo, compression sign) is a sensitive, fast first-line test; combined with biopsy raises yield.</td><td>Fast-track US the same day; biopsy within 1–2 weeks.</td></tr>
+            <tr><td><span class="lvl">COHORT</span> Skip-lesion / biopsy-length data</td><td>GCA is segmental — "skip lesions" mean a short or contralateral biopsy can miss disease; longer specimens raise yield.</td><td>A negative biopsy does NOT exclude GCA if the picture fits — keep treating.</td></tr>
+            <tr><td><span class="lvl">COHORT</span> Fellow-eye risk data</td><td>Untreated, the second eye is at high risk of AION within ~1–2 weeks of the first.</td><td>Treat urgently to protect the fellow eye even once one is lost.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The chart that keeps me awake is the 'tension headache' who was sent home on amitriptyline with an ESR of 90 sitting unread in the inbox. She came back three days later blind in one eye, then lost the second before we could taper. Every hour we withhold steroids in suspected GCA is myocardium — sorry, retina — we cannot get back."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY the headache, WHY the blindness (the WHY behind the WHY)</h3>
+        <ol>
+          <li>🛡️ <strong>Trigger + immune activation:</strong> in a genetically primed older adult, dendritic cells in the arterial adventitia activate; the immune-privileged vessel wall loses tolerance.</li>
+          <li>🧫 <strong>Granulomatous panarteritis:</strong> CD4⁺ T-cells (Th1 → IFN-γ; Th17 → IL-17), macrophages and multinucleated <strong>giant cells</strong> infiltrate large- and medium-sized arteries with an elastic lamina — especially branches of the external carotid (temporal, ophthalmic, posterior ciliary) and the aorta.</li>
+          <li>🧱 <strong>Intimal hyperplasia + luminal occlusion:</strong> IL-6-driven inflammation and growth factors (PDGF, VEGF) thicken the intima. The lumen narrows and occludes — <em>this is why the ESR/CRP soar and why the artery becomes hard and pulseless</em>.</li>
+          <li>👁️ <strong>Ischaemia downstream:</strong> occlusion of the <strong>posterior ciliary arteries</strong> starves the optic nerve head → <strong>arteritic anterior ischaemic optic neuropathy</strong> → sudden, painless, often irreversible visual loss. Jaw claudication = masseter ischaemia; scalp tenderness = superficial temporal ischaemia; the headache = inflamed cranial arteries.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"GCA is a race between the granuloma closing the artery and you opening the steroids. Amaurosis fugax is the last warning before the door to the optic nerve shuts for good."</div>
+
+        <h3>⚖️ Contrast pair — GCA vs PMR</h3>
+        <div class="vs">
+          <div class="side a"><h4>👁️ Giant cell arteritis (GCA)</h4><ul><li>Large/medium-vessel granulomatous vasculitis</li><li>Cranial: headache, scalp tenderness, jaw claudication, visual loss</li><li>Sight-threatening emergency — high-dose steroids (IV if visual)</li><li>Prednisolone 40–60 mg/day</li></ul></div>
+          <div class="side b"><h4>💪 Polymyalgia rheumatica (PMR)</h4><ul><li>Proximal girdle pain &amp; morning stiffness, no true weakness</li><li>Raised ESR/CRP; NO cranial or visual features by itself</li><li>Not sight-threatening — lower-dose steroids (prednisolone 15 mg/day)</li><li>Dramatic response to steroids within days is characteristic</li></ul></div>
+        </div>
+        <p>💡 They are two ends of one disease spectrum. Any PMR patient who develops a new headache, jaw claudication, or visual symptom has "converted" and needs GCA-dose steroids immediately.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The Sight-Saving Clock</h3>
+          <p style="font-size:13px">Amaurosis fugax started this morning. Drag the dial to set how many hours pass before high-dose steroids go in, and watch the risk of permanent blindness climb.</p>
+          <label for="kRange">⏱️ Hours from visual symptom to high-dose steroid: <b id="kVal">2</b> h</label>
+          <input type="range" id="kRange" min="0" max="72" value="2">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore how delay converts a warning into permanent loss.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 The message: transient visual loss is reversible; established AION is not. Every hour of delay while "waiting for the biopsy" trades a treatable warning for a fixed deficit.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The order set (09:50)</h3>
+        <ul>
+          <li>💊 <strong>IV methylprednisolone 500–1000 mg once daily × 3 days</strong> (visual symptoms) → then oral <strong>prednisolone 40–60 mg/day</strong>. Give the first dose NOW.</li>
+          <li>🧪 <strong>ESR + CRP</strong>, FBC, U&amp;E, LFTs, glucose, HbA1c, bone profile, ± CK (to exclude myositis mimicking PMR).</li>
+          <li>🔬 <strong>Temporal artery ultrasound today</strong>; book <strong>temporal artery biopsy within 1–2 weeks</strong> (do not delay steroids for it).</li>
+          <li>🦴 <strong>Bone protection from day 1:</strong> calcium/vitamin D + bisphosphonate; <strong>PPI</strong> for gastric protection.</li>
+          <li>🩸 <strong>Glucose monitoring</strong> (steroid hyperglycaemia); baseline BP and weight.</li>
+          <li>💊 Consider <strong>low-dose aspirin</strong> in selected cranial/ischaemic cases; plan <strong>tocilizumab</strong> discussion for steroid sparing.</li>
+          <li>👁️ <strong>Urgent same-day ophthalmology</strong> review and documented visual acuity in both eyes.</li>
+          <li>📞 If acuity drops acutely → escalate steroid pulse and ophthalmology immediately.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The first prescription in suspected GCA is the steroid, written before the biopsy is booked — and the second is the bone/gastric protection written in the same breath."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Day-unit priorities — the nurse runs the safety net</h3>
+        <ul>
+          <li>👁️ <strong>Serial visual checks</strong> — record acuity and any new visual change every few hours; any drop is an emergency requiring immediate escalation.</li>
+          <li>💊 <strong>Give the IV methylprednisolone promptly and correctly</strong> — infuse over the prescribed time, monitor for arrhythmia, flushing, mood/insomnia, and glucose spikes.</li>
+          <li>🩸 <strong>Capillary glucose monitoring</strong> — high-dose steroids commonly unmask or worsen diabetes; flag persistent hyperglycaemia.</li>
+          <li>🧾 Counsel on the <strong>steroid card</strong>, never to stop steroids abruptly (adrenal crisis risk), and PPI/bone-protection adherence.</li>
+          <li>🧠 Reassure and inform — she is frightened of going blind; clear explanation reduces distress and improves adherence to a long taper.</li>
+          <li>🦷 Support soft/easy-chew meals while jaw claudication persists; document intake and weight (constitutional weight loss).</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who rechecks the vision on every round is the earliest detector of the fellow eye going — and the one who guards the glucose and bones from the cure."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Value</th><th>Interpretation</th></tr>
+          <tr><td>ESR</td><td class="hi">88 mm/h</td><td><strong>Markedly raised</strong> — supports active large-vessel inflammation. Normal ESR does not exclude GCA (~4% biopsy-proven have normal ESR).</td></tr>
+          <tr><td>CRP</td><td class="hi">96 mg/L</td><td>Sensitive marker of inflammation; rises and falls faster than ESR — useful for monitoring the steroid response.</td></tr>
+          <tr><td>Haemoglobin</td><td class="lo">104 g/L</td><td>Normocytic anaemia of chronic disease — a common constitutional clue in GCA.</td></tr>
+          <tr><td>Platelets</td><td class="hi">512 ×10⁹/L</td><td>Thrombocytosis is a supportive acute-phase feature.</td></tr>
+          <tr><td>ALP</td><td class="hi">168 U/L</td><td>Mildly raised alkaline phosphatase (hepatic acute phase) is a recognised GCA finding.</td></tr>
+          <tr><td>Creatine kinase</td><td class="ok-v">Normal</td><td>Normal CK separates PMR (stiffness, preserved power) from an inflammatory myopathy.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In GCA the triad of raised ESR, raised CRP and thrombocytosis is your acute-phase signature — but the decision to treat was already made on the story before any of them returned."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why markers support but never gate treatment</b>ESR and CRP confirm and monitor GCA, and a dramatic fall after steroids reassures. But sensitivity is imperfect (normal ESR in a minority), and they are non-specific — infection, malignancy and other vasculitides also raise them. Interpret them inside the clinical story, and never delay the first steroid dose for a pending result.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 IMAGING / BIOPSY / SEROLOGY ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>🔬 Imaging / Biopsy / Serology + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🩻 Temporal artery ultrasound — the "halo sign"</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Temporal artery ultrasound: hypoechoic halo around the lumen">
+            <rect width="820" height="150" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="38" x2="820" y2="38"/><line x1="0" y1="75" x2="820" y2="75"/><line x1="0" y1="112" x2="820" y2="112"/></g>
+            <ellipse cx="230" cy="75" rx="70" ry="46" fill="none" stroke="#fca5a5" stroke-width="12" opacity="0.85"/>
+            <ellipse cx="230" cy="75" rx="34" ry="22" fill="#0b1220" stroke="#93c5fd" stroke-width="2"/>
+            <text x="150" y="24" fill="#fca5a5" font-size="11">GCA — thick hypoechoic HALO (non-compressible)</text>
+            <ellipse cx="600" cy="75" rx="70" ry="46" fill="none" stroke="#4b5563" stroke-width="3" opacity="0.7"/>
+            <ellipse cx="600" cy="75" rx="52" ry="34" fill="#0b1220" stroke="#93c5fd" stroke-width="2"/>
+            <text x="540" y="24" fill="#93c5fd" font-size="11">Normal artery — thin wall, compressible</text>
+          </svg>
+          <div class="ecg-cap">The <span style="color:#fca5a5">GCA vessel</span> shows a thick, hypoechoic circumferential "halo" that stays visible under probe compression; the <span style="color:#93c5fd">normal vessel</span> has a thin wall and collapses. Ultrasound is fast, same-day, and stays positive for days after steroids start.</div>
+        </div>
+
+        <h3>🔎 The confirmatory tests you must know cold</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Look for</th><th>Meaning / caveat</th></tr>
+          <tr><td>🩻 <strong>Vascular ultrasound</strong></td><td>Halo sign; non-compressible artery ("compression sign")</td><td>First-line, same-day; operator-dependent. Positive result can replace biopsy in expert hands (fast-track clinics).</td></tr>
+          <tr><td>🔬 <strong>Temporal artery biopsy</strong></td><td>Transmural granulomatous inflammation, giant cells, disrupted internal elastic lamina</td><td>Within ~1–2 weeks of starting steroids; <strong>skip lesions</strong> mean a negative biopsy does NOT exclude GCA — take an adequate length (≥1 cm).</td></tr>
+          <tr><td>🖥️ <strong>PET-CT / MRA / CTA</strong></td><td>Large-vessel FDG uptake / wall thickening of aorta &amp; branches</td><td>For suspected <strong>large-vessel GCA</strong> (extracranial disease, aortitis) — atypical presentations, fever of unknown origin, aneurysm surveillance.</td></tr>
+          <tr><td>🧪 <strong>Serology (to exclude mimics)</strong></td><td>ANCA, ANA, blood cultures</td><td>GCA has NO specific autoantibody — serology is to rule out ANCA-vasculitis, infection, and other mimics, not to confirm GCA.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A negative temporal artery biopsy in a classic GCA patient means 'you missed a skip lesion,' not 'she does not have GCA.' Keep treating and confirm with ultrasound, the fellow side, or large-vessel imaging."</div>
+
+        <h3>🩻 Adjunct assessment</h3>
+        <ul>
+          <li><strong>Fundoscopy / OCT:</strong> pallid disc swelling of arteritic AION; distinguishes from hyperaemic non-arteritic AION.</li>
+          <li><strong>Aortic imaging:</strong> long-term surveillance for thoracic aortic aneurysm/dissection — a late large-vessel complication of GCA.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The GCA drug map — what, why, and the traps</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>IV methylprednisolone</strong> 500–1000 mg/day × 3 days</td><td>Any visual involvement / threatened sight</td><td>Rapid, potent immunosuppression to halt arteritic ischaemia. Watch glucose, BP, mood, arrhythmia.</td></tr>
+          <tr><td><strong>Oral prednisolone</strong> 40–60 mg/day (no visual loss: 40–60; PMR alone: ~15)</td><td>Backbone of GCA therapy after pulse</td><td>Long <strong>slow taper over 12–24 months</strong>; never stop abruptly (adrenal insufficiency).</td></tr>
+          <tr><td><strong>Tocilizumab</strong> (anti-IL-6R)</td><td>Steroid-sparing; relapsing/refractory GCA (GiACTA)</td><td>Blocks IL-6 signalling — the core cytokine driving GCA. Risk of infection, GI perforation, deranged lipids/LFTs; masks CRP.</td></tr>
+          <tr><td><strong>Calcium / vitamin D + bisphosphonate</strong></td><td>Bone protection from day 1</td><td>Long high-dose steroids cause osteoporosis/fractures — start protection with the steroid, not later.</td></tr>
+          <tr><td><strong>Proton-pump inhibitor</strong></td><td>Gastric protection</td><td>Reduces steroid/aspirin-related ulcer risk.</td></tr>
+          <tr><td><strong>Low-dose aspirin</strong></td><td>Selected cranial/ischaemic GCA</td><td>May reduce ischaemic events; weigh bleeding risk — not universal.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Steroids save the eye; tocilizumab saves the patient from the steroids. Every GCA prescription is really three: the immunosuppressant, the bone protection, and the taper plan."</div>
+        <div class="callout danger"><b class="ct">🚫 The steroid-toxicity list you must pre-empt</b>❌ osteoporotic fracture · ❌ steroid diabetes · ❌ peptic ulcer/GI bleed · ❌ infection · ❌ adrenal crisis on abrupt withdrawal · ❌ mood disturbance/insomnia. Anticipate and mitigate each from day one — the cure has its own morbidity.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why</h3>
+        <ul>
+          <li>👁️ <strong>Visual acuity and symptoms</strong> — the fellow eye stays at risk early; any new visual change is an emergency and prompts steroid escalation.</li>
+          <li>🧪 <strong>ESR + CRP trajectory</strong> — should fall rapidly with steroids; a re-rise with symptoms signals relapse (note: tocilizumab suppresses CRP, so track symptoms too).</li>
+          <li>🩸 <strong>Glucose/HbA1c and BP</strong> — steroid hyperglycaemia and hypertension; adjust proactively.</li>
+          <li>🦴 <strong>Bone health</strong> — DEXA and ongoing bone protection through the long taper.</li>
+          <li>💪 <strong>PMR symptoms</strong> — girdle stiffness should melt within days of steroids; failure to respond should make you doubt the diagnosis.</li>
+          <li>🫀 <strong>Aortic surveillance</strong> — long-term imaging for aneurysm in large-vessel GCA.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After you start steroids, the monitor's question shifts from 'is this GCA?' to 'is the taper going too fast (relapse) or the steroids doing their own harm (bones, glucose)?' — and both answers save the patient."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong — from the disease and from the cure</h3>
+        <ul>
+          <li>👁️ <strong>Irreversible blindness (arteritic AION / CRAO)</strong> — the feared endpoint; often the fellow eye within 1–2 weeks if untreated.</li>
+          <li>🧠 <strong>Stroke / TIA</strong> — vertebrobasilar territory from vertebral/carotid arteritis.</li>
+          <li>🫀 <strong>Aortitis, thoracic aortic aneurysm and dissection</strong> — late large-vessel complications requiring surveillance.</li>
+          <li>🦴 <strong>Steroid osteoporosis and fragility fractures</strong> — the commonest iatrogenic harm.</li>
+          <li>🩸 <strong>Steroid diabetes, hypertension, infection, GI ulceration, adrenal suppression</strong> — the price of prolonged therapy.</li>
+          <li>🔁 <strong>Relapse on taper</strong> — recurrence of headache, PMR, or acute-phase rise as the dose comes down (a driver for tocilizumab).</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The deadliest complication of GCA is the sight you failed to save by hesitating; the commonest is the fracture you failed to prevent by forgetting bone protection. Guard against both from hour one."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The new-headache-over-50 differential — sight-robbers first</h3>
+        <table class="tbl">
+          <tr><th>Diagnosis</th><th>Discriminators</th><th>Don't-miss action</th></tr>
+          <tr><td>👁️ <strong>GCA</strong> (this patient)</td><td>New headache, jaw claudication, scalp tenderness, amaurosis, raised ESR/CRP, PMR</td><td>High-dose steroids on suspicion (IV if visual); US/biopsy after.</td></tr>
+          <tr><td>👁️ <strong>Non-arteritic AION</strong></td><td>Painless visual loss, "disc-at-risk" small crowded disc, normal ESR/CRP, no systemic features</td><td>Not steroid-responsive; treat vascular risk factors — do NOT miss GCA masquerading.</td></tr>
+          <tr><td>🧠 <strong>Tension headache / migraine</strong></td><td>Chronic/recurrent pattern, younger, normal markers, no jaw/visual/systemic features</td><td>A dangerous default in the elderly with raised ESR — the M&amp;M trap (S21).</td></tr>
+          <tr><td>💪 <strong>PMR alone</strong></td><td>Girdle stiffness, raised markers, NO cranial/visual features</td><td>Lower-dose steroids; watch for conversion to GCA.</td></tr>
+          <tr><td>🩸 <strong>Other vasculitis / infection / malignancy</strong></td><td>ANCA-vasculitis, endocarditis, myeloma — systemic upset, raised markers</td><td>Serology, cultures, imaging to exclude mimics.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Every new headache over 50 gets the same three questions: does the JAW ache on chewing, has the VISION dimmed, is the SCALP tender? Any 'yes' is GCA until steroids and a specialist say otherwise."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The First Hours"</h3>
+          <div class="hud"><span>👁️ Vision reserve: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">A 72-year-old with a new temporal headache, jaw claudication, scalp tenderness and two episodes of transient visual loss this morning. ESR is pending. The registrar says "let us wait for the biopsy before committing her to steroids." What do you do?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The management plan</h3>
+        <ol>
+          <li>👁️ <strong>Diagnosis:</strong> GCA with visual involvement + associated PMR. Started on IV methylprednisolone same hour; ophthalmology reviewing.</li>
+          <li>💊 IV pulse × 3 days → oral prednisolone 40–60 mg/day with a structured 12–24 month taper; <strong>tocilizumab</strong> discussed for steroid sparing.</li>
+          <li>🔬 <strong>Confirm:</strong> temporal artery ultrasound today; biopsy booked within 1–2 weeks; large-vessel imaging if features suggest aortitis.</li>
+          <li>🦴 Bone protection, PPI, glucose/BP monitoring from day one; steroid card and education; rheumatology + ophthalmology follow-up.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"GCA is not 'a headache to investigate' — it is an eye emergency to treat now and confirm later, wrapped in a long, carefully-supported steroid taper."</div>
+
+        <div class="checklist" id="ckGCA">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Suspected GCA fast-track (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>👁️ Documented visual acuity both eyes + urgent ophthalmology referral</span></label>
+          <label class="ck"><input type="checkbox"><span>💊 High-dose steroid given on suspicion — IV methylprednisolone because visual symptoms present</span></label>
+          <label class="ck"><input type="checkbox"><span>🧪 ESR + CRP + FBC sent (but treatment NOT delayed for them)</span></label>
+          <label class="ck"><input type="checkbox"><span>🔬 Temporal artery ultrasound arranged today; biopsy booked within 1–2 weeks</span></label>
+          <label class="ck"><input type="checkbox"><span>🦴 Bone protection + PPI + glucose monitoring started with the steroid</span></label>
+          <label class="ck"><input type="checkbox"><span>💉 Tocilizumab / steroid-sparing plan considered and documented</span></label>
+          <label class="ck"><input type="checkbox"><span>📞 Clear follow-up: rheumatology, taper plan, steroid card, safety-net for visual change</span></label>
+          <div class="ck-progress" data-progress>0 / 7 complete</div>
+        </div>
+
+        <div class="checklist" id="ckTaper">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Safe steroid taper &amp; monitoring</h3>
+          <label class="ck"><input type="checkbox"><span>📉 Structured taper mapped (typically over 12–24 months), never abrupt</span></label>
+          <label class="ck"><input type="checkbox"><span>🧪 ESR/CRP + symptoms reviewed at each step for relapse</span></label>
+          <label class="ck"><input type="checkbox"><span>🦴 DEXA + ongoing calcium/vitamin D/bisphosphonate</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 HbA1c/glucose and BP monitored and treated</span></label>
+          <label class="ck"><input type="checkbox"><span>🫀 Long-term aortic aneurysm surveillance in large-vessel disease</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">09:40</div>Arrival; new headache, jaw claudication, scalp tenderness, two episodes of amaurosis, pallid disc swelling left eye.</div>
+          <div class="t-item"><div class="t-time">09:55</div>GCA suspected clinically → <strong>IV methylprednisolone 1 g given</strong> without waiting for ESR or biopsy; ophthalmology alerted.</div>
+          <div class="t-item"><div class="t-time">Same day</div>ESR 88, CRP 96; temporal artery ultrasound shows a clear halo sign. Biopsy booked for day 5.</div>
+          <div class="t-item"><div class="t-time">Day 2</div>Headache and jaw pain markedly improved; no further visual episodes; girdle stiffness easing (PMR response). Switched to oral prednisolone 60 mg.</div>
+          <div class="t-item"><div class="t-time">Day 5</div>Temporal artery biopsy: transmural granulomatous arteritis with giant cells — confirms GCA. Tocilizumab commenced for steroid sparing; long taper planned.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>Her sight is intact because someone refused "tension headache," treated on clinical suspicion, and did NOT wait for the biopsy. The vision preserved in the fellow eye is the whole point of the emergency.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 The GCA discharge vs the PMR-alone discharge — two different intensities</h3>
+        <div class="vs">
+          <div class="side a"><h4>👁️ This patient (GCA with visual involvement)</h4><ul><li>Oral prednisolone with a long structured taper + tocilizumab; steroid card</li><li>Bone protection, PPI, glucose/BP monitoring; DEXA</li><li>Red flags: ANY new visual loss, new/worsening headache, jaw pain, limb claudication → same-day review / 999 if sudden visual loss</li><li>Rheumatology + ophthalmology follow-up; aortic surveillance long-term</li></ul></div>
+          <div class="side b"><h4>💪 PMR alone (no cranial/visual features)</h4><ul><li>Lower-dose prednisolone (~15 mg) with faster taper; dramatic early response expected</li><li>Bone/gastric protection still required</li><li>Explicit safety-net: report new headache, jaw or visual symptoms immediately (conversion to GCA)</li><li>GP + rheumatology review of taper and relapse</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Every GCA/PMR patient goes home knowing three things by heart: never stop steroids suddenly, protect your bones, and if the vision dims come straight back — the taper is a marathon, not a discharge."</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>💊 Treat first, prove later</b>High-dose steroids on suspicion — IV methylprednisolone if any visual symptom. Never wait for the biopsy.</div>
+          <div class="pearl"><b>👁️ Amaurosis = last warning</b>Transient visual loss is reversible; established AION is not. Hours matter.</div>
+          <div class="pearl"><b>🦷 Jaw claudication</b>The symptom that most raises the odds of a positive biopsy — take it seriously.</div>
+          <div class="pearl"><b>🔬 Biopsy stays positive</b>Yield persists 1–2 weeks after steroids; skip lesions mean negative does not exclude.</div>
+          <div class="pearl"><b>🩻 Halo sign</b>Same-day temporal artery ultrasound is fast, sensitive first-line confirmation.</div>
+          <div class="pearl"><b>💪 GCA + PMR spectrum</b>Any PMR patient with a new headache/jaw/visual symptom has converted — GCA-dose steroids now.</div>
+          <div class="pearl"><b>💉 Tocilizumab spares steroids</b>IL-6 blockade (GiACTA) for relapsing/refractory disease and steroid toxicity.</div>
+          <div class="pearl"><b>🦴 Protect from day one</b>Bone protection, PPI, glucose and BP monitoring go in with the first steroid, not later.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the pathway</h3>
+          <ul>
+            <li>🫀 <strong>Large-vessel GCA (LV-GCA):</strong> up to a third of GCA has extracranial large-vessel involvement (aorta, subclavian, axillary). It may present with limb claudication, bruits, fever of unknown origin or few cranial symptoms — PET-CT and MRA/CTA are key, and it drives long-term aneurysm/dissection risk.</li>
+            <li>🧬 <strong>Immunology:</strong> GCA is a Th1 (IFN-γ) and Th17 (IL-17) driven granulomatous arteritis; <strong>IL-6</strong> underlies the acute-phase response and is the therapeutic target of tocilizumab. Dendritic cells in the adventitia and vascular smooth-muscle remodelling (PDGF/VEGF, intimal hyperplasia) explain luminal occlusion.</li>
+            <li>💉 <strong>Steroid-sparing agents:</strong> tocilizumab (GiACTA) is first-line adjunct; methotrexate has modest steroid-sparing benefit; emerging agents target GM-CSF (mavrilimumab) and JAK pathways (upadacitinib in trials).</li>
+            <li>🩻 <strong>Fast-track GCA clinics:</strong> same-day ultrasound-led pathways reduce time-to-treatment and permanent visual loss; a positive halo in a high-probability patient can obviate biopsy.</li>
+            <li>👁️ <strong>Arteritic vs non-arteritic AION:</strong> pallid ("chalky") disc swelling, profound acuity loss, raised ESR/CRP and systemic features point to arteritic — a genuine emergency — versus the hyperaemic, small-disc, marker-negative non-arteritic form.</li>
+            <li>🔗 <strong>GCA / PMR overlap and Takayasu:</strong> understanding the spectrum of large-vessel vasculitis (Takayasu in the young, GCA over 50) and PMR as a shared inflammatory phenotype informs imaging choice and follow-up.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The Tension Headache That Took an Eye"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 74-year-old woman saw her GP with three weeks of a new right temporal headache and aching in her jaw when eating. Labelled "tension headache — stress and screen time," she was started on amitriptyline. An ESR of 92 sent that day returned to an inbox no one reviewed. She mentioned that her sight had "flickered" once; it was not documented. Four days later she woke <strong>blind in the right eye</strong> from arteritic AION. High-dose steroids were finally started — but nine days after that, before the taper stabilised, she lost <strong>useful vision in the left eye</strong> too. The temporal artery biopsy, taken late, still showed florid giant-cell arteritis.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🧠 ANCHORING</b>"Tension headache" label stuck despite a NEW headache in a 74-year-old.</div>
+            <div class="hole"><b>🦷 SYMPTOM IGNORED</b>Jaw claudication and transient visual flicker not recognised as GCA red flags.</div>
+            <div class="hole"><b>🧪 RESULT UNREAD</b>ESR 92 sat unactioned — the alarm that should have triggered treatment.</div>
+            <div class="hole"><b>💊 STEROIDS DELAYED</b>Treatment withheld until fixed blindness, then again while "waiting" — losing the second eye.</div>
+            <div class="hole"><b>🏥 SYSTEM</b>No fast-track GCA pathway; no safety-net for visual symptoms.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved her sight:</strong> treat every new headache over 50 with jaw or visual symptoms as GCA; start high-dose steroids on clinical suspicion — IV methylprednisolone for visual involvement — WITHOUT waiting for the ESR or biopsy; act on the raised ESR the day it returns; and safety-net every patient to return instantly for any visual change. <strong>This is exactly the discipline that saved the patient in Bed 5.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Probably a tension headache' in an older patient with a raised ESR has blinded more people than any rare disease. When in doubt in GCA, the steroid goes in first and the biopsy waits."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · 🩸 Rheumatology &amp; Immunology · Bed 5 — Giant Cell Arteritis &amp; Polymyalgia Rheumatica<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+    /* ===== SIDEBAR TABS — show one section at a time ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not a high-risk feature'); } if(found===total){ flagResult.textContent='✅ All '+total+' high-risk features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' high-risk features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: sight-saving clock ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=(v-0)/(72-0)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<=6){ msg='🟢 Steroids within '+v+' h. Transient visual loss is still reversible — the optic nerve is protected. This is the target.'; cls='good'; }
+      else if(v<=24){ msg='🟠 '+v+' h delay. Risk of fixed anterior ischaemic optic neuropathy is rising fast — each hour of "waiting for the biopsy" costs retina.'; cls='warn-r'; }
+      else if(v<=48){ msg='🔴 '+v+' h delay. High risk of permanent monocular blindness and the fellow eye now threatened. Unacceptable delay.'; cls='bad'; }
+      else { msg='🔴 '+v+' h delay. Likely irreversible bilateral visual loss — the exact catastrophe of the S21 M&M case.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Clock Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"A 72-year-old with a new temporal headache, jaw claudication, scalp tenderness and two episodes of transient visual loss this morning. ESR is pending. The registrar says 'let us wait for the biopsy before starting steroids.' What do you do?",
+      choices:[
+        {t:"⏳ Wait for the temporal artery biopsy before any steroids",good:false,ds:-2,dt:240,xp:0,fb:"☠️ This is the M&M case in S21. Biopsy stays positive for 1–2 weeks — waiting protects nothing and risks the optic nerve. She loses vision while you wait. Restart.",end:true},
+        {t:"💊 Start high-dose steroids NOW — IV methylprednisolone because she has visual symptoms — then arrange US and biopsy",good:true,ds:1,dt:15,xp:40,fb:"✅ Exactly. Suspicion + visual involvement = IV methylprednisolone immediately. The biopsy and ultrasound stay informative for days afterwards.",next:"confirm"},
+        {t:"📅 Send her to a routine rheumatology clinic next week with analgesia",good:false,ds:-2,dt:600,xp:0,fb:"☠️ Catastrophic — this is a same-hour eye emergency, not an outpatient headache. Blindness can occur within days. Restart.",end:true}
+      ]},
+    confirm:{ text:"IV methylprednisolone is running. ESR returns at 88, CRP 96. Same-day ultrasound shows a halo sign. The registrar asks whether the biopsy is now unnecessary and whether to skip bone protection 'for a short course.' Next best step?",
+      choices:[
+        {t:"🔬 Still book the biopsy within 1–2 weeks and start bone protection + PPI + glucose monitoring today",good:true,ds:1,dt:10,xp:40,fb:"✅ Right. This is not a short course — GCA needs months of steroids, so bone/gastric/glucose protection start on day one; biopsy confirms and documents.",next:"taper"},
+        {t:"🚫 Skip bone protection since it is 'only steroids for a few weeks'",good:false,ds:-1,dt:30,xp:0,fb:"⚠️ Wrong — GCA steroids run 12–24 months. Osteoporotic fracture is the commonest iatrogenic harm; protection starts with the first dose.",next:"taper"}
+      ]},
+    taper:{ text:"Day 2: her headache and jaw pain have melted away and vision is stable. She is relieved and asks to stop the steroids now that she feels well. What now?",
+      choices:[
+        {t:"📉 Continue a slow structured taper over 12–24 months, add tocilizumab for steroid sparing, safety-net for any visual change",good:true,ds:1,dt:10,xp:45,fb:"🏆 Perfect. Rapid symptom relief confirms GCA but relapse and blindness return if steroids stop early — taper slowly, spare steroids with IL-6 blockade, and safety-net the eyes.",end:true},
+        {t:"🛑 Stop the steroids abruptly now that she feels better",good:false,ds:-2,dt:60,xp:0,fb:"☠️ Dangerous on two counts — abrupt withdrawal risks adrenal crisis AND disease relapse with recurrent, potentially blinding arteritis. Never stop suddenly.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='taper'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 72-year-old has a new temporal headache, jaw claudication and transient visual loss. ESR is pending. The single most important next step is:", opts:["Wait for the temporal artery biopsy before any treatment","Start high-dose steroids immediately (IV methylprednisolone) on clinical suspicion","Prescribe amitriptyline for tension headache","Arrange a routine clinic review next week"], correct:1, exp:"GCA with visual symptoms is a sight-threatening emergency. Start high-dose steroids on suspicion — IV methylprednisolone for visual involvement — without waiting for markers or biopsy. Blindness can occur within hours to days." },
+    { q:"Why is it safe to start steroids before the temporal artery biopsy in suspected GCA?", opts:["Steroids make the biopsy positive","Arteritic changes and giant cells persist for at least 1–2 weeks after steroids begin","The biopsy is never useful","Steroids are only diagnostic, not therapeutic"], correct:1, exp:"Temporal artery biopsy remains positive for 1–2 weeks after steroids start, so treating first does not sacrifice diagnostic yield — but delaying steroids can cost irreversible sight." },
+    { q:"A negative temporal artery biopsy in a patient with classic GCA features means:", opts:["GCA is definitively excluded, stop steroids","A skip lesion may have been missed — keep treating if the picture fits","The ESR must be wrong","The patient has PMR instead"], correct:1, exp:"GCA is segmental with skip lesions, so a short or contralateral biopsy can miss disease. A negative biopsy does NOT exclude GCA when the clinical picture is convincing — continue treatment and confirm by other means." },
+    { q:"Which finding best distinguishes arteritic AION (GCA) from non-arteritic AION?", opts:["Painless visual loss","Pallid ('chalky-white') disc swelling with markedly raised ESR/CRP and systemic features","A small crowded disc","Normal inflammatory markers"], correct:1, exp:"Arteritic AION shows pallid disc swelling, profound acuity loss, raised ESR/CRP and systemic/constitutional features. Non-arteritic AION has a hyperaemic small ('at-risk') disc and normal markers." },
+    { q:"What is the relationship between GCA and polymyalgia rheumatica (PMR)?", opts:["They are unrelated diseases","They are two ends of one inflammatory spectrum; PMR can convert to GCA","PMR always causes blindness","GCA never has girdle symptoms"], correct:1, exp:"40–60% of GCA patients have PMR and ~15% of PMR develops GCA. Any PMR patient developing headache, jaw claudication or visual symptoms has converted and needs GCA-dose steroids immediately." },
+    { q:"Which agent is the established steroid-sparing therapy for relapsing or refractory GCA (GiACTA trial)?", opts:["Cyclophosphamide","Tocilizumab (anti-IL-6 receptor)","Rituximab","Allopurinol"], correct:1, exp:"GiACTA showed tocilizumab (IL-6 receptor blockade) achieved higher sustained remission and major cumulative steroid sparing. IL-6 is the central cytokine driving the GCA acute-phase response." },
+    { q:"Which should be started on day one alongside high-dose steroids in GCA?", opts:["Nothing until side effects appear","Bone protection, gastric (PPI) protection, and glucose/BP monitoring","Only vitamin D once a year","Immediate steroid withdrawal plan"], correct:1, exp:"GCA needs months of steroids, so bone protection (calcium/vitamin D + bisphosphonate), a PPI, and glucose/BP monitoring start with the first dose to pre-empt osteoporosis, ulceration and steroid diabetes." },
+    { q:"A same-day, first-line confirmatory test in a fast-track GCA clinic is:", opts:["Temporal artery ultrasound looking for the halo sign","Lumbar puncture","Coronary angiography","Skin biopsy"], correct:1, exp:"Temporal (and axillary) artery ultrasound showing a hypoechoic, non-compressible halo is a sensitive, rapid first-line test (TABUL). In expert hands a positive halo in a high-probability patient can obviate biopsy." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you treat GCA like a consultant. 🏆':score>=6?'Strong — review the misses and S10 confirmatory tests.':'Revisit S4, S5 and S6 — treat-first-prove-later is the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>

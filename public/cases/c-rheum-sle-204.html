@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Systemic Lupus Erythematosus with Lupus Nephritis — Virtual Teaching Hospital</title>
+<!-- META
+id: c-rheum-sle-204
+title: Systemic Lupus Erythematosus — the Kidney that Changes Prognosis
+hospital: rheumatology
+department: rheum-immunology
+bednumber: 4
+chiefcomplaint: Fatigue, arthralgia, malar rash, oral ulcers — now frothy urine & oedema
+system: Rheumatology & Immunology
+severity: high
+tags: SLE, Lupus nephritis, ANA, anti-dsDNA, Complement, Hydroxychloroquine, Immune complex
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🦋</div>
+      <div>
+        <div class="t1">Rheumatology &amp; Immunology</div>
+        <div class="t2">Bed 4 · SLE + Lupus Nephritis</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">📨</span><span>Referral / Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📸</span><span>Imaging / Serology</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · 🦋 Rheumatology &amp; Immunology · 🩺 Rapid-Access Clinic · 🛏️ Bed 4</div>
+        <h1>🦋 Lupus with a Kidney in Trouble — "Always Dip the Urine"</h1>
+        <div class="sub">⚡ A 26-year-old woman with months of fatigue, joint pain, a butterfly rash and mouth ulcers now notices her urine is frothy and her ankles are swelling. The rash was treated. The joints were treated. Nobody dipped the urine. The organ that decides whether she keeps her kidneys is the one that was never checked.</div>
+        <div class="chips">
+          <span class="chip crit">🟠 HIGH PRIORITY</span>
+          <span class="chip">🦋 Multisystem Autoimmunity</span>
+          <span class="chip">🧪 ANA / anti-dsDNA / Complement</span>
+          <span class="chip">🩸 Lupus Nephritis</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital"><div class="v-label">💓 HR</div><div class="v-num">92</div></div>
+        <div class="vital warn"><div class="v-label">🩸 BP</div><div class="v-num">152/96</div></div>
+        <div class="vital"><div class="v-label">🌬️ RR</div><div class="v-num">17</div></div>
+        <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">98%</div></div>
+        <div class="vital warn"><div class="v-label">🌡️ Temp</div><div class="v-num">37.6°</div></div>
+        <div class="vital alert"><div class="v-label">🧫 Urine PCR</div><div class="v-num">380</div></div>
+        <div class="vital warn"><div class="v-label">🦵 Oedema</div><div class="v-num">++</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — Rapid-access clinic, urgent slot</b>A young woman sits with a faint red flush across both cheeks and the bridge of her nose, sparing the folds. She says: <em>"I have been exhausted and achy for months, I had ulcers in my mouth, and now the toilet water foams and my rings and shoes do not fit."</em> Her rash and joints were treated as separate problems by three different clinicians. The frothy urine and the swelling are the moment lupus stopped being a skin-and-joint nuisance and became a kidney emergency.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>👩 Name</td><td><strong>Ms. S.L.E.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>26-year-old woman</td></tr>
+          <tr><td>🆔 MRN</td><td>RHM-0404</td></tr>
+          <tr><td>🌍 Background</td><td>Afro-Caribbean heritage — higher SLE incidence &amp; more severe nephritis</td></tr>
+          <tr><td>💼 Occupation</td><td>Graphic designer, planning a family next year</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 History — a multisystem story hiding in plain sight</h3>
+        <ul>
+          <li>🦋 <strong>Malar (butterfly) rash</strong> over cheeks and nasal bridge, <em>sparing the nasolabial folds</em>; photosensitive — worse after a sunny weekend.</li>
+          <li>👄 <strong>Painless oral/palatal ulcers</strong>; diffuse hair thinning.</li>
+          <li>🖐️ <strong>Inflammatory arthralgia</strong> of hands and wrists — <em>non-erosive</em> (unlike RA); Raynaud phenomenon in the cold.</li>
+          <li>😴 Months of <strong>fatigue, low-grade fevers and malaise</strong> — the systemic hum of active lupus.</li>
+          <li>🚽 <strong>NEW: frothy urine and ankle/periorbital oedema</strong> — the alarm that the kidney is now involved.</li>
+          <li>🤰 Keen to conceive next year — makes drug choice and anti-Ro status critical (see S20).</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In any young woman with a multisystem inflammatory illness, DIP THE URINE at every visit — lupus nephritis is silent until it is not, and it is the organ that rewrites the prognosis."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why lupus is the great imitator</b>SLE affects women 9:1, peak 15–45, and is commoner and more severe in Black and Asian patients. It can involve skin, joints, kidney, brain, blood, heart and lungs — often sequentially, which is exactly how a nephritis gets missed while everyone treats the rash. Renal involvement affects up to ~40% and is a leading driver of morbidity and mortality.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 REFERRAL / HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>📨 Referral / Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 GP referral — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ Primary-care referral (verbatim)</b>
+          <p><strong>S:</strong> "26-year-old woman, months of fatigue, joint pain, a facial rash and mouth ulcers, now with frothy urine and swollen ankles."</p>
+          <p><strong>B:</strong> "Treated separately for 'eczema' and 'a viral arthralgia'. Today her BP is 152/96 and her urine dipstick is +++ protein, ++ blood. I have never checked her urine before."</p>
+          <p><strong>A:</strong> "I sent ANA — strongly positive — and bloods are pending. She looks tired and puffy around the eyes."</p>
+          <p><strong>R:</strong> "Referred URGENTLY — I think this is lupus with kidney involvement. Please assess for lupus nephritis."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Proteinuria + haematuria + hypertension in a young woman with a multisystem illness is lupus nephritis until a biopsy says otherwise — this earns an urgent nephrology/rheumatology referral, not an outpatient wait."</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each feature that supports ACTIVE lupus / nephritis</h3>
+        <p>🎮 <em>Click every feature that raises the probability of active SLE with renal involvement. Each correct = +10 XP.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">🦋 Photosensitive malar rash sparing nasolabial folds</button>
+          <button class="btn ghost flag-btn" data-good="1">👄 Painless oral ulcers</button>
+          <button class="btn ghost flag-btn" data-good="1">🚽 Frothy urine + oedema (proteinuria)</button>
+          <button class="btn ghost flag-btn" data-good="1">🩸 New hypertension + haematuria</button>
+          <button class="btn ghost flag-btn" data-good="1">😴 Multisystem fatigue, fevers, arthralgia</button>
+          <button class="btn ghost flag-btn" data-good="0">☝️ Painful bony DIP nodules</button>
+          <button class="btn ghost flag-btn" data-good="0">🌞 Rash only in sun-protected skin folds</button>
+          <button class="btn ghost flag-btn" data-good="0">🦶 Isolated big-toe gout attack</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Praise where due</b>The moment the GP finally dipped the urine, the whole diagnosis reframed. Protein and blood on the dipstick converted "another rash" into a renal emergency. The single cheapest test in medicine — urinalysis — is the one that changes this prognosis.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🔎 The head-to-toe of a multisystem disease</h3>
+        <table class="tbl">
+          <tr><th>System</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>🧑 Skin</td><td>Fixed malar erythema sparing nasolabial folds; no scarring discoid lesions; photosensitive.</td><td>A classic mucocutaneous criterion; sparing of folds distinguishes it from rosacea/dermatomyositis.</td></tr>
+          <tr><td>👄 Mucosa</td><td>Two painless palatal ulcers; mild alopecia.</td><td>Painless mucosal ulceration is a specific lupus feature.</td></tr>
+          <tr><td>🖐️ Joints</td><td>Tender wrists/MCPs, soft-tissue only, <strong>no erosions, no fixed deformity</strong>.</td><td>Non-erosive (Jaccoud) arthropathy — contrasts with RA pannus/erosions.</td></tr>
+          <tr><td>🩸 Cardiovascular/renal</td><td><strong>BP 152/96</strong>, periorbital &amp; pedal oedema, no rub today.</td><td>New hypertension + oedema screams renal involvement — the organ of prognosis.</td></tr>
+          <tr><td>🚽 Urine</td><td>Dipstick protein +++, blood ++; bedside <strong>uPCR 380 mg/mmol</strong>.</td><td>Nephrotic-range proteinuria + active sediment = lupus nephritis until biopsied.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Lupus arthritis is NON-erosive and reducible; if you see erosions and pannus you are looking at rheumatoid, not lupus. Feel the joints, but always finish at the kidney."</div>
+
+        <h3>🧭 The bedside question that must be asked every visit</h3>
+        <p>In known or suspected SLE, three checks catch the organ threats early: <strong>the urine</strong> (nephritis), <strong>the blood pressure</strong> (renal/vascular), and <strong>a neuro/mental-state screen</strong> (cerebral lupus). Add a quick <strong>blood count</strong> for cytopenias and a question about pleuritic chest pain for serositis (see S14).</p>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of treating lupus organ-by-organ</b>The commonest way lupus nephritis is missed is by treating the rash in dermatology, the joints in rheumatology, and never joining the dots with a urine dip. <strong>Active urine sediment can exist with a "well-looking" patient and a normal creatinine.</strong> Screen the kidney at every contact — do not wait for the creatinine to rise.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The rheumatology registrar thinks out loud:</em></p>
+        <h3>🧠 Frame it as "confirm lupus, then stage the kidney"</h3>
+        <p>"Multisystem: skin, mucosa, joints, constitutional — plus new proteinuria, haematuria and hypertension. This is SLE with likely lupus nephritis. My job is to confirm the diagnosis serologically (ANA, then anti-dsDNA and complement), quantify the kidney (uPCR, sediment, renal function), and get an <strong>urgent renal biopsy</strong> to classify the nephritis, because the class (I–VI) dictates whether she needs aggressive immunosuppression. And I start <strong>hydroxychloroquine now</strong> — everyone with lupus gets it."</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>🧪 <strong>ANA</strong> (screen) → if positive, <strong>anti-dsDNA, anti-Sm, complement C3/C4</strong>, plus anti-Ro/La and antiphospholipid antibodies (S9).</li>
+          <li>🚽 <strong>Quantify the kidney:</strong> uPCR/24-h protein, urine microscopy for <strong>dysmorphic red cells and red-cell casts</strong>, creatinine/eGFR, albumin.</li>
+          <li>🩻 <strong>Urgent renal biopsy</strong> to assign the ISN/RPS class (I–VI) and score activity vs chronicity (S10).</li>
+          <li>💊 <strong>Start hydroxychloroquine</strong> immediately; plan induction immunosuppression scaled to the biopsy class (S11).</li>
+          <li>🩸 Control BP (ACE inhibitor/ARB for proteinuria once class known), screen APS/anti-Ro given her pregnancy plans.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"You cannot treat lupus nephritis you have not classified — proteinuria plus active sediment earns an URGENT renal biopsy, because Class II is watched while Class IV is treated hard, and the treatment for one would harm the other."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Registrar's self-test</b>The ANA is positive at 1:640. Does that confirm lupus?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No — ANA is sensitive, not specific.</strong> ANA is positive in &gt;95% of SLE (so a negative ANA makes lupus very unlikely — a great rule-OUT), but it is also positive in healthy people, other autoimmune diseases, thyroid disease and infections. Confirmation comes from the <strong>specific antibodies (anti-dsDNA, anti-Sm)</strong> and the clinical picture. <strong>anti-dsDNA and low C3/C4 also track disease activity and nephritis</strong> — that is their real power here.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The consultant rheumatologist at the bedside:</em></p>
+        <h3>🧮 The 2019 EULAR/ACR criteria — ANA is the entry gate</h3>
+        <table class="tbl">
+          <tr><th>Step</th><th>Detail</th><th>This patient</th></tr>
+          <tr><td><strong>Entry criterion</strong></td><td>ANA ≥ 1:80 (HEp-2) — required to classify</td><td class="hi">ANA 1:640 ✔</td></tr>
+          <tr><td><strong>Clinical domains</strong></td><td>Constitutional, mucocutaneous, arthritis, serositis, neuro, haematological, renal</td><td class="hi">Rash, ulcers, arthritis, renal</td></tr>
+          <tr><td><strong>Immunology domains</strong></td><td>anti-dsDNA/anti-Sm, low complement, antiphospholipid</td><td class="hi">anti-dsDNA high, low C3/C4</td></tr>
+          <tr><td><strong>Weighting</strong></td><td>Renal (Class III/IV biopsy) is weighted heavily; ≥10 points = classify as SLE</td><td class="hi">Well over threshold</td></tr>
+        </table>
+        <p>A key rule: <strong>you count the highest-weighted item in each domain, and only if not better explained by another cause.</strong> Biopsy-proven Class III/IV nephritis alone scores 10 — the kidney can classify the disease by itself.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A NEGATIVE ANA makes SLE very unlikely — it is the great rule-OUT. But a positive ANA never rules it IN; the specific antibodies and the clinical/biopsy picture do."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">FOUNDATION</span> Hydroxychloroquine (Canadian HCQ withdrawal &amp; cohorts)</td><td>HCQ reduces flares, organ damage, thrombosis and improves survival across SLE.</td><td>Hydroxychloroquine for essentially ALL lupus patients — the backbone drug.</td></tr>
+            <tr><td><span class="lvl">RCT</span> Euro-Lupus Nephritis Trial</td><td>Low-dose IV cyclophosphamide as effective as high-dose with less toxicity for induction.</td><td>Modern induction favours lower-toxicity regimens.</td></tr>
+            <tr><td><span class="lvl">RCT</span> ALMS (mycophenolate)</td><td>Mycophenolate mofetil equivalent to cyclophosphamide for induction, better tolerated, preferred in many.</td><td>MMF is a first-line induction/maintenance option, esp. in younger/fertility-concerned patients.</td></tr>
+            <tr><td><span class="lvl">RCT</span> BLISS (belimumab) &amp; BLISS-LN</td><td>Belimumab (anti-BLyS/BAFF) added to standard care improves disease control and renal outcomes.</td><td>Add-on biologic for active/refractory lupus and nephritis.</td></tr>
+            <tr><td><span class="lvl">RCT</span> Voclosporin (AURORA)</td><td>Calcineurin inhibitor added to MMF improved complete renal response in lupus nephritis.</td><td>Combination ("multi-target") induction is now an option for nephritis.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The chart that keeps me awake is the young woman whose lupus rash and joints were treated for a year and <strong>whose urine was never dipped</strong>. Her Class IV nephritis smouldered until she arrived with an eGFR of 12 and needed dialysis. And second: never let a patient quietly <strong>stop her hydroxychloroquine</strong> — the flares that follow can be organ- or life-threatening."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY immune complexes wreck organs (the WHY behind the WHY)</h3>
+        <ol>
+          <li>🧬 <strong>Loss of tolerance:</strong> in a genetically primed host, defective clearance of apoptotic cell debris exposes nuclear antigens (DNA, histones, Sm). Autoreactive B and T cells escape tolerance.</li>
+          <li>🎯 <strong>Autoantibodies:</strong> the immune system makes antibodies to nuclear material — <strong>ANA</strong> broadly, and specifically <strong>anti-dsDNA</strong> and <strong>anti-Sm</strong>.</li>
+          <li>🔗 <strong>Immune-complex formation:</strong> antibody binds antigen forming circulating and in-situ <strong>immune complexes</strong> (a type III hypersensitivity).</li>
+          <li>🌊 <strong>Deposition + complement:</strong> complexes deposit in the <strong>glomerular basement membrane</strong>, skin, serosa and vessels; they <strong>activate complement</strong>, consuming C3 and C4 (which is WHY complement falls when disease is active) and recruiting neutrophils.</li>
+          <li>💀 <strong>Inflammation + organ injury:</strong> the resulting inflammation damages the glomerulus → <strong>proteinuria, haematuria, red-cell casts</strong>; in the brain, serosa, marrow and vessels it produces the protean features. Rising anti-dsDNA + falling complement is the biochemical signature of an active flare.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Anti-dsDNA UP and complement (C3/C4) DOWN = the flare is real and the kidney is at risk. These two numbers, moving in opposite directions, are your disease-activity dashboard."</div>
+
+        <h3>⚖️ Contrast pair — Lupus arthritis vs Rheumatoid arthritis</h3>
+        <div class="vs">
+          <div class="side a"><h4>🦋 Lupus (SLE)</h4><ul><li>Non-erosive, <strong>reducible</strong> (Jaccoud) deformity; joints look worse than the X-ray</li><li>Multisystem: rash, ulcers, renal, cytopenias, serositis</li><li>ANA+, anti-dsDNA/anti-Sm, LOW complement in flare</li><li>Hydroxychloroquine backbone ± immunosuppression by organ</li></ul></div>
+          <div class="side b"><h4>🔥 Rheumatoid arthritis</h4><ul><li><strong>Erosive</strong> pannus, fixed deformity; X-ray shows marginal erosions</li><li>Joint-dominant (though extra-articular disease exists)</li><li>anti-CCP/RF; complement usually normal</li><li>Methotrexate anchor, treat-to-target DMARDs</li></ul></div>
+        </div>
+        <p>💡 Both are autoimmune and both can hurt the same knuckles — but lupus reduces, rheumatoid erodes, and only lupus routinely threatens the kidney and brain.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The Disease-Activity Dial (anti-dsDNA vs complement)</h3>
+          <p style="font-size:13px">Lupus activity is read from two opposing trends. Drag the <strong>anti-dsDNA</strong> up and watch complement fall and the flare/nephritis risk climb.</p>
+          <label for="kRange">🧪 anti-dsDNA titre: <b id="kVal">40</b> IU/mL (complement falls as this rises)</label>
+          <input type="range" id="kRange" min="5" max="300" value="40">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore quiescent vs active/nephritic lupus.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 Low, stable anti-dsDNA with normal C3/C4 → quiescent. A rising anti-dsDNA with falling complement AND active urine → a flare threatening the kidney: escalate and re-check the urine.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The order set (urgent clinic visit)</h3>
+        <ul>
+          <li>🧪 <strong>ANA</strong>, then <strong>anti-dsDNA, anti-Sm, anti-Ro/La, complement C3/C4</strong>; antiphospholipid antibodies (lupus anticoagulant, anti-cardiolipin, anti-β2GPI).</li>
+          <li>🚽 <strong>Urinalysis + microscopy</strong> (dysmorphic RBCs, red-cell casts), <strong>uPCR / 24-h protein</strong>, creatinine/eGFR, serum albumin.</li>
+          <li>🩸 <strong>FBC</strong> (cytopenias — haemolytic anaemia, leukopenia, thrombocytopenia), reticulocytes, DAT/Coombs, LDH, haptoglobin if haemolysis suspected.</li>
+          <li>🩻 <strong>Urgent renal biopsy</strong> referral to classify nephritis (ISN/RPS I–VI) and score activity/chronicity.</li>
+          <li>💊 <strong>Start hydroxychloroquine</strong> now (weight-based dosing; baseline ophthalmology screening arranged).</li>
+          <li>🩸 <strong>Blood pressure control</strong>; ACE inhibitor/ARB for proteinuria (anti-proteinuric + renoprotective) once class known and pregnancy status considered.</li>
+          <li>☀️ Photoprotection advice; screen infection and vaccination status before immunosuppression.</li>
+          <li>🤰 Pregnancy test and pre-conception counselling flag — teratogenic drugs to be avoided; document anti-Ro status.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Every lupus order set starts with a urine dip and ends with hydroxychloroquine. The dip finds the kidney; the hydroxychloroquine protects every organ — neither is optional."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ The rheumatology/renal nurse runs the safety net and the education</h3>
+        <ul>
+          <li>🚽 <strong>Dip the urine at every visit</strong> and quantify new proteinuria — the nurse is often the one who catches the silent nephritis first.</li>
+          <li>💊 <strong>Hydroxychloroquine adherence:</strong> explain it is protective, not just symptomatic; it takes weeks to work; do NOT stop it in a flare or pregnancy (it is continued in pregnancy). Arrange annual retinal screening.</li>
+          <li>☀️ <strong>Photoprotection &amp; triggers:</strong> high-SPF sunscreen, sun avoidance, smoking cessation; counsel that UV, infection and some drugs trigger flares.</li>
+          <li>🦠 <strong>Immunosuppression safety:</strong> infection sick-day rules, vaccination (no live vaccines while heavily immunosuppressed), PJP prophylaxis where indicated; monitor bloods on cyclophosphamide/MMF.</li>
+          <li>🩸 <strong>BP &amp; fluid:</strong> daily weights and BP, watch oedema and for signs of nephrotic complications (infection, VTE).</li>
+          <li>🤰 <strong>Family planning:</strong> reinforce reliable contraception on teratogens (mycophenolate, cyclophosphamide), and flag pre-conception counselling and anti-Ro status for neonatal-lupus risk.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who dips every lupus urine and says 'never stop your hydroxychloroquine' prevents both the missed nephritis and the avoidable flare — the two catastrophes of this disease."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Result</th><th>Interpretation</th></tr>
+          <tr><td>ANA</td><td class="hi">Positive 1:640 (homogeneous)</td><td>Entry criterion; &gt;95% sensitive — a negative would make SLE very unlikely.</td></tr>
+          <tr><td>anti-dsDNA</td><td class="hi">Strongly positive (high titre)</td><td>Specific for SLE and <strong>tracks activity/nephritis</strong> — rises with flares.</td></tr>
+          <tr><td>anti-Sm</td><td class="hi">Positive</td><td>Highly specific for SLE (though not activity-tracking).</td></tr>
+          <tr><td>Complement C3 / C4</td><td class="lo">Both LOW</td><td>Consumed by immune complexes → falls in active disease; tracks with anti-dsDNA inversely.</td></tr>
+          <tr><td>Urine microscopy</td><td class="hi">Dysmorphic RBCs + red-cell casts</td><td><strong>Active nephritic sediment</strong> — glomerular inflammation; a biopsy indication.</td></tr>
+          <tr><td>uPCR / creatinine</td><td class="hi">380 mg/mmol · Cr 118 µmol/L</td><td>Nephrotic-range proteinuria with early renal impairment — the prognosis-defining organ.</td></tr>
+          <tr><td>FBC</td><td class="lo">Hb 96, WCC 3.1, Plt 118</td><td>Autoimmune cytopenias (haemolytic anaemia/leukopenia/thrombocytopenia) — another SLE domain.</td></tr>
+          <tr><td>Antiphospholipid antibodies</td><td class="hi">Lupus anticoagulant positive</td><td>APS overlap → thrombosis/pregnancy-loss risk; changes anticoagulation &amp; pregnancy planning.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"ANA tells you it MIGHT be lupus; anti-Sm/anti-dsDNA tell you it IS; and anti-dsDNA rising with complement falling tells you it is ACTIVE right now. Order the panel, then trend the two that move."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why the antibody panel is layered — and its trap</b>ANA is the sensitive screen (rule-out), the specific antibodies confirm, and anti-dsDNA/complement monitor. The trap: ANA is positive in many healthy people and other conditions, so <strong>never diagnose lupus from a positive ANA alone</strong> in someone without compatible clinical features — you will label a healthy person with a lifelong disease.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 IMAGING / SEROLOGY ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📸 Imaging / Serology + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🔬 The renal biopsy — the test that changes the prognosis</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Schematic of immune-complex deposition along the glomerular basement membrane">
+            <rect width="820" height="150" fill="#0b1220"/>
+            <path d="M60,120 Q120,20 200,60 Q280,100 360,50 Q440,10 520,70 Q600,120 680,60 Q740,30 780,80" fill="none" stroke="#93c5fd" stroke-width="4"/>
+            <g fill="#fca5a5"><circle cx="150" cy="52" r="6"/><circle cx="240" cy="80" r="6"/><circle cx="330" cy="62" r="6"/><circle cx="430" cy="34" r="6"/><circle cx="520" cy="70" r="6"/><circle cx="610" cy="92" r="6"/><circle cx="690" cy="60" r="6"/></g>
+            <text x="60" y="30" fill="#93c5fd" font-size="12">Glomerular basement membrane</text>
+            <text x="430" y="130" fill="#fca5a5" font-size="12">Sub-endothelial immune-complex deposits (Class IV) → complement activation</text>
+          </svg>
+          <div class="ecg-cap">Immune complexes (<span style="color:#fca5a5">red</span>) deposit along the <span style="color:#93c5fd">glomerular basement membrane</span>, activate complement and drive the proliferative injury of Class III/IV lupus nephritis — the pattern that demands aggressive immunosuppression.</div>
+        </div>
+
+        <h3>🔎 The ISN/RPS lupus nephritis classes you must know cold</h3>
+        <table class="tbl">
+          <tr><th>Class</th><th>Pattern</th><th>Meaning / treatment</th></tr>
+          <tr><td>Ⅰ <strong>Minimal mesangial</strong></td><td>Deposits only on immunofluorescence</td><td>Normal light microscopy; usually no specific therapy.</td></tr>
+          <tr><td>Ⅱ <strong>Mesangial proliferative</strong></td><td>Mesangial hypercellularity</td><td>Mild; often monitored, hydroxychloroquine ± modest therapy.</td></tr>
+          <tr><td>Ⅲ <strong>Focal (&lt;50% glomeruli)</strong></td><td>Focal proliferative — active/inflammatory</td><td><strong>Aggressive immunosuppression</strong> (induction + maintenance).</td></tr>
+          <tr><td>Ⅳ <strong>Diffuse (≥50%)</strong></td><td>Diffuse proliferative — the most common &amp; severe</td><td><strong>The one that goes to dialysis if missed</strong> — full induction immunosuppression.</td></tr>
+          <tr><td>Ⅴ <strong>Membranous</strong></td><td>Sub-epithelial deposits, nephrotic proteinuria</td><td>Nephrotic; immunosuppression ± anti-proteinuric therapy; can coexist with III/IV.</td></tr>
+          <tr><td>Ⅵ <strong>Advanced sclerosing (≥90%)</strong></td><td>Global sclerosis, burnt-out</td><td>Irreversible scarring → prepare for renal replacement; immunosuppression will not reverse it.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Proteinuria plus active sediment BUYS a biopsy, and the biopsy CLASS buys the treatment. You never guess Class IV from the outside — and a Class IV missed becomes a Class VI you cannot treat."</div>
+
+        <h3>🩻 The rest of the workup</h3>
+        <ul>
+          <li><strong>Serology monitoring:</strong> serial anti-dsDNA + C3/C4 to track activity and response.</li>
+          <li><strong>Cardiorespiratory:</strong> echo/CXR if serositis or pleuritic pain (pericardial/pleural effusions); consider Libman-Sacks endocarditis.</li>
+          <li><strong>Brain:</strong> MRI + lumbar puncture if neuropsychiatric features (seizure, psychosis) — exclude infection first.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The lupus drug map — scaled to organ involvement</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>Hydroxychloroquine</strong></td><td><strong>For essentially ALL patients</strong> — the backbone</td><td>Reduces flares, organ damage, thrombosis, mortality; safe in pregnancy. ❗ Annual retinal screening (rare retinopathy). Do NOT stop it.</td></tr>
+          <tr><td><strong>Glucocorticoids</strong></td><td>Rapid control of flares / bridge to steroid-sparing agents</td><td>Powerful but toxic long-term (bone, diabetes, infection, avascular necrosis) — minimise and taper; not a maintenance strategy.</td></tr>
+          <tr><td><strong>Mycophenolate mofetil (MMF)</strong></td><td>Induction &amp; maintenance for Class III/IV/V nephritis</td><td>Anti-proliferative. ❗ <strong>Teratogenic</strong> — reliable contraception; switch pre-conception. Marrow/GI toxicity, infection.</td></tr>
+          <tr><td><strong>Cyclophosphamide</strong> (e.g. low-dose Euro-Lupus)</td><td>Induction for severe proliferative nephritis / neuro-lupus</td><td>Alkylating agent. Infection, marrow suppression, haemorrhagic cystitis, <strong>infertility</strong> (fertility preservation counselling).</td></tr>
+          <tr><td><strong>Belimumab</strong> / <strong>Rituximab</strong></td><td>Add-on biologics for active/refractory disease &amp; nephritis</td><td>Belimumab (anti-BAFF) BLISS-LN; rituximab (anti-CD20) for refractory disease; screen infections.</td></tr>
+          <tr><td><strong>Voclosporin / Tacrolimus</strong> (CNIs)</td><td>Multi-target induction added to MMF in nephritis</td><td>Improves complete renal response (AURORA); monitor levels, BP, renal function.</td></tr>
+          <tr><td><strong>ACE inhibitor / ARB</strong></td><td>Anti-proteinuric &amp; BP control in nephritis</td><td>Renoprotective; ❗ avoid in pregnancy (teratogenic) — plan around conception.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Hydroxychloroquine for everyone; steroids to bridge; and immunosuppression (mycophenolate/cyclophosphamide ± belimumab/rituximab) scaled to the ORGAN — a rash needs less than a Class IV kidney."</div>
+        <div class="callout danger"><b class="ct">🚫 The lupus 'never' list</b>❌ stopping hydroxychloroquine (organ-threatening flares) · ❌ mycophenolate / cyclophosphamide / ACE inhibitors in pregnancy or without contraception (teratogens) · ❌ long-term high-dose steroids as a maintenance plan · ❌ treating nephritis without a biopsy class. Sulfonamides, sun and some drugs can trigger flares.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why</h3>
+        <ul>
+          <li>🚽 <strong>Urine at every visit</strong> — proteinuria (uPCR) and sediment are the earliest sign of renal flare; do not wait for creatinine.</li>
+          <li>🧪 <strong>Serial anti-dsDNA + C3/C4</strong> — the activity dashboard; rising dsDNA with falling complement heralds a flare, often before symptoms.</li>
+          <li>🩸 <strong>Renal function &amp; BP</strong> — eGFR, albumin, tight BP control (ACE inhibitor/ARB) to protect the kidney.</li>
+          <li>🩸 <strong>FBC</strong> — autoimmune cytopenias AND drug marrow toxicity (MMF/cyclophosphamide); trend regularly.</li>
+          <li>👁️ <strong>Hydroxychloroquine retinopathy</strong> — baseline and annual ophthalmology screening (esp. after ~5 years / high dose).</li>
+          <li>❤️ <strong>Cardiovascular &amp; thrombosis</strong> — accelerated atherosclerosis and APS: manage CV risk, consider anticoagulation if APS with thrombosis.</li>
+          <li>🦠 <strong>Infection</strong> — the leading cause of death alongside renal/CV disease in immunosuppressed lupus; vaccinate, prophylax, have sick-day rules.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In lupus you monitor two clocks: the immune clock (anti-dsDNA/complement + urine) telling you if it is flaring, and the drug clock (bloods, eyes, infection) telling you if the treatment is safe."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong — organ threats and iatrogenic harm</h3>
+        <ul>
+          <li>🩸 <strong>Lupus nephritis → end-stage renal failure</strong> — the prognosis-defining complication; Class IV missed goes to dialysis/transplant.</li>
+          <li>🧠 <strong>Neuropsychiatric lupus (cerebral lupus)</strong> — seizures, psychosis, stroke, aseptic meningitis, cognitive dysfunction; always exclude infection first.</li>
+          <li>🫁 <strong>Serositis</strong> — pleuritis/pleural effusions, pericarditis/effusion (rarely tamponade); pneumonitis; the rare catastrophic diffuse alveolar haemorrhage.</li>
+          <li>🩸 <strong>Haematological</strong> — autoimmune haemolytic anaemia, immune thrombocytopenia, leukopenia/lymphopenia; TTP-like microangiopathy.</li>
+          <li>🧬 <strong>Antiphospholipid syndrome (APS) overlap</strong> — arterial/venous thrombosis, recurrent miscarriage; the nephrotic state itself is prothrombotic.</li>
+          <li>❤️ <strong>Accelerated atherosclerosis</strong> — chronic inflammation + steroids → premature cardiovascular disease (a leading late cause of death); Libman-Sacks endocarditis.</li>
+          <li>🦠 <strong>Infection</strong> — from the disease and its immunosuppression; a leading cause of death — always in the differential for a "flare".</li>
+          <li>💊 <strong>Iatrogenic:</strong> steroid toxicity (osteoporosis, avascular necrosis, diabetes), cyclophosphamide infertility/cystitis, MMF teratogenicity, HCQ retinopathy.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"When a lupus patient deteriorates, ask THREE questions before you reach for steroids: is it a FLARE, is it INFECTION, or is it THROMBOSIS (APS)? Treating the wrong one is how lupus patients die."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The multisystem / glomerulonephritis differential</h3>
+        <table class="tbl">
+          <tr><th>Diagnosis</th><th>Discriminators</th><th>Don't-miss action</th></tr>
+          <tr><td>🦋 <strong>SLE + lupus nephritis</strong> (this patient)</td><td>Young woman, malar rash, ulcers, non-erosive arthritis, ANA+, anti-dsDNA/low complement, active urine</td><td>Antibody panel + urgent renal biopsy; hydroxychloroquine + organ-scaled immunosuppression.</td></tr>
+          <tr><td>💊 <strong>Drug-induced lupus</strong></td><td>Culprit drug (hydralazine, procainamide, isoniazid, minocycline, anti-TNF); <strong>anti-histone+</strong>; renal/CNS usually spared</td><td>Stop the drug — usually resolves; anti-dsDNA typically negative.</td></tr>
+          <tr><td>🔥 <strong>Rheumatoid arthritis</strong></td><td>Erosive symmetrical small-joint disease, anti-CCP+, complement normal</td><td>Different serology &amp; treatment; erosions on X-ray.</td></tr>
+          <tr><td>🩸 <strong>Other glomerulonephritis / vasculitis</strong></td><td>ANCA vasculitis, anti-GBM, post-infectious GN — pulmonary-renal syndromes</td><td>ANCA, anti-GBM, complement pattern; biopsy distinguishes.</td></tr>
+          <tr><td>🦠 <strong>Infection / other CTD</strong></td><td>Endocarditis, viral (parvovirus, HIV, hepatitis), mixed CTD/Sjögren overlap</td><td>Cultures, viral serology, specific antibodies; exclude before immunosuppressing.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"anti-histone with SPARED kidney/brain and a culprit drug = drug-induced lupus (stop the drug); anti-dsDNA with an ACTIVE kidney = the real thing (biopsy and treat). The antibody pattern separates them."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The Frothy Urine"</h3>
+          <div class="hud"><span>🩸 Renal reserve: <b id="scStab">●●●○○</b></span><span>⏳ Delay: <b id="scTime">0 wks</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">A 26-year-old woman with a malar rash, oral ulcers and arthralgia now has frothy urine, ankle oedema and BP 152/96. Dipstick: protein +++, blood ++. ANA is strongly positive. What do you do?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The management plan</h3>
+        <ol>
+          <li>🦋 <strong>Diagnosis:</strong> SLE (ANA+, anti-dsDNA/anti-Sm+, low complement, mucocutaneous + arthritis + renal) with <strong>active lupus nephritis</strong> and APS overlap.</li>
+          <li>🩻 <strong>Classify the kidney:</strong> urgent renal biopsy → ISN/RPS class + activity/chronicity to select induction.</li>
+          <li>💊 <strong>Treat:</strong> hydroxychloroquine for all; steroids to bridge; <strong>induction immunosuppression scaled to class</strong> (MMF or low-dose cyclophosphamide ± belimumab/voclosporin for proliferative nephritis); ACE inhibitor/ARB + BP control.</li>
+          <li>🫀 <strong>Whole-patient care:</strong> cardiovascular-risk reduction, VTE/APS management, infection prophylaxis &amp; vaccination, bone protection, pre-conception planning and anti-Ro documentation.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Lupus treatment is a dimmer, not a switch — hydroxychloroquine underneath everyone, and immunosuppression turned up to match the organ at risk; the kidney turns it up the most."</div>
+
+        <div class="checklist" id="ckLupus">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Suspected lupus nephritis workup (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>🚽 Urinalysis + microscopy (dysmorphic RBCs/casts) + uPCR/24-h protein documented</span></label>
+          <label class="ck"><input type="checkbox"><span>🧪 ANA done; specific antibodies (anti-dsDNA, anti-Sm) + C3/C4 sent</span></label>
+          <label class="ck"><input type="checkbox"><span>🩻 Urgent renal biopsy referred to obtain ISN/RPS class &amp; activity/chronicity</span></label>
+          <label class="ck"><input type="checkbox"><span>💊 Hydroxychloroquine started (dose checked) + baseline ophthalmology arranged</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 BP controlled; ACE inhibitor/ARB for proteinuria (pregnancy status considered)</span></label>
+          <label class="ck"><input type="checkbox"><span>🦠 Infection screen + vaccination status checked before immunosuppression</span></label>
+          <label class="ck"><input type="checkbox"><span>🤰 Contraception/pre-conception counselling &amp; anti-Ro / antiphospholipid status documented</span></label>
+          <div class="ck-progress" data-progress>0 / 7 complete</div>
+        </div>
+
+        <div class="checklist" id="ckFlare">
+          <h3 style="margin-top:0">🩺 Procedure Guide — The deteriorating lupus patient (flare vs infection vs thrombosis)</h3>
+          <label class="ck"><input type="checkbox"><span>🌡️ Septic screen + cultures BEFORE escalating immunosuppression</span></label>
+          <label class="ck"><input type="checkbox"><span>🧪 Anti-dsDNA + C3/C4 + urine to confirm a genuine flare</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 Assess for thrombosis / APS (clinical VTE/stroke, antiphospholipid antibodies)</span></label>
+          <label class="ck"><input type="checkbox"><span>🧠 Neuro/mental-state screen for cerebral lupus (image + LP if indicated)</span></label>
+          <label class="ck"><input type="checkbox"><span>💊 Confirm hydroxychloroquine has not been stopped; reconcile all medications</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">Week 0</div>SLE confirmed (ANA 1:640, anti-dsDNA high, low C3/C4) with active nephritic urine. Hydroxychloroquine started; steroid bridge; urgent biopsy booked; BP controlled.</div>
+          <div class="t-item"><div class="t-time">Week 1</div>Renal biopsy: <strong>Class IV diffuse proliferative lupus nephritis</strong>, high activity/low chronicity. Induction started with mycophenolate + steroids (± belimumab).</div>
+          <div class="t-item"><div class="t-time">Week 6</div>Proteinuria falling (uPCR 380 → 150), complement recovering, anti-dsDNA down. Steroids tapering; infection prophylaxis in place.</div>
+          <div class="t-item"><div class="t-time">Month 6</div>Partial-to-complete renal response; eGFR stable; maintenance mycophenolate + hydroxychloroquine. Pre-conception plan documented (switch off teratogens, anti-Ro noted).</div>
+          <div class="t-item"><div class="t-time">Month 12</div>Sustained remission on hydroxychloroquine + low-dose maintenance. Kidneys preserved; back to work; monitoring on protocol.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>Her kidneys survived because someone finally dipped the urine, sent the antibody panel, biopsied fast, classified the nephritis and started hydroxychloroquine plus class-matched immunosuppression — and because she never stopped her hydroxychloroquine. Ordinary discipline, extraordinary outcome.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge / Shared Care</h2></div>
+      <div class="section-content">
+        <h3>📋 Two different worlds — remission maintenance vs the flaring kidney</h3>
+        <div class="vs">
+          <div class="side a"><h4>🎯 This patient (nephritis in remission)</h4><ul><li>Continue hydroxychloroquine + maintenance immunosuppression; ACE inhibitor/ARB; BP control</li><li>Monitoring: urine + anti-dsDNA/complement + renal function on protocol; annual eye screening</li><li>Red flags: frothy urine/oedema (renal flare), seizure/confusion (cerebral lupus), pleuritic pain, fever (infection), leg swelling/breathlessness (VTE/APS) → urgent contact</li><li>Rheumatology + nephrology shared care; pre-conception clinic before pregnancy</li></ul></div>
+          <div class="side b"><h4>🟢 Safe self-management</h4><ul><li>Knows to NEVER stop hydroxychloroquine and to continue it in pregnancy</li><li>Photoprotection, smoking cessation, vaccination, infection sick-day rules</li><li>Reliable contraception on teratogens; flare hotline; understands anti-Ro/neonatal-lupus relevance</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A safe lupus discharge is a shared-care plan with a urine-and-serology monitoring schedule, a flare hotline, continued hydroxychloroquine and a patient who knows the three faces of deterioration — flare, infection, thrombosis."</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>🚽 Always dip the urine</b>Lupus nephritis is silent — proteinuria/sediment at every visit is what changes the prognosis.</div>
+          <div class="pearl"><b>🧪 ANA rules OUT, specifics rule IN</b>Negative ANA makes SLE very unlikely; anti-dsDNA/anti-Sm confirm; never diagnose lupus from ANA alone.</div>
+          <div class="pearl"><b>📉 dsDNA up, complement down</b>The activity dashboard — rising anti-dsDNA + falling C3/C4 = a flare, often before symptoms.</div>
+          <div class="pearl"><b>🩻 Biopsy buys the treatment</b>Proteinuria + active sediment → renal biopsy; the ISN/RPS class (esp. IV) dictates immunosuppression.</div>
+          <div class="pearl"><b>💊 Hydroxychloroquine for ALL</b>Reduces flares, damage, thrombosis and mortality; safe in pregnancy; never stop it.</div>
+          <div class="pearl"><b>🦋 Lupus reduces, RA erodes</b>Lupus arthritis is non-erosive (Jaccoud); erosions mean rheumatoid, not lupus.</div>
+          <div class="pearl"><b>🤰 Pregnancy & anti-Ro</b>Plan conception off teratogens; anti-Ro crosses the placenta → neonatal lupus & congenital heart block.</div>
+          <div class="pearl"><b>🔀 Flare, infection or clot?</b>Before steroids, ask if the deterioration is a flare, an infection, or APS thrombosis.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the pathway</h3>
+          <ul>
+            <li>🤰 <strong>Pregnancy, anti-Ro &amp; neonatal lupus:</strong> anti-Ro/SSA (and anti-La) antibodies cross the placenta and can cause neonatal lupus — a transient rash and, critically, <strong>irreversible congenital complete heart block</strong>. Plan pregnancy in quiescent disease, continue hydroxychloroquine (which reduces heart-block recurrence), monitor fetal heart, and time conception ≥6 months after renal remission on pregnancy-safe drugs.</li>
+            <li>🩸 <strong>Antiphospholipid syndrome overlap:</strong> lupus anticoagulant / anti-cardiolipin / anti-β2GPI → thrombosis and pregnancy morbidity; management with aspirin/anticoagulation, and the feared <strong>catastrophic APS</strong> (multi-organ thrombosis).</li>
+            <li>🧬 <strong>Type I interferon signature &amp; new biologics:</strong> the interferon pathway drives lupus; <strong>anifrolumab</strong> (anti-IFN-α receptor) and B-cell/BAFF-targeted therapy (belimumab, and emerging CAR-T-cell approaches inducing drug-free remission) reflect a mechanistic revolution.</li>
+            <li>🩻 <strong>Nephritis nuance:</strong> repeat/protocol biopsy to reassess activity vs chronicity, the significance of the chronicity index for prognosis, mixed Class III/IV + V lesions, and multi-target induction (MMF + calcineurin inhibitor / voclosporin).</li>
+            <li>🧠 <strong>Neuropsychiatric SLE:</strong> distinguishing primary NPSLE (immune-complex / anti-neuronal / antiphospholipid mechanisms) from infection, metabolic and steroid-induced causes — and why you exclude infection before immunosuppressing the brain.</li>
+            <li>💉 <strong>Drug-induced lupus mechanism:</strong> anti-histone antibodies, typical culprits (hydralazine, procainamide, isoniazid, minocycline, anti-TNF), sparing of kidney/CNS, and resolution on withdrawal — the mimic you must not treat as idiopathic SLE.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The Urine Nobody Dipped"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 24-year-old woman was seen five times over a year — twice in dermatology for a "photosensitive facial rash", twice in general practice for "viral" joint pains and fatigue, and once for mouth ulcers. Her ANA had been positive but was dismissed as "non-specific". <strong>Nobody ever dipped her urine or checked her blood pressure.</strong> She then presented to the emergency department with breathlessness, gross oedema and a blood pressure of 180/110; her creatinine was 480 and eGFR 12. Biopsy showed <strong>Class IV diffuse proliferative lupus nephritis with a high chronicity index</strong> — much of the kidney was already scarred. Despite aggressive immunosuppression she progressed to dialysis and the transplant waiting list, aged 25. A second patient on the unit, previously stable, had a life-threatening flare after quietly <strong>stopping her hydroxychloroquine</strong> because she felt well.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🚽 URINE NEVER DIPPED</b>The single cheapest test that finds silent nephritis was never done.</div>
+            <div class="hole"><b>🧩 SILOED CARE</b>Rash, joints and ulcers treated separately; nobody joined the multisystem dots.</div>
+            <div class="hole"><b>🧪 ANA DISMISSED</b>A positive ANA in a compatible clinical picture was written off as noise.</div>
+            <div class="hole"><b>🩸 BP IGNORED</b>New hypertension — a renal red flag — went unmeasured/unaddressed.</div>
+            <div class="hole"><b>💊 HCQ STOPPED</b>The second patient flared after stopping hydroxychloroquine while feeling well.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved them:</strong> treat lupus as ONE multisystem disease and <strong>dip the urine and check the BP at every single contact</strong>; act on a positive ANA in a compatible patient by sending specific antibodies and complement; biopsy proteinuria with active sediment <strong>early</strong>, while the chronicity index is still low and the kidney is still salvageable; and drill every patient that <strong>hydroxychloroquine is lifelong and must not be stopped, even when they feel well.</strong> <strong>This is exactly the discipline that saved the kidneys of the patient in Bed 4.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The urine you did not dip has cost more lupus kidneys than any drug ever saved. In lupus, the dipstick is the prognosis — do it every time."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · 🦋 Rheumatology &amp; Immunology · Bed 4 — Systemic Lupus Erythematosus with Lupus Nephritis<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+    /* ===== SIDEBAR TABS — show one section at a time ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not a lupus/nephritis feature'); } if(found===total){ flagResult.textContent='✅ All '+total+' active-lupus features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' active-lupus features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: anti-dsDNA / complement activity ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=(v-5)/(300-5)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<=30){ msg='🟢 anti-dsDNA '+v+' IU/mL, complement normal — QUIESCENT lupus. Maintain hydroxychloroquine, keep monitoring the urine.'; cls='good'; }
+      else if(v<=100){ msg='🟠 anti-dsDNA '+v+' IU/mL, complement mildly low — RISING activity. Re-check the urine and serology closely; a flare may be building.'; cls='warn-r'; }
+      else if(v<=200){ msg='🟠 anti-dsDNA '+v+' IU/mL with LOW complement — ACTIVE flare. If the urine is active, this is threatening the kidney: escalate.'; cls='warn-r'; }
+      else { msg='🔴 anti-dsDNA '+v+' IU/mL, complement markedly consumed — SEVERE active/nephritic flare. Biopsy-guided immunosuppression; treat hard, the kidney is at risk NOW.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Activity Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"A 26-year-old woman with a malar rash, oral ulcers and arthralgia now has frothy urine, ankle oedema and BP 152/96. Dipstick: protein +++, blood ++. ANA is strongly positive. What do you do?",
+      choices:[
+        {t:"🧴 Treat the rash and joints, reassure, and follow up in a few months",good:false,ds:-2,dt:12,xp:0,fb:"☠️ This is the M&M case in S21 — the nephritis smoulders unseen until dialysis. Proteinuria + active urine in lupus is a renal emergency, not a skin problem. Restart.",end:true},
+        {t:"🚽 Quantify the kidney (uPCR + microscopy), send anti-dsDNA/complement, start hydroxychloroquine and refer for an URGENT renal biopsy",good:true,ds:1,dt:1,xp:40,fb:"✅ Exactly. You confirmed lupus, quantified the kidney, started the backbone drug, and are classifying the nephritis so treatment can be scaled correctly.",next:"biopsy"},
+        {t:"💊 Start high-dose cyclophosphamide immediately without a biopsy",good:false,ds:-1,dt:2,xp:5,fb:"⚠️ Premature — you have not classified the nephritis. Class II needs far less than Class IV, and toxic induction for the wrong class harms. Biopsy first.",next:"biopsy"}
+      ]},
+    biopsy:{ text:"Biopsy shows Class IV diffuse proliferative lupus nephritis with high activity. Induction with mycophenolate + steroids begins. She feels much better at week 6 and asks if she can stop her hydroxychloroquine. What do you advise?",
+      choices:[
+        {t:"💊 Continue hydroxychloroquine indefinitely — it protects every organ and reduces flares and mortality",good:true,ds:1,dt:1,xp:45,fb:"🏆 Perfect. Hydroxychloroquine is lifelong and continued even in pregnancy; stopping it risks organ-threatening flares (the second M&M patient).",end:true},
+        {t:"✅ Agree she can stop it now she feels well",good:false,ds:-2,dt:2,xp:0,fb:"☠️ This is the second M&M near-miss — stopping hydroxychloroquine while feeling well triggers dangerous flares. It is protective, not symptomatic.",end:true},
+        {t:"💊 Stop everything including immunosuppression as she is in remission at week 6",good:false,ds:-2,dt:4,xp:0,fb:"⚠️ Six weeks is induction, not cure — stopping now guarantees relapse and irreversible renal scarring. Maintain therapy and monitor.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' wks'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='biopsy'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 wks'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 26-year-old woman with SLE features develops frothy urine, oedema and hypertension. The single most important next step is:", opts:["Treat the malar rash and review in months","Quantify proteinuria/sediment and refer for an urgent renal biopsy","Start high-dose cyclophosphamide without a biopsy","Reassure — lupus rarely affects the kidney"], correct:1, exp:"Proteinuria with active sediment and hypertension is lupus nephritis until biopsied. The biopsy class (I-VI) dictates treatment intensity, so you quantify and biopsy urgently rather than treating blindly or dismissing it." },
+    { q:"Which statement about ANA in SLE is correct?", opts:["A positive ANA confirms lupus","A negative ANA makes SLE very unlikely (a good rule-out)","ANA tracks disease activity","ANA is specific for lupus"], correct:1, exp:"ANA is >95% sensitive, so a negative result makes SLE very unlikely (rule-out), but it is not specific and does not track activity. Specific antibodies (anti-dsDNA, anti-Sm) confirm; anti-dsDNA and complement track activity." },
+    { q:"Which pair of results best indicates an active lupus flare?", opts:["Low anti-dsDNA with high complement","Rising anti-dsDNA with falling C3/C4","Normal anti-dsDNA with normal complement","Positive anti-histone with a culprit drug"], correct:1, exp:"Immune complexes consume complement, so active disease shows anti-dsDNA rising while C3/C4 fall. Anti-histone with a culprit drug points instead to drug-induced lupus." },
+    { q:"On renal biopsy, which class of lupus nephritis is the most severe common proliferative lesion requiring aggressive immunosuppression?", opts:["Class I minimal mesangial","Class II mesangial proliferative","Class IV diffuse proliferative","Class VI advanced sclerosing"], correct:2, exp:"Class IV (diffuse proliferative) is the most common severe lesion and needs full induction immunosuppression. Class I/II are mild; Class VI is burnt-out scarring that immunosuppression will not reverse." },
+    { q:"Which drug is recommended for essentially ALL patients with SLE?", opts:["Cyclophosphamide","Hydroxychloroquine","Long-term high-dose prednisolone","Rituximab"], correct:1, exp:"Hydroxychloroquine reduces flares, organ damage, thrombosis and mortality and is safe in pregnancy; it is the backbone for nearly all lupus patients. Cytotoxics/biologics are scaled to organ involvement; long-term high-dose steroids are avoided." },
+    { q:"A patient with SLE plans pregnancy. Which antibody most importantly raises the risk of neonatal lupus and congenital heart block?", opts:["anti-CCP","anti-Ro (SSA)","Rheumatoid factor","anti-Sm"], correct:1, exp:"Anti-Ro/SSA (and anti-La) cross the placenta and can cause neonatal lupus, including irreversible congenital complete heart block. Hydroxychloroquine is continued in pregnancy and reduces heart-block recurrence." },
+    { q:"A patient develops a lupus rash and arthralgia on hydralazine, with positive anti-histone antibodies but a normal kidney and negative anti-dsDNA. The most likely diagnosis is:", opts:["Active idiopathic SLE with nephritis","Drug-induced lupus","Rheumatoid arthritis","Antiphospholipid syndrome"], correct:1, exp:"Drug-induced lupus is anti-histone positive, typically spares the kidney and CNS, follows a culprit drug (hydralazine, procainamide, isoniazid, minocycline, anti-TNF) and resolves on withdrawal; anti-dsDNA is usually negative." },
+    { q:"A stable lupus patient stops her hydroxychloroquine because she feels well. The main risk is:", opts:["No effect — it is only symptomatic","Organ-threatening disease flares","Immediate retinal toxicity","Hyperkalaemia"], correct:1, exp:"Hydroxychloroquine is protective, not merely symptomatic; stopping it precipitates flares that can be organ- or life-threatening. It should be continued long-term, including in pregnancy." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you manage lupus and its kidney like a specialist. 🏆':score>=6?'Strong — review the misses and S10 nephritis classes.':'Revisit S5, S6 and S11 — the antibody logic and organ-scaled treatment are the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>
