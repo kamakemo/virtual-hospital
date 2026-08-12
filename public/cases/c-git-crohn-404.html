@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crohn's Disease — the Transmural Skip-Lesion Enteropathy — Virtual Teaching Hospital</title>
+<!-- META
+id: c-git-crohn-404
+title: Crohn's Disease — Chronic Diarrhoea, Weight Loss & Perianal Disease
+hospital: gastroenterology
+department: git-hepatology
+bednumber: 4
+chiefcomplaint: Chronic diarrhoea, cramping abdominal pain, weight loss, mouth ulcers & perianal pain in a 24-year-old
+system: Gastroenterology & Hepatology
+severity: high
+tags: Crohn's disease, IBD, transmural, skip lesions, perianal fistula, faecal calprotectin, anti-TNF
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🩻</div>
+      <div>
+        <div class="t1">Gastroenterology</div>
+        <div class="t2">Bed 4 · Crohn's Disease</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">🔬</span><span>Endoscopy / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · 🩻 Gastroenterology &amp; Hepatology · 🛏️ Bed 4</div>
+        <h1>🔥 Crohn's Disease — "Mouth to Anus, Skipping as It Goes"</h1>
+        <div class="sub">⚡ Clinic, 10:40. A pale, thin 24-year-old has had 3 months of loose stools, cramping right-iliac-fossa pain, 8 kg of weight loss, aphthous mouth ulcers — and a painful "boil" by the anus that keeps discharging. Someone called it "IBS with a bit of stress." Your job is to find the transmural disease hiding behind it.</div>
+        <div class="chips">
+          <span class="chip crit">🟠 HIGH ACUITY</span>
+          <span class="chip">🔥 Transmural IBD</span>
+          <span class="chip">🧪 Faecal Calprotectin</span>
+          <span class="chip">🔬 Ileocolonoscopy + Biopsy</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital warn"><div class="v-label">💓 HR</div><div class="v-num">104</div></div>
+        <div class="vital"><div class="v-label">🩸 BP</div><div class="v-num">112/70</div></div>
+        <div class="vital"><div class="v-label">🌬️ RR</div><div class="v-num">16</div></div>
+        <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">99%</div></div>
+        <div class="vital warn"><div class="v-label">🌡️ Temp</div><div class="v-num">37.8°</div></div>
+        <div class="vital alert"><div class="v-label">⚖️ Weight loss</div><div class="v-num">8 kg</div></div>
+        <div class="vital alert"><div class="v-label">😖 Pain</div><div class="v-num">6/10</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 10:40, GI Clinic Room 2</b>A gaunt young woman sits hunched, one hand on her right lower abdomen. She says: <em>"I go to the loo six or seven times a day, sometimes at night, and I've stopped eating because it makes the cramps worse."</em> The referral letter says "probable irritable bowel — reassure and diet advice." But she has mouth ulcers, a low-grade fever, and a tender fullness in the right iliac fossa. This is the exact moment terminal-ileal Crohn's gets mislabelled as IBS and sent away for months.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>👩 Name</td><td><strong>Ms. R.K.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>24-year-old female</td></tr>
+          <tr><td>🆔 MRN</td><td>GI-CD-0404</td></tr>
+          <tr><td>⚖️ Weight</td><td>52 kg (BMI 18.4, down from 21)</td></tr>
+          <tr><td>💼 Occupation</td><td>University student — exams, exhausted, "living on toast"</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 Past history — every line points at IBD, not IBS</h3>
+        <ul>
+          <li>🩸 <strong>3 months of non-bloody watery diarrhoea</strong>, up to 7×/day, <strong>waking her at night</strong>. Nocturnal diarrhoea is an organic (alarm) feature — IBS does not wake you.</li>
+          <li>😣 <strong>Cramping right-iliac-fossa pain</strong>, worse after food — classic for terminal-ileal disease and early stricturing.</li>
+          <li>👄 <strong>Recurrent aphthous mouth ulcers</strong> — Crohn's can affect anywhere <em>mouth to anus</em>.</li>
+          <li>🍑 <strong>A painful, discharging perianal lesion</strong> — a perianal fistula/abscess is almost a giveaway for Crohn's over UC.</li>
+          <li>🚬 <strong>Smoker, 6 pack-years</strong> — smoking WORSENS Crohn's (the opposite of UC). This matters enormously for management.</li>
+          <li>👪 Aunt with "bowel disease." First-degree/close family history raises IBD risk.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Weight loss, nocturnal diarrhoea, perianal disease, mouth ulcers or raised inflammatory markers in a young person are NOT irritable bowel — they are alarm features that demand you look for IBD."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why the young patient is the one that gets missed</b>Crohn's peaks at 15–35 years. The typical patient is young, otherwise well-looking, and their symptoms overlap with the vastly commoner IBS. The cost of the "it is just stress/IBS" label is months of untreated transmural inflammation — and transmural inflammation is what forms <strong>strictures and fistulae</strong> you can never fully reverse.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 GP referral handover — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ Referral SBAR (verbatim)</b>
+          <p><strong>S:</strong> "24-year-old woman, 3 months of diarrhoea up to 7 times a day including at night, cramping RIF pain, 8 kg weight loss, mouth ulcers and a painful perianal lump."</p>
+          <p><strong>B:</strong> "Smoker, aunt with bowel disease. No foreign travel, no recent antibiotics. Tried loperamide and a low-FODMAP diet without benefit."</p>
+          <p><strong>A:</strong> "Looks thin and tired, low-grade fever, RIF tenderness. Bloods: Hb 101, CRP 58, platelets 520, albumin 30. Faecal calprotectin 720. Stool cultures and C. difficile negative."</p>
+          <p><strong>R:</strong> "This looks like inflammatory bowel disease, not IBS. Referring urgently for endoscopy — please assess."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A raised faecal calprotectin with weight loss and anaemia in a young person means organic bowel disease until a scope proves otherwise — never a 'trial of reassurance'."</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each feature pointing to IBD over IBS</h3>
+        <p>🎮 <em>Click every feature that RAISES the probability of Crohn's disease. Each correct = +10 XP.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">🌙 Nocturnal diarrhoea waking her</button>
+          <button class="btn ghost flag-btn" data-good="1">⚖️ 8 kg unintentional weight loss</button>
+          <button class="btn ghost flag-btn" data-good="1">🍑 Discharging perianal lesion</button>
+          <button class="btn ghost flag-btn" data-good="1">👄 Recurrent aphthous mouth ulcers</button>
+          <button class="btn ghost flag-btn" data-good="1">🧪 Faecal calprotectin 720 µg/g</button>
+          <button class="btn ghost flag-btn" data-good="0">😰 "It is probably exam stress"</button>
+          <button class="btn ghost flag-btn" data-good="0">🥗 No response to low-FODMAP diet</button>
+          <button class="btn ghost flag-btn" data-good="0">🧻 Symptoms relieved by defaecation</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Praise where due</b>The GP did exactly the right thing: sent a faecal calprotectin, checked stool cultures and C. difficile to exclude infection, and referred urgently rather than prescribing yet another anti-diarrhoeal. Calprotectin is the single test that best separates IBD from IBS in primary care.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🅰️🅱️🅲️ Focused assessment — the "young diarrhoea in 90 seconds"</h3>
+        <table class="tbl">
+          <tr><th>Step</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>🩸 Haemodynamics</td><td>HR 104, BP 112/70, warm.</td><td>Mild tachycardia from inflammation/anaemia/dehydration; not shocked, but flag for obstruction/sepsis if it climbs.</td></tr>
+          <tr><td>👄 Mouth</td><td>Two aphthous ulcers, angular cheilitis.</td><td>Oral Crohn's + iron/B-vitamin deficiency from malabsorption.</td></tr>
+          <tr><td>🤰 Abdomen</td><td>Soft, tender fullness/mass in the <strong>right iliac fossa</strong>, active bowel sounds.</td><td>An RIF mass = thickened inflamed terminal ileum ± phlegmon/abscess. Watch for obstruction.</td></tr>
+          <tr><td>🍑 Perianal exam</td><td>A tender <strong>perianal fistula opening</strong> with a skin tag, discharge, no fluctuant abscess today.</td><td>Perianal disease strongly favours Crohn's and changes management (needs MRI + surgical input).</td></tr>
+          <tr><td>👁️ Eyes / skin / joints</td><td>No red eye, no rash, mild knee ache.</td><td>Screen for extra-intestinal manifestations (uveitis, erythema nodosum, arthropathy) — see S13.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Never assess suspected IBD without examining the mouth AND the perianus — the two ends of the gut tell you it is Crohn's, not ulcerative colitis."</div>
+
+        <h3>🧭 The three things you exclude before calling it Crohn's flare</h3>
+        <p>Before you commit, exclude the mimics that need different treatment: <strong>infection</strong> (stool culture, C. difficile toxin, ova/parasites — never immunosuppress an infection), <strong>a septic collection/abscess</strong> (a fluctuant, febrile perianal or intra-abdominal mass needs drainage, not more steroids), and <strong>obstruction</strong> from a stricture (vomiting, distension, no flatus). All three are covered in S13/S14.</p>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of "just treat the flare"</b>A young patient with fever, an RIF mass and rising CRP might have an <strong>abscess</strong>, not just active inflammation. Piling on steroids/anti-TNF into an undrained collection is dangerous. Image first (MR enterography / CT if unwell), drain pus, cover with antibiotics — THEN escalate immunosuppression.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The gastroenterology resident thinks out loud at 11:05:</em></p>
+        <h3>🧠 Frame it as "confirm IBD, phenotype it, exclude infection &amp; sepsis"</h3>
+        <p>"Alarm features everywhere: weight loss, anaemia, nocturnal diarrhoea, raised CRP and calprotectin, perianal disease. My job is not to 'reassure' — it is to <strong>confirm IBD with an ileocolonoscopy and biopsies</strong>, <strong>define disease location and behaviour</strong> (inflammatory vs stricturing vs fistulising), <strong>exclude infection</strong> (including C. difficile) before I immunosuppress, and <strong>map the perianal disease with an MRI</strong>. I will screen for latent TB and hepatitis B/C NOW, because whatever I start, biologics are on the horizon."</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>🧪 <strong>Bloods + stool</strong> — FBC, CRP, ESR, U&amp;E, LFTs, albumin, haematinics (ferritin, B12, folate), stool culture + C. difficile toxin, faecal calprotectin.</li>
+          <li>🔬 <strong>Ileocolonoscopy with terminal ileal intubation + segmental biopsies</strong> — the diagnostic cornerstone.</li>
+          <li>🧲 <strong>MR enterography</strong> for small-bowel extent/strictures/fistulae; <strong>pelvic MRI</strong> for perianal disease.</li>
+          <li>🛡️ <strong>Pre-immunosuppression screen NOW:</strong> latent TB (IGRA/chest X-ray), hepatitis B &amp; C, HIV, VZV status, TPMT before thiopurines, vaccination review.</li>
+          <li>🍽️ <strong>Nutrition + smoking cessation</strong> referral from day one — both are disease-modifying in Crohn's.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Screen for latent TB and viral hepatitis BEFORE you start steroids-sparing immunosuppression or anti-TNF — the drug that heals the gut can wake up a dormant infection and kill the patient."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>She wants to start high-dose steroids AND infliximab today to "get on top of it fast," before the TB screen or MRI. Right move?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No.</strong> Two problems. First, you have not excluded an undrained abscess (fever + RIF mass) — anti-TNF into sepsis is dangerous. Second, starting anti-TNF before screening for <strong>latent TB and hepatitis B</strong> risks reactivation (miliary TB, fulminant hepatitis). Induce with corticosteroids (or exclusive enteral nutrition), image, drain any pus, complete the infection screen — <em>then</em> plan the biologic.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The IBD consultant at the bedside, 11:30:</em></p>
+        <h3>🧮 Phenotyping Crohn's — the Montreal classification drives the plan</h3>
+        <table class="tbl">
+          <tr><th>Axis</th><th>Categories</th><th>This patient</th></tr>
+          <tr><td><strong>A</strong> — Age at diagnosis</td><td>A1 &lt;17 · A2 17–40 · A3 &gt;40</td><td class="hi">A2 (24 y)</td></tr>
+          <tr><td><strong>L</strong> — Location</td><td>L1 ileal · L2 colonic · L3 ileocolonic · L4 upper GI</td><td class="hi">L1 (terminal ileal) ± oral</td></tr>
+          <tr><td><strong>B</strong> — Behaviour</td><td>B1 inflammatory · B2 stricturing · B3 penetrating/fistulising</td><td class="hi">B1 now, early B2 features</td></tr>
+          <tr><td><strong>p</strong> — Perianal modifier</td><td>Add "p" if perianal disease</td><td class="hi">p (perianal fistula)</td></tr>
+        </table>
+        <p>So she is <strong>A2 L1 B1p</strong> — young, ileal, inflammatory with perianal disease. The perianal "p" and smoking mark her out as <strong>higher risk for a complicated, relapsing course</strong> — an argument for early effective therapy rather than a slow step-up.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Location and behaviour are not academic — ileal stricturing disease behaves nothing like inflammatory colonic disease, and perianal Crohn's needs a surgeon and an MRI, not just a prescription."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">RCT</span> SONIC</td><td>Infliximab + azathioprine beat either drug alone for steroid-free remission and mucosal healing in Crohn's.</td><td>Combination (biologic + immunomodulator) is powerful induction in moderate–severe disease.</td></tr>
+            <tr><td><span class="lvl">RCT</span> ACCENT I / CHARM</td><td>Infliximab and adalimumab maintain remission and heal fistulae in Crohn's.</td><td>Anti-TNF agents are effective maintenance and for fistulising disease.</td></tr>
+            <tr><td><span class="lvl">RCT</span> GEMINI / UNITI</td><td>Vedolizumab (gut-selective anti-integrin) and ustekinumab (anti-IL-12/23) induce and maintain remission.</td><td>Effective biologic options when anti-TNF fails or is contraindicated.</td></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> ECCO / NICE / BSG</td><td>Steroids or exclusive enteral nutrition to induce; thiopurine/methotrexate/biologic to maintain; steroids NOT for maintenance.</td><td>Induce then maintain with a steroid-sparing agent; treat-to-target on calprotectin/endoscopy.</td></tr>
+            <tr><td><span class="lvl">EVIDENCE</span> Smoking &amp; Crohn's</td><td>Smoking roughly doubles relapse, surgery and post-op recurrence risk.</td><td>Smoking cessation is one of the highest-value interventions in Crohn's.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The chart that haunts me is the young man whose 'IBS' was actually a slowly narrowing ileal stricture. When he finally vomited and distended, someone treated the obstruction with more steroids instead of imaging. His bowel perforated behind the stricture. Transmural Crohn's does not just inflame — it narrows, and a narrowed bowel is a surgical problem, not a steroid problem."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY transmural, WHY skip lesions, WHY the complications (the WHY behind the WHY)</h3>
+        <ol>
+          <li>🧬 <strong>Dysregulated immunity:</strong> in a genetically susceptible gut (e.g. <em>NOD2/CARD15</em> variants), the mucosal immune system mounts an exaggerated <strong>Th1/Th17</strong> response to luminal bacteria. TNF-α, IL-12 and IL-23 drive chronic granulomatous inflammation.</li>
+          <li>🧱 <strong>Transmural inflammation:</strong> unlike UC (mucosa only), Crohn's inflammation penetrates the <em>full thickness</em> of the bowel wall. This single fact explains almost every complication: full-thickness scarring → <strong>strictures</strong>; full-thickness ulcers tunnelling out → <strong>fistulae and abscesses</strong>.</li>
+          <li>🦘 <strong>Skip lesions, anywhere mouth-to-anus:</strong> discontinuous patches of disease with normal bowel between, classically the <strong>terminal ileum</strong>, giving cobblestone mucosa, deep serpiginous ulcers and non-caseating granulomas on biopsy.</li>
+          <li>🩸 <strong>Malabsorption:</strong> diseased/resected terminal ileum cannot absorb <strong>vitamin B12 and bile salts</strong> → B12 deficiency, bile-salt diarrhoea and gallstones; general inflammation and reduced intake cause iron/folate deficiency, low albumin and weight loss.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"One word explains Crohn's complications: TRANSMURAL. Mucosa-only disease bleeds; full-thickness disease strictures, fistulates and abscesses."</div>
+
+        <h3>⚖️ Contrast pair — Ulcerative Colitis vs Crohn's Disease</h3>
+        <div class="vs">
+          <div class="side a"><h4>🟥 Ulcerative Colitis</h4><ul><li><strong>Continuous</strong> inflammation from the rectum proximally</li><li><strong>Mucosa/submucosa only</strong></li><li><strong>Bloody</strong> diarrhoea, tenesmus, urgency</li><li>No perianal fistulae, no granulomas</li><li>Smoking is <em>protective</em>; PSC association; colectomy is curative</li></ul></div>
+          <div class="side b"><h4>🟦 Crohn's Disease</h4><ul><li><strong>Patchy skip lesions</strong>, mouth to anus (ileum classic)</li><li><strong>Transmural</strong> — cobblestoning, granulomas</li><li>Often <strong>non-bloody</strong> diarrhoea, pain, weight loss</li><li><strong>Perianal disease + fistulae</strong>; B12/bile-salt malabsorption</li><li>Smoking <em>worsens</em> it; surgery is NOT curative</li></ul></div>
+        </div>
+        <p>💡 Remember the giveaways: <strong>perianal fistulae, mouth ulcers, granulomas and terminal-ileal disease = Crohn's</strong>; <strong>continuous bloody rectal-onset colitis = UC</strong>.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The Faecal Calprotectin Dial</h3>
+          <p style="font-size:13px">Faecal calprotectin is a neutrophil protein shed into stool when the gut mucosa is inflamed — the single best non-invasive marker to separate <strong>inflammation (IBD)</strong> from <strong>IBS</strong>. Drag the value and watch how it reframes the patient.</p>
+          <label for="kRange">🧪 Faecal calprotectin: <b id="kVal">50</b> µg/g</label>
+          <input type="range" id="kRange" min="20" max="1200" value="50">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore IBS vs active IBD.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 A low value makes IBD unlikely and supports IBS; a high value means active mucosal inflammation and mandates a scope. Calprotectin also tracks treatment response — the treat-to-target marker.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The order set (11:10)</h3>
+        <ul>
+          <li>🧪 <strong>Bloods:</strong> FBC, CRP, ESR, U&amp;E, LFTs, albumin, ferritin/iron studies, B12, folate, vitamin D, bone profile, coagulation, group &amp; save.</li>
+          <li>💩 <strong>Stool:</strong> culture &amp; sensitivity, ova/cysts/parasites, <strong>C. difficile toxin</strong>, faecal calprotectin — exclude infection before immunosuppressing.</li>
+          <li>🔬 <strong>Ileocolonoscopy + segmental &amp; terminal-ileal biopsies</strong> — confirm diagnosis, define extent, look for granulomas.</li>
+          <li>🧲 <strong>MR enterography</strong> (small-bowel extent, strictures, fistulae) + <strong>pelvic MRI</strong> for perianal disease.</li>
+          <li>🛡️ <strong>Pre-biologic screen:</strong> IGRA/QuantiFERON + chest X-ray for latent TB, HBsAg/anti-HBc/anti-HCV, HIV, VZV serology, TPMT level, up-to-date vaccinations (avoid live vaccines once immunosuppressed).</li>
+          <li>💊 <strong>Induction:</strong> corticosteroid (e.g. prednisolone taper, or budesonide for ileocaecal disease) OR <strong>exclusive enteral nutrition</strong>; correct iron/B12/folate; VTE prophylaxis if admitted (IBD is prothrombotic).</li>
+          <li>🚭 <strong>Smoking cessation referral</strong> and dietitian referral — disease-modifying, not optional.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Before the first dose of any immunosuppressant: a negative stool infection screen, a TB and hepatitis screen, and a drained abscess. Skip those and the treatment becomes the disease."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Ward priorities — the nurse runs the safety net</h3>
+        <ul>
+          <li>📈 <strong>Stool chart (frequency, consistency, blood) + fluid balance</strong> — the objective record of flare severity; a rising frequency with abdominal distension is an early warning of obstruction or toxicity.</li>
+          <li>🌡️ <strong>Observations for sepsis</strong> — fever + tachycardia + a tender abdomen may mean an abscess or perforation, not "just the flare." Escalate early.</li>
+          <li>⚖️ <strong>Daily weight + nutrition support</strong> — malnutrition is part of the disease; involve the dietitian, protect enteral nutrition, monitor for refeeding if severely malnourished.</li>
+          <li>😖 Assess abdominal pain and distension each round; new vomiting or absent flatus = query obstruction, keep nil by mouth and call the doctor.</li>
+          <li>🍑 Gentle perianal care and dignity for a young patient with an embarrassing, painful problem; watch the fistula site for increasing pain/swelling (abscess).</li>
+          <li>🚭 Reinforce smoking cessation and medication counselling; support adherence — the young non-adherent patient relapses.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who charts every stool and flags the first fever is the earliest detector of the abscess and the obstruction hiding inside a Crohn's flare."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Value</th><th>Interpretation</th></tr>
+          <tr><td>Haemoglobin</td><td class="lo">101 g/L (microcytic)</td><td>Anaemia of chronic disease + iron deficiency from malabsorption/inflammation.</td></tr>
+          <tr><td>CRP</td><td class="hi">58 mg/L</td><td>Active inflammation; useful to track flare and response.</td></tr>
+          <tr><td>Platelets</td><td class="hi">520 ×10⁹/L</td><td>Reactive thrombocytosis of chronic inflammation.</td></tr>
+          <tr><td>Albumin</td><td class="lo">30 g/L</td><td>Low — protein-losing enteropathy + poor intake; a marker of severity.</td></tr>
+          <tr><td>Faecal calprotectin</td><td class="hi">720 µg/g</td><td><strong>Markedly raised → active mucosal inflammation.</strong> IBS excluded; scope indicated.</td></tr>
+          <tr><td>Ferritin / B12 / folate</td><td class="lo">Ferritin 8 · B12 low-normal</td><td>Iron deficiency; watch B12 (terminal-ileal disease). Replace deficiencies.</td></tr>
+          <tr><td>Stool culture + C. difficile toxin</td><td class="ok-v">Negative</td><td>Infection excluded — safe to plan immunosuppression once other screens clear.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Calprotectin says 'inflamed or not'; the scope and biopsy say 'what and where.' You need both — a number never replaces the tissue."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why faecal calprotectin changed practice — and its limits</b>Calprotectin is a neutrophil-derived protein; its stool level rises with mucosal inflammation, giving a cheap, non-invasive gate that keeps IBS patients out of colonoscopy queues and pushes IBD patients through. Limits: it also rises with infection, NSAID enteropathy and colorectal cancer, and it is less sensitive for isolated small-bowel disease — so a convincing story still earns imaging even if calprotectin is borderline.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 ENDOSCOPY / IMAGING + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>🔬 Endoscopy / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🎥 Ileocolonoscopy — read the mucosa like a map</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Schematic of Crohn's skip lesions vs continuous UC">
+            <rect width="820" height="150" fill="#0b1220"/>
+            <text x="12" y="24" fill="#93c5fd" font-size="12">Crohn's — SKIP lesions (patchy, deep ulcers, cobblestone)</text>
+            <rect x="12" y="34" width="796" height="26" rx="8" fill="#1e293b" stroke="#334155"/>
+            <rect x="40" y="34" width="90" height="26" rx="8" fill="#b91c1c"/>
+            <rect x="230" y="34" width="60" height="26" rx="8" fill="#b91c1c"/>
+            <rect x="420" y="34" width="120" height="26" rx="8" fill="#b91c1c"/>
+            <rect x="690" y="34" width="90" height="26" rx="8" fill="#b91c1c"/>
+            <text x="12" y="98" fill="#fca5a5" font-size="12">Ulcerative colitis — CONTINUOUS from rectum (mucosal, uniform)</text>
+            <rect x="12" y="108" width="796" height="26" rx="8" fill="#1e293b" stroke="#334155"/>
+            <rect x="360" y="108" width="448" height="26" rx="8" fill="#f59e0b"/>
+            <text x="770" y="126" fill="#0b1220" font-size="11" text-anchor="end">rectum →</text>
+          </svg>
+          <div class="ecg-cap">In <span style="color:#93c5fd">Crohn's</span>, red patches are diseased bowel with normal segments between (skip lesions), classically the terminal ileum. In <span style="color:#fca5a5">UC</span>, disease is continuous, starting at the rectum. The diagnosis lives in the PATTERN.</div>
+        </div>
+
+        <h3>🔎 What the scope, biopsy and MR enterography show in Crohn's</h3>
+        <table class="tbl">
+          <tr><th>Modality</th><th>Findings</th><th>Meaning</th></tr>
+          <tr><td>🔬 <strong>Ileocolonoscopy</strong></td><td>Patchy deep serpiginous/aphthous ulcers, <strong>cobblestone</strong> mucosa, terminal-ileal involvement, rectal sparing possible</td><td>Skip-lesion transmural disease — the classic Crohn's picture.</td></tr>
+          <tr><td>🧫 <strong>Histology (biopsy)</strong></td><td><strong>Non-caseating granulomas</strong>, transmural lymphoid aggregates, crypt architecture distortion</td><td>Granulomas support Crohn's (present in a minority but near-diagnostic when found).</td></tr>
+          <tr><td>🧲 <strong>MR enterography</strong></td><td>Mural thickening &amp; enhancement, <strong>strictures</strong>, prestenotic dilatation, <strong>fistulae/sinus tracts</strong>, comb sign, abscess</td><td>Defines small-bowel extent and penetrating/stricturing behaviour without radiation — key in a young patient.</td></tr>
+          <tr><td>🍑 <strong>Pelvic MRI</strong></td><td>Maps perianal fistula tracts and collections (Parks classification)</td><td>Guides surgery (seton) and biologic therapy for perianal Crohn's.</td></tr>
+          <tr><td>💊 <strong>Capsule endoscopy</strong></td><td>Small-bowel mucosal ulceration beyond reach of scopes</td><td>Only AFTER excluding a stricture (capsule can impact and obstruct).</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Cobblestones, skip lesions, terminal-ileal ulcers and non-caseating granulomas spell Crohn's. And never fire a capsule down a bowel you have not proven is unobstructed."</div>
+
+        <h3>🩻 Adjunct imaging</h3>
+        <ul>
+          <li><strong>CT abdomen/pelvis:</strong> quickest way to find an abscess or free air in an acutely unwell, febrile patient.</li>
+          <li><strong>Abdominal X-ray:</strong> in suspected obstruction/toxicity — dilated loops, look for the complication, not the diagnosis.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The Crohn's drug map — induce, then maintain (the WHY and the traps)</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>Corticosteroids</strong> (prednisolone; budesonide for ileocaecal)</td><td><strong>Induction</strong> of remission</td><td>Broad anti-inflammatory. Fast but NOT for maintenance (osteoporosis, diabetes, adrenal suppression). Budesonide has high first-pass metabolism → fewer systemic effects.</td></tr>
+          <tr><td><strong>Exclusive enteral nutrition</strong></td><td>Induction (esp. children/young adults), avoids steroids</td><td>Liquid formula only for 6–8 weeks; heals mucosa and nourishes — first-line induction in paediatrics.</td></tr>
+          <tr><td><strong>Thiopurines</strong> (azathioprine, mercaptopurine)</td><td><strong>Maintenance</strong>, steroid-sparing</td><td>Check <strong>TPMT</strong> first (deficiency → myelosuppression); monitor FBC/LFTs; small lymphoma/skin-cancer risk.</td></tr>
+          <tr><td><strong>Methotrexate</strong></td><td>Maintenance if thiopurine intolerant</td><td>Weekly with folic acid; <strong>teratogenic</strong> — contraception essential in this young woman.</td></tr>
+          <tr><td><strong>Anti-TNF</strong> (infliximab, adalimumab)</td><td>Moderate–severe &amp; <strong>fistulising/perianal</strong> disease</td><td>Screen TB &amp; hepatitis B FIRST; risk of reactivation, infection, infusion reactions.</td></tr>
+          <tr><td><strong>Other biologics</strong> (vedolizumab, ustekinumab; JAK inhibitors)</td><td>Alternative/second-line targeted therapy</td><td>Vedolizumab is gut-selective (favourable safety); ustekinumab targets IL-12/23.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Steroids INDUCE, they never MAINTAIN. A patient still on steroids months later is a treatment failure — escalate to a steroid-sparing agent."</div>
+        <div class="callout danger"><b class="ct">🚫 The 'do not give / do not miss' list</b>❌ No maintenance steroids · ❌ No anti-TNF before TB/hepatitis screen · ❌ No thiopurine before TPMT · ❌ Avoid NSAIDs and (relatively) anti-motility agents in active disease · ✅ Always correct B12/iron/folate/vitamin D and address bone health.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why — treat-to-target</h3>
+        <ul>
+          <li>📊 <strong>Symptom + biomarker trend:</strong> stool frequency, CRP and <strong>faecal calprotectin</strong> to judge whether therapy is working — the modern target is objective remission, not just "feeling better."</li>
+          <li>🔬 <strong>Endoscopic re-assessment</strong> for mucosal healing — the target that predicts durable remission and fewer surgeries (treat-to-target, CALM trial logic).</li>
+          <li>🧪 <strong>Drug monitoring:</strong> thiopurine → FBC/LFTs regularly; anti-TNF → drug levels &amp; anti-drug antibodies if losing response; methotrexate → FBC/LFTs.</li>
+          <li>🦴 <strong>Nutrition &amp; bone:</strong> recheck iron/B12/folate/vitamin D; DEXA if repeated steroids; growth in adolescents.</li>
+          <li>⚠️ <strong>Red flags for the complication:</strong> new obstructive symptoms (a maturing stricture), spiking fever/localised pain (abscess), or new perianal discharge (fistula) — image, do not just up the dose.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Feeling a bit better' is not remission. Chase mucosal healing and a normal calprotectin — the gap between symptomatic and endoscopic remission is where the strictures grow."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 Complications of transmural disease — and beyond the gut</h3>
+        <h4>🧱 Intestinal (the transmural consequences)</h4>
+        <ul>
+          <li>🚧 <strong>Strictures → bowel obstruction</strong> — fibrotic narrowing (usually ileal); colicky pain, vomiting, distension. May need balloon dilatation or resection.</li>
+          <li>🕳️ <strong>Fistulae</strong> — enteroenteric, enterovesical (pneumaturia/recurrent UTIs), enterocutaneous, rectovaginal, and <strong>perianal</strong>.</li>
+          <li>🔥 <strong>Abscesses</strong> — intra-abdominal or perianal collections; need drainage + antibiotics, not just immunosuppression.</li>
+          <li>🍑 <strong>Perianal disease</strong> — fissures, skin tags, fistulae, abscesses; a hallmark of Crohn's.</li>
+          <li>🩸 <strong>Malabsorption</strong> — B12 &amp; bile-salt malabsorption (terminal ileum), iron/folate deficiency, gallstones, oxalate renal stones, short-bowel syndrome after repeated resections.</li>
+          <li>🎗️ <strong>Colorectal cancer</strong> — increased risk with long-standing colonic disease → surveillance colonoscopy.</li>
+        </ul>
+        <h4>🌍 Extra-intestinal manifestations (screen for these)</h4>
+        <ul>
+          <li>🦵 <strong>Arthropathy</strong> — peripheral (parallels gut activity) and axial/sacroiliitis (independent).</li>
+          <li>👁️ <strong>Uveitis / episcleritis</strong> — a red, painful eye needs urgent ophthalmology.</li>
+          <li>🔴 <strong>Erythema nodosum</strong> (tender shin nodules, tracks disease activity) and <strong>pyoderma gangrenosum</strong> (painful ulcer, does NOT track activity).</li>
+          <li>🟡 <strong>Primary sclerosing cholangitis (PSC)</strong> — check LFTs; commoner with colitis, raises cholangiocarcinoma/colorectal risk.</li>
+          <li>🦴 <strong>Metabolic bone disease</strong> — from inflammation, malabsorption and steroids; and <strong>VTE</strong> — IBD is a prothrombotic state.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Strictures obstruct, fistulae leak, abscesses need draining — and the disease shows on the skin, eyes, joints and liver. Examine the whole patient, not just the bowel."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The chronic-diarrhoea-with-alarm-features differential</h3>
+        <table class="tbl">
+          <tr><th>Diagnosis</th><th>Discriminators</th><th>Don't-miss action</th></tr>
+          <tr><td>🔥 <strong>Crohn's disease</strong> (this patient)</td><td>Patchy transmural disease, terminal ileum, perianal/oral disease, granulomas, non-bloody diarrhoea + weight loss</td><td>Ileocolonoscopy + biopsy; MR enterography; screen before immunosuppressing.</td></tr>
+          <tr><td>🟥 <strong>Ulcerative colitis</strong></td><td>Continuous mucosal colitis from rectum, bloody diarrhoea, no perianal fistulae/granulomas</td><td>Colonoscopy + biopsy; colectomy is curative if refractory.</td></tr>
+          <tr><td>🦠 <strong>Infective colitis</strong> (incl. C. difficile, TB, Yersinia)</td><td>Acute onset, travel/antibiotics, positive stool tests; ileal TB mimics Crohn's</td><td>Stool culture/toxin; consider TB in endemic/immunosuppressed — <em>caseating</em> granulomas.</td></tr>
+          <tr><td>🧻 <strong>Irritable bowel syndrome</strong></td><td>NO alarm features, normal calprotectin/bloods, symptoms with defaecation, no nocturnal symptoms</td><td>A positive diagnosis — but only after excluding organic disease.</td></tr>
+          <tr><td>🌾 <strong>Coeliac disease</strong></td><td>Bloating, iron/folate deficiency, anti-tTG positive, villous atrophy</td><td>Anti-tTG + duodenal biopsy (see the coeliac case).</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In endemic areas, intestinal TB is the great Crohn's mimic — caseating granulomas and a positive TB screen change everything. Do not start anti-TNF until you have excluded it."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The New Diagnosis"</h3>
+          <div class="hud"><span>❤️ Safety: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">Colonoscopy confirms patchy ileocolonic ulceration with cobblestoning; biopsies show non-caseating granulomas. She is febrile with a tender RIF mass and a discharging perianal fistula. The junior wants to start high-dose steroids plus infliximab today "to hit it hard." What do you do first?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The management plan</h3>
+        <ol>
+          <li>🔥 <strong>Diagnosis:</strong> ileocolonic Crohn's disease with perianal involvement (A2 L1 B1p), moderately active.</li>
+          <li>🩹 <strong>Exclude/treat sepsis first:</strong> image (MRI/CT), drain any abscess, antibiotics + seton for the perianal fistula BEFORE escalating immunosuppression.</li>
+          <li>💊 <strong>Induce remission:</strong> corticosteroid (or exclusive enteral nutrition); correct anaemia and deficiencies; VTE prophylaxis if admitted.</li>
+          <li>🛡️ <strong>Complete pre-biologic screen</strong> (TB, hepatitis, TPMT) then <strong>maintain</strong> with a steroid-sparing agent — thiopurine/methotrexate and/or anti-TNF (combination for higher-risk perianal disease per SONIC).</li>
+          <li>🚭 <strong>Smoking cessation</strong>, dietitian, IBD nurse specialist, and treat-to-target follow-up on calprotectin and endoscopy. Surgery for complications only — it is not curative.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Surgery in Crohn's treats the complication, never the disease — resect a stricture and the disease can recur at the anastomosis. Preserve bowel and keep the medicine going."</div>
+
+        <div class="checklist" id="ckACS">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Safe new-diagnosis Crohn's pathway (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>💩 Stool infection screen (culture + C. difficile) negative before immunosuppression</span></label>
+          <label class="ck"><input type="checkbox"><span>🔬 Ileocolonoscopy + biopsies done; diagnosis, location &amp; behaviour recorded (Montreal)</span></label>
+          <label class="ck"><input type="checkbox"><span>🧲 MR enterography + pelvic MRI to map small bowel, strictures &amp; perianal disease</span></label>
+          <label class="ck"><input type="checkbox"><span>🩹 Any abscess drained + antibiotics; perianal fistula seton considered</span></label>
+          <label class="ck"><input type="checkbox"><span>💊 Induction started (steroid or EEN); B12/iron/folate/vitamin D corrected</span></label>
+          <label class="ck"><input type="checkbox"><span>🚭 Smoking cessation + dietitian + IBD nurse referrals made</span></label>
+          <label class="ck"><input type="checkbox"><span>🗓️ Maintenance &amp; treat-to-target follow-up plan documented</span></label>
+          <div class="ck-progress" data-progress>0 / 7 complete</div>
+        </div>
+
+        <div class="checklist" id="ckSTEMI">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Pre-immunosuppression / pre-biologic safety screen</h3>
+          <label class="ck"><input type="checkbox"><span>🫁 Latent TB screened (IGRA/QuantiFERON + chest X-ray)</span></label>
+          <label class="ck"><input type="checkbox"><span>🧬 Hepatitis B (HBsAg/anti-HBc) &amp; hepatitis C &amp; HIV checked</span></label>
+          <label class="ck"><input type="checkbox"><span>🧪 TPMT checked before a thiopurine; FBC/LFT baseline done</span></label>
+          <label class="ck"><input type="checkbox"><span>💉 Vaccinations reviewed &amp; updated; live vaccines avoided once immunosuppressed</span></label>
+          <label class="ck"><input type="checkbox"><span>🤰 Pregnancy/contraception discussed (methotrexate teratogenic)</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">Day 0</div>Bloods, stool screen and calprotectin sent; TB &amp; hepatitis screen requested; induction steroid started; smoking cessation + dietitian referral.</div>
+          <div class="t-item"><div class="t-time">Day 1</div>Ileocolonoscopy: patchy ulceration, cobblestoning, terminal-ileal disease; biopsies show non-caseating granulomas. MRI: short ileal segment + a perianal fistula, small collection.</div>
+          <div class="t-item"><div class="t-time">Day 2</div>Perianal collection drained, seton placed, antibiotics given. Infection &amp; TB/hepatitis screens negative → safe to escalate.</div>
+          <div class="t-item"><div class="t-time">Week 2</div>Symptoms improving on steroids + iron; maintenance planned with azathioprine (TPMT normal) + anti-TNF for perianal disease.</div>
+          <div class="t-item"><div class="t-time">Month 3</div>Steroid weaned off, stopped smoking, calprotectin falling from 720 → 180; treat-to-target follow-up with repeat scope planned.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>She is doing well because someone refused the "IBS" label, confirmed transmural Crohn's with tissue, <strong>drained the abscess and screened for TB/hepatitis before immunosuppressing</strong>, and treated the smoking and nutrition — not just the inflammation. Ordinary discipline, disease-modifying outcome.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 Two very different Crohn's discharges</h3>
+        <div class="vs">
+          <div class="side a"><h4>🔥 This patient (moderate, perianal, on immunosuppression)</h4><ul><li>Maintenance therapy + steroid taper plan; NEVER stop biologic/immunomodulator abruptly</li><li>Smoking cessation reinforced; contraception if on methotrexate</li><li>Red flags: obstruction (vomiting, distension, no flatus), fever/abscess, heavy bleeding → return</li><li>IBD nurse contact, calprotectin monitoring, repeat scope; vaccinations; bone protection</li></ul></div>
+          <div class="side b"><h4>🟢 The mild, well-controlled patient</h4><ul><li>Stable on maintenance, calprotectin normal, mucosal healing</li><li>Annual review, deficiency &amp; bone monitoring, cancer surveillance if long-standing colitis</li><li>Clear written safety-net and rapid-access flare pathway</li><li>Self-management education and adherence support</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A safe Crohn's discharge names the maintenance drug, the monitoring plan, the flare red flags and the flare hotline — and never sends a smoker home without a cessation plan."</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>🦘 Mouth to anus, skipping</b>Crohn's is patchy transmural disease anywhere in the gut — terminal ileum is classic.</div>
+          <div class="pearl"><b>🧱 Transmural = complications</b>Full-thickness inflammation makes strictures, fistulae and abscesses; that word explains it all.</div>
+          <div class="pearl"><b>🍑 Two ends tell the tale</b>Examine the mouth and the perianus — ulcers + fistulae mean Crohn's, not UC.</div>
+          <div class="pearl"><b>🧪 Calprotectin first</b>The best non-invasive gate between IBS and IBD; then scope + biopsy for the tissue.</div>
+          <div class="pearl"><b>🛡️ Screen before you suppress</b>TB, hepatitis B/C and TPMT before immunosuppression; drain pus before biologics.</div>
+          <div class="pearl"><b>💊 Induce, then maintain</b>Steroids induce and never maintain; escalate to thiopurine/methotrexate/biologic.</div>
+          <div class="pearl"><b>🚭 Smoking cessation is treatment</b>Smoking worsens Crohn's (opposite of UC) — cessation is disease-modifying.</div>
+          <div class="pearl"><b>🔪 Surgery is not a cure</b>Resect the complication, preserve bowel; disease recurs at the anastomosis.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the basics</h3>
+          <ul>
+            <li>🎯 <strong>Treat-to-target &amp; tight control:</strong> the <em>CALM</em> trial showed that escalating therapy to biomarker targets (CRP + calprotectin) plus symptoms achieved better mucosal healing than symptom-guided care alone. Endoscopic remission, not symptom relief, is the goal.</li>
+            <li>🧬 <strong>Therapeutic drug monitoring:</strong> anti-TNF loss of response is often due to sub-therapeutic drug levels or anti-drug antibodies — measure levels and optimise dose or switch, rather than blindly cycling drugs.</li>
+            <li>💉 <strong>Newer targeted therapy:</strong> gut-selective anti-integrin (vedolizumab), anti-IL-12/23 (ustekinumab) and anti-IL-23 agents, plus oral JAK inhibitors and S1P modulators (more established in UC) — positioning depends on phenotype, safety and perianal involvement.</li>
+            <li>🕳️ <strong>Perianal fistulising Crohn's:</strong> combined medical-surgical management — MRI mapping, seton drainage, anti-TNF (± thiopurine), and emerging local mesenchymal stem-cell therapy (darvadstrocel) for complex perianal fistulae.</li>
+            <li>🚧 <strong>Stricturing disease:</strong> distinguishing inflammatory (treat medically) from fibrotic (endoscopic balloon dilatation or bowel-sparing stricturoplasty/resection) strictures — MR enterography and response to steroids help decide.</li>
+            <li>🧫 <strong>Post-operative recurrence prevention:</strong> smoking cessation plus early prophylactic therapy guided by colonoscopy at 6–12 months (Rutgeerts score) reduces clinical recurrence after ileocolic resection.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The Stricture Nobody Imaged"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 27-year-old man with known ileal Crohn's presented with worsening colicky central pain, vomiting and abdominal distension over two days. He had been labelled as "just a flare" at two previous visits. This time the on-call team, seeing a known Crohn's patient with pain, <strong>increased his steroids and started IV hydrocortisone without imaging</strong>. Overnight he became peritonitic. A CT — finally done at 04:00 — showed a tight fibrotic ileal <strong>stricture with proximal dilatation and a contained perforation</strong>. He went for emergency resection, spent a week in intensive care, and lost a long segment of small bowel he could not afford to lose. Separately, three months earlier he had been started on infliximab <strong>without a TB screen</strong>; he later developed reactivated pulmonary tuberculosis.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🧠 ANCHORING</b>"Known Crohn's = flare" — obstruction from a stricture was never considered.</div>
+            <div class="hole"><b>🧲 NO IMAGING</b>Vomiting + distension in Crohn's demanded a CT/MRI, not more steroids.</div>
+            <div class="hole"><b>💊 WRONG TREATMENT</b>Steroids do not open a fibrotic stricture — they masked the perforation.</div>
+            <div class="hole"><b>🛡️ NO TB SCREEN</b>Anti-TNF started without screening → reactivated tuberculosis.</div>
+            <div class="hole"><b>🚭 SMOKING IGNORED</b>Ongoing smoking drove aggressive, stricturing, relapsing disease.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> treat obstructive symptoms in Crohn's as a possible <strong>stricture</strong> and image early — a fibrotic stricture is a mechanical/surgical problem, not a steroid problem; always screen for latent TB and hepatitis <strong>before</strong> any anti-TNF; and never underestimate smoking cessation. <strong>This is exactly the discipline that protected the patient in Bed 4.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'It is just a flare' has perforated more Crohn's bowels than any stricture. Vomiting and distension earn an image, not a bigger dose of steroid."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · 🩻 Gastroenterology &amp; Hepatology · Bed 4 — Crohn's Disease<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+    /* ===== SIDEBAR TABS — show one section at a time ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not an IBD alarm feature'); } if(found===total){ flagResult.textContent='✅ All '+total+' alarm features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' alarm features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: faecal calprotectin ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=(v-20)/(1200-20)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<50){ msg='🟢 Normal ('+v+' µg/g). Mucosal inflammation unlikely → supports IBS; a scope is usually not needed on this alone.'; cls='good'; }
+      else if(v<150){ msg='🟠 Borderline ('+v+' µg/g). Indeterminate — interpret with symptoms; repeat, and scope if alarm features persist.'; cls='warn-r'; }
+      else if(v<500){ msg='🟠 Raised ('+v+' µg/g). Active mucosal inflammation likely → this needs ileocolonoscopy + biopsy, not reassurance.'; cls='warn-r'; }
+      else { msg='🔴 Markedly raised ('+v+' µg/g). Significant active IBD — urgent scope; this is our patient. Also tracks response to treatment.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Calprotectin Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"Colonoscopy confirms patchy ileocolonic ulceration with cobblestoning and non-caseating granulomas. She is febrile with a tender RIF mass and a discharging perianal fistula. The junior wants steroids PLUS infliximab today to hit it hard. What do you do first?",
+      choices:[
+        {t:"💉 Start high-dose steroids and infliximab now, before any imaging or screening",good:false,ds:-2,dt:0,xp:0,fb:"☠️ This is the S21 lesson. You have not excluded an undrained abscess (fever + RIF mass), nor screened for TB/hepatitis B. Anti-TNF into sepsis and latent TB can be fatal. Restart.",end:true},
+        {t:"🧲 Image (MR/CT) to find any abscess, drain pus + antibiotics, and send TB/hepatitis screen before escalating",good:true,ds:1,dt:20,xp:40,fb:"✅ Exactly. Exclude/drain sepsis and complete the pre-biologic screen first, then induce and plan maintenance safely.",next:"induce"},
+        {t:"🧻 Prescribe loperamide and discharge with a diet sheet",good:false,ds:-2,dt:15,xp:0,fb:"☠️ She has confirmed active Crohn's with sepsis and perianal disease — anti-motility and discharge is unsafe and misses the collection.",next:"induce"}
+      ]},
+    induce:{ text:"MRI shows a small perianal collection and a short inflammatory ileal segment. The collection is drained, a seton placed, antibiotics given, and TB/hepatitis screens are negative. How do you induce and maintain?",
+      choices:[
+        {t:"💊 Induce with a corticosteroid (or EEN), correct iron/B12, then maintain with a steroid-sparing agent ± anti-TNF for the perianal disease",good:true,ds:1,dt:10,xp:40,fb:"✅ Right. Steroids induce; a thiopurine/methotrexate and/or anti-TNF maintains — and anti-TNF is effective for fistulising perianal disease.",next:"maintain"},
+        {t:"💊 Keep her on long-term high-dose steroids as maintenance",good:false,ds:-2,dt:30,xp:0,fb:"⚠️ Steroids never maintain — osteoporosis, diabetes, adrenal suppression, and ongoing disease. Escalate to a steroid-sparing agent.",next:"maintain"}
+      ]},
+    maintain:{ text:"She is improving. What single lifestyle intervention is most disease-modifying, and what target guides her follow-up?",
+      choices:[
+        {t:"🚭 Smoking cessation, with treat-to-target follow-up on calprotectin + endoscopy",good:true,ds:1,dt:5,xp:45,fb:"🏆 Perfect. Smoking cessation halves relapse/surgery risk in Crohn's, and chasing mucosal healing (not just symptoms) prevents strictures.",end:true},
+        {t:"🥩 Tell her diet is irrelevant and she can keep smoking",good:false,ds:-1,dt:20,xp:0,fb:"⚠️ Smoking worsens Crohn's and nutrition matters — this advice drives an aggressive, relapsing, stricturing course.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='maintain'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 24-year-old with 3 months of non-bloody diarrhoea, nocturnal symptoms, 8 kg weight loss and a perianal fistula most likely has:", opts:["Irritable bowel syndrome","Crohn's disease","Coeliac disease","Lactose intolerance"], correct:1, exp:"Alarm features (weight loss, nocturnal diarrhoea, perianal disease) plus a fistula point firmly to Crohn's, not IBS. Perianal fistulae are a Crohn's hallmark and effectively exclude IBS." },
+    { q:"Which feature most reliably distinguishes Crohn's disease from ulcerative colitis?", opts:["Bloody diarrhoea","Continuous inflammation from the rectum","Perianal fistulae and non-caseating granulomas","Response to mesalazine"], correct:2, exp:"Perianal fistulising disease and non-caseating granulomas with transmural, skip-lesion involvement characterise Crohn's. Continuous rectal-onset mucosal bloody colitis characterises UC." },
+    { q:"Before starting anti-TNF therapy (e.g. infliximab) in this patient, you must FIRST:", opts:["Start a gluten-free diet","Screen for latent TB and hepatitis B","Give loperamide","Perform a colectomy"], correct:1, exp:"Anti-TNF can reactivate latent tuberculosis and hepatitis B. Screening (IGRA/chest X-ray, HBsAg/anti-HBc) before starting is mandatory to prevent life-threatening reactivation." },
+    { q:"A patient with ileal Crohn's develops colicky pain, vomiting and distension. The most appropriate next step is:", opts:["Increase steroids and continue","Prescribe loperamide","Image for a stricture/obstruction (CT/MR enterography)","Start a biologic immediately"], correct:2, exp:"Obstructive symptoms suggest a stricture. A fibrotic stricture is a mechanical/surgical problem — image first. Escalating steroids without imaging risks masking obstruction or perforation." },
+    { q:"Which best describes the correct use of corticosteroids in Crohn's disease?", opts:["First-line maintenance therapy","Induction of remission only, not maintenance","Never used","Only for perianal disease"], correct:1, exp:"Steroids induce remission but must not be used for maintenance (osteoporosis, diabetes, adrenal suppression). Maintenance uses thiopurines, methotrexate or biologics." },
+    { q:"Terminal ileal Crohn's (or its resection) characteristically causes deficiency of:", opts:["Vitamin C","Vitamin B12 and bile-salt malabsorption","Vitamin K only","Sodium"], correct:1, exp:"The terminal ileum absorbs vitamin B12 and reabsorbs bile salts; its disease/resection causes B12 deficiency and bile-salt (and later fat-soluble vitamin) malabsorption, plus gallstones." },
+    { q:"Which lifestyle intervention is genuinely disease-modifying in Crohn's disease?", opts:["A gluten-free diet","Smoking cessation","High-dose vitamin C","Bed rest"], correct:1, exp:"Smoking roughly doubles relapse, surgery and post-operative recurrence in Crohn's (the opposite of UC). Smoking cessation is one of the most valuable interventions." },
+    { q:"The best non-invasive test to distinguish inflammatory bowel disease from IBS in a young patient is:", opts:["Serum amylase","Faecal calprotectin","Fasting glucose","Chest X-ray"], correct:1, exp:"Faecal calprotectin, a neutrophil protein shed with mucosal inflammation, best separates IBD from IBS and helps decide who needs colonoscopy; it also tracks treatment response." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you phenotype Crohn disease like a consultant. 🏆':score>=6?'Strong — review the misses and S10 endoscopy/histology.':'Revisit S5, S6 and S10 — the transmural logic is the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>

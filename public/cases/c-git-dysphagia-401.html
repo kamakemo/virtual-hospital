@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Progressive Dysphagia — Oesophageal Cancer & Achalasia — Virtual Teaching Hospital</title>
+<!-- META
+id: c-git-dysphagia-401
+title: Progressive Dysphagia — Oesophageal Cancer & Achalasia
+hospital: gastroenterology
+department: git-hep
+bednumber: 1
+chiefcomplaint: Progressive dysphagia (solids → liquids) × 4 months with 9 kg weight loss
+system: Gastroenterology & Hepatology
+severity: high
+tags: Dysphagia, Oesophageal cancer, Achalasia, ALARM, 2-week-wait OGD, Manometry
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🍽️</div>
+      <div>
+        <div class="t1">Gastroenterology</div>
+        <div class="t2">Bed 1 · Dysphagia Work-up</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>Endoscopy / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · 🍽️ Gastroenterology &amp; Hepatology · 🔎 Rapid-Access Upper GI Clinic · 🛏️ Bed 1</div>
+        <h1>🍽️ Progressive Dysphagia — "The Reflux That Was Not Reflux"</h1>
+        <div class="sub">⚡ Clinic, 10:40. A 66-year-old sits opposite you, thinner than his photo ID. Four months ago meat started sticking; now even water hangs in his chest. His GP has been renewing a PPI for "reflux." Your job in the next few minutes is to make sure this is not the oesophageal cancer that hides behind heartburn.</div>
+        <div class="chips">
+          <span class="chip crit">🔴 RED-FLAG DYSPHAGIA</span>
+          <span class="chip">🔎 2-Week-Wait OGD</span>
+          <span class="chip">🎗️ Oesophageal Cancer</span>
+          <span class="chip">🐦 Achalasia</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital"><div class="v-label">💓 HR</div><div class="v-num">88</div></div>
+        <div class="vital"><div class="v-label">🩸 BP</div><div class="v-num">118/74</div></div>
+        <div class="vital"><div class="v-label">🌬️ RR</div><div class="v-num">16</div></div>
+        <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">97%</div></div>
+        <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">36.6°</div></div>
+        <div class="vital warn"><div class="v-label">⚖️ BMI</div><div class="v-num">19.4</div></div>
+        <div class="vital alert"><div class="v-label">📉 Wt loss</div><div class="v-num">9 kg</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 10:40, Clinic Room 4</b>A gaunt man loosens his collar and says: <em>"At first it was just steak that stuck — I cut it small. Now bread stops halfway, and this week even tea sits behind my breastbone."</em> He points a finger flat to the mid-sternum. His trousers are held up with a new belt hole. The referral letter says "long-standing GORD, please review meds." Progressive dysphagia plus weight loss is a red flag until an endoscope proves otherwise. Not today.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>🧔 Name</td><td><strong>Mr. R.H.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>66-year-old male</td></tr>
+          <tr><td>🆔 MRN</td><td>GI-UGI-0401</td></tr>
+          <tr><td>⚖️ Weight</td><td>58 kg (was 67 kg 4 months ago; BMI 19.4)</td></tr>
+          <tr><td>💼 Occupation</td><td>Retired publican</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 Past history — every line shifts the pre-test probability</h3>
+        <ul>
+          <li>🔥 <strong>Long-standing GORD / heartburn</strong> for 20 years, on intermittent PPI. Chronic acid reflux is the seed-bed for <strong>Barrett's oesophagus</strong> and lower-third <em>adeno</em>carcinoma.</li>
+          <li>🚬 <strong>Ex-smoker, 30 pack-years</strong>; 🍺 <strong>heavy alcohol</strong> across a publican career. The two classic risks for <em>squamous</em> cell carcinoma.</li>
+          <li>📉 <strong>Unintentional 9 kg (13%) weight loss</strong> in 4 months — an ALARM feature that alone earns urgent endoscopy.</li>
+          <li>🩸 Tired, breathless on the stairs — screen for <strong>iron-deficiency anaemia</strong> (occult blood loss / Plummer-Vinson web).</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"New progressive dysphagia in an adult is oesophageal cancer until an endoscopy says otherwise — the label 'reflux' has buried more late tumours than any other three words in gastroenterology."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why dysphagia is a can't-miss symptom</b>True dysphagia (food sticking / hold-up) is almost never functional. Oesophageal cancer often stays silent until the lumen is &gt;50% narrowed, so by the time solids stick many tumours are already locally advanced — which is why 5-year survival across all stages is only ~15–20%. Speed to endoscopy is the single biggest thing you control.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 GP referral handover — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ Referral SBAR (verbatim)</b>
+          <p><strong>S:</strong> "66-year-old man, 4 months of food sticking — began with solids, now struggling with liquids too. 9 kg weight loss."</p>
+          <p><strong>B:</strong> "Long history of reflux on omeprazole, ex-smoker, heavy previous alcohol. Bloods show microcytic anaemia (Hb 104, MCV 76)."</p>
+          <p><strong>A:</strong> "I increased his PPI three months ago with little benefit. Sending on the urgent suspected-cancer (2-week-wait) pathway for endoscopy."</p>
+          <p><strong>R:</strong> "Please assess and arrange upper GI endoscopy. He is frightened he 'has what his brother had.'"</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A PPI that does not fix dysphagia is a red flag, not a reason to double the dose. Failure to respond to acid suppression means look for a mechanical or malignant cause — do not keep titrating."</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each ALARM / high-risk feature</h3>
+        <p>🎮 <em>Click every feature that mandates urgent endoscopy or raises cancer probability. Each correct = +10 XP.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">📉 Unintentional weight loss 9 kg</button>
+          <button class="btn ghost flag-btn" data-good="1">🍖 Progressive solids → liquids dysphagia</button>
+          <button class="btn ghost flag-btn" data-good="1">🩸 Iron-deficiency (microcytic) anaemia</button>
+          <button class="btn ghost flag-btn" data-good="1">🎂 New dysphagia, age &gt; 55</button>
+          <button class="btn ghost flag-btn" data-good="1">🚬 Smoking + heavy alcohol history</button>
+          <button class="btn ghost flag-btn" data-good="0">💊 On a PPI for reflux</button>
+          <button class="btn ghost flag-btn" data-good="0">😌 Symptoms only in the evening</button>
+          <button class="btn ghost flag-btn" data-good="0">🌡️ Temperature 36.6°C</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Praise where due</b>The GP got the two things that matter right: recognised the ALARM features and referred on the 2-week-wait pathway rather than endlessly titrating a PPI. Speed of referral is a modifiable determinant of resectability.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🗣️ The three questions that localise dysphagia in 60 seconds</h3>
+        <table class="tbl">
+          <tr><th>Question</th><th>This patient</th><th>Why it matters</th></tr>
+          <tr><td>🔀 Solids, liquids, or both?</td><td>Started with <strong>solids</strong>, now <strong>liquids too</strong>, steadily worsening.</td><td>Progressive solids→liquids = <strong>mechanical/obstructing</strong> lesion. Solids AND liquids from the very start = <strong>motility</strong> (achalasia).</td></tr>
+          <tr><td>⏱️ Onset &amp; course?</td><td>4 months, <strong>relentlessly progressive</strong>.</td><td>Progressive over weeks–months screams malignancy; intermittent/non-progressive over years favours a web, ring or spasm.</td></tr>
+          <tr><td>📍 Where does it stick?</td><td>Points to <strong>mid/lower sternum</strong>; no cough on swallowing.</td><td>Retrosternal hold-up = oesophageal. A localisation to the throat with cough/nasal regurgitation = <strong>oropharyngeal</strong> (bulbar/neuromuscular).</td></tr>
+          <tr><td>😖 Odynophagia?</td><td>Mild pain on swallowing solids.</td><td>Painful swallowing suggests ulceration (tumour, infective/pill oesophagitis, severe reflux).</td></tr>
+          <tr><td>🔎 Exam</td><td>Cachectic, pale conjunctivae, <strong>no palpable neck node</strong>, no hepatomegaly.</td><td>A hard left supraclavicular (Virchow) node or hepatomegaly would signal metastatic disease.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Oropharyngeal vs oesophageal, then mechanical vs motility — two forks answer most of dysphagia. 'Solids then liquids, getting worse' points the arrow straight at an obstructing lesion."</div>
+
+        <h3>🧭 True dysphagia vs its mimics</h3>
+        <p>Separate genuine <strong>hold-up of the bolus</strong> from <strong>odynophagia</strong> (painful swallow), <strong>globus</strong> (a lump sensation between meals that eases when eating — reassuring), and <strong>xerostomia</strong>. Only true dysphagia earns the full obstructive/motility work-up. This man describes classic bolus hold-up.</p>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of "it is just his old reflux"</b>Barrett's and chronic GORD are precisely the population that develops adenocarcinoma. New or changed swallowing symptoms in a long-standing refluxer is a signal to <strong>scope</strong>, not to reassure. Anchoring on the pre-existing diagnosis is how early cancers are missed.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The gastroenterology registrar thinks out loud at 10:52:</em></p>
+        <h3>🧠 Frame it as "obstructing until proven otherwise"</h3>
+        <p>"Progressive solids-then-liquids dysphagia, weight loss and iron-deficiency anaemia in a 66-year-old ex-smoker with reflux — this is a mechanical/malignant picture until the endoscope tells me otherwise. My job is not to relabel his reflux; it is to get eyes and a biopsy on that oesophagus fast, and to correct his anaemia and nutrition in parallel."</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>🔎 <strong>Urgent OGD (upper GI endoscopy) within 2 weeks</strong> — the single most important test; direct visualisation + biopsy.</li>
+          <li>🩸 <strong>Bloods</strong>: FBC (confirm iron-deficiency anaemia), iron studies, U&amp;E, LFTs, albumin, bone profile, clotting.</li>
+          <li>🥤 <strong>Nutrition &amp; hydration review</strong> — dietitian, soft/liquid diet advice; consider what he can safely swallow now.</li>
+          <li>🧪 If OGD shows an obstructing mass → <strong>biopsy</strong>, then <strong>staging</strong> (CT chest/abdo/pelvis, then EUS + PET-CT, ± laparoscopy) and <strong>upper GI cancer MDT</strong>.</li>
+          <li>🐦 If OGD is macroscopically <em>normal</em> despite convincing dysphagia → do not stop; arrange <strong>barium swallow and high-resolution manometry</strong> to hunt for achalasia/motility disorder.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A normal endoscopy does not end a dysphagia work-up — it redirects it. If the mucosa looks fine but the patient truly cannot swallow, the disease is in the muscle: think achalasia and get manometry."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>The clinic nurse suggests a barium swallow first "to avoid an invasive test." Is barium the right first investigation here?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No — endoscopy first.</strong> With ALARM features (weight loss, anaemia, age &gt;55, progressive dysphagia) the priority is <strong>tissue diagnosis</strong> and mucosal inspection, which barium cannot provide. Barium/manometry come <em>after</em> a normal or non-diagnostic OGD, or to define achalasia. Leading with barium only delays a possible cancer diagnosis.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The consultant gastroenterologist at the bedside, 11:05:</em></p>
+        <h3>🚨 The ALARM approach to dysphagia — who gets urgent endoscopy</h3>
+        <table class="tbl">
+          <tr><th>ALARM letter</th><th>Feature</th><th>This patient</th></tr>
+          <tr><td><strong>A</strong>naemia</td><td>Iron-deficiency anaemia</td><td class="hi">✔ Hb 104, MCV 76</td></tr>
+          <tr><td><strong>L</strong>oss of weight</td><td>Unintentional weight loss</td><td class="hi">✔ 9 kg (13%)</td></tr>
+          <tr><td><strong>A</strong>norexia</td><td>Loss of appetite / early satiety</td><td class="hi">✔ eating less</td></tr>
+          <tr><td><strong>R</strong>ecent progressive symptoms</td><td>Dysphagia, persistent vomiting</td><td class="hi">✔ progressive dysphagia</td></tr>
+          <tr><td><strong>M</strong>elaena / mass / swallowing difficulty</td><td>GI bleeding, epigastric mass, dysphagia</td><td class="hi">✔ dysphagia</td></tr>
+        </table>
+        <p><strong>Any ALARM feature — or new dysphagia at any age — mandates urgent (2-week-wait) upper GI endoscopy.</strong> Age &gt;55 with new/unexplained upper-GI symptoms is itself a referral trigger. He scores on nearly every letter.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Dysphagia is itself an ALARM symptom — you do not need the others. Any adult with new difficulty swallowing goes down the urgent endoscopy pathway, full stop."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> NICE NG12 (suspected cancer referral)</td><td>Dysphagia at any age, or age ≥55 with weight loss + upper-abdo pain/reflux/dyspepsia, warrants urgent OGD.</td><td>Refer on the 2-week-wait pathway — do not "trial and review".</td></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> BSG/ACG achalasia guidance</td><td>High-resolution manometry is the diagnostic gold standard; endoscopy first to exclude pseudoachalasia (malignancy at the GOJ).</td><td>Scope everyone; manometry defines the motility disorder and Chicago subtype.</td></tr>
+            <tr><td><span class="lvl">RCT</span> European Achalasia Trial (Boeckxstaens, NEJM 2011)</td><td>Pneumatic dilatation and laparoscopic Heller myotomy had comparable 2-year success.</td><td>Both are reasonable first-line definitive therapies for achalasia.</td></tr>
+            <tr><td><span class="lvl">RCT</span> POEM vs pneumatic dilatation (Ponds, JAMA 2019)</td><td>POEM gave higher 2-year clinical success but more reflux.</td><td>POEM is a durable modern option (esp. type III / spastic), at the cost of GORD.</td></tr>
+            <tr><td><span class="lvl">RCT</span> CROSS trial (van Hagen, NEJM 2012)</td><td>Neoadjuvant chemoradiotherapy before surgery improved survival in resectable oesophageal cancer.</td><td>Staging drives multimodal, MDT-directed treatment — not surgery alone.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The chart that keeps me awake is the man whose 'reflux' was up-titrated for eight months while he quietly lost two stone. By the time anyone scoped him, the tumour was through the wall and into nodes — inoperable. He did not need a bigger PPI. He needed an endoscope in month one."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY solids stick before liquids (the WHY behind the WHY)</h3>
+        <ol>
+          <li>🍖 <strong>A shrinking lumen:</strong> a growing mural tumour, or a fibrous stricture, narrows the oesophageal channel. A bulky solid bolus cannot pass a narrowed lumen — so <strong>solids stick first</strong>. Only when the lumen is critically tight do liquids also hold up. Hence "progressive solids→liquids" is the fingerprint of <em>mechanical obstruction</em>.</li>
+          <li>🐦 <strong>A muscle that cannot relax:</strong> in <strong>achalasia</strong> there is degeneration of inhibitory (nitrergic) ganglion cells in the myenteric plexus. The lower oesophageal sphincter (LOS) <em>fails to relax</em> and the body of the oesophagus loses peristalsis (aperistalsis). Because the problem is a non-relaxing sphincter, <strong>both solids AND liquids are held up from the start</strong> — the discriminator from cancer.</li>
+          <li>🩸 <strong>Why the weight falls and the blood thins:</strong> reduced intake → cachexia; a friable tumour oozes → chronic occult blood loss → iron-deficiency anaemia. Two ALARM features driven by one lesion.</li>
+          <li>🧬 <strong>Two cancers, two biologies:</strong> chronic acid → Barrett's metaplasia → dysplasia → <em>adeno</em>carcinoma (lower third); smoking/alcohol nitrosamine injury → <em>squamous</em> cell carcinoma (upper/mid third).</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Solids then liquids = a narrowing lumen (obstruction). Solids AND liquids together from day one = a sphincter that will not open (achalasia). The pattern of dysphagia is the diagnosis until proven otherwise."</div>
+
+        <h3>⚖️ Contrast pair — Mechanical obstruction vs Motility disorder</h3>
+        <div class="vs">
+          <div class="side a"><h4>🍖 Mechanical (cancer / stricture / web)</h4><ul><li>Progressive <strong>solids → liquids</strong></li><li>Weight loss, anaemia, older, risk factors</li><li>Endoscopy + biopsy is diagnostic; "apple-core"/mass on barium</li><li>This patient's likely track</li></ul></div>
+          <div class="side b"><h4>🐦 Motility (achalasia / spasm)</h4><ul><li>Dysphagia to <strong>solids AND liquids from the start</strong></li><li>Regurgitation of undigested food, chest pain, slow weight loss</li><li>'Bird-beak' on barium; <strong>manometry diagnostic</strong></li><li>Treat the sphincter, not a tumour</li></ul></div>
+        </div>
+        <p>💡 Always exclude <strong>pseudoachalasia</strong> — a tumour at the gastro-oesophageal junction can mimic achalasia exactly. Short history, older age and rapid weight loss should make you scope hard and biopsy the GOJ.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The Dysphagia Pattern Dial</h3>
+          <p style="font-size:13px">Slide from an intermittent, non-progressive nuisance toward relentless progression with weight loss, and watch how the <strong>pattern</strong> (not any single meal) drives urgency.</p>
+          <label for="kRange">🍽️ Dysphagia progression index (0 = intermittent/stable, 100 = rapid solids→liquids + weight loss): <b id="kVal">70</b></label>
+          <input type="range" id="kRange" min="0" max="100" value="70">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore benign vs urgent-referral patterns.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 Intermittent, non-progressive dysphagia (a web/ring) can be worked up routinely. Progressive solids→liquids with weight loss is a 2-week-wait endoscopy — regardless of how well the reflux was "controlled".</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The order set (11:10)</h3>
+        <ul>
+          <li>🔎 <strong>Urgent OGD within 2 weeks</strong> with biopsies of any lesion (multiple, targeted); note distance from incisors and length of any tumour.</li>
+          <li>🩸 <strong>FBC, iron studies, ferritin, U&amp;E, LFTs, albumin, bone profile, coag, group &amp; save.</strong></li>
+          <li>🥤 <strong>Dietitian referral</strong> + nutritional assessment (MUST score); safe-swallow / texture-modified diet advice.</li>
+          <li>💊 Continue PPI for symptom relief but <strong>do not rely on it</strong> as treatment for dysphagia.</li>
+          <li>🩻 <strong>Staging CT chest/abdomen/pelvis</strong> if malignancy confirmed; then EUS (T/N stage) and PET-CT (occult metastases) per MDT.</li>
+          <li>🐦 If OGD normal → <strong>barium swallow + high-resolution manometry</strong> (and 24-h pH if reflux uncertain).</li>
+          <li>📞 Book directly into the <strong>upper GI cancer MDT</strong> if a tumour is found — parallel-process, do not wait.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Endoscopy and a biopsy answer the only question that changes his life — cancer or not. Order it first, order it fast, and let everything else run in parallel."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Clinic &amp; day-case priorities — the nurse guards nutrition and airway</h3>
+        <ul>
+          <li>🥤 <strong>Assess what he can safely swallow now</strong>; document any coughing/choking on liquids (aspiration risk) and escalate for a swallow/SALT review if present.</li>
+          <li>⚖️ <strong>Weigh and record</strong>; track the trajectory — weight loss is both a red flag and a nutritional emergency.</li>
+          <li>😰 Regurgitation of undigested food, especially <strong>nocturnal</strong>, risks aspiration pneumonia — nurse upright, advise small frequent soft meals, sit up after eating.</li>
+          <li>💉 Fasting and consent for OGD; check anticoagulants/antiplatelets and diabetes meds; confirm IV access for sedation.</li>
+          <li>🩸 Flag anaemia symptoms (breathlessness, dizziness) and arrange iron replacement / transfusion thresholds per protocol.</li>
+          <li>🫂 Break bad news gently and keep the patient informed — the fear of cancer is itself a clinical problem; involve the CNS/specialist nurse early.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who notices he chokes on water has found an aspiration risk before it becomes a pneumonia — swallow safety is a bedside vital sign in dysphagia."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Value</th><th>Interpretation</th></tr>
+          <tr><td>Haemoglobin</td><td class="hi">104 g/L</td><td>Anaemia — an ALARM feature.</td></tr>
+          <tr><td>MCV</td><td class="hi">76 fL</td><td><strong>Microcytic</strong> → iron-deficiency; occult tumour blood loss until proven otherwise.</td></tr>
+          <tr><td>Ferritin / transferrin sat</td><td class="hi">8 µg/L / 9%</td><td>Confirms iron deficiency.</td></tr>
+          <tr><td>Albumin</td><td class="lo">31 g/L</td><td>Low — malnutrition / catabolic state; matters for surgical fitness.</td></tr>
+          <tr><td>Creatinine / U&amp;E</td><td>92 µmol/L</td><td>Reflects hydration; relevant to contrast for staging CT.</td></tr>
+          <tr><td>LFTs</td><td>Normal</td><td>Screens for hepatic metastases (imaging still required).</td></tr>
+          <tr><td>Coeliac serology</td><td>Negative</td><td>Considered given anaemia/weight loss — not the answer here.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Iron-deficiency anaemia + dysphagia is a GI-cancer duet until the endoscope proves innocence — never write it off as 'poor diet' in a patient who is losing weight."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why the OGD trumps everything</b>Endoscopy does four jobs at once: sees the lesion, measures its length and distance from the incisors (guides staging and surgical planning), takes the biopsy that gives histology (adeno vs squamous), and can therapeutically dilate/stent for palliation. No blood test or barium image replaces it.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 ENDOSCOPY / IMAGING + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 Endoscopy / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🩻 Barium swallow — read the two silhouettes that define the fork</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 200" preserveAspectRatio="xMidYMid meet" aria-label="Barium swallow: irregular apple-core stricture of cancer versus smooth bird-beak of achalasia">
+            <rect width="820" height="200" fill="#0b1220"/>
+            <!-- Cancer: apple-core / shouldered irregular stricture -->
+            <path d="M120,20 L150,20 L150,80 C150,95 138,100 138,110 C138,120 150,125 150,140 L150,185 L120,185 L120,140 C120,125 132,120 132,110 C132,100 120,95 120,80 Z" fill="#e2e8f0" opacity=".9"/>
+            <path d="M132,96 L138,96 L138,124 L132,124 Z" fill="#0b1220"/>
+            <text x="135" y="15" fill="#fca5a5" font-size="12" text-anchor="middle">Oesophageal CANCER</text>
+            <text x="135" y="198" fill="#93c5fd" font-size="10" text-anchor="middle">irregular, shouldered "apple-core"</text>
+            <!-- Achalasia: dilated body tapering to bird-beak -->
+            <path d="M600,20 C560,40 560,120 590,150 C600,162 615,168 620,178 L630,178 C635,168 650,162 660,150 C690,120 690,40 650,20 Z" fill="#e2e8f0" opacity=".9"/>
+            <path d="M620,176 L630,176 L626,190 L624,190 Z" fill="#e2e8f0"/>
+            <text x="625" y="15" fill="#86efac" font-size="12" text-anchor="middle">ACHALASIA</text>
+            <text x="625" y="198" fill="#93c5fd" font-size="10" text-anchor="middle">dilated body, smooth "bird-beak"</text>
+          </svg>
+          <div class="ecg-cap">Left: an <span style="color:#fca5a5">irregular, shouldered stricture</span> ("apple-core") — the mechanical fingerprint of cancer. Right: a dilated body tapering to a <span style="color:#86efac">smooth "bird-beak"</span> at the LOS — classic achalasia. The endoscope and biopsy tell them apart definitively.</div>
+        </div>
+
+        <h3>🔎 What each modality adds</h3>
+        <table class="tbl">
+          <tr><th>Modality</th><th>What it shows</th><th>Role</th></tr>
+          <tr><td>🔬 <strong>OGD + biopsy</strong></td><td>Direct view, tissue diagnosis, tumour length/level, dilate/stent</td><td>FIRST test — diagnostic and often therapeutic.</td></tr>
+          <tr><td>🩻 <strong>Barium swallow</strong></td><td>Apple-core stricture (cancer) vs bird-beak (achalasia) vs web/ring/spasm (corkscrew)</td><td>Adjunct when OGD normal or before manometry.</td></tr>
+          <tr><td>📊 <strong>High-resolution manometry</strong></td><td>Failure of LOS relaxation (high integrated relaxation pressure) + aperistalsis; Chicago subtype I–III</td><td><strong>Gold standard for achalasia</strong>.</td></tr>
+          <tr><td>🖥️ <strong>CT chest/abdo/pelvis</strong></td><td>Local invasion, nodes, distant metastases</td><td>First staging step in confirmed cancer.</td></tr>
+          <tr><td>🔊 <strong>EUS</strong></td><td>Depth of invasion (T) and regional nodes (N)</td><td>Local staging accuracy for resectability.</td></tr>
+          <tr><td>☢️ <strong>PET-CT</strong></td><td>Occult distant metastases</td><td>Refines M-stage before radical treatment.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Bird-beak' is achalasia's silhouette and 'apple-core' is cancer's — but manometry, not a picture, confirms achalasia, and a biopsy, not a shadow, confirms cancer."</div>
+
+        <div class="callout warn"><b class="ct">⚠️ The pseudoachalasia trap</b>A malignancy infiltrating the GOJ can produce a manometric and radiological picture identical to achalasia. Red flags for pseudoachalasia: <strong>older age, short symptom history (&lt;6–12 months), and marked weight loss</strong>. Always take a careful look and biopsy at the GOJ — treating pseudoachalasia as achalasia lets a cancer grow.</div>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications &amp; Definitive Therapies</h2></div>
+      <div class="section-content">
+        <h3>💉 The treatment map — what, why, and the traps</h3>
+        <table class="tbl">
+          <tr><th>Therapy</th><th>Role</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>Pneumatic (balloon) dilatation</strong></td><td>First-line definitive for achalasia</td><td>Forcefully disrupts LOS muscle fibres. Risk: perforation (~2%); often needs repeat sessions.</td></tr>
+          <tr><td><strong>Laparoscopic Heller myotomy</strong> (+ partial fundoplication)</td><td>Durable surgical achalasia treatment</td><td>Divides LOS muscle; fundoplication limits reflux. Excellent long-term relief.</td></tr>
+          <tr><td><strong>POEM</strong> (per-oral endoscopic myotomy)</td><td>Endoscopic myotomy — esp. type III / spastic achalasia</td><td>Durable; downside is significant post-procedure GORD — needs PPI surveillance.</td></tr>
+          <tr><td><strong>Botulinum toxin</strong> injection to LOS</td><td>Temporising for frail/unfit patients</td><td>Relaxes LOS but wears off in months; can scar tissue planes for later surgery.</td></tr>
+          <tr><td><strong>Nitrates / CCBs</strong> (e.g. nifedipine)</td><td>Weak, temporary symptom relief in achalasia</td><td>Reduce LOS tone; limited efficacy and side-effects — not definitive.</td></tr>
+          <tr><td><strong>PPI</strong></td><td>Reflux symptom control; Barrett's</td><td>Does NOT treat obstruction/dysphagia — never a substitute for endoscopy.</td></tr>
+          <tr><td><strong>Oesophageal stent</strong></td><td>Palliation of malignant dysphagia</td><td>Restores swallowing in incurable disease; risks migration, pain, reflux.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"For achalasia you either stretch it (pneumatic dilatation), cut it (Heller/POEM), or freeze it temporarily (botulinum) — pills only nibble at the edges. Choose by fitness, subtype and reflux tolerance."</div>
+        <div class="callout danger"><b class="ct">🚫 The 'do not' list in dysphagia</b>❌ Do not keep escalating a PPI as "treatment" for progressive dysphagia · ❌ Do not label pseudoachalasia as achalasia without biopsy · ❌ Do not blindly dilate an undiagnosed stricture (perforate an unstaged cancer) — diagnose, then treat.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why</h3>
+        <ul>
+          <li>⚖️ <strong>Weight and nutritional status</strong> — serial weights, albumin, MUST score; deterioration may need a feeding jejunostomy/NG or dietetic escalation.</li>
+          <li>🥤 <strong>Swallowing capacity</strong> — can he manage saliva/liquids? Complete dysphagia (cannot swallow saliva) with an impacted bolus is an <strong>endoscopic emergency</strong>.</li>
+          <li>🫁 <strong>Signs of aspiration</strong> — new cough, fevers, chest signs; nocturnal regurgitation is a warning.</li>
+          <li>🩸 <strong>Anaemia trend</strong> — repeat Hb; falling Hb or melaena signals active tumour bleeding.</li>
+          <li>📉 <strong>Post-procedure watch</strong> — after dilatation/POEM/myotomy monitor for chest pain, surgical emphysema, fever, tachycardia → suspect <strong>perforation</strong> and image urgently.</li>
+          <li>🔁 <strong>Barrett's / post-treatment surveillance</strong> — endoscopic surveillance intervals per dysplasia grade.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After any oesophageal procedure, chest pain + fever + tachycardia is a perforation until a contrast study says otherwise — do not reach for reassurance, reach for the CT."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong</h3>
+        <ul>
+          <li>🫁 <strong>Aspiration pneumonia</strong> — from retained food/regurgitation (both cancer obstruction and achalasia); a common and preventable killer.</li>
+          <li>📉 <strong>Malnutrition &amp; cachexia</strong> — worsens surgical outcomes, immunity and quality of life.</li>
+          <li>🩸 <strong>Tumour haemorrhage / iron-deficiency anaemia.</strong></li>
+          <li>🕳️ <strong>Oesophageal perforation</strong> — spontaneous (rare) or iatrogenic after dilatation/stent/POEM; mediastinitis is life-threatening.</li>
+          <li>🎗️ <strong>Local invasion &amp; fistula</strong> — tracheo-oesophageal fistula (cough on swallowing, recurrent pneumonia); recurrent laryngeal nerve palsy (hoarse voice).</li>
+          <li>🐦 <strong>Achalasia long-term:</strong> ~few-fold increased risk of oesophageal (squamous) cancer from chronic stasis → needs long-term follow-up; megaoesophagus.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Long-standing achalasia is not benign forever — chronic stasis raises squamous cancer risk, so a treated achalasic still needs long-term surveillance and a low threshold to re-scope new symptoms."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The dysphagia differential — obstruction, motility, and mimics</h3>
+        <table class="tbl">
+          <tr><th>Diagnosis</th><th>Discriminators</th><th>Don't-miss action</th></tr>
+          <tr><td>🎗️ <strong>Oesophageal cancer</strong> (this patient)</td><td>Progressive solids→liquids, weight loss, anaemia, older, smoking/alcohol or Barrett's</td><td>Urgent OGD + biopsy; stage; MDT.</td></tr>
+          <tr><td>🐦 <strong>Achalasia</strong></td><td>Solids AND liquids from onset, regurgitation, bird-beak, chest pain</td><td>Endoscopy (exclude pseudoachalasia) → manometry → myotomy/dilatation.</td></tr>
+          <tr><td>🧵 <strong>Peptic / benign stricture</strong></td><td>Long GORD history, gradual solid dysphagia, no weight loss</td><td>OGD + biopsy (exclude malignancy) then dilate; PPI.</td></tr>
+          <tr><td>🥩 <strong>Eosinophilic oesophagitis</strong></td><td>Younger, atopic, food impaction, rings/furrows; ≥15 eosinophils/hpf</td><td>Biopsy even if mucosa looks normal; PPI/topical steroid, diet.</td></tr>
+          <tr><td>🕸️ <strong>Oesophageal web / Plummer–Vinson</strong></td><td>Iron deficiency + upper web; intermittent solid dysphagia</td><td>Treat iron deficiency; dilate web (premalignant — surveil).</td></tr>
+          <tr><td>🧠 <strong>Bulbar / neuromuscular (oropharyngeal)</strong></td><td>Cough/choke on swallowing, nasal regurgitation, MND/stroke/myasthenia</td><td>SALT + videofluoroscopy; treat cause; protect airway.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Ask three questions of every dysphagia: does it hold up in the THROAT (oropharyngeal), does it PROGRESS solids→liquids (obstruction), or was it BOTH from the start (motility)? The answers sort the whole list."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The Clinic Decision"</h3>
+          <div class="hud"><span>❤️ Safety: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 days</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">A 66-year-old with 4 months of progressive solids→liquids dysphagia, 9 kg weight loss and iron-deficiency anaemia sits in front of you. A colleague suggests: "He is a known refluxer — just double the PPI and review in two months." What do you do?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The management plan</h3>
+        <ol>
+          <li>🔎 <strong>Diagnosis:</strong> urgent OGD reveals an ulcerating, near-obstructing mass at 34 cm; biopsies → <strong>adenocarcinoma</strong> on a background of Barrett's.</li>
+          <li>🖥️ <strong>Stage:</strong> CT chest/abdo/pelvis → EUS → PET-CT (± staging laparoscopy). Establish TNM and resectability.</li>
+          <li>👥 <strong>Upper GI cancer MDT:</strong> decide curative (neoadjuvant chemo/chemoradiotherapy then oesophagectomy) vs palliative (stent, chemo/radiotherapy, best supportive care) based on stage and fitness.</li>
+          <li>🥤 <strong>Support in parallel:</strong> dietitian/nutrition, iron replacement, smoking/alcohol cessation, CNS support, prehabilitation for surgical candidates.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Oesophageal cancer is an MDT disease, not a solo operation — staging decides curative vs palliative, and getting there fast is the difference between a resectable tumour and a stent."</div>
+
+        <div class="checklist" id="ckDysphagia">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Safe dysphagia work-up checklist (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>🗣️ Characterise dysphagia: solids vs liquids, progressive vs intermittent, level, odynophagia</span></label>
+          <label class="ck"><input type="checkbox"><span>🚩 Screen ALARM features (anaemia, weight loss, anorexia, progressive symptoms, mass/melaena)</span></label>
+          <label class="ck"><input type="checkbox"><span>🔎 Urgent OGD within 2 weeks + targeted biopsies (biopsy even if mucosa looks normal — EoE)</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 FBC/iron studies/albumin; correct anaemia; nutrition &amp; dietitian review</span></label>
+          <label class="ck"><input type="checkbox"><span>🐦 If OGD normal → barium swallow + high-resolution manometry (exclude achalasia)</span></label>
+          <label class="ck"><input type="checkbox"><span>🖥️ If cancer → stage (CT → EUS → PET-CT) and refer to upper GI MDT</span></label>
+          <label class="ck"><input type="checkbox"><span>📞 Clear plan communicated; CNS/specialist nurse involved; safety-net swallowing/aspiration advice</span></label>
+          <div class="ck-progress" data-progress>0 / 7 complete</div>
+        </div>
+
+        <div class="checklist" id="ckAchalasia">
+          <h3 style="margin-top:0">🩺 Procedure Guide — If it is achalasia (definitive therapy pathway)</h3>
+          <label class="ck"><input type="checkbox"><span>🔬 Endoscopy first — biopsy the GOJ to exclude pseudoachalasia/malignancy</span></label>
+          <label class="ck"><input type="checkbox"><span>📊 High-resolution manometry to confirm + subtype (Chicago I–III)</span></label>
+          <label class="ck"><input type="checkbox"><span>⚖️ Choose therapy by fitness/subtype: pneumatic dilatation vs Heller myotomy vs POEM</span></label>
+          <label class="ck"><input type="checkbox"><span>💉 Botulinum toxin only if unfit for definitive treatment</span></label>
+          <label class="ck"><input type="checkbox"><span>🔁 Counsel on reflux after myotomy/POEM and arrange long-term surveillance</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">Day 0</div>Clinic: progressive dysphagia + 9 kg weight loss + iron-deficiency anaemia recognised as red-flag; urgent OGD booked.</div>
+          <div class="t-item"><div class="t-time">Day 6</div>OGD: ulcerating near-obstructing mass at 34 cm from incisors; biopsies taken; lumen dilated for symptom relief. Histology → <strong>adenocarcinoma</strong> on Barrett's.</div>
+          <div class="t-item"><div class="t-time">Day 12</div>Staging CT + EUS + PET-CT: T3 N1 M0, no distant metastases — potentially resectable.</div>
+          <div class="t-item"><div class="t-time">Day 18</div>Upper GI MDT: neoadjuvant chemoradiotherapy (CROSS regimen) then planned oesophagectomy; nutrition optimised, prehabilitation begun.</div>
+          <div class="t-item"><div class="t-time">Month 5</div>Restaged after neoadjuvant therapy → oesophagectomy. Alive, eating, under surveillance — because month one was an endoscopy, not a bigger PPI.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>He has a shot at cure because someone refused "just reflux," recognised the ALARM features, and put an endoscope on the oesophagus in week one. Ordinary discipline, extraordinary difference in stage.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge / Follow-up</h2></div>
+      <div class="section-content">
+        <h3>📋 Two very different destinations</h3>
+        <div class="vs">
+          <div class="side a"><h4>🎗️ This patient (cancer pathway)</h4><ul><li>MDT-directed treatment; CNS key-worker; nutrition &amp; prehab</li><li>Red flags: complete dysphagia/food impaction, vomiting blood, breathlessness, aspiration → seek urgent care</li><li>Post-oesophagectomy: small frequent meals, dumping advice, surveillance</li><li>Smoking/alcohol cessation; psychological support</li></ul></div>
+          <div class="side b"><h4>🐦 The achalasia patient</h4><ul><li>Definitive therapy (dilatation/Heller/POEM); reflux advice after myotomy/POEM</li><li>Long-term follow-up (symptom recurrence, small squamous cancer risk)</li><li>Dietary advice: eat upright, chew well, avoid late heavy meals</li><li>Safety-net: new/worsening dysphagia or weight loss → re-scope</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Whether the answer is a tumour or a tight sphincter, the discharge is never 'all clear and forget' — both diagnoses carry a long-term surveillance obligation and a written safety-net."</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>🚩 Dysphagia = ALARM</b>New difficulty swallowing at any age earns urgent endoscopy — no other red flag required.</div>
+          <div class="pearl"><b>🍖 Pattern is diagnosis</b>Solids→liquids = obstruction; solids AND liquids from onset = motility (achalasia).</div>
+          <div class="pearl"><b>💊 PPI failure is a flag</b>Dysphagia that ignores a PPI is not "more reflux" — it is a reason to scope, not to titrate.</div>
+          <div class="pearl"><b>🔬 Scope first</b>Endoscopy gives the tissue diagnosis; barium/manometry come after a normal OGD.</div>
+          <div class="pearl"><b>🐦 Bird-beak vs apple-core</b>Silhouettes hint; manometry confirms achalasia, biopsy confirms cancer.</div>
+          <div class="pearl"><b>🕵️ Pseudoachalasia</b>Older + short history + weight loss? Biopsy the GOJ — a tumour can mimic achalasia perfectly.</div>
+          <div class="pearl"><b>🧬 Two cancers</b>Adeno (Barrett's/GORD, lower third) vs squamous (smoking/alcohol, upper/mid).</div>
+          <div class="pearl"><b>👥 MDT + speed</b>Stage fast; MDT decides curative vs palliative — time changes the stage.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the pathway</h3>
+          <ul>
+            <li>📊 <strong>Chicago Classification v4.0:</strong> high-resolution manometry defines achalasia by integrated relaxation pressure (IRP) and peristalsis — <em>type I</em> (aperistalsis), <em>type II</em> (pan-oesophageal pressurisation, best prognosis), <em>type III</em> (spastic, responds best to POEM). Distinguish from oesophagogastric junction outflow obstruction (EGJOO), distal oesophageal spasm and jackhammer oesophagus.</li>
+            <li>🧬 <strong>Barrett's surveillance &amp; ablation:</strong> risk-stratify by dysplasia; endoscopic eradication therapy (radiofrequency ablation + EMR/ESD) for dysplastic Barrett's and early T1a mucosal cancer avoids oesophagectomy in selected cases.</li>
+            <li>🎯 <strong>Molecular oncology of adenocarcinoma:</strong> HER2 testing (trastuzumab), PD-L1/CPS-directed immunotherapy (nivolumab/pembrolizumab in the peri-operative and advanced setting), and Claudin-18.2 emerging targets.</li>
+            <li>🔪 <strong>Surgical strategy:</strong> minimally invasive/robotic oesophagectomy, transthoracic (Ivor–Lewis) vs transhiatal approaches, and the impact of centralisation of upper-GI cancer surgery on outcomes.</li>
+            <li>🥩 <strong>Eosinophilic oesophagitis:</strong> the "3 D" phenotype (dysphagia, food impaction, rings/furrows); diagnosis needs ≥15 eos/hpf; PPI-responsive vs steroid (swallowed budesonide/fluticasone) vs elimination diet vs dupilumab.</li>
+            <li>🩹 <strong>Palliation of malignant dysphagia:</strong> self-expanding metal stents vs brachytherapy vs external-beam radiotherapy; managing tracheo-oesophageal fistula; the balance of quality-of-life against procedural risk.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The PPI That Kept Being Doubled"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 64-year-old man with 15 years of "reflux" told his GP that food had started to stick. He was on a standard PPI; the dose was doubled and he was told to "avoid big meals and review in a few months." He lost weight steadily — a stone, then two — and became breathless (his Hb was 96 but the microcytic result was filed unactioned). Eight months after the first mention of dysphagia he was finally scoped: an <strong>obstructing lower-third adenocarcinoma</strong>, invading through the wall with coeliac nodes and liver metastases. Inoperable. He died within the year, needing a palliative stent to swallow.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🧠 ANCHORING</b>"Known refluxer" — the pre-existing label captured every new symptom.</div>
+            <div class="hole"><b>💊 TREAT-DO-NOT-INVESTIGATE</b>PPI up-titrated instead of endoscopy; dysphagia treated as "worse reflux".</div>
+            <div class="hole"><b>🩸 IGNORED ALARM</b>Weight loss + microcytic anaemia never actioned as red flags.</div>
+            <div class="hole"><b>⏱️ DELAY</b>Eight months from first dysphagia to first endoscope — stage advanced meanwhile.</div>
+            <div class="hole"><b>📄 RESULT NOT READ</b>Abnormal FBC filed without follow-up.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> treat new progressive dysphagia as cancer until endoscopy proves otherwise; refer on the 2-week-wait pathway the day it is mentioned; act on every ALARM feature (weight loss, iron-deficiency anaemia) rather than filing it; and never let "known reflux" or "the PPI just needs increasing" close the door on an endoscopy. <strong>This is exactly the discipline that gave the patient in Bed 1 a curative-intent pathway.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Just increase the PPI' has staged more cancers than it has ever cured. Dysphagia plus weight loss is an endoscopy this week — not a prescription and a review in the spring."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · 🍽️ Gastroenterology &amp; Hepatology · Bed 1 — Progressive Dysphagia / Oesophageal Cancer &amp; Achalasia<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+    /* ===== SIDEBAR TABS — show one section at a time ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not a red-flag feature'); } if(found===total){ flagResult.textContent='✅ All '+total+' red-flag features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' red-flag features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: dysphagia pattern dial ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=v; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<25){ msg='🟢 Intermittent, non-progressive dysphagia (think web or ring). Routine work-up: OGD, treat iron deficiency, consider dilatation.'; cls='good'; }
+      else if(v<55){ msg='🟠 Slowly progressive solid dysphagia without weight loss — could be a benign peptic stricture. Still needs OGD + biopsy to exclude malignancy.'; cls='warn-r'; }
+      else if(v<80){ msg='🔴 Progressive solids toward liquids — a narrowing lumen. Urgent (2-week-wait) endoscopy for tissue diagnosis.'; cls='bad'; }
+      else { msg='🔴 Rapid solids→liquids progression WITH weight loss and anaemia — oesophageal cancer until proven otherwise. Urgent OGD + staging pathway now.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Pattern Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"A 66-year-old with 4 months of progressive solids→liquids dysphagia, 9 kg weight loss and iron-deficiency anaemia. A colleague says: 'He is a known refluxer — just double the PPI and review in two months.' What do you do?",
+      choices:[
+        {t:"💊 Double the PPI and review in two months",good:false,ds:-2,dt:240,xp:0,fb:"☠️ This is the M&M case in S21. Progressive dysphagia + weight loss + anaemia is red-flag; titrating a PPI lets a curable cancer become inoperable. Restart.",end:true},
+        {t:"🔎 Refer for urgent (2-week-wait) OGD with biopsy and correct the anaemia/nutrition",good:true,ds:1,dt:6,xp:40,fb:"✅ Exactly. Dysphagia plus ALARM features is a tissue-diagnosis-now problem. You have started the pathway that decides curative vs palliative.",next:"scope"},
+        {t:"🩻 Arrange a barium swallow first to avoid an invasive test",good:false,ds:-1,dt:14,xp:5,fb:"⚠️ Barium cannot biopsy and only delays diagnosis in a patient with ALARM features. Endoscopy is first-line here; barium/manometry come after a normal OGD.",next:"scope"}
+      ]},
+    scope:{ text:"OGD shows an ulcerating, near-obstructing mass at 34 cm; biopsies confirm adenocarcinoma. The lumen was dilated for symptom relief. What is the next priority?",
+      choices:[
+        {t:"🖥️ Stage it — CT chest/abdo/pelvis, then EUS and PET-CT, and refer to the upper GI cancer MDT",good:true,ds:1,dt:12,xp:40,fb:"✅ Right. Staging (TNM) and MDT decide curative multimodal therapy vs palliation. Nutrition and prehab run in parallel.",next:"mdt"},
+        {t:"🔪 Book straight for oesophagectomy without staging",good:false,ds:-2,dt:20,xp:0,fb:"⚠️ Operating on an unstaged tumour risks a futile resection of metastatic disease. Stage first; MDT decides.",next:"mdt"}
+      ]},
+    mdt:{ text:"Staging shows T3 N1 M0 — potentially resectable, patient reasonably fit. What does the MDT recommend?",
+      choices:[
+        {t:"👥 Neoadjuvant chemoradiotherapy then oesophagectomy, with nutrition optimisation and prehabilitation",good:true,ds:1,dt:10,xp:45,fb:"🏆 Perfect. Multimodal, MDT-directed, curative-intent treatment (CROSS trial) with prehab — the whole fast pathway existed to reach this moment.",end:true},
+        {t:"💊 Straight to palliative care — it is oesophageal cancer",good:false,ds:-1,dt:15,xp:0,fb:"⚠️ Defeatism costs a cure. T3N1M0 is potentially curable with multimodal therapy; do not write off a resectable tumour.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' days'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='mdt'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 days'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 66-year-old has 4 months of progressive dysphagia (solids then liquids) with 9 kg weight loss. The single most important next step is:", opts:["Increase the PPI and review in 2 months","Urgent (2-week-wait) upper GI endoscopy with biopsy","Reassure — it is long-standing reflux","Barium swallow only"], correct:1, exp:"Progressive dysphagia + weight loss are ALARM features mandating urgent endoscopy for tissue diagnosis. PPI titration or reassurance delays a possibly curable cancer; barium cannot biopsy." },
+    { q:"Which dysphagia pattern most suggests a MECHANICAL/obstructing lesion rather than a motility disorder?", opts:["Dysphagia to solids and liquids equally from the very start","Progressive dysphagia to solids first, then liquids","Intermittent painless liquid dysphagia only","Lump-in-throat sensation that eases when eating"], correct:1, exp:"Progressive solids→liquids reflects a narrowing lumen (cancer/stricture). Solids AND liquids together from onset points to achalasia; globus eases when eating and is reassuring." },
+    { q:"The diagnostic gold standard for achalasia is:", opts:["Barium swallow","High-resolution oesophageal manometry","CT chest","Serum gastrin"], correct:1, exp:"High-resolution manometry demonstrates failure of LOS relaxation (raised integrated relaxation pressure) plus aperistalsis, and subtypes achalasia (Chicago I–III). Endoscopy is still done first to exclude pseudoachalasia." },
+    { q:"A smooth, tapering 'bird-beak' appearance at the gastro-oesophageal junction on barium swallow is characteristic of:", opts:["Squamous cell carcinoma","Achalasia","Peptic stricture","Zenker diverticulum"], correct:1, exp:"The dilated body tapering to a smooth 'bird-beak' at the non-relaxing LOS is the classic barium appearance of achalasia. Confirm with manometry and exclude pseudoachalasia by biopsy." },
+    { q:"Which risk profile most fits oesophageal ADENOCARCINOMA (rather than squamous cell)?", opts:["Smoking and heavy alcohol, upper-third tumour","Long-standing GORD / Barrett's oesophagus, lower-third tumour","Achalasia with mid-oesophageal tumour","Coeliac disease"], correct:1, exp:"Adenocarcinoma arises on chronic acid reflux/Barrett's metaplasia and sits in the lower third. Squamous cell carcinoma links to smoking/alcohol and the upper/mid third." },
+    { q:"An older patient with a short history and marked weight loss has manometry suggesting achalasia. Before treating, you must exclude:", opts:["Eosinophilic oesophagitis","Pseudoachalasia (malignancy at the GOJ)","Coeliac disease","Hiatus hernia"], correct:1, exp:"A GOJ tumour can mimic achalasia exactly (pseudoachalasia). Older age, short history and rapid weight loss are red flags — inspect and biopsy the GOJ before offering achalasia therapy." },
+    { q:"Recognised definitive treatments for achalasia include all EXCEPT:", opts:["Pneumatic (balloon) dilatation","Laparoscopic Heller myotomy","Per-oral endoscopic myotomy (POEM)","Long-term high-dose PPI as monotherapy"], correct:3, exp:"PPIs treat reflux, not the non-relaxing LOS of achalasia. Definitive options are pneumatic dilatation, Heller myotomy and POEM (botulinum toxin temporises in the unfit)." },
+    { q:"A young atopic man has intermittent dysphagia and a food-bolus impaction; the mucosa looks near-normal with subtle rings. The key step is:", opts:["Reassure and discharge","Oesophageal biopsies (≥15 eosinophils/hpf diagnoses eosinophilic oesophagitis)","Start a beta-blocker","Immediate oesophagectomy"], correct:1, exp:"Eosinophilic oesophagitis can present with food impaction and near-normal mucosa; biopsy even when it looks normal. Treat with PPI/swallowed topical steroid/elimination diet ± dilatation." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you work up dysphagia like a consultant. 🏆':score>=6?'Strong — review the misses and S10 imaging.':'Revisit S3, S5 and S10 — the pattern-and-ALARM logic is the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>
