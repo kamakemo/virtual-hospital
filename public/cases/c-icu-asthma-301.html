@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Near-Fatal Acute Severe Asthma — Virtual Teaching Hospital</title>
+<!-- META
+id: c-icu-asthma-301
+title: Near-Fatal (Life-Threatening) Acute Severe Asthma
+hospital: internal-medicine
+department: icu
+bednumber: 1
+chiefcomplaint: Severe asthma attack, now exhausted with a silent chest, rising CO₂ and drowsy
+system: Critical Care
+severity: critical
+tags: Asthma, Life-threatening, Silent chest, Auto-PEEP, Permissive hypercapnia, BTS/SIGN, ICU
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🫁</div>
+      <div>
+        <div class="t1">Critical Care Unit</div>
+        <div class="t2">Bed 1 · Near-Fatal Asthma</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>ABG / Imaging</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · 🩺 Internal Medicine · 🚨 Critical Care Unit · 🛏️ Bed 1</div>
+        <h1>🫁 Near-Fatal Asthma — "The Chest That Went Quiet"</h1>
+        <div class="sub">⚡ 21:40. A 22-year-old who was fighting for every breath an hour ago is now slumped, sweaty and drowsy. The wheeze you could hear across the room has stopped. The nurse says "he seems calmer." He is not calmer — his chest has fallen silent and his CO₂ is climbing. This is a peri-arrest.</div>
+        <div class="chips">
+          <span class="chip crit">🔴 CRITICAL</span>
+          <span class="chip">🫁 Life-Threatening Asthma</span>
+          <span class="chip">🔇 Silent Chest</span>
+          <span class="chip">📈 Rising PaCO₂</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital alert"><div class="v-label">💓 HR</div><div class="v-num">138</div></div>
+        <div class="vital warn"><div class="v-label">🩸 BP</div><div class="v-num">102/64</div></div>
+        <div class="vital alert"><div class="v-label">🌬️ RR</div><div class="v-num">8</div></div>
+        <div class="vital alert"><div class="v-label">🫁 SpO₂</div><div class="v-num">88%</div></div>
+        <div class="vital"><div class="v-label">🌡️ Temp</div><div class="v-num">37.1°</div></div>
+        <div class="vital warn"><div class="v-label">🧠 GCS</div><div class="v-num">12</div></div>
+        <div class="vital alert"><div class="v-label">📉 PEF</div><div class="v-num">&lt;33%</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 21:40, Resus Bay 1</b>A young man sits bolt-upright on the trolley, then starts to slump. An hour ago he was too breathless to speak; now he manages only single words and his eyes are half-closing. The tripod posture is gone. The loud wheeze is gone. A nebuliser hisses beside a silent chest. <em>"He's settling,"</em> someone says. This is the exact moment a tiring asthmatic is mistaken for an improving one — and sent to a ward to arrest.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>🧑 Name</td><td><strong>Mr. J.A.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>22-year-old male</td></tr>
+          <tr><td>🆔 MRN</td><td>ICU-RESP-0301</td></tr>
+          <tr><td>⚖️ Weight</td><td>72 kg</td></tr>
+          <tr><td>💼 Occupation</td><td>University student — exam-season stress, poor sleep</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA · cat &amp; grass-pollen atopy</td></tr>
+        </table>
+
+        <h3>📜 Past history — every line marks him as a "brittle" high-risk asthmatic</h3>
+        <ul>
+          <li>🔺 <strong>Asthma since childhood</strong>, atopic (eczema, hay fever). <strong>One previous ICU admission</strong> with ventilation aged 19 — the single strongest predictor of near-fatal asthma.</li>
+          <li>💨 <strong>Over-using his blue (salbutamol) inhaler</strong> — 3 canisters this month — and <strong>not taking his brown (steroid) preventer.</strong> Reliever overuse + preventer non-adherence is the classic death-risk fingerprint.</li>
+          <li>🏥 Two ED attendances in the past year; a course of oral steroids 6 weeks ago.</li>
+          <li>😔 Adverse psychosocial factors: exam stress, previous non-attendance at asthma review. <strong>Brittle asthma</strong> + poor engagement = the phenotype on the coroner's list.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Previous ventilation, reliever overuse, and preventer non-adherence are the fingerprints of the patient who dies of asthma — treat every attack in this phenotype as potentially fatal."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why asthma still kills the young</b>Most asthma deaths are judged preventable. The recurring themes (from the UK National Review of Asthma Deaths, NRAD): under-recognition of severity, reliever over-reliance, inadequate steroids, and failure to escalate. The tragedy is that this is a <strong>reversible</strong> disease — the patient in Bed 1 should walk out of hospital if we read the severity correctly tonight.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 Paramedic handover — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ Pre-hospital SBAR (verbatim)</b>
+          <p><strong>S:</strong> "22-year-old known asthmatic, 3-hour worsening wheeze and breathlessness after a cold, ran out of his preventer weeks ago. Couldn't complete a sentence at the door."</p>
+          <p><strong>B:</strong> "Brittle asthma, ventilated in ICU three years ago. Been hammering the blue inhaler with no relief."</p>
+          <p><strong>A:</strong> "On scene: SpO₂ 89% on air, silent-ish chest, HR 140, exhausted. We gave back-to-back salbutamol + ipratropium nebs driven by oxygen, put out a pre-alert. He was talking in words on scene — now he's quieter and drowsier."</p>
+          <p><strong>R:</strong> "We are worried — he tired through the journey. Please meet us in resus, senior + anaesthetics."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A wheeze that disappears in an unwell asthmatic is NOT improvement — no air movement means no wheeze. The 'quiet, calmer' asthmatic is the one about to arrest."</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each life-threatening feature</h3>
+        <p>🎮 <em>Click every feature that marks this as LIFE-THREATENING / near-fatal asthma. Each correct = +10 XP.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">🔇 Silent chest</button>
+          <button class="btn ghost flag-btn" data-good="1">😴 Drowsy / falling GCS</button>
+          <button class="btn ghost flag-btn" data-good="1">🫁 SpO₂ &lt; 92%</button>
+          <button class="btn ghost flag-btn" data-good="1">😮‍💨 Poor respiratory effort / exhaustion</button>
+          <button class="btn ghost flag-btn" data-good="1">📉 PEF &lt; 33% best/predicted</button>
+          <button class="btn ghost flag-btn" data-good="1">📈 Normal or RISING PaCO₂</button>
+          <button class="btn ghost flag-btn" data-good="0">🎵 Loud audible wheeze</button>
+          <button class="btn ghost flag-btn" data-good="0">🗣️ Speaking in full sentences</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Praise where due</b>The crew did the right things fast: high-flow oxygen, back-to-back nebulised salbutamol + ipratropium driven by oxygen, and a pre-alert asking for seniors and anaesthetics. Recognising deterioration <em>en route</em> and calling ahead buys the minutes that decide the outcome.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🅰️🅱️🅲️ Primary survey — the peri-arrest asthmatic</h3>
+        <table class="tbl">
+          <tr><th>Step</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>🅰️ Airway</td><td>Own airway, but now only single-word/no speech.</td><td>Loss of speech = catastrophic work of breathing and fatigue; airway may soon need protecting.</td></tr>
+          <tr><td>🅱️ Breathing</td><td>RR falling to 8 (was 34), <strong>silent chest</strong>, poor effort, SpO₂ 88% on high-flow O₂, tracheal tug earlier now absent.</td><td>A falling RR + silent chest in a tiring asthmatic is <strong>exhaustion</strong>, not recovery — a pre-arrest sign.</td></tr>
+          <tr><td>🅲️ Circulation</td><td>HR 138, BP 102/64, <strong>pulsus paradoxus</strong> earlier; cool peripheries.</td><td>Tachycardia from hypoxia/β-agonist; falling BP raises the spectre of auto-PEEP/tension pneumothorax if he is being bagged.</td></tr>
+          <tr><td>🅳 Disability</td><td>GCS 12 and dropping, drowsy, agitatedly settling.</td><td>Altered consciousness = life-threatening feature — the brain is telling you the CO₂ is climbing.</td></tr>
+          <tr><td>🅴 Exposure</td><td>Diaphoretic, no urticaria/angio-oedema, no fever source, no calf swelling.</td><td>Screens for anaphylaxis (a mimic) and for the alternative causes of acute wheeze.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In acute asthma, a NORMAL respiratory rate and a NORMAL PaCO₂ are red flags, not reassurance — a patient this sick should be blowing off CO₂; if he isn't, he is failing."</div>
+
+        <h3>🧭 The severity call you make in 60 seconds</h3>
+        <p>Before anything else, classify him against the <strong>BTS/SIGN severity ladder</strong> (full table in S5). He has a silent chest, SpO₂ &lt; 92%, poor effort, exhaustion and a falling conscious level — this is <strong>life-threatening asthma</strong>, and a rising PaCO₂ tips him into <strong>near-fatal</strong>. That single label mandates senior + ICU + anaesthetic presence <em>now</em>.</p>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of "he's settling"</b>The dangerous transition is silent. Loud wheeze → quiet chest, agitation → drowsiness, fast breathing → slow breathing, high effort → collapse. Every one of those "improvements" is actually <strong>decompensation</strong>. Re-examine minute-to-minute and trust the trend, not the snapshot.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The medical registrar thinks out loud at 21:44:</em></p>
+        <h3>🧠 Frame it as failing ventilation, not just "bad asthma"</h3>
+        <p>"This is near-fatal asthma. My job is maximal medical therapy delivered <strong>simultaneously, not sequentially</strong>, while I get the people who can secure the airway into the room. High-flow oxygen to 94–98%, continuous nebulised salbutamol + ipratropium, IV steroid, IV magnesium — all at once. I am calling ICU and anaesthetics <em>before</em> he arrests, not after. And I am NOT reaching for antibiotics or reflexively sedating him."</p>
+
+        <h3>🎯 Her order of operations (all in parallel)</h3>
+        <ol>
+          <li>🆘 <strong>Call for help NOW</strong> — senior physician, ICU, anaesthetics; move to a resus bay with airway kit and a chest-drain set to hand.</li>
+          <li>🫧 <strong>Controlled high-flow oxygen</strong>, titrate to SpO₂ 94–98%.</li>
+          <li>💨 <strong>Back-to-back / continuous nebulised salbutamol 5 mg + ipratropium 0.5 mg</strong>, oxygen-driven.</li>
+          <li>💊 <strong>Steroids early</strong> — hydrocortisone 100 mg IV (or prednisolone 40–50 mg PO if able).</li>
+          <li>🧲 <strong>IV magnesium sulfate 1.2–2 g over 20 min</strong>; escalate to IV salbutamol / aminophylline only with senior/ICU input.</li>
+          <li>🩸 ABG (venous or arterial) for CO₂ trend, portable CXR to exclude pneumothorax, continuous monitoring.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Call for the airway team on the way UP, not on the way DOWN. In near-fatal asthma the decision you must never make late is 'who intubates when he tires' — have them in the room before he needs them."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>The nurse asks whether to give a big dose of IV morphine or midazolam because he is agitated. Do it?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No — not as a sedating "calming" dose on a spontaneously breathing, tiring asthmatic.</strong> Agitation here is HYPOXIA and HYPERCAPNIA, not anxiety. Sedatives blunt his respiratory drive and can precipitate the arrest. Sedation and paralysis belong to a <strong>controlled rapid-sequence induction</strong> by the airway team who are then ready to ventilate — never as a standalone anxiolytic before support is in the room.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The ICU consultant at the bedside, 21:50:</em></p>
+        <h3>🪜 The BTS/SIGN severity ladder — the most important table tonight</h3>
+        <table class="tbl">
+          <tr><th>Grade</th><th>Defining features (any one)</th><th>This patient</th></tr>
+          <tr><td><strong>Moderate</strong></td><td>Increasing symptoms; PEF &gt; 50–75% best/predicted; no features of acute severe.</td><td class="lo">passed through</td></tr>
+          <tr><td><strong>Acute severe</strong></td><td>PEF 33–50%; RR ≥ 25; HR ≥ 110; cannot complete sentences in one breath.</td><td class="hi">passed through</td></tr>
+          <tr><td><strong>Life-threatening</strong></td><td>PEF &lt; 33%; SpO₂ &lt; 92%; silent chest; cyanosis; poor respiratory effort; bradycardia/arrhythmia; hypotension; exhaustion; altered consciousness; <strong>normal PaCO₂ (4.6–6.0 kPa)</strong>.</td><td class="hi">YES — multiple</td></tr>
+          <tr><td><strong>Near-fatal</strong></td><td><strong>Raised PaCO₂</strong> and/or requiring mechanical ventilation with raised inflation pressures.</td><td class="hi">YES — rising CO₂</td></tr>
+        </table>
+        <p>He is <strong>near-fatal</strong>. Note the cruel subtlety: within "life-threatening", a <strong>normal</strong> PaCO₂ is already abnormal, and a <strong>rising</strong> PaCO₂ is the near-fatal alarm.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"You only need ONE life-threatening feature to call it life-threatening. Do not average the numbers — a silent chest with 'normal' obs is still a peri-arrest."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> BTS/SIGN (and 2024 BTS/NICE/SIGN joint) asthma guideline</td><td>Structured severity grading + escalation ladder for acute asthma.</td><td>Grade every attack; life-threatening/near-fatal ⇒ senior + ICU now.</td></tr>
+            <tr><td><span class="lvl">RCT/META</span> IV magnesium sulfate (e.g. 3Mg / Cochrane)</td><td>Single IV MgSO₄ reduces admissions in severe attacks not responding to initial β-agonist; nebulised Mg not routinely beneficial.</td><td>Give IV MgSO₄ 1.2–2 g in severe/life-threatening asthma.</td></tr>
+            <tr><td><span class="lvl">SYSTEMATIC REVIEW</span> Early systemic corticosteroids</td><td>Reduce admissions and relapse; benefit begins over hours — so give EARLY.</td><td>Steroids in the first minutes, not after the nebs "fail".</td></tr>
+            <tr><td><span class="lvl">RCT</span> Ipratropium added to β-agonist</td><td>Combination bronchodilation improves lung function and reduces admission in severe attacks.</td><td>Add ipratropium to salbutamol in acute severe/life-threatening.</td></tr>
+            <tr><td><span class="lvl">AUDIT</span> NRAD (National Review of Asthma Deaths)</td><td>Most asthma deaths preventable: under-recognition, reliever over-use, inadequate steroids, failure to escalate.</td><td>The lesson is systems + escalation, not a new drug.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The chart that haunts me is the tiring student whose repeat gas showed a CO₂ that had climbed from 3.2 to 5.1 — still 'normal', so he was moved to a ward bed overnight. That 'normalising' number was the tide going out before the wave. He arrested at 03:00 on an unmonitored ward."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY the silent chest, WHY the rising CO₂ (the WHY behind the WHY)</h3>
+        <ol>
+          <li>🌪️ <strong>Bronchospasm + mucosal oedema + mucus plugging</strong> narrow the airways. Expiration — normally passive — becomes slow and incomplete.</li>
+          <li>🎈 <strong>Dynamic hyperinflation / breath-stacking:</strong> the next breath comes in before the last one has fully left. Air stacks in the lungs, trapped behind narrowed airways at end-expiration. This trapped pressure is <strong>auto-PEEP (intrinsic PEEP).</strong></li>
+          <li>💪 <strong>The exhaustion spiral:</strong> hyperinflated lungs put the diaphragm at a mechanical disadvantage; each breath costs enormous work against auto-PEEP. The patient generates huge negative pressures — until the respiratory muscles simply <strong>fatigue</strong>.</li>
+          <li>🔇 <strong>The silent chest:</strong> so little air is moving that there is no turbulence to make a wheeze. Silence = minimal ventilation = the end-stage, not the calm.</li>
+          <li>📈 <strong>Rising CO₂:</strong> early in an attack the frightened, driven patient hyperventilates → LOW CO₂. As they tire, minute ventilation falls and CO₂ rises back to "normal" then above it. So a CO₂ climbing toward normal is the fatigue curve, not recovery.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In an acute severe attack, a rising CO₂ is the sound of the respiratory muscles giving up. 'Normalising' gases in a tiring asthmatic mean he is running OUT of the strength to over-breathe — escalate, do not relax."</div>
+
+        <h3>⚖️ Contrast pair — the frightened early attack vs the exhausted late attack</h3>
+        <div class="vs">
+          <div class="side a"><h4>😤 Early / compensating</h4><ul><li>Agitated, tachypnoeic, loud wheeze, tripod posture</li><li>PaCO₂ LOW (blowing it off)</li><li>Working hard but keeping up</li></ul></div>
+          <div class="side b"><h4>😴 Late / decompensating (this patient)</h4><ul><li>Drowsy, slowing RR, SILENT chest, poor effort</li><li>PaCO₂ normal then RISING</li><li>Failing — pre-arrest</li></ul></div>
+        </div>
+        <p>💡 The two look opposite on the monitor (loud/fast vs quiet/slow) but the second is far sicker. Read the direction of travel.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The PaCO₂ Fatigue Dial</h3>
+          <p style="font-size:13px">One patient, one hour of an attack. Drag the PaCO₂ and watch why "normal" is the danger zone in a tiring asthmatic — the number that looks reassuring is the one that should terrify you.</p>
+          <label for="kRange">🩸 Arterial PaCO₂: <b id="kVal">3.2</b> kPa</label>
+          <input type="range" id="kRange" min="26" max="90" value="32">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore the fatigue curve.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 Low CO₂ = still compensating. A CO₂ climbing THROUGH the normal range in a sick, tiring asthmatic = failing ventilation → get the airway team ready.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The order set (21:44) — the treatment ladder, delivered in parallel</h3>
+        <ul>
+          <li>🫧 <strong>Controlled high-flow oxygen</strong>, titrate to <strong>SpO₂ 94–98%</strong> (this is not COPD — aim high, but titrate).</li>
+          <li>💨 <strong>Nebulised salbutamol 5 mg back-to-back / continuous</strong> + <strong>ipratropium bromide 0.5 mg</strong> (repeat 4–6 hourly), oxygen-driven.</li>
+          <li>💊 <strong>Steroids EARLY:</strong> hydrocortisone 100 mg IV or prednisolone 40–50 mg PO — give in the first minutes.</li>
+          <li>🧲 <strong>Magnesium sulfate 1.2–2 g IV over 20 min</strong> for severe/life-threatening not responding.</li>
+          <li>⚡ <strong>Escalation (senior/ICU only):</strong> IV salbutamol or IV aminophylline (load 5 mg/kg over 20 min unless already on theophylline, then infusion with levels).</li>
+          <li>🆘 <strong>Refer ICU + anaesthetics now;</strong> continuous SpO₂/ECG/BP; ABG for CO₂ trend; portable CXR (exclude pneumothorax).</li>
+          <li>🚫 <strong>Do NOT:</strong> give routine antibiotics (most attacks are viral/allergic); do NOT sedate a spontaneously breathing tiring asthmatic outside a controlled RSI.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"OSHIMA delivered together, not in sequence: Oxygen, Salbutamol, Hydrocortisone, Ipratropium, Magnesium, Anaesthetics/ICU. The dying asthmatic gets everything at once and the airway team called early."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Resus-bay priorities — the nurse runs the safety net</h3>
+        <ul>
+          <li>📟 <strong>Continuous SpO₂, ECG and BP;</strong> never leave a near-fatal asthmatic unobserved — arrest can be minutes away.</li>
+          <li>💨 <strong>Keep nebulisers running oxygen-driven and back-to-back;</strong> a dry nebuliser chamber is lost bronchodilator time — refill immediately.</li>
+          <li>😴 <strong>Flag the "settling" patient loudly:</strong> a falling RR, quieter chest, or drowsiness is deterioration — call the doctor, do not dim the lights.</li>
+          <li>🩸 Draw and time the ABG/VBG accurately; the CO₂ <em>trend</em> is a headline number for the team.</li>
+          <li>🧰 <strong>Have the airway trolley and a chest-drain set at the bedside</strong> before they are needed — sudden hypotension may be a tension pneumothorax.</li>
+          <li>🚫 Challenge any request to give sedation or "just move him to the ward"; confirm the escalation plan is documented and ICU is aware.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The nurse who refuses to let a quiet, drowsy asthmatic 'rest' on a ward bed is the safety catch on a loaded gun."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board — read the ABG as a movie</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>On arrival (21:20)</th><th>Repeat (21:50)</th><th>Interpretation</th></tr>
+          <tr><td>pH</td><td class="lo">7.47</td><td class="hi">7.29</td><td>Started respiratory alkalosis (hyperventilating) → now acidaemia as he tires + lactate rises.</td></tr>
+          <tr><td>PaCO₂ (kPa)</td><td class="lo">3.2</td><td class="hi">6.4</td><td><strong>The killer trend.</strong> A CO₂ that climbs from low → normal → high in a sick asthmatic is FATIGUE. This is now near-fatal.</td></tr>
+          <tr><td>PaO₂ (kPa, on O₂)</td><td>9.0</td><td class="hi">7.6</td><td>Falling despite high-flow O₂ — worsening V/Q mismatch and hypoventilation.</td></tr>
+          <tr><td>Lactate</td><td>2.1</td><td class="hi">4.8</td><td>Type B lactate from work of breathing + high-dose β-agonist; also a marker of severity.</td></tr>
+          <tr><td>K⁺</td><td>3.9</td><td class="lo">3.1</td><td>β-agonists drive K⁺ intracellularly — monitor and replace to avoid arrhythmia.</td></tr>
+          <tr><td>Glucose</td><td>7.8</td><td>9.2</td><td>Stress + β-agonist + steroid effect; monitor.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"One ABG is a photograph; asthma is a film. It is the CO₂ going the WRONG way over 30 minutes — not any single value — that tells you he is about to stop breathing."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why the "normal" gas is the trap</b>A single PaCO₂ of 5.0 kPa reads as "normal" on the printout. But in a patient this distressed it means he can no longer over-breathe to blow CO₂ off — his respiratory muscles are failing. Interpret the gas <em>against how sick the patient looks</em> and against the previous value. A normal number in a peri-arrest patient is a scream, not a reassurance.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 ABG / IMAGING + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 ABG / Imaging + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🩸 The PaCO₂ trend — read it like a movie</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="PaCO2 trend climbing from low through normal to high as the patient tires">
+            <rect width="820" height="150" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="38" x2="820" y2="38"/><line x1="0" y1="75" x2="820" y2="75"/><line x1="0" y1="112" x2="820" y2="112"/></g>
+            <rect x="0" y="70" width="820" height="34" fill="#14532d" opacity="0.35"/>
+            <text x="8" y="90" fill="#86efac" font-size="10">"normal" CO₂ band 4.6–6.0</text>
+            <polyline fill="none" stroke="#fca5a5" stroke-width="3" points="20,120 200,118 380,96 560,66 720,34 800,20"/>
+            <circle cx="20" cy="120" r="5" fill="#93c5fd"/><circle cx="380" cy="96" r="5" fill="#fde68a"/><circle cx="720" cy="34" r="5" fill="#f87171"/>
+            <text x="20" y="138" fill="#93c5fd" font-size="11">21:20 · 3.2 kPa (blowing off)</text>
+            <text x="330" y="88" fill="#fde68a" font-size="11">"normalising" — the trap</text>
+            <text x="600" y="26" fill="#fca5a5" font-size="11">21:50 · 6.4 kPa · near-fatal</text>
+          </svg>
+          <div class="ecg-cap">The CO₂ starts <span style="color:#93c5fd">low</span> (compensating), drifts up <span style="color:#fde68a">through "normal"</span> (the reassuring-looking trap), and climbs into the <span style="color:#fca5a5">danger zone</span> as the muscles fail. The diagnosis lived in the TREND, not any single value.</div>
+        </div>
+
+        <h3>🩻 Chest X-ray &amp; the imaging you actually need</h3>
+        <table class="tbl">
+          <tr><th>Study</th><th>Look for</th><th>Meaning / action</th></tr>
+          <tr><td>🩻 <strong>Portable CXR</strong></td><td>Hyperinflation (flat diaphragms, &gt;9 posterior ribs); <strong>pneumothorax / pneumomediastinum</strong>; focal consolidation</td><td>Not routine for every attack — but do it in life-threatening/near-fatal asthma, if not responding, or if ventilated. A pneumothorax here is lethal.</td></tr>
+          <tr><td>🫁 <strong>Bedside lung ultrasound</strong></td><td>Absent lung sliding = pneumothorax; B-lines suggest an alternative (oedema)</td><td>Fast bedside rule-out of tension pneumothorax when the ventilated patient drops their BP.</td></tr>
+          <tr><td>📟 <strong>Continuous capnography</strong> (once airway secured)</td><td>Obstructive "shark-fin" EtCO₂ upstroke; trend of EtCO₂</td><td>Confirms tube, tracks ventilation and obstruction in real time.</td></tr>
+          <tr><td>🫀 <strong>Bedside echo</strong> (if shocked)</td><td>Under-filled, hyperdynamic LV; obstructed venous return from auto-PEEP</td><td>Helps separate auto-PEEP hypotension from tension pneumothorax from other shock.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In the ventilated asthmatic who suddenly drops their BP: think auto-PEEP and tension pneumothorax FIRST — DISCONNECT the circuit and decompress the chest, do not just crank up the numbers."</div>
+
+        <h3>🎈 The picture of dynamic hyperinflation</h3>
+        <ul>
+          <li><strong>CXR:</strong> hyperexpanded, dark lung fields, flattened diaphragms — air the patient cannot get out.</li>
+          <li><strong>Ventilator waveform:</strong> expiratory flow that does NOT return to zero before the next breath = <strong>auto-PEEP / breath-stacking</strong> — the mechanical signature of the trapped air that kills.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The acute-asthma drug map — what, why, and the traps</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>Oxygen</strong> (high-flow, titrated)</td><td>All hypoxic attacks</td><td>Target SpO₂ 94–98%. Corrects hypoxia; does NOT treat the obstruction — it buys time.</td></tr>
+          <tr><td><strong>Salbutamol</strong> neb 5 mg back-to-back/continuous (± IV, senior-led)</td><td>First-line bronchodilator</td><td>β₂-agonist relaxes airway smooth muscle. Causes tachycardia, tremor, <strong>hypokalaemia</strong> and lactate rise — monitor K⁺.</td></tr>
+          <tr><td><strong>Ipratropium bromide</strong> 0.5 mg neb</td><td>Add in severe/life-threatening</td><td>Antimuscarinic bronchodilation, additive to salbutamol; reduces admissions in severe attacks.</td></tr>
+          <tr><td><strong>Corticosteroid</strong> (hydrocortisone 100 mg IV or prednisolone 40–50 mg PO)</td><td>Every acute attack, EARLY</td><td>Dampens airway inflammation; benefit over hours, so give at once. Continue oral steroids ≥ 5 days.</td></tr>
+          <tr><td><strong>Magnesium sulfate</strong> 1.2–2 g IV over 20 min</td><td>Severe/life-threatening not responding</td><td>Smooth-muscle relaxation; single dose reduces admissions. Watch for hypotension/areflexia if overdosed.</td></tr>
+          <tr><td><strong>IV aminophylline / IV salbutamol</strong></td><td>Escalation, senior/ICU only</td><td>Narrow therapeutic index (aminophylline) — load only if not on theophylline, check levels; arrhythmia risk.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Bronchodilators + steroids + magnesium treat the airways; oxygen buys time; but only RECOGNISING FATIGUE and calling the airway team saves the life the drugs cannot."</div>
+        <div class="callout danger"><b class="ct">🚫 The 'do NOT reach for' list in acute asthma</b>❌ Routine antibiotics (attacks are usually viral/allergic — antibiotics do not treat bronchospasm). ❌ Sedatives/opioids to "calm" a spontaneously breathing tiring asthmatic (abolish respiratory drive → arrest). ❌ β-blockers. ❌ Excessive uncontrolled oxygen without titration. Sedation belongs ONLY to a controlled RSI with the airway team ready to ventilate.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why</h3>
+        <ul>
+          <li>😮‍💨 <strong>Work of breathing &amp; conscious level</strong> — the most sensitive monitors are your eyes: rising drowsiness or a FALLING respiratory rate = failing, escalate.</li>
+          <li>🩸 <strong>Serial ABG for the CO₂ trend</strong> — repeat after treatment and with any deterioration; the direction matters more than the value.</li>
+          <li>🫁 SpO₂ (target 94–98%) and continuous <strong>capnography</strong> once the airway is secured.</li>
+          <li>💓 Continuous ECG — β-agonists + hypokalaemia + hypoxia = arrhythmia risk; watch K⁺.</li>
+          <li>🩸 BP — a sudden fall in a ventilated asthmatic = auto-PEEP or tension pneumothorax until proven otherwise.</li>
+          <li>📉 PEF once well enough to perform it — trend recovery, but never let a "can't-do-PEF" patient be under-treated.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"After maximal therapy the monitor's question changes from 'is the asthma severe?' to 'is he tiring toward arrest?' — and the answers are the conscious level, the respiratory rate, and the CO₂ trend."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong — the asthma-specific killers</h3>
+        <ul>
+          <li>🛑 <strong>Respiratory arrest from exhaustion</strong> — the commonest fatal pathway; the silent chest and drowsiness are its heralds.</li>
+          <li>🎈 <strong>Dynamic hyperinflation / auto-PEEP</strong> — trapped air raises intrathoracic pressure, obstructs venous return → <strong>hypotension</strong> and PEA; the fix is <strong>disconnect the circuit and let the chest deflate</strong>.</li>
+          <li>💥 <strong>Tension pneumothorax / pneumomediastinum</strong> — from high pressures and air-trapping; sudden hypotension/hypoxia in a ventilated asthmatic → decompress.</li>
+          <li>💓 <strong>Arrhythmia</strong> — hypokalaemia (β-agonist), hypoxia, acidosis, aminophylline toxicity.</li>
+          <li>🧠 <strong>Hypoxic-ischaemic brain injury</strong> — from a late-recognised arrest.</li>
+          <li>🩺 <strong>The system complication:</strong> under-recognition of severity and moving a tiring asthmatic to an unmonitored ward — the biggest killer of all.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"When a ventilated asthmatic arrests or drops their pressure: DISCONNECT (let them exhale), decompress a possible tension pneumothorax, then reventilate slowly. Do not fight auto-PEEP with more breaths."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 "All that wheezes is not asthma" — the differential of acute wheeze/breathlessness</h3>
+        <table class="tbl">
+          <tr><th>Diagnosis</th><th>Discriminators</th><th>Don't-miss action</th></tr>
+          <tr><td>🫁 <strong>Acute severe asthma</strong> (this patient)</td><td>Known asthmatic, expiratory wheeze → silent chest, PEF drop, tiring</td><td>Severity grade; O₂, nebs, steroids, Mg; airway team early.</td></tr>
+          <tr><td>🐝 <strong>Anaphylaxis</strong></td><td>Sudden onset after trigger, urticaria/angio-oedema, hypotension, stridor</td><td>IM adrenaline immediately — a wheezing hypotensive patient may need adrenaline, not just salbutamol.</td></tr>
+          <tr><td>😤 <strong>Tension pneumothorax</strong></td><td>Sudden unilateral silence, tracheal shift, hypotension, distended neck veins</td><td>Immediate decompression — do not mistake for "worsening asthma".</td></tr>
+          <tr><td>🫀 <strong>Cardiac ("cardiac asthma") / pulmonary oedema</strong></td><td>Older, orthopnoea, crackles + B-lines, cardiac history</td><td>Treat heart failure — bronchodilators alone will fail.</td></tr>
+          <tr><td>🚬 <strong>Infective exacerbation of COPD / inhaled foreign body / upper-airway obstruction</strong></td><td>Smoker/older (COPD); sudden choking (FB); stridor (upper airway)</td><td>Different oxygen targets/therapy; secure/relieve the airway.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Before you commit to 'asthma', ask: does it have a RASH and low BP (anaphylaxis), a SILENT hemithorax with a shifted trachea (tension pneumothorax), or CRACKLES (cardiac)? Three checks stop three fatal mimics."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The First Ten Minutes of a Silent Chest"</h3>
+          <div class="hud"><span>🫁 Safety: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">Your 22-year-old asthmatic has a silent chest, SpO₂ 88% on high-flow O₂, is drowsy (GCS 12) and his repeat CO₂ has climbed from 3.2 to 6.4 kPa. The ward nurse offers to take him upstairs because "he's finally settled and quiet." What do you do?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The disposition plan</h3>
+        <ol>
+          <li>🫁 <strong>Diagnosis:</strong> near-fatal asthma (rising PaCO₂, silent chest, exhaustion, falling GCS). Maximal medical therapy delivered in parallel; ICU + anaesthetics at the bedside.</li>
+          <li>🫧 Oxygen 94–98%; continuous nebulised salbutamol + ipratropium; IV steroid; IV magnesium; escalate to IV bronchodilators with ICU.</li>
+          <li>🫀 <strong>The decision to intubate is CLINICAL</strong> — exhaustion, falling GCS, silent chest, failure to respond — <em>not</em> a single ABG number. Prepare for a difficult, high-risk induction.</li>
+          <li>🏥 Admit to ICU/HDU; nobody with near-fatal asthma goes to an unmonitored ward. Address the reasons the attack got this far (adherence, preventer, follow-up).</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Intubation in asthma is a decision made at the bedside about a TIRING patient, not a threshold crossed on a blood-gas printout. If you are asking 'should the airway team be here?', the answer is already yes."</div>
+
+        <div class="callout warn"><b class="ct">🫁 Ventilating the asthmatic — the perils (why the ICU team must lead)</b>
+          <ul>
+            <li><strong>Permissive hypercapnia:</strong> accept a high CO₂ and low-normal pH to avoid barotrauma — do NOT chase a normal CO₂.</li>
+            <li><strong>Low respiratory rate + LONG expiratory time</strong> (low I:E), lower tidal volumes — give the trapped air time to escape and prevent auto-PEEP.</li>
+            <li><strong>Watch for auto-PEEP → hypotension.</strong> If BP falls: <strong>DISCONNECT the circuit</strong> and let the chest deflate, then decompress a possible tension pneumothorax.</li>
+            <li>Peri-intubation is the most dangerous moment: sedation removes the drive that was keeping them alive, and positive pressure can worsen air-trapping and drop the BP.</li>
+          </ul>
+        </div>
+
+        <div class="checklist" id="ckAcute">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Near-fatal asthma resus checklist (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>🪜 Severity graded against BTS/SIGN — life-threatening/near-fatal features documented</span></label>
+          <label class="ck"><input type="checkbox"><span>🆘 Senior physician + ICU + anaesthetics called EARLY (before arrest)</span></label>
+          <label class="ck"><input type="checkbox"><span>🫧 O₂ titrated to 94–98%; continuous salbutamol + ipratropium nebs (oxygen-driven)</span></label>
+          <label class="ck"><input type="checkbox"><span>💊 Steroid given early; 🧲 IV magnesium given for non-responding severe/life-threatening</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 ABG for CO₂ trend; K⁺ monitored/replaced; portable CXR to exclude pneumothorax</span></label>
+          <label class="ck"><input type="checkbox"><span>🚫 No routine antibiotics; no standalone sedation of a spontaneously breathing patient</span></label>
+          <label class="ck"><input type="checkbox"><span>🏥 Disposition = ICU/HDU (never an unmonitored ward)</span></label>
+          <div class="ck-progress" data-progress>0 / 7 complete</div>
+        </div>
+
+        <div class="checklist" id="ckVent">
+          <h3 style="margin-top:0">🩺 Procedure Guide — If he needs intubation &amp; ventilation</h3>
+          <label class="ck"><input type="checkbox"><span>🫀 Decision to intubate is CLINICAL (exhaustion / falling GCS / silent chest), not an ABG number</span></label>
+          <label class="ck"><input type="checkbox"><span>🧰 Prepare for a difficult, high-risk RSI; most experienced airway operator; fluids ready for post-induction hypotension</span></label>
+          <label class="ck"><input type="checkbox"><span>🌬️ Ventilator: permissive hypercapnia, low rate, LONG expiratory time, lower tidal volume</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 Sudden hypotension → DISCONNECT circuit &amp; decompress chest (auto-PEEP / tension pneumothorax)</span></label>
+          <label class="ck"><input type="checkbox"><span>📟 Continuous capnography; continue bronchodilators; keep chest-drain set to hand</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">21:20</div>Arrival: acute severe asthma, loud wheeze, RR 34, PEF &lt;33%, ABG pH 7.47 / CO₂ 3.2 (blowing off). Nebs + steroid + O₂ started.</div>
+          <div class="t-item"><div class="t-time">21:50</div>Chest falls silent, GCS 12, RR 8; repeat ABG pH 7.29 / CO₂ 6.4 — <strong>near-fatal</strong>. ICU + anaesthetics at bedside; IV magnesium given.</div>
+          <div class="t-item"><div class="t-time">22:05</div>Clinical decision (exhaustion + falling GCS) → <strong>controlled RSI and intubation</strong> by ICU. Ventilated with permissive hypercapnia, low rate, long expiratory time.</div>
+          <div class="t-item"><div class="t-time">22:20</div>Sudden BP drop to 70 systolic on the ventilator. Circuit <strong>disconnected → chest deflated</strong>, BP recovered; CXR excluded pneumothorax. Auto-PEEP was the culprit.</div>
+          <div class="t-item"><div class="t-time">Day 3</div>Bronchospasm settled, extubated. Started on preventer, personalised asthma action plan, respiratory follow-up and psychology input for adherence.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>He is alive because someone read the silent chest and the rising CO₂ as FAILURE, called the airway team early, ventilated him gently, and knew to disconnect the circuit when the BP fell. Ordinary discipline, extraordinary outcome.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 The near-fatal survivor vs the routine attack — two different discharges</h3>
+        <div class="vs">
+          <div class="side a"><h4>🫁 This patient (near-fatal survivor)</h4><ul><li>Inhaled corticosteroid preventer restarted + ≥5 days oral steroids; inhaler technique checked</li><li>Personalised <strong>written asthma action plan</strong>; peak-flow diary</li><li><strong>Specialist respiratory follow-up</strong> (near-fatal = difficult/severe asthma pathway); address adherence &amp; psychosocial risk</li><li>Red flags: reliever not lasting, night waking, PEF falling → seek help early / call 999</li></ul></div>
+          <div class="side b"><h4>🟢 The routine mild–moderate attack</h4><ul><li>Good response, PEF &gt; 75%, stable off nebs for hours before discharge</li><li>Preventer + technique reviewed; short oral steroid course</li><li>GP/asthma-nurse review within 48 h; safety-net advice</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"A near-fatal attack is a preventer prescription, a written action plan, a technique check and a specialist follow-up — never 'nebs, feels better, home'. The next attack is the one that decides whether he becomes an NRAD statistic."</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>🔇 Silent chest = pre-arrest</b>No air moving means no wheeze. Silence is the end-stage, not the calm.</div>
+          <div class="pearl"><b>📈 Rising/"normal" CO₂ is a red flag</b>A tiring asthmatic who stops over-breathing is failing — escalate, do not relax.</div>
+          <div class="pearl"><b>🪜 One feature = life-threatening</b>Grade every attack against BTS/SIGN; a single life-threatening feature is enough.</div>
+          <div class="pearl"><b>💊 Steroids early, together</b>Deliver O₂ + nebs + steroid + magnesium in parallel, not in sequence.</div>
+          <div class="pearl"><b>🫀 Intubate on CLINICAL grounds</b>Exhaustion and falling GCS decide it — not a blood-gas number.</div>
+          <div class="pearl"><b>🎈 Beware auto-PEEP</b>Ventilate slowly, long expiratory time, permissive hypercapnia; if BP drops, DISCONNECT.</div>
+          <div class="pearl"><b>💥 Sudden hypotension = decompress</b>Tension pneumothorax and auto-PEEP kill the ventilated asthmatic — think of them first.</div>
+          <div class="pearl"><b>🚫 No routine antibiotics / no lone sedation</b>Attacks are viral/allergic; sedating a breathing tiring asthmatic can precipitate arrest.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the ladder</h3>
+          <ul>
+            <li>🌬️ <strong>Ventilator strategy in detail:</strong> the enemy is dynamic hyperinflation. Use low minute ventilation (low rate ~6–10, tidal volume ~6 mL/kg), high inspiratory flow to maximise expiratory time, monitor <strong>plateau pressure</strong> (keep &lt; ~30 cmH₂O) rather than peak, and measure intrinsic PEEP with an expiratory-hold. Accept a high CO₂ (permissive hypercapnia) provided pH is tolerable.</li>
+            <li>💉 <strong>Ketamine</strong> as an induction/sedation agent has bronchodilator properties and preserves respiratory drive/BP — often favoured for RSI in severe asthma.</li>
+            <li>🫁 <strong>NIV in asthma is controversial:</strong> unlike COPD it is not standard; may be trialled in selected cooperative patients in a critical-care setting, but must NEVER delay intubation in the tiring patient.</li>
+            <li>🫧 <strong>Heliox</strong> (helium–oxygen) lowers airway resistance to turbulent flow; evidence is limited but occasionally used as a bridge in refractory obstruction.</li>
+            <li>❤️ <strong>ECMO / extracorporeal CO₂ removal</strong> is a rescue for refractory life-threatening bronchospasm with uncontrollable hypercapnia/acidosis or barotrauma — refer to an ECMO centre early rather than late.</li>
+            <li>💊 <strong>After the crisis — the "difficult/severe asthma" work-up:</strong> phenotyping (eosinophilic vs allergic), adherence and inhaler-technique review, and biologics (anti-IgE omalizumab; anti-IL-5 mepolizumab/benralizumab; anti-IL-4Rα dupilumab) to prevent the next near-fatal attack.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The 'Normal' Gas That Killed"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 24-year-old asthmatic came in at 23:00 with an acute severe attack. Nebulisers and steroids were given and, after an hour, the team noted she was "quieter and more settled." A repeat ABG showed a PaCO₂ that had risen from 3.4 to <strong>5.2 kPa</strong> — labelled "normal, improving" — with a lactate of 4. She was breathing more slowly and looked tired. With the ED full, she was moved to a general medical ward for "observation overnight", off continuous monitoring, no ICU referral made. Her chest had in fact gone <strong>silent</strong>. At 03:10 she was found in respiratory arrest; the crash team achieved return of circulation but she sustained severe hypoxic brain injury and died five days later.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🧠 MISREAD TREND</b>A CO₂ rising from low → "normal" was read as improvement, not fatigue.</div>
+            <div class="hole"><b>🔇 SILENT CHEST MISSED</b>"Quieter/settled" was decompensation — no air movement, not calm.</div>
+            <div class="hole"><b>🆘 NO ESCALATION</b>Life-threatening features present but no ICU/anaesthetic referral.</div>
+            <div class="hole"><b>🏥 WRONG PLACE</b>A near-fatal asthmatic sent to an unmonitored ward.</div>
+            <div class="hole"><b>📟 NO MONITORING</b>Continuous SpO₂/ECG removed at the worst possible moment.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved her:</strong> read a rising/"normalising" CO₂ in a tiring asthmatic as failing ventilation; recognise the silent chest and drowsiness as pre-arrest; refer ICU + anaesthetics at the first life-threatening feature; keep every near-fatal asthmatic monitored in critical care — never a dark ward; and never let "she seems settled" close the book. <strong>This is exactly the discipline that saved the patient in Bed 1.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"'Settled and quiet' has killed more asthmatics than any wheeze. In an unwell asthmatic, silence and a normalising CO₂ are the sound of the lungs giving up — act on the trend, not the calm."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · 🩺 Internal Medicine · 🚨 Critical Care Unit · Bed 1 — Near-Fatal (Life-Threatening) Acute Severe Asthma<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+    /* ===== SIDEBAR TABS — show one section at a time ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not a life-threatening feature'); } if(found===total){ flagResult.textContent='✅ All '+total+' life-threatening features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' life-threatening features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: PaCO2 fatigue dial ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var raw=parseInt(kRange.value,10); var v=raw/10; kVal.textContent=v.toFixed(1); var pct=(raw-26)/(90-26)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<4.0){ msg='🟢 PaCO₂ '+v.toFixed(1)+' kPa — LOW. He is still over-breathing and blowing CO₂ off. Compensating, but exhausting himself.'; cls='good'; }
+      else if(v<=6.0){ msg='🟠 PaCO₂ '+v.toFixed(1)+' kPa — "normal" on paper, but in a distressed tiring asthmatic a normalising CO₂ means his minute ventilation is falling. This is the TRAP — escalate, get the airway team ready.'; cls='warn-r'; }
+      else if(v<8.0){ msg='🔴 PaCO₂ '+v.toFixed(1)+' kPa — RAISED. This is near-fatal asthma: failing ventilation from muscle fatigue. Clinical decision to intubate looms.'; cls='bad'; }
+      else { msg='🔴 PaCO₂ '+v.toFixed(1)+' kPa — severe hypercapnic respiratory failure. Peri-arrest — secure the airway with the ICU/anaesthetic team NOW.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Fatigue Curve Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"Your 22-year-old asthmatic has a silent chest, SpO₂ 88% on high-flow O₂, is drowsy (GCS 12) and his repeat CO₂ has climbed from 3.2 to 6.4 kPa. The ward nurse offers to take him upstairs because he is finally quiet. What do you do?",
+      choices:[
+        {t:"🛏️ Send him to the ward — he has settled and the CO₂ is only just above normal",good:false,ds:-2,dt:90,xp:0,fb:"☠️ This is the M&M case in S21. A silent chest + drowsiness + rising CO₂ is near-fatal asthma, not settling. On an unmonitored ward he arrests. Restart.",end:true},
+        {t:"🆘 Call ICU + anaesthetics NOW, continue continuous nebs + O₂, give IV magnesium, keep him monitored in resus",good:true,ds:1,dt:6,xp:40,fb:"✅ Exactly. Recognise near-fatal asthma, escalate before arrest, maximal therapy in parallel, airway team in the room.",next:"tire"},
+        {t:"💉 Give IV midazolam to calm his agitation so he can rest",good:false,ds:-2,dt:10,xp:0,fb:"⚠️ His agitation is hypoxia and hypercapnia. Sedating a spontaneously breathing tiring asthmatic abolishes his drive and can precipitate arrest. Never sedate outside a controlled RSI.",next:"tire"}
+      ]},
+    tire:{ text:"Despite maximal therapy he is more drowsy, RR now 6, still a silent chest, GCS falling. The anaesthetist asks whether to intubate. On what basis do you decide?",
+      choices:[
+        {t:"🫀 Intubate now — this is a CLINICAL decision: exhaustion, falling GCS and silent chest, not a single ABG number",good:true,ds:1,dt:6,xp:40,fb:"✅ Right. Intubation in asthma is decided at the bedside on the tiring patient. Prepare for a high-risk RSI and post-induction hypotension.",next:"vent"},
+        {t:"⏳ Wait for the next ABG and only intubate if the CO₂ crosses a set number",good:false,ds:-2,dt:20,xp:0,fb:"⚠️ Dangerous — the decision is clinical. Waiting for a number in an exhausted, drowsy patient with a silent chest risks a respiratory arrest before the gas returns.",next:"vent"}
+      ]},
+    vent:{ text:"He is intubated and ventilated. Minutes later his BP crashes to 70 systolic. What is your FIRST move?",
+      choices:[
+        {t:"🔌 DISCONNECT the ventilator circuit to let the chest deflate, then check for tension pneumothorax",good:true,ds:1,dt:4,xp:45,fb:"🏆 Perfect. Auto-PEEP from breath-stacking obstructs venous return → hypotension. Disconnecting lets trapped air escape and the BP recover; then exclude/decompress a tension pneumothorax.",end:true},
+        {t:"⬆️ Increase the respiratory rate and tidal volume to 'improve ventilation'",good:false,ds:-2,dt:15,xp:0,fb:"⚠️ This worsens dynamic hyperinflation and auto-PEEP — exactly the wrong move. You must give trapped air TIME to escape, not stack more breaths.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='vent'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A 22-year-old with a severe asthma attack now has a silent chest, is drowsy and his PaCO₂ has risen from 3.2 to 6.4 kPa. This tells you he is:", opts:["Improving — the wheeze and CO₂ are normalising","Near-fatal — failing ventilation from respiratory-muscle fatigue","Mildly unwell and safe for the ward","Hyperventilating from anxiety"], correct:1, exp:"A silent chest, drowsiness and a rising CO₂ in a tiring asthmatic are life-threatening/near-fatal features. The disappearing wheeze and 'normalising' CO₂ reflect falling minute ventilation as the muscles fail, not recovery." },
+    { q:"Which oxygen target is correct in acute severe asthma?", opts:["88–92%","Titrate to SpO₂ 94–98%","No oxygen unless SpO₂ < 85%","Always 100% on a non-rebreathe"], correct:1, exp:"Asthma is not COPD — aim for SpO₂ 94–98% with controlled, titrated high-flow oxygen. Oxygen buys time; it does not treat the bronchospasm." },
+    { q:"Which single statement about PaCO₂ in acute asthma is TRUE?", opts:["A low CO₂ is the most worrying finding","A normal or rising CO₂ in a distressed asthmatic is a red flag for exhaustion","CO₂ is irrelevant in asthma","A high CO₂ means the attack is mild"], correct:1, exp:"Early in an attack the patient hyperventilates (low CO₂). As they tire, minute ventilation falls and CO₂ rises back through 'normal' and above — a normal or rising CO₂ in a sick asthmatic signals impending respiratory failure." },
+    { q:"The decision to intubate a severe asthmatic is best described as:", opts:["Made once the PaCO₂ crosses a fixed threshold","A clinical decision based on exhaustion, falling GCS and failure to respond","Only made after a trial of sedation","Automatic if SpO₂ < 92%"], correct:1, exp:"Intubation in asthma is a clinical decision about a tiring, deteriorating patient — not a blood-gas number. Prepare for a difficult, high-risk RSI led by the most experienced airway operator." },
+    { q:"When ventilating a severe asthmatic, the strategy is:", opts:["High rate and large tidal volumes to normalise CO₂","Low rate, long expiratory time and permissive hypercapnia","High PEEP to open the airways","Maximise minute ventilation"], correct:1, exp:"Give trapped air time to escape: low respiratory rate, prolonged expiratory time, lower tidal volumes and permissive hypercapnia. Chasing a normal CO₂ causes dynamic hyperinflation, auto-PEEP and barotrauma." },
+    { q:"A ventilated asthmatic suddenly becomes hypotensive. Your FIRST action is to:", opts:["Give a fluid bolus and increase the rate","Disconnect the circuit to let the chest deflate and check for tension pneumothorax","Increase the tidal volume","Start noradrenaline"], correct:1, exp:"Auto-PEEP from breath-stacking obstructs venous return and drops the BP; a tension pneumothorax does the same. Disconnect to let trapped air out (BP often recovers), then decompress a pneumothorax if present." },
+    { q:"Which drug is NOT routinely indicated in an uncomplicated acute asthma attack?", opts:["Nebulised salbutamol","Systemic corticosteroid","Routine antibiotics","Ipratropium bromide"], correct:2, exp:"Most attacks are triggered by viral infection or allergen, not bacterial infection — antibiotics are not routine and do not treat bronchospasm. Salbutamol, ipratropium and early steroids are the core of treatment." },
+    { q:"IV magnesium sulfate in acute asthma is used:", opts:["As first-line before any nebuliser","As a single 1.2–2 g dose over 20 min in severe/life-threatening asthma not responding to initial therapy","Only after intubation","To lower the potassium"], correct:1, exp:"A single IV magnesium sulfate dose (1.2–2 g over 20 min) reduces admissions in severe/life-threatening attacks not responding to initial bronchodilators. Nebulised magnesium is not routinely beneficial." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you read the tiring asthmatic like an intensivist. 🏆':score>=6?'Strong — review the misses and S5/S6 severity + fatigue.':'Revisit S5, S6 and S15 — reading fatigue and ventilating gently is the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>

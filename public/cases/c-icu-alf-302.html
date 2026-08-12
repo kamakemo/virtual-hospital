@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acute Liver Failure — Virtual Teaching Hospital</title>
+<!-- META
+id: c-icu-alf-302
+title: Acute Liver Failure (Fulminant Hepatic Failure)
+hospital: internal-medicine
+department: icu
+bednumber: 2
+chiefcomplaint: Jaundice, coagulopathy and new confusion with a rising INR in a previously well patient
+system: Critical Care
+severity: critical
+tags: Acute liver failure, Paracetamol, NAC, Cerebral oedema, King's College Criteria, Encephalopathy, ICU
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🫗</div>
+      <div>
+        <div class="t1">Critical Care Unit</div>
+        <div class="t2">Bed 2 · Acute Liver Failure</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">📈</span><span>Imaging / EEG</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · 🩺 Internal Medicine · 🚨 Critical Care Unit · 🛏️ Bed 2</div>
+        <h1>🫗 Acute Liver Failure — "The Liver That Stopped, and the Brain That Followed"</h1>
+        <div class="sub">⚡ 14:20. A previously well 28-year-old, deeply jaundiced, is now confused and drowsy. The INR is 3.8 and climbing, the glucose is 2.9, and the story of a paracetamol overdose came out only from a flatmate. This is fulminant hepatic failure — and the clock to a transplant referral is already running.</div>
+        <div class="chips">
+          <span class="chip crit">🔴 CRITICAL</span>
+          <span class="chip">🫗 Fulminant Hepatic Failure</span>
+          <span class="chip">💊 Paracetamol / NAC</span>
+          <span class="chip">🧠 Encephalopathy</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital warn"><div class="v-label">💓 HR</div><div class="v-num">112</div></div>
+        <div class="vital warn"><div class="v-label">🩸 BP</div><div class="v-num">104/58</div></div>
+        <div class="vital"><div class="v-label">🌬️ RR</div><div class="v-num">22</div></div>
+        <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">97%</div></div>
+        <div class="vital warn"><div class="v-label">🌡️ Temp</div><div class="v-num">37.9°</div></div>
+        <div class="vital alert"><div class="v-label">🧠 GCS</div><div class="v-num">13</div></div>
+        <div class="vital alert"><div class="v-label">🩸 INR</div><div class="v-num">3.8</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 14:20, Resus Bay 2</b>A young woman lies yellow-eyed and restless, plucking at the sheets. She answers slowly, gets the day wrong, and drifts off mid-sentence. Her flatmate mentions, almost in passing, "she'd been low… I found empty paracetamol boxes last week." The lab flashes an <strong>INR of 3.8</strong>, a glucose of <strong>2.9 mmol/L</strong>, and a lactate that is rising. A previously healthy liver has failed — and the brain is beginning to swell.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>🧑 Name</td><td><strong>Ms. R.O.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>28-year-old female</td></tr>
+          <tr><td>🆔 MRN</td><td>ICU-HEP-0302</td></tr>
+          <tr><td>⚖️ Weight</td><td>64 kg</td></tr>
+          <tr><td>💼 Occupation</td><td>Teacher — recent relationship breakdown, low mood</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 Past history — a previously WELL liver is the whole point</h3>
+        <ul>
+          <li>✅ <strong>No known chronic liver disease</strong>, no alcohol excess, no cirrhosis. This matters: acute liver failure is defined in a liver that was previously normal.</li>
+          <li>💊 <strong>A staggered paracetamol overdose</strong> over ~2 days (found empty boxes), plus regular over-the-counter cold remedies (hidden extra paracetamol). Depression, recent stressor — the classic context.</li>
+          <li>🍽️ Poor oral intake / possible fasting for days (malnourished, enzyme-induced states raise paracetamol toxicity risk).</li>
+          <li>🤢 Nausea and vomiting for two days, then jaundice, then — the ominous new sign today — <strong>confusion</strong>.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Acute liver failure = ENCEPHALOPATHY + COAGULOPATHY (INR ≥ 1.5) in a patient WITHOUT pre-existing liver disease. The moment a jaundiced patient becomes confused, the diagnosis has declared itself."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why paracetamol is the one you must never miss</b>Paracetamol (acetaminophen) is the <strong>commonest cause of acute liver failure in the UK</strong> and one of the few with a specific antidote. The tragedy of the staggered or hidden overdose is that it presents late, past the window where the nomogram helps — so treatment is driven by the clinical picture and bloods, not by a single timed level. Give NAC and refer early; the patient in Bed 2 can survive if we move now.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 Referral handover — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ ED-to-ICU SBAR (verbatim)</b>
+          <p><strong>S:</strong> "28-year-old previously well, two days of vomiting, now jaundiced and acutely confused. INR 3.8, glucose 2.9, ALT over 6000, bilirubin rising, pH 7.31, lactate 4.5."</p>
+          <p><strong>B:</strong> "Flatmate found empty paracetamol boxes — looks like a staggered overdose over 48 hours plus OTC cold remedies. Low mood, recent break-up. No known liver disease."</p>
+          <p><strong>A:</strong> "We have started IV N-acetylcysteine, given 10% dextrose for the hypo, checking paracetamol level, HR 112, BP 104/58, GCS 13 and drifting."</p>
+          <p><strong>R:</strong> "This is acute liver failure with early encephalopathy. We need ICU and we are calling the regional liver/transplant unit now."</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In a staggered or late overdose, do NOT wait for a paracetamol level or a nomogram — start N-acetylcysteine EMPIRICALLY. The antidote is safe; delay is not."</div>
+
+        <h3>🚩 Spot-the-Red-Flag — tap each poor-prognosis / danger feature</h3>
+        <p>🎮 <em>Click every feature that signals SEVERE / high-risk acute liver failure. Each correct = +10 XP.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">🧠 New hepatic encephalopathy (confusion)</button>
+          <button class="btn ghost flag-btn" data-good="1">🩸 Rising INR (coagulopathy)</button>
+          <button class="btn ghost flag-btn" data-good="1">🍬 Hypoglycaemia (glucose 2.9)</button>
+          <button class="btn ghost flag-btn" data-good="1">🧪 Lactic acidosis (pH 7.31, lactate 4.5)</button>
+          <button class="btn ghost flag-btn" data-good="1">💊 Staggered / late paracetamol overdose</button>
+          <button class="btn ghost flag-btn" data-good="0">🟢 Mild isolated rise in ALT only</button>
+          <button class="btn ghost flag-btn" data-good="0">😀 Fully alert and orientated</button>
+          <button class="btn ghost flag-btn" data-good="0">🩸 INR 1.0 (normal clotting)</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 Praise where due</b>The ED did the two things that save lives here: <strong>started NAC empirically</strong> without waiting for a level, and <strong>treated the hypoglycaemia</strong>. And crucially, they recognised encephalopathy for what it is — a trigger to phone the transplant centre <em>early</em>, not a problem to sit on overnight.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🅰️🅱️🅲️ Primary survey — the encephalopathic liver-failure patient</h3>
+        <table class="tbl">
+          <tr><th>Step</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>🅰️ Airway</td><td>Maintaining own airway now, but drowsy and drifting.</td><td>As encephalopathy deepens (grade III–IV), the airway is at risk — plan early intubation for airway protection and to control CO₂/ICP.</td></tr>
+          <tr><td>🅱️ Breathing</td><td>RR 22, SpO₂ 97%; deep sighing breaths.</td><td>Tachypnoea partly compensates a metabolic (lactic) acidosis — a marker of severity in paracetamol ALF.</td></tr>
+          <tr><td>🅲️ Circulation</td><td>HR 112, BP 104/58, warm, vasodilated ("hyperdynamic").</td><td>ALF causes a SIRS-like distributive state; hypotension threatens cerebral and renal perfusion.</td></tr>
+          <tr><td>🅳 Disability</td><td><strong>GCS 13</strong>, disorientated, asterixis, glucose 2.9 (corrected).</td><td>ALWAYS check glucose in the confused liver patient — hypoglycaemia is common, dangerous and reversible; then grade the encephalopathy.</td></tr>
+          <tr><td>🅴 Exposure</td><td>Deep jaundice, no chronic-liver stigmata, mild RUQ tenderness, no ascites, temp 37.9.</td><td>Absence of cirrhotic stigmata supports an ACUTE process; fever raises the question of infection/SIRS.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In any confused jaundiced patient: check the GLUCOSE, check the INR, and grade the encephalopathy — the three numbers that turn 'unwell liver' into 'acute liver failure' in sixty seconds."</div>
+
+        <h3>🧭 Grading hepatic encephalopathy (West Haven) — it drives everything</h3>
+        <table class="tbl">
+          <tr><th>Grade</th><th>Features</th><th>Implication</th></tr>
+          <tr><td>I</td><td>Mild confusion, altered mood/sleep, mild asterixis</td><td>Watch closely, treat cause.</td></tr>
+          <tr><td>II (this patient)</td><td>Drowsy, disorientated, obvious asterixis, inappropriate behaviour</td><td>Transfer to critical care; the trajectory is what matters.</td></tr>
+          <tr><td>III</td><td>Marked confusion, somnolent but rousable, incomprehensible speech</td><td>High risk of cerebral oedema — intubate/protect airway; ICP threat.</td></tr>
+          <tr><td>IV</td><td>Coma, ± decerebrate posturing</td><td>Intracranial hypertension until proven otherwise; intensive neuroprotection.</td></tr>
+        </table>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of "just the overdose"</b>It is easy to anchor on "paracetamol overdose, give NAC, admit for the mental-health team." But this patient has <strong>crossed into acute liver failure</strong> — encephalopathy + coagulopathy. That changes the whole plan: ICU, transplant-centre discussion, neuroprotection and King's College Criteria — not a medical-ward psychiatric hold.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The medical registrar thinks out loud at 14:26:</em></p>
+        <h3>🧠 Frame it as multi-organ failure that starts in the liver</h3>
+        <p>"This is acute liver failure with grade II encephalopathy and a rising INR. My job is to keep NAC running, protect the brain, feed her glucose, and — above all — <strong>get the transplant centre on the phone now</strong>, because if she meets King's criteria she needs a bed there, not here. And I must resist the reflex to 'correct' her INR with FFP: that INR is my best prognostic marker."</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>💧 <strong>Continue IV N-acetylcysteine</strong> (started empirically; give even if this turns out to be non-paracetamol ALF).</li>
+          <li>🍬 <strong>Treat and prevent hypoglycaemia</strong> — 10% dextrose infusion, hourly glucose (aim &gt; 4 mmol/L).</li>
+          <li>🧠 <strong>Neuroprotection</strong> — nurse head-up 30°, avoid the things that raise ICP; watch for progression to grade III–IV.</li>
+          <li>🩸 <strong>Do NOT routinely correct the INR</strong> — it is the key transplant prognostic marker; give products only for active bleeding or before a procedure.</li>
+          <li>📞 <strong>Phone the regional liver/transplant unit EARLY</strong> and apply King's College Criteria (S5).</li>
+          <li>🧫 Septic screen + low threshold for antimicrobials (ALF patients are functionally immunosuppressed); check U&amp;E for AKI, ABG for lactate/pH, ammonia.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Refer to a transplant centre the moment you diagnose acute liver failure — BEFORE the patient is 'sick enough'. By the time cerebral oedema and multi-organ failure arrive, the transfer window has often closed."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>The night team suggests giving FFP "to bring the INR down before it gets dangerous." Do it?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No — not routinely.</strong> In ALF the raised INR reflects failing hepatic synthesis and is the <strong>single most important prognostic marker</strong> (it drives the King's College Criteria). Correcting it with FFP <em>masks</em> the trend the transplant team relies on, and these patients are often not truly bleeding despite the numbers (balanced deficits of pro- and anticoagulant factors). Give products <strong>only</strong> for active bleeding or to cover an invasive procedure — and tell the transplant centre if you do.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The ICU/hepatology consultant at the bedside, 14:35:</em></p>
+        <h3>👑 The King's College Criteria — who needs a transplant, and when to refer</h3>
+        <table class="tbl">
+          <tr><th>Group</th><th>Criteria for transplant consideration</th><th>This patient</th></tr>
+          <tr><td><strong>Paracetamol</strong></td><td><strong>Arterial pH &lt; 7.3</strong> (after resuscitation) — OR — the TRIAD of <strong>INR &gt; 6.5</strong> AND <strong>creatinine &gt; 300 µmol/L</strong> AND <strong>grade III/IV encephalopathy</strong> (all three).</td><td class="hi">Trending toward — pH 7.31, INR climbing, encephalopathy present</td></tr>
+          <tr><td><strong>Non-paracetamol</strong></td><td><strong>INR &gt; 6.5</strong> (any grade of encephalopathy) — OR — any THREE of: age &lt; 10 or &gt; 40; unfavourable aetiology (seronegative/drug/Wilson's); jaundice-to-encephalopathy &gt; 7 days; INR &gt; 3.5; bilirubin &gt; 300 µmol/L.</td><td class="lo">apply if aetiology changes</td></tr>
+        </table>
+        <p>⚠️ Note the lactate: a persistently high arterial lactate after fluid resuscitation is an additional adverse marker in paracetamol ALF. The criteria are a <strong>referral trigger</strong>, not a barrier — phone <em>before</em> the numbers are fully met.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"For paracetamol ALF, an arterial pH &lt; 7.3 alone is enough to consider transplant. Do not wait for the full triad — a single acidotic gas after resuscitation is a red-alert phone call to the liver unit."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">LANDMARK</span> King's College Criteria (O'Grady 1989)</td><td>Prognostic model predicting death without transplant in ALF.</td><td>Use it to trigger transplant referral — pH &lt; 7.3, or INR&gt;6.5 + Cr&gt;300 + grade III/IV (paracetamol).</td></tr>
+            <tr><td><span class="lvl">RCT</span> IV N-acetylcysteine in paracetamol poisoning (Prescott)</td><td>NAC restores glutathione, prevents/limits hepatotoxicity; near-total protection if given early.</td><td>Give NAC — early if possible, but still give it late.</td></tr>
+            <tr><td><span class="lvl">RCT</span> NAC in NON-paracetamol ALF (Lee, 2009)</td><td>Improved transplant-free survival in EARLY (grade I–II) encephalopathy.</td><td>Give NAC even when the cause is not paracetamol.</td></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> EASL / AASLD acute liver failure guidance</td><td>Aetiology-specific therapy, ICP/neuroprotection, do not routinely correct coagulopathy, early transplant referral.</td><td>The INR is a prognostic marker — don't blindly reverse it.</td></tr>
+            <tr><td><span class="lvl">RCT</span> Hypertonic saline for intracranial hypertension (Murphy)</td><td>Prophylactic hypertonic saline reduced ICP rises in severe ALF encephalopathy.</td><td>Hypertonic saline / mannitol are the ICP tools; sodium ~145–150.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The death I still think about was an INR of 7 that a well-meaning team 'fixed' with three units of FFP overnight. By morning the INR looked 'better', the King's criteria were masked, the transplant referral was deemed 'not needed yet' — and by the time she coned from cerebral oedema, no centre would list her. We reversed the very number that would have saved her."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY paracetamol kills the liver, WHY the brain swells (the WHY behind the WHY)</h3>
+        <ol>
+          <li>💊 <strong>Paracetamol metabolism:</strong> most is conjugated safely, but a fraction becomes the toxic metabolite <strong>NAPQI</strong> via CYP2E1. Normally glutathione mops NAPQI up.</li>
+          <li>🪫 <strong>Glutathione depletion:</strong> in overdose (or fasting/enzyme-induced states) glutathione runs out; free NAPQI binds hepatocyte proteins → <strong>centrilobular necrosis</strong>. <strong>NAC replenishes glutathione</strong> — that is exactly why it works, and why earlier is better.</li>
+          <li>🏭 <strong>Loss of synthetic function:</strong> the dying liver stops making clotting factors → <strong>rising INR (coagulopathy)</strong>; stops storing/releasing glucose → <strong>hypoglycaemia</strong>; stops clearing toxins.</li>
+          <li>🧠 <strong>Hyperammonaemia → cerebral oedema:</strong> the failing liver cannot detoxify ammonia. Ammonia crosses into the brain, astrocytes convert it to <strong>glutamine</strong>, which draws water in osmotically → astrocyte swelling → <strong>cerebral oedema and raised ICP</strong> — the leading cause of death in hyperacute ALF.</li>
+          <li>🔥 <strong>SIRS / multi-organ spiral:</strong> necrotic liver releases inflammatory mediators → distributive shock, AKI, lactic acidosis, functional immunosuppression and sepsis — the vicious cycle that closes the transplant window.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"NAC replaces the glutathione the liver ran out of — so give it early, give it late, and give it even when the cause is not paracetamol. It is safe; the missed dose is not."</div>
+
+        <h3>⚖️ Contrast pair — acute liver failure vs decompensated chronic liver disease</h3>
+        <div class="vs">
+          <div class="side a"><h4>🫗 Acute liver failure (this patient)</h4><ul><li>Previously NORMAL liver; encephalopathy + INR ≥ 1.5</li><li>Cerebral OEDEMA / raised ICP is the killer</li><li>NAC, neuroprotection, King's criteria, EMERGENCY transplant</li></ul></div>
+          <div class="side b"><h4>🍷 Decompensated cirrhosis</h4><ul><li>Pre-existing chronic liver disease; stigmata, varices, ascites</li><li>Cerebral oedema is RARE; encephalopathy driven by precipitants</li><li>Treat precipitant, lactulose, manage portal hypertension</li></ul></div>
+        </div>
+        <p>💡 Same word "encephalopathy", completely different danger. In ALF the brain physically swells and cones; in cirrhosis it usually does not. Do not manage one as the other.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The Arterial pH / King's Criteria Dial</h3>
+          <p style="font-size:13px">Paracetamol ALF, resuscitated. Drag the arterial pH and watch the King's College transplant trigger fire — the single number that turns "unwell" into "phone the transplant centre now".</p>
+          <label for="kRange">🩸 Arterial pH (post-resuscitation): <b id="kVal">7.31</b></label>
+          <input type="range" id="kRange" min="705" max="745" value="731">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore the transplant trigger.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 For paracetamol ALF, an arterial pH &lt; 7.3 after resuscitation ALONE meets King's criteria for transplant consideration — refer immediately, do not wait for the INR/creatinine/encephalopathy triad.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The order set (14:26) — treat the poison, protect the organs, phone for help</h3>
+        <ul>
+          <li>💧 <strong>IV N-acetylcysteine</strong> — continue/commence per protocol (empirically for staggered/late overdose; continue in non-paracetamol ALF with early encephalopathy).</li>
+          <li>🍬 <strong>10% dextrose infusion</strong>; check glucose hourly, keep &gt; 4 mmol/L; correct hypoglycaemia aggressively.</li>
+          <li>🧠 <strong>Neuroprotection bundle:</strong> head-up 30° midline, avoid noxious stimuli/coughing, treat fever, sodium 145–150 (hypertonic saline for ICP), mannitol available.</li>
+          <li>🩸 <strong>Do NOT routinely give FFP / vitamin K to "normalise" the INR;</strong> reserve products for active bleeding or pre-procedure. Give IV vitamin K once if nutritional deficiency likely (document it).</li>
+          <li>🧫 <strong>Septic screen + low threshold for broad-spectrum antimicrobials/antifungals</strong> (functionally immunosuppressed); cultures, CXR.</li>
+          <li>🧪 Ammonia, ABG (pH/lactate), U&amp;E (AKI), phosphate/magnesium, paracetamol level, viral/autoimmune/Wilson's screen, pregnancy test, group &amp; save.</li>
+          <li>📞 <strong>Refer regional liver/transplant unit NOW;</strong> apply King's College Criteria; ICU admission; consider PPI for stress-ulcer prophylaxis.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"NAC + glucose + neuroprotection + a phone call to the transplant centre — and hands OFF the INR. In acute liver failure the phone is as important as the drip."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Critical-care priorities — the nurse guards the brain and the sugar</h3>
+        <ul>
+          <li>🍬 <strong>Hourly glucose;</strong> a falling glucose in an already-confused liver patient can look like "worsening encephalopathy" — always check the sugar first and treat it.</li>
+          <li>🧠 <strong>Neuro obs &amp; encephalopathy grade;</strong> escalate the moment she becomes less rousable — deepening encephalopathy heralds cerebral oedema and the need for airway protection.</li>
+          <li>🛌 <strong>Nurse head-up ~30°, head midline;</strong> minimise suctioning/agitation that spike ICP; cluster care; keep her normothermic.</li>
+          <li>🩸 <strong>Do not chase the INR with products;</strong> report bleeding, but understand the coagulopathy is a prognostic sign, not a target — challenge any unplanned FFP.</li>
+          <li>🧫 Strict asepsis with lines; watch for fever/hypotension (sepsis) and for falling urine output (AKI).</li>
+          <li>📞 Keep the transplant referral, timings and repeat bloods visible on the chart — the trend is the story the liver unit needs.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In the confused liver-failure patient, the nurse's glucometer is a neurological instrument — check the sugar before you blame the encephalopathy."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board — the synthetic-function story</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Admission (14:20)</th><th>6 h later</th><th>Interpretation</th></tr>
+          <tr><td>INR</td><td class="hi">3.8</td><td class="hi">5.9</td><td><strong>Rising = failing synthesis.</strong> The key prognostic marker (King's) — do NOT routinely correct it.</td></tr>
+          <tr><td>ALT</td><td class="hi">6400 U/L</td><td class="hi">7100 U/L</td><td>Massive hepatocellular necrosis (paracetamol pattern — very high transaminases).</td></tr>
+          <tr><td>Bilirubin</td><td class="hi">190 µmol/L</td><td class="hi">240 µmol/L</td><td>Rising jaundice; part of non-paracetamol King's criteria.</td></tr>
+          <tr><td>Glucose</td><td class="lo">2.9 mmol/L</td><td>5.1 (on dextrose)</td><td><strong>Hypoglycaemia</strong> from loss of gluconeogenesis/glycogen — check hourly, treat hard.</td></tr>
+          <tr><td>Creatinine</td><td>150 µmol/L</td><td class="hi">260 µmol/L</td><td>Evolving AKI (hepatorenal / ATN) — part of the King's triad; watch it climb.</td></tr>
+          <tr><td>Arterial pH / lactate</td><td class="hi">7.31 / 4.5</td><td class="hi">7.27 / 5.8</td><td>Persistent acidosis after resuscitation — adverse marker; pH &lt; 7.3 alone meets King's for paracetamol.</td></tr>
+          <tr><td>Ammonia</td><td class="hi">142 µmol/L</td><td class="hi">180 µmol/L</td><td>Hyperammonaemia drives cerebral oedema; &gt;150–200 associated with intracranial hypertension.</td></tr>
+          <tr><td>Paracetamol level</td><td>Detectable, "off nomogram" (staggered)</td><td>—</td><td>Nomogram does NOT apply to staggered/late overdose — treat clinically, keep NAC running.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In acute liver failure the INR is a PROGNOSTIC instrument, not a clotting problem to fix. Trend it, report it to the transplant centre — but keep your FFP in the fridge unless she is bleeding."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why the nomogram fails here — and NAC doesn't</b>The paracetamol treatment nomogram only works for a <strong>single acute ingestion with a known time</strong> and a level taken ≥ 4 h post-ingestion. For <strong>staggered overdoses, unknown time, or late presentation</strong>, the nomogram is invalid — you treat on the clinical picture and bloods and give NAC regardless. Also send a full ALF work-up (viral hepatitis serology, autoimmune markers, caeruloplasmin/Wilson's, pregnancy test) so you do not miss a treatable non-paracetamol cause.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 IMAGING / EEG + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>📈 Imaging / EEG + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>🩸 The INR trend — the prognostic curve you must NOT flatten</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 150" preserveAspectRatio="none" aria-label="Rising INR trend versus a masked INR if FFP were given">
+            <rect width="820" height="150" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="38" x2="820" y2="38"/><line x1="0" y1="75" x2="820" y2="75"/><line x1="0" y1="112" x2="820" y2="112"/></g>
+            <line x1="0" y1="45" x2="820" y2="45" stroke="#f59e0b" stroke-dasharray="6 5" stroke-width="1.5"/>
+            <text x="8" y="40" fill="#fbbf24" font-size="10">King's INR &gt; 6.5 threshold</text>
+            <polyline fill="none" stroke="#fca5a5" stroke-width="3" points="20,118 220,96 420,66 620,42 780,26"/>
+            <polyline fill="none" stroke="#93c5fd" stroke-width="3" stroke-dasharray="7 5" points="420,66 620,104 780,110"/>
+            <circle cx="20" cy="118" r="5" fill="#86efac"/><circle cx="620" cy="42" r="5" fill="#f87171"/>
+            <text x="20" y="136" fill="#86efac" font-size="11">INR 3.8 → true trajectory climbs to criteria</text>
+            <text x="500" y="122" fill="#93c5fd" font-size="11">if 'corrected' with FFP → masked, criteria hidden</text>
+          </svg>
+          <div class="ecg-cap">The <span style="color:#fca5a5">true INR</span> climbs toward the King's threshold — the signal the transplant team needs. <span style="color:#93c5fd">Give FFP</span> and the line falls artificially, hiding the prognosis. The number is a message; do not delete it.</div>
+        </div>
+
+        <h3>🧠 The imaging &amp; monitoring that matter in ALF</h3>
+        <table class="tbl">
+          <tr><th>Study</th><th>Look for</th><th>Meaning / action</th></tr>
+          <tr><td>🧠 <strong>CT head</strong></td><td>Cerebral oedema (loss of grey-white differentiation, effaced sulci); exclude bleed</td><td>Do it as encephalopathy deepens / before any suspected ICP crisis; a normal early CT does NOT exclude rising ICP.</td></tr>
+          <tr><td>🩻 <strong>Liver / abdominal ultrasound + Dopplers</strong></td><td>Liver size/echotexture, patency of hepatic veins/portal vein (exclude Budd-Chiari), ascites, exclude chronic disease</td><td>Confirms an acute process and screens vascular causes.</td></tr>
+          <tr><td>📉 <strong>EEG</strong></td><td>Diffuse slowing / triphasic waves of encephalopathy; non-convulsive seizures</td><td>Supports encephalopathy grade; detects subclinical seizures that raise ICP.</td></tr>
+          <tr><td>📟 <strong>ICP monitoring / transcranial Doppler</strong></td><td>Directly measured intracranial hypertension in grade III/IV (selected transplant candidates)</td><td>Controversial (bleeding risk in coagulopathy) — decided with the transplant/neuro team.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Cerebral oedema is the number-one killer in hyperacute liver failure — treat the brain as the second failing organ from the moment encephalopathy appears: head-up, control sodium/CO₂, hypertonic saline or mannitol for surges."</div>
+
+        <h3>🖼️ Neuroprotection at a glance</h3>
+        <ul>
+          <li><strong>Raise the head</strong> (~30°, midline) to aid cerebral venous drainage.</li>
+          <li><strong>Avoid ICP spikes:</strong> minimise coughing/suctioning/agitation, treat fever and seizures, keep sodium high-normal (145–150).</li>
+          <li><strong>Surges:</strong> hypertonic saline or mannitol; controlled ventilation to target CO₂ once intubated.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The acute-liver-failure drug map — what, why, and the traps</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>N-acetylcysteine (NAC)</strong></td><td>Antidote — give in ALL paracetamol ALF, AND in non-paracetamol ALF with early encephalopathy</td><td>Replenishes glutathione → detoxifies NAPQI; also improves microcirculation. Very safe; give early, still give late.</td></tr>
+          <tr><td><strong>10% dextrose</strong></td><td>Treat/prevent hypoglycaemia</td><td>Failed gluconeogenesis/glycogenolysis; keep glucose &gt; 4 mmol/L, hourly checks.</td></tr>
+          <tr><td><strong>Hypertonic saline / mannitol</strong></td><td>Raised ICP / cerebral oedema</td><td>Osmotherapy; target Na 145–150. Mannitol needs adequate renal output/osmolar gap check.</td></tr>
+          <tr><td><strong>Broad-spectrum antimicrobials ± antifungals</strong></td><td>Suspected/proven infection (functionally immunosuppressed)</td><td>Low threshold; sepsis rapidly worsens encephalopathy and can preclude transplant.</td></tr>
+          <tr><td><strong>Vitamin K</strong> (single IV dose)</td><td>If nutritional deficiency likely</td><td>Corrects a deficiency contribution — but does NOT reverse the synthetic failure; do not use to serially "normalise" the INR.</td></tr>
+          <tr><td><strong>PPI</strong></td><td>Stress-ulcer prophylaxis</td><td>GI bleeding risk in coagulopathic critically-ill patients.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"NAC treats the poison and glucose feeds the brain, but the drug you must NOT give reflexively is FFP — reversing the INR blinds the transplant team to the very prognosis they need to see."</div>
+        <div class="callout danger"><b class="ct">🚫 The 'handle with care' list in ALF</b>❌ Routine FFP to normalise INR (masks prognosis; give only for bleeding/procedures). ❌ Hepatotoxic or sedating drugs / long-acting benzodiazepines that cloud the neuro exam. ❌ Nephrotoxins (worsen the AKI that feeds King's criteria). ⚠️ Lactulose has a limited role in ALF (unlike cirrhosis) and must never delay transplant referral or neuroprotection.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why</h3>
+        <ul>
+          <li>🧠 <strong>Encephalopathy grade &amp; pupils</strong> — deepening grade or a fixed/sluggish pupil signals cerebral oedema/coning — a neuro emergency.</li>
+          <li>🍬 <strong>Hourly glucose</strong> — hypoglycaemia is common, mimics/worsens encephalopathy, and is instantly treatable.</li>
+          <li>🩸 <strong>Serial INR &amp; bilirubin</strong> — the prognostic trend for King's; report to the transplant centre. Do not flatten it with products.</li>
+          <li>🧪 <strong>Arterial pH &amp; lactate</strong> — a persistent acidosis after resuscitation is an adverse King's marker in paracetamol ALF.</li>
+          <li>🫘 <strong>Urine output / creatinine</strong> — AKI is part of the King's triad and a driver of outcome; consider renal replacement early for acidosis/ammonia/fluid.</li>
+          <li>🧫 <strong>Temperature, cultures, inflammatory markers</strong> — infection is frequent and closes the transplant window.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In ALF you are monitoring FIVE failing organs at once — brain, liver, kidney, circulation and immune system — and every one of them can be the reason a transplant is offered, or too late."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong — the organ threats that kill</h3>
+        <ul>
+          <li>🧠 <strong>Cerebral oedema &amp; raised ICP / coning</strong> — the leading cause of death in hyperacute ALF; driven by hyperammonaemia. Herald: deepening encephalopathy, hypertension + bradycardia (Cushing), pupillary change.</li>
+          <li>🩸 <strong>Coagulopathy &amp; bleeding</strong> — real bleeding risk exists, but the numbers overstate it (balanced factor deficits); manage bleeding, not the INR.</li>
+          <li>🍬 <strong>Hypoglycaemia</strong> — recurrent and dangerous; a reversible cause of coma.</li>
+          <li>🧫 <strong>Infection / SIRS / sepsis</strong> — functional immunosuppression; sepsis worsens encephalopathy and can make a patient untransplantable.</li>
+          <li>🫘 <strong>Acute kidney injury</strong> — common (especially paracetamol); may need renal replacement, also clears ammonia/acid.</li>
+          <li>🧪 <strong>Lactic acidosis &amp; multi-organ failure</strong> — the final common pathway; a persistently rising lactate is ominous.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The liver is the first domino; the brain, kidney, circulation and immune system fall next. Anticipate each one — and if a transplant can interrupt the cascade, refer BEFORE the later dominoes fall."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The causes of acute liver failure — hunt the treatable ones</h3>
+        <table class="tbl">
+          <tr><th>Cause</th><th>Clues</th><th>Specific action</th></tr>
+          <tr><td>💊 <strong>Paracetamol</strong> (this patient — #1 in the UK)</td><td>Overdose history (often staggered/hidden), very high ALT, early acidosis/AKI</td><td>N-acetylcysteine; King's (paracetamol) criteria; transplant referral.</td></tr>
+          <tr><td>🦠 <strong>Viral</strong> (hepatitis A/B/E; HSV; others)</td><td>Prodrome, travel, risk factors, serology positive</td><td>Supportive ± antivirals (e.g. aciclovir for HSV); still give NAC.</td></tr>
+          <tr><td>💉 <strong>Drug / toxin</strong> (idiosyncratic DILI, herbals, <em>Amanita</em> mushrooms, ecstasy)</td><td>New drug/herbal, foraged mushrooms, recreational drugs</td><td>Stop the agent; toxin-specific therapy; NAC.</td></tr>
+          <tr><td>🧬 <strong>Autoimmune / Wilson's / ischaemic / pregnancy-related</strong></td><td>Autoantibodies; low caeruloplasmin, Kayser-Fleischer, haemolysis (Wilson's); shock liver; HELLP/AFLP in pregnancy</td><td>Steroids (autoimmune); urgent transplant work-up (Wilson's); deliver the baby (pregnancy); treat shock.</td></tr>
+          <tr><td>🩸 <strong>Vascular — Budd-Chiari</strong></td><td>Tender hepatomegaly, ascites, thrombophilia; abnormal hepatic vein Dopplers</td><td>Anticoagulation / decompression; hepatology.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Give NAC to almost every acute liver failure while you hunt the cause — and never stop hunting: a treatable aetiology (HSV, Wilson's, autoimmune, pregnancy, Budd-Chiari) is a life you can save without a new liver."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The Rising INR at Midnight"</h3>
+          <div class="hud"><span>🫗 Safety: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 h</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">Your paracetamol ALF patient has grade II encephalopathy, INR risen from 3.8 to 5.9, creatinine 260, arterial pH 7.27 after resuscitation. NAC is running and the glucose is controlled. The on-call SHO suggests giving FFP to bring the INR down "before she bleeds", and reviewing transplant "in the morning if she's worse". What do you do?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The management plan</h3>
+        <ol>
+          <li>🫗 <strong>Diagnosis:</strong> paracetamol-induced acute liver failure with grade II encephalopathy, rising INR, AKI and acidosis. NAC running; glucose and neuroprotection managed in ICU.</li>
+          <li>👑 <strong>Apply King's College Criteria and refer the regional transplant centre NOW</strong> — pH &lt; 7.3, or the INR&gt;6.5 + Cr&gt;300 + grade III/IV triad. She is trending toward criteria; the referral is a phone call, not a wait.</li>
+          <li>🧠 <strong>Neuroprotection</strong> escalated as encephalopathy deepens: intubate for airway protection at grade III–IV, control CO₂/sodium, hypertonic saline/mannitol for ICP surges.</li>
+          <li>🩸 <strong>Coagulopathy left uncorrected</strong> unless bleeding/procedure; kidney supported (consider RRT for acidosis/ammonia); infection screened and treated early.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The transplant referral is a treatment, not a formality — and it is time-critical. Make the call when you DIAGNOSE acute liver failure, not when the patient is dying."</div>
+
+        <div class="callout warn"><b class="ct">🧠 Managing the brain — the ICP bundle (why the ICU team leads)</b>
+          <ul>
+            <li><strong>Head-up 30°, midline;</strong> avoid ICP spikes (coughing, suction, agitation); treat fever and seizures.</li>
+            <li><strong>Sodium 145–150</strong> with hypertonic saline; <strong>mannitol</strong> for acute surges; controlled ventilation to a target CO₂ once intubated.</li>
+            <li><strong>Intubate early</strong> for grade III–IV encephalopathy to protect the airway and control CO₂ — do not wait for aspiration.</li>
+            <li>ICP monitoring only in selected transplant candidates after weighing the bleeding risk with the transplant/neuro team.</li>
+          </ul>
+        </div>
+
+        <div class="checklist" id="ckALF">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Acute liver failure bundle (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>💧 N-acetylcysteine commenced/continued (empirically for staggered/late overdose)</span></label>
+          <label class="ck"><input type="checkbox"><span>🍬 Glucose &gt; 4 mmol/L with 10% dextrose; hourly checks</span></label>
+          <label class="ck"><input type="checkbox"><span>🧠 Encephalopathy graded; neuroprotection bundle started; airway plan for grade III–IV</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 INR trended and NOT routinely corrected (products only for bleeding/procedure)</span></label>
+          <label class="ck"><input type="checkbox"><span>👑 King's College Criteria applied and transplant centre phoned EARLY</span></label>
+          <label class="ck"><input type="checkbox"><span>🧫 Septic screen sent; AKI monitored; full aetiology work-up (viral/autoimmune/Wilson's/pregnancy)</span></label>
+          <label class="ck"><input type="checkbox"><span>🏥 ICU admission; mental-health / safeguarding review planned once medically stable</span></label>
+          <div class="ck-progress" data-progress>0 / 7 complete</div>
+        </div>
+
+        <div class="checklist" id="ckTransplant">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Transplant-referral call to the liver unit</h3>
+          <label class="ck"><input type="checkbox"><span>👑 State which King's criteria are met/trending (pH, INR, creatinine, encephalopathy grade)</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 Report the RAW (uncorrected) INR and its trend — flag if any products were given</span></label>
+          <label class="ck"><input type="checkbox"><span>🧠 Report encephalopathy grade, lactate, pH, creatinine and urine output</span></label>
+          <label class="ck"><input type="checkbox"><span>🚑 Agree transfer timing while the patient is still transferable (before grade III–IV / instability)</span></label>
+          <label class="ck"><input type="checkbox"><span>📝 Document contraindications review (active malignancy, uncontrolled sepsis, psychosocial) with the team</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">14:20</div>Arrival: jaundice + grade II encephalopathy, INR 3.8, glucose 2.9. NAC and 10% dextrose started; acute liver failure diagnosed.</div>
+          <div class="t-item"><div class="t-time">14:35</div>King's criteria applied; arterial pH 7.31 falling, creatinine and INR rising. <strong>Regional transplant unit phoned early</strong> and patient accepted for transfer — INR left uncorrected.</div>
+          <div class="t-item"><div class="t-time">18:30</div>Encephalopathy deepens to grade III; <strong>intubated for airway protection</strong>, neuroprotection escalated (head-up, sodium 148, controlled CO₂).</div>
+          <div class="t-item"><div class="t-time">Night</div>Transferred to the liver unit; listed for super-urgent transplant as INR &gt; 6.5, creatinine &gt; 300 and grade III/IV develop — the criteria were VISIBLE because no one masked the INR.</div>
+          <div class="t-item"><div class="t-time">Day 3</div>Emergency liver transplant performed; slow neurological recovery. Mental-health and safeguarding follow-up arranged for the overdose.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>She is alive because someone gave NAC empirically, fed the brain glucose, protected against cerebral oedema, <strong>left the INR untouched so King's criteria stayed visible</strong>, and phoned the transplant centre early. The phone call was the operation before the operation.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 The transplanted survivor vs the recovered (non-transplant) ALF — two paths</h3>
+        <div class="vs">
+          <div class="side a"><h4>🫗 This patient (post-transplant)</h4><ul><li>Lifelong immunosuppression + graft monitoring; infection vigilance</li><li><strong>Mental-health follow-up &amp; safeguarding</strong> — the overdose was the root cause; means-restriction counselling, crisis plan</li><li>Avoid further hepatotoxins/alcohol; medication review for all OTC paracetamol</li><li>Red flags: fever, graft dysfunction, jaundice, confusion → urgent review</li></ul></div>
+          <div class="side b"><h4>🟢 Recovered ALF without transplant</h4><ul><li>Some paracetamol ALF regenerate if they survive the acute phase — hepatology follow-up to confirm recovery</li><li>Same mental-health/safeguarding pathway; overdose prevention</li><li>Counsel on hidden paracetamol in OTC/compound analgesics</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Surviving the liver is only half the job — a paracetamol ALF discharge without a mental-health and safeguarding plan sends the patient home to the same overdose. Treat the cause, not just the organ."</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>🫗 The definition</b>Encephalopathy + coagulopathy (INR ≥ 1.5) in a liver WITHOUT pre-existing disease = acute liver failure.</div>
+          <div class="pearl"><b>💧 NAC — early, late, and even non-paracetamol</b>It replaces glutathione; give it in doubt, it is safe.</div>
+          <div class="pearl"><b>🩸 Don't 'fix' the INR</b>It is the key transplant prognostic marker — products only for bleeding/procedures.</div>
+          <div class="pearl"><b>🧠 Cerebral oedema is the killer</b>Hyperammonaemia swells astrocytes; head-up, sodium 145–150, hypertonic saline/mannitol.</div>
+          <div class="pearl"><b>🍬 Always check the glucose</b>Hypoglycaemia mimics and worsens encephalopathy and is instantly reversible.</div>
+          <div class="pearl"><b>👑 King's = refer EARLY</b>Paracetamol: pH &lt; 7.3, OR INR&gt;6.5 + Cr&gt;300 + grade III/IV. Phone before it is met.</div>
+          <div class="pearl"><b>📈 The nomogram fails late</b>Staggered/unknown-time overdose → treat clinically, keep NAC running.</div>
+          <div class="pearl"><b>🧫 Anticipate multi-organ failure</b>AKI, sepsis, lactic acidosis all feed prognosis and the transplant window.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the bundle</h3>
+          <ul>
+            <li>⏱️ <strong>Classifying by jaundice-to-encephalopathy interval:</strong> <em>hyperacute</em> (&lt; 7 days — paracetamol/viral; highest cerebral-oedema risk but best spontaneous recovery), <em>acute</em> (8–28 days), <em>subacute</em> (5–12 weeks — worst spontaneous survival despite less oedema). The tempo predicts both ICP risk and transplant urgency.</li>
+            <li>🩸 <strong>Extracorporeal &amp; liver-support therapies:</strong> high-volume plasma exchange improves transplant-free survival in ALF (Larsen); albumin dialysis (MARS) and other liver-support devices are bridges, not cures; continuous renal replacement clears ammonia and controls acidosis/sodium.</li>
+            <li>🧠 <strong>Ammonia &amp; ICP science:</strong> arterial ammonia &gt; ~150–200 µmol/L predicts intracranial hypertension; management targets ammonia production/clearance (CRRT), astrocyte osmotic load (hypertonic saline), and cerebral metabolic rate. Indomethacin and therapeutic hypothermia are salvage options in refractory ICP.</li>
+            <li>🍄 <strong>Aetiology-specific antidotes:</strong> silibinin/penicillin + NAC for <em>Amanita phalloides</em>; aciclovir for HSV hepatitis; steroids for autoimmune; chelation/urgent transplant for Wilsonian crisis (haemolysis + low ALP:bilirubin ratio); delivery for pregnancy-related (HELLP/AFLP).</li>
+            <li>🧪 <strong>Prognostic refinements:</strong> arterial lactate and phosphate add to King's criteria in paracetamol ALF; dynamic models (e.g. incorporating lactate, or the ALFSG index) aim to improve on the original 1989 rules — but early referral still beats any score used late.</li>
+            <li>🩺 <strong>Coagulation nuance:</strong> ALF produces a <em>rebalanced</em> haemostasis (parallel falls in pro- and anticoagulant factors); conventional INR overestimates bleeding risk — viscoelastic testing (TEG/ROTEM) guides real transfusion decisions better than the INR, which stays reserved as a prognostic marker.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "The INR We 'Corrected' to Death"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 34-year-old man presented with a staggered paracetamol overdose, jaundice and early confusion. NAC was started — good. But overnight his <strong>INR rose to 7.2</strong>, and the covering team, worried he would "bleed", gave <strong>three units of FFP</strong>, dropping the recorded INR to 2.4. On the morning ward round the INR "looked fine", he was not obviously encephalopathic between doses of sedation, and the plan became "continue NAC, review need for transplant referral later". No one phoned the liver unit. Twenty-four hours on, he developed fixed dilated pupils from <strong>cerebral oedema</strong>; by the time the transplant centre was called he was coning and no longer a candidate. He died.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🩸 MASKED PROGNOSIS</b>FFP given to "correct" the INR erased the key King's marker.</div>
+            <div class="hole"><b>👑 CRITERIA HIDDEN</b>With a false INR, King's criteria appeared unmet — referral deemed unnecessary.</div>
+            <div class="hole"><b>📞 NO EARLY REFERRAL</b>The transplant centre was never called while she was still transferable.</div>
+            <div class="hole"><b>💤 SEDATION MASKED BRAIN</b>Sedatives clouded the encephalopathy exam, delaying recognition of ICP.</div>
+            <div class="hole"><b>🧠 OEDEMA MISSED</b>Cerebral oedema — the number-one killer — was not anticipated or pre-empted.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> treat the INR as a prognostic marker, not a target — do NOT give FFP unless bleeding/procedure; apply King's College Criteria on the RAW INR and refer the transplant centre EARLY, before criteria are fully met; anticipate and neuroprotect against cerebral oedema from the first sign of encephalopathy; and avoid sedatives that hide the neuro exam. <strong>This is exactly the discipline that saved the patient in Bed 2.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In acute liver failure, correcting the INR can kill — you delete the very number that earns the patient a transplant. Trend it, refer on it, and keep your FFP in the fridge unless there is blood on the floor."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · 🩺 Internal Medicine · 🚨 Critical Care Unit · Bed 2 — Acute Liver Failure (Fulminant Hepatic Failure)<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Flag-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting flags, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+    /* ===== SIDEBAR TABS — show one section at a time ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Flag'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ Not a high-risk feature'); } if(found===total){ flagResult.textContent='✅ All '+total+' high-risk features found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Flag-Spotter'); } else { flagResult.textContent=found+' / '+total+' high-risk features found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: arterial pH / King's trigger ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var raw=parseInt(kRange.value,10); var v=raw/100; kVal.textContent=v.toFixed(2); var pct=(raw-705)/(745-705)*100; kNeedle.style.left=(100-pct)+'%'; var msg,cls;
+      if(v<7.15){ msg='🔴 Arterial pH '+v.toFixed(2)+' — profound acidosis. Meets King’s (paracetamol) on pH alone and marks very high mortality. Super-urgent transplant discussion NOW.'; cls='bad'; }
+      else if(v<7.30){ msg='🔴 Arterial pH '+v.toFixed(2)+' — BELOW 7.3 after resuscitation. This ALONE meets King’s College Criteria for paracetamol ALF → refer the transplant centre immediately, do not wait for the triad.'; cls='bad'; }
+      else if(v<7.35){ msg='🟠 Arterial pH '+v.toFixed(2)+' — borderline. Not yet at the pH threshold, but trending down and other criteria (INR/creatinine/encephalopathy) may fire. Phone the liver unit EARLY.'; cls='warn-r'; }
+      else { msg='🟢 Arterial pH '+v.toFixed(2)+' — currently above threshold. Keep resuscitating, keep NAC running, and re-check — the trend, not one value, decides.'; cls='good'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Criteria Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"Your paracetamol ALF patient has grade II encephalopathy, INR risen from 3.8 to 5.9, creatinine 260, arterial pH 7.27 after resuscitation. NAC is running and glucose is controlled. The SHO suggests giving FFP to bring the INR down and reviewing transplant in the morning. What do you do?",
+      choices:[
+        {t:"🩸 Give FFP to correct the INR now, and reassess transplant need in the morning",good:false,ds:-2,dt:12,xp:0,fb:"☠️ This is the M&M case in S21. FFP masks the INR — the key King’s marker — and delays referral. The masked criteria hide the prognosis and the transplant window closes. Restart.",end:true},
+        {t:"📞 Leave the INR uncorrected, apply King’s criteria and phone the transplant centre NOW (pH < 7.3 already meets it)",good:true,ds:1,dt:5,xp:45,fb:"✅ Exactly. An arterial pH < 7.3 after resuscitation meets King’s for paracetamol ALF. Refer early on the RAW INR; products only if she bleeds.",next:"brain"},
+        {t:"💤 Sedate her for agitation and wait for the next set of bloods",good:false,ds:-2,dt:15,xp:0,fb:"⚠️ Sedation clouds the encephalopathy exam and can mask deepening ICP. Do not sedate for agitation here — assess, protect the brain, and refer.",next:"brain"}
+      ]},
+    brain:{ text:"Overnight she becomes harder to rouse — grade III encephalopathy. The transplant unit has accepted her. What is the priority now?",
+      choices:[
+        {t:"🧠 Intubate for airway protection + neuroprotection (head-up, sodium 145–150, controlled CO₂) and arrange transfer while still transferable",good:true,ds:1,dt:6,xp:40,fb:"✅ Right. Grade III–IV = high cerebral-oedema risk; secure the airway, protect the brain, and move her before intracranial hypertension makes her untransferable.",next:"icp"},
+        {t:"⏳ Keep her on the ward spontaneously breathing and recheck neuro obs in a few hours",good:false,ds:-2,dt:20,xp:0,fb:"⚠️ Dangerous — grade III encephalopathy threatens the airway and heralds cerebral oedema. Waiting risks aspiration and an ICP crisis before transfer.",next:"icp"}
+      ]},
+    icp:{ text:"En route to theatre her BP rises, heart rate falls and one pupil becomes sluggish — an ICP surge. Your immediate move?",
+      choices:[
+        {t:"🧠 Give hypertonic saline / mannitol, ensure head-up midline and controlled ventilation, alert the team — treat the intracranial hypertension",good:true,ds:1,dt:4,xp:45,fb:"🏆 Perfect. Cerebral oedema is the number-one killer in ALF. Osmotherapy, positioning and CO₂ control buy the brain time to reach transplant.",end:true},
+        {t:"🩸 Assume it is bleeding and transfuse FFP and platelets",good:false,ds:-2,dt:15,xp:0,fb:"⚠️ This is a Cushing response to raised ICP, not haemorrhage. Reversing coagulation does nothing for the swelling brain and wastes the critical minutes.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' h'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='icp'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 h'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"Which combination defines acute liver failure?", opts:["Jaundice + ascites in known cirrhosis","Encephalopathy + coagulopathy (INR ≥ 1.5) in a patient without pre-existing liver disease","Raised ALT alone","Encephalopathy in established chronic liver disease"], correct:1, exp:"Acute liver failure = hepatic encephalopathy PLUS coagulopathy (INR ≥ 1.5) developing in a patient WITHOUT pre-existing liver disease. Encephalopathy in known cirrhosis is decompensated chronic liver disease — a different entity where cerebral oedema is rare." },
+    { q:"A patient presents with a staggered paracetamol overdose over 2 days and confusion. Regarding N-acetylcysteine you should:", opts:["Wait for a timed paracetamol level and plot the nomogram first","Start NAC empirically now — the nomogram does not apply to staggered/late overdose","Only give NAC if the level is above the treatment line","Withhold NAC because it is too late to help"], correct:1, exp:"The nomogram is only valid for a single acute ingestion with a known time and a level ≥ 4 h post-ingestion. For staggered/late/unknown-time overdoses you treat clinically and start NAC empirically — it is safe and still beneficial late." },
+    { q:"In acute liver failure, the raised INR should be managed how?", opts:["Corrected to normal with FFP as soon as possible","Left uncorrected unless active bleeding or a procedure — it is a key prognostic/transplant marker","Corrected only with vitamin K daily","Ignored entirely"], correct:1, exp:"The INR reflects hepatic synthetic function and is central to the King's College Criteria. Routinely correcting it with FFP masks prognosis and can delay transplant referral; give products only for active bleeding or to cover procedures." },
+    { q:"Which of the King's College Criteria for a PARACETAMOL acute liver failure is sufficient ALONE to consider transplant?", opts:["Bilirubin > 300 µmol/L","Arterial pH < 7.3 after adequate resuscitation","ALT > 5000 U/L","Age < 40"], correct:1, exp:"For paracetamol ALF, an arterial pH < 7.3 after resuscitation alone meets criteria. The alternative is the TRIAD of INR > 6.5 AND creatinine > 300 µmol/L AND grade III/IV encephalopathy (all three required)." },
+    { q:"The leading cause of death in hyperacute (paracetamol) liver failure is:", opts:["Variceal haemorrhage","Cerebral oedema with raised intracranial pressure","Spontaneous bacterial peritonitis","Hepatorenal syndrome alone"], correct:1, exp:"Cerebral oedema, driven by hyperammonaemia and astrocyte swelling, causing raised ICP and coning, is the leading killer in hyperacute ALF. Neuroprotection (head-up, sodium 145–150, hypertonic saline/mannitol) is central." },
+    { q:"N-acetylcysteine in NON-paracetamol acute liver failure:", opts:["Is contraindicated","Improves transplant-free survival in early (grade I–II) encephalopathy, so is given","Is only for Wilson's disease","Should replace transplant referral"], correct:1, exp:"Trial evidence (Lee 2009) showed NAC improves transplant-free survival in non-paracetamol ALF with early-grade encephalopathy — so NAC is given across most acute liver failure while the cause is sought." },
+    { q:"A confused, jaundiced ALF patient suddenly deteriorates. Which reversible cause must you check FIRST?", opts:["Serum ammonia","Blood glucose (hypoglycaemia)","Serum copper","Blood cultures"], correct:1, exp:"Hypoglycaemia from loss of gluconeogenesis/glycogen stores is common in ALF, mimics or worsens encephalopathy, and is instantly reversible — always check the glucose (hourly) and treat with dextrose before attributing deterioration to encephalopathy alone." },
+    { q:"When should a patient with acute liver failure be referred to a transplant centre?", opts:["Only once King's criteria are fully met","Only if they arrest","Early — as soon as ALF is diagnosed, before criteria are fully met","After 72 hours of NAC"], correct:2, exp:"Refer EARLY — as soon as acute liver failure is diagnosed and certainly as any King's parameter trends toward threshold. Waiting until criteria are fully met (or the patient has cerebral oedema/multi-organ failure) often closes the transfer/transplant window." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you manage liver failure like a transplant hepatologist. 🏆':score>=6?'Strong — review the misses and S5 King’s criteria + neuroprotection.':'Revisit S5, S6 and S15 — NAC, the INR-as-prognosis rule and early referral are the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>
