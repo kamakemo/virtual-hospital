@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hepatic Encephalopathy — the Precipitant Hunt — Virtual Teaching Hospital</title>
+<!-- META
+id: c-hep-encephalopathy-409
+title: Hepatic Encephalopathy — the Confused Cirrhotic
+hospital: gastroenterology
+department: git-hepatology
+bednumber: 7
+chiefcomplaint: Known cirrhotic, increasing confusion and drowsiness × 2 days, asterixis
+system: Gastroenterology & Hepatology
+severity: critical
+tags: Hepatic encephalopathy, Cirrhosis, Ammonia, West Haven, Lactulose, Rifaximin, SBP, GI bleed
+-->
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0;
+    --rose:#e11d48; --rose-soft:#fff1f2; --rose-line:#fecdd3;
+    --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a;
+    --emerald:#059669; --emerald-soft:#ecfdf5; --emerald-line:#a7f3d0;
+    --sky:#0284c7; --sky-soft:#f0f9ff; --sky-line:#bae6fd;
+    --violet:#7c3aed; --violet-soft:#f5f3ff; --violet-line:#ddd6fe;
+    --pink:#db2777; --pink-soft:#fdf2f8; --pink-line:#fbcfe8;
+    --slate-soft:#f1f5f9;
+    --sbw:240px;
+    --radius:16px; --shadow:0 4px 16px rgba(15,23,42,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.65}
+
+  /* ===== LAYOUT: vertical sidebar + content ===== */
+  .layout{display:flex; min-height:100vh}
+
+  /* ===== VERTICAL SIDEBAR ===== */
+  .sidebar{position:fixed; top:0; left:0; width:var(--sbw); height:100vh; overflow-y:auto; background:#fff; border-right:1px solid var(--line); z-index:50; padding:14px 10px; scrollbar-width:thin}
+  .sidebar .brand{display:flex; align-items:center; gap:9px; padding:6px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .sidebar .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#e11d48); display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto}
+  .sidebar .brand .t1{font-size:12.5px; font-weight:800; line-height:1.15}
+  .sidebar .brand .t2{font-size:10px; color:var(--ink2); letter-spacing:.4px}
+  .navlink{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:10px; color:var(--ink2); text-decoration:none; font-size:12.5px; font-weight:600; margin:1px 0; transition:all .15s; border:1px solid transparent}
+  .navlink .s-emoji{font-size:15px; width:20px; text-align:center; flex:0 0 auto}
+  .navlink .s-id{font-size:9.5px; font-weight:800; color:#94a3b8; width:26px; flex:0 0 auto}
+  .navlink:hover{background:var(--slate-soft); color:var(--rose)}
+  .navlink.active{background:linear-gradient(135deg,#e11d48,#f43f5e); color:#fff; border-color:#e11d48}
+  .navlink.active .s-id{color:#fecdd3}
+  .navlink.visited:not(.active){color:var(--emerald)}
+  .navlink.visited:not(.active) .s-id{color:var(--emerald)}
+  .sidebar .sb-foot{font-size:10px; color:#94a3b8; padding:10px 8px 4px; border-top:1px solid var(--line); margin-top:8px}
+
+  /* ===== CONTENT ===== */
+  .content{margin-left:var(--sbw); flex:1 1 auto; min-width:0; width:calc(100% - var(--sbw))}
+  main{max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+  @media(max-width:820px){
+    :root{--sbw:60px}
+    .sidebar{padding:10px 6px}
+    .sidebar .brand .t1,.sidebar .brand .t2,.navlink span:not(.s-emoji),.sidebar .sb-foot{display:none}
+    .navlink{justify-content:center; padding:9px 4px}
+    .navlink .s-emoji{width:auto}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; padding:30px 24px 74px; position:relative; overflow:hidden; margin:0 -24px 0}
+  .hero::after{content:"🫀"; position:absolute; right:-16px; top:-24px; font-size:190px; opacity:.12; transform:rotate(-12deg)}
+  .hero .wrap{position:relative; z-index:1}
+  .hero .crumbs{font-size:12.5px; opacity:.85; letter-spacing:.4px}
+  .hero h1{margin:8px 0 6px; font-size:clamp(23px,3.4vw,34px); line-height:1.15}
+  .hero .sub{font-size:15px; opacity:.95; max-width:760px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+  .chip{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600}
+  .chip.crit{background:#fff; color:#b91c1c}
+
+  /* ===== VITALS ===== */
+  .vitals-strip{margin:-50px 0 0; position:relative; z-index:2}
+  .vitals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .vital{text-align:center; padding:8px 4px; border-radius:12px; background:var(--slate-soft)}
+  .vital .v-label{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ink2); text-transform:uppercase}
+  .vital .v-num{font-size:20px; font-weight:800; margin-top:2px}
+  .vital.alert{background:var(--rose-soft); border:1px solid var(--rose-line)}
+  .vital.alert .v-num{color:var(--rose); animation:pulseNum 1.4s ease-in-out infinite}
+  .vital.warn{background:var(--amber-soft); border:1px solid var(--amber-line)}
+  .vital.warn .v-num{color:var(--amber)}
+  @keyframes pulseNum{0%,100%{opacity:1}50%{opacity:.55}}
+
+  /* ===== DASHBOARD ===== */
+  .dash{position:fixed; right:14px; bottom:14px; z-index:60; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(15,23,42,.18); padding:12px 14px; width:212px; font-size:12.5px}
+  .dash h4{margin:0 0 8px; font-size:13px; display:flex; align-items:center; gap:6px; justify-content:space-between}
+  .dash .min-btn{cursor:pointer; border:none; background:var(--slate-soft); border-radius:8px; padding:2px 8px; font-size:12px; font-weight:800; color:var(--ink2)}
+  .dash .xpbar{height:9px; background:var(--slate-soft); border-radius:999px; overflow:hidden; margin:4px 0 8px}
+  .dash .xpfill{height:100%; width:0%; background:linear-gradient(90deg,#0284c7,#e11d48); border-radius:999px; transition:width .5s}
+  .dash .row{display:flex; justify-content:space-between; margin:2px 0; color:var(--ink2)}
+  .dash .row b{color:var(--ink)}
+  .dash .badges{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+  .badge{font-size:10px; padding:2px 7px; border-radius:999px; background:var(--slate-soft); border:1px solid var(--line); color:#94a3b8}
+  .badge.earned{background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); font-weight:700}
+  .dash .mini{font-size:10px; color:#94a3b8; margin-top:6px}
+  .dash.collapsed .dash-body{display:none}
+  @media(max-width:900px){.dash{display:none}}
+
+  /* ===== SECTIONS ===== */
+  section.case-sec{display:none; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin:22px 0; overflow:hidden; scroll-margin-top:16px}
+  section.case-sec.sec-active{display:block; animation:fadeIn .25s}
+  .sec-header{display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--line); background:linear-gradient(90deg,var(--slate-soft),#fff)}
+  .sec-header .s-badge{font-size:11px; font-weight:800; letter-spacing:1px; background:var(--ink); color:#fff; padding:3px 10px; border-radius:999px}
+  .sec-header h2{margin:0; font-size:19px; display:flex; align-items:center; gap:8px}
+  .section-content{padding:20px 22px}
+  .section-content > :first-child{margin-top:0}
+  .section-content h3{font-size:16px; margin:24px 0 8px; display:flex; align-items:center; gap:7px}
+  .section-content h4{font-size:14px; margin:16px 0 6px}
+  .section-content p{margin:8px 0}
+  .section-content ul,.section-content ol{margin:8px 0; padding-left:22px}
+  .section-content li{margin:5px 0}
+
+  /* ===== CALLOUTS ===== */
+  .rule{background:linear-gradient(135deg,#7f1d1d,#ef4444); color:#fff; border-radius:14px; padding:14px 18px; margin:16px 0; font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(185,28,28,.25)}
+  .rule .tag{display:block; font-size:10.5px; letter-spacing:1.6px; opacity:.85; font-weight:800; margin-bottom:4px}
+  .callout{border-radius:14px; padding:13px 16px; margin:14px 0; border:1px solid}
+  .callout.danger{background:var(--rose-soft); border-color:var(--rose-line)}
+  .callout.warn{background:var(--amber-soft); border-color:var(--amber-line)}
+  .callout.ok{background:var(--emerald-soft); border-color:var(--emerald-line)}
+  .callout.info{background:var(--sky-soft); border-color:var(--sky-line)}
+  .callout.purple{background:var(--violet-soft); border-color:var(--violet-line)}
+  .callout.pink{background:var(--pink-soft); border-color:var(--pink-line)}
+  .callout b.ct{display:block; margin-bottom:4px; font-size:14px}
+
+  /* ===== TABLES ===== */
+  table.tbl{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; border-radius:12px; overflow:hidden}
+  .tbl th{background:var(--ink); color:#fff; text-align:left; padding:9px 12px; font-size:12.5px}
+  .tbl td{padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl tr:nth-child(even) td{background:var(--slate-soft)}
+  .tbl .hi{color:var(--rose); font-weight:700}
+  .tbl .lo{color:var(--sky); font-weight:700}
+  .tbl .ok-v{color:var(--emerald); font-weight:700}
+
+  /* ===== CONTRAST PAIR ===== */
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0}
+  @media(max-width:700px){.vs{grid-template-columns:1fr}}
+  .vs .side{border-radius:14px; padding:14px 16px; border:1px solid}
+  .vs .side.a{background:var(--rose-soft); border-color:var(--rose-line)}
+  .vs .side.b{background:var(--sky-soft); border-color:var(--sky-line)}
+  .vs .side h4{margin:0 0 8px; font-size:14px}
+
+  /* ===== BUTTONS / INTERACTIVE ===== */
+  .btn{display:inline-block; cursor:pointer; border:none; border-radius:12px; padding:9px 16px; font-weight:700; font-size:13.5px; font-family:inherit; transition:all .15s}
+  .btn.primary{background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--rose); color:var(--rose)}
+  .flag-btn.flag-good{border-color:var(--emerald)!important; background:var(--emerald-soft)!important; color:var(--emerald)!important}
+  .flag-btn.flag-bad{border-color:var(--rose)!important; background:var(--rose-soft)!important; color:var(--rose)!important; text-decoration:line-through}
+
+  /* Branching scenario */
+  .scenario{background:linear-gradient(160deg,#1e1b4b,#312e81); color:#e0e7ff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 10px 30px rgba(49,46,129,.3)}
+  .scenario h3{color:#fff !important; margin-top:0 !important}
+  .scenario .scene-text{font-size:14.5px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .scenario .choices{display:flex; flex-direction:column; gap:8px}
+  .scenario .choice{text-align:left; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; border-radius:12px; padding:11px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s}
+  .scenario .choice:hover{background:rgba(255,255,255,.22); transform:translateX(4px)}
+  .scenario .feedback{border-radius:12px; padding:12px 14px; margin-top:12px; font-size:13.5px; display:none}
+  .scenario .feedback.good{background:rgba(16,185,129,.2); border:1px solid #34d399; display:block}
+  .scenario .feedback.bad{background:rgba(244,63,94,.25); border:1px solid #fb7185; display:block}
+  .scenario .hud{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; margin-bottom:10px; opacity:.9}
+  .scenario .hud span{background:rgba(255,255,255,.12); padding:3px 10px; border-radius:999px}
+
+  /* Sim */
+  .sim{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:18px; margin:16px 0}
+  .sim label{display:block; font-weight:700; font-size:13.5px; margin:12px 0 4px}
+  .sim input[type=range]{width:100%; accent-color:var(--rose)}
+  .sim .gauge{height:16px; border-radius:999px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); position:relative; margin:10px 0 4px}
+  .sim .needle{position:absolute; top:-5px; width:5px; height:26px; background:var(--ink); border-radius:3px; transition:left .25s; left:50%}
+  .sim .readout{font-size:13.5px; font-weight:700; padding:9px 13px; border-radius:12px; margin-top:10px}
+  .sim .readout.good{background:var(--emerald-soft); border:1px solid var(--emerald-line); color:var(--emerald)}
+  .sim .readout.warn-r{background:var(--amber-soft); border:1px solid var(--amber-line); color:var(--amber)}
+  .sim .readout.bad{background:var(--rose-soft); border:1px solid var(--rose-line); color:var(--rose)}
+
+  /* Checklist */
+  .checklist{background:var(--emerald-soft); border:1px solid var(--emerald-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .checklist .ck{display:flex; align-items:flex-start; gap:9px; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:13.5px}
+  .checklist .ck:hover{background:rgba(5,150,105,.08)}
+  .checklist .ck input{margin-top:4px; accent-color:var(--emerald); width:16px; height:16px}
+  .checklist .ck.done span{text-decoration:line-through; color:#64748b}
+  .checklist .ck-progress{font-size:12.5px; font-weight:800; color:var(--emerald); margin-top:8px}
+
+  /* Reveal */
+  .reveal-box{border:2px dashed var(--violet-line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--violet-soft)}
+  .reveal-hidden{display:none}
+  .reveal-shown{display:block; animation:fadeIn .35s}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+
+  /* ECG figure */
+  .ecg-fig{background:#0b1220; border-radius:16px; padding:14px; margin:14px 0; overflow:hidden}
+  .ecg-fig svg{width:100%; height:auto; display:block}
+  .ecg-cap{color:#cbd5e1; font-size:12.5px; margin-top:8px; text-align:center}
+
+  /* Timeline */
+  .timeline{border-left:3px solid var(--rose-line); margin:14px 0 14px 8px; padding-left:18px}
+  .t-item{position:relative; margin:0 0 16px}
+  .t-item::before{content:""; position:absolute; left:-26px; top:5px; width:13px; height:13px; border-radius:50%; background:var(--rose); border:3px solid var(--rose-soft)}
+  .t-item .t-time{font-size:11.5px; font-weight:800; letter-spacing:.8px; color:var(--rose); text-transform:uppercase}
+
+  /* Pearls */
+  .pearl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0}
+  .pearl{background:linear-gradient(150deg,#fffbeb,#fef3c7); border:1px solid var(--amber-line); border-radius:14px; padding:14px; font-size:13.5px}
+  .pearl b{display:block; margin-bottom:4px}
+
+  /* MCQ */
+  .mcq{border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin:16px 0; background:#fff}
+  .mcq .mcq-q{font-weight:800; color:var(--violet); font-size:13px; letter-spacing:.6px; margin:0 0 6px}
+  .mcq .mcq-stem{font-weight:600; font-size:14.5px}
+  .mcq .mcq-opt{display:block; cursor:pointer; border:1.5px solid var(--line); border-radius:11px; padding:9px 13px; margin:7px 0; font-size:13.5px; transition:all .14s; background:#fff}
+  .mcq .mcq-opt:hover{border-color:var(--violet); background:var(--violet-soft)}
+  .mcq .mcq-opt.picked-right{border-color:var(--emerald); background:var(--emerald-soft); font-weight:700}
+  .mcq .mcq-opt.picked-wrong{border-color:var(--rose); background:var(--rose-soft)}
+  .mcq .mcq-opt.show-right{border-color:var(--emerald); background:var(--emerald-soft)}
+  .mcq .mcq-exp{display:none; border-radius:11px; padding:10px 13px; margin-top:8px; font-size:13px}
+  .mcq.answered .mcq-exp{display:block; background:var(--sky-soft); border:1px solid var(--sky-line)}
+
+  /* M&M */
+  .mm{background:linear-gradient(160deg,#18181b,#3f3f46); color:#e4e4e7; border-radius:18px; padding:20px; margin:16px 0}
+  .mm h3{color:#fff !important; margin-top:0 !important}
+  .mm .mm-case{background:rgba(255,255,255,.07); border-left:4px solid #f87171; border-radius:0 12px 12px 0; padding:13px 16px; margin:12px 0; font-size:14px}
+  .mm .swiss{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px 0}
+  .mm .hole{background:rgba(248,113,113,.13); border:1px solid rgba(248,113,113,.4); border-radius:12px; padding:11px 13px; font-size:12.5px}
+  .mm .hole b{color:#fca5a5; display:block; font-size:12px; letter-spacing:.6px; margin-bottom:3px}
+
+  /* EBM */
+  .ebm{background:var(--sky-soft); border:1px solid var(--sky-line); border-radius:16px; padding:16px 18px; margin:14px 0}
+  .ebm .lvl{display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:2px 8px; border-radius:999px; background:var(--sky); color:#fff; margin-right:6px}
+
+  .toast{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:24px; background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:all .3s; z-index:99}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .footer{text-align:center; color:#94a3b8; font-size:12px; padding:26px 0 0}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===================== VERTICAL SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🫁</div>
+      <div>
+        <div class="t1">GIT &amp; Hepatology</div>
+        <div class="t2">Bed 7 · Confused Cirrhotic</div>
+      </div>
+    </div>
+    <a class="navlink" href="#s1"><span class="s-emoji">🪪</span><span>Profile</span><span class="s-id">S1</span></a>
+    <a class="navlink" href="#s2"><span class="s-emoji">🚑</span><span>Handover</span><span class="s-id">S2</span></a>
+    <a class="navlink" href="#s3"><span class="s-emoji">🩺</span><span>Initial Assessment</span><span class="s-id">S3</span></a>
+    <a class="navlink" href="#s4"><span class="s-emoji">👨‍⚕️</span><span>Resident Review</span><span class="s-id">S4</span></a>
+    <a class="navlink" href="#s5"><span class="s-emoji">🎓</span><span>Consultant + EBM</span><span class="s-id">S5</span></a>
+    <a class="navlink" href="#s6"><span class="s-emoji">🧠</span><span>Teaching + Sim</span><span class="s-id">S6</span></a>
+    <a class="navlink" href="#s7"><span class="s-emoji">📋</span><span>Orders</span><span class="s-id">S7</span></a>
+    <a class="navlink" href="#s8"><span class="s-emoji">👩‍⚕️</span><span>Nursing Care</span><span class="s-id">S8</span></a>
+    <a class="navlink" href="#s9"><span class="s-emoji">🧪</span><span>Investigations</span><span class="s-id">S9</span></a>
+    <a class="navlink" href="#s10"><span class="s-emoji">🩻</span><span>Imaging / Labs</span><span class="s-id">S10</span></a>
+    <a class="navlink" href="#s11"><span class="s-emoji">💊</span><span>Medications</span><span class="s-id">S11</span></a>
+    <a class="navlink" href="#s12"><span class="s-emoji">📟</span><span>Monitoring</span><span class="s-id">S12</span></a>
+    <a class="navlink" href="#s13"><span class="s-emoji">⚠️</span><span>Complications</span><span class="s-id">S13</span></a>
+    <a class="navlink" href="#s14"><span class="s-emoji">🔀</span><span>Differentials + Path</span><span class="s-id">S14</span></a>
+    <a class="navlink" href="#s15"><span class="s-emoji">🗺️</span><span>Plan + Procedures</span><span class="s-id">S15</span></a>
+    <a class="navlink" href="#s16"><span class="s-emoji">📊</span><span>Progress</span><span class="s-id">S16</span></a>
+    <a class="navlink" href="#s17"><span class="s-emoji">🏠</span><span>Discharge</span><span class="s-id">S17</span></a>
+    <a class="navlink" href="#s18"><span class="s-emoji">💎</span><span>Clinical Pearls</span><span class="s-id">S18</span></a>
+    <a class="navlink" href="#s19"><span class="s-emoji">📝</span><span>MCQs</span><span class="s-id">S19</span></a>
+    <a class="navlink" href="#s20"><span class="s-emoji">🔬</span><span>Advanced Topics</span><span class="s-id">S20</span></a>
+    <a class="navlink" href="#s21"><span class="s-emoji">🎭</span><span>M&amp;M Conference</span><span class="s-id">S21</span></a>
+    <div class="sb-foot">🏥 Virtual Teaching Hospital · Educational use only</div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div class="content">
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="crumbs">🏥 Virtual Teaching Hospital · 🫁 GIT &amp; Hepatology · 🛏️ Bed 7 · Acute Medical Unit</div>
+        <h1>🧠 Hepatic Encephalopathy — "The Confused Cirrhotic Is Never Just Confused"</h1>
+        <div class="sub">⚡ 22:40. A known cirrhotic is drowsy, disoriented and flapping. The family say he has been "getting muddled" for two days and "sleeps all day, up all night." The easy label is "his liver again — give lactulose." The real question: <strong>what tipped him over?</strong> Miss the precipitant and you treat the smoke while the fire burns.</div>
+        <div class="chips">
+          <span class="chip crit">🔴 CRITICAL</span>
+          <span class="chip">🫁 Cirrhosis / Decompensation</span>
+          <span class="chip">🧠 West Haven Grades</span>
+          <span class="chip">🔎 Precipitant Hunt</span>
+          <span class="chip">🎮 Interactive Case</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VITALS -->
+    <div class="vitals-strip">
+      <div class="vitals-grid">
+        <div class="vital warn"><div class="v-label">💓 HR</div><div class="v-num">104</div></div>
+        <div class="vital warn"><div class="v-label">🩸 BP</div><div class="v-num">102/58</div></div>
+        <div class="vital"><div class="v-label">🌬️ RR</div><div class="v-num">18</div></div>
+        <div class="vital"><div class="v-label">🫁 SpO₂</div><div class="v-num">96%</div></div>
+        <div class="vital warn"><div class="v-label">🌡️ Temp</div><div class="v-num">37.9°</div></div>
+        <div class="vital alert"><div class="v-label">🧠 GCS</div><div class="v-num">12</div></div>
+        <div class="vital alert"><div class="v-label">👋 Asterixis</div><div class="v-num">+++</div></div>
+      </div>
+    </div>
+
+    <!-- ============ S1 PROFILE ============ -->
+    <section class="case-sec" id="s1">
+      <div class="sec-header"><span class="s-badge">S1</span><h2>🪪 Profile</h2></div>
+      <div class="section-content">
+        <div class="callout danger"><b class="ct">🚨 YOU ARE HERE — 22:40, Acute Medical Unit, Bed 7</b>A gaunt, jaundiced man lies half-asleep, rousing only to voice, then drifting off mid-sentence. His wife holds his hand: <em>"He knew me this morning, now he is calling me by his sister’s name. He has been so constipated, and he stopped his lactulose last week because it was ‘too much of a bother.’"</em> When you lift his outstretched hands, they beat downwards in a slow, irregular flap. The referral note simply says <em>"cirrhotic, confused — for lactulose."</em> That note is the trap.</div>
+
+        <h3>👤 Patient Identity</h3>
+        <table class="tbl">
+          <tr><th>Field</th><th>Detail</th></tr>
+          <tr><td>🧔 Name</td><td><strong>Mr. H.E.</strong></td></tr>
+          <tr><td>🎂 Age / Sex</td><td>58-year-old male</td></tr>
+          <tr><td>🆔 MRN</td><td>HEP-0409</td></tr>
+          <tr><td>⚖️ Weight</td><td>74 kg (dry weight ~68 kg; ascites present)</td></tr>
+          <tr><td>🍷 Background</td><td>Alcohol-related cirrhosis, abstinent 8 months. Child–Pugh C, MELD-Na 19.</td></tr>
+          <tr><td>🚫 Allergies</td><td>NKDA</td></tr>
+        </table>
+
+        <h3>📜 Past history — every line changes the precipitant list</h3>
+        <ul>
+          <li>🫁 <strong>Established cirrhosis</strong> with <strong>portal hypertension</strong>: known <strong>oesophageal varices</strong> (banded once), <strong>ascites</strong> on spironolactone + furosemide, prior <strong>hepatic encephalopathy</strong> (on lactulose ± rifaximin).</li>
+          <li>💊 Recently prescribed <strong>zopiclone</strong> for insomnia by an out-of-hours GP — a sedative in a failing liver.</li>
+          <li>🚽 <strong>Constipated for 4 days</strong> since stopping lactulose — gut transit slows, ammonia-producing bacteria have longer to work.</li>
+          <li>🩸 One episode of <strong>black stool</strong> yesterday the family dismissed as "the iron tablets." A whisper of a GI bleed.</li>
+        </ul>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Hepatic encephalopathy is a diagnosis of the PRECIPITANT, not of the liver. ‘Confused cirrhotic → lactulose and move on’ is how you miss the bleed, the sepsis, and the subdural."</div>
+
+        <div class="callout warn"><b class="ct">🔥 Why this presentation is high-stakes</b>An episode of overt HE marks decompensated cirrhosis and predicts a grim trajectory — roughly <strong>~40% one-year and ~more than half three-year mortality</strong> after the first overt episode. It is also the classic "revolving-door" admission, and the single commonest reason a cirrhotic is wrongly labelled "just drunk" or "just confused" and under-worked-up.</div>
+      </div>
+    </section>
+
+    <!-- ============ S2 HANDOVER ============ -->
+    <section class="case-sec" id="s2">
+      <div class="sec-header"><span class="s-badge">S2</span><h2>🚑 Handover</h2></div>
+      <div class="section-content">
+        <h3>📻 Referral handover — SBAR</h3>
+        <div class="callout info"><b class="ct">🎙️ ED-to-AMU SBAR (verbatim)</b>
+          <p><strong>S:</strong> "58-year-old known cirrhotic, two days of worsening confusion and drowsiness, reversed sleep pattern, now flapping. Brought in by wife."</p>
+          <p><strong>B:</strong> "Alcohol cirrhosis, Child–Pugh C, varices, ascites on diuretics, prior HE. Stopped lactulose a week ago, constipated 4 days. Started on zopiclone recently. One black stool yesterday."</p>
+          <p><strong>A:</strong> "Afebrile-ish at 37.9, mildly tachycardic 104, BP 102/58, drowsy GCS 12, asterixis positive, abdomen distended with shifting dullness. We gave a stat dose of lactulose and were going to admit as ‘HE.’"</p>
+          <p><strong>R:</strong> "Wanted your team to take over — assume it is just his liver, or is there something else?"</p>
+        </div>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Every overt HE is guilty of a precipitant until proven innocent. The reflex is not just ‘lactulose’ — it is ‘lactulose AND septic screen AND PR exam AND bloods,’ done together."</div>
+
+        <h3>🚩 Spot-the-Precipitant — tap each feature that could have TIPPED him into HE</h3>
+        <p>🎮 <em>Click every feature that is a plausible PRECIPITANT of this episode. Each correct = +10 XP.</em></p>
+        <div id="flagGame">
+          <button class="btn ghost flag-btn" data-good="1">🚽 Constipation × 4 days (stopped lactulose)</button>
+          <button class="btn ghost flag-btn" data-good="1">🩸 Black stool = possible GI bleed</button>
+          <button class="btn ghost flag-btn" data-good="1">🌡️ Low-grade fever — ?infection / SBP</button>
+          <button class="btn ghost flag-btn" data-good="1">💊 New zopiclone (sedative)</button>
+          <button class="btn ghost flag-btn" data-good="1">💧 On dual diuretics — ?dehydration / electrolytes</button>
+          <button class="btn ghost flag-btn" data-good="0">👋 Asterixis on examination</button>
+          <button class="btn ghost flag-btn" data-good="0">💛 Long-standing jaundice</button>
+          <button class="btn ghost flag-btn" data-good="0">😴 Reversed sleep pattern</button>
+        </div>
+        <p id="flagResult" style="font-weight:700"></p>
+
+        <div class="callout ok"><b class="ct">🏅 The teaching point hidden in the wrong answers</b>Asterixis, jaundice and the reversed sleep pattern are <em>features/signs of HE itself</em> — not precipitants. The precipitant hunt is a separate task: constipation, GI bleed, infection/SBP, sedatives, dehydration/electrolytes, renal failure, and excess dietary protein are the things you actually reverse.</div>
+      </div>
+    </section>
+
+    <!-- ============ S3 INITIAL ASSESSMENT ============ -->
+    <section class="case-sec" id="s3">
+      <div class="sec-header"><span class="s-badge">S3</span><h2>🩺 Initial Assessment</h2></div>
+      <div class="section-content">
+        <h3>🅰️🅱️🅲️ Primary survey — the drowsy cirrhotic first belongs to airway &amp; glucose</h3>
+        <table class="tbl">
+          <tr><th>Step</th><th>Finding</th><th>Why it matters</th></tr>
+          <tr><td>🅰️ Airway</td><td>Rousable to voice, gag intact, protecting airway <em>for now</em> (GCS 12).</td><td>As grade deepens toward III–IV, airway is lost. Pre-plan the anaesthetic call; never sedate to "settle" him.</td></tr>
+          <tr><td>🅱️ Breathing</td><td>RR 18, SpO₂ 96% RA, chest clear.</td><td>Look for aspiration and hepatopulmonary issues; a septic source may be pulmonary.</td></tr>
+          <tr><td>🅲️ Circulation</td><td>HR 104, <strong>BP 102/58</strong>, warm peripheries, tense ascites.</td><td>Hyperdynamic cirrhotic circulation; relative hypotension may signal bleeding or sepsis, not just baseline.</td></tr>
+          <tr><td>🅳 Disability</td><td>GCS 12 (E3 V4 M5), disoriented, <strong>asterixis positive</strong>, no focal deficit, pupils equal. <strong>Glucose 4.1 mmol/L.</strong></td><td>ALWAYS check glucose — the failing liver cannot gluconeogenese; hypoglycaemia mimics HE. Focal signs point AWAY from HE (think subdural/stroke).</td></tr>
+          <tr><td>🅴 Exposure</td><td>Jaundice, spider naevi, distended abdomen (shifting dullness), <strong>PR: melaena on the glove</strong>, no cellulitis, temp 37.9°.</td><td>The PR exam is not optional — it just found the GI bleed the family called "iron tablets."</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"In any confused cirrhotic: check the GLUCOSE, do the PR, tap the ASCITES, and screen for SEPSIS — before you write ‘hepatic encephalopathy’ in the notes."</div>
+
+        <h3>🧭 The three things that turn "just HE" into a resuscitation</h3>
+        <p>Before you settle on encephalopathy, actively exclude the reversible killers that hide behind confusion in liver disease: <strong>hypoglycaemia</strong> (bedside glucose), a <strong>bleed</strong> (PR, Hb, haemodynamics — variceal until proven otherwise), and <strong>sepsis / SBP</strong> (temp, ascitic tap). A focal neurological sign or a head-injury story adds a fourth: <strong>intracranial bleed</strong> (these patients are coagulopathic and fall).</p>
+
+        <div class="callout warn"><b class="ct">⚠️ The trap of "he is a known encephalopath"</b>A prior label of HE does not immunise against a subdural, a hypo, or meningitis. The more times someone is admitted as "his liver again," the more likely the one time it is something else gets missed. Re-earn the diagnosis each admission.</div>
+      </div>
+    </section>
+
+    <!-- ============ S4 RESIDENT REVIEW ============ -->
+    <section class="case-sec" id="s4">
+      <div class="sec-header"><span class="s-badge">S4</span><h2>👨‍⚕️ Resident Review</h2></div>
+      <div class="section-content">
+        <p><em>The medical resident thinks out loud at 22:52:</em></p>
+        <h3>🧠 Frame it as "grade it, then hunt the trigger"</h3>
+        <p>"This is overt HE — <strong>West Haven grade II going on III</strong>: disoriented, drowsy, obvious asterixis. But grading is the easy half. My real job is the <strong>precipitant hunt</strong>. He has at least four candidates staring at me: <strong>constipation off lactulose, melaena (GI bleed), a low-grade fever with ascites (SBP?), and new zopiclone</strong>. I will start lactulose AND run a full septic screen with a diagnostic ascitic tap, send bloods, and hold every sedative. I am NOT protein-restricting him."</p>
+
+        <h3>🎯 Her order of operations</h3>
+        <ol>
+          <li>🩸 <strong>PR done, group &amp; save + crossmatch, Hb, coag</strong> — melaena in a variceal patient is a bleed until proven otherwise; involve endoscopy early.</li>
+          <li>💧 <strong>Diagnostic ascitic tap</strong> (cell count + culture) BEFORE antibiotics if feasible — SBP is present in a meaningful minority of hospitalised cirrhotics with HE and is easy to miss.</li>
+          <li>🧪 <strong>Full bloods</strong>: FBC, U&amp;E (renal failure, Na⁺, K⁺), LFTs, glucose, CRP, cultures, and an ammonia only to support (not grade).</li>
+          <li>💊 <strong>Lactulose now</strong>, titrated to 2–3 soft stools/day; add enemas if he cannot take oral / is too drowsy.</li>
+          <li>🚫 <strong>Stop the zopiclone and all sedatives/opioids</strong>; correct electrolytes; avoid over-diuresis; give thiamine (cover Wernicke).</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Treat the trigger and the encephalopathy melts. Give lactulose but chase the precipitant — the lactulose without the SBP-tap and the PR is half a treatment."</div>
+
+        <div class="callout purple"><b class="ct">🧪 Resident's self-test</b>The night SHO suggests midazolam "to settle his agitation" so imaging is easier. Agree?
+          <button class="btn ghost reveal-btn" data-target="rev1">💡 Reveal</button>
+          <div class="reveal-hidden" id="rev1"><p><strong>No — this can be lethal.</strong> A cirrhotic clears benzodiazepines poorly; sedation deepens the encephalopathy, obtunds him further, and risks losing the airway. Agitation in HE is treated by treating the HE and its precipitant, optimising the environment, and — if the airway is threatened — a controlled anaesthetic intubation, NOT a ward benzo. Sedatives are a documented precipitant, not a treatment.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ S5 CONSULTANT + EBM ============ -->
+    <section class="case-sec" id="s5">
+      <div class="sec-header"><span class="s-badge">S5</span><h2>🎓 Consultant Round + Evidence-Based Medicine</h2></div>
+      <div class="section-content">
+        <p><em>The hepatology consultant at the bedside, 23:10:</em></p>
+        <h3>🧮 The West Haven criteria — grade it at the bedside, do not lab it</h3>
+        <table class="tbl">
+          <tr><th>Grade</th><th>Consciousness / cognition</th><th>Signs</th><th>This patient</th></tr>
+          <tr><td><strong>0 / MHE</strong></td><td>Normal exam; minimal HE only on psychometric testing</td><td>None overt; subtle driving/attention deficits</td><td></td></tr>
+          <tr><td><strong>I</strong></td><td>Trivial lack of awareness, euphoria/anxiety, shortened attention</td><td>Reversed sleep, mild tremor</td><td></td></tr>
+          <tr><td><strong>II</strong></td><td>Lethargy, disorientation to TIME, personality change</td><td><strong>Asterixis</strong>, slurred speech</td><td class="hi">◄ was here</td></tr>
+          <tr><td><strong>III</strong></td><td>Somnolent but rousable, gross disorientation, confusion</td><td>Asterixis, hyperreflexia, clonus</td><td class="hi">◄ trending here</td></tr>
+          <tr><td><strong>IV</strong></td><td>Coma, unresponsive to pain</td><td>±decerebrate; asterixis gone (cannot sustain posture)</td><td></td></tr>
+        </table>
+        <p>He sits at <strong>grade II–III</strong>. That grade is a <strong>clinical judgement</strong> — the ammonia level does NOT define it. Grade III+ is the threshold to escalate care and to actively plan airway protection.</p>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"HE is a CLINICAL diagnosis graded at the bedside. Ammonia can support the story and track trends, but a ‘normal’ ammonia does not exclude HE and a high one does not grade it — never titrate treatment to the ammonia."</div>
+
+        <div class="ebm">
+          <h3>📚 Evidence-Based Medicine Corner</h3>
+          <table class="tbl">
+            <tr><th>Evidence</th><th>What it showed</th><th>Bedside translation</th></tr>
+            <tr><td><span class="lvl">GUIDELINE</span> AASLD / EASL 2014 (+ updates)</td><td>HE is clinical; treat with non-absorbable disaccharides + treat precipitants; ammonia not needed to diagnose.</td><td>Grade at bedside; hunt and reverse the trigger; do not chase ammonia numbers.</td></tr>
+            <tr><td><span class="lvl">RCT</span> Lactulose (Sharma 2009, others)</td><td>Lactulose reduces recurrence and improves overt HE vs placebo; also effective as secondary prophylaxis.</td><td>Titrate lactulose to 2–3 soft stools/day; continue for prevention.</td></tr>
+            <tr><td><span class="lvl">RCT</span> Rifaximin — Bass 2010 (NEJM)</td><td>Rifaximin 550 mg BD maintained HE remission and cut HE-related hospitalisation when ADDED to lactulose.</td><td>Add rifaximin for recurrent/breakthrough HE, on top of lactulose — not instead of it.</td></tr>
+            <tr><td><span class="lvl">RCT</span> Protein (Córdoba 2004)</td><td>Normal-protein diet was as safe as low-protein and improved protein balance in HE.</td><td>Do NOT protein-restrict; feed 1.2–1.5 g/kg/day protein, favour vegetable/dairy sources.</td></tr>
+            <tr><td><span class="lvl">RCT</span> SBP prophylaxis / antibiotics</td><td>Treating SBP and other infections reverses a leading HE precipitant; delay increases mortality.</td><td>Tap the ascites, treat infection early — it is often THE trigger.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout danger"><b class="ct">☠️ The consultant's warning (more in S21)</b>"The chart that haunts me is the ‘known encephalopath’ we labelled and lactulosed at 3am. Nobody did the PR or the tap. He had a variceal bleed feeding his ammonia AND an SBP, and a well-meaning benzo went in to ‘settle’ him. He aspirated and arrested. We treated the word ‘encephalopathy’ instead of the patient."</div>
+      </div>
+    </section>
+
+    <!-- ============ S6 TEACHING + SIM ============ -->
+    <section class="case-sec" id="s6">
+      <div class="sec-header"><span class="s-badge">S6</span><h2>🧠 Teaching Points + Interactive Simulation</h2></div>
+      <div class="section-content">
+        <h3>🔬 The mechanism — WHY the brain fails (the WHY behind the WHY)</h3>
+        <ol>
+          <li>🦠 <strong>Gut makes ammonia:</strong> colonic bacteria and enterocyte glutaminase generate <strong>NH₃/NH₄⁺</strong> from dietary protein, blood, and urea. Constipation and a GI bleed (a huge protein load of blood in the gut) both crank up production.</li>
+          <li>🫁 <strong>The failing / shunted liver cannot clear it:</strong> normally the liver converts ammonia to urea (urea cycle) and glutamine. In cirrhosis, hepatocyte failure PLUS <strong>portosystemic shunting</strong> (spontaneous shunts or TIPS) let ammonia-rich portal blood <em>bypass</em> the liver straight into the systemic circulation. This is the core of the WHY.</li>
+          <li>🧠 <strong>Ammonia crosses into the brain:</strong> astrocytes are the only brain cells that detoxify ammonia — they combine it with glutamate to make <strong>glutamine</strong>. Glutamine is an osmolyte; it draws water in, causing <strong>astrocyte swelling → low-grade cerebral oedema and dysfunction</strong>. Add oxidative stress, altered neurotransmission (GABA-ergic tone, inflammation), and you get the clinical syndrome.</li>
+          <li>🔁 <strong>The vicious cycle:</strong> a precipitant (bleed/sepsis/constipation/dehydration) → more ammonia and/or worse clearance → more astrocyte swelling → deeper coma → poorer airway and gut function → aspiration/AKI → even more ammonia. Break the cycle by removing the precipitant AND lowering gut ammonia.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Ammonia is GUT-made and LIVER-cleared; HE is what happens when the gut makes too much and the shunted, failing liver clears too little — so we treat at BOTH ends: less made (lactulose/rifaximin) and less produced by the trigger (stop the bleed/sepsis/constipation)."</div>
+
+        <h3>⚖️ Contrast pair — the two levers of lactulose</h3>
+        <div class="vs">
+          <div class="side a"><h4>💩 Lactulose: the cathartic lever</h4><ul><li>Non-absorbable disaccharide → osmotic laxative</li><li>Clears the nitrogen load (and any blood) OUT of the gut fast</li><li>Target: 2–3 soft stools/day — under-dosing does nothing, over-dosing dehydrates and can WORSEN HE</li></ul></div>
+          <div class="side b"><h4>🧫 Lactulose: the acidifying lever</h4><ul><li>Colonic bacteria ferment it → acidifies lumen (↓pH)</li><li>Traps NH₃ as non-absorbable NH₄⁺ ("ion trapping"); shifts flora away from ammonia producers</li><li>Rifaximin adds a gut-selective antibiotic that lowers ammonia-producing bacteria for recurrence</li></ul></div>
+        </div>
+        <p>💡 Lactulose is not "just a laxative" — it is a two-mechanism ammonia-lowering drug. But it only works if it is <em>titrated to stool output</em>, which is exactly what the sim below trains.</p>
+
+        <!-- SIM -->
+        <div class="sim" id="kSim">
+          <h3 style="margin-top:0">🎮 Simulation — The Lactulose Titration Dial</h3>
+          <p style="font-size:13px">Lactulose is dosed to a <strong>target of 2–3 soft stools per day</strong>, not to a fixed millilitre. Drag the dose and watch how <em>too little</em> and <em>too much</em> both fail the patient.</p>
+          <label for="kRange">🍯 Effect of dose → stools per day: <b id="kVal">0</b> stools/day</label>
+          <input type="range" id="kRange" min="0" max="8" value="0">
+          <div class="gauge"><div class="needle" id="kNeedle"></div></div>
+          <div class="readout good" id="kReadout">Set the dial to explore under-dosing vs the target vs over-dosing.</div>
+          <p style="font-size:12px; margin-top:10px; color:var(--ink2)">🎯 Zero stools = the gut keeps making ammonia and HE persists. 2–3 soft stools/day = the sweet spot. More than 4–5 watery stools = dehydration, hypokalaemia and AKI, which PRECIPITATE worse HE — the treatment becomes the trigger.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S7 ORDERS ============ -->
+    <section class="case-sec" id="s7">
+      <div class="sec-header"><span class="s-badge">S7</span><h2>📋 Orders</h2></div>
+      <div class="section-content">
+        <h3>🖊️ The order set (22:55)</h3>
+        <ul>
+          <li>💊 <strong>Lactulose 30 mL PO/NG QDS</strong>, then titrate to 2–3 soft stools/day; <strong>add phosphate/lactulose enemas</strong> if too drowsy to swallow safely.</li>
+          <li>🩸 <strong>Bloods:</strong> FBC, U&amp;E (Na⁺, K⁺, creatinine — AKI/HRS), LFTs, glucose, magnesium, phosphate, CRP, coag, <strong>group &amp; crossmatch</strong>; venous <strong>ammonia</strong> (supportive only).</li>
+          <li>🧫 <strong>Diagnostic ascitic tap NOW</strong>: cell count (PMN ≥ 250/mm³ = SBP), culture in blood-culture bottles at the bedside, albumin/protein.</li>
+          <li>🦠 <strong>Septic screen:</strong> blood cultures, urine, CXR; low threshold to start empirical antibiotics for SBP/sepsis after the tap.</li>
+          <li>🩸 <strong>Treat the suspected GI bleed:</strong> IV access ×2, fluids/blood to target, <strong>terlipressin + prophylactic antibiotics</strong> for suspected variceal bleed, urgent <strong>endoscopy</strong>; hold non-essential antihypertensives.</li>
+          <li>🚫 <strong>STOP:</strong> zopiclone and all sedatives/opioids; hold/decrease diuretics if dehydrated or AKI; avoid nephrotoxins.</li>
+          <li>💉 <strong>Thiamine (Pabrinex)</strong> to cover Wernicke; correct K⁺/Mg²⁺; maintain glucose.</li>
+          <li>🍽️ <strong>Do NOT protein-restrict</strong> — early enteral feeding, 1.2–1.5 g/kg/day protein; NG feed if unsafe swallow.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The order set for HE is a two-column sheet: LOWER the ammonia (lactulose ± rifaximin) and REMOVE the precipitant (tap, PR, cultures, stop sedatives). Skip the second column and the first column fails."</div>
+      </div>
+    </section>
+
+    <!-- ============ S8 NURSING ============ -->
+    <section class="case-sec" id="s8">
+      <div class="sec-header"><span class="s-badge">S8</span><h2>👩‍⚕️ Nursing Care</h2></div>
+      <div class="section-content">
+        <h3>🛏️ Ward priorities — the nurse runs the safety net</h3>
+        <ul>
+          <li>📟 <strong>Neuro obs / GCS hourly</strong> with grade tracking; a falling GCS toward III–IV is an airway emergency — escalate early, do not "watch and wait."</li>
+          <li>💩 <strong>Chart every stool</strong> — lactulose is titrated to output. Too few = under-treated HE; too many watery = dehydration/AKI. The stool chart IS the drug chart here.</li>
+          <li>🥄 <strong>Assess swallow before oral meds/food</strong>; a drowsy patient aspirates lactulose and diet. Nurse head-up, have suction ready, request SALT/NG if unsafe.</li>
+          <li>🩸 Watch for ongoing bleeding: fresh melaena, haematemesis, rising HR, falling BP — the bleed feeds the encephalopathy.</li>
+          <li>💧 Strict fluid balance; daily weights; flag over-diuresis (postural drop, rising creatinine, low urine output → HRS risk).</li>
+          <li>🚫 <strong>Challenge any sedative prescribed to "settle" him</strong> — benzodiazepines/opioids deepen HE. Advocate for treating the cause, not sedating the sign.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The stool chart is the ammonia gauge and the GCS trend is the airway alarm. The nurse who reports ‘only one hard stool all shift’ or ‘GCS dropped to 8’ changes the whole plan."</div>
+      </div>
+    </section>
+
+    <!-- ============ S9 INVESTIGATIONS ============ -->
+    <section class="case-sec" id="s9">
+      <div class="sec-header"><span class="s-badge">S9</span><h2>🧪 Investigations</h2></div>
+      <div class="section-content">
+        <h3>🧾 Results board</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Result</th><th>Interpretation</th></tr>
+          <tr><td>Ascitic PMN count</td><td class="hi">480 cells/mm³</td><td><strong>≥ 250 = SBP.</strong> A precipitant found — start empirical antibiotics + IV albumin.</td></tr>
+          <tr><td>Haemoglobin</td><td class="hi">78 g/L (was 112)</td><td>Falling Hb + melaena → <strong>active GI (likely variceal) bleed</strong> — a second precipitant.</td></tr>
+          <tr><td>Sodium</td><td class="lo">128 mmol/L</td><td>Hyponatraemia — both a cause of confusion and an HE aggravator; correct slowly (avoid ODS).</td></tr>
+          <tr><td>Potassium</td><td class="lo">3.1 mmol/L</td><td><strong>Hypokalaemia shifts ammonia into cells and increases renal ammoniagenesis → worsens HE.</strong> Replace K⁺.</td></tr>
+          <tr><td>Creatinine</td><td class="hi">142 µmol/L (baseline 80)</td><td>AKI — dehydration/diuretics/bleed; watch for hepatorenal syndrome.</td></tr>
+          <tr><td>Glucose</td><td class="ok-v">4.1 mmol/L</td><td>Low-normal — a failing liver can drop it; keep it topped up.</td></tr>
+          <tr><td>Venous ammonia</td><td>96 µmol/L (raised)</td><td><strong>Supports</strong> the picture but did NOT diagnose or grade it — the bedside exam did. Do not treat the number.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Do not send an ammonia to ‘confirm’ HE and do not chase it to ‘treat’ HE. Send it to support a diagnosis you already made clinically, then treat the patient and the precipitant."</div>
+
+        <div class="callout info"><b class="ct">🧠 Why this bloods panel is a precipitant map</b>Every abnormal line is a lever: SBP → antibiotics; the bleed → terlipressin + endoscopy; hypokalaemia and hyponatraemia → correct; AKI → fluids, stop nephrotoxins, hold diuretics. Fix these and the encephalopathy lifts far faster than lactulose alone would manage.</div>
+      </div>
+    </section>
+
+    <!-- ============ S10 IMAGING / LABS + MULTIMEDIA ============ -->
+    <section class="case-sec" id="s10">
+      <div class="sec-header"><span class="s-badge">S10</span><h2>🩻 Imaging / Labs + Visual Enhancements</h2></div>
+      <div class="section-content">
+        <h3>👋 Asterixis — the sign you can "see" on a tremor trace</h3>
+        <div class="ecg-fig">
+          <svg viewBox="0 0 820 130" preserveAspectRatio="none" aria-label="Wrist position trace showing asterixis: sustained posture broken by sudden drops">
+            <rect width="820" height="130" fill="#0b1220"/>
+            <g stroke="#1e3a5f" stroke-width="1"><line x1="0" y1="32" x2="820" y2="32"/><line x1="0" y1="65" x2="820" y2="65"/><line x1="0" y1="98" x2="820" y2="98"/></g>
+            <polyline fill="none" stroke="#fca5a5" stroke-width="2.3" points="0,40 120,40 130,40 132,110 150,44 300,44 312,44 314,112 332,46 470,46 482,46 484,108 502,42 640,42 652,42 654,111 672,44 820,44"/>
+            <text x="60" y="24" fill="#93c5fd" font-size="11">sustained wrist extension (dorsiflexion held)</text>
+            <text x="330" y="126" fill="#fca5a5" font-size="11">sudden loss of tone → the "flap"</text>
+          </svg>
+          <div class="ecg-cap">Asterixis is a <span style="color:#93c5fd">held posture</span> broken by <span style="color:#fca5a5">sudden brief lapses of tone</span> ("negative myoclonus") — a flapping tremor. It is a sign of grades I–III; it <strong>disappears in grade IV coma</strong> because the patient can no longer sustain the posture. Not specific to HE (also uraemia, CO₂ narcosis).</div>
+        </div>
+
+        <h3>🔎 What imaging is FOR in HE — mostly to exclude the mimics</h3>
+        <table class="tbl">
+          <tr><th>Test</th><th>Role in HE</th><th>What you are looking for</th></tr>
+          <tr><td>🩸 <strong>Bedside glucose</strong></td><td>First, every time</td><td>Hypoglycaemia — a fully reversible HE mimic in liver failure.</td></tr>
+          <tr><td>🧫 <strong>Diagnostic ascitic tap</strong></td><td>Core precipitant test</td><td>PMN ≥ 250/mm³ = SBP; culture guides antibiotics.</td></tr>
+          <tr><td>🧠 <strong>CT head</strong></td><td>When it is NOT a clean HE picture</td><td>Subdural/intracranial bleed (coagulopathic fallers), stroke, mass — do it for focal signs, head injury, no precipitant found, or failure to improve.</td></tr>
+          <tr><td>💉 <strong>Lumbar puncture</strong></td><td>If meningitis/encephalitis possible</td><td>CNS infection — but correct coagulopathy and image first.</td></tr>
+          <tr><td>📉 <strong>EEG</strong></td><td>Rarely needed acutely</td><td>Triphasic waves / generalised slowing (non-specific); mainly to exclude non-convulsive status if it does not fit.</td></tr>
+          <tr><td>🩻 <strong>Doppler / CT for shunts</strong></td><td>Recurrent/refractory HE</td><td>Large spontaneous portosystemic shunts (or a TIPS) driving persistent HE — potentially embolisable.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"There is no scan that says ‘hepatic encephalopathy.’ Imaging in HE exists to catch the SUBDURAL, the stroke and the shunt — do a CT head the moment the story is not a clean, precipitated, improving HE."</div>
+
+        <h3>🩻 This patient's imaging</h3>
+        <ul>
+          <li><strong>CT head:</strong> requested because of drowsiness and a coagulopathic faller — no intracranial bleed or infarct; supports HE as the mechanism once mimics are excluded.</li>
+          <li><strong>Abdominal US / Doppler:</strong> cirrhotic morphology, moderate ascites, patent portal vein; no new mass. Confirms the substrate; the tap did the diagnostic work for SBP.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ S11 MEDICATIONS ============ -->
+    <section class="case-sec" id="s11">
+      <div class="sec-header"><span class="s-badge">S11</span><h2>💊 Medications</h2></div>
+      <div class="section-content">
+        <h3>💉 The HE drug map — what, why, and the traps</h3>
+        <table class="tbl">
+          <tr><th>Drug</th><th>Role</th><th>Mechanism / caution</th></tr>
+          <tr><td><strong>Lactulose</strong> 30 mL QDS → titrate</td><td>First-line for overt HE + secondary prevention</td><td>Osmotic catharsis + colonic acidification (traps NH₄⁺). Titrate to 2–3 soft stools/day; OVER-dosing dehydrates and worsens HE. Enemas if unsafe swallow.</td></tr>
+          <tr><td><strong>Rifaximin</strong> 550 mg BD</td><td>ADD-ON for recurrent/breakthrough HE</td><td>Gut-selective, minimally absorbed antibiotic → fewer ammonia-producing bacteria. Add to lactulose (Bass 2010), do not replace it.</td></tr>
+          <tr><td><strong>Terlipressin</strong> + prophylactic antibiotics</td><td>Suspected variceal bleed (a precipitant)</td><td>Splanchnic vasoconstriction ↓portal pressure; antibiotics (e.g. ceftriaxone) reduce rebleed/mortality. Bridge to endoscopy.</td></tr>
+          <tr><td><strong>Empirical antibiotics + IV albumin</strong></td><td>SBP (PMN ≥ 250)</td><td>3rd-gen cephalosporin; albumin (1.5 g/kg day 1, 1 g/kg day 3) cuts HRS and mortality in SBP.</td></tr>
+          <tr><td><strong>Thiamine (Pabrinex)</strong></td><td>Cover Wernicke in every alcohol-related admission</td><td>Confusion in a drinker is Wernicke until proven otherwise — cheap, safe, give BEFORE glucose loads.</td></tr>
+          <tr><td><strong>Electrolyte correction</strong> (K⁺, Mg²⁺, Na⁺)</td><td>Reverse metabolic precipitants</td><td>Hypokalaemia worsens HE (drives renal ammoniagenesis); correct Na⁺ slowly to avoid osmotic demyelination.</td></tr>
+        </table>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Lactulose for everyone with overt HE; rifaximin when it keeps coming back. And never a sedative to ‘settle’ a cirrhotic — the drug that calms him is the drug that can kill him."</div>
+        <div class="callout danger"><b class="ct">🚫 The 'never in this patient' list</b>❌ Benzodiazepines / Z-drugs (zopiclone) · ❌ opioids for sedation · ❌ aggressive diuresis into an AKI · ❌ nephrotoxic NSAIDs — each deepens encephalopathy or precipitates HRS. Flumazenil is only a niche, transient option for a clear benzodiazepine-precipitated case, not routine.</div>
+      </div>
+    </section>
+
+    <!-- ============ S12 MONITORING ============ -->
+    <section class="case-sec" id="s12">
+      <div class="sec-header"><span class="s-badge">S12</span><h2>📟 Monitoring</h2></div>
+      <div class="section-content">
+        <h3>📡 What to watch and why</h3>
+        <ul>
+          <li>🧠 <strong>GCS / West Haven grade hourly</strong> — the trend decides escalation. Grade III→IV means <strong>call anaesthetics for airway protection</strong>; do not sedate to control agitation.</li>
+          <li>💩 <strong>Stool chart</strong> — titrate lactulose to 2–3 soft stools/day. No stool = under-treated; profuse watery = over-treated → dehydration/AKI/hypokalaemia → worse HE.</li>
+          <li>🩸 <strong>Bleeding watch</strong> — serial Hb, obvious melaena/haematemesis, HR/BP; the bleed and the HE feed each other.</li>
+          <li>🧪 <strong>U&amp;E + electrolytes</strong> daily/twice-daily — Na⁺ (correct slowly), K⁺ (keep normal), creatinine (AKI/HRS), glucose.</li>
+          <li>🌡️ <strong>Sepsis surveillance</strong> — cirrhotics mount blunted fevers; a soft rise or new confusion may be the only sign of recurrent infection.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Once you have decided ‘precipitated HE,’ the monitor's question changes from ‘what tipped him?’ to ‘is his airway about to go and is he still bleeding?’ — and the answers are the GCS trend and the stool/Hb charts."</div>
+      </div>
+    </section>
+
+    <!-- ============ S13 COMPLICATIONS ============ -->
+    <section class="case-sec" id="s13">
+      <div class="sec-header"><span class="s-badge">S13</span><h2>⚠️ Complications</h2></div>
+      <div class="section-content">
+        <h3>💀 What can go wrong</h3>
+        <ul>
+          <li>🫁 <strong>Aspiration pneumonia</strong> — the drowsy, flapping patient given oral lactulose/food with an unsafe swallow; a leading avoidable killer here.</li>
+          <li>🧠 <strong>Progression to grade IV coma</strong> with loss of airway — needs ICU and intubation; do not let a benzo get you there.</li>
+          <li>🩸 <strong>Ongoing / rebleeding varices</strong> — hypovolaemia, more blood-protein in the gut, deeper HE, AKI.</li>
+          <li>💧 <strong>Hepatorenal syndrome / AKI</strong> — from the bleed, over-diuresis, SBP; worsens ammonia handling and prognosis.</li>
+          <li>🧂 <strong>Iatrogenic:</strong> over-aggressive lactulose → dehydration/hypokalaemia/hypernatraemia (which worsen HE); too-rapid Na⁺ correction → osmotic demyelination.</li>
+          <li>🎭 <strong>The system complication:</strong> premature "it is just his liver" labelling — the biggest complication of all, and the one that misses the bleed and the SBP.</li>
+        </ul>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"The deadliest complication of HE is not the ammonia — it is the aspiration you allowed by feeding a grade-III patient and the precipitant you never looked for. Protect the airway, hunt the trigger."</div>
+      </div>
+    </section>
+
+    <!-- ============ S14 DIFFERENTIALS + BRANCHING ============ -->
+    <section class="case-sec" id="s14">
+      <div class="sec-header"><span class="s-badge">S14</span><h2>🔀 Differentials + "Choose Your Path"</h2></div>
+      <div class="section-content">
+        <h3>🧩 The confused-cirrhotic differential — mimics first</h3>
+        <table class="tbl">
+          <tr><th>Diagnosis</th><th>Discriminators</th><th>Don't-miss action</th></tr>
+          <tr><td>🧠 <strong>Hepatic encephalopathy</strong> (this patient)</td><td>Cirrhosis, asterixis, reversed sleep, a precipitant, no focal deficit, improves with treatment</td><td>Grade clinically; lactulose + hunt/treat precipitant.</td></tr>
+          <tr><td>🍷 <strong>Wernicke encephalopathy</strong></td><td>Confusion + ophthalmoplegia + ataxia (rarely all three); alcohol/malnutrition</td><td>Give IV <strong>thiamine before glucose</strong> — treat empirically, do not wait.</td></tr>
+          <tr><td>🩸 <strong>Subdural / intracranial bleed</strong></td><td>Focal signs, head injury, coagulopathy, no precipitant, not improving</td><td><strong>CT head</strong> — coagulopathic fallers bleed silently.</td></tr>
+          <tr><td>🧂 <strong>Hyponatraemia / electrolyte / hypoglycaemia</strong></td><td>Low Na⁺/glucose/K⁺; on diuretics</td><td>Check and correct; glucose at the bedside FIRST.</td></tr>
+          <tr><td>🦠 <strong>Sepsis / SBP / meningitis</strong></td><td>Fever (often blunted), rising CRP, ascites, neck stiffness</td><td>Cultures, ascitic tap, empirical antibiotics; LP if indicated.</td></tr>
+          <tr><td>💊 <strong>Drug intoxication / withdrawal</strong></td><td>Sedatives (zopiclone/opioids), alcohol withdrawal, tremor/autonomic signs</td><td>Stop sedatives; treat withdrawal appropriately.</td></tr>
+        </table>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Confusion in a cirrhotic asks the same first questions every time: is he HYPO (glucose), is he BLEEDING (PR/Hb), is he SEPTIC (tap/cultures), has he BUMPED his head (CT), and is he WERNICKE (thiamine)? Only then is it ‘just’ HE."</div>
+
+        <!-- BRANCHING SCENARIO -->
+        <div class="scenario" id="scenarioBox">
+          <h3>🎬 Choose Your Path — "The First Thirty Minutes"</h3>
+          <div class="hud"><span>❤️ Safety: <b id="scStab">●●●○○</b></span><span>⏱️ Elapsed: <b id="scTime">0 min</b></span><span>⚡ Path XP: <b id="scXP">0</b></span></div>
+          <div class="scene-text" id="scText">A known cirrhotic is drowsy, disoriented and flapping. He has melaena on the glove, a low-grade fever, tense ascites, and was recently started on zopiclone. The night SHO says: "He is a known encephalopath — just give lactulose and settle him with a bit of midazolam so we can review in the morning." What do you do?</div>
+          <div class="choices" id="scChoices"></div>
+          <div class="feedback" id="scFeedback"></div>
+          <button class="btn primary" id="scRestart" style="display:none; margin-top:12px">🔄 Replay scenario</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S15 PLAN + PROCEDURES ============ -->
+    <section class="case-sec" id="s15">
+      <div class="sec-header"><span class="s-badge">S15</span><h2>🗺️ Plan + Procedure Guides with Checklists</h2></div>
+      <div class="section-content">
+        <h3>🧭 The management plan</h3>
+        <ol>
+          <li>🧠 <strong>Diagnosis:</strong> overt HE (West Haven II–III) <strong>precipitated by SBP + variceal GI bleed</strong>, aggravated by constipation, hypokalaemia, hyponatraemia and new zopiclone. Multiple triggers, all being treated.</li>
+          <li>💊 <strong>Lower the ammonia:</strong> lactulose titrated to 2–3 soft stools/day (+ enemas while drowsy); add rifaximin given recurrent HE.</li>
+          <li>🔎 <strong>Remove the precipitants:</strong> antibiotics + IV albumin for SBP; terlipressin + antibiotics + urgent endoscopy for the bleed; replace K⁺/correct Na⁺ slowly; stop zopiclone; thiamine; treat AKI.</li>
+          <li>🫁 <strong>Protect the airway:</strong> nil-by-mouth until swallow safe / NG feed; if GCS falls toward grade IV → ICU + anaesthetics for intubation. Feed 1.2–1.5 g/kg/day protein — no restriction.</li>
+          <li>🏥 <strong>Disposition:</strong> monitored bed/HDU; hepatology + endoscopy; secondary prophylaxis (lactulose + rifaximin) and adherence/alcohol support on recovery; consider shunt work-up if recurrent.</li>
+        </ol>
+
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"HE is treated on two fronts at once: empty and acidify the gut, AND extinguish the precipitant. Doing only the first is why the ‘lactulose-only’ patient bounces back — or does not wake up."</div>
+
+        <div class="checklist" id="ckHE">
+          <h3 style="margin-top:0">🩺 Procedure Guide — Confused-cirrhotic bundle (tick as you go)</h3>
+          <label class="ck"><input type="checkbox"><span>🩸 Bedside glucose checked FIRST; thiamine given (cover Wernicke)</span></label>
+          <label class="ck"><input type="checkbox"><span>🧠 HE graded clinically (West Haven); focal signs / head-injury story sought</span></label>
+          <label class="ck"><input type="checkbox"><span>🩸 PR exam done; Hb + coag + group &amp; save sent; bleed addressed</span></label>
+          <label class="ck"><input type="checkbox"><span>🧫 Diagnostic ascitic tap (PMN + culture) before antibiotics where feasible</span></label>
+          <label class="ck"><input type="checkbox"><span>🦠 Full septic screen; empirical antibiotics for SBP/sepsis</span></label>
+          <label class="ck"><input type="checkbox"><span>🧂 Electrolytes (K⁺, Na⁺, Mg²⁺) + renal function checked and corrected</span></label>
+          <label class="ck"><input type="checkbox"><span>🚫 ALL sedatives/opioids stopped; diuretics reviewed</span></label>
+          <label class="ck"><input type="checkbox"><span>💊 Lactulose started, titrated to 2–3 stools/day; no protein restriction</span></label>
+          <div class="ck-progress" data-progress>0 / 8 complete</div>
+        </div>
+
+        <div class="checklist" id="ckAirway">
+          <h3 style="margin-top:0">🩺 Procedure Guide — If HE deepens to grade III–IV (airway escalation)</h3>
+          <label class="ck"><input type="checkbox"><span>🧠 Reassess GCS/grade; document a clear trend and time</span></label>
+          <label class="ck"><input type="checkbox"><span>🛑 Nil-by-mouth; suction to hand; nurse head-up to reduce aspiration</span></label>
+          <label class="ck"><input type="checkbox"><span>📞 Call ICU + anaesthetics EARLY for airway protection — do not sedate to settle</span></label>
+          <label class="ck"><input type="checkbox"><span>💩 Continue ammonia-lowering via enemas + NG lactulose</span></label>
+          <label class="ck"><input type="checkbox"><span>🔎 Re-hunt the precipitant if not improving; CT head if new/focal signs</span></label>
+          <div class="ck-progress" data-progress>0 / 5 complete</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S16 PROGRESS ============ -->
+    <section class="case-sec" id="s16">
+      <div class="sec-header"><span class="s-badge">S16</span><h2>📊 Progress</h2></div>
+      <div class="section-content">
+        <div class="timeline">
+          <div class="t-item"><div class="t-time">22:40</div>Arrival: drowsy GCS 12, asterixis, melaena on PR. Labelled "HE" — but the precipitant hunt begins.</div>
+          <div class="t-item"><div class="t-time">23:15</div>Ascitic tap PMN 480 → SBP; Hb 78 with melaena → variceal bleed; K⁺ 3.1, Na⁺ 128. Zopiclone stopped, thiamine given.</div>
+          <div class="t-item"><div class="t-time">23:40</div>Terlipressin + IV ceftriaxone (covers SBP and variceal-bleed prophylaxis) started; IV albumin; K⁺ replaced; lactulose + enema. Kept nil-by-mouth.</div>
+          <div class="t-item"><div class="t-time">01:30</div>Urgent OGD: two oesophageal varices banded, no active spurt post-band. Transfused to Hb ~ 80.</div>
+          <div class="t-item"><div class="t-time">Day 2</div>Passing regular soft stools; GCS 15, asterixis resolving, oriented. SBP culture guiding antibiotics; rifaximin added for secondary prevention.</div>
+          <div class="t-item"><div class="t-time">Day 4</div>Back to baseline. Eating a normal-protein diet, K⁺/Na⁺ corrected, creatinine improving. Discharge planning + adherence and alcohol support.</div>
+        </div>
+        <div class="callout ok"><b class="ct">✅ The save</b>He woke up because someone refused "just his liver," did the PR and the tap, found the SBP and the bleed, corrected the potassium — and did NOT reach for a benzo. The lactulose helped; the precipitant hunt is what actually reversed him.</div>
+      </div>
+    </section>
+
+    <!-- ============ S17 DISCHARGE ============ -->
+    <section class="case-sec" id="s17">
+      <div class="sec-header"><span class="s-badge">S17</span><h2>🏠 Discharge</h2></div>
+      <div class="section-content">
+        <h3>📋 Preventing the revolving door — two worlds of after-care</h3>
+        <div class="vs">
+          <div class="side a"><h4>🧠 Secondary prevention of HE</h4><ul><li><strong>Lactulose</strong> daily, self-titrated to 2–3 soft stools/day — with clear written instructions</li><li><strong>Rifaximin 550 mg BD</strong> added after a recurrent episode (this patient qualifies)</li><li><strong>Normal-protein diet</strong> (1.2–1.5 g/kg/day), avoid fasting, favour vegetable/dairy protein and a late-evening snack</li><li>Avoid sedatives/opioids; treat constipation promptly; recognise early confusion and reverse triggers at home</li></ul></div>
+          <div class="side b"><h4>🫁 The whole cirrhotic package</h4><ul><li>Variceal secondary prophylaxis (non-selective beta-blocker ± banding programme)</li><li>SBP prophylaxis where indicated; diuretics for ascites reviewed and titrated</li><li>Alcohol abstinence support; nutrition; vaccination; HCC surveillance</li><li><strong>Transplant assessment</strong> — an overt HE episode flags decompensation and prognosis</li></ul></div>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"Discharge on lactulose ‘titrated to 2–3 soft stools,’ NOT a fixed dose — the fixed dose either does nothing or dehydrates. Add rifaximin for recurrence, keep the protein IN, and refer for transplant assessment."</div>
+      </div>
+    </section>
+
+    <!-- ============ S18 PEARLS ============ -->
+    <section class="case-sec" id="s18">
+      <div class="sec-header"><span class="s-badge">S18</span><h2>💎 Clinical Pearls</h2></div>
+      <div class="section-content">
+        <div class="pearl-grid">
+          <div class="pearl"><b>🔎 Hunt the precipitant</b>HE is a diagnosis of the trigger. Infection/SBP, GI bleed, constipation, dehydration/diuretics, electrolytes, sedatives, renal failure — find it, treat it.</div>
+          <div class="pearl"><b>🧠 Grade it clinically</b>West Haven 0–IV at the bedside. Asterixis in I–III, gone in IV coma. Ammonia supports but never grades.</div>
+          <div class="pearl"><b>🩸 Do the PR &amp; the tap</b>Melaena and SBP are the two most-missed precipitants. A tap (PMN ≥ 250) and a PR change the whole plan.</div>
+          <div class="pearl"><b>💩 Titrate to stools</b>Lactulose is dosed to 2–3 soft stools/day, not a fixed millilitre — too little fails, too much dehydrates and worsens HE.</div>
+          <div class="pearl"><b>🧫 Rifaximin for recurrence</b>Add rifaximin 550 mg BD to lactulose for recurrent HE (Bass 2010) — not instead of it.</div>
+          <div class="pearl"><b>🍽️ Keep the protein IN</b>Do NOT protein-restrict. Feed 1.2–1.5 g/kg/day; over-restriction worsens muscle loss and outcomes.</div>
+          <div class="pearl"><b>🚫 No sedatives</b>Benzodiazepines/opioids deepen HE and cost the airway. Treat the cause; never sedate a cirrhotic to "settle."</div>
+          <div class="pearl"><b>🧂 Fix the potassium</b>Hypokalaemia drives renal ammoniagenesis and worsens HE — replace K⁺, correct Na⁺ slowly, check glucose.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S19 MCQs ============ -->
+    <section class="case-sec" id="s19">
+      <div class="sec-header"><span class="s-badge">S19</span><h2>📝 MCQs / Assessment</h2></div>
+      <div class="section-content">
+        <p>🎮 <em>Eight questions. Pick an option to lock it in — correct answers earn XP.</em></p>
+        <div id="mcqHost"></div>
+        <div class="callout ok" id="mcqDone" style="display:none"><b class="ct">🏆 Assessment complete</b><span id="mcqSummary"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ S20 ADVANCED TOPICS ============ -->
+    <section class="case-sec" id="s20">
+      <div class="sec-header"><span class="s-badge">S20</span><h2>🔬 Advanced Topics — Fellowship Level</h2></div>
+      <div class="section-content">
+        <div class="callout purple">
+          <h3 style="margin-top:0">🧠 Beyond the bundle</h3>
+          <ul>
+            <li>🧬 <strong>Minimal / covert HE (MHE):</strong> normal bedside exam but impaired psychometrics (e.g. PHES, Stroop/EncephalApp, critical flicker frequency). It impairs driving and predicts overt HE — worth detecting and treating in selected patients.</li>
+            <li>🩻 <strong>Portosystemic shunts &amp; TIPS:</strong> HE occurs in a significant minority after TIPS; large spontaneous shunts can drive recurrent/refractory HE and may be amenable to <strong>shunt embolisation</strong>. Balance shunt reduction against rebleeding/ascites risk.</li>
+            <li>💊 <strong>Beyond lactulose/rifaximin:</strong> <strong>L-ornithine L-aspartate (LOLA)</strong> supports ammonia detoxification (urea cycle/glutamine synthesis) and has RCT support; oral <strong>branched-chain amino acids</strong> improve HE and nutrition; <strong>albumin/plasma-exchange</strong> and faecal microbiota transplantation are areas of active study.</li>
+            <li>🔁 <strong>Ammonia is not the whole story:</strong> systemic inflammation, infection, sarcopenia, manganese deposition, altered GABA-ergic neurotransmission and gut dysbiosis all modulate HE — which is why a "normal" ammonia never excludes it and why treating infection matters so much.</li>
+            <li>🧪 <strong>Refractory HE work-up:</strong> if it is not improving, re-hunt occult infection, occult bleeding, a missed shunt, hyponatraemia, and consider non-convulsive status epilepticus (EEG) and structural mimics (CT/MRI).</li>
+            <li>🫁 <strong>Prognosis &amp; transplant:</strong> an episode of overt HE is a decompensation event with poor medium-term survival — it should trigger MELD-based transplant assessment, not just another lactulose script.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ S21 M&M ============ -->
+    <section class="case-sec" id="s21">
+      <div class="sec-header"><span class="s-badge">S21</span><h2>🎭 Morbidity &amp; Mortality Conference</h2></div>
+      <div class="section-content">
+        <div class="mm">
+          <h3>🎭 M&amp;M — "Just Encephalopathy"</h3>
+          <div class="mm-case">
+            <strong>The case:</strong> A 62-year-old man with alcohol-related cirrhosis was brought in at 02:30, drowsy and confused. Triage wrote <strong>"known encephalopath — for lactulose."</strong> He was given lactulose and, when he became restless, a dose of <strong>lorazepam "to settle him"</strong> so the busy night team could review later. No PR was performed, no ascitic tap was done, and he was <strong>protein-restricted</strong> and left on the ward. Overnight he passed large volumes of <strong>melaena</strong> and spiked a fever; his abdomen was tense. By morning he was in grade IV coma. A PR and tap — finally done at the crash call — revealed a <strong>variceal GI bleed AND spontaneous bacterial peritonitis</strong>, the two precipitants nobody had looked for. He aspirated, arrested, and could not be resuscitated. The benzodiazepine had deepened the coma and taken his airway.
+          </div>
+          <p><strong>🧀 The Swiss-cheese holes that lined up:</strong></p>
+          <div class="swiss">
+            <div class="hole"><b>🧠 ANCHORING</b>"Known encephalopath" label stuck; the episode was treated as routine, not investigated.</div>
+            <div class="hole"><b>🩸 NO PR / NO TAP</b>The GI bleed and the SBP — the actual triggers — were never sought.</div>
+            <div class="hole"><b>💊 SEDATION</b>A benzodiazepine given to "settle" him deepened HE and lost the airway.</div>
+            <div class="hole"><b>🍽️ WRONG DIET</b>Protein-restricted against evidence — worsening catabolism, no benefit.</div>
+            <div class="hole"><b>🫁 AIRWAY</b>A grade-deepening patient left unmonitored on the ward until he aspirated.</div>
+          </div>
+          <p style="margin-bottom:0"><strong>🛡️ What would have saved him:</strong> treat every "known encephalopath" as a precipitant hunt — PR, ascitic tap, cultures, glucose and electrolytes on arrival; treat the SBP and the variceal bleed; NEVER sedate a cirrhotic to settle agitation (protect the airway with anaesthetics if needed); keep the protein IN; titrate lactulose to stools; and monitor the GCS trend closely. <strong>This is exactly the discipline that saved the patient in Bed 7.</strong></p>
+        </div>
+        <div class="rule"><span class="tag">⚔️ ONE-LINER RULE</span>"‘Just encephalopathy’ has killed more cirrhotics than the encephalopathy itself. The label is not a diagnosis — the PR, the tap, and the precipitant you find are."</div>
+      </div>
+    </section>
+
+    <div class="footer">🏥 Virtual Teaching Hospital · 🫁 GIT &amp; Hepatology · Bed 7 — Hepatic Encephalopathy / The Precipitant Hunt<br>⚠️ Educational use only — not for clinical decision-making. "Simple enough to remember, impossible to forget."</div>
+
+  </main>
+  </div>
+</div>
+
+<!-- DASHBOARD + TOAST (fixed, outside layout flow) -->
+<aside class="dash" id="dash">
+  <h4>📊 Live Dashboard <button class="min-btn" id="dashMin" title="Minimize">–</button></h4>
+  <div class="dash-body">
+    <div class="row"><span>⚡ XP</span><b id="xpVal">0</b></div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="row"><span>📚 Sections read</span><b id="visitVal">0 / 21</b></div>
+    <div class="row"><span>🧠 MCQ score</span><b id="mcqVal">0 / 8</b></div>
+    <div class="badges">
+      <span class="badge" id="bdg-flag">🚩 Precipitant-Spotter</span>
+      <span class="badge" id="bdg-path">🧭 Right Path</span>
+      <span class="badge" id="bdg-ck">✅ Checklist Champ</span>
+      <span class="badge" id="bdg-quiz">🏆 Quiz Ace</span>
+      <span class="badge" id="bdg-explorer">🗺️ Explorer</span>
+    </div>
+    <div class="mini">Earn XP by spotting precipitants, running the sim, choosing the right path, and answering MCQs.</div>
+  </div>
+</aside>
+<div class="toast" id="toast">+XP</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== XP / DASHBOARD ===== */
+  var XP=0, XP_MAX=1250, awarded={};
+  var xpVal=document.getElementById('xpVal'), xpFill=document.getElementById('xpFill'),
+      toast=document.getElementById('toast'), toastTimer=null;
+  function showToast(m){ toast.textContent=m; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toast.classList.remove('show');},1600); }
+  function addXP(n,key,label){ if(key){ if(awarded[key]) return; awarded[key]=true; } XP+=n; if(XP>XP_MAX) XP=XP_MAX; xpVal.textContent=XP; xpFill.style.width=Math.min(100,Math.round(XP/XP_MAX*100))+'%'; showToast('+'+n+' XP'+(label?' · '+label:'')); }
+  function earnBadge(id){ var b=document.getElementById(id); if(b&&!b.classList.contains('earned')) b.classList.add('earned'); }
+  var dash=document.getElementById('dash');
+  document.getElementById('dashMin').addEventListener('click', function(){ dash.classList.toggle('collapsed'); this.textContent=dash.classList.contains('collapsed')?'+':'–'; });
+
+    /* ===== SIDEBAR TABS — show one section at a time ===== */
+  var navlinks=[].slice.call(document.querySelectorAll('.navlink'));
+  var sections=navlinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var heroBits=[document.querySelector('.hero'), document.querySelector('.vitals-strip')].filter(Boolean);
+  var visited={}, visitVal=document.getElementById('visitVal');
+  function setActive(idx){ navlinks.forEach(function(c){c.classList.remove('active');}); if(navlinks[idx]) navlinks[idx].classList.add('active'); }
+  function markVisited(idx){ var sec=sections[idx]; if(!sec) return; if(!visited[sec.id]){ visited[sec.id]=true; navlinks[idx].classList.add('visited'); var n=Object.keys(visited).length; visitVal.textContent=n+' / 21'; addXP(6,'visit-'+sec.id,'Section read'); if(n>=21){ earnBadge('bdg-explorer'); addXP(60,'allvisited','Explorer!'); } } }
+  function showSection(idx){ sections.forEach(function(s,i){ if(s) s.classList.toggle('sec-active', i===idx); }); heroBits.forEach(function(el){ el.style.display=(idx===0)?'':'none'; }); setActive(idx); markVisited(idx); try{ window.scrollTo(0,0); }catch(_){ } }
+  navlinks.forEach(function(link,idx){ link.addEventListener('click', function(ev){ ev.preventDefault(); showSection(idx); }); });
+  showSection(0);
+
+  /* ===== FLAG GAME ===== */
+  var flagBtns=document.querySelectorAll('#flagGame .flag-btn'), flagResult=document.getElementById('flagResult');
+  var found=0, total=0, wrong=0;
+  flagBtns.forEach(function(b){ if(b.getAttribute('data-good')==='1') total++; });
+  flagBtns.forEach(function(btn){ btn.addEventListener('click', function(){ if(btn.dataset.locked) return; btn.dataset.locked='1'; var good=btn.getAttribute('data-good')==='1'; if(good){ btn.classList.add('flag-good'); found++; addXP(10,'flag-'+found+'-'+Math.random(),'Precipitant'); } else { btn.classList.add('flag-bad'); wrong++; showToast('❌ That is a sign of HE, not a precipitant'); } if(found===total){ flagResult.textContent='✅ All '+total+' precipitants found'+(wrong?' (with '+wrong+' wrong pick'+(wrong>1?'s':'')+')':' — flawless!'); earnBadge('bdg-flag'); addXP(30,'flags-complete','Precipitant-Spotter'); } else { flagResult.textContent=found+' / '+total+' precipitants found…'; } }); });
+
+  /* ===== REVEAL ===== */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){ btn.addEventListener('click', function(){ var t=document.getElementById(btn.getAttribute('data-target')); if(!t) return; if(t.classList.contains('reveal-shown')){ t.classList.remove('reveal-shown'); t.classList.add('reveal-hidden'); } else { t.classList.remove('reveal-hidden'); t.classList.add('reveal-shown'); addXP(8,'reveal-'+btn.getAttribute('data-target'),'Self-test'); } }); });
+
+  /* ===== SIM: lactulose titration ===== */
+  var kRange=document.getElementById('kRange'), kVal=document.getElementById('kVal'), kNeedle=document.getElementById('kNeedle'), kReadout=document.getElementById('kReadout');
+  if(kRange){ var simUsed=false;
+    function updateK(){ var v=parseInt(kRange.value,10); kVal.textContent=v; var pct=(v-0)/(8-0)*100; kNeedle.style.left=pct+'%'; var msg,cls;
+      if(v<=1){ msg='🔴 Under-dosed ('+v+' stool/day). The gut keeps making ammonia — HE persists. Increase the lactulose.'; cls='bad'; }
+      else if(v<=3){ msg='🟢 Target zone ('+v+' soft stools/day). Ammonia load cleared and lumen acidified — this is the sweet spot.'; cls='good'; }
+      else if(v<=5){ msg='🟠 Getting loose ('+v+' stools/day). Watch fluid balance and potassium — pull back before dehydration sets in.'; cls='warn-r'; }
+      else { msg='🔴 Over-dosed ('+v+' watery stools/day). Dehydration, hypokalaemia and AKI now PRECIPITATE worse HE — the treatment became the trigger. Reduce the dose.'; cls='bad'; }
+      kReadout.textContent=msg; kReadout.className='readout '+cls; if(!simUsed){ simUsed=true; addXP(15,'ksim','Titration Master'); } }
+    kRange.addEventListener('input', updateK); updateK();
+  }
+
+  /* ===== CHECKLISTS ===== */
+  var totalCk=document.querySelectorAll('.checklist').length, ckDone=0;
+  document.querySelectorAll('.checklist').forEach(function(list){ var boxes=list.querySelectorAll('input[type=checkbox]'), prog=list.querySelector('[data-progress]'), total=boxes.length, doneAw=false;
+    function refresh(){ var d=0; boxes.forEach(function(b){ if(b.checked){ d++; b.closest('.ck').classList.add('done'); } else b.closest('.ck').classList.remove('done'); }); prog.textContent=d+' / '+total+' complete'; if(d===total && !doneAw){ doneAw=true; ckDone++; addXP(25,'ck-'+list.id,'Checklist'); if(ckDone>=totalCk){ earnBadge('bdg-ck'); addXP(20,'allck','Checklist Champ'); } } }
+    boxes.forEach(function(b){ b.addEventListener('change', function(){ if(b.checked) addXP(4,null,'Step'); refresh(); }); }); });
+
+  /* ===== BRANCHING SCENARIO ===== */
+  var scText=document.getElementById('scText'), scChoices=document.getElementById('scChoices'), scFeedback=document.getElementById('scFeedback'),
+      scRestart=document.getElementById('scRestart'), scStab=document.getElementById('scStab'), scTime=document.getElementById('scTime'), scXP=document.getElementById('scXP');
+  var pathXP=0, stab=1, elapsed=0;
+  var STEPS={
+    start:{ text:"A known cirrhotic is drowsy, disoriented and flapping. There is melaena on the glove, a low-grade fever, tense ascites, and recent zopiclone. The SHO says: 'Known encephalopath — give lactulose and a bit of midazolam to settle him, review in the morning.' What do you do?",
+      choices:[
+        {t:"💊 Lactulose plus midazolam to settle him, review later",good:false,ds:-2,dt:120,xp:0,fb:"☠️ This is the M&M case in S21. The benzo deepens the coma and loses the airway; the missed bleed and SBP feed the ammonia. He aspirates and arrests. Restart.",end:true},
+        {t:"🔎 Start lactulose AND run the precipitant hunt: PR, ascitic tap, bloods, cultures, stop the zopiclone",good:true,ds:1,dt:20,xp:40,fb:"✅ Exactly. Lactulose lowers ammonia, but the tap and PR find the SBP and the bleed — the triggers that actually reverse him. Sedatives stopped.",next:"results"},
+        {t:"🧠 Protein-restrict him and give lactulose only, hold off on tests",good:false,ds:-1,dt:40,xp:5,fb:"⚠️ Wrong on both counts: protein restriction is not recommended and harms, and 'lactulose only' misses the precipitant. Hunt the trigger and keep the protein in.",next:"results"}
+      ]},
+    results:{ text:"The hunt pays off: ascitic PMN 480 (SBP), Hb 78 with melaena (variceal bleed), K⁺ 3.1, Na⁺ 128. He is grade II–III HE. What is the priority package?",
+      choices:[
+        {t:"🦠 Antibiotics + albumin for SBP, terlipressin + urgent endoscopy for the bleed, replace K⁺, correct Na⁺ slowly, continue lactulose",good:true,ds:1,dt:20,xp:45,fb:"✅ Right. Treat every precipitant at once; the encephalopathy lifts as the triggers are reversed. Correct sodium slowly to avoid demyelination.",next:"airway"},
+        {t:"💩 Just push more lactulose to a fixed high dose and wait for stools",good:false,ds:-2,dt:40,xp:0,fb:"⚠️ Dangerous — ignoring the SBP and the active bleed while flogging lactulose lets both triggers keep driving the ammonia. And a fixed high dose risks dehydration.",next:"airway"}
+      ]},
+    airway:{ text:"Overnight his GCS drifts down; he is now barely rousable and cannot protect his swallow. What now?",
+      choices:[
+        {t:"🫁 Nil-by-mouth, suction ready, call ICU/anaesthetics for airway protection; continue ammonia-lowering via enemas/NG",good:true,ds:1,dt:15,xp:45,fb:"🏆 Perfect. Grade III–IV means the airway is the emergency — protect it properly, never sedate to settle. Keep treating the precipitants and the gut.",end:true},
+        {t:"💉 Give lorazepam to keep him calm and keep feeding oral lactulose",good:false,ds:-2,dt:30,xp:0,fb:"⚠️ This is exactly how the M&M patient died — sedation deepens HE and oral dosing into an unsafe swallow causes aspiration. Protect the airway instead.",end:true}
+      ]}
+  };
+  function renderStab(){ var s=Math.max(0,Math.min(5,stab+2)); var d=''; for(var i=0;i<5;i++) d+=(i<s?'●':'○'); scStab.textContent=d; }
+  function renderStep(key){ var st=STEPS[key]; scText.textContent=st.text; scFeedback.className='feedback'; scFeedback.style.display='none'; scChoices.innerHTML='';
+    st.choices.forEach(function(ch){ var b=document.createElement('button'); b.className='choice'; b.textContent=ch.t; b.addEventListener('click', function(){ pathXP+=ch.xp; scXP.textContent=pathXP; elapsed+=ch.dt; scTime.textContent=elapsed+' min'; stab+=ch.ds; renderStab(); if(ch.xp) addXP(ch.xp,null,'Scenario'); scFeedback.textContent=ch.fb; scFeedback.className='feedback '+(ch.good?'good':'bad'); scFeedback.style.display='block'; [].slice.call(scChoices.children).forEach(function(c){ c.disabled=true; c.style.opacity=.6; }); if(ch.end){ scRestart.style.display='inline-block'; if(ch.good && key==='airway'){ earnBadge('bdg-path'); addXP(20,'scenario-win','Right Path!'); } } else if(ch.next){ setTimeout(function(){ renderStep(ch.next); },1400); } }); scChoices.appendChild(b); }); }
+  scRestart.addEventListener('click', function(){ pathXP=0; stab=1; elapsed=0; scXP.textContent=0; scTime.textContent='0 min'; renderStab(); scRestart.style.display='none'; renderStep('start'); });
+  renderStab(); renderStep('start');
+
+  /* ===== MCQs ===== */
+  var MCQS=[
+    { q:"A known cirrhotic is drowsy, disoriented and flapping. The single most important next step after starting lactulose is:", opts:["Send an ammonia level to confirm the diagnosis","Actively hunt and treat the precipitant (PR, ascitic tap, cultures, electrolytes)","Protein-restrict the diet","Give a benzodiazepine to settle him"], correct:1, exp:"HE is a diagnosis of the precipitant. The tap, PR, cultures and electrolytes find the SBP, bleed and metabolic triggers that actually reverse the episode. Ammonia only supports; protein restriction harms; sedatives deepen HE." },
+    { q:"The core mechanism of hepatic encephalopathy is best described as:", opts:["Direct bilirubin toxicity to neurons","Gut-derived ammonia bypassing the failing/shunted liver, causing astrocyte swelling","Cerebral vasospasm from portal hypertension","Autoimmune demyelination"], correct:1, exp:"Ammonia made by the gut is normally cleared by the liver. In cirrhosis, hepatocyte failure plus portosystemic shunting let ammonia reach the brain, where astrocytes convert it to glutamine (an osmolyte) → cell swelling and dysfunction." },
+    { q:"Which statement about ammonia levels in HE is correct?", opts:["A normal ammonia excludes HE","Ammonia is used to grade severity","Ammonia supports the diagnosis but does not grade it, and treatment is not titrated to it","Treatment should be titrated to the ammonia level"], correct:2, exp:"HE is diagnosed and graded clinically (West Haven). Ammonia can support the picture and track trends, but a normal level does not exclude HE, a high level does not grade it, and you never titrate treatment to the number." },
+    { q:"Lactulose in HE should be dosed to:", opts:["A fixed 30 mL twice daily regardless of response","Target of 2–3 soft stools per day","The lowest dose that avoids any diarrhoea","Normalise the serum ammonia"], correct:1, exp:"Lactulose is titrated to 2–3 soft stools/day. Under-dosing fails to clear the nitrogen load; over-dosing causes dehydration, hypokalaemia and AKI, which themselves precipitate worse HE." },
+    { q:"Regarding dietary protein in a patient with overt HE:", opts:["Restrict protein strictly to reduce ammonia","Maintain a normal-protein diet (about 1.2–1.5 g/kg/day)","Give no enteral nutrition until fully alert","Only intravenous amino acids are safe"], correct:1, exp:"Protein restriction is NOT recommended (Córdoba 2004) — it worsens catabolism and muscle loss without benefit. Feed 1.2–1.5 g/kg/day, favouring vegetable/dairy protein; use NG feeding if the swallow is unsafe." },
+    { q:"Which is a well-recognised precipitant of hepatic encephalopathy?", opts:["Asterixis","Reversed sleep pattern","Spontaneous bacterial peritonitis (infection)","Jaundice"], correct:2, exp:"Infection (including SBP), GI bleeding, constipation, dehydration/diuretics, electrolyte disturbance, sedatives and renal failure are precipitants. Asterixis, reversed sleep and jaundice are features/signs of the syndrome, not triggers." },
+    { q:"Rifaximin in hepatic encephalopathy is best used to:", opts:["Replace lactulose as monotherapy first-line","Be added to lactulose to prevent recurrence of HE","Treat only minimal HE","Acidify the colon directly"], correct:1, exp:"Bass 2010 (NEJM) showed rifaximin 550 mg BD, added to lactulose, maintained remission and reduced HE-related hospitalisation. It is an add-on for recurrent HE, not a replacement for lactulose." },
+    { q:"A cirrhotic with grade III–IV HE who cannot protect his airway and is agitated should receive:", opts:["Intravenous midazolam to control agitation","Airway protection (ICU/anaesthetics) while treating HE and its precipitant — no sedation","Oral lactulose forced despite the drowsiness","Nothing until morning review"], correct:1, exp:"Sedatives deepen HE and cost the airway. Advancing grade means airway protection (anaesthetic-led intubation if needed), continued ammonia-lowering via enemas/NG, and aggressive treatment of the precipitant — never a ward benzodiazepine." }
+  ];
+  var host=document.getElementById('mcqHost'), mcqVal=document.getElementById('mcqVal'), letters=['A','B','C','D','E'], score=0, answered=0;
+  MCQS.forEach(function(item,qi){ var box=document.createElement('div'); box.className='mcq';
+    var html='<div class="mcq-q">QUESTION '+(qi+1)+' / '+MCQS.length+'</div><div class="mcq-stem">'+item.q+'</div>';
+    item.opts.forEach(function(opt,oi){ html+='<label class="mcq-opt" data-oi="'+oi+'"><strong>'+letters[oi]+'.</strong> '+opt+'</label>'; });
+    html+='<div class="mcq-exp"></div>'; box.innerHTML=html; host.appendChild(box);
+    var opts=box.querySelectorAll('.mcq-opt'), exp=box.querySelector('.mcq-exp'), locked=false;
+    opts.forEach(function(label){ label.addEventListener('click', function(){ if(locked) return; locked=true; var oi=parseInt(label.getAttribute('data-oi'),10); box.classList.add('answered'); var c=item.correct;
+      if(oi===c){ label.classList.add('picked-right'); score++; addXP(25,null,'Correct'); } else { label.classList.add('picked-wrong'); opts[c].classList.add('show-right'); showToast('❌ Correct: '+letters[c]); }
+      exp.innerHTML='<strong>'+(oi===c?'✅ Correct. ':'📘 Explanation. ')+'</strong>'+item.exp; answered++; mcqVal.textContent=score+' / '+MCQS.length;
+      if(answered===MCQS.length){ var d=document.getElementById('mcqDone'), s=document.getElementById('mcqSummary'); d.style.display='block'; s.textContent='You scored '+score+' / '+MCQS.length+'. '+(score===MCQS.length?'Flawless — you treat the precipitant, not the label. 🏆':score>=6?'Strong — review the misses and S5/S6 on grading and mechanism.':'Revisit S4, S5 and S6 — the precipitant hunt is the whole case.'); if(score>=7){ earnBadge('bdg-quiz'); addXP(50,'quizace','Quiz Ace!'); } }
+    }); }); });
+})();
+</script>
+</body>
+</html>
