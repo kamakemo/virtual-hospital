@@ -8184,6 +8184,92 @@ function Field({ label, children }) {
   );
 }
 
+// Raw HTML editor for rich-html cases — works for uploaded (html_url) cases too.
+// Editing stores the HTML inline (data.htmlContent) and detaches the uploaded
+// file (htmlUrl -> null), which the renderer then prefers.
+function RawHtmlEditor({ draft, setDraft }) {
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState('');
+  const [showPreview, setShowPreview] = useState(true);
+  const [previewKey, setPreviewKey] = useState(0);
+
+  const html = draft.htmlContent || '';
+  const fromUpload = !!draft.htmlUrl && !draft.htmlContent;
+
+  const loadFromUrl = async () => {
+    if (!draft.htmlUrl) return;
+    setLoading(true); setErr('');
+    try {
+      const r = await fetch(draft.htmlUrl);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const text = await r.text();
+      setDraft(d => ({ ...d, htmlContent: text, htmlUrl: null }));
+    } catch (e) { setErr('Could not load the uploaded file: ' + e.message); }
+    setLoading(false);
+  };
+
+  const onEdit = (v) => setDraft(d => ({ ...d, htmlContent: v, htmlUrl: null }));
+  const kb = (html.length / 1024).toFixed(1);
+  const lines = html ? html.split('\n').length : 0;
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+        <div className="text-xs uppercase tracking-wider text-slate-500 font-semibold">Raw HTML editor</div>
+        {!fromUpload && html && (
+          <label className="text-xs flex items-center gap-1.5 cursor-pointer text-slate-600 dark:text-slate-300">
+            <input type="checkbox" checked={showPreview} onChange={e => setShowPreview(e.target.checked)} /> Live preview
+          </label>
+        )}
+      </div>
+
+      {fromUpload ? (
+        <div className="rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-4">
+          <p className="text-sm text-amber-800 dark:text-amber-200 mb-3">
+            This case renders from an <strong>uploaded HTML file</strong>. Load it here to edit inline — when you press <strong>Save</strong> (top-right), your edited copy is stored in the app and the uploaded file is detached (it will no longer be used).
+          </p>
+          <button onClick={loadFromUrl} disabled={loading}
+            className="px-4 py-2 rounded-lg bg-amber-500 text-white text-sm font-bold disabled:opacity-50 hover:bg-amber-600">
+            {loading ? 'Loading…' : '⤵ Load for editing'}
+          </button>
+          {err && <p className="text-xs text-rose-600 mt-2">{err}</p>}
+          <p className="text-[11px] text-amber-700/80 dark:text-amber-300/70 mt-3 break-all">Source: {draft.htmlUrl}</p>
+        </div>
+      ) : (
+        <>
+          <p className="text-xs text-slate-500 mb-2">
+            Edit the full HTML document (swap image/YouTube URLs, change text, anything), then press the main <b>Save</b> button at the top-right to publish.
+            {draft.htmlUrl ? ' Saving replaces the uploaded file with this inline copy.' : ''}
+          </p>
+          <div className={cx('grid gap-3', showPreview ? 'lg:grid-cols-2' : 'grid-cols-1')}>
+            <div>
+              <textarea
+                value={html}
+                onChange={e => onEdit(e.target.value)}
+                spellCheck={false} wrap="off"
+                className="w-full h-[540px] font-mono text-[12px] leading-relaxed rounded-xl border border-slate-700 bg-slate-950 text-slate-100 p-3 focus:outline-none focus:ring-2 focus:ring-teal-500 scrollbar-thin"
+                placeholder="<!DOCTYPE html> …"
+              />
+              <div className="flex items-center justify-between text-[11px] text-slate-400 mt-1">
+                <span>{kb} KB · {lines} lines</span>
+                {showPreview && <button onClick={() => setPreviewKey(k => k + 1)} className="text-teal-600 font-semibold hover:underline">↻ Refresh preview</button>}
+              </div>
+            </div>
+            {showPreview && (
+              <div className="rounded-xl border border-slate-300 dark:border-slate-700 overflow-hidden bg-white flex flex-col">
+                <div className="text-[10px] uppercase tracking-wider font-bold text-slate-500 px-2 py-1 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">Live preview</div>
+                <iframe key={previewKey} title="html-preview" srcDoc={html}
+                  sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms"
+                  className="w-full h-[520px] bg-white" />
+              </div>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function CaseEditor({ caseData, stageKey, setStageKey, onUpdate, onDelete }) {
   const [draft, setDraft] = useState(caseData);
   const [saved, setSaved] = useState(false);
@@ -8269,6 +8355,9 @@ function CaseEditor({ caseData, stageKey, setStageKey, onUpdate, onDelete }) {
       <div className="border-b border-slate-200 dark:border-slate-800 overflow-x-auto scrollbar-thin">
         <div className="flex p-2 gap-1 min-w-max">
           <StageTab id="meta" label="📋 Profile + Vitals" active={stageKey === 'meta'} onClick={() => setStageKey('meta')} />
+          {draft.caseType === 'rich-html' && (
+            <StageTab id="html" label={'</> Edit HTML'} active={stageKey === 'html'} onClick={() => setStageKey('html')} />
+          )}
           <StageTab id="sections" label="🧩 Sections" active={stageKey === 'sections'} onClick={() => setStageKey('sections')} />
           {getCaseStages(draft).filter(s => s.key !== 'profile').map(s => (
             <StageTab key={s.key} id={s.id} label={s.label} active={stageKey === s.key} onClick={() => setStageKey(s.key)} />
@@ -8285,13 +8374,16 @@ function CaseEditor({ caseData, stageKey, setStageKey, onUpdate, onDelete }) {
         {stageKey === 'sections' && (
           <SectionsEditor draft={draft} updateField={updateField} />
         )}
+        {stageKey === 'html' && (
+          <RawHtmlEditor draft={draft} setDraft={setDraft} />
+        )}
         {stageKey === 'mcqs' && (
           <MCQEditor mcqs={draft.mcqs || []} onChange={(m) => updateField('mcqs', m)} />
         )}
         {stageKey === 'labtrend' && (
           <LabTrendEditor data={draft.labTrend || []} onChange={(d) => updateField('labTrend', d)} />
         )}
-        {!['meta', 'sections', 'mcqs', 'labtrend'].includes(stageKey) && (
+        {!['meta', 'sections', 'mcqs', 'labtrend', 'html'].includes(stageKey) && (
           <div>
             <div className="text-xs uppercase tracking-wider text-slate-500 font-semibold mb-2">
               {getCaseStages(draft).find(s => s.key === stageKey)?.label || STAGES.find(s => s.key === stageKey)?.label}
