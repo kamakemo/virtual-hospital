@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cardiac Emergencies — Question Bank</title>
+<style>
+  :root{ --bg:#f6f8fb; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --muted:#94a3b8;
+    --line:#e2e8f0; --accent:#0d9488; --accent2:#0ea5e9; --good:#16a34a; --goodbg:#dcfce7;
+    --bad:#dc2626; --badbg:#fee2e2; --warn:#f59e0b; --shadow:0 10px 30px rgba(15,23,42,.08); }
+  *{ box-sizing:border-box; }
+  body{ margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.6; }
+  .wrap{ max-width:900px; margin:0 auto; padding:20px 16px 80px; }
+  .hero{ background:linear-gradient(135deg,#0f766e 0%,#0d9488 45%,#0ea5e9 100%); color:#fff; border-radius:20px; padding:26px 24px; box-shadow:var(--shadow); position:relative; overflow:hidden; }
+  .hero h1{ margin:0 0 4px; font-size:26px; letter-spacing:-.01em; }
+  .hero p{ margin:0; opacity:.92; font-size:14px; }
+  .hero .pill{ display:inline-block; margin-top:12px; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.25); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:700; }
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); padding:20px; margin-top:18px; }
+  .modes{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:6px; }
+  @media(max-width:620px){ .modes{ grid-template-columns:1fr; } }
+  .mode-btn{ text-align:left; cursor:pointer; border:2px solid var(--line); background:#fff; border-radius:16px; padding:18px; transition:all .16s; }
+  .mode-btn:hover{ border-color:var(--accent); transform:translateY(-2px); box-shadow:var(--shadow); }
+  .mode-btn .emoji{ font-size:26px; }
+  .mode-btn h3{ margin:8px 0 4px; font-size:17px; }
+  .mode-btn p{ margin:0; font-size:12.5px; color:var(--ink2); }
+  .row{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  .chip{ font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.04em; padding:3px 9px; border-radius:999px; background:#ecfeff; color:#0e7490; border:1px solid #a5f3fc; }
+  .btn{ cursor:pointer; border:0; border-radius:12px; padding:11px 18px; font-weight:800; font-size:14px; background:var(--accent); color:#fff; transition:all .15s; }
+  .btn:hover{ filter:brightness(1.05); transform:translateY(-1px); }
+  .btn.ghost{ background:#fff; color:var(--ink); border:1px solid var(--line); }
+  .btn.ghost:hover{ border-color:var(--accent); }
+  .btn:disabled{ opacity:.5; cursor:default; transform:none; }
+  .seg{ display:inline-flex; border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  .seg button{ border:0; background:#fff; padding:8px 14px; font-weight:700; font-size:13px; cursor:pointer; color:var(--ink2); }
+  .seg button.on{ background:var(--accent); color:#fff; }
+  .qmeta{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:12.5px; color:var(--ink2); }
+  .pbar{ height:7px; background:#e2e8f0; border-radius:999px; overflow:hidden; margin:8px 0 16px; }
+  .pbar > div{ height:100%; background:linear-gradient(90deg,#0d9488,#0ea5e9); transition:width .3s; }
+  .stem{ font-size:17px; font-weight:700; margin:2px 0 16px; }
+  .opts{ display:flex; flex-direction:column; gap:10px; }
+  .opt{ text-align:left; cursor:pointer; border:2px solid var(--line); background:#fff; border-radius:12px; padding:13px 15px; font-size:14.5px; display:flex; gap:10px; align-items:flex-start; transition:all .13s; }
+  .opt:hover{ border-color:var(--accent); background:#f0fdfa; }
+  .opt .key{ flex:0 0 auto; width:24px; height:24px; border-radius:7px; background:#f1f5f9; color:var(--ink2); font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; }
+  .opt.sel{ border-color:var(--accent2); background:#f0f9ff; }
+  .opt.correct{ border-color:var(--good); background:var(--goodbg); }
+  .opt.correct .key{ background:var(--good); color:#fff; }
+  .opt.wrong{ border-color:var(--bad); background:var(--badbg); }
+  .opt.wrong .key{ background:var(--bad); color:#fff; }
+  .opt.locked{ cursor:default; }
+  .expl{ margin-top:14px; border-left:4px solid var(--accent); background:#f0fdfa; border-radius:0 12px 12px 0; padding:12px 14px; font-size:13.5px; }
+  .expl b{ display:block; text-transform:uppercase; font-size:11px; letter-spacing:.05em; color:#0e7490; margin-bottom:3px; }
+  .nav{ display:flex; justify-content:space-between; gap:10px; margin-top:18px; }
+  .grid-nav{ display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+  .gn{ width:30px; height:30px; border-radius:8px; border:1px solid var(--line); background:#fff; font-size:12px; font-weight:700; cursor:pointer; color:var(--ink2); }
+  .gn.answered{ background:#ccfbf1; border-color:#5eead4; color:#0f766e; }
+  .gn.flag{ background:#fef3c7; border-color:#fcd34d; }
+  .gn.cur{ outline:2px solid var(--accent); }
+  .big{ font-size:40px; font-weight:900; letter-spacing:-.02em; }
+  .statgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:14px 0; }
+  .stat{ background:#f8fafc; border:1px solid var(--line); border-radius:12px; padding:12px; text-align:center; }
+  .stat .n{ font-size:24px; font-weight:900; }
+  .stat .l{ font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); }
+  .catbar{ display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+  .catbar .cb{ display:flex; align-items:center; gap:10px; font-size:12.5px; }
+  .catbar .cb .track{ flex:1; height:8px; background:#e2e8f0; border-radius:999px; overflow:hidden; }
+  .catbar .cb .track > div{ height:100%; background:#0d9488; }
+  .hidden{ display:none; }
+  .review-q{ border:1px solid var(--line); border-radius:12px; padding:14px; margin-top:12px; }
+  .review-q.ok{ border-left:4px solid var(--good); }
+  .review-q.no{ border-left:4px solid var(--bad); }
+  .tag{ font-size:11px; font-weight:800; padding:2px 8px; border-radius:6px; }
+  .tag.ok{ background:var(--goodbg); color:#166534; }
+  .tag.no{ background:var(--badbg); color:#991b1b; }
+  .timer{ font-variant-numeric:tabular-nums; font-weight:800; }
+  a.src{ color:var(--accent); text-decoration:none; font-weight:700; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <h1>Cardiac Emergencies</h1>
+    <p>Prehospital &amp; paramedic cardiac emergencies — 100 exam-style questions with worked explanations.</p>
+    <span class="pill">🎯 <span id="qcount">0</span> practice questions · Educational &amp; Test modes</span>
+  </div>
+
+  <!-- ===== MENU ===== -->
+  <div id="menu" class="card">
+    <h2 style="margin:2px 0 4px;font-size:18px;">Choose a study mode</h2>
+    <p style="margin:0 0 14px;color:var(--ink2);font-size:13.5px;">Every question has a worked explanation covering pathophysiology, assessment, management, pharmacology and complications.</p>
+    <div class="modes">
+      <div class="mode-btn" onclick="startEducational()">
+        <div class="emoji">📚</div>
+        <h3>Educational Mode</h3>
+        <p>Learn as you go. See the correct answer and a full explanation immediately after each question. Nothing is timed.</p>
+      </div>
+      <div class="mode-btn" onclick="openTestSetup()">
+        <div class="emoji">📝</div>
+        <h3>Test Mode</h3>
+        <p>Exam conditions — answer first, feedback later. Choose length and an optional timer, then review every answer with explanations at the end.</p>
+      </div>
+    </div>
+
+    <div id="testSetup" class="hidden" style="margin-top:16px;border-top:1px dashed var(--line);padding-top:16px;">
+      <div class="row" style="justify-content:space-between;">
+        <div>
+          <div style="font-size:12px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Number of questions</div>
+          <div class="seg" id="lenSeg">
+            <button data-len="25" class="on">25</button>
+            <button data-len="50">50</button>
+            <button data-len="100">All</button>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Timer</div>
+          <div class="seg" id="timerSeg">
+            <button data-t="0" class="on">Off</button>
+            <button data-t="1">1 min/Q</button>
+            <button data-t="2">1.5 min/Q</button>
+          </div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:14px;">
+        <label style="font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:6px;cursor:pointer;">
+          <input type="checkbox" id="shuffleChk" checked> Shuffle questions
+        </label>
+        <button class="btn" style="margin-left:auto;" onclick="startTest()">Start test →</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;box-shadow:none;background:#f8fafc;">
+      <div style="font-size:12px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Topics covered</div>
+      <div id="catBreakdown" class="catbar"></div>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <div id="quiz" class="card hidden">
+    <div class="qmeta">
+      <span class="row" style="gap:8px;">
+        <span class="chip" id="qcat">—</span>
+        <span id="qmode" style="font-weight:800;"></span>
+      </span>
+      <span class="row" style="gap:12px;">
+        <span id="qtimer" class="timer hidden">⏱ 00:00</span>
+        <span id="qprog">Q 1 / 1</span>
+        <span id="qscore" class="hidden" style="font-weight:800;color:var(--good);">Score 0</span>
+      </span>
+    </div>
+    <div class="pbar"><div id="pbarFill" style="width:0%"></div></div>
+    <div class="stem" id="stem">…</div>
+    <div class="opts" id="opts"></div>
+    <div id="expl" class="expl hidden"></div>
+    <div class="nav">
+      <button class="btn ghost" id="prevBtn" onclick="prevQ()">← Prev</button>
+      <button class="btn ghost hidden" id="flagBtn" onclick="toggleFlag()">⚑ Flag</button>
+      <button class="btn" id="nextBtn" onclick="nextQ()">Next →</button>
+      <button class="btn" id="submitBtn" onclick="submitTest()" style="background:#0f766e;display:none;">Submit test ✓</button>
+    </div>
+    <div id="gridNav" class="grid-nav hidden" style="margin-top:16px;"></div>
+    <div style="margin-top:14px;"><button class="btn ghost" onclick="backToMenu()" style="font-size:12px;padding:7px 12px;">✕ Exit to menu</button></div>
+  </div>
+
+  <!-- ===== RESULTS ===== -->
+  <div id="results" class="card hidden">
+    <h2 style="margin:0 0 4px;">Results</h2>
+    <div class="row" style="align-items:flex-end;gap:16px;">
+      <div class="big" id="scorePct">0%</div>
+      <div id="scoreVerdict" style="font-weight:800;font-size:15px;padding-bottom:8px;"></div>
+    </div>
+    <div class="statgrid">
+      <div class="stat"><div class="n" id="stCorrect">0</div><div class="l">Correct</div></div>
+      <div class="stat"><div class="n" id="stWrong">0</div><div class="l">Incorrect</div></div>
+      <div class="stat"><div class="n" id="stTotal">0</div><div class="l">Total</div></div>
+    </div>
+    <div style="font-size:12px;font-weight:800;text-transform:uppercase;color:var(--muted);margin:8px 0;">By topic</div>
+    <div id="resCats" class="catbar"></div>
+    <div class="row" style="margin:16px 0;">
+      <button class="btn" onclick="showReview()">📖 Review all answers</button>
+      <button class="btn ghost" onclick="backToMenu()">↺ Back to menu</button>
+    </div>
+    <div id="reviewList"></div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [{"cat": "Acute Coronary Syndrome", "q": "What is the underlying pathophysiology of most acute coronary syndromes?", "opts": ["Rupture or erosion of an atherosclerotic plaque with thrombus formation", "Coronary artery vasospasm without plaque", "Gradual fixed stenosis causing demand ischaemia only", "Embolism from an atrial myxoma"], "ans": 0, "exp": "Most ACS results from <b>plaque rupture/erosion</b> triggering platelet aggregation and thrombus. Fixed stenosis causes stable angina, not acute events; vasospasm (Prinzmetal) and emboli are rare causes."}, {"cat": "Acute Coronary Syndrome", "q": "A STEMI is distinguished from an NSTEMI primarily by:", "opts": ["Presence of chest pain", "ST-segment elevation on the 12-lead ECG", "Raised troponin", "A history of hypertension"], "ans": 1, "exp": "STEMI shows <b>ST-segment elevation</b> reflecting full-thickness ischaemia from a completely occluded artery. Troponin rises in both STEMI and NSTEMI; pain and hypertension are non-specific."}, {"cat": "Acute Coronary Syndrome", "q": "Which group most commonly presents with atypical or 'silent' myocardial infarction?", "opts": ["Young athletes", "Patients with asthma", "Elderly patients and people with diabetes", "Tall thin males"], "ans": 2, "exp": "<b>Elderly and diabetic</b> patients often have autonomic neuropathy and blunted pain, presenting with dyspnoea, syncope or confusion. The other groups are not classically associated with silent MI."}, {"cat": "Acute Coronary Syndrome", "q": "The correct adult dose of aspirin in suspected ACS is:", "opts": ["75 mg chewed", "150 mg IV", "600 mg swallowed whole", "300 mg chewed or dispersed orally"], "ans": 3, "exp": "<b>300 mg aspirin</b>, chewed or dispersed, gives rapid antiplatelet effect. 75 mg is the maintenance dose; aspirin is given orally not IV prehospital; 600 mg is not used."}, {"cat": "Acute Coronary Syndrome", "q": "Glyceryl trinitrate (GTN) relieves ischaemic chest pain mainly by:", "opts": ["Venodilation reducing preload and coronary dilation", "Increasing heart rate", "Positive inotropy", "Blocking beta receptors"], "ans": 0, "exp": "GTN causes <b>venodilation, lowering preload</b> and myocardial oxygen demand, plus some coronary dilation. It does not raise rate deliberately, is not an inotrope, and is not a beta-blocker."}, {"cat": "Acute Coronary Syndrome", "q": "GTN should be used with extreme caution or withheld in which situation?", "opts": ["Anterior STEMI with hypertension", "Inferior MI with suspected right ventricular involvement", "Stable angina", "Pulmonary oedema with high blood pressure"], "ans": 1, "exp": "In <b>RV infarction</b> the right ventricle is preload-dependent; GTN can cause catastrophic hypotension. The other scenarios generally tolerate or benefit from nitrates if BP allows."}, {"cat": "Acute Coronary Syndrome", "q": "In the mnemonic MONA, supplemental oxygen should now be:", "opts": ["Given to every chest pain patient at 15 L/min", "Withheld in all patients", "Titrated to maintain SpO2 94-98% only if hypoxic", "Given only if the patient smokes"], "ans": 2, "exp": "Current guidance gives oxygen <b>only if SpO2 is low</b>, targeting 94-98%. Routine high-flow oxygen in normoxic ACS may worsen outcomes; it is not withheld from hypoxic patients."}, {"cat": "Acute Coronary Syndrome", "q": "The definitive treatment for STEMI within the recommended time window is:", "opts": ["Oral beta-blocker", "Long-term statin", "Bed rest and analgesia", "Primary percutaneous coronary intervention (PPCI)"], "ans": 3, "exp": "<b>PPCI</b> mechanically reopens the occluded artery and is first-line where available. Beta-blockers and statins are important but not reperfusion; rest and analgesia do not restore flow."}, {"cat": "Acute Coronary Syndrome", "q": "A key prehospital reason to obtain an early 12-lead ECG in chest pain is to:", "opts": ["Identify STEMI and pre-alert a PPCI centre", "Measure blood pressure", "Diagnose pneumonia", "Assess blood glucose"], "ans": 0, "exp": "Early ECG allows <b>STEMI recognition and PPCI pre-alert</b>, shortening reperfusion time. It does not measure BP, glucose, or diagnose pneumonia."}, {"cat": "Acute Coronary Syndrome", "q": "Which symptom pattern is most typical of a classic myocardial infarction?", "opts": ["Sharp, well-localised pain worse on inspiration", "Central crushing chest pain radiating to the arm or jaw with sweating", "Burning epigastric pain relieved instantly by antacid", "Pain reproduced by chest wall palpation"], "ans": 1, "exp": "Classic MI is <b>central, heavy pain radiating to arm/jaw with diaphoresis</b>. Pleuritic, positional, or palpable pain suggests non-cardiac causes, though atypical MI still occurs."}, {"cat": "Acute Coronary Syndrome", "q": "A dangerous early complication of acute MI that can cause sudden death is:", "opts": ["Gastritis", "Costochondritis", "Ventricular fibrillation", "Panic attack"], "ans": 2, "exp": "<b>VF</b> is the leading cause of early MI death and is why continuous monitoring/defibrillation readiness is vital. The other options are benign non-cardiac conditions."}, {"cat": "Acute Coronary Syndrome", "q": "Ticagrelor or clopidogrel are given in ACS as:", "opts": ["An anticoagulant", "A thrombolytic", "An analgesic", "A second antiplatelet agent (dual antiplatelet therapy)"], "ans": 3, "exp": "They are <b>P2Y12 inhibitors</b> added to aspirin for dual antiplatelet therapy. They are not anticoagulants, clot-busters, or painkillers."}, {"cat": "Acute Coronary Syndrome", "q": "Unstable angina differs from NSTEMI in that unstable angina has:", "opts": ["A normal troponin (no myocardial necrosis)", "ST elevation", "A pathological Q wave", "Complete artery occlusion"], "ans": 0, "exp": "Unstable angina is ischaemia <b>without troponin rise</b>; NSTEMI has detectable necrosis. Neither shows persistent ST elevation, which defines STEMI."}, {"cat": "Acute Coronary Syndrome", "q": "Opioid analgesia (e.g. morphine) in ACS is indicated primarily to:", "opts": ["Dissolve the clot", "Relieve pain and reduce sympathetic drive/oxygen demand", "Raise the heart rate", "Reverse hypotension"], "ans": 1, "exp": "Morphine <b>relieves pain and lowers catecholamine-driven oxygen demand</b>. It has no thrombolytic action, tends to lower rate/BP, and can worsen hypotension."}, {"cat": "12-Lead ECG", "q": "ST elevation in leads V1-V4 indicates infarction of which wall, usually from which artery?", "opts": ["Inferior wall, right coronary artery", "Lateral wall, circumflex", "Anterior wall, left anterior descending (LAD)", "Posterior wall, posterior descending"], "ans": 2, "exp": "V1-V4 face the <b>anterior wall supplied by the LAD</b>. Inferior = II/III/aVF (RCA); lateral = I/aVL/V5-6 (circumflex)."}, {"cat": "12-Lead ECG", "q": "ST elevation in leads II, III and aVF represents:", "opts": ["Anterior MI", "High lateral MI", "Anteroseptal MI", "Inferior MI"], "ans": 3, "exp": "II, III and aVF are the <b>inferior leads</b>, usually RCA territory. Anterior is V1-V4, high lateral is I/aVL."}, {"cat": "12-Lead ECG", "q": "Reciprocal ST depression in leads II, III and aVF is often seen with which STEMI?", "opts": ["High lateral/anterolateral", "Inferior", "Posterior only", "Right ventricular"], "ans": 0, "exp": "<b>High lateral (I/aVL)</b> STEMI produces reciprocal inferior ST depression. Inferior MI itself may show reciprocal change in aVL, not in the inferior leads."}, {"cat": "12-Lead ECG", "q": "A patient with an inferior STEMI should also have which additional leads recorded?", "opts": ["Repeat aVR only", "Right-sided chest leads (e.g. V4R)", "Lead I doubled", "No extra leads needed"], "ans": 1, "exp": "<b>Right-sided leads (V4R)</b> detect RV infarction, which alters management (avoid nitrates, give fluids). The other options add no information."}, {"cat": "12-Lead ECG", "q": "Posterior MI is suggested on a standard 12-lead by:", "opts": ["ST elevation in V1-V3", "Deep Q waves in aVL", "Tall R waves and ST depression in V1-V3", "Peaked P waves"], "ans": 2, "exp": "Posterior injury appears as a mirror image: <b>ST depression with tall R waves in V1-V3</b>. Posterior leads (V7-V9) confirm true ST elevation."}, {"cat": "12-Lead ECG", "q": "In a patient with chest pain and new left bundle branch block (LBBB), you should:", "opts": ["Assume it is always benign", "Ignore the ECG entirely", "Wait for troponin before acting", "Treat as a STEMI-equivalent and consider Sgarbossa criteria"], "ans": 3, "exp": "New LBBB with ischaemic symptoms is a <b>STEMI-equivalent</b>; Sgarbossa criteria help identify MI within LBBB. Waiting or ignoring delays reperfusion."}, {"cat": "12-Lead ECG", "q": "Which finding is a component of the Sgarbossa criteria for MI in LBBB?", "opts": ["Concordant ST elevation >=1 mm in a lead with a positive QRS", "Any T wave inversion", "A wide QRS alone", "Sinus tachycardia"], "ans": 0, "exp": "<b>Concordant ST elevation >=1 mm</b> is the most specific Sgarbossa criterion. Wide QRS and secondary T changes are expected in LBBB and are not diagnostic."}, {"cat": "12-Lead ECG", "q": "Hyperacute T waves in early MI appear as:", "opts": ["Flattened T waves", "Tall, broad, symmetrical peaked T waves", "Inverted T waves only", "Absent T waves"], "ans": 1, "exp": "The earliest ECG change of MI is <b>tall, broad hyperacute T waves</b> before ST elevation develops. Flattening/inversion occur later or in other conditions."}, {"cat": "12-Lead ECG", "q": "Which leads represent the lateral wall of the left ventricle?", "opts": ["V1 and V2", "II, III, aVF", "I, aVL, V5 and V6", "aVR and V1"], "ans": 2, "exp": "<b>I, aVL, V5-V6</b> face the lateral wall (circumflex/diagonal). V1-V2 are septal/anterior, II/III/aVF inferior."}, {"cat": "12-Lead ECG", "q": "A normal QRS duration is:", "opts": ["200-300 ms", "Exactly 400 ms", "Greater than 160 ms", "Less than 120 ms (under 3 small squares)"], "ans": 3, "exp": "Normal QRS is <b>under 120 ms</b> (<3 small squares). A wider QRS suggests bundle branch block or a ventricular origin."}, {"cat": "12-Lead ECG", "q": "At standard paper speed, each small (1 mm) square represents:", "opts": ["0.04 seconds", "0.2 seconds", "0.1 seconds", "1 second"], "ans": 0, "exp": "Each small square is <b>0.04 s</b> (40 ms) and each large square 0.2 s at 25 mm/s. This underpins rate and interval measurement."}, {"cat": "12-Lead ECG", "q": "A quick way to estimate heart rate on the ECG is:", "opts": ["Count P waves in one square", "300 divided by the number of large squares between R waves", "Multiply QRS width by 10", "Count small squares in the PR interval"], "ans": 1, "exp": "The <b>300 rule</b> (300 / large squares between R-R) gives rate for regular rhythms. The other methods do not estimate rate."}, {"cat": "12-Lead ECG", "q": "ST elevation across many unrelated territories with PR depression more likely indicates:", "opts": ["Acute STEMI", "LBBB", "Pericarditis", "Hyperkalaemia"], "ans": 2, "exp": "<b>Widespread saddle-shaped ST elevation with PR depression</b> suggests pericarditis, not a single-artery STEMI. It is important not to misfire PPCI for pericarditis."}, {"cat": "Cardiac Arrest & ALS", "q": "Which two rhythms are shockable in cardiac arrest?", "opts": ["Asystole and PEA", "Sinus bradycardia and AF", "Atrial flutter and junctional rhythm", "Ventricular fibrillation and pulseless ventricular tachycardia"], "ans": 3, "exp": "<b>VF and pulseless VT</b> are shockable. Asystole and PEA are non-shockable and treated with CPR and adrenaline, not defibrillation."}, {"cat": "Cardiac Arrest & ALS", "q": "During adult CPR the recommended compression rate and depth are:", "opts": ["100-120/min, 5-6 cm", "80-90/min, 3 cm", "140/min, 2 cm", "60/min, 7 cm"], "ans": 0, "exp": "High-quality CPR is <b>100-120/min at 5-6 cm depth</b> with full recoil. Slower/shallower or excessively fast/deep compressions reduce perfusion."}, {"cat": "Cardiac Arrest & ALS", "q": "In a shockable rhythm, adrenaline should first be given:", "opts": ["Before the first shock", "After the third shock (once CPR resumed post-shock)", "Only at ROSC", "Never in shockable rhythms"], "ans": 1, "exp": "In VF/pVT, adrenaline 1 mg is given <b>after the 3rd shock</b>, then every 3-5 minutes. In non-shockable arrest it is given as soon as possible."}, {"cat": "Cardiac Arrest & ALS", "q": "Amiodarone in cardiac arrest is indicated:", "opts": ["For asystole", "For every PEA arrest", "After 3 shocks in refractory VF/pVT (300 mg IV)", "Only after ROSC"], "ans": 2, "exp": "<b>Amiodarone 300 mg</b> is given after the 3rd shock in refractory VF/pVT, with a further 150 mg after the 5th. It is not used for non-shockable rhythms."}, {"cat": "Cardiac Arrest & ALS", "q": "The dose of adrenaline in adult cardiac arrest is:", "opts": ["0.5 mg IV once", "1 mg IV every minute", "10 mg IV bolus", "1 mg IV/IO every 3-5 minutes"], "ans": 3, "exp": "Adrenaline is <b>1 mg (10 mL of 1:10,000) every 3-5 minutes</b>. Higher doses or every-minute dosing are not recommended."}, {"cat": "Cardiac Arrest & ALS", "q": "The 4 Hs of reversible cardiac arrest causes include:", "opts": ["Hypoxia, hypovolaemia, hypo/hyperkalaemia, hypothermia", "Hypertension, hyperlipidaemia, hunger, hearing loss", "Headache, hiccups, hernia, hypertrophy", "Hypoxia, hypertension, hypoglycaemia only"], "ans": 0, "exp": "The 4 Hs are <b>Hypoxia, Hypovolaemia, Hypo/Hyperkalaemia (and metabolic), Hypothermia</b>. The 4 Ts are Thrombosis, Tension pneumothorax, Tamponade, Toxins."}, {"cat": "Cardiac Arrest & ALS", "q": "The 4 Ts of reversible cardiac arrest causes are:", "opts": ["Tachycardia, tremor, thirst, tinnitus", "Thrombosis, tension pneumothorax, tamponade, toxins", "Trauma, tumour, TIA, thyroid", "Temperature, tiredness, tetany, tinnitus"], "ans": 1, "exp": "The 4 Ts are <b>Thrombosis (coronary/pulmonary), Tension pneumothorax, Tamponade, Toxins</b>. Recognising and treating these is essential in refractory arrest."}, {"cat": "Cardiac Arrest & ALS", "q": "In the ALS algorithm, how often is the rhythm reassessed during CPR?", "opts": ["Every 30 seconds", "Every 5 minutes", "Every 2 minutes", "Continuously without pausing"], "ans": 2, "exp": "Rhythm/pulse is checked at the end of each <b>2-minute CPR cycle</b>, minimising interruptions. More frequent checks reduce perfusion time."}, {"cat": "Cardiac Arrest & ALS", "q": "Immediately after delivering a shock you should:", "opts": ["Check the pulse for 10 seconds", "Give a second shock straight away", "Assess the airway first", "Resume chest compressions immediately for 2 minutes"], "ans": 3, "exp": "<b>Resume CPR immediately</b> after a shock without a pulse check; any rhythm change is assessed at the next 2-minute point. Pausing to check reduces coronary perfusion."}, {"cat": "Cardiac Arrest & ALS", "q": "A sign of return of spontaneous circulation (ROSC) during resuscitation is:", "opts": ["Sudden sustained rise in end-tidal CO2", "Flat capnography trace", "Loss of the ECG complexes", "Widening of the QRS"], "ans": 0, "exp": "A <b>sharp rise in ETCO2</b> reflects restored pulmonary blood flow and often heralds ROSC. A flat trace suggests no circulation or tube displacement."}, {"cat": "Cardiac Arrest & ALS", "q": "For an unmonitored adult in VF, the priority sequence is:", "opts": ["Adrenaline then intubation", "High-quality CPR and rapid defibrillation", "IV access before any compressions", "12-lead ECG before CPR"], "ans": 1, "exp": "In VF the outcome-critical actions are <b>early CPR and defibrillation</b>; drugs and airway come after. Delaying compressions for access or ECG worsens survival."}, {"cat": "Cardiac Arrest & ALS", "q": "In post-ROSC care, oxygen and ventilation should be targeted to:", "opts": ["SpO2 100% with hyperventilation", "Lowest possible SpO2", "SpO2 94-98% and normocapnia", "Deliberate hypoventilation"], "ans": 2, "exp": "Post-arrest, aim for <b>SpO2 94-98% and normal CO2</b>; hyperoxia and hypo/hypercapnia worsen brain injury. Deliberate hypoxia/hypoventilation is harmful."}, {"cat": "Cardiac Arrest & ALS", "q": "Recognition of cardiac arrest in an unresponsive patient is based on:", "opts": ["Presence of a weak radial pulse", "A recorded blood pressure", "Pupil size alone", "Absent or abnormal (agonal) breathing"], "ans": 3, "exp": "Arrest is diagnosed by <b>unresponsiveness with absent or agonal breathing</b>; agonal gasps must not delay CPR. Pulse checks are unreliable and pupils/BP are not primary criteria."}, {"cat": "Cardiac Arrest & ALS", "q": "Factors supporting a decision to stop resuscitation include:", "opts": ["Prolonged asystole unresponsive to ALS with no reversible cause", "Any brief pause in CPR", "Family presence at scene", "A single shock delivered"], "ans": 0, "exp": "Stopping is considered after <b>prolonged asystole despite full ALS with no reversible cause</b>. Pauses, family presence or a single shock are not stopping criteria."}, {"cat": "Arrhythmias", "q": "First-line treatment for a stable narrow-complex regular SVT after failed vagal manoeuvres is:", "opts": ["Amiodarone 300 mg", "Adenosine 6 mg rapid IV push", "Synchronised cardioversion", "Atropine 500 mcg"], "ans": 1, "exp": "<b>Adenosine 6 mg</b> (then 12 mg) is first-line for stable SVT after vagal manoeuvres. Cardioversion is for unstable patients; atropine treats bradycardia."}, {"cat": "Arrhythmias", "q": "If the initial 6 mg dose of adenosine fails to terminate an SVT, the next dose is:", "opts": ["6 mg again", "3 mg", "12 mg", "18 mg then 24 mg"], "ans": 2, "exp": "The adenosine sequence is <b>6 mg then 12 mg</b> (a further 12 mg may be considered per protocol). It is given as a rapid push with a saline flush."}, {"cat": "Arrhythmias", "q": "A patient with tachycardia showing shock, syncope, myocardial ischaemia or heart failure has:", "opts": ["No adverse features", "An indication for observation only", "An absolute indication for adenosine", "Adverse/life-threatening features requiring synchronised cardioversion"], "ans": 3, "exp": "These are the <b>adverse features</b>; an unstable tachycardic patient needs <b>synchronised DC cardioversion</b>. Drugs are reserved for stable patients."}, {"cat": "Arrhythmias", "q": "Broad-complex regular tachycardia in an adult should be assumed to be:", "opts": ["Ventricular tachycardia until proven otherwise", "SVT with aberrancy", "Sinus tachycardia", "Atrial flutter"], "ans": 0, "exp": "Treat broad-complex tachycardia as <b>VT until proven otherwise</b>, especially with cardiac history. Assuming SVT risks inappropriate/harmful treatment."}, {"cat": "Arrhythmias", "q": "Atropine for symptomatic bradycardia is given at a dose of:", "opts": ["3 mg IV once", "500 mcg IV, repeated to a maximum of 3 mg", "100 mcg IV", "6 mg IV push"], "ans": 1, "exp": "Atropine <b>500 mcg IV</b> may be repeated every 3-5 min to a <b>maximum of 3 mg</b>. 6 mg is the adenosine dose; 100 mcg is subtherapeutic."}, {"cat": "Arrhythmias", "q": "If atropine fails in unstable bradycardia, the next intervention is:", "opts": ["Adenosine", "Synchronised cardioversion", "Transcutaneous pacing (or adrenaline infusion)", "Beta-blocker"], "ans": 2, "exp": "When atropine is ineffective, use <b>transcutaneous pacing or an adrenaline infusion</b>. Adenosine/cardioversion treat tachyarrhythmias; beta-blockers worsen bradycardia."}, {"cat": "Arrhythmias", "q": "Which is an adverse (high-risk) feature in bradycardia?", "opts": ["Rate of 55/min with normal BP", "Isolated first-degree AV block", "Sinus arrhythmia", "Recent asystole or Mobitz II/complete heart block"], "ans": 3, "exp": "<b>Recent asystole, Mobitz II, complete heart block or ventricular pauses >3 s</b> mark high risk. A well-tolerated rate of 55, first-degree block and sinus arrhythmia are benign."}, {"cat": "Arrhythmias", "q": "Atrial fibrillation is characterised on the ECG by:", "opts": ["An irregularly irregular rhythm with absent P waves", "Regular P waves before each QRS", "A sawtooth baseline", "A fixed PR interval"], "ans": 0, "exp": "AF is <b>irregularly irregular with no discrete P waves</b>. Sawtooth waves indicate atrial flutter; regular P waves and fixed PR occur in sinus rhythm."}, {"cat": "Arrhythmias", "q": "Atrial flutter classically shows:", "opts": ["Absent atrial activity", "Sawtooth flutter waves, often at an atrial rate around 300/min", "Irregularly irregular rhythm", "Delta waves"], "ans": 1, "exp": "Flutter shows <b>sawtooth waves near 300/min</b>, often conducting 2:1 to a ventricular rate of ~150. Delta waves indicate pre-excitation (WPW)."}, {"cat": "Arrhythmias", "q": "Complete (third-degree) heart block is defined by:", "opts": ["A prolonged but constant PR interval", "Progressive PR lengthening then a dropped beat", "Complete AV dissociation (P waves and QRS independent)", "A normal PR with occasional dropped beats"], "ans": 2, "exp": "Third-degree block is <b>complete AV dissociation</b>. Constant long PR is first-degree; progressive lengthening is Mobitz I (Wenckebach)."}, {"cat": "Arrhythmias", "q": "Torsades de pointes is a form of polymorphic VT associated with:", "opts": ["A short PR interval", "A delta wave", "First-degree AV block", "A prolonged QT interval"], "ans": 3, "exp": "Torsades arises on a background of <b>long QT</b> and may respond to IV magnesium. It is not linked to short PR, delta waves or first-degree block."}, {"cat": "Arrhythmias", "q": "Which is the correct energy approach for defibrillating adult VF with a biphasic device?", "opts": ["Around 150-200 J biphasic", "Always 360 J monophasic", "20 J synchronised", "1 J/kg"], "ans": 0, "exp": "Adult VF/pVT is defibrillated at <b>150-200 J biphasic</b> (per manufacturer) escalating as needed. 360 J is a monophasic value; 20 J synchronised is for some cardioversions."}, {"cat": "Arrhythmias", "q": "A vagal manoeuvre used to attempt termination of stable SVT is:", "opts": ["Trendelenburg tilt", "The modified Valsalva manoeuvre", "Rapid fluid bolus", "Hyperventilation"], "ans": 1, "exp": "The <b>modified Valsalva</b> (strain then leg raise) increases vagal tone and can terminate SVT. Positioning, fluids and hyperventilation are not vagal manoeuvres."}, {"cat": "Heart Failure & Pulmonary Oedema", "q": "The classic auscultation finding in acute cardiogenic pulmonary oedema is:", "opts": ["Unilateral bronchial breathing", "Absent breath sounds one side", "Bilateral fine inspiratory crackles", "Expiratory wheeze only"], "ans": 2, "exp": "Pulmonary oedema causes <b>bilateral fine crackles</b> from alveolar fluid, sometimes with frothy sputum. Unilateral or absent sounds suggest pneumonia/pneumothorax."}, {"cat": "Heart Failure & Pulmonary Oedema", "q": "The optimal position for a conscious patient with acute pulmonary oedema is:", "opts": ["Flat supine", "Left lateral recovery", "Trendelenburg (head down)", "Sitting upright"], "ans": 3, "exp": "<b>Sitting upright</b> reduces venous return and improves ventilation. Lying flat or head-down worsens dyspnoea and oxygenation."}, {"cat": "Heart Failure & Pulmonary Oedema", "q": "CPAP helps acute pulmonary oedema mainly by:", "opts": ["Forcing fluid out of alveoli and reducing work of breathing", "Increasing preload", "Causing bronchoconstriction", "Lowering oxygen delivery"], "ans": 0, "exp": "CPAP <b>recruits alveoli, drives fluid back into circulation and cuts the work of breathing</b>, also reducing preload/afterload. It improves, not reduces, oxygenation."}, {"cat": "Heart Failure & Pulmonary Oedema", "q": "GTN in hypertensive acute pulmonary oedema is beneficial because it:", "opts": ["Raises preload", "Reduces preload and afterload, easing pulmonary congestion", "Slows the heart", "Reverses hypoxia directly"], "ans": 1, "exp": "GTN <b>reduces preload and afterload</b>, relieving pulmonary congestion when BP is adequate. It should be avoided if the patient is hypotensive."}, {"cat": "Heart Failure & Pulmonary Oedema", "q": "A contraindication to CPAP in pulmonary oedema is:", "opts": ["Alert cooperative patient", "Mild tachypnoea", "Reduced consciousness with inability to protect the airway", "Adequate blood pressure"], "ans": 2, "exp": "CPAP needs a <b>conscious, cooperative patient who can protect their airway</b>; obtundation, vomiting or hypotension are contraindications."}, {"cat": "Heart Failure & Pulmonary Oedema", "q": "Acute left ventricular failure most commonly causes which type of oedema?", "opts": ["Peripheral ankle oedema", "Ascites", "Facial oedema", "Pulmonary (lung) oedema"], "ans": 3, "exp": "Acute LV failure backs pressure into the lungs causing <b>pulmonary oedema</b>. Chronic right heart failure causes peripheral oedema and ascites."}, {"cat": "Heart Failure & Pulmonary Oedema", "q": "A patient in acute pulmonary oedema who becomes hypotensive with cool peripheries is likely developing:", "opts": ["Cardiogenic shock", "Simple anxiety", "Dehydration", "Hyperventilation syndrome"], "ans": 0, "exp": "Pump failure plus hypotension and poor perfusion signals <b>cardiogenic shock</b>, a high-mortality state. Anxiety and hyperventilation do not cause hypoperfusion."}, {"cat": "Heart Failure & Pulmonary Oedema", "q": "Which prehospital finding best supports a cardiac (rather than respiratory) cause of acute breathlessness?", "opts": ["Prolonged expiratory wheeze and history of COPD", "Orthopnoea, PND and pink frothy sputum", "Fever and green sputum", "Pleuritic pain with recent immobility"], "ans": 1, "exp": "<b>Orthopnoea, paroxysmal nocturnal dyspnoea and frothy sputum</b> point to cardiogenic pulmonary oedema. The others suggest COPD, pneumonia or PE."}, {"cat": "Heart Failure & Pulmonary Oedema", "q": "Frothy pink-tinged sputum in a breathless patient suggests:", "opts": ["Pneumonia", "Asthma", "Pulmonary oedema", "Pulmonary embolism"], "ans": 2, "exp": "<b>Pink frothy sputum</b> is characteristic of alveolar pulmonary oedema. Purulent sputum suggests infection; PE and asthma do not typically produce it."}, {"cat": "Heart Failure & Pulmonary Oedema", "q": "Which vital-sign pattern is typical of severe acute pulmonary oedema before decompensation?", "opts": ["Low BP and bradycardia", "Normal everything", "Bradypnoea with high SpO2", "Hypertension, tachycardia, tachypnoea and falling SpO2"], "ans": 3, "exp": "Early severe pulmonary oedema often shows <b>high BP, tachycardia, tachypnoea and hypoxia</b>. Hypotension/bradycardia is a late, ominous decompensated sign."}, {"cat": "Heart Failure & Pulmonary Oedema", "q": "The single most useful prehospital intervention (with oxygen/GTN) for a hypoxic, distressed pulmonary oedema patient is often:", "opts": ["CPAP", "High-dose opioid sedation", "Lying the patient flat", "Rapid IV fluids"], "ans": 0, "exp": "<b>CPAP</b> rapidly improves oxygenation and work of breathing. Heavy sedation, lying flat and fluid boluses can all worsen the situation."}, {"cat": "Heart Failure & Pulmonary Oedema", "q": "Why are large IV fluid boluses generally harmful in cardiogenic pulmonary oedema?", "opts": ["They dilute the blood", "They increase preload and worsen pulmonary congestion", "They cause hypernatraemia", "They lower the heart rate"], "ans": 1, "exp": "Extra fluid <b>raises preload and floods the already congested lungs</b>. The failing left ventricle cannot handle the load, worsening oedema."}, {"cat": "Cardiogenic Shock & Mechanical", "q": "Cardiogenic shock is best defined as:", "opts": ["Hypotension from blood loss", "High-output vasodilated state", "Inadequate tissue perfusion due to primary cardiac pump failure", "Shock from anaphylaxis"], "ans": 2, "exp": "Cardiogenic shock is <b>tissue hypoperfusion from pump failure</b>, often post-MI. Haemorrhage causes hypovolaemic shock; anaphylaxis is distributive."}, {"cat": "Cardiogenic Shock & Mechanical", "q": "In right ventricular infarction with hypotension, the appropriate initial management is:", "opts": ["GTN and diuretics", "High-dose morphine", "Immediate diuresis", "Cautious IV fluid boluses and avoid nitrates"], "ans": 3, "exp": "The preload-dependent RV needs <b>fluids, and nitrates/diuretics must be avoided</b> as they drop preload and cause severe hypotension."}, {"cat": "Cardiogenic Shock & Mechanical", "q": "Beck's triad, indicating cardiac tamponade, consists of:", "opts": ["Hypotension, muffled heart sounds and raised JVP", "Hypertension, bradycardia and irregular breathing", "Fever, rash and hypotension", "Chest pain, sweating and vomiting"], "ans": 0, "exp": "Beck's triad is <b>hypotension, muffled heart sounds and distended neck veins</b>. Cushing's triad (hypertension/bradycardia) relates to raised ICP."}, {"cat": "Cardiogenic Shock & Mechanical", "q": "Pulsus paradoxus (an exaggerated fall in BP on inspiration) is a feature of:", "opts": ["Aortic dissection", "Cardiac tamponade", "Simple faint", "First-degree heart block"], "ans": 1, "exp": "<b>Pulsus paradoxus</b> occurs in tamponade (and severe asthma) due to impaired ventricular filling. It is not typical of dissection or vasovagal syncope."}, {"cat": "Cardiogenic Shock & Mechanical", "q": "A tearing chest pain radiating to the back with a blood-pressure difference between arms suggests:", "opts": ["Simple muscular strain", "Reflux oesophagitis", "Acute aortic dissection", "Panic disorder"], "ans": 2, "exp": "<b>Aortic dissection</b> gives tearing interscapular pain and inter-arm BP differences; it can extend to occlude coronaries or cause tamponade. The others do not cause these signs."}, {"cat": "Cardiogenic Shock & Mechanical", "q": "Why must aortic dissection be excluded before giving thrombolysis for a suspected STEMI?", "opts": ["Thrombolytics raise blood pressure", "It slows the heart dangerously", "It has no clinical relevance", "Thrombolysis can cause catastrophic bleeding/extension of the dissection"], "ans": 3, "exp": "Giving clot-busters in dissection can cause <b>fatal haemorrhage or dissection extension</b>. Dissection is an absolute contraindication to thrombolysis."}, {"cat": "Cardiogenic Shock & Mechanical", "q": "A new harsh pansystolic murmur days after MI with acute deterioration suggests:", "opts": ["A mechanical complication such as papillary muscle/VSD rupture", "Simple anxiety", "Pericarditis", "Stable angina"], "ans": 0, "exp": "Post-MI, a new loud systolic murmur with collapse suggests <b>papillary muscle rupture or ventricular septal defect</b>, both life-threatening mechanical complications."}, {"cat": "Cardiogenic Shock & Mechanical", "q": "The most common overall cause of cardiogenic shock is:", "opts": ["Simple dehydration", "Acute MI with extensive left ventricular damage", "Vasovagal syncope", "Panic attack"], "ans": 1, "exp": "<b>Large MI with LV pump failure</b> is the leading cause of cardiogenic shock. The other options do not impair the pump."}, {"cat": "Cardiogenic Shock & Mechanical", "q": "Which sign indicates poor tissue perfusion in shock?", "opts": ["Warm dry flushed skin", "Bounding pulses", "Cool, mottled skin with prolonged capillary refill", "Slow deep sighing breathing at rest"], "ans": 2, "exp": "<b>Cool, mottled skin and prolonged capillary refill</b> reflect compensatory vasoconstriction and hypoperfusion. Warm flushed skin suggests distributive states."}, {"cat": "Cardiogenic Shock & Mechanical", "q": "Definitive management of significant cardiac tamponade is:", "opts": ["Fluid restriction", "Beta-blockade", "Oral analgesia", "Pericardiocentesis/drainage of the effusion"], "ans": 3, "exp": "Tamponade requires <b>drainage (pericardiocentesis)</b> to relieve compression; prehospital care supports circulation and expedites transfer. Drugs alone do not fix it."}, {"cat": "Cardiogenic Shock & Mechanical", "q": "A patient with an inferior STEMI who becomes profoundly hypotensive after a single GTN spray most likely has:", "opts": ["Right ventricular infarction", "Anxiety", "A vasovagal faint", "Aortic stenosis"], "ans": 0, "exp": "Profound hypotension after GTN in inferior MI strongly suggests <b>RV infarction</b>, where nitrate-induced preload loss is poorly tolerated. Reverse with fluids."}, {"cat": "Pharmacology", "q": "Aspirin exerts its antiplatelet effect by:", "opts": ["Blocking beta receptors", "Irreversibly inhibiting cyclo-oxygenase and thromboxane A2", "Dissolving fibrin", "Blocking calcium channels"], "ans": 1, "exp": "Aspirin <b>irreversibly inhibits COX, reducing thromboxane A2</b> and platelet aggregation. It is not a beta-blocker, thrombolytic or calcium blocker."}, {"cat": "Pharmacology", "q": "A common prehospital dose/route of GTN for cardiac chest pain is:", "opts": ["10 mg IV bolus", "1 g orally", "400-800 mcg sublingual spray, BP permitting", "5 mcg sublingual"], "ans": 2, "exp": "GTN is given <b>sublingually (400-800 mcg spray)</b> if systolic BP is adequate. IV/gram doses are not prehospital first-line and 5 mcg is subtherapeutic."}, {"cat": "Pharmacology", "q": "Adenosine works by:", "opts": ["Increasing AV conduction", "Directly cardioverting VF", "Causing sustained tachycardia", "Blocking the AV node briefly to interrupt re-entrant SVT"], "ans": 3, "exp": "Adenosine causes <b>transient AV nodal block</b>, terminating re-entrant SVT. It briefly slows/blocks conduction; it does not treat VF."}, {"cat": "Pharmacology", "q": "A key warning to give a patient before administering adenosine is that they may experience:", "opts": ["A brief but very unpleasant sensation of chest tightness/flushing/impending doom", "No effects at all", "Permanent paralysis", "Prolonged blindness"], "ans": 0, "exp": "Adenosine causes a short-lived but distressing <b>flushing, chest tightness and sense of doom</b> due to a transient pause; it resolves within seconds owing to its very short half-life."}, {"cat": "Pharmacology", "q": "Amiodarone is classified principally as which type of antiarrhythmic action?", "opts": ["Pure beta-agonist", "Predominantly potassium-channel blocker prolonging repolarisation", "Sodium-bicarbonate buffer", "Calcium supplement"], "ans": 1, "exp": "Amiodarone mainly <b>blocks potassium channels, prolonging the action potential/QT</b>, with multi-class effects. It is not a beta-agonist, buffer or calcium salt."}, {"cat": "Pharmacology", "q": "Atropine treats bradycardia by:", "opts": ["Stimulating the vagus nerve", "Blocking beta receptors", "Blocking vagal (muscarinic) tone to increase heart rate", "Prolonging the QT"], "ans": 2, "exp": "Atropine is an <b>antimuscarinic that blocks vagal tone</b>, raising the heart rate. It opposes, not stimulates, the vagus."}, {"cat": "Pharmacology", "q": "The concentration of adrenaline used for IV cardiac arrest dosing is:", "opts": ["1:1000 (1 mg/mL)", "1:100", "Undiluted 10 mg/mL", "1:10,000 (1 mg in 10 mL)"], "ans": 3, "exp": "IV/IO arrest adrenaline is <b>1 mg in 10 mL (1:10,000)</b>. The 1:1000 (1 mg/mL) preparation is used for IM anaphylaxis dosing."}, {"cat": "Pharmacology", "q": "Which is an absolute contraindication to prehospital thrombolysis?", "opts": ["Recent haemorrhagic stroke or active internal bleeding", "Controlled hypertension", "Age over 60", "Diabetes"], "ans": 0, "exp": "<b>Recent haemorrhagic stroke or active bleeding</b> are absolute contraindications to fibrinolysis. Age, diabetes and controlled BP are not absolute bars."}, {"cat": "Pharmacology", "q": "Morphine's important adverse effects relevant to ACS include:", "opts": ["Hypertension and tachycardia", "Respiratory depression, hypotension and nausea/vomiting", "Hyperthermia and seizures", "Bronchospasm reliably"], "ans": 1, "exp": "Morphine can cause <b>respiratory depression, hypotension and nausea</b>; monitor closely and consider an antiemetic. It typically lowers, not raises, BP and rate."}, {"cat": "Pharmacology", "q": "Ticagrelor and clopidogrel both act by:", "opts": ["Inhibiting COX like aspirin", "Blocking thrombin directly", "Inhibiting the platelet P2Y12 ADP receptor", "Activating plasminogen"], "ans": 2, "exp": "They are <b>P2Y12 receptor inhibitors</b>, complementing aspirin's COX blockade. They are not COX inhibitors, thrombin blockers or thrombolytics."}, {"cat": "Pharmacology", "q": "GTN should be withheld if a patient has taken which medication within the last 24-48 hours?", "opts": ["Paracetamol", "Aspirin", "Metformin", "A phosphodiesterase-5 inhibitor (e.g. sildenafil)"], "ans": 3, "exp": "PDE-5 inhibitors (e.g. <b>sildenafil</b>) plus nitrates can cause profound, dangerous hypotension. Paracetamol, aspirin and metformin do not interact this way."}, {"cat": "Pharmacology", "q": "The maximum total dose of atropine in adult bradycardia is:", "opts": ["3 mg", "1 mg", "6 mg", "10 mg"], "ans": 0, "exp": "The maximum atropine dose in bradycardia is <b>3 mg</b> (500 mcg increments). Beyond this, pacing or catecholamine infusions are indicated."}, {"cat": "Assessment & Resus Priorities", "q": "The correct order of a primary survey is:", "opts": ["Disability, Breathing, Airway", "Airway, Breathing, Circulation, Disability, Exposure", "Circulation first, then Airway", "Exposure, Disability, Circulation"], "ans": 1, "exp": "The primary survey follows <b>ABCDE</b> to find and treat life threats in order of lethality. Reordering risks missing a more immediately fatal problem."}, {"cat": "Assessment & Resus Priorities", "q": "A red-flag feature in chest pain that increases concern for a serious cardiac cause is:", "opts": ["Pain reproduced by palpation", "Sharp pain lasting 2 seconds", "Associated diaphoresis, breathlessness and radiation to the arm/jaw", "Pain only on swallowing"], "ans": 2, "exp": "<b>Diaphoresis, dyspnoea and radiation</b> raise suspicion of ACS. Positional, palpable, fleeting or swallowing-related pain more often has non-cardiac causes."}, {"cat": "Assessment & Resus Priorities", "q": "Which mnemonic is commonly used to structure a focused pain history?", "opts": ["AVPU", "GCS", "APGAR", "SOCRATES"], "ans": 3, "exp": "<b>SOCRATES</b> (Site, Onset, Character, Radiation, Associations, Time, Exacerbating/relieving, Severity) structures pain assessment. AVPU/GCS assess consciousness; APGAR is neonatal."}, {"cat": "Assessment & Resus Priorities", "q": "The main reason to place a chest pain patient on continuous ECG monitoring is to:", "opts": ["Detect life-threatening arrhythmias early", "Measure temperature", "Assess blood glucose", "Record respiratory rate"], "ans": 0, "exp": "Continuous monitoring lets you <b>catch malignant arrhythmias (e.g. VF) immediately</b>. It does not measure temperature, glucose or respiratory rate."}, {"cat": "Assessment & Resus Priorities", "q": "When peripheral IV access fails in a peri-arrest cardiac patient, the recommended alternative is:", "opts": ["Delay all drugs until hospital", "Intraosseous (IO) access", "Oral medication", "Subcutaneous injection"], "ans": 1, "exp": "<b>Intraosseous access</b> provides rapid, reliable drug/fluid delivery when IV fails. Oral/subcutaneous routes are too slow/unreliable in arrest."}, {"cat": "Assessment & Resus Priorities", "q": "A prehospital pre-alert to a PPCI/heart-attack centre is most appropriate for:", "opts": ["Stable atypical chest pain with a normal ECG", "Simple palpitations resolved", "A confirmed STEMI on the 12-lead ECG", "Musculoskeletal chest wall pain"], "ans": 2, "exp": "A <b>confirmed STEMI</b> warrants a pre-alert to activate the cath lab and minimise reperfusion delay. The other presentations do not need time-critical PPCI activation."}, {"cat": "Assessment & Resus Priorities", "q": "Which differential should always be considered in acute severe chest pain besides ACS?", "opts": ["Common cold", "Migraine", "Conjunctivitis", "Aortic dissection and pulmonary embolism"], "ans": 3, "exp": "Life-threatening chest pain differentials include <b>aortic dissection, PE, tension pneumothorax and tamponade</b>. The other options are not causes of acute chest pain."}, {"cat": "Assessment & Resus Priorities", "q": "Cardiac-relevant elements of a focused history include:", "opts": ["Previous MI/angina, cardiac risk factors and current medications", "Favourite foods", "Shoe size", "Recent holidays only"], "ans": 0, "exp": "Relevant history covers <b>prior cardiac events, risk factors (smoking, diabetes, hypertension, family history) and medications</b>. The other items are not clinically useful."}, {"cat": "Assessment & Resus Priorities", "q": "In the ABCDE approach, a patient who is talking in full sentences has:", "opts": ["A definitely obstructed airway", "At least a currently patent airway", "No need for any assessment", "Confirmed normal circulation"], "ans": 1, "exp": "Speaking in full sentences confirms a <b>patent airway at that moment</b>, but reassessment continues. It does not confirm normal breathing or circulation."}, {"cat": "Assessment & Resus Priorities", "q": "Why is early blood glucose measurement useful in a collapsed cardiac patient?", "opts": ["It confirms STEMI", "It measures cardiac output", "Hypoglycaemia can mimic or complicate cardiac presentations and is rapidly treatable", "It replaces the ECG"], "ans": 2, "exp": "<b>Hypoglycaemia</b> can cause collapse, confusion or arrhythmia-like presentations and is quickly reversible, so it is checked early (Disability). It neither confirms STEMI nor replaces the ECG."}, {"cat": "Assessment & Resus Priorities", "q": "During transport of a high-risk ACS patient, the crew should ensure:", "opts": ["No monitoring to avoid alarms", "The patient walks to the ambulance", "Oxygen at 15 L/min regardless of SpO2", "Defibrillator/monitor immediately available and IV access secured"], "ans": 3, "exp": "High-risk ACS patients must travel with <b>continuous monitoring, a defibrillator to hand and IV access</b>. Walking a STEMI patient or removing monitoring is dangerous, and oxygen is titrated to SpO2."}];
+
+/* ---------- state ---------- */
+var order=[], idx=0, mode='edu', answers={}, flags={}, locked={}, timerId=null, timeLeft=0, timerPerQ=0;
+
+function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor((i+1)*pseudo(i)); var t=a[i]; a[i]=a[j]; a[j]=t;} return a; }
+/* deterministic-ish shuffle without Math.random dependency issues */
+var _seed = (QUESTIONS.length*7919 + 17)%233280;
+function pseudo(){ _seed=(_seed*9301+49297)%233280; return _seed/233280; }
+
+function byCat(){ var m={}; QUESTIONS.forEach(function(q){ m[q.cat]=(m[q.cat]||0)+1; }); return m; }
+
+function renderCatBreakdown(el){
+  var m=byCat(), max=0; Object.keys(m).forEach(function(k){ if(m[k]>max) max=m[k]; });
+  el.innerHTML = Object.keys(m).sort(function(a,b){return m[b]-m[a];}).map(function(k){
+    return '<div class="cb"><span style="min-width:150px;font-weight:700;">'+k+'</span><span class="track"><div style="width:'+Math.round(m[k]/max*100)+'%"></div></span><span style="color:var(--muted);">'+m[k]+'</span></div>';
+  }).join('');
+}
+
+/* ---------- start ---------- */
+function startEducational(){ mode='edu'; order=QUESTIONS.map(function(_,i){return i;}); idx=0; answers={}; locked={}; beginQuiz(); }
+function openTestSetup(){ document.getElementById('testSetup').classList.toggle('hidden'); }
+function startTest(){
+  mode='test';
+  var len=parseInt(document.querySelector('#lenSeg .on').dataset.len,10);
+  var sh=document.getElementById('shuffleChk').checked;
+  var base=QUESTIONS.map(function(_,i){return i;});
+  if(sh) base=shuffle(base);
+  order=base.slice(0, Math.min(len, QUESTIONS.length));
+  var tsel=parseInt(document.querySelector('#timerSeg .on').dataset.t,10);
+  timerPerQ = tsel===1?60 : tsel===2?90 : 0;
+  idx=0; answers={}; flags={}; locked={};
+  beginQuiz();
+  if(timerPerQ>0){ timeLeft=timerPerQ*order.length; document.getElementById('qtimer').classList.remove('hidden'); tick(); timerId=setInterval(tick,1000); }
+}
+function tick(){
+  var m=Math.floor(timeLeft/60), s=timeLeft%60;
+  document.getElementById('qtimer').textContent='⏱ '+(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  if(timeLeft<=0){ clearInterval(timerId); submitTest(); return; }
+  timeLeft--;
+}
+
+function beginQuiz(){
+  document.getElementById('menu').classList.add('hidden');
+  document.getElementById('results').classList.add('hidden');
+  document.getElementById('quiz').classList.remove('hidden');
+  document.getElementById('qmode').textContent = mode==='edu'?'📚 Educational':'📝 Test';
+  document.getElementById('qscore').classList.toggle('hidden', mode!=='edu');
+  document.getElementById('flagBtn').classList.toggle('hidden', mode!=='test');
+  document.getElementById('gridNav').classList.toggle('hidden', mode!=='test');
+  if(mode==='test') buildGridNav();
+  renderQ();
+}
+
+function buildGridNav(){
+  var g=document.getElementById('gridNav');
+  g.innerHTML=order.map(function(_,i){ return '<button class="gn" id="gn'+i+'" onclick="jump('+i+')">'+(i+1)+'</button>'; }).join('');
+}
+function jump(i){ idx=i; renderQ(); }
+
+function renderQ(){
+  var qi=order[idx], q=QUESTIONS[qi];
+  document.getElementById('qcat').textContent=q.cat;
+  document.getElementById('qprog').textContent='Q '+(idx+1)+' / '+order.length;
+  document.getElementById('pbarFill').style.width=Math.round((idx+1)/order.length*100)+'%';
+  document.getElementById('stem').textContent=q.q;
+  var isLocked = mode==='edu' && locked[qi];
+  var opts=document.getElementById('opts'); opts.innerHTML='';
+  q.opts.forEach(function(text,oi){
+    var b=document.createElement('button'); b.className='opt';
+    var chosen = answers[qi];
+    if(mode==='test' && chosen===oi) b.className+=' sel';
+    if(isLocked){
+      b.className+=' locked';
+      if(oi===q.ans) b.className+=' correct';
+      else if(chosen===oi) b.className+=' wrong';
+    }
+    b.innerHTML='<span class="key">'+String.fromCharCode(65+oi)+'</span><span>'+text+'</span>';
+    b.onclick=function(){ choose(oi); };
+    opts.appendChild(b);
+  });
+  var expl=document.getElementById('expl');
+  if(isLocked){ expl.classList.remove('hidden'); expl.innerHTML='<b>Explanation</b>'+q.exp; }
+  else expl.classList.add('hidden');
+  if(mode==='edu'){
+    var sc=Object.keys(locked).reduce(function(a,k){ return a+(answers[k]===QUESTIONS[k].ans?1:0); },0);
+    document.getElementById('qscore').textContent='Score '+sc;
+  }
+  document.getElementById('prevBtn').disabled = idx===0;
+  var last = idx===order.length-1;
+  document.getElementById('nextBtn').style.display = (mode==='test' && last)?'none':'inline-block';
+  document.getElementById('submitBtn').style.display = (mode==='test' && last)?'inline-block':'none';
+  var fb=document.getElementById('flagBtn'); if(mode==='test'){ fb.textContent = flags[qi]?'⚑ Flagged':'⚑ Flag'; }
+  if(mode==='test'){ var gn=document.getElementById('gn'+idx); if(gn){ document.querySelectorAll('.gn').forEach(function(x){x.classList.remove('cur');}); gn.classList.add('cur'); } }
+}
+
+function choose(oi){
+  var qi=order[idx];
+  if(mode==='edu'){
+    if(locked[qi]) return;
+    answers[qi]=oi; locked[qi]=true; renderQ();
+  } else {
+    answers[qi]=oi;
+    var gn=document.getElementById('gn'+idx); if(gn) gn.classList.add('answered');
+    renderQ();
+  }
+}
+function toggleFlag(){ var qi=order[idx]; flags[qi]=!flags[qi]; var gn=document.getElementById('gn'+idx); if(gn) gn.classList.toggle('flag', !!flags[qi]); renderQ(); }
+function nextQ(){ if(idx<order.length-1){ idx++; renderQ(); } }
+function prevQ(){ if(idx>0){ idx--; renderQ(); } }
+
+function backToMenu(){
+  if(timerId){ clearInterval(timerId); timerId=null; }
+  document.getElementById('qtimer').classList.add('hidden');
+  document.getElementById('quiz').classList.add('hidden');
+  document.getElementById('results').classList.add('hidden');
+  document.getElementById('menu').classList.remove('hidden');
+}
+
+function submitTest(){
+  if(timerId){ clearInterval(timerId); timerId=null; }
+  document.getElementById('qtimer').classList.add('hidden');
+  var correct=0, catStat={};
+  order.forEach(function(qi){
+    var q=QUESTIONS[qi]; var ok=answers[qi]===q.ans; if(ok) correct++;
+    catStat[q.cat]=catStat[q.cat]||{c:0,t:0}; catStat[q.cat].t++; if(ok) catStat[q.cat].c++;
+  });
+  var total=order.length, pct=Math.round(correct/total*100);
+  document.getElementById('quiz').classList.add('hidden');
+  var r=document.getElementById('results'); r.classList.remove('hidden');
+  document.getElementById('scorePct').textContent=pct+'%';
+  var v=document.getElementById('scoreVerdict');
+  if(pct>=80){ v.textContent='🏆 Excellent — exam-ready'; v.style.color='var(--good)'; }
+  else if(pct>=60){ v.textContent='👍 Solid — review the misses'; v.style.color='var(--warn)'; }
+  else { v.textContent='📚 Keep studying — revisit the topics below'; v.style.color='var(--bad)'; }
+  document.getElementById('stCorrect').textContent=correct;
+  document.getElementById('stWrong').textContent=total-correct;
+  document.getElementById('stTotal').textContent=total;
+  var max=0; Object.keys(catStat).forEach(function(k){ if(catStat[k].t>max) max=catStat[k].t; });
+  document.getElementById('resCats').innerHTML=Object.keys(catStat).sort().map(function(k){
+    var cs=catStat[k], p=Math.round(cs.c/cs.t*100);
+    return '<div class="cb"><span style="min-width:150px;font-weight:700;">'+k+'</span><span class="track"><div style="width:'+p+'%;background:'+(p>=60?'#16a34a':'#dc2626')+'"></div></span><span style="color:var(--muted);">'+cs.c+'/'+cs.t+'</span></div>';
+  }).join('');
+  document.getElementById('reviewList').innerHTML='';
+}
+
+function showReview(){
+  var host=document.getElementById('reviewList');
+  host.innerHTML='<div style="font-size:12px;font-weight:800;text-transform:uppercase;color:var(--muted);margin:14px 0 4px;">Full review</div>'+
+  order.map(function(qi,n){
+    var q=QUESTIONS[qi], chosen=answers[qi], ok=chosen===q.ans;
+    var optHtml=q.opts.map(function(t,oi){
+      var cls=''; if(oi===q.ans) cls='color:#166534;font-weight:800;'; else if(oi===chosen) cls='color:#991b1b;font-weight:700;text-decoration:line-through;';
+      return '<div style="'+cls+'">'+String.fromCharCode(65+oi)+'. '+t+(oi===q.ans?' ✓':(oi===chosen?' ✗':''))+'</div>';
+    }).join('');
+    return '<div class="review-q '+(ok?'ok':'no')+'"><div class="row" style="justify-content:space-between;"><span class="chip">'+q.cat+'</span><span class="tag '+(ok?'ok':'no')+'">'+(ok?'Correct':(chosen==null?'Not answered':'Incorrect'))+'</span></div>'+
+      '<div style="font-weight:700;margin:8px 0;">'+(n+1)+'. '+q.q+'</div>'+optHtml+
+      '<div class="expl" style="margin-top:10px;"><b>Explanation</b>'+q.exp+'</div></div>';
+  }).join('');
+  host.scrollIntoView({behavior:'smooth'});
+}
+
+/* ---------- init ---------- */
+document.getElementById('qcount').textContent=QUESTIONS.length;
+renderCatBreakdown(document.getElementById('catBreakdown'));
+document.querySelectorAll('#lenSeg button').forEach(function(b){ b.onclick=function(){ document.querySelectorAll('#lenSeg button').forEach(function(x){x.classList.remove('on');}); b.classList.add('on'); }; });
+document.querySelectorAll('#timerSeg button').forEach(function(b){ b.onclick=function(){ document.querySelectorAll('#timerSeg button').forEach(function(x){x.classList.remove('on');}); b.classList.add('on'); }; });
+</script>
+</body>
+</html>
