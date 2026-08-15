@@ -8184,17 +8184,35 @@ function Field({ label, children }) {
   );
 }
 
-// Raw HTML editor for rich-html cases — works for uploaded (html_url) cases too.
-// Editing stores the HTML inline (data.htmlContent) and detaches the uploaded
-// file (htmlUrl -> null), which the renderer then prefers.
+// Live content editor for rich-html cases (incl. uploaded ones). Renders the case
+// exactly as published in an iframe; a Visual mode lets you click text to edit it
+// and click an image to change it, syncing back to data.htmlContent (and detaching
+// any uploaded html_url). A Code mode is available as a fallback.
 function RawHtmlEditor({ draft, setDraft }) {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState('');
+  const [mode, setMode] = useState('visual');      // 'visual' | 'code'
+  const [editing, setEditing] = useState(false);   // designMode on/off
+  const [synced, setSynced] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
   const [previewKey, setPreviewKey] = useState(0);
+  const [baseline, setBaseline] = useState(draft.htmlContent || '');
+
+  const iframeRef = useRef(null);
+  const docRef = useRef(null);
+  const editingRef = useRef(false);
+  const syncTimer = useRef(null);
 
   const html = draft.htmlContent || '';
   const fromUpload = !!draft.htmlUrl && !draft.htmlContent;
+
+  useEffect(() => {
+    editingRef.current = editing;
+    const d = docRef.current;
+    if (d) { try { d.designMode = editing ? 'on' : 'off'; } catch (e) {} }
+  }, [editing]);
+
+  useEffect(() => { setBaseline(draft.htmlContent || ''); setEditing(false); }, [draft.id]);
 
   const loadFromUrl = async () => {
     if (!draft.htmlUrl) return;
@@ -8204,63 +8222,134 @@ function RawHtmlEditor({ draft, setDraft }) {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       const text = await r.text();
       setDraft(d => ({ ...d, htmlContent: text, htmlUrl: null }));
+      setBaseline(text);
     } catch (e) { setErr('Could not load the uploaded file: ' + e.message); }
     setLoading(false);
   };
 
-  const onEdit = (v) => setDraft(d => ({ ...d, htmlContent: v, htmlUrl: null }));
+  const serialize = () => {
+    const d = docRef.current; if (!d) return;
+    try {
+      const clone = d.documentElement.cloneNode(true);
+      clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+      const out = '<!DOCTYPE html>\n' + clone.outerHTML;
+      setDraft(dr => ({ ...dr, htmlContent: out, htmlUrl: null }));
+      setSynced(true); setTimeout(() => setSynced(false), 1400);
+    } catch (e) { setErr('Could not read edits: ' + e.message); }
+  };
+
+  const handleFrameLoad = () => {
+    const ifr = iframeRef.current; if (!ifr) return;
+    let d; try { d = ifr.contentDocument; } catch (e) { return; }
+    docRef.current = d; if (!d) return;
+    try { d.designMode = editingRef.current ? 'on' : 'off'; } catch (e) {}
+    const onClick = (e) => {
+      if (!editingRef.current) return;
+      const img = e.target.closest && e.target.closest('img');
+      if (img) { e.preventDefault(); e.stopPropagation(); const u = window.prompt('Image URL:', img.getAttribute('src') || ''); if (u !== null) { img.setAttribute('src', u); serialize(); } return; }
+      const a = e.target.closest && e.target.closest('a');
+      if (a && e.altKey) { e.preventDefault(); e.stopPropagation(); const u = window.prompt('Link URL:', a.getAttribute('href') || ''); if (u !== null) { a.setAttribute('href', u); serialize(); } return; }
+    };
+    const onInput = () => { if (syncTimer.current) clearTimeout(syncTimer.current); syncTimer.current = setTimeout(serialize, 900); };
+    d.addEventListener('click', onClick, true);
+    d.addEventListener('input', onInput, true);
+  };
+
+  const exec = (cmd, val) => {
+    const d = docRef.current; if (!d) return;
+    try { if (!editingRef.current) setEditing(true); d.designMode = 'on'; d.execCommand(cmd, false, val || null); serialize(); } catch (e) {}
+  };
+  const doLink = () => { const u = window.prompt('Link URL for the selected text:'); if (u) exec('createLink', u); };
+
+  const switchMode = (m) => {
+    if (m === mode) return;
+    if (mode === 'visual') serialize();          // capture visual edits before leaving
+    if (m === 'visual') setBaseline(draft.htmlContent || '');
+    setMode(m);
+  };
+
+  const onCodeEdit = (v) => setDraft(d => ({ ...d, htmlContent: v, htmlUrl: null }));
   const kb = (html.length / 1024).toFixed(1);
-  const lines = html ? html.split('\n').length : 0;
+
+  // Uploaded case not yet pulled in for editing
+  if (fromUpload) {
+    return (
+      <div className="rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-4">
+        <p className="text-sm text-amber-800 dark:text-amber-200 mb-3">
+          This case renders from an <strong>uploaded HTML file</strong>. Load it to edit it live — when you press <strong>Save</strong> (top-right) your edited copy is stored in the app and the uploaded file is detached.
+        </p>
+        <button onClick={loadFromUrl} disabled={loading}
+          className="px-4 py-2 rounded-lg bg-amber-500 text-white text-sm font-bold disabled:opacity-50 hover:bg-amber-600">
+          {loading ? 'Loading…' : '⤵ Load for editing'}
+        </button>
+        {err && <p className="text-xs text-rose-600 mt-2">{err}</p>}
+        <p className="text-[11px] text-amber-700/80 dark:text-amber-300/70 mt-3 break-all">Source: {draft.htmlUrl}</p>
+      </div>
+    );
+  }
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
-        <div className="text-xs uppercase tracking-wider text-slate-500 font-semibold">Raw HTML editor</div>
-        {!fromUpload && html && (
-          <label className="text-xs flex items-center gap-1.5 cursor-pointer text-slate-600 dark:text-slate-300">
-            <input type="checkbox" checked={showPreview} onChange={e => setShowPreview(e.target.checked)} /> Live preview
-          </label>
-        )}
+      {/* Mode switch */}
+      <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+        <div className="seg inline-flex border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+          <button onClick={() => switchMode('visual')} className={cx('px-3 py-1.5 text-sm font-bold', mode === 'visual' ? 'bg-teal-500 text-white' : 'bg-white dark:bg-slate-900 text-slate-600')}>🖊 Visual</button>
+          <button onClick={() => switchMode('code')} className={cx('px-3 py-1.5 text-sm font-bold', mode === 'code' ? 'bg-teal-500 text-white' : 'bg-white dark:bg-slate-900 text-slate-600')}>{'</>'} Code</button>
+        </div>
+        <div className="text-xs text-slate-500 flex items-center gap-3">
+          {synced && <span className="text-emerald-600 font-semibold flex items-center gap-1"><CheckCircle2 size={12} /> Synced</span>}
+          <span>Edits auto-sync — press <b>Save</b> (top-right) to publish.</span>
+        </div>
       </div>
 
-      {fromUpload ? (
-        <div className="rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-4">
-          <p className="text-sm text-amber-800 dark:text-amber-200 mb-3">
-            This case renders from an <strong>uploaded HTML file</strong>. Load it here to edit inline — when you press <strong>Save</strong> (top-right), your edited copy is stored in the app and the uploaded file is detached (it will no longer be used).
-          </p>
-          <button onClick={loadFromUrl} disabled={loading}
-            className="px-4 py-2 rounded-lg bg-amber-500 text-white text-sm font-bold disabled:opacity-50 hover:bg-amber-600">
-            {loading ? 'Loading…' : '⤵ Load for editing'}
-          </button>
+      {mode === 'visual' ? (
+        <>
+          {/* Visual toolbar */}
+          <div className="flex items-center gap-2 flex-wrap mb-2 p-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+            <button onClick={() => setEditing(e => !e)}
+              className={cx('px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1.5', editing ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white')}>
+              {editing ? '✏️ Editing — click text to change' : '👁 Browse (click to start editing)'}
+            </button>
+            <div className="w-px h-6 bg-slate-300 dark:bg-slate-600" />
+            <button onClick={() => exec('bold')} className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-bold" title="Bold">B</button>
+            <button onClick={() => exec('italic')} className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 italic" title="Italic">I</button>
+            <button onClick={() => exec('underline')} className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 underline" title="Underline">U</button>
+            <button onClick={doLink} className="px-2.5 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-semibold" title="Make selection a link">🔗 Link</button>
+            <button onClick={() => exec('undo')} className="px-2.5 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm" title="Undo">↩ Undo</button>
+            <span className="ml-auto text-[11px] text-slate-500">Tip: click an <b>image</b> to change its URL · <b>Alt-click</b> a link to change where it goes</span>
+          </div>
+          <div className="rounded-xl border-2 border-slate-300 dark:border-slate-600 overflow-hidden bg-white">
+            <iframe key={draft.id + ':' + baseline.length} ref={iframeRef} title="live-editor" srcDoc={baseline} onLoad={handleFrameLoad}
+              sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms"
+              className="w-full h-[620px] bg-white" />
+          </div>
+          <div className="flex items-center gap-3 mt-2">
+            <button onClick={serialize} className="px-3 py-1.5 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold">↻ Sync edits now</button>
+            <button onClick={() => { setBaseline(''); setTimeout(() => setBaseline(draft.htmlContent || ''), 30); }} className="text-xs text-slate-500 hover:underline">Reload preview</button>
+            <span className="text-[11px] text-slate-400 ml-auto">{kb} KB</span>
+          </div>
           {err && <p className="text-xs text-rose-600 mt-2">{err}</p>}
-          <p className="text-[11px] text-amber-700/80 dark:text-amber-300/70 mt-3 break-all">Source: {draft.htmlUrl}</p>
-        </div>
+        </>
       ) : (
         <>
-          <p className="text-xs text-slate-500 mb-2">
-            Edit the full HTML document (swap image/YouTube URLs, change text, anything), then press the main <b>Save</b> button at the top-right to publish.
-            {draft.htmlUrl ? ' Saving replaces the uploaded file with this inline copy.' : ''}
-          </p>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-xs text-slate-500">Full HTML source. Edits sync automatically; press <b>Save</b> to publish.</p>
+            <label className="text-xs flex items-center gap-1.5 cursor-pointer text-slate-600 dark:text-slate-300"><input type="checkbox" checked={showPreview} onChange={e => setShowPreview(e.target.checked)} /> Preview</label>
+          </div>
           <div className={cx('grid gap-3', showPreview ? 'lg:grid-cols-2' : 'grid-cols-1')}>
             <div>
-              <textarea
-                value={html}
-                onChange={e => onEdit(e.target.value)}
-                spellCheck={false} wrap="off"
-                className="w-full h-[540px] font-mono text-[12px] leading-relaxed rounded-xl border border-slate-700 bg-slate-950 text-slate-100 p-3 focus:outline-none focus:ring-2 focus:ring-teal-500 scrollbar-thin"
-                placeholder="<!DOCTYPE html> …"
-              />
+              <textarea value={html} onChange={e => onCodeEdit(e.target.value)} spellCheck={false} wrap="off"
+                className="w-full h-[560px] font-mono text-[12px] leading-relaxed rounded-xl border border-slate-700 bg-slate-950 text-slate-100 p-3 focus:outline-none focus:ring-2 focus:ring-teal-500 scrollbar-thin" placeholder="<!DOCTYPE html> …" />
               <div className="flex items-center justify-between text-[11px] text-slate-400 mt-1">
-                <span>{kb} KB · {lines} lines</span>
+                <span>{kb} KB</span>
                 {showPreview && <button onClick={() => setPreviewKey(k => k + 1)} className="text-teal-600 font-semibold hover:underline">↻ Refresh preview</button>}
               </div>
             </div>
             {showPreview && (
-              <div className="rounded-xl border border-slate-300 dark:border-slate-700 overflow-hidden bg-white flex flex-col">
-                <div className="text-[10px] uppercase tracking-wider font-bold text-slate-500 px-2 py-1 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">Live preview</div>
-                <iframe key={previewKey} title="html-preview" srcDoc={html}
+              <div className="rounded-xl border border-slate-300 dark:border-slate-700 overflow-hidden bg-white">
+                <iframe key={previewKey} title="code-preview" srcDoc={html}
                   sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms"
-                  className="w-full h-[520px] bg-white" />
+                  className="w-full h-[588px] bg-white" />
               </div>
             )}
           </div>
@@ -8356,7 +8445,7 @@ function CaseEditor({ caseData, stageKey, setStageKey, onUpdate, onDelete }) {
         <div className="flex p-2 gap-1 min-w-max">
           <StageTab id="meta" label="📋 Profile + Vitals" active={stageKey === 'meta'} onClick={() => setStageKey('meta')} />
           {draft.caseType === 'rich-html' && (
-            <StageTab id="html" label={'</> Edit HTML'} active={stageKey === 'html'} onClick={() => setStageKey('html')} />
+            <StageTab id="html" label={'✏️ Edit content'} active={stageKey === 'html'} onClick={() => setStageKey('html')} />
           )}
           <StageTab id="sections" label="🧩 Sections" active={stageKey === 'sections'} onClick={() => setStageKey('sections')} />
           {getCaseStages(draft).filter(s => s.key !== 'profile').map(s => (
