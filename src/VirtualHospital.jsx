@@ -6457,6 +6457,11 @@ function AdminPanel({ cases, updateCase, addCase, deleteCase, navigate, auth }) 
   const [activeStageKey, setActiveStageKey] = useState('profile');
   const [showNew, setShowNew] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
+  // Case-list search / filter / grouping
+  const [caseQuery, setCaseQuery] = useState('');
+  const [caseHosp, setCaseHosp] = useState('all');
+  const [caseDept, setCaseDept] = useState('all');
+  const [collapsedGroups, setCollapsedGroups] = useState({});
 
   // Update activeId when cases change
   useEffect(() => {
@@ -6606,34 +6611,95 @@ values ('${auth.user.email}');`}
         <ConferenceAdmin />
       ) : (
       <div className="grid lg:grid-cols-[280px_1fr] gap-5">
-        {/* Case list */}
-        <aside className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 lg:max-h-[calc(100vh-12rem)] lg:overflow-y-auto scrollbar-thin">
-          <div className="px-3 py-2 text-[10px] uppercase tracking-wider text-slate-500 font-bold flex items-center justify-between">
-            <span>Cases ({cases.length})</span>
+        {/* Case list — searchable & grouped by hospital → department */}
+        <aside className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 lg:max-h-[calc(100vh-8rem)] lg:sticky lg:top-4 flex flex-col overflow-hidden">
+          {/* Filters (sticky) */}
+          <div className="p-2.5 border-b border-slate-200 dark:border-slate-800 space-y-2">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" size={13} />
+              <input value={caseQuery} onChange={e => setCaseQuery(e.target.value)} placeholder="Search cases…"
+                className="w-full pl-8 pr-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <select value={caseHosp} onChange={e => { setCaseHosp(e.target.value); setCaseDept('all'); }}
+                className="text-xs px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 focus:outline-none">
+                <option value="all">All hospitals</option>
+                <option value="cardiology">Cardiology</option>
+                <option value="internal">Internal Medicine</option>
+                <option value="prehospital">Prehospital Field</option>
+              </select>
+              <select value={caseDept} onChange={e => setCaseDept(e.target.value)}
+                className="text-xs px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 focus:outline-none">
+                <option value="all">All departments</option>
+                {(caseHosp === 'all' ? Object.values(DEPARTMENTS).flat() : (DEPARTMENTS[caseHosp] || [])).map(d => (
+                  <option key={d.id} value={d.id}>{d.label}</option>
+                ))}
+              </select>
+            </div>
           </div>
-          {cases.map(c => {
-            const sev = SEVERITY[c.severity];
-            return (
-              <button
-                key={c.id}
-                onClick={() => setActiveId(c.id)}
-                className={cx(
-                  'w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg transition-all mb-0.5',
-                  activeId === c.id
-                    ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                    : 'hover:bg-slate-100 dark:hover:bg-slate-800'
-                )}
-              >
-                <span className={cx('w-1.5 h-1.5 rounded-full flex-shrink-0', sev.dot)} />
-                <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-sm truncate">{c.title}</div>
-                  <div className={cx('text-[10px] uppercase tracking-wider', activeId === c.id ? 'opacity-70' : 'text-slate-500')}>
-                    {c.hospital === 'cardiology' ? 'CV' : 'IM'} · {DEPARTMENT_BY_ID[c.department]?.short || '—'} · {c.severity}
+
+          {/* Grouped list */}
+          <div className="flex-1 overflow-y-auto scrollbar-thin p-2">
+            {(() => {
+              const HOSP = { cardiology: 'Cardiology', internal: 'Internal Medicine', prehospital: 'Prehospital Field' };
+              const ORDER = ['cardiology', 'internal', 'prehospital'];
+              const q = caseQuery.trim().toLowerCase();
+              const filtered = cases.filter(c =>
+                (caseHosp === 'all' || c.hospital === caseHosp) &&
+                (caseDept === 'all' || c.department === caseDept) &&
+                (!q || (c.title || '').toLowerCase().includes(q) || (c.chiefComplaint || '').toLowerCase().includes(q) ||
+                  (c.system || '').toLowerCase().includes(q) || (c.tags || []).some(t => (t || '').toLowerCase().includes(q)))
+              );
+              if (!filtered.length) {
+                return <div className="px-3 py-8 text-center text-xs text-slate-400">No cases match.</div>;
+              }
+              const caseBtn = (c) => {
+                const sev = SEVERITY[c.severity];
+                return (
+                  <button key={c.id} onClick={() => setActiveId(c.id)}
+                    className={cx('w-full text-left flex items-center gap-2 pl-6 pr-2 py-1.5 rounded-lg transition-all mb-0.5',
+                      activeId === c.id ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'hover:bg-slate-100 dark:hover:bg-slate-800')}>
+                    <span className={cx('w-1.5 h-1.5 rounded-full flex-shrink-0', sev.dot)} />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-[13px] truncate">{c.title}</div>
+                      <div className={cx('text-[9px] uppercase tracking-wider', activeId === c.id ? 'opacity-70' : 'text-slate-500')}>
+                        {c.bedNumber ? `Bed ${c.bedNumber} · ` : ''}{c.severity}
+                      </div>
+                    </div>
+                  </button>
+                );
+              };
+              return ORDER.map(h => {
+                const hCases = filtered.filter(c => c.hospital === h);
+                if (!hCases.length) return null;
+                const defs = DEPARTMENTS[h] || [];
+                const known = defs.map(d => d.id);
+                const buckets = [];
+                defs.forEach(d => { const dc = hCases.filter(c => c.department === d.id); if (dc.length) buckets.push({ key: h + ':' + d.id, label: d.label, cases: dc }); });
+                const other = hCases.filter(c => !known.includes(c.department));
+                if (other.length) buckets.push({ key: h + ':other', label: 'Other / Unassigned', cases: other });
+                return (
+                  <div key={h} className="mb-2">
+                    <div className="px-1.5 py-1 text-[10px] uppercase tracking-[0.15em] font-extrabold text-teal-600 dark:text-teal-400">{HOSP[h]} <span className="text-slate-400">({hCases.length})</span></div>
+                    {buckets.map(b => {
+                      const isC = collapsedGroups[b.key];
+                      return (
+                        <div key={b.key} className="mb-0.5">
+                          <button onClick={() => setCollapsedGroups(g => ({ ...g, [b.key]: !g[b.key] }))}
+                            className="w-full flex items-center gap-1 px-1.5 py-1 text-[11px] font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/60">
+                            <ChevronRight size={12} className={cx('transition-transform flex-shrink-0', !isC && 'rotate-90')} />
+                            <span className="flex-1 text-left truncate">{b.label}</span>
+                            <span className="text-slate-400">{b.cases.length}</span>
+                          </button>
+                          {!isC && b.cases.map(caseBtn)}
+                        </div>
+                      );
+                    })}
                   </div>
-                </div>
-              </button>
-            );
-          })}
+                );
+              });
+            })()}
+          </div>
         </aside>
 
         {/* Editor */}
