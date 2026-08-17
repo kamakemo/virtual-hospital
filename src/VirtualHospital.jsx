@@ -24,6 +24,7 @@ import {
   signInWithMagicLink,
   signInWithPassword,
   signUpWithPassword,
+  resendConfirmation,
   sendPasswordReset,
   signInWithProvider,
   signOut,
@@ -2152,12 +2153,13 @@ function LoginScreen({ theme, setTheme, navigate, returnTo }) {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [magicSent, setMagicSent] = useState(false);
+  const [needsConfirm, setNeedsConfirm] = useState(false);
 
   const goHome = () => { if (navigate) navigate(returnTo || { name: 'landing' }); };
 
   const handlePassword = async (e) => {
     e.preventDefault();
-    setError(''); setNotice('');
+    setError(''); setNotice(''); setNeedsConfirm(false);
     if (!email.trim() || !password) return;
     setBusy(true);
     if (mode === 'signup') {
@@ -2165,13 +2167,27 @@ function LoginScreen({ theme, setTheme, navigate, returnTo }) {
       setBusy(false);
       if (error) { setError(error.message || 'Could not create the account.'); return; }
       if (data?.session) { goHome(); }
-      else { setNotice('Account created — check your email to confirm your address, then sign in.'); setMode('signin'); setPassword(''); }
+      else { setNotice('Account created! We sent a confirmation link to ' + email.trim() + ' — click it to activate your account, then sign in.'); setMode('signin'); setPassword(''); setNeedsConfirm(true); }
     } else {
       const { data, error } = await signInWithPassword(email.trim(), password);
       setBusy(false);
-      if (error) { setError(error.message || 'Could not sign in.'); return; }
+      if (error) {
+        const msg = (error.message || '').toLowerCase();
+        if (msg.includes('confirm')) { setError('Your email is not confirmed yet — check your inbox for the confirmation link.'); setNeedsConfirm(true); }
+        else setError(error.message || 'Could not sign in.');
+        return;
+      }
       if (data?.session) goHome();
     }
+  };
+
+  const handleResend = async () => {
+    if (!email.trim()) { setError('Enter your email above first.'); return; }
+    setBusy(true); setError('');
+    const { error } = await resendConfirmation(email.trim());
+    setBusy(false);
+    if (error) setError(error.message || 'Could not resend the confirmation email.');
+    else setNotice('Confirmation email re-sent to ' + email.trim() + '.');
   };
 
   const handleMagic = async (e) => {
@@ -2196,10 +2212,17 @@ function LoginScreen({ theme, setTheme, navigate, returnTo }) {
   };
 
   const handleOAuth = async (provider) => {
-    setError(''); setNotice('');
+    setError(''); setNotice(''); setNeedsConfirm(false);
     setOauthBusy(provider);
     const { error } = await signInWithProvider(provider);
-    if (error) { setOauthBusy(''); setError(error.message || 'Could not start sign-in.'); }
+    if (error) {
+      setOauthBusy('');
+      const m = (error.message || '').toLowerCase();
+      const label = provider === 'google' ? 'Google' : 'Microsoft';
+      if (m.includes('not enabled') || m.includes('unsupported') || m.includes('provider is not'))
+        setError(label + ' sign-in is not enabled yet — an admin needs to turn on the ' + label + ' provider in the Supabase dashboard (Authentication → Providers).');
+      else setError(error.message || 'Could not start sign-in.');
+    }
     // on success the browser redirects to the provider and back to the app
   };
 
@@ -2298,6 +2321,13 @@ function LoginScreen({ theme, setTheme, navigate, returnTo }) {
                 <div className="text-xs text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 px-3 py-2 rounded-lg mb-3">
                   {notice}
                 </div>
+              )}
+
+              {needsConfirm && (
+                <button type="button" onClick={handleResend} disabled={busy}
+                  className="w-full mb-3 text-xs font-bold px-3 py-2 rounded-lg bg-amber-100 dark:bg-amber-500/15 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-500/30 hover:bg-amber-200 disabled:opacity-50">
+                  ✉️ Resend confirmation email
+                </button>
               )}
 
               {mode === 'magic' ? (

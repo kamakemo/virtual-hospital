@@ -59,6 +59,17 @@ export async function signInWithProvider(provider) {
   return { data, error }
 }
 
+// Re-send the sign-up confirmation email (used when a user tries to sign in
+// before confirming their address, while "Confirm email" is enabled).
+export async function resendConfirmation(email) {
+  const { error } = await supabase.auth.resend({
+    type: 'signup',
+    email,
+    options: { emailRedirectTo: window.location.origin },
+  })
+  return { error }
+}
+
 // Magic-link (kept as an optional fallback sign-in method)
 export async function signInWithMagicLink(email) {
   const { error } = await supabase.auth.signInWithOtp({
