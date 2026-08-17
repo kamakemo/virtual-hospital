@@ -165,6 +165,25 @@ export async function uploadRichCaseFile(fileText, fileName) {
   }
 }
 
+// Uploads an image file to Storage (bucket "rich-cases", images/ prefix) and
+// returns { url } (a public URL) or { error }.
+export async function uploadImageFile(file) {
+  const BUCKET = 'rich-cases'
+  const ext = ((file.name || '').split('.').pop() || 'png').replace(/[^a-z0-9]/gi, '').toLowerCase() || 'png'
+  const rand = Math.floor(Math.random() * 1e9)
+  const path = `images/${Date.now()}-${rand}.${ext}`
+  const { error } = await supabase
+    .storage
+    .from(BUCKET)
+    .upload(path, file, { contentType: file.type || 'image/png', cacheControl: '3600', upsert: false })
+  if (error) {
+    console.error('[storage] image upload failed:', error.message)
+    return { error }
+  }
+  const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(path)
+  return { url: urlData.publicUrl }
+}
+
 // Deletes a Rich HTML file from Storage when the case is deleted.
 export async function deleteRichCaseFile(htmlUrl) {
   if (!htmlUrl) return

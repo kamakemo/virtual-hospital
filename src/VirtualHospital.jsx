@@ -53,6 +53,7 @@ import {
   upsertSession,
   deleteSessionRow,
   uploadRichCaseFile,
+  uploadImageFile,
   deleteRichCaseFile,
 } from './supabaseClient';
 
@@ -8250,6 +8251,48 @@ function Field({ label, children }) {
   );
 }
 
+// Strip alien fonts/styles from pasted HTML so it inherits the case's own CSS.
+// Keeps structural tags (headings, lists, bold, links, images, tables) but removes
+// style/class/font attributes and unwraps <span>/<font> wrappers.
+function cleanPastedHTML(html) {
+  try {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    doc.querySelectorAll('script,style,meta,link,title').forEach(n => n.remove());
+    doc.querySelectorAll('span,font').forEach(el => {
+      const p = el.parentNode; if (!p) return;
+      while (el.firstChild) p.insertBefore(el.firstChild, el);
+      p.removeChild(el);
+    });
+    doc.querySelectorAll('*').forEach(el => {
+      const tag = el.tagName;
+      Array.prototype.slice.call(el.attributes).forEach(a => {
+        const n = a.name.toLowerCase();
+        const keep = (tag === 'A' && n === 'href') || (tag === 'IMG' && (n === 'src' || n === 'alt')) ||
+          ((tag === 'TD' || tag === 'TH') && (n === 'colspan' || n === 'rowspan'));
+        if (!keep) el.removeAttribute(a.name);
+      });
+    });
+    return doc.body.innerHTML;
+  } catch (e) { return (html || '').replace(/<[^>]+>/g, ''); }
+}
+
+function youtubeId(u) {
+  if (!u) return null;
+  const m = u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|v\/))([\w-]{11})/);
+  if (m) return m[1];
+  if (/^[\w-]{11}$/.test(u.trim())) return u.trim();
+  return null;
+}
+
+function TBtn({ onClick, title, children }) {
+  return (
+    <button onClick={onClick} title={title}
+      className="min-w-[32px] h-8 px-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-semibold hover:border-teal-400 flex items-center justify-center">
+      {children}
+    </button>
+  );
+}
+
 // Live content editor for rich-html cases (incl. uploaded ones). Renders the case
 // exactly as published in an iframe; a Visual mode lets you click text to edit it
 // and click an image to change it, syncing back to data.htmlContent (and detaching
@@ -8263,11 +8306,14 @@ function RawHtmlEditor({ draft, setDraft }) {
   const [showPreview, setShowPreview] = useState(true);
   const [previewKey, setPreviewKey] = useState(0);
   const [baseline, setBaseline] = useState(draft.htmlContent || '');
+  const [fullscreen, setFullscreen] = useState(false);
+  const [imgBusy, setImgBusy] = useState(false);
 
   const iframeRef = useRef(null);
   const docRef = useRef(null);
   const editingRef = useRef(false);
   const syncTimer = useRef(null);
+  const fileRef = useRef(null);
 
   const html = draft.htmlContent || '';
   const fromUpload = !!draft.htmlUrl && !draft.htmlContent;
@@ -8317,9 +8363,47 @@ function RawHtmlEditor({ draft, setDraft }) {
       if (a && e.altKey) { e.preventDefault(); e.stopPropagation(); const u = window.prompt('Link URL:', a.getAttribute('href') || ''); if (u !== null) { a.setAttribute('href', u); serialize(); } return; }
     };
     const onInput = () => { if (syncTimer.current) clearTimeout(syncTimer.current); syncTimer.current = setTimeout(serialize, 900); };
+    const onPaste = (ev) => {
+      if (!editingRef.current) return;
+      const cd = ev.clipboardData; if (!cd) return;
+      ev.preventDefault();
+      const htmlData = cd.getData('text/html');
+      if (htmlData) d.execCommand('insertHTML', false, cleanPastedHTML(htmlData));
+      else d.execCommand('insertText', false, cd.getData('text/plain'));
+      if (syncTimer.current) clearTimeout(syncTimer.current); syncTimer.current = setTimeout(serialize, 500);
+    };
     d.addEventListener('click', onClick, true);
     d.addEventListener('input', onInput, true);
+    d.addEventListener('paste', onPaste, true);
   };
+
+  const insertHTML = (h) => {
+    const d = docRef.current; if (!d) return;
+    try { if (!editingRef.current) setEditing(true); d.designMode = 'on'; d.body && d.body.focus(); d.execCommand('insertHTML', false, h); serialize(); } catch (e) {}
+  };
+  const insertYoutube = () => {
+    const u = window.prompt('Paste a YouTube link or video ID:'); if (!u) return;
+    const id = youtubeId(u.trim()); if (!id) { setErr('Could not read a YouTube video ID from that.'); return; }
+    insertHTML('<div style="position:relative;padding-bottom:56.25%;height:0;margin:1em 0;border-radius:12px;overflow:hidden;"><iframe src="https://www.youtube.com/embed/' + id + '" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen loading="lazy"></iframe></div><p><br></p>');
+  };
+  const insertImageUrl = () => { const u = window.prompt('Image URL:'); if (u) insertHTML('<img src="' + u + '" alt="" style="max-width:100%;height:auto;border-radius:8px;">'); };
+  const onPickImage = async (e) => {
+    const f = e.target.files && e.target.files[0]; if (e.target) e.target.value = ''; if (!f) return;
+    setImgBusy(true); setErr('');
+    try {
+      const res = await uploadImageFile(f);
+      if (res.error) throw new Error(res.error.message || 'upload failed');
+      insertHTML('<img src="' + res.url + '" alt="" style="max-width:100%;height:auto;border-radius:8px;">');
+    } catch (up) {
+      try {
+        const dataUrl = await new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = no; r.readAsDataURL(f); });
+        insertHTML('<img src="' + dataUrl + '" alt="" style="max-width:100%;height:auto;border-radius:8px;">');
+        setErr('Stored inline (storage unavailable: ' + up.message + ')');
+      } catch (e2) { setErr('Image failed: ' + up.message); }
+    }
+    setImgBusy(false);
+  };
+  const blockFmt = (v) => { if (v) exec('formatBlock', v); };
 
   const exec = (cmd, val) => {
     const d = docRef.current; if (!d) return;
@@ -8369,33 +8453,70 @@ function RawHtmlEditor({ draft, setDraft }) {
       </div>
 
       {mode === 'visual' ? (
-        <>
+        <div className={cx(fullscreen && 'fixed inset-0 z-[70] bg-white dark:bg-slate-950 p-3 flex flex-col')}>
           {/* Visual toolbar */}
-          <div className="flex items-center gap-2 flex-wrap mb-2 p-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+          <div className="flex items-center gap-1.5 flex-wrap mb-2 p-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
             <button onClick={() => setEditing(e => !e)}
               className={cx('px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1.5', editing ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white')}>
-              {editing ? '✏️ Editing — click text to change' : '👁 Browse (click to start editing)'}
+              {editing ? '✏️ Editing' : '👁 Browse'}
             </button>
             <div className="w-px h-6 bg-slate-300 dark:bg-slate-600" />
-            <button onClick={() => exec('bold')} className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-bold" title="Bold">B</button>
-            <button onClick={() => exec('italic')} className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 italic" title="Italic">I</button>
-            <button onClick={() => exec('underline')} className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 underline" title="Underline">U</button>
-            <button onClick={doLink} className="px-2.5 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-semibold" title="Make selection a link">🔗 Link</button>
-            <button onClick={() => exec('undo')} className="px-2.5 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm" title="Undo">↩ Undo</button>
-            <span className="ml-auto text-[11px] text-slate-500">Tip: click an <b>image</b> to change its URL · <b>Alt-click</b> a link to change where it goes</span>
+            <select onChange={e => { blockFmt(e.target.value); e.target.selectedIndex = 0; }} defaultValue=""
+              className="h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm px-1" title="Text style">
+              <option value="">¶ Style</option>
+              <option value="<p>">Paragraph</option>
+              <option value="<h1>">Heading 1</option>
+              <option value="<h2>">Heading 2</option>
+              <option value="<h3>">Heading 3</option>
+              <option value="<blockquote>">Quote</option>
+              <option value="<pre>">Code block</option>
+            </select>
+            <TBtn onClick={() => exec('bold')} title="Bold"><b>B</b></TBtn>
+            <TBtn onClick={() => exec('italic')} title="Italic"><i>I</i></TBtn>
+            <TBtn onClick={() => exec('underline')} title="Underline"><u>U</u></TBtn>
+            <TBtn onClick={() => exec('strikeThrough')} title="Strikethrough"><s>S</s></TBtn>
+            <div className="w-px h-6 bg-slate-300 dark:bg-slate-600" />
+            <TBtn onClick={() => exec('insertUnorderedList')} title="Bulleted list">• List</TBtn>
+            <TBtn onClick={() => exec('insertOrderedList')} title="Numbered list">1.</TBtn>
+            <TBtn onClick={() => exec('justifyLeft')} title="Align left">⯇</TBtn>
+            <TBtn onClick={() => exec('justifyCenter')} title="Align center">≡</TBtn>
+            <div className="w-px h-6 bg-slate-300 dark:bg-slate-600" />
+            <label className="relative min-w-[32px] h-8 px-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center cursor-pointer" title="Text colour">
+              <span style={{ color: '#ef4444', fontWeight: 700 }}>A</span>
+              <input type="color" onChange={e => exec('foreColor', e.target.value)} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+            </label>
+            <label className="relative min-w-[32px] h-8 px-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center cursor-pointer" title="Highlight">
+              <span style={{ background: '#fde68a', padding: '0 3px', borderRadius: 3, fontWeight: 700 }}>H</span>
+              <input type="color" onChange={e => exec('hiliteColor', e.target.value)} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+            </label>
+            <div className="w-px h-6 bg-slate-300 dark:bg-slate-600" />
+            <TBtn onClick={doLink} title="Insert link">🔗</TBtn>
+            <TBtn onClick={() => fileRef.current && fileRef.current.click()} title="Upload image">{imgBusy ? '…' : '🖼 Upload'}</TBtn>
+            <TBtn onClick={insertImageUrl} title="Image by URL">🖼 URL</TBtn>
+            <TBtn onClick={insertYoutube} title="Embed YouTube">▶ YouTube</TBtn>
+            <TBtn onClick={() => insertHTML('<hr>')} title="Divider">―</TBtn>
+            <TBtn onClick={() => exec('removeFormat')} title="Clear formatting">⌫</TBtn>
+            <div className="w-px h-6 bg-slate-300 dark:bg-slate-600" />
+            <TBtn onClick={() => exec('undo')} title="Undo">↩</TBtn>
+            <TBtn onClick={() => exec('redo')} title="Redo">↪</TBtn>
+            <button onClick={() => setFullscreen(f => !f)} className="ml-auto px-2.5 h-8 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold" title="Toggle fullscreen">
+              {fullscreen ? '✕ Exit fullscreen' : '⛶ Fullscreen'}
+            </button>
+            <input ref={fileRef} type="file" accept="image/*" onChange={onPickImage} className="hidden" />
           </div>
-          <div className="rounded-xl border-2 border-slate-300 dark:border-slate-600 overflow-hidden bg-white">
+          <div className={cx('rounded-xl border-2 border-slate-300 dark:border-slate-600 overflow-hidden bg-white', fullscreen && 'flex-1')}>
             <iframe key={draft.id + ':' + baseline.length} ref={iframeRef} title="live-editor" srcDoc={baseline} onLoad={handleFrameLoad}
               sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms"
-              className="w-full h-[620px] bg-white" />
+              className={cx('w-full bg-white', fullscreen ? 'h-full' : 'h-[72vh] min-h-[560px]')} />
           </div>
-          <div className="flex items-center gap-3 mt-2">
-            <button onClick={serialize} className="px-3 py-1.5 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold">↻ Sync edits now</button>
-            <button onClick={() => { setBaseline(''); setTimeout(() => setBaseline(draft.htmlContent || ''), 30); }} className="text-xs text-slate-500 hover:underline">Reload preview</button>
+          <div className="flex items-center gap-3 mt-2 flex-wrap">
+            <button onClick={serialize} className="px-3 py-1.5 rounded-lg bg-teal-600 text-white text-xs font-bold">↻ Sync edits now</button>
+            <button onClick={() => { setBaseline(''); setTimeout(() => setBaseline(draft.htmlContent || ''), 30); }} className="text-xs text-slate-500 hover:underline">Reload</button>
+            <span className="text-[11px] text-slate-400">Click an image to change it · Alt-click a link to change its URL · pasted text auto-matches the case fonts</span>
             <span className="text-[11px] text-slate-400 ml-auto">{kb} KB</span>
           </div>
           {err && <p className="text-xs text-rose-600 mt-2">{err}</p>}
-        </>
+        </div>
       ) : (
         <>
           <div className="flex items-center justify-between mb-2">
