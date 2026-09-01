@@ -8806,6 +8806,7 @@ function RawHtmlEditor({ draft, setDraft }) {
   const editingRef = useRef(false);
   const syncTimer = useRef(null);
   const fileRef = useRef(null);
+  const lastSerialized = useRef('');
 
   const html = draft.htmlContent || '';
   const fromUpload = !!draft.htmlUrl && !draft.htmlContent;
@@ -8817,6 +8818,15 @@ function RawHtmlEditor({ draft, setDraft }) {
   }, [editing]);
 
   useEffect(() => { setBaseline(draft.htmlContent || ''); setEditing(false); }, [draft.id]);
+
+  // If the content changes from OUTSIDE the live frame (e.g. an uploaded file, or
+  // typing in Code mode), refresh the preview. Edits made inside the frame come
+  // back through serialize(), which records lastSerialized so we do NOT reload
+  // the iframe (that would discard the caret and in-progress edits).
+  useEffect(() => {
+    const h = draft.htmlContent || '';
+    if (h !== baseline && h !== lastSerialized.current) setBaseline(h);
+  }, [draft.htmlContent]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadFromUrl = async () => {
     if (!draft.htmlUrl) return;
@@ -8837,6 +8847,7 @@ function RawHtmlEditor({ draft, setDraft }) {
       const clone = d.documentElement.cloneNode(true);
       clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
       const out = '<!DOCTYPE html>\n' + clone.outerHTML;
+      lastSerialized.current = out;
       setDraft(dr => ({ ...dr, htmlContent: out, htmlUrl: null }));
       setSynced(true); setTimeout(() => setSynced(false), 1400);
     } catch (e) { setErr('Could not read edits: ' + e.message); }
