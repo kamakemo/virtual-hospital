@@ -55,6 +55,9 @@ import {
   deleteSessionRow,
   uploadRichCaseFile,
   uploadImageFile,
+  fetchLibraryItems,
+  upsertLibraryItem,
+  deleteLibraryItem,
   deleteRichCaseFile,
 } from './supabaseClient';
 
@@ -1666,6 +1669,7 @@ export default function VirtualHospital() {
   const [theme, setTheme] = useLocal(SK.SETTINGS, { dark: false });
   const [cases, setCases] = useState([]);
   const [casesLoading, setCasesLoading] = useState(true);
+  const [library, setLibrary] = useState([]);
   const [progress, setProgress] = useState({
     xp: 0, completedStages: {}, mcqScores: {}, badges: [], teachingMode: 'advanced'
   });
@@ -1754,6 +1758,28 @@ export default function VirtualHospital() {
     window.addEventListener('popstate', onPop);
     return () => window.removeEventListener('popstate', onPop);
   }, []);
+
+  // ===== Department library =====
+  useEffect(() => {
+    if (!isConfigured || !auth.user) { setLibrary([]); return; }
+    let cancelled = false;
+    fetchLibraryItems().then(rows => { if (!cancelled) setLibrary(rows || []); });
+    return () => { cancelled = true; };
+  }, [isConfigured, auth.user]);
+
+  const saveLibraryItem = async (item) => {
+    setLibrary(ls => ls.find(l => l.id === item.id) ? ls.map(l => l.id === item.id ? item : l) : [...ls, item]);
+    if (isConfigured) {
+      const res = await upsertLibraryItem(item);
+      if (res?.error) { alert('Could not save library item: ' + res.error.message); }
+      const fresh = await fetchLibraryItems();
+      setLibrary(fresh || []);
+    }
+  };
+  const removeLibraryItem = async (id) => {
+    setLibrary(ls => ls.filter(l => l.id !== id));
+    if (isConfigured) await deleteLibraryItem(id);
+  };
 
   // Case CRUD — go through Supabase
   const updateCase = async (updated) => {
@@ -1906,7 +1932,7 @@ export default function VirtualHospital() {
 
       <main>
         <div
-          key={`${route.name}:${route.hospital || ''}:${route.departmentId || ''}:${route.caseId || ''}:${route.examId || ''}:${route.topicId || ''}:${route.conferenceId || ''}:${route.sessionId || ''}`}
+          key={`${route.name}:${route.hospital || ''}:${route.departmentId || ''}:${route.caseId || ''}:${route.examId || ''}:${route.topicId || ''}:${route.conferenceId || ''}:${route.sessionId || ''}:${route.libraryItemId || ''}`}
           className="page-transition"
         >
         {casesLoading && route.name === 'landing' && (
@@ -1924,9 +1950,27 @@ export default function VirtualHospital() {
           />
         )}
         {route.name === 'department' && route.hospital !== 'prehospital' && (
+          <DepartmentGateway
+            hospital={route.hospital} departmentId={route.departmentId}
+            cases={cases} library={library} navigate={navigate}
+          />
+        )}
+        {route.name === 'ward' && (
           <DepartmentView
             hospital={route.hospital} departmentId={route.departmentId}
             cases={cases} navigate={navigate} progress={progress}
+          />
+        )}
+        {route.name === 'library' && (
+          <LibraryView
+            hospital={route.hospital} departmentId={route.departmentId}
+            library={library} navigate={navigate}
+          />
+        )}
+        {route.name === 'libraryItem' && (
+          <LibraryItemView
+            item={library.find(l => l.id === route.libraryItemId)}
+            navigate={navigate}
           />
         )}
         {route.name === 'department' && route.hospital === 'prehospital' && (
@@ -1989,6 +2033,7 @@ export default function VirtualHospital() {
             cases={cases} updateCase={updateCase} addCase={addCase}
             deleteCase={deleteCase} navigate={navigate}
             auth={auth}
+            library={library} saveLibraryItem={saveLibraryItem} removeLibraryItem={removeLibraryItem}
           />
         )}
         </div>
@@ -2969,6 +3014,249 @@ function HospitalView({ hospital, cases, navigate, progress }) {
   );
 }
 
+// ============== DEPARTMENT GATEWAY (Ward vs Library) ==============
+function DepartmentGateway({ hospital, departmentId, cases, library, navigate }) {
+  const dept = DEPARTMENT_BY_ID[departmentId];
+  if (!dept) {
+    return (
+      <div className="max-w-7xl mx-auto px-6 py-12 text-center">
+        <p>Department not found.</p>
+        <button onClick={() => navigate({ name: 'hospital', hospital })} className="mt-3 text-teal-600 underline">Back to hospital</button>
+      </div>
+    );
+  }
+  const accent = ACCENT_CLASSES[dept.accent];
+  const DIcon = dept.icon;
+  const wardCount = cases.filter(c => c.department === departmentId).length;
+  const critical = cases.filter(c => c.department === departmentId && c.severity === 'critical').length;
+  const libCount = (library || []).filter(l => l.department === departmentId).length;
+
+  return (
+    <div>
+      <SmartImage src={DEPT_PHOTO[dept.id]} alt={dept.label} gradient={cx('bg-gradient-to-br', accent.grad)} kenBurns className="h-56 sm:h-64">
+        <div className="absolute inset-0 hero-scrim" />
+        <div className="relative max-w-7xl mx-auto px-6 h-full flex flex-col justify-between py-6">
+          <button onClick={() => navigate({ name: 'hospital', hospital })} className="self-start flex items-center gap-1 text-sm text-white/80 hover:text-white">
+            <ChevronLeft size={14} /> Back to {hospital === 'cardiology' ? 'Cardiology' : 'Internal Medicine'}
+          </button>
+          <div className="flex items-center gap-4">
+            <div className={cx('w-16 h-16 rounded-2xl bg-gradient-to-br flex items-center justify-center shadow-2xl ring-1 ring-white/30 float-slow', accent.grad)}>
+              <DIcon className="text-white" size={30} />
+            </div>
+            <div className="text-white">
+              <p className="text-[11px] uppercase tracking-[0.25em] text-white/70 font-semibold mb-1">{dept.short}</p>
+              <h1 className="display-font text-3xl sm:text-5xl font-bold leading-none drop-shadow-lg">{dept.label}</h1>
+              <p className="text-sm text-white/80 mt-1.5">{dept.desc}</p>
+            </div>
+          </div>
+        </div>
+      </SmartImage>
+
+      <div className="max-w-5xl mx-auto px-6 py-10">
+        <p className="text-center text-sm text-slate-500 mb-8">Where would you like to go?</p>
+        <div className="grid sm:grid-cols-2 gap-6">
+          {/* Ward */}
+          <Tilt3D max={7} className="cursor-pointer" onClick={() => navigate({ name: 'ward', hospital, departmentId })}>
+            <div className="group h-full rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden depth-shadow hover:shadow-2xl transition-shadow">
+              <SmartImage src={DEPT_PHOTO[dept.id]} alt="Ward" gradient={cx('bg-gradient-to-br', accent.grad)} className="h-32">
+                <div className="absolute inset-0 card-scrim" />
+                <div className="absolute inset-0 p-4 flex items-end">
+                  <span className="text-white display-font text-2xl font-bold drop-shadow tilt-pop-sm">🛏 Enter the Ward</span>
+                </div>
+              </SmartImage>
+              <div className="p-5">
+                <p className="text-sm text-slate-600 dark:text-slate-300 mb-3">Walk the ward and work through real patient cases at the bedside — full clinical workflow, decisions and assessment.</p>
+                <div className="flex items-center gap-2 flex-wrap text-[11px]">
+                  <span className={cx('px-2 py-0.5 rounded-full font-bold text-white', accent.bg)}>{wardCount} case{wardCount !== 1 ? 's' : ''}</span>
+                  {critical > 0 && <span className="px-2 py-0.5 rounded-full font-bold bg-red-500 text-white">{critical} critical</span>}
+                  <span className="ml-auto font-bold text-slate-500 group-hover:text-teal-600 flex items-center gap-1">Enter <ArrowRight size={12} /></span>
+                </div>
+              </div>
+            </div>
+          </Tilt3D>
+
+          {/* Library */}
+          <Tilt3D max={7} className="cursor-pointer" onClick={() => navigate({ name: 'library', hospital, departmentId })}>
+            <div className="group h-full rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden depth-shadow hover:shadow-2xl transition-shadow">
+              <SmartImage src={null} alt="Library" gradient="bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600" className="h-32">
+                <div className="absolute inset-0 card-scrim" />
+                <div className="absolute inset-0 p-4 flex items-end">
+                  <span className="text-white display-font text-2xl font-bold drop-shadow tilt-pop-sm">📚 Department Library</span>
+                </div>
+              </SmartImage>
+              <div className="p-5">
+                <p className="text-sm text-slate-600 dark:text-slate-300 mb-3">Study the topics behind the cases — structured teaching material, revision notes and reference guides for this department.</p>
+                <div className="flex items-center gap-2 flex-wrap text-[11px]">
+                  <span className="px-2 py-0.5 rounded-full font-bold text-white bg-violet-500">{libCount} topic{libCount !== 1 ? 's' : ''}</span>
+                  <span className="ml-auto font-bold text-slate-500 group-hover:text-violet-600 flex items-center gap-1">Open <ArrowRight size={12} /></span>
+                </div>
+              </div>
+            </div>
+          </Tilt3D>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============== DEPARTMENT LIBRARY ==============
+function LibraryView({ hospital, departmentId, library, navigate }) {
+  const dept = DEPARTMENT_BY_ID[departmentId];
+  const [q, setQ] = useState('');
+  const accent = ACCENT_CLASSES[dept?.accent] || ACCENT_CLASSES.teal;
+  const items = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    return (library || [])
+      .filter(l => l.department === departmentId)
+      .filter(l => !s || (l.title || '').toLowerCase().includes(s) || (l.description || '').toLowerCase().includes(s) ||
+        (l.category || '').toLowerCase().includes(s) || (l.tags || []).some(t => (t || '').toLowerCase().includes(s)));
+  }, [library, departmentId, q]);
+
+  const cats = useMemo(() => {
+    const m = {};
+    items.forEach(i => { const k = i.category || 'General'; (m[k] = m[k] || []).push(i); });
+    return m;
+  }, [items]);
+
+  if (!dept) return <div className="max-w-7xl mx-auto px-6 py-12 text-center text-slate-500">Department not found.</div>;
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <button onClick={() => navigate({ name: 'department', hospital, departmentId })} className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white mb-4">
+        <ChevronLeft size={14} /> Back to {dept.label}
+      </button>
+
+      <div className="relative overflow-hidden rounded-3xl border border-violet-200 dark:border-violet-500/30 mb-6 text-white">
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-700 via-violet-600 to-fuchsia-600 gradient-drift" />
+        <div className="absolute inset-0 opacity-[0.12]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.6) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.6) 1px,transparent 1px)', backgroundSize: '26px 26px' }} />
+        <div className="relative p-6 flex flex-wrap items-center gap-4 justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-white/15 border border-white/25 flex items-center justify-center text-3xl">📚</div>
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-semibold mb-1">Department Library</p>
+              <h1 className="display-font text-3xl font-bold leading-tight">{dept.label}</h1>
+              <p className="text-sm text-white/80 mt-0.5">Study topics &amp; teaching material</p>
+            </div>
+          </div>
+          <div className="glass rounded-xl border border-white/20 px-4 py-2 text-center">
+            <div className="display-font text-2xl font-bold leading-none">{items.length}</div>
+            <div className="text-[10px] uppercase tracking-wider text-white/70 mt-0.5">Topics</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 mb-6">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+          <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search topics…"
+            className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm focus:outline-none" />
+        </div>
+      </div>
+
+      {items.length === 0 ? (
+        <div className="rounded-3xl border-2 border-dashed border-slate-300 dark:border-slate-700 p-12 text-center">
+          <BookOpen size={40} className="mx-auto mb-3 text-slate-300 dark:text-slate-600" />
+          <h3 className="font-bold mb-1">No study topics yet</h3>
+          <p className="text-sm text-slate-500">An admin can upload HTML study material to this department&apos;s library from the Admin panel.</p>
+        </div>
+      ) : (
+        Object.keys(cats).sort().map(cat => (
+          <div key={cat} className="mb-7">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-[11px] uppercase tracking-[0.2em] font-extrabold text-violet-600 dark:text-violet-400">{cat}</span>
+              <span className="text-xs text-slate-400">{cats[cat].length}</span>
+              <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {cats[cat].map((it, i) => (
+                <Reveal key={it.id} delay={i * 45}>
+                  <button onClick={() => navigate({ name: 'libraryItem', hospital, departmentId, libraryItemId: it.id })}
+                    className="group w-full h-full text-left rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 hover:shadow-xl hover:-translate-y-0.5 transition-all depth-shadow">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center text-white text-lg shadow-md">📖</div>
+                      <ArrowRight size={15} className="text-slate-300 group-hover:text-violet-500 group-hover:translate-x-1 transition-all" />
+                    </div>
+                    <h3 className="font-bold text-base leading-tight mb-1 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors line-clamp-2">{it.title}</h3>
+                    {it.description && <p className="text-xs text-slate-500 line-clamp-3">{it.description}</p>}
+                    {it.tags?.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-3">
+                        {it.tags.slice(0, 3).map(t => (
+                          <span key={t} className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">{t}</span>
+                        ))}
+                      </div>
+                    )}
+                  </button>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
+
+// Renders one library topic (rich HTML) full-height, scrolling inside the frame.
+function LibraryItemView({ item, navigate }) {
+  const [htmlDoc, setHtmlDoc] = useState('');
+  const [fetching, setFetching] = useState(false);
+  const [fetchError, setFetchError] = useState('');
+  const [fullscreen, setFullscreen] = useState(false);
+
+  const rawValue = item ? (item.htmlUrl || item.htmlContent || '') : '';
+  const isUrl = rawValue.startsWith('http://') || rawValue.startsWith('https://');
+
+  useEffect(() => {
+    if (!item) return;
+    if (!isUrl) { setHtmlDoc(rawValue); return; }
+    setFetching(true); setFetchError('');
+    fetch(rawValue)
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+      .then(t => { setHtmlDoc(t); setFetching(false); })
+      .catch(e => { setFetchError('Could not load this topic: ' + e.message); setFetching(false); });
+  }, [rawValue, isUrl, item]);
+
+  const srcDocFinal = useMemo(() => injectAnchorFix(htmlDoc), [htmlDoc]);
+
+  if (!item) {
+    return (
+      <div className="max-w-7xl mx-auto px-6 py-12 text-center">
+        <p className="text-slate-500">Topic not found.</p>
+        <button onClick={() => navigate({ name: 'landing' })} className="mt-3 text-teal-600 underline">Return home</button>
+      </div>
+    );
+  }
+
+  return (
+    <div className={cx(fullscreen && 'fixed inset-0 z-[60] bg-white dark:bg-slate-950 flex flex-col')}>
+      <div className={cx('flex items-center gap-3 flex-wrap px-4 sm:px-6 py-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900', !fullscreen && 'max-w-[1600px] mx-auto w-full')}>
+        <button onClick={() => navigate({ name: 'library', hospital: item.hospital, departmentId: item.department })}
+          className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white">
+          <ChevronLeft size={14} /> Library
+        </button>
+        <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300">📚 Study topic</span>
+        <h1 className="font-bold text-base sm:text-lg truncate flex-1 min-w-[140px]">{item.title}</h1>
+        <button onClick={() => setFullscreen(f => !f)} className="px-3 py-1.5 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold">
+          {fullscreen ? '✕ Exit fullscreen' : '⛶ Fullscreen'}
+        </button>
+      </div>
+
+      {fetching && <div className="p-8 text-center text-slate-500 text-sm"><RefreshCw size={14} className="inline animate-spin mr-2" /> Loading topic…</div>}
+      {fetchError && <div className="p-8 text-center text-rose-600 text-sm">{fetchError}</div>}
+      {!fetching && !fetchError && (
+        <div className={cx(fullscreen ? 'flex-1' : 'max-w-[1600px] mx-auto w-full px-2 sm:px-4 py-3')}>
+          <iframe
+            title={item.title}
+            srcDoc={srcDocFinal}
+            sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-presentation allow-downloads"
+            className={cx('w-full bg-white rounded-xl border border-slate-200 dark:border-slate-800', fullscreen ? 'h-full rounded-none border-0' : 'h-[calc(100vh-11rem)] min-h-[560px]')}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ============== DEPARTMENT VIEW (3D BEDS) ==============
 function DepartmentView({ hospital, departmentId, cases, navigate, progress }) {
   const dept = DEPARTMENT_BY_ID[departmentId];
@@ -3023,8 +3311,8 @@ function DepartmentView({ hospital, departmentId, cases, navigate, progress }) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-      <button onClick={() => navigate({ name: 'hospital', hospital })} className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white mb-4">
-        <ChevronLeft size={14} /> Back to {hospital === 'cardiology' ? 'Cardiology' : hospital === 'prehospital' ? 'Prehospital Field' : 'Internal Medicine'} hospital
+      <button onClick={() => navigate({ name: 'department', hospital, departmentId })} className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white mb-4">
+        <ChevronLeft size={14} /> Back to {dept.label}
       </button>
 
       {/* Department banner — photo backdrop + nurse-station strip */}
@@ -4180,7 +4468,7 @@ function CaseView({ caseData, navigate, progress, setProgress, userRole }) {
     <div className="max-w-[1480px] mx-auto px-4 sm:px-6 py-6">
       <button
         onClick={() => caseData.department
-          ? navigate({ name: 'department', hospital: caseData.hospital, departmentId: caseData.department })
+          ? navigate({ name: caseData.hospital === 'prehospital' ? 'department' : 'ward', hospital: caseData.hospital, departmentId: caseData.department })
           : navigate({ name: 'hospital', hospital: caseData.hospital })
         }
         className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white mb-4"
@@ -6482,7 +6770,168 @@ function AudienceQCard({ qa }) {
 }
 
 // ============== ADMIN PANEL ==============
-function AdminPanel({ cases, updateCase, addCase, deleteCase, navigate, auth }) {
+// ============== LIBRARY ADMIN ==============
+function LibraryAdmin({ library, onSave, onDelete }) {
+  const [selId, setSelId] = useState(null);
+  const [draft, setDraft] = useState(null);
+  const [q, setQ] = useState('');
+  const [saved, setSaved] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const fileRef = useRef(null);
+
+  const items = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    return (library || []).filter(l => !s || (l.title || '').toLowerCase().includes(s) ||
+      (l.category || '').toLowerCase().includes(s) || (DEPARTMENT_BY_ID[l.department]?.label || '').toLowerCase().includes(s));
+  }, [library, q]);
+
+  const select = (it) => { setSelId(it.id); setDraft({ ...it }); };
+  const newItem = () => {
+    const id = 'lib-' + Date.now();
+    setSelId(id);
+    setDraft({
+      id, hospital: 'cardiology', department: DEPARTMENTS.cardiology[0].id,
+      title: '', description: '', category: '', tags: [],
+      htmlContent: '', htmlUrl: null, displayOrder: 0, active: true,
+    });
+  };
+  const upd = (k, v) => setDraft(d => ({ ...d, [k]: v }));
+
+  const save = async () => {
+    if (!draft) return;
+    if (!draft.title.trim()) { alert('Please give the topic a title.'); return; }
+    if (!draft.htmlContent && !draft.htmlUrl) { alert('Upload an HTML file (or paste content) first.'); return; }
+    setBusy(true); await onSave(draft); setBusy(false);
+    setSaved(true); setTimeout(() => setSaved(false), 1600);
+  };
+  const del = async () => {
+    if (!draft) return;
+    if (confirm('Delete "' + (draft.title || 'this topic') + '" from the library?')) {
+      await onDelete(draft.id); setDraft(null); setSelId(null);
+    }
+  };
+  const onFile = async (e) => {
+    const f = e.target.files && e.target.files[0]; if (e.target) e.target.value = ''; if (!f) return;
+    const text = await f.text();
+    setDraft(d => ({
+      ...d, htmlContent: text, htmlUrl: null,
+      title: d.title || f.name.replace(/\.html?$/i, '').replace(/[-_]+/g, ' ').trim(),
+    }));
+  };
+
+  const grouped = useMemo(() => {
+    const HOSP = { cardiology: 'Cardiology', internal: 'Internal Medicine', prehospital: 'Prehospital Field' };
+    const out = [];
+    ['cardiology', 'internal', 'prehospital'].forEach(h => {
+      const hi = items.filter(i => i.hospital === h);
+      if (!hi.length) return;
+      const defs = DEPARTMENTS[h] || [];
+      const buckets = [];
+      defs.forEach(d => { const di = hi.filter(i => i.department === d.id); if (di.length) buckets.push({ label: d.label, items: di }); });
+      const other = hi.filter(i => !defs.map(d => d.id).includes(i.department));
+      if (other.length) buckets.push({ label: 'Unassigned', items: other });
+      out.push({ hospital: h, label: HOSP[h], buckets, count: hi.length });
+    });
+    return out;
+  }, [items]);
+
+  const kb = draft?.htmlContent ? (draft.htmlContent.length / 1024).toFixed(1) : 0;
+
+  return (
+    <div className="grid lg:grid-cols-[300px_1fr] gap-5">
+      {/* List */}
+      <aside className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 lg:max-h-[calc(100vh-8rem)] lg:sticky lg:top-4 flex flex-col overflow-hidden">
+        <div className="p-2.5 border-b border-slate-200 dark:border-slate-800 space-y-2">
+          <button onClick={newItem} className="w-full px-3 py-2 rounded-lg bg-indigo-500 text-white text-sm font-bold flex items-center justify-center gap-1.5 hover:bg-indigo-600">
+            <Plus size={14} /> New study topic
+          </button>
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" size={13} />
+            <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search topics…"
+              className="w-full pl-8 pr-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm focus:outline-none" />
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto scrollbar-thin p-2">
+          {grouped.length === 0 && <div className="px-3 py-8 text-center text-xs text-slate-400">No topics yet.</div>}
+          {grouped.map(g => (
+            <div key={g.hospital} className="mb-2">
+              <div className="px-1.5 py-1 text-[10px] uppercase tracking-[0.15em] font-extrabold text-indigo-600 dark:text-indigo-400">{g.label} <span className="text-slate-400">({g.count})</span></div>
+              {g.buckets.map(b => (
+                <div key={b.label} className="mb-1">
+                  <div className="px-1.5 py-0.5 text-[11px] font-bold text-slate-500">{b.label}</div>
+                  {b.items.map(it => (
+                    <button key={it.id} onClick={() => select(it)}
+                      className={cx('w-full text-left px-3 py-1.5 rounded-lg mb-0.5 transition-all',
+                        selId === it.id ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'hover:bg-slate-100 dark:hover:bg-slate-800')}>
+                      <div className="font-semibold text-[13px] truncate">{it.title || '(untitled)'}</div>
+                      {it.category && <div className={cx('text-[9px] uppercase tracking-wider', selId === it.id ? 'opacity-70' : 'text-slate-500')}>{it.category}</div>}
+                    </button>
+                  ))}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </aside>
+
+      {/* Editor */}
+      {!draft ? (
+        <div className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-12 text-center text-slate-500">
+          <BookOpen size={36} className="mx-auto mb-3 text-slate-300 dark:text-slate-700" />
+          <p className="font-semibold mb-1">Department Library</p>
+          <p className="text-sm">Select a topic to edit, or click <b>New study topic</b> to upload an HTML file. It appears live in that department&apos;s library.</p>
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
+          <div className="p-5 border-b border-slate-200 dark:border-slate-800">
+            <div className="flex items-start justify-between gap-3 flex-wrap mb-3">
+              <input value={draft.title} onChange={e => upd('title', e.target.value)} placeholder="Topic title…"
+                className="display-font text-2xl font-bold bg-transparent border-none focus:outline-none flex-1 min-w-[220px]" />
+              <div className="flex items-center gap-2">
+                {saved && <span className="text-xs text-emerald-600 font-semibold flex items-center gap-1"><CheckCircle2 size={12} /> Saved</span>}
+                <button onClick={save} disabled={busy} className="px-4 py-2 rounded-full bg-indigo-500 text-white text-sm font-bold hover:bg-indigo-600 disabled:opacity-50 flex items-center gap-1.5">
+                  <Save size={14} /> {busy ? 'Saving…' : 'Save & publish'}
+                </button>
+                <button onClick={del} className="p-2 rounded-full hover:bg-rose-100 dark:hover:bg-rose-500/15 text-rose-500" title="Delete topic"><Trash2 size={14} /></button>
+              </div>
+            </div>
+            <textarea value={draft.description || ''} onChange={e => upd('description', e.target.value)} rows={2}
+              placeholder="Short description shown on the library card…"
+              className="w-full text-sm px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 focus:outline-none mb-3" />
+            <div className="flex items-center gap-2 flex-wrap">
+              <select value={draft.hospital} onChange={e => { const h = e.target.value; setDraft(d => ({ ...d, hospital: h, department: DEPARTMENTS[h]?.[0]?.id })); }}
+                className="text-xs px-2 py-1.5 rounded bg-slate-100 dark:bg-slate-800">
+                <option value="cardiology">Cardiology</option>
+                <option value="internal">Internal Medicine</option>
+                <option value="prehospital">Prehospital Field</option>
+              </select>
+              <select value={draft.department || ''} onChange={e => upd('department', e.target.value)} className="text-xs px-2 py-1.5 rounded bg-slate-100 dark:bg-slate-800">
+                {(DEPARTMENTS[draft.hospital] || []).map(d => <option key={d.id} value={d.id}>{d.label}</option>)}
+              </select>
+              <input value={draft.category || ''} onChange={e => upd('category', e.target.value)} placeholder="Category (e.g. Core topics)"
+                className="text-xs px-2 py-1.5 rounded bg-slate-100 dark:bg-slate-800 w-48" />
+              <input value={(draft.tags || []).join(', ')} onChange={e => upd('tags', e.target.value.split(',').map(t => t.trim()).filter(Boolean))}
+                placeholder="tags, comma, separated" className="text-xs px-2 py-1.5 rounded bg-slate-100 dark:bg-slate-800 flex-1 min-w-[160px]" />
+              <input type="number" value={draft.displayOrder || 0} onChange={e => upd('displayOrder', parseInt(e.target.value, 10) || 0)}
+                title="Display order" className="text-xs px-2 py-1.5 rounded bg-slate-100 dark:bg-slate-800 w-16" />
+            </div>
+            <div className="flex items-center gap-3 mt-3">
+              <button onClick={() => fileRef.current && fileRef.current.click()}
+                className="px-3 py-1.5 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold">⬆ Upload HTML file</button>
+              <input ref={fileRef} type="file" accept=".html,.htm,text/html" onChange={onFile} className="hidden" />
+              <span className="text-[11px] text-slate-400">{draft.htmlContent ? kb + ' KB loaded' : draft.htmlUrl ? 'Linked file' : 'No content yet'}</span>
+            </div>
+          </div>
+          <div className="p-5">
+            <RawHtmlEditor draft={draft} setDraft={setDraft} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AdminPanel({ cases, updateCase, addCase, deleteCase, navigate, auth, library, saveLibraryItem, removeLibraryItem }) {
   const [activeTab, setActiveTab] = useState('cases'); // 'cases' | 'exams'
   const [activeId, setActiveId] = useState(cases[0]?.id);
   const [activeStageKey, setActiveStageKey] = useState('profile');
@@ -6611,6 +7060,17 @@ values ('${auth.user.email}');`}
         >
           🎤 Conferences
         </button>
+        <button
+          onClick={() => setActiveTab('library')}
+          className={cx(
+            'px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors -mb-px',
+            activeTab === 'library'
+              ? 'border-indigo-500 text-indigo-700 dark:text-indigo-400'
+              : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white'
+          )}
+        >
+          📚 Library
+        </button>
       </div>
 
       {showNew && (
@@ -6640,6 +7100,8 @@ values ('${auth.user.email}');`}
         <ExamAdmin />
       ) : activeTab === 'conferences' ? (
         <ConferenceAdmin />
+      ) : activeTab === 'library' ? (
+        <LibraryAdmin library={library} onSave={saveLibraryItem} onDelete={removeLibraryItem} />
       ) : (
       <div className="grid lg:grid-cols-[280px_1fr] gap-5">
         {/* Case list — searchable & grouped by hospital → department */}

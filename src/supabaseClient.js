@@ -195,6 +195,74 @@ export async function uploadImageFile(file) {
   return { url: urlData.publicUrl }
 }
 
+// ============== DEPARTMENT LIBRARY ==============
+// Study topics (rich HTML) attached to a hospital + department.
+export async function fetchLibraryItems() {
+  const { data, error } = await supabase
+    .from('library_items')
+    .select('*')
+    .eq('active', true)
+    .order('display_order', { ascending: true })
+    .order('created_at', { ascending: false })
+  if (error) {
+    console.error('[library] fetch failed:', error.message)
+    return []
+  }
+  return (data || []).map(rowToLibraryItem)
+}
+
+export async function upsertLibraryItem(item) {
+  const { id, hospital, department, title, description, category, tags,
+          htmlUrl, displayOrder, active, ...rest } = item
+  const row = {
+    id,
+    hospital,
+    department: department || null,
+    title,
+    description: description || null,
+    category: category || null,
+    tags: tags || [],
+    html_url: htmlUrl || null,
+    display_order: displayOrder || 0,
+    active: active !== false,
+    data: rest,
+    updated_at: new Date().toISOString(),
+  }
+  const { data, error } = await supabase
+    .from('library_items')
+    .upsert(row, { onConflict: 'id' })
+    .select()
+    .single()
+  if (error) {
+    console.error('[library] upsert failed:', error.message)
+    return { error }
+  }
+  return { data: rowToLibraryItem(data) }
+}
+
+export async function deleteLibraryItem(id) {
+  const { error } = await supabase.from('library_items').delete().eq('id', id)
+  if (error) console.error('[library] delete failed:', error.message)
+  return { error }
+}
+
+function rowToLibraryItem(row) {
+  return {
+    id: row.id,
+    hospital: row.hospital,
+    department: row.department,
+    title: row.title,
+    description: row.description,
+    category: row.category,
+    tags: row.tags || [],
+    htmlUrl: row.html_url || null,
+    displayOrder: row.display_order || 0,
+    active: row.active !== false,
+    createdAt: row.created_at,
+    ...(row.data || {}),
+  }
+}
+
 // Deletes a Rich HTML file from Storage when the case is deleted.
 export async function deleteRichCaseFile(htmlUrl) {
   if (!htmlUrl) return
