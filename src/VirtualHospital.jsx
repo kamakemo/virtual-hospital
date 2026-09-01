@@ -1665,6 +1665,37 @@ function InsMenuItem({ icon: Icon, label, onClick }) {
 }
 
 // ============== APP ==============
+// Turns an unhandled render crash into a readable message instead of a white screen.
+class ErrorBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { err: null }; }
+  static getDerivedStateFromError(err) { return { err }; }
+  componentDidCatch(err, info) { console.error('[Virtual Hospital] render crash:', err, info); }
+  render() {
+    if (this.state.err) {
+      const e = this.state.err;
+      return (
+        <div className="max-w-2xl mx-auto px-6 py-16">
+          <div className="rounded-2xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 p-6">
+            <h2 className="display-font text-2xl font-bold mb-2 text-rose-700 dark:text-rose-300">This page failed to load</h2>
+            <p className="text-sm text-slate-600 dark:text-slate-300 mb-3">
+              Something in the page crashed. Copy the message below and send it over — it pinpoints the cause exactly.
+            </p>
+            <pre className="text-[11px] bg-slate-900 text-rose-200 p-3 rounded-lg overflow-auto max-h-72 whitespace-pre-wrap">
+              {String((e && (e.stack || e.message)) || e)}
+            </pre>
+            <div className="flex gap-2 mt-3">
+              <button onClick={() => this.setState({ err: null })} className="px-4 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold">Try again</button>
+              <button onClick={() => { try { window.history.pushState({ route: { name: 'landing' } }, ''); } catch (x) {} window.location.reload(); }}
+                className="px-4 py-2 rounded-full border border-slate-300 dark:border-slate-700 text-sm font-bold">Back to home</button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function VirtualHospital() {
   const [theme, setTheme] = useLocal(SK.SETTINGS, { dark: false });
   const [cases, setCases] = useState([]);
@@ -1931,6 +1962,7 @@ export default function VirtualHospital() {
       />
 
       <main>
+        <ErrorBoundary key={`eb:${route.name}:${route.departmentId || ''}:${route.libraryItemId || ''}`}>
         <div
           key={`${route.name}:${route.hospital || ''}:${route.departmentId || ''}:${route.caseId || ''}:${route.examId || ''}:${route.topicId || ''}:${route.conferenceId || ''}:${route.sessionId || ''}:${route.libraryItemId || ''}`}
           className="page-transition"
@@ -2037,6 +2069,7 @@ export default function VirtualHospital() {
           />
         )}
         </div>
+        </ErrorBoundary>
       </main>
 
       <footer className="mt-20 border-t border-slate-200 dark:border-slate-800 py-8 text-center text-xs text-slate-500">
