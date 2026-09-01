@@ -3231,13 +3231,15 @@ function LibraryView({ hospital, departmentId, library, navigate }) {
 
 // Renders one library topic (rich HTML) full-height, scrolling inside the frame.
 function LibraryItemView({ item, navigate }) {
-  const [htmlDoc, setHtmlDoc] = useState('');
+  const rawValue = item ? (item.htmlUrl || item.htmlContent || '') : '';
+  const isUrl = rawValue.startsWith('http://') || rawValue.startsWith('https://');
+
+  // Seed inline content on the FIRST render. Mounting the iframe empty and then
+  // swapping srcDoc does not reliably re-parse the document, which left the page blank.
+  const [htmlDoc, setHtmlDoc] = useState(() => (isUrl ? '' : rawValue));
   const [fetching, setFetching] = useState(false);
   const [fetchError, setFetchError] = useState('');
   const [fullscreen, setFullscreen] = useState(false);
-
-  const rawValue = item ? (item.htmlUrl || item.htmlContent || '') : '';
-  const isUrl = rawValue.startsWith('http://') || rawValue.startsWith('https://');
 
   useEffect(() => {
     if (!item) return;
@@ -3279,10 +3281,12 @@ function LibraryItemView({ item, navigate }) {
       {!fetching && !fetchError && (
         <div className={cx(fullscreen ? 'flex-1' : 'max-w-[1600px] mx-auto w-full px-2 sm:px-4 py-3')}>
           <iframe
+            key={item.id + ':' + srcDocFinal.length}
             title={item.title}
             srcDoc={srcDocFinal}
             sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-presentation allow-downloads"
-            className={cx('w-full bg-white rounded-xl border border-slate-200 dark:border-slate-800', fullscreen ? 'h-full rounded-none border-0' : 'h-[calc(100vh-11rem)] min-h-[560px]')}
+            className={cx('w-full bg-white rounded-xl border border-slate-200 dark:border-slate-800', fullscreen ? 'h-full rounded-none border-0' : 'min-h-[560px]')}
+            style={fullscreen ? undefined : { height: 'calc(100vh - 11rem)' }}
           />
         </div>
       )}
