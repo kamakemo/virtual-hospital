@@ -1,342 +1,312 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 /* ============================================================
-   Virtual Teaching Hospital — "clinical & calm"
-   A single committed light design: paper ground, one deep-teal
-   accent, hairline rules, flat panels, no gradients, no shadows.
-   Depth comes from rules and spacing, not from elevation.
+   Virtual Hospital — the chrome around the scenes.
+   Light, quiet, and out of the way: frosted cream glass for the
+   location plate, brushed steel for the lift, and nothing else
+   competing with the hospital itself.
    ============================================================ */
 
 :root {
-  --paper: #F7F9FB;
-  --panel: #FFFFFF;
-  --sunk:  #EDF1F5;
-  --ink:   #0F1A20;
-  --ink-2: #44575F;
-  --ink-3: #6F838D;
-  --line:  #DCE4EA;
-  --line-soft: #E9EEF2;
-  --accent: #0E6B7A;
-  --accent-deep: #0A4F5A;
-  --accent-soft: #E4F0F2;
-  --good: #0F766E;
-  --warn: #A8620F;
-  --crit: #AE2A22;
+  --ink: #13212B;
+  --ink-2: #4A5A66;
+  --ink-3: #7C8A94;
+  --cream: #F6F2EA;
+  --paper: #FBFAF7;
+  --glass: rgba(251, 250, 247, 0.82);
+  --glass-line: rgba(19, 33, 43, 0.1);
+  --teal: #0E6B7A;
+  --shadow: 0 1px 2px rgba(19, 33, 43, 0.08), 0 12px 32px -14px rgba(19, 33, 43, 0.4);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
   color-scheme: light;
 }
 
-html, body, #root { height: 100%; }
-
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
 body {
-  margin: 0;
-  background: var(--paper);
+  background: #E9E6DF;
   color: var(--ink);
   font-family: Archivo, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  font-size: 15.5px;
-  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Headings carry the institutional voice: a quiet serif, tight and balanced. */
-.display {
-  font-family: Newsreader, Georgia, Cambria, serif;
-  font-weight: 500;
-  letter-spacing: -0.012em;
-  text-wrap: balance;
-}
-
-/* Small uppercase signage label — used for eyebrows, unit kickers, table heads */
-.label {
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.17em;
-  text-transform: uppercase;
-}
-
-/* Tabular figures wherever digits line up */
-.nums { font-variant-numeric: tabular-nums; }
-
-/* Keyboard focus is always visible and always the accent */
-:where(a, button, input, select, textarea, [tabindex]):focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-/* A hairline that reads as a rule, not a border */
-.rule { border-top: 1px solid var(--line); }
-
-/* Route transition — the page wrapper is keyed by route so this replays.
-   Deliberately no opacity: the page must never be parked invisible waiting on
-   an animation, or the first frame (and any screenshot of it) is blank. */
-@keyframes pageIn { from { transform: translateY(7px); } to { transform: none; } }
-.page-in { animation: pageIn 0.24s cubic-bezier(0.22, 1, 0.36, 1); }
-
-/* Thin indeterminate bar for loading states */
-@keyframes slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(320%); } }
-.loading-bar { position: relative; overflow: hidden; background: var(--line-soft); height: 2px; }
-.loading-bar::after {
-  content: ''; position: absolute; inset: 0 auto 0 0; width: 32%;
-  background: var(--accent); animation: slide 1.1s ease-in-out infinite;
-}
-
-/* Scroll-snap-free horizontal scroller for wide content */
-.scroll-x { overflow-x: auto; overscroll-behavior-x: contain; }
-.scroll-x::-webkit-scrollbar { height: 8px; }
-.scroll-x::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
-
-/* ============================================================
-   Prose — conference lecture fragments (.rte-content) and any
-   other author-supplied HTML rendered inline rather than in an
-   iframe. Tuned to the light palette; replaces the old themed
-   duplicate blocks.
-   ============================================================ */
-
-.rte-content {
-  font-size: 16.5px;
-  line-height: 1.68;
-  color: var(--ink-2);
-}
-.rte-content > :first-child { margin-top: 0; }
-.rte-content h2 {
-  font-family: Newsreader, Georgia, serif;
-  font-size: 25px; font-weight: 600; line-height: 1.2;
-  letter-spacing: -0.01em;
-  color: var(--ink);
-  margin: 2em 0 0.5em;
-  padding-bottom: 0.3em;
-  border-bottom: 1px solid var(--line);
-  text-wrap: balance;
-}
-.rte-content h3 {
-  font-size: 17px; font-weight: 600; color: var(--ink);
-  margin: 1.5em 0 0.4em;
-}
-.rte-content h4 {
-  font-size: 15px; font-weight: 600; color: var(--ink);
-  margin: 1.2em 0 0.3em;
-}
-.rte-content p { margin: 0 0 1em; }
-.rte-content strong { color: var(--ink); font-weight: 600; }
-.rte-content em { font-style: italic; }
-.rte-content a { color: var(--accent-deep); text-decoration: underline; text-underline-offset: 2px; }
-.rte-content ul, .rte-content ol { margin: 0 0 1.1em; padding-left: 1.35em; }
-.rte-content li { margin-bottom: 0.4em; }
-.rte-content li::marker { color: var(--ink-3); }
-.rte-content hr { border: 0; border-top: 1px solid var(--line); margin: 2em 0; }
-.rte-content img { max-width: 100%; height: auto; border-radius: 8px; }
-.rte-content code {
-  font-family: 'IBM Plex Mono', monospace; font-size: 0.87em;
-  background: var(--sunk); border: 1px solid var(--line-soft);
-  border-radius: 4px; padding: 1px 5px;
-}
-
-/* Pull-quote — authors use blockquote for the one-line rule of the section */
-.rte-content blockquote {
-  margin: 1.4em 0;
-  padding: 0.1em 0 0.1em 1.1em;
-  border-left: 3px solid var(--accent);
-  font-family: Newsreader, Georgia, serif;
-  font-size: 19px;
-  line-height: 1.5;
-  color: var(--ink);
-}
-.rte-content blockquote p { margin: 0.35em 0; }
-
-/* Tables scroll inside their own container rather than widening the page */
-.rte-content table,
-.rte-content table.rte-table {
-  border-collapse: collapse;
-  width: 100%;
-  margin: 1.2em 0;
-  font-size: 14.5px;
-  font-family: Archivo, sans-serif;
-  display: block;
-  overflow-x: auto;
-  white-space: normal;
-}
-.rte-content table th,
-.rte-content table td {
-  border: 1px solid var(--line);
-  padding: 8px 11px;
-  text-align: left;
-  vertical-align: top;
-}
-.rte-content table th {
-  background: var(--sunk);
-  color: var(--ink);
-  font-weight: 600;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.rte-content table tbody tr:nth-child(even) { background: #FAFCFD; }
-
-/* Callouts — four kinds, each a flat tinted block with a colour edge.
-   Authors emit: .rte-callout + .rte-info | .rte-pearl | .rte-warn */
-.rte-content .rte-callout {
-  margin: 1.3em 0;
-  padding: 0.85em 1.1em;
-  border-left: 3px solid;
-  border-radius: 0 8px 8px 0;
-  font-size: 15.5px;
-}
-.rte-content .rte-callout > strong:first-child {
-  display: block;
-  margin-bottom: 0.35em;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-.rte-content .rte-callout p:last-child { margin-bottom: 0; }
-.rte-content .rte-info  { background: #ECF4F6; border-color: var(--accent);  color: #184A54; }
-.rte-content .rte-pearl { background: #F3F1E8; border-color: #8A6A1F;        color: #4A3A10; }
-.rte-content .rte-warn  { background: #F9EEEC; border-color: var(--crit);    color: #6B1F19; }
-.rte-content .rte-callout strong,
-.rte-content .rte-callout em { color: inherit; }
-
-@media (max-width: 640px) {
-  .rte-content { font-size: 16px; }
-  .rte-content h2 { font-size: 22px; }
-  .rte-content blockquote { font-size: 17.5px; }
-}
-
-/* ============================================================
-   ROOMS — every unit is a place you walk into.
-   The photograph is the room; it is blurred and darkened so the
-   drawn bays in front stay crisp and nothing reads doubled.
-   ============================================================ */
-
-.room {
-  position: relative;
-  border-radius: 16px;
   overflow: hidden;
-  background: #0B1A22;
-  isolation: isolate;
 }
-.room__photo {
-  position: absolute; inset: -4%;
-  width: 108%; height: 108%;
-  object-fit: cover;
-  filter: blur(3px) saturate(0.85) brightness(0.62);
-  transform: scale(1.04);
-  z-index: 0;
-}
-/* Vignette + top-down gradient so type and bays always have ground to sit on */
-.room__scrim {
-  position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background:
-    radial-gradient(120% 85% at 50% 18%, rgba(8,20,27,0.18) 0%, rgba(8,20,27,0.72) 72%, rgba(8,20,27,0.88) 100%),
-    linear-gradient(180deg, rgba(8,20,27,0.74) 0%, rgba(8,20,27,0.38) 28%, rgba(8,20,27,0.52) 100%);
-}
-/* The ceiling-mounted curtain track that runs across every real ward */
-.room__rail {
-  position: absolute; left: 0; right: 0; top: 64px; height: 2px; z-index: 2;
-  background: linear-gradient(90deg, transparent, rgba(226,238,245,0.42) 12%, rgba(226,238,245,0.42) 88%, transparent);
-  pointer-events: none;
-}
-.room__rail::before,
-.room__rail::after {
-  content: ''; position: absolute; top: -5px; width: 8px; height: 8px; border-radius: 50%;
-  background: rgba(226,238,245,0.3);
-}
-.room__rail::before { left: 11%; }
-.room__rail::after  { right: 11%; }
+button { font: inherit; color: inherit; }
+:where(button, [tabindex]):focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
 
-/* One-point-perspective floor under the bays */
-.room__floor {
-  position: absolute; left: -20%; right: -20%; bottom: -2px; height: 190px; z-index: 1;
-  transform: perspective(520px) rotateX(62deg);
-  transform-origin: bottom center;
-  background-image:
-    linear-gradient(rgba(190,214,228,0.16) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(190,214,228,0.16) 1px, transparent 1px);
-  background-size: 54px 54px;
-  -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 86%);
-          mask-image: linear-gradient(to top, #000 0%, transparent 86%);
-  pointer-events: none;
-}
+.stage { position: fixed; inset: 0; overflow: hidden; }
+.scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; outline: none; }
 
-.room__inner { position: relative; z-index: 3; }
-
-/* The bays sit in a shallow 3D stage so hover lifts them toward the viewer */
-.bays { perspective: 1700px; perspective-origin: 50% 24%; }
-
-.bay3d {
-  transform-style: preserve-3d;
-  transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.26s ease;
-  box-shadow: 0 2px 6px rgba(5,16,22,0.3), 0 18px 34px -20px rgba(5,16,22,0.6);
+/* ---------- bed number labels (positioned each frame by the world) ---------- */
+/* z-index makes this its own stacking context, so the per-tag depth ordering
+   can never lift a tag above the plate or the lift panel */
+.bed-tags { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 5; }
+.bed-tags.is-hidden { visibility: hidden; }
+.bed-tags.is-hidden .bed-tag { pointer-events: none !important; }
+.bed-tag {
+  position: absolute; left: 0; top: 0;
+  pointer-events: auto; cursor: pointer;
+  border: 0; padding: 0; background: none;
+  transition: opacity 0.25s ease;
   will-change: transform;
 }
-.bay3d.is-live:hover,
-.bay3d.is-live:focus-within {
-  transform: translateY(-10px) translateZ(46px) rotateX(2.2deg);
-  box-shadow: 0 10px 20px rgba(5,16,22,0.26), 0 40px 64px -26px rgba(5,16,22,0.7);
-}
-
-/* Red wall placard — the bed number sign every ward screws above the bed */
-.placard {
-  background: linear-gradient(180deg, #C8372E, #A32A22);
+.bed-tag span {
+  display: block;
+  font: 600 11px/1 'IBM Plex Mono', ui-monospace, monospace;
+  letter-spacing: 0.04em;
   color: #fff;
-  box-shadow: 0 1px 0 rgba(255,255,255,0.3) inset, 0 2px 5px rgba(0,0,0,0.3);
+  background: #C8302A;
+  border: 1.5px solid #fff;
+  border-radius: 5px;
+  padding: 4px 6px 3px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  transition: transform 0.18s var(--ease), background 0.18s ease;
 }
+.bed-tag.is-empty span { background: #6E7B85; }
+.bed-tag:hover span, .bed-tag.is-hot span { transform: scale(1.22); background: #A82520; }
+.bed-tag.is-empty:hover span, .bed-tag.is-empty.is-hot span { background: #55616A; }
 
-/* Live monitor trace */
-@keyframes sweepTrace { to { transform: translateX(-171px); } }
-.trace-run { animation: sweepTrace var(--trace-dur, 3.2s) linear infinite; }
-
-/* Soft glass plate for the case label on each bed */
+/* ---------- location plate ---------- */
 .plate {
-  background: rgba(255,255,255,0.96);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  position: absolute; top: 14px; left: 14px; z-index: 20;
+  display: flex; align-items: center; gap: 8px;
+  max-width: calc(100% - 28px);
 }
+.plate-back, .plate-trail {
+  background: var(--glass);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid var(--glass-line);
+  box-shadow: var(--shadow);
+}
+.plate-back {
+  width: 40px; height: 40px; flex: none;
+  display: grid; place-items: center;
+  border-radius: 12px; cursor: pointer;
+  transition: background 0.15s ease;
+}
+.plate-back:hover:not(:disabled) { background: #fff; }
+.plate-trail {
+  display: flex; align-items: center; gap: 4px;
+  border-radius: 12px; padding: 4px 6px; min-width: 0; min-height: 40px;
+}
+.plate-home, .plate-crumb {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: none; border: 0; padding: 5px 8px; border-radius: 8px;
+  cursor: pointer; white-space: nowrap; min-width: 0;
+}
+.plate-home:disabled, .plate-crumb:disabled, .plate-crumb.is-current { cursor: default; }
+.plate-home:hover:not(:disabled), .plate-crumb:hover:not(:disabled) { background: rgba(19, 33, 43, 0.06); }
+.plate-home { color: var(--teal); font-weight: 600; font-size: 14px; }
+.plate-home span { color: var(--ink); font-family: Newsreader, Georgia, serif; font-size: 16px; font-weight: 500; }
+.plate-sep { color: var(--ink-3); opacity: 0.5; }
+.plate-floor {
+  font: 600 11px/1 'IBM Plex Mono', monospace; color: #fff;
+  background: var(--hue, var(--teal)); border-radius: 5px; padding: 4px 5px 3px;
+}
+.plate-name { font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; }
+.plate-wing { font-size: 12px; color: var(--ink-3); }
+.plate-crumb.is-current { font-weight: 600; font-size: 14px; }
 
-/* ============================================================
-   HERO — the hospital itself
-   ============================================================ */
-
-.hero { position: relative; overflow: hidden; isolation: isolate; background: #071219; }
-.hero__photo {
-  position: absolute; inset: 0; width: 100%; height: 100%;
-  object-fit: cover; z-index: 0;
-  transform: scale(1.06);
-  animation: heroDrift 34s ease-in-out infinite alternate;
+/* ---------- elevator panel ---------- */
+.lift {
+  position: absolute; z-index: 20;
+  right: 14px; top: 50%; transform: translateY(-50%);
+  width: 196px;
 }
-@keyframes heroDrift {
-  from { transform: scale(1.06) translate3d(0, 0, 0); }
-  to   { transform: scale(1.16) translate3d(-1.6%, -1.2%, 0); }
-}
-.hero__scrim {
-  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+.lift-face {
+  border-radius: 18px; padding: 12px;
   background:
-    linear-gradient(100deg, rgba(5,18,25,0.94) 0%, rgba(5,18,25,0.78) 38%, rgba(5,18,25,0.42) 68%, rgba(5,18,25,0.3) 100%),
-    linear-gradient(180deg, rgba(5,18,25,0.5) 0%, transparent 34%, rgba(5,18,25,0.6) 100%);
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0 1px, rgba(0,0,0,0.02) 1px 3px),
+    linear-gradient(160deg, #E9ECEE 0%, #C9CED3 46%, #DDE1E4 100%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -1px 0 rgba(0,0,0,0.08), var(--shadow);
 }
-/* Only lifts content above the photo and scrim. Deliberately does NOT set
-   `position`, so elements can choose relative or absolute via utilities
-   without this rule winning the cascade against them. */
-.hero__inner { z-index: 2; }
+.lift-display {
+  background: #070B0E; border-radius: 10px; padding: 9px 11px 8px;
+  border: 1px solid #2A3238;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+.lift-digits {
+  display: flex; align-items: center; gap: 8px;
+  font: 600 28px/1 'IBM Plex Mono', monospace; color: #FF9F3A;
+  text-shadow: 0 0 10px rgba(255, 140, 40, 0.55);
+}
+.lift-arrow { font-size: 13px; }
+.lift-dest {
+  margin-top: 6px; min-height: 2.4em;
+  font-size: 11px; line-height: 1.2; color: #FFC98A; opacity: 0.86;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.lift-wings { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 10px 0; padding: 3px; border-radius: 10px; background: rgba(19, 33, 43, 0.08); }
+.lift-wing {
+  border: 0; background: none; border-radius: 7px; padding: 6px 4px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.02em; color: var(--ink-2); cursor: pointer;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.lift-wing.is-on { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15); }
+.lift-buttons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 10px; justify-items: center; }
+.lift-btn {
+  border: 0; background: none; padding: 0; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.lift-btn:disabled { cursor: default; }
+.lift-btn-ring {
+  width: 42px; height: 42px; border-radius: 50%;
+  display: grid; place-items: center;
+  font: 600 14px/1 'IBM Plex Mono', monospace; color: #3B444B;
+  background: radial-gradient(circle at 35% 30%, #FDFDFD 0%, #D6DADE 70%, #B9BFC4 100%);
+  box-shadow: inset 0 1px 0 #fff, 0 1px 0 rgba(255,255,255,0.8), 0 2px 4px rgba(0, 0, 0, 0.25), 0 0 0 2px rgba(120, 130, 138, 0.35);
+  transition: box-shadow 0.18s ease, color 0.18s ease, transform 0.12s ease;
+}
+.lift-btn:hover:not(:disabled) .lift-btn-ring { color: var(--hue, var(--teal)); box-shadow: inset 0 1px 0 #fff, 0 2px 4px rgba(0,0,0,0.25), 0 0 0 2px var(--hue, var(--teal)); }
+.lift-btn:active:not(:disabled) .lift-btn-ring { transform: scale(0.95); }
+.lift-btn.is-here .lift-btn-ring {
+  color: #fff;
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--hue, var(--teal)) 70%, #fff), var(--hue, var(--teal)));
+  box-shadow: 0 0 0 2px #fff, 0 0 14px color-mix(in srgb, var(--hue, var(--teal)) 70%, transparent);
+}
+.lift-btn-g { grid-column: span 2; }
+.lift-btn-g .lift-btn-ring { --hue: #4A5A66; }
+.lift-btn-name { display: none; }
+.lift-toggle { display: none; }
+.lift-scrim { display: none; }
 
-/* Thin accent keyline under the hero, like a department colour band */
-.hero__band {
-  position: absolute; left: 0; right: 0; bottom: 0; height: 4px; z-index: 3;
-  background: linear-gradient(90deg, #0E6B7A 0%, #3B4E8C 32%, #A32F3A 64%, #8A6A1F 100%);
+/* ---------- hover readouts ---------- */
+.tip {
+  position: absolute; z-index: 25; pointer-events: none;
+  transform: translate(16px, 16px);
+  display: flex; flex-direction: column; gap: 2px;
+  background: var(--glass);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-line); border-radius: 10px;
+  padding: 9px 12px; box-shadow: var(--shadow);
+  max-width: 280px;
+}
+.tip-floor { font: 600 10px/1 'IBM Plex Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase; color: var(--hue, var(--teal)); }
+.tip-name { font-weight: 600; font-size: 14px; }
+.tip-wing { font-size: 12px; color: var(--ink-3); }
+
+.caption, .bedbar {
+  position: absolute; z-index: 20; left: 50%; bottom: 18px; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 10px;
+  background: var(--glass);
+  backdrop-filter: blur(14px) saturate(140%); -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid var(--glass-line); border-radius: 14px;
+  box-shadow: var(--shadow);
+  max-width: min(640px, calc(100% - 28px));
+}
+.caption { padding: 10px 14px; pointer-events: none; animation: rise 0.2s var(--ease); }
+.caption-bed, .bedbar-num {
+  flex: none;
+  font: 600 11px/1 'IBM Plex Mono', monospace; color: #fff;
+  background: #C8302A; border-radius: 5px; padding: 5px 7px 4px;
+}
+.caption-text, .bedbar-text { font-weight: 500; font-size: 14px; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bedbar { padding: 6px; animation: rise 0.3s var(--ease); }
+.bedbar-id { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 0 4px; }
+.bedbar-step {
+  flex: none; width: 36px; height: 36px; border-radius: 10px;
+  display: grid; place-items: center; cursor: pointer;
+  background: rgba(19, 33, 43, 0.06); border: 0;
+}
+.bedbar-step:hover:not(:disabled) { background: rgba(19, 33, 43, 0.12); }
+
+.hint {
+  position: absolute; z-index: 15; left: 16px; bottom: 16px; margin: 0;
+  font-size: 12.5px; color: var(--ink-2);
+  background: var(--glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-line); border-radius: 999px; padding: 7px 13px;
+  pointer-events: none; animation: rise 0.4s var(--ease) 0.6s both;
+}
+@keyframes rise { from { opacity: 0; transform: translate(var(--tx, 0), 8px); } to { opacity: 1; transform: translate(var(--tx, 0), 0); } }
+.caption, .bedbar { --tx: -50%; }
+
+/* ---------- lift doors ---------- */
+.doors { position: absolute; inset: 0; z-index: 40; pointer-events: none; }
+.doors.is-shut { pointer-events: auto; }
+.door {
+  position: absolute; top: 0; bottom: 0; width: 50.5%;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.07) 0 1px, rgba(0,0,0,0.035) 1px 3px),
+    linear-gradient(90deg, #B8BEC3 0%, #E3E6E8 40%, #CDD2D6 70%, #AEB4B9 100%);
+  transition: transform 0.72s cubic-bezier(0.65, 0, 0.35, 1);
+}
+.door-l { left: 0; transform: translateX(-101%); box-shadow: inset -2px 0 0 rgba(0,0,0,0.25), 6px 0 18px rgba(0,0,0,0.18); }
+.door-r { right: 0; transform: translateX(101%); box-shadow: inset 2px 0 0 rgba(255,255,255,0.4), -6px 0 18px rgba(0,0,0,0.18); }
+.doors.is-shut .door { transform: translateX(0); }
+.doors-indicator {
+  position: absolute; left: 50%; top: 38%; transform: translate(-50%, -50%);
+  text-align: center; opacity: 0; transition: opacity 0.25s ease;
+}
+.doors.is-shut .doors-indicator { opacity: 1; transition-delay: 0.4s; }
+.doors-num {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: #070B0E; border-radius: 12px; padding: 10px 18px 8px;
+  font: 600 44px/1 'IBM Plex Mono', monospace; color: #FF9F3A;
+  text-shadow: 0 0 14px rgba(255, 140, 40, 0.6);
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.9), 0 0 0 3px #D0D5D9, 0 6px 18px rgba(0,0,0,0.25);
+}
+.doors-arrow { font-size: 18px; }
+.doors-label { margin-top: 14px; font-family: Newsreader, Georgia, serif; font-size: 20px; color: #2D3A43; text-shadow: 0 1px 0 rgba(255,255,255,0.6); }
+
+/* ---------- arrival ---------- */
+.splash {
+  position: absolute; inset: 0; z-index: 60;
+  display: grid; place-content: center; justify-items: center; gap: 14px;
+  background: var(--cream);
+  transition: opacity 0.9s ease 0.1s, visibility 0s linear 1s;
+}
+.splash.is-gone { opacity: 0; visibility: hidden; }
+.splash-mark { color: var(--teal); transform: scale(2.2); margin-bottom: 14px; }
+.splash-name { font-family: Newsreader, Georgia, serif; font-size: 28px; color: var(--ink); }
+.splash-bar { width: 160px; height: 2px; background: rgba(19,33,43,0.1); overflow: hidden; border-radius: 2px; }
+.splash-bar span { display: block; width: 40%; height: 100%; background: var(--teal); animation: load 1.1s ease-in-out infinite; }
+@keyframes load { from { transform: translateX(-100%); } to { transform: translateX(260%); } }
+.failed { position: absolute; inset: 0; z-index: 70; display: grid; place-content: center; text-align: center; padding: 30px; background: var(--cream); }
+.failed h1 { font-family: Newsreader, Georgia, serif; font-weight: 500; margin: 0 0 8px; }
+.failed p { max-width: 46ch; color: var(--ink-2); line-height: 1.5; margin: 0; }
+
+/* ---------- tablet ---------- */
+@media (max-width: 1100px) {
+  .lift { width: 168px; }
+  .lift-btn-ring { width: 36px; height: 36px; font-size: 13px; }
+  .lift-buttons { gap: 6px 8px; }
+  .plate-wing { display: none; }
+}
+
+/* ---------- phone: the panel becomes a sheet ---------- */
+@media (max-width: 760px) {
+  .plate { top: 10px; left: 10px; max-width: calc(100% - 20px); }
+  .plate-home span { display: none; }
+  .plate-name { max-width: 42vw; }
+  .lift-toggle {
+    position: absolute; z-index: 21; right: 12px; bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+    border: 1px solid rgba(255,255,255,0.7); border-radius: 14px; padding: 6px 12px 6px 6px;
+    background: linear-gradient(160deg, #E9ECEE, #C9CED3); box-shadow: var(--shadow); cursor: pointer;
+  }
+  .lift-toggle-num {
+    background: #070B0E; color: #FF9F3A; border-radius: 8px; padding: 7px 8px 6px;
+    font: 600 15px/1 'IBM Plex Mono', monospace; text-shadow: 0 0 8px rgba(255,140,40,0.5);
+  }
+  .lift-toggle-label { font-weight: 600; font-size: 13px; }
+  .lift {
+    top: auto; bottom: 0; right: 0; left: 0; width: auto; transform: translateY(105%);
+    transition: transform 0.38s var(--ease); z-index: 31;
+  }
+  .lift.is-open { transform: translateY(0); }
+  .lift-face { border-radius: 20px 20px 0 0; padding: 14px 14px max(16px, env(safe-area-inset-bottom)); max-height: 78vh; overflow-y: auto; }
+  .lift-buttons { grid-template-columns: 1fr 1fr; justify-items: stretch; gap: 8px; }
+  .lift-btn { flex-direction: row; gap: 10px; text-align: left; padding: 4px; border-radius: 12px; }
+  .lift-btn-ring { width: 34px; height: 34px; flex: none; font-size: 12px; }
+  .lift-btn-name { display: block; font-size: 12px; line-height: 1.2; color: var(--ink-2); }
+  .lift-btn.is-here .lift-btn-name { color: var(--ink); font-weight: 600; }
+  .lift-scrim { display: block; position: absolute; inset: 0; z-index: 30; background: rgba(19, 33, 43, 0.25); }
+  .caption, .bedbar { bottom: 70px; }
+  .hint { bottom: 70px; left: 50%; transform: translateX(-50%); --tx: -50%; white-space: nowrap; font-size: 12px; }
+  .doors-num { font-size: 34px; }
+  .doors-label { font-size: 17px; padding: 0 20px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .page-in { animation: none; }
-  .loading-bar::after { animation: none; width: 100%; opacity: 0.4; }
-  .hero__photo { animation: none; }
-  .trace-run { animation: none; }
-  .bay3d.is-live:hover { transform: translateY(-4px); }
-}
-
-@media print {
-  body { background: #fff; }
-  .no-print { display: none !important; }
+  .door { transition-duration: 0.01s; }
+  .splash-bar span, .caption, .bedbar, .hint { animation: none; }
 }

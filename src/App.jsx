@@ -1,239 +1,295 @@
-import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { TopBar, Footer, Page } from './ui/Chrome.jsx';
-import { useRouter, Loading, EmptyState, Button, Divider } from './ui/kit.jsx';
-import Home from './views/Home.jsx';
-import Department from './views/Department.jsx';
-import Unit from './views/Unit.jsx';
-import CaseReader from './views/CaseReader.jsx';
-import LibraryItemView from './views/LibraryItem.jsx';
-import Auth from './views/Auth.jsx';
-import { ConferencesList, ConferenceView, SessionView } from './views/Conferences.jsx';
-import { DEPARTMENTS, isVisible } from './data/curriculum.js';
-import {
-  supabase, isSupabaseConfigured, signOut,
-  fetchAllCases, fetchLibraryItems, fetchAllConferences,
-  fetchProgress, saveProgress,
-} from './supabaseClient.js';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { World } from './hospital/three/World.js';
+import ElevatorPanel from './hospital/ui/ElevatorPanel.jsx';
+import ElevatorDoors from './hospital/ui/ElevatorDoors.jsx';
+import { WINGS, WING_BY_ID, HOSPITAL_NAME, BEDS_PER_FLOOR, floorOf, pad2 } from './hospital/data.js';
 
-const EMPTY_PROGRESS = {
-  xp: 0,
-  completedStages: {},
-  mcqScores: {},
-  badges: [],
-  conferenceProgress: {},
+/* ============================================================
+   VIRTUAL HOSPITAL
+   building → floor → department → patient bed.
+   The 3D world does the drawing; this component owns where the
+   visitor is, the history stack, and the few controls laid over
+   the scene.
+   ============================================================ */
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+const HINTS = {
+  building: 'Drag to walk around the building · choose a floor',
+  floor: 'Drag to look around · choose a bed',
+  bed: 'Drag to look · Esc to step back',
 };
 
-/* A thrown render error used to blank the page entirely. Now it shows what
-   broke, with a way back into the app. */
-class ErrorBoundary extends React.Component {
-  constructor(props) { super(props); this.state = { error: null }; }
-  static getDerivedStateFromError(error) { return { error }; }
-  componentDidCatch(error, info) { console.error('[VTH]', error, info); }
-  render() {
-    if (!this.state.error) return this.props.children;
-    return (
-      <Page>
-        <div className="max-w-read">
-          <h1 className="display text-[28px] text-crit mb-3">This page failed to load</h1>
-          <p className="text-[14px] text-ink-2 mb-5">
-            Something in the hospital threw an error. The detail below is what went wrong.
-          </p>
-          <pre className="text-[12px] bg-sunk border border-line rounded-panel p-4 overflow-x-auto whitespace-pre-wrap text-ink-2">
-            {String(this.state.error?.stack || this.state.error)}
-          </pre>
-          <div className="mt-6 flex gap-3">
-            <Button onClick={() => { this.setState({ error: null }); window.history.replaceState({ route: { name: 'home' } }, ''); window.location.reload(); }}>
-              Back to the hospital
-            </Button>
-          </div>
-        </div>
-      </Page>
-    );
-  }
+function Mark() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true">
+      <rect x="1.25" y="1.25" width="29.5" height="29.5" rx="7" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M16 8.5v15M8.5 16h15" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" />
+    </svg>
+  );
 }
 
 export default function App() {
-  const [route, navigate] = useRouter({ name: 'home' });
-  const [session, setSession] = useState(null);
-  const [authReady, setAuthReady] = useState(false);
+  const canvasRef = useRef(null);
+  const labelsRef = useRef(null);
+  const world = useRef(null);
 
-  const [cases, setCases] = useState([]);
-  const [library, setLibrary] = useState([]);
-  const [conferences, setConferences] = useState([]);
-  const [dataReady, setDataReady] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState('');
+  const [view, setView] = useState({ level: 'building' });
+  const [doors, setDoors] = useState({ state: 'open' });
+  const [busy, setBusy] = useState(false);
+  const [hover, setHover] = useState(null);
+  const [hintSeen, setHintSeen] = useState({});
 
-  const [progress, setProgress] = useState(EMPTY_PROGRESS);
-  const saveTimer = useRef(null);
-  const progressLoaded = useRef(false);
+  const viewRef = useRef(view);
+  const busyRef = useRef(false);
+  viewRef.current = view;
 
-  /* ---------- auth ---------- */
-  useEffect(() => {
-    if (!isSupabaseConfigured()) { setAuthReady(true); return; }
-    let cancelled = false;
-    supabase.auth.getSession().then(({ data }) => {
-      if (cancelled) return;
-      setSession(data?.session || null);
-      setAuthReady(true);
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
-      setSession(s || null);
-      setAuthReady(true);
-    });
-    return () => { cancelled = true; sub?.subscription?.unsubscribe(); };
+  const lock = v => { busyRef.current = v; setBusy(v); };
+
+  /* ---------- navigation ---------- */
+
+  const record = (v, push) => {
+    if (push) window.history.pushState({ v }, '');
+    else window.history.replaceState({ v }, '');
+  };
+
+  const goFloor = useCallback(async (wingId, number, { push = true } = {}) => {
+    const floor = floorOf(wingId, number);
+    const W = world.current;
+    if (!floor || !W || busyRef.current) return;
+    const cur = viewRef.current;
+    if (cur.level === 'floor' && cur.wingId === wingId && cur.number === number) return;
+    if (cur.level === 'bed' && cur.wingId === wingId && cur.number === number) {
+      lock(true);
+      await W.leaveBed();
+      const v = { level: 'floor', wingId, number };
+      setView(v); record(v, push);
+      lock(false);
+      return;
+    }
+    lock(true);
+    setHover(null);
+    if (cur.level === 'building') await W.flyToFloor(wingId, number);
+    setDoors({ state: 'closing', from: cur.number || 0, to: number, label: floor.name });
+    await sleep(720);
+    setDoors(d => ({ ...d, state: 'closed' }));
+    await sleep(40);
+    W.enterFloor(floor);               // the ward is built behind closed doors
+    const v = { level: 'floor', wingId, number };
+    setView(v); record(v, push);
+    await sleep(420);
+    setDoors(d => ({ ...d, state: 'opening' }));
+    await sleep(760);
+    setDoors({ state: 'open' });
+    lock(false);
   }, []);
 
-  /* ---------- content ---------- */
-  useEffect(() => {
-    if (!session) return;
-    let cancelled = false;
-    (async () => {
-      const [c, l, f] = await Promise.all([
-        fetchAllCases(), fetchLibraryItems(), fetchAllConferences(),
-      ]);
-      if (cancelled) return;
-      // Retired departments (the prehospital field) still have rows in the
-      // database; they are simply never surfaced.
-      setCases((c || []).filter(isVisible));
-      setLibrary((l || []).filter(isVisible));
-      setConferences(f || []);
-      setDataReady(true);
-    })();
-    return () => { cancelled = true; };
-  }, [session]);
+  const goBuilding = useCallback(async ({ push = true } = {}) => {
+    const W = world.current;
+    const cur = viewRef.current;
+    if (!W || busyRef.current || cur.level === 'building') return;
+    lock(true);
+    setHover(null);
+    setDoors({ state: 'closing', from: cur.number || 0, to: 0, label: 'Ground · Main entrance' });
+    await sleep(720);
+    setDoors(d => ({ ...d, state: 'closed' }));
+    await sleep(40);
+    W.showBuilding();
+    const v = { level: 'building' };
+    setView(v); record(v, push);
+    await sleep(380);
+    setDoors(d => ({ ...d, state: 'opening' }));
+    await sleep(760);
+    setDoors({ state: 'open' });
+    lock(false);
+  }, []);
 
-  /* ---------- progress ---------- */
+  const goBed = useCallback(async (index, { push = true } = {}) => {
+    const W = world.current;
+    const cur = viewRef.current;
+    if (!W || busyRef.current || cur.level === 'building') return;
+    if (index < 0 || index >= BEDS_PER_FLOOR) return;
+    lock(true);
+    setHover(null);
+    const v = { level: 'bed', wingId: cur.wingId, number: cur.number, bed: index };
+    setView(v); record(v, push);
+    await W.focusBed(index);
+    lock(false);
+  }, []);
+
+  const stepBack = useCallback(() => {
+    const cur = viewRef.current;
+    if (cur.level === 'bed') goFloor(cur.wingId, cur.number);
+    else if (cur.level === 'floor') goBuilding();
+  }, [goFloor, goBuilding]);
+
+  // Browser back/forward walks the same path.
   useEffect(() => {
-    if (!session?.user?.id) return;
-    let cancelled = false;
-    (async () => {
-      const p = await fetchProgress(session.user.id);
-      if (!cancelled) {
-        setProgress({ ...EMPTY_PROGRESS, ...(p || {}) });
-        progressLoaded.current = true;
+    record(viewRef.current, false);
+    const onPop = async e => {
+      const t = e.state?.v || { level: 'building' };
+      const cur = viewRef.current;
+      if (t.level === 'building') return goBuilding({ push: false });
+      if (t.level === 'floor') return goFloor(t.wingId, t.number, { push: false });
+      if (t.level === 'bed') {
+        if (cur.wingId !== t.wingId || cur.number !== t.number || cur.level === 'building') {
+          await goFloor(t.wingId, t.number, { push: false });
+        }
+        return goBed(t.bed, { push: false });
       }
-    })();
-    return () => { cancelled = true; };
-  }, [session?.user?.id]);
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, [goFloor, goBuilding, goBed]);
+
+  /* ---------- the 3D world ---------- */
+
+  const handlers = useRef({});
+  handlers.current = {
+    selectFloor: (w, n) => goFloor(w, n),
+    selectBed: i => goBed(i),
+  };
 
   useEffect(() => {
-    if (!session?.user?.id || !progressLoaded.current) return;
-    clearTimeout(saveTimer.current);
-    saveTimer.current = setTimeout(() => {
-      saveProgress(session.user.id, progress);
-    }, 900);
-    return () => clearTimeout(saveTimer.current);
-  }, [progress, session?.user?.id]);
+    let w;
+    try {
+      w = new World({
+        canvas: canvasRef.current,
+        labels: labelsRef.current,
+        wings: WINGS,
+        on: {
+          ready: () => setTimeout(() => setReady(true), 250),
+          hover: h => setHover(h),
+          selectFloor: (a, b) => handlers.current.selectFloor(a, b),
+          selectBed: i => handlers.current.selectBed(i),
+        },
+      });
+      world.current = w;
+    } catch (e) {
+      console.error(e);
+      setFailed('This device could not start the 3D view. Try a recent version of Chrome, Edge, Safari or Firefox with hardware acceleration turned on.');
+    }
+    return () => { w?.dispose(); world.current = null; };
+  }, []);
 
-  const onSignOut = useCallback(async () => {
-    await signOut();
-    progressLoaded.current = false;
-    setProgress(EMPTY_PROGRESS);
-    setCases([]); setLibrary([]); setConferences([]);
-    setDataReady(false);
-    navigate({ name: 'home' }, { replace: true });
-  }, [navigate]);
+  /* ---------- keyboard ---------- */
 
-  const caseById = useMemo(() => {
-    const m = {};
-    for (const c of cases) m[c.id] = c;
-    return m;
-  }, [cases]);
+  useEffect(() => {
+    const onKey = e => {
+      if (e.target.closest?.('input, textarea')) return;
+      const cur = viewRef.current;
+      if (e.key === 'Escape') stepBack();
+      if (cur.level === 'bed' && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+        const next = (cur.bed + (e.key === 'ArrowRight' ? 1 : BEDS_PER_FLOOR - 1)) % BEDS_PER_FLOOR;
+        goBed(next, { push: false });
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [stepBack, goBed]);
 
-  const libraryById = useMemo(() => {
-    const m = {};
-    for (const l of library) m[l.id] = l;
-    return m;
-  }, [library]);
+  /* ---------- derived ---------- */
 
-  const counts = useMemo(() => ({
-    cases: cases.length,
-    units: DEPARTMENTS.reduce((n, d) => n + d.units.length, 0),
-    library: library.length,
-    conferences: conferences.length,
-  }), [cases, library, conferences]);
+  const wing = view.wingId ? WING_BY_ID[view.wingId] : null;
+  const floor = view.wingId ? floorOf(view.wingId, view.number) : null;
+  const bedHeader = view.level === 'bed' && floor ? floor.beds[view.bed] : null;
+  const hint = !hintSeen[view.level] && ready ? HINTS[view.level] : null;
 
-  /* ---------- gates ---------- */
-  if (!isSupabaseConfigured()) {
-    return (
-      <Page>
-        <EmptyState
-          title="Supabase is not configured"
-          body="Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in the environment, then reload."
-        />
-      </Page>
-    );
-  }
-
-  if (!authReady) return <div className="loading-bar" />;
-  if (!session) return <Auth />;
-
-  const shared = { cases, library, conferences, progress, setProgress, navigate };
-
-  let screen;
-  switch (route.name) {
-    case 'department':
-      screen = <Department deptId={route.deptId} {...shared} />;
-      break;
-    case 'unit':
-      screen = <Unit deptId={route.deptId} unitId={route.unitId} {...shared} />;
-      break;
-    case 'case':
-      screen = (
-        <CaseReader
-          caseData={caseById[route.caseId]}
-          deptId={route.deptId}
-          unitId={route.unitId}
-          progress={progress}
-          setProgress={setProgress}
-          navigate={navigate}
-        />
-      );
-      break;
-    case 'libraryItem':
-      screen = (
-        <LibraryItemView
-          item={libraryById[route.itemId]}
-          deptId={route.deptId}
-          unitId={route.unitId}
-          navigate={navigate}
-        />
-      );
-      break;
-    case 'conferences':
-      screen = <ConferencesList conferences={conferences} progress={progress} navigate={navigate} />;
-      break;
-    case 'conference':
-      screen = <ConferenceView conferenceId={route.conferenceId} progress={progress} navigate={navigate} />;
-      break;
-    case 'session':
-      screen = (
-        <SessionView
-          conferenceId={route.conferenceId}
-          sessionId={route.sessionId}
-          progress={progress}
-          setProgress={setProgress}
-          navigate={navigate}
-        />
-      );
-      break;
-    case 'home':
-    default:
-      screen = dataReady
-        ? <Home {...shared} />
-        : <Page><Loading label="Opening the hospital…" /></Page>;
-  }
-
-  // The case and library readers bring their own full-width chrome.
-  const bare = route.name === 'case' || route.name === 'libraryItem';
+  const dismissHint = () => setHintSeen(s => (s[view.level] ? s : { ...s, [view.level]: true }));
 
   return (
-    <div className="min-h-full flex flex-col">
-      <TopBar route={route} navigate={navigate} session={session} onSignOut={onSignOut} />
-      <div key={`${route.name}:${route.deptId || ''}:${route.unitId || route.caseId || route.itemId || route.conferenceId || ''}:${route.sessionId || ''}`}
-        className="flex-1">
-        <ErrorBoundary>{screen}</ErrorBoundary>
+    <div className="stage" onPointerDown={dismissHint}>
+      <canvas ref={canvasRef} className="scene" />
+      <div ref={labelsRef} className="bed-tags" />
+
+      {/* ---------- where you are ---------- */}
+      <header className="plate">
+        {view.level !== 'building' && (
+          <button type="button" className="plate-back" onClick={stepBack} aria-label="Step back" disabled={busy}>
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          </button>
+        )}
+        <nav className="plate-trail" aria-label="Location">
+          <button type="button" className="plate-home" onClick={() => goBuilding()} disabled={busy || view.level === 'building'}>
+            <Mark /> <span>{HOSPITAL_NAME}</span>
+          </button>
+          {wing && floor && (
+            <>
+              <span className="plate-sep" aria-hidden="true">/</span>
+              <button type="button" className="plate-crumb" onClick={() => goFloor(wing.id, floor.number)} disabled={busy || view.level === 'floor'}>
+                <span className="plate-floor" style={{ '--hue': floor.hue }}>{pad2(floor.number)}</span>
+                <span className="plate-name">{floor.name}</span>
+                <span className="plate-wing">{wing.name}</span>
+              </button>
+            </>
+          )}
+          {view.level === 'bed' && (
+            <>
+              <span className="plate-sep" aria-hidden="true">/</span>
+              <span className="plate-crumb is-current">Bed {pad2(view.bed + 1)}</span>
+            </>
+          )}
+        </nav>
+      </header>
+
+      {/* ---------- floor selector ---------- */}
+      <ElevatorPanel
+        current={view.level === 'building' ? null : { wingId: view.wingId, number: view.number }}
+        onSelect={(w, n) => goFloor(w, n)}
+        onLobby={() => goBuilding()}
+        onPreview={p => world.current?.previewFloor(p?.wingId, p?.number)}
+        busy={busy}
+      />
+
+      {/* ---------- hover readouts ---------- */}
+      {hover?.type === 'floor' && view.level === 'building' && !busy && (
+        <div className="tip" style={{ left: hover.x, top: hover.y }}>
+          <span className="tip-floor" style={{ '--hue': hover.hue }}>Floor {pad2(hover.number)}</span>
+          <span className="tip-name">{hover.name}</span>
+          <span className="tip-wing">{WING_BY_ID[hover.wingId]?.name}</span>
+        </div>
+      )}
+      {hover?.type === 'bed' && view.level === 'floor' && !busy && (
+        <div className="caption">
+          <span className="caption-bed">Bed {pad2(hover.number)}</span>
+          <span className="caption-text">{hover.header || 'Bed available'}</span>
+        </div>
+      )}
+
+      {/* ---------- bedside ---------- */}
+      {view.level === 'bed' && floor && (
+        <div className="bedbar">
+          <button type="button" className="bedbar-step" disabled={busy} onClick={() => goBed((view.bed + BEDS_PER_FLOOR - 1) % BEDS_PER_FLOOR, { push: false })} aria-label="Previous bed">
+            <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          </button>
+          <div className="bedbar-id">
+            <span className="bedbar-num" style={{ '--hue': floor.hue }}>Bed {pad2(view.bed + 1)}</span>
+            <span className="bedbar-text">{bedHeader || 'Bed available'}</span>
+          </div>
+          <button type="button" className="bedbar-step" disabled={busy} onClick={() => goBed((view.bed + 1) % BEDS_PER_FLOOR, { push: false })} aria-label="Next bed">
+            <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          </button>
+        </div>
+      )}
+
+      {hint && <p className="hint">{hint}</p>}
+
+      <ElevatorDoors state={doors.state} from={doors.from} to={doors.to} label={doors.label} />
+
+      {/* ---------- arrival ---------- */}
+      <div className={'splash' + (ready || failed ? ' is-gone' : '')} aria-hidden={ready}>
+        <div className="splash-mark"><Mark /></div>
+        <div className="splash-name">{HOSPITAL_NAME}</div>
+        <div className="splash-bar"><span /></div>
       </div>
-      {!bare && <Footer navigate={navigate} counts={counts} />}
+      {failed && (
+        <div className="failed" role="alert">
+          <h1>{HOSPITAL_NAME}</h1>
+          <p>{failed}</p>
+        </div>
+      )}
     </div>
   );
 }
