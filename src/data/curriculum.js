@@ -87,7 +87,7 @@ export const DEPARTMENTS = [
         label: 'Heart Failure',
         short: 'Heart Failure',
         hue: HUE.plum,
-        ward: false,
+        ward: true,
         blurb: 'Congestion, perfusion and the four pillars — acute decompensation through advanced therapy.',
         topics: [
           'HFrEF, HFmrEF and HFpEF: definitions that change management',
@@ -127,7 +127,7 @@ export const DEPARTMENTS = [
         label: 'Valvular & Structural',
         short: 'Structural',
         hue: HUE.indigo,
-        ward: false,
+        ward: true,
         blurb: 'Severity, symptoms, timing of intervention — and the transcatheter alternative.',
         topics: [
           'Aortic stenosis: grading and timing of intervention',
@@ -169,7 +169,7 @@ export const DEPARTMENTS = [
         label: 'Cardiac Imaging & Diagnostics',
         short: 'Imaging',
         hue: HUE.sea,
-        ward: false,
+        ward: true,
         blurb: 'Reading the heart: the ECG upward through echo, CT, MRI and the cath haemodynamics.',
         topics: [
           'Systematic ECG interpretation',
@@ -189,7 +189,7 @@ export const DEPARTMENTS = [
         label: 'Preventive & Outpatient Cardiology',
         short: 'Prevention',
         hue: HUE.moss,
-        ward: false,
+        ward: true,
         blurb: 'The long game — risk estimation, lipids, pressure and the clinic conversation.',
         topics: [
           'Cardiovascular risk estimation',
@@ -208,7 +208,7 @@ export const DEPARTMENTS = [
         label: 'Hypertension & Vascular Disease',
         short: 'Vascular',
         hue: HUE.slate,
-        ward: false,
+        ward: true,
         blurb: 'Pressure, aorta and peripheral circulation — the whole vascular tree.',
         topics: [
           'Primary hypertension: assessment and targets',
@@ -228,7 +228,7 @@ export const DEPARTMENTS = [
         label: 'Cardiomyopathy & Myopericardial Disease',
         short: 'Myopericardial',
         hue: HUE.plum,
-        ward: false,
+        ward: true,
         blurb: 'When the muscle or the sac is the disease, not the vessel.',
         topics: [
           'Hypertrophic cardiomyopathy',
@@ -249,7 +249,7 @@ export const DEPARTMENTS = [
         label: 'Congenital & Adult CHD',
         short: 'Congenital',
         hue: HUE.indigo,
-        ward: false,
+        ward: true,
         blurb: 'Grown-up congenital hearts: the repaired, the palliated and the newly found.',
         topics: [
           'Shunt lesions: ASD, VSD, PDA',
@@ -268,7 +268,7 @@ export const DEPARTMENTS = [
         label: 'Pulmonary Hypertension & Right Heart',
         short: 'Right Heart',
         hue: HUE.sea,
-        ward: false,
+        ward: true,
         blurb: 'The forgotten ventricle and the circulation it serves.',
         topics: [
           'Pulmonary hypertension classification',
@@ -285,7 +285,7 @@ export const DEPARTMENTS = [
         label: 'Endocarditis & Inflammatory Heart Disease',
         short: 'Endocarditis',
         hue: HUE.rust,
-        ward: false,
+        ward: true,
         blurb: 'Infection and inflammation on the valves, the device and the myocardium.',
         topics: [
           'Infective endocarditis: the modified Duke criteria',
@@ -303,7 +303,7 @@ export const DEPARTMENTS = [
         label: 'Special Populations & Cardio-Oncology',
         short: 'Special Populations',
         hue: HUE.ochre,
-        ward: false,
+        ward: true,
         blurb: 'The same heart in pregnancy, in cancer therapy, in sport and in old age.',
         topics: [
           'Pregnancy and heart disease',
@@ -330,7 +330,7 @@ export const DEPARTMENTS = [
         label: 'Respiratory Medicine',
         short: 'Respiratory',
         hue: HUE.sea,
-        ward: false,
+        ward: true,
         blurb: 'Obstruction, infection, infiltration and the failing gas exchange.',
         topics: [
           'Asthma: control, exacerbation and near-fatal attack',
@@ -377,7 +377,7 @@ export const DEPARTMENTS = [
         label: 'Nephrology, Fluids & Electrolytes',
         short: 'Nephrology',
         hue: HUE.indigo,
-        ward: false,
+        ward: true,
         blurb: 'Filtration, balance and the arithmetic of sodium, potassium and acid.',
         topics: [
           'Acute kidney injury',
@@ -399,7 +399,7 @@ export const DEPARTMENTS = [
         label: 'Endocrinology & Metabolism',
         short: 'Endocrinology',
         hue: HUE.ochre,
-        ward: false,
+        ward: true,
         blurb: 'Axes, feedback loops and the emergencies that follow when they break.',
         topics: [
           'Type 1 diabetes and insulin strategy',
@@ -423,7 +423,7 @@ export const DEPARTMENTS = [
         label: 'Gastroenterology & Hepatology',
         short: 'GI & Liver',
         hue: HUE.moss,
-        ward: false,
+        ward: true,
         blurb: 'Gut, liver and pancreas — bleeding, inflammation and failure.',
         topics: [
           'Upper gastrointestinal bleeding',
@@ -449,7 +449,7 @@ export const DEPARTMENTS = [
         label: 'Neurology',
         short: 'Neurology',
         hue: HUE.plum,
-        ward: false,
+        ward: true,
         blurb: 'Localise the lesion, then treat the clock.',
         topics: [
           'Ischaemic stroke and TIA',
@@ -474,7 +474,7 @@ export const DEPARTMENTS = [
         label: 'Rheumatology & Immunology',
         short: 'Rheumatology',
         hue: HUE.clay,
-        ward: false,
+        ward: true,
         blurb: 'Autoimmunity, inflammation and the immune system that under- or over-shoots.',
         topics: [
           'Rheumatoid arthritis',
@@ -500,7 +500,7 @@ export const DEPARTMENTS = [
         label: 'Haematology & Oncology',
         short: 'Haem/Onc',
         hue: HUE.rust,
-        ward: false,
+        ward: true,
         blurb: 'Counts, clots, marrow and malignancy — plus the emergencies of cancer care.',
         topics: [
           'Anaemia: a structured approach',
@@ -526,7 +526,7 @@ export const DEPARTMENTS = [
         label: 'Infectious Diseases',
         short: 'Infection',
         hue: HUE.sea,
-        ward: false,
+        ward: true,
         blurb: 'Find the source, name the organism, choose the narrowest drug that works.',
         topics: [
           'Sepsis recognition and source control',
@@ -550,7 +550,7 @@ export const DEPARTMENTS = [
         label: 'Geriatric Medicine',
         short: 'Geriatrics',
         hue: HUE.slate,
-        ward: false,
+        ward: true,
         blurb: 'Frailty, function and the medicine of accumulated deficits.',
         topics: [
           'Frailty and comprehensive geriatric assessment',
@@ -571,7 +571,7 @@ export const DEPARTMENTS = [
         label: 'Clinical Toxicology & Therapeutics',
         short: 'Toxicology',
         hue: HUE.crimson,
-        ward: false,
+        ward: true,
         blurb: 'The overdose, the interaction and the antidote.',
         topics: [
           'The poisoned patient: a general approach',
@@ -596,7 +596,7 @@ export const DEPARTMENTS = [
         label: 'General & Ambulatory Medicine',
         short: 'General Medicine',
         hue: HUE.moss,
-        ward: false,
+        ward: true,
         blurb: 'The undifferentiated presentation — where internal medicine actually starts.',
         topics: [
           'The undifferentiated symptom',
@@ -619,7 +619,7 @@ export const DEPARTMENTS = [
         label: 'Dermatology for the Internist',
         short: 'Dermatology',
         hue: HUE.clay,
-        ward: false,
+        ward: true,
         blurb: 'The rash that is a clue, and the rash that is an emergency.',
         topics: [
           'Drug eruptions',
@@ -640,7 +640,7 @@ export const DEPARTMENTS = [
         label: 'Palliative & End-of-Life Care',
         short: 'Palliative Care',
         hue: HUE.indigo,
-        ward: false,
+        ward: true,
         blurb: 'Symptom control, honest conversations, and care that does not depend on cure.',
         topics: [
           'Pain assessment and the analgesic ladder',
@@ -699,6 +699,33 @@ export function unitForLegacy(legacyDept) {
 export function isVisible(row) {
   if (!row?.department) return false;
   return !!UNIT_BY_LEGACY[row.department];
+}
+
+/* ---------- rooms ----------
+   Every unit is a real room you walk into. The photograph is the room you are
+   standing in — blurred and darkened behind the drawn bays, so it reads as
+   depth rather than competing with the beds in front of it. */
+
+export const ROOM = {
+  icu:  '/img/room-icu.jpg',     // single-bed critical care room, monitor on a stand
+  ward: '/img/room-ward.webp',   // bedded ward with Bed-01/02/03 wall placards
+  bay:  '/img/room-bay.jpg',     // open ward, curtained bays
+  ed:   '/img/hero-ed.webp',     // emergency floor with the nursing station
+  front: '/img/exterior.png',    // the hospital from the street
+};
+
+/* High-acuity units get the closed critical-care room; the front-door and
+   high-traffic units get the open emergency floor; everything else is a ward. */
+const ROOM_KIND = {
+  'cv-ed': ROOM.ed, 'im-id': ROOM.ed, 'im-gen': ROOM.ed,
+  'cv-ccu': ROOM.icu, 'cv-cath': ROOM.icu, 'cv-ep': ROOM.icu,
+  'im-icu': ROOM.icu, 'im-tox': ROOM.icu, 'cv-ph': ROOM.icu,
+  'cv-prevent': ROOM.bay, 'im-ger': ROOM.bay, 'im-pall': ROOM.bay,
+  'im-derm': ROOM.bay, 'cv-special': ROOM.bay, 'cv-chd': ROOM.bay,
+};
+
+export function roomFor(unit) {
+  return ROOM_KIND[unit?.id] || ROOM.ward;
 }
 
 export const SEVERITY = {

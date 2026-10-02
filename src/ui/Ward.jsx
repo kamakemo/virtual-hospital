@@ -1,172 +1,199 @@
 import React from 'react';
-import { cx, SeverityTag, Progress } from './kit.jsx';
+import { cx } from './kit.jsx';
+import { roomFor, SEVERITY } from '../data/curriculum.js';
 
 /* ============================================================
-   WARD FLOOR
-   Only the time-critical units get one (unit.ward === true):
-   Emergency, Coronary Care, Cath Lab, EP Lab, Critical Care.
-   Everywhere else a bed would be a decoration, so the unit
-   shows a case index instead.
-
-   Drawn, not photographed — line work and flat fills that sit
-   inside the light design rather than fighting it.
+   THE UNIT ROOM
+   Every unit is a real room. The photograph behind is the room
+   you are standing in; the bays drawn in front are the beds, and
+   each bed carries the placard and the label of its case.
    ============================================================ */
 
 const TRACE = {
-  critical: { stroke: '#F87171', dur: '2.1s' },
-  urgent:   { stroke: '#FBBF24', dur: '2.9s' },
-  stable:   { stroke: '#4ADE80', dur: '3.6s' },
+  critical: { stroke: '#FF5A52', dur: '2.0s' },
+  urgent:   { stroke: '#FFB020', dur: '2.8s' },
+  stable:   { stroke: '#3DDC84', dur: '3.6s' },
 };
 
-/** One ECG cycle, repeated; the group slides to give a running trace. */
 function MonitorTrace({ severity }) {
   const t = TRACE[severity] || TRACE.stable;
   const cycle = 'l12,0 l4,-3 l3,5 l2,-14 l3,23 l3,-11 l5,0 c3,-7 7,-7 10,0 l15,0';
-  const path = 'M0,15' + cycle.repeat(6);
   return (
-    <svg viewBox="0 0 171 30" preserveAspectRatio="none" className="w-full h-[26px] block" aria-hidden="true">
-      <g>
-        <path d={path} fill="none" stroke={t.stroke} strokeWidth="1.4" vectorEffect="non-scaling-stroke" />
-        <animateTransform
-          attributeName="transform" type="translate"
-          from="0 0" to="-171 0" dur={t.dur} repeatCount="indefinite"
-        />
+    <svg viewBox="0 0 171 30" preserveAspectRatio="none" className="w-full h-[28px] block" aria-hidden="true">
+      <g className="trace-run" style={{ '--trace-dur': t.dur }}>
+        <path d={'M0,15' + cycle.repeat(6)} fill="none" stroke={t.stroke} strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
       </g>
     </svg>
   );
 }
 
-/** A hospital bed: chrome base on castors, blue boards, pale linen. */
+/* An articulated ward bed, drawn from the side: chrome base on castors,
+   padded side rail, raised head section, linen and blanket. */
 function BedArt({ occupied }) {
-  const frame  = occupied ? '#3F5E93' : '#A7B4C2';
-  const panel  = occupied ? '#DBE6F7' : '#E6EBF1';
-  const linen  = occupied ? '#EFF5FC' : '#EDEFF3';
-  const rail   = occupied ? '#5A78AE' : '#AFBAC7';
+  const frame = occupied ? '#2E4D7E' : '#8E9CAC';
+  const panel = occupied ? '#C9DAF2' : '#DCE2E9';
+  const linen = occupied ? '#F4F8FD' : '#E8ECF1';
+  const rail  = occupied ? '#44639C' : '#9BA7B5';
   return (
-    <svg viewBox="0 0 260 150" className="w-full h-auto block" style={{ maxWidth: 260 }} aria-hidden="true">
-      <ellipse cx="132" cy="141" rx="108" ry="6" fill="#0F1A20" opacity="0.07" />
+    <svg viewBox="0 0 260 152" className="w-full h-auto block" aria-hidden="true">
+      <defs>
+        <linearGradient id="mattressG" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#FFFFFF" />
+          <stop offset="1" stopColor={linen} />
+        </linearGradient>
+      </defs>
+      <ellipse cx="132" cy="142" rx="106" ry="6" fill="#04101A" opacity="0.26" />
       {[46, 96, 166, 216].map(x => (
         <g key={x}>
-          <circle cx={x} cy="133" r="7" fill="#8795A5" />
-          <circle cx={x} cy="133" r="2.6" fill="#D5DCE4" />
+          <circle cx={x} cy="133" r="7" fill="#5C6B7C" />
+          <circle cx={x} cy="133" r="2.6" fill="#C2CBD5" />
         </g>
       ))}
       <path d="M50,132 L96,112 M96,132 L50,112 M166,132 L216,112 M216,132 L166,112"
-        stroke="#B6C0CB" strokeWidth="4.5" strokeLinecap="round" fill="none" />
-      <rect x="44" y="105" width="178" height="8" rx="4" fill="#C8D1DA" />
-      <rect x="212" y="68" width="19" height="44" rx="6" fill={frame} />
-      <rect x="216" y="74" width="11" height="26" rx="4" fill={panel} />
-      <rect x="29" y="44" width="21" height="68" rx="7" fill={frame} />
-      <rect x="33" y="54" width="13" height="40" rx="5" fill={panel} />
-      <rect x="46" y="86" width="172" height="11" rx="4" fill="#9FB2CC" />
-      <rect x="48" y="70" width="168" height="20" rx="9" fill={linen} stroke="#D7E3F1" strokeWidth="1.5" />
+        stroke="#A8B4C1" strokeWidth="4.5" strokeLinecap="round" fill="none" />
+      <rect x="44" y="104" width="178" height="9" rx="4" fill="#BDC8D4" />
+      <rect x="44" y="104" width="178" height="3.5" rx="2" fill="#E3EAF1" />
+
+      {/* footboard + headboard */}
+      <rect x="212" y="66" width="20" height="46" rx="6" fill={frame} />
+      <rect x="216" y="72" width="12" height="28" rx="4" fill={panel} />
+      <rect x="28" y="40" width="22" height="72" rx="7" fill={frame} />
+      <rect x="32" y="50" width="14" height="44" rx="5" fill={panel} />
+
+      {/* platform, mattress, raised head */}
+      <rect x="46" y="85" width="172" height="12" rx="4" fill="#92A6C2" />
+      <rect x="48" y="68" width="168" height="21" rx="9" fill="url(#mattressG)" stroke="#CEDEF0" strokeWidth="1.5" />
       {occupied && (
         <>
-          <path d="M128,72 h82 a8,8 0 0 1 8,8 v4 a4,4 0 0 1 -4,4 h-86 z" fill="#C3D7F1" />
-          <g transform="rotate(-8 80 64)">
-            <rect x="53" y="57" width="52" height="17" rx="8" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="1.2" />
+          <path d="M126,70 h84 a8,8 0 0 1 8,8 v5 a4,4 0 0 1 -4,4 h-88 z" fill="#B7CDEC" />
+          <path d="M126,70 v17" stroke="#A3BFE3" strokeWidth="1.5" />
+          <g transform="rotate(-9 80 62)">
+            <rect x="52" y="54" width="54" height="18" rx="9" fill="#FFFFFF" stroke="#DCE6F2" strokeWidth="1.2" />
           </g>
         </>
       )}
-      <rect x="58" y="74" width="154" height="15" rx="6" fill={rail} />
+
+      {/* near side rail */}
+      <rect x="58" y="72" width="154" height="16" rx="6" fill={rail} />
+      <rect x="58" y="74" width="154" height="4" rx="2" fill={occupied ? '#BFD2EE' : '#C7CEd6'} />
       {[74, 97, 120, 143, 166, 189].map(x => (
-        <rect key={x} x={x} y="79" width="3.5" height="8" rx="1.8" fill={occupied ? '#35507F' : '#92A0AF'} />
+        <rect key={x} x={x} y="79" width="3.5" height="8" rx="1.8" fill={occupied ? '#23406F' : '#808E9D'} />
       ))}
     </svg>
   );
 }
 
-function Bay({ bedNumber, caseData, hue, done, onOpen }) {
-  const c = caseData;
+function Bay({ bedNumber, caseData: c, hue, done, onOpen }) {
   const occupied = !!c;
+  const sev = c ? SEVERITY[c.severity] : null;
 
   return (
-    <div className={cx('border border-line rounded-panel overflow-hidden bg-panel flex flex-col',
-      !occupied && 'border-dashed bg-paper')}>
-      {/* Headwall: bed number, severity, gas outlets */}
-      <div className="flex items-center gap-2 px-3 py-1.5 border-b border-line-soft bg-sunk/70">
-        <span className="label nums text-ink-3" style={{ fontSize: 9.5 }}>Bed {bedNumber}</span>
-        {c && <SeverityTag severity={c.severity} />}
+    <div
+      className={cx(
+        'bay3d rounded-xl overflow-hidden flex flex-col',
+        occupied ? 'is-live bg-white/[0.07] border border-white/15' : 'bg-white/[0.03] border border-dashed border-white/12'
+      )}
+    >
+      {/* Headwall: red bed placard, gas outlets */}
+      <div className="flex items-center gap-2 px-2.5 py-2 bg-[#0C2029]/80 border-b border-white/10">
+        <span className="placard rounded px-2 py-[3px] label nums" style={{ fontSize: 9.5, letterSpacing: '0.12em' }}>
+          Bed {String(bedNumber).padStart(2, '0')}
+        </span>
+        {sev && (
+          <span className="label px-1.5 py-[2px] rounded" style={{ fontSize: 8.5, color: '#07161D', background: sev.color }}>
+            {sev.label}
+          </span>
+        )}
         <span className="ml-auto flex items-center gap-1" aria-hidden="true">
-          <span className="w-2.5 h-2.5 rounded-sm bg-white border border-line" title="Oxygen" />
-          <span className="w-2.5 h-2.5 rounded-sm bg-[#3B4654]" title="Air" />
-          <span className="w-2.5 h-2.5 rounded-sm bg-[#E9C23F]" title="Suction" />
+          <span className="w-2.5 h-2.5 rounded-sm bg-white/90 border border-white/40" title="Oxygen" />
+          <span className="w-2.5 h-2.5 rounded-sm bg-[#1E2A36] border border-white/25" title="Air" />
+          <span className="w-2.5 h-2.5 rounded-sm bg-[#E9C23F] border border-black/20" title="Suction" />
         </span>
       </div>
 
-      {/* Monitor */}
-      <div className="bg-[#0B1118] px-2 pt-1.5 pb-1">
+      {/* Wall-mounted monitor */}
+      <div className="bg-[#040C12] px-2 pt-1.5 pb-1 border-b border-white/10">
         {occupied ? (
           <>
             <MonitorTrace severity={c.severity} />
             <div className="flex items-center justify-between font-mono text-[9.5px] leading-none pb-0.5 nums">
-              <span style={{ color: TRACE[c.severity]?.stroke || '#4ADE80' }}>
-                {c.vitals?.hr || '--'}<span className="text-[7px] text-[#6B7F96] ml-0.5">bpm</span>
+              <span style={{ color: TRACE[c.severity]?.stroke || '#3DDC84' }}>
+                {c.vitals?.hr || '--'}<span className="text-[7px] text-[#5C7489] ml-0.5">bpm</span>
               </span>
-              <span className="text-[#67C7F5]">
-                {c.vitals?.spo2 || '--'}<span className="text-[7px] text-[#6B7F96] ml-0.5">%</span>
+              <span className="text-[#4FC3F7]">
+                {c.vitals?.spo2 || '--'}<span className="text-[7px] text-[#5C7489] ml-0.5">%</span>
               </span>
-              <span className="text-[#A5B4C8]">{c.vitals?.bp || '--/--'}</span>
+              <span className="text-[#9FB3C6]">{c.vitals?.bp || '--/--'}</span>
             </div>
           </>
         ) : (
-          <div className="h-[36px] flex items-center justify-center font-mono text-[9px] text-[#556679] label">Standby</div>
+          <div className="h-[34px] flex items-center justify-center font-mono label text-[#44586B]" style={{ fontSize: 9 }}>
+            Monitor off
+          </div>
         )}
       </div>
 
-      {/* Bed */}
-      <div className="px-3 pt-3 pb-1 relative"
-        style={{ backgroundImage: 'linear-gradient(#EDF1F5 1px, transparent 1px), linear-gradient(90deg, #EDF1F5 1px, transparent 1px)', backgroundSize: '22px 22px' }}>
+      {/* The bed, standing on the room floor */}
+      <div className="px-3 pt-3 pb-1 relative">
         {occupied && (
-          <span className="absolute left-3 bottom-2 flex flex-col items-center pointer-events-none" aria-hidden="true">
-            <span className="w-2.5 h-3.5 rounded-sm bg-[#DCEBF8] border border-[#BBD4EA]" />
-            <span className="w-[2px] h-14 bg-[#C3CBD6]" />
+          <span className="absolute left-2.5 bottom-2 flex flex-col items-center pointer-events-none" aria-hidden="true">
+            <span className="w-2.5 h-3.5 rounded-sm bg-[#CFE6F7]/90 border border-white/40" />
+            <span className="w-[2px] h-16 bg-white/35" />
           </span>
         )}
         <BedArt occupied={occupied} />
       </div>
 
-      {/* Case plate — the click target */}
-      <div className="p-3 pt-1.5 mt-auto border-t border-line-soft">
+      {/* The label of the case — what this bed is teaching */}
+      <div className="mt-auto p-2.5">
         {occupied ? (
-          <>
-            <button onClick={onOpen} className="block text-left w-full group">
-              <span className="block text-[13.5px] font-medium leading-snug text-ink group-hover:text-accent-deep">
-                {c.title}
+          <button
+            onClick={onOpen}
+            className="plate block w-full text-left rounded-lg px-3 py-2.5 group transition-colors hover:bg-white"
+            style={{ borderLeft: `3px solid ${hue}` }}
+          >
+            <span className="block text-[13px] font-semibold leading-snug text-ink group-hover:text-accent-deep">
+              {c.title}
+            </span>
+            {c.chiefComplaint && (
+              <span className="block text-[11.5px] text-ink-3 mt-0.5 line-clamp-2 leading-snug">
+                {c.chiefComplaint}
               </span>
-              {c.chiefComplaint && (
-                <span className="block text-[12px] text-ink-3 mt-0.5 line-clamp-2 leading-snug">{c.chiefComplaint}</span>
-              )}
-            </button>
-            <div className="flex items-center justify-between gap-2 mt-2 text-[11px] text-ink-3 nums">
-              <span className="truncate">
+            )}
+            <span className="flex items-center justify-between gap-2 mt-1.5 text-[10.5px] nums">
+              <span className="text-ink-3 truncate">
                 {c.profile?.age ? `${c.profile.age}${(c.profile.sex || '')[0] || ''}` : '—'}
                 {c.profile?.name ? ` · ${c.profile.name}` : ''}
               </span>
-              {done && <span className="text-good label" style={{ fontSize: 9 }}>Done</span>}
-            </div>
-            <Progress value={done ? 1 : 0} color={hue} className="mt-1.5" />
-          </>
+              {done
+                ? <span className="label text-good" style={{ fontSize: 9 }}>Seen</span>
+                : <span className="label text-accent" style={{ fontSize: 9 }}>Open →</span>}
+            </span>
+          </button>
         ) : (
-          <p className="label text-ink-3 text-center py-1" style={{ fontSize: 9.5 }}>Bed available</p>
+          <div className="rounded-lg border border-dashed border-white/20 px-3 py-3 text-center">
+            <span className="label text-white/45" style={{ fontSize: 9 }}>Bed available</span>
+          </div>
         )}
       </div>
     </div>
   );
 }
 
-export default function WardFloor({ unit, cases, progress, onOpenCase }) {
-  // Explicit bed numbers win; everything else fills the first free slot, so a
-  // unit whose cases carry no bed number still lays out tidily in order.
+export default function WardRoom({ unit, cases, progress, onOpenCase }) {
   const done = progress?.completedStages || {};
   const withBed = cases.filter(c => Number.isFinite(c.bedNumber) && c.bedNumber > 0);
   const withoutBed = cases.filter(c => !(Number.isFinite(c.bedNumber) && c.bedNumber > 0));
-
   const taken = new Set(withBed.map(c => c.bedNumber));
-  const total = Math.max(cases.length + 2, 6, ...(withBed.length ? withBed.map(c => c.bedNumber) : [0]));
 
+  const total = Math.max(
+    cases.length + (cases.length ? 2 : 6),
+    6,
+    ...(withBed.length ? withBed.map(c => c.bedNumber) : [0])
+  );
+
+  const queue = [...withoutBed];
   const slots = [];
-  let queue = [...withoutBed];
   for (let n = 1; n <= total; n++) {
     const pinned = withBed.find(c => c.bedNumber === n);
     slots.push({ bedNumber: n, case: pinned || (taken.has(n) ? null : queue.shift() || null) });
@@ -175,39 +202,39 @@ export default function WardFloor({ unit, cases, progress, onOpenCase }) {
   const occupied = slots.filter(s => s.case).length;
 
   return (
-    <div className="border border-line rounded-panel overflow-hidden bg-panel">
-      {/* Room backdrop: a window band above the bays */}
-      <div className="border-b border-line-soft bg-gradient-to-b from-[#E8F1F8] to-panel pt-6 pb-3">
-        <div className="flex justify-center gap-10" aria-hidden="true">
-          {[0, 1, 2].map(i => (
-            <span
-              key={i}
-              className="w-32 h-[72px] rounded border-2 border-line hidden sm:block"
-              style={{
-                backgroundImage:
-                  'repeating-linear-gradient(90deg, rgba(255,255,255,.8) 0 8px, rgba(186,212,235,.55) 8px 11px), linear-gradient(180deg,#D5E9FA,#F4FAFF)',
-              }}
+    <div className="room">
+      <img src={roomFor(unit)} alt="" className="room__photo" aria-hidden="true" />
+      <div className="room__scrim" />
+      <div className="room__rail" />
+      <div className="room__floor" />
+
+      <div className="room__inner px-4 sm:px-6 pt-5 pb-6">
+        {/* Room sign, the way a real unit announces itself at the door */}
+        <div className="flex items-center justify-center mb-6">
+          <div
+            className="inline-flex items-center gap-3 rounded-lg px-4 py-2 border border-white/20 bg-[#08161E]/70"
+            style={{ boxShadow: `inset 3px 0 0 ${unit.hue}` }}
+          >
+            <span className="label text-white" style={{ fontSize: 10.5 }}>{unit.label}</span>
+            <span className="w-px h-4 bg-white/20" />
+            <span className="label text-white/60 nums" style={{ fontSize: 10 }}>
+              {occupied} of {slots.length} beds occupied
+            </span>
+          </div>
+        </div>
+
+        <div className="bays grid sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+          {slots.map(s => (
+            <Bay
+              key={s.bedNumber}
+              bedNumber={s.bedNumber}
+              caseData={s.case}
+              hue={unit.hue}
+              done={s.case ? !!(done[`rich:${s.case.id}`] || done[s.case.id]) : false}
+              onOpen={() => s.case && onOpenCase(s.case)}
             />
           ))}
         </div>
-        <div className="flex justify-center mt-4">
-          <span className="label text-ink-3 bg-panel px-3 py-1 rounded-full border border-line" style={{ fontSize: 9.5 }}>
-            {unit.label} · {occupied} of {slots.length} beds occupied
-          </span>
-        </div>
-      </div>
-
-      <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4 p-4 sm:p-5 bg-paper">
-        {slots.map(s => (
-          <Bay
-            key={s.bedNumber}
-            bedNumber={s.bedNumber}
-            caseData={s.case}
-            hue={unit.hue}
-            done={s.case ? !!(done[`rich:${s.case.id}`] || done[s.case.id]) : false}
-            onOpen={() => s.case && onOpenCase(s.case)}
-          />
-        ))}
       </div>
     </div>
   );
