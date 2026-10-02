@@ -75,7 +75,7 @@ export default function App() {
     setDoors({ state: 'closing', from: cur.number || 0, to: number, label: floor.name });
     await sleep(720);
     setDoors(d => ({ ...d, state: 'closed' }));
-    await sleep(40);
+    await Promise.race([W.assetsReady, sleep(6000)]);   // patients need the head scan
     W.enterFloor(floor);               // the ward is built behind closed doors
     const v = { level: 'floor', wingId, number };
     setView(v); record(v, push);
@@ -275,6 +275,11 @@ export default function App() {
       )}
 
       {hint && <p className="hint">{hint}</p>}
+      {view.level === 'bed' && !hint && (
+        <p className="credit">
+          Head scan: Lee Perry-Smith, <a href="https://ir-ltd.net/" target="_blank" rel="noopener noreferrer">Infinite-Realities</a>, <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">CC BY 3.0</a>
+        </p>
+      )}
 
       <ElevatorDoors state={doors.state} from={doors.from} to={doors.to} label={doors.label} />
 

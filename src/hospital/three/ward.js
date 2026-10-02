@@ -222,15 +222,22 @@ export function buildWard(floor) {
     unit.position.set(side * W / 2, 0, z);
     unit.rotation.y = side < 0 ? 0 : Math.PI;
 
-    const bed = hospitalBed({ kind: floor.kind, occupied, patient: { seed, cap: seed % 5 === 0 } });
+    // airway support, decided per bed: intubated in critical care, then masks
+    // and nasal cannulae scattered through the acute units
+    const ventilated = occupied && floor.kind === KIND.critical && i % 2 === 0;
+    const support = !occupied ? 'none'
+      : ventilated ? 'vent'
+      : floor.kind !== KIND.comfort && seed % 4 === 1 ? 'mask'
+      : floor.kind !== KIND.comfort && seed % 3 === 0 ? 'cannula'
+      : 'none';
+    const bed = hospitalBed({ kind: floor.kind, occupied, patient: { seed, cap: seed % 5 === 0, support } });
     unit.add(bed.group);
     unit.add(headwall({ bedNumber: number, unitName: floor.name, header, hue: floor.hue, kind: floor.kind, own }));
     unit.add(wallMonitor(live[seed % 3].texture, fit.monitorBig));
 
-    const ventilated = occupied && floor.kind === KIND.critical && i % 2 === 0;
     unit.add(ivPole({ pumps: occupied ? Math.max(1, fit.pumps) : 0, bag: occupied, lineTo: occupied ? bed.anchors.hand : null }));
     if (ventilated) unit.add(ventilator({ to: bed.anchors.mouth }));
-    else if (occupied && seed % 3 === 0 && floor.kind !== KIND.comfort) unit.add(cannula(bed.anchors.nose));
+    else if (support === 'cannula') unit.add(cannula(bed.anchors.nose));
 
     unit.add(locker({ kind: floor.kind }));
     if (fit.table) unit.add(overbedTable({}));

@@ -4,6 +4,7 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import { setAnisotropy } from './textures.js';
 import { buildExterior } from './exterior.js';
 import { buildWard } from './ward.js';
+import { loadPatientAssets } from './patientAssets.js';
 import { pad2 } from '../data.js';
 
 /* ============================================================
@@ -44,6 +45,9 @@ export class World {
     setAnisotropy(r.capabilities.getMaxAnisotropy());
 
     this.camera = new THREE.PerspectiveCamera(42, 1, 0.5, 3000);
+
+    // the scanned head loads in the background while the visitor is outside
+    this.assetsReady = loadPatientAssets(r);
 
     /* the building */
     this.exterior = buildExterior(wings);

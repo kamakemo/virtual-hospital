@@ -2,6 +2,10 @@ import * as THREE from 'three';
 import { MAT, box, rbox, cyl, sphere, plane, part, tube, texMat, screenMat } from './kit.js';
 import * as TX from './textures.js';
 import { KIND } from '../data.js';
+import { BED, headToUnit } from './bedFrame.js';
+import { buildPatient, pillowGeometry } from './patient.js';
+
+export { BED, headToUnit };
 
 /* ============================================================
    PROPS
@@ -11,22 +15,6 @@ import { KIND } from '../data.js';
    Proportions follow the reference beds: a 2.1 m frame, deck at
    0.5 m, mattress top at ~0.69 m, side rails to ~0.93 m.
    ============================================================ */
-
-export const BED = {
-  headX: 0.32,
-  footX: 2.42,
-  hingeX: 1.06,
-  deckY: 0.535,
-  mattressT: 0.15,
-  width: 0.9,
-  headLen: 0.72,
-};
-
-/** World (bed-unit) position of a point given in the raised head section. */
-function headToUnit(x, y, angle) {
-  const c = Math.cos(-angle), s = Math.sin(-angle);
-  return new THREE.Vector3(BED.hingeX + x * c - y * s, BED.deckY + x * s + y * c, 0);
-}
 
 /* ---------- small reusable assemblies ---------- */
 
@@ -79,7 +67,7 @@ export function hospitalBed({ kind, occupied, patient }) {
   head.position.set(BED.hingeX, BED.deckY, 0);
   head.rotation.z = -angle;
   head.add(part(rbox(BED.headLen, BED.mattressT, BED.width, 0.06, 4), MAT.mattress(), -BED.headLen / 2, BED.mattressT / 2, 0));
-  head.add(part(rbox(0.42, 0.13, 0.66, 0.06, 4), MAT.pillow(), -BED.headLen + 0.27, BED.mattressT + 0.07, 0, 0, 0, 0.12));
+  head.add(part(pillowGeometry(), MAT.pillow(), -BED.headLen + 0.27, BED.mattressT + 0.07, 0, 0, 0, 0.1));
   g.add(head);
 
   // head- and footboards, with the coloured panel facing outward
@@ -100,7 +88,7 @@ export function hospitalBed({ kind, occupied, patient }) {
   }
 
   let anchors = null;
-  if (occupied) anchors = addPatient(g, head, angle, kind, patient);
+  if (occupied) anchors = buildPatient(g, head, angle, kind, patient);
   else {
     // made-up empty bed: folded blanket at the foot
     const fold = kind === KIND.comfort ? MAT.blanketWarm() : MAT.blanketBlue();
@@ -109,96 +97,6 @@ export function hospitalBed({ kind, occupied, patient }) {
   }
 
   return { group: g, angle, anchors };
-}
-
-/* ---------- the patient ---------- */
-
-/** A capsule spanning two points — upper arms, forearms. */
-function limb(a, b, r, material) {
-  const A = new THREE.Vector3(...a), B = new THREE.Vector3(...b);
-  const dir = B.clone().sub(A);
-  const len = Math.max(0.001, dir.length() - r * 2);
-  const m = new THREE.Mesh(new THREE.CapsuleGeometry(r, len, 4, 10), material);
-  m.position.copy(A).add(B).multiplyScalar(0.5);
-  m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
-  return m;
-}
-
-const SKIN = ['#E8C3A6', '#C99877', '#A8775A', '#7E5038', '#5E3B29', '#F0D2BC'];
-const HAIR = ['#2B211B', '#4A3426', '#1A1612', '#8A8580', '#C9C2B8', '#6B4A2E'];
-
-function addPatient(g, head, angle, kind, p) {
-  const skin = MAT.skin(SKIN[p.seed % SKIN.length]);
-  const hair = MAT.hair(HAIR[(p.seed >>> 2) % HAIR.length]); // unsigned shift: seeds exceed 2^31
-  const T = BED.mattressT;
-
-  // torso on the raised section, in a hospital gown
-  const torso = part(new THREE.CapsuleGeometry(0.16, 0.36, 6, 14), MAT.gown(), -0.36, T + 0.12, 0, 0, 0, Math.PI / 2);
-  torso.scale.set(0.78, 1, 1.32);
-  head.add(torso);
-  head.add(part(cyl(0.05, 0.055, 0.1, 12), skin, -0.6, T + 0.16, 0, 0, 0, Math.PI / 2));   // neck
-
-  // Head on the pillow. Lying back, the face points away from the backrest
-  // (local +y), tipped a little toward the feet — not along the backrest.
-  const hx = -0.69, hy = T + 0.24;
-  const skull = part(sphere(0.1, 24, 18), skin, hx, hy, 0);
-  skull.scale.set(1.08, 0.94, 0.9);
-  head.add(skull);
-  const dark = MAT.hair('#3A2A22');
-  head.add(part(sphere(0.02, 10, 8), skin, hx + 0.045, hy + 0.095, 0));                       // nose
-  for (const s of [-1, 1]) {
-    head.add(part(sphere(0.022, 10, 8), skin, hx - 0.01, hy + 0.005, s * 0.09));               // ears
-    const lid = part(sphere(0.013, 8, 6), dark, hx + 0.005, hy + 0.088, s * 0.033);           // closed eyes
-    lid.scale.set(1.5, 0.35, 1);
-    head.add(lid);
-  }
-  const lips = part(sphere(0.012, 8, 6), MAT.paint('#9A5A4C', 0.7), hx + 0.088, hy + 0.068, 0);
-  lips.scale.set(0.5, 0.4, 2.2);
-  head.add(lips);
-  // hair or a theatre cap over the crown and the back of the head, face clear
-  const cover = part(sphere(p.cap ? 0.108 : 0.104, 20, 14), p.cap ? MAT.cap() : hair, hx - 0.05, hy - 0.012, 0);
-  cover.scale.set(0.82, 0.9, 0.98);
-  head.add(cover);
-
-  // blanket over the chest, with the turned-down fold
-  const blanket = kind === KIND.comfort ? MAT.blanketWarm() : kind === KIND.ward ? MAT.blanketBlue() : MAT.blanket();
-  head.add(part(rbox(0.5, 0.05, 1.0, 0.02), blanket, -0.22, T + 0.27, 0));
-  head.add(part(cyl(0.035, 0.035, 0.98, 14), MAT.linen(), -0.46, T + 0.285, 0, Math.PI / 2, 0, 0));
-
-  // Arms at rest: upper arm along the side, elbow bent, forearm angled in so
-  // the hands lie on the blanket over the abdomen.
-  const armY = T + 0.296;
-  for (const s of [-1, 1]) {
-    const shoulder = [-0.5, armY + 0.02, s * 0.235];
-    const elbow = [-0.2, armY + 0.034, s * 0.272];
-    const wrist = [0.04, armY + 0.03, s * 0.15];
-    head.add(limb(shoulder, elbow, 0.043, MAT.gown()));
-    head.add(limb([elbow[0] - 0.05, elbow[1], elbow[2]], elbow, 0.041, MAT.gown()));
-    head.add(limb(elbow, wrist, 0.033, skin));
-    const hand = part(sphere(0.04, 12, 10), skin, wrist[0] + 0.045, armY + 0.022, s * 0.13);
-    hand.scale.set(1.35, 0.55, 0.9);
-    head.add(hand);
-  }
-
-  // legs under the blanket on the flat section
-  const legY = BED.deckY + T + 0.085;
-  for (const s of [-1, 1]) {
-    g.add(part(new THREE.CapsuleGeometry(0.085, 0.86, 4, 12), MAT.linen(), BED.hingeX + 0.62, legY, s * 0.11, 0, 0, Math.PI / 2));
-  }
-  // blanket across the legs, draped over both sides and the foot
-  const top = legY + 0.1;
-  g.add(part(rbox(1.34, 0.035, 1.02, 0.015), blanket, BED.hingeX + 0.64, top, 0));
-  for (const s of [-1, 1]) g.add(part(rbox(1.3, 0.2, 0.02, 0.01), blanket, BED.hingeX + 0.64, top - 0.11, s * 0.5));
-  g.add(part(rbox(0.02, 0.2, 1.0, 0.01), blanket, BED.footX - 0.06, top - 0.11, 0));
-  // feet lift the blanket at the end
-  for (const s of [-1, 1]) { const f = part(sphere(0.06, 12, 10), blanket, BED.footX - 0.24, top + 0.012, s * 0.11); f.scale.set(1.2, 0.55, 1); g.add(f); }
-
-  // where the airway lines meet the face (ventilator circuit, nasal cannula)
-  const mouth = headToUnit(hx + 0.1, hy + 0.075, angle);
-  const nose = headToUnit(hx + 0.05, hy + 0.115, angle);
-  const hand = headToUnit(0.085, T + 0.318, angle);
-  hand.z = 0.13;
-  return { mouth, nose, hand };
 }
 
 /* ---------- the headwall ---------- */

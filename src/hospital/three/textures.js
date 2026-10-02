@@ -177,6 +177,62 @@ export const curtain = (kind, base) => cached('curt' + kind + base, () => make(2
   g.fillRect(0, meshH - 3, w, 4);
 }, { repeat: [1, 1] }));
 
+/** Hospital gown: pale blue cotton with the small repeating diamond print. */
+export const gownPrint = () => cached('gown', () => make(256, 256, (g, w, h) => {
+  g.fillStyle = '#A7C3D8'; g.fillRect(0, 0, w, h);
+  const r = rng(101);
+  for (let i = 0; i < 2600; i++) { g.fillStyle = `rgba(255,255,255,${0.04 + r() * 0.06})`; g.fillRect(r() * w, r() * h, 1, 1); }
+  const s = 32;
+  for (let y = 0; y < h; y += s) for (let x = 0; x < w; x += s) {
+    const ox = (y / s) % 2 ? s / 2 : 0;
+    g.fillStyle = '#5B7FA3';
+    g.beginPath();
+    const cx = x + ox + s / 2, cy = y + s / 2;
+    g.moveTo(cx, cy - 4); g.lineTo(cx + 4, cy); g.lineTo(cx, cy + 4); g.lineTo(cx - 4, cy); g.closePath(); g.fill();
+    g.fillStyle = '#EAF1F6'; g.fillRect(cx - 1, cy - 1, 2, 2);
+  }
+}, { repeat: [3, 3] }));
+
+/** Cellular cotton blanket: the open waffle weave of every ward. */
+export const cellularBlanket = (tone = '#EEF2F4') => cached('blanket' + tone, () => make(256, 256, (g, w, h) => {
+  g.fillStyle = tone; g.fillRect(0, 0, w, h);
+  const s = 16;
+  for (let y = 0; y < h; y += s) for (let x = 0; x < w; x += s) {
+    const grd = g.createRadialGradient(x + s / 2, y + s / 2, 1, x + s / 2, y + s / 2, s * 0.55);
+    grd.addColorStop(0, 'rgba(70,90,110,0.22)');
+    grd.addColorStop(1, 'rgba(70,90,110,0)');
+    g.fillStyle = grd; g.fillRect(x, y, s, s);
+  }
+  g.strokeStyle = 'rgba(255,255,255,0.55)'; g.lineWidth = 2;
+  for (let i = 0; i <= w; i += s) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i, h); g.stroke(); g.beginPath(); g.moveTo(0, i); g.lineTo(w, i); g.stroke(); }
+}, { repeat: [6, 6] }));
+
+/** Short hair, as fine strands over a darker root tone. */
+export const hairStrands = (base) => cached('hair' + base, () => make(512, 512, (g, w, h) => {
+  const c = new THREE.Color(base);
+  g.fillStyle = '#' + c.clone().multiplyScalar(0.7).getHexString(); g.fillRect(0, 0, w, h);
+  const r = rng(111);
+  for (let i = 0; i < 9000; i++) {
+    const t = c.clone().offsetHSL(0, 0, (r() - 0.4) * 0.16);
+    g.strokeStyle = '#' + t.getHexString();
+    g.globalAlpha = 0.35 + r() * 0.5;
+    g.lineWidth = 0.6 + r() * 0.8;
+    const x = r() * w, y = r() * h, a = r() * Math.PI * 2, l = 4 + r() * 9;
+    g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); g.stroke();
+  }
+  g.globalAlpha = 1;
+}, { repeat: [1, 1] }));
+
+/** Non-woven theatre cap fabric. */
+export const capFabric = () => cached('capfab', () => make(256, 256, (g, w, h) => {
+  g.fillStyle = '#86B9DE'; g.fillRect(0, 0, w, h);
+  const r = rng(121);
+  for (let i = 0; i < 5000; i++) {
+    g.fillStyle = r() < 0.5 ? 'rgba(255,255,255,0.12)' : 'rgba(30,70,110,0.08)';
+    g.fillRect(r() * w, r() * h, 1 + r() * 3, 1);
+  }
+}, { repeat: [1, 1] }));
+
 /* ---------- signage ---------- */
 
 function roundRect(g, x, y, w, h, r) {
