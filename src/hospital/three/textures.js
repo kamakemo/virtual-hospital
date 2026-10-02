@@ -309,7 +309,7 @@ export function idBoard({ bed, unit, header, hue }) {
     g.fillText('PATIENT', 40, 146);
 
     g.fillStyle = '#16212A';
-    const text = header || 'Awaiting admission';
+    const text = header || 'Case to be assigned';
     let size = 46;
     let lines;
     do {

@@ -216,7 +216,10 @@ export function buildWard(floor) {
     const z = BAY_Z[i % 6];
     const number = i + 1;
     const seed = hash(floor.id + ':' + number);
-    const occupied = !!header;
+    // Every bed has a patient. Whether a case is attached only changes the
+    // identification board and the colour of the bed's number tag.
+    const occupied = true;
+    const hasCase = !!header;
 
     const unit = new THREE.Group();
     unit.position.set(side * W / 2, 0, z);
@@ -272,7 +275,7 @@ export function buildWard(floor) {
       index: i,
       number,
       header,
-      occupied,
+      occupied: hasCase,
       side,
       hit,
       glow,

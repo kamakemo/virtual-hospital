@@ -257,7 +257,7 @@ export class World {
       el.type = 'button';
       el.className = 'bed-tag' + (b.occupied ? '' : ' is-empty');
       el.innerHTML = `<span>${pad2(b.number)}</span>`;
-      el.setAttribute('aria-label', `Bed ${b.number}${b.header ? ' — ' + b.header : ' — available'}`);
+      el.setAttribute('aria-label', `Bed ${b.number}${b.header ? ' — ' + b.header : ' — case to be assigned'}`);
       el.addEventListener('mouseenter', () => this.setHover({ type: 'bed', index: b.index }));
       el.addEventListener('mouseleave', () => this.setHover(null));
       el.addEventListener('click', () => this.on.selectBed?.(b.index));

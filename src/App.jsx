@@ -254,7 +254,7 @@ export default function App() {
       {hover?.type === 'bed' && view.level === 'floor' && !busy && (
         <div className="caption">
           <span className="caption-bed">Bed {pad2(hover.number)}</span>
-          <span className="caption-text">{hover.header || 'Bed available'}</span>
+          <span className="caption-text">{hover.header || 'Case to be assigned'}</span>
         </div>
       )}
 
@@ -266,7 +266,7 @@ export default function App() {
           </button>
           <div className="bedbar-id">
             <span className="bedbar-num" style={{ '--hue': floor.hue }}>Bed {pad2(view.bed + 1)}</span>
-            <span className="bedbar-text">{bedHeader || 'Bed available'}</span>
+            <span className="bedbar-text">{bedHeader || 'Case to be assigned'}</span>
           </div>
           <button type="button" className="bedbar-step" disabled={busy} onClick={() => goBed((view.bed + 1) % BEDS_PER_FLOOR, { push: false })} aria-label="Next bed">
             <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
