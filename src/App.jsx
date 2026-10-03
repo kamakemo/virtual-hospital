@@ -1,8 +1,16 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { World } from './hospital/three/World.js';
 import ElevatorPanel from './hospital/ui/ElevatorPanel.jsx';
 import ElevatorDoors from './hospital/ui/ElevatorDoors.jsx';
 import { WINGS, WING_BY_ID, HOSPITAL_NAME, BEDS_PER_FLOOR, floorOf, pad2 } from './hospital/data.js';
+import { CASES, caseKey } from './cases/registry.js';
+
+// each written case is its own chunk, fetched the first time it is opened
+const lazyCases = {};
+const caseComponent = key => (lazyCases[key] ||= React.lazy(CASES[key]));
+
+/* the catheter lab's day list: start times for its twelve slots */
+const LIST_TIMES = ['08:00', '08:45', '09:30', '10:15', '11:00', '11:45', '12:30', '13:15', '14:00', '14:45', '15:30', '16:15'];
 
 /* ============================================================
    VIRTUAL HOSPITAL
@@ -17,6 +25,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const HINTS = {
   building: 'Drag to walk around the building · choose a floor',
   floor: 'Drag to look around · choose a bed',
+  lab: 'Drag to look around · choose a case from today’s list',
   bed: 'Drag to look · Esc to step back',
 };
 
@@ -41,6 +50,18 @@ export default function App() {
   const [busy, setBusy] = useState(false);
   const [hover, setHover] = useState(null);
   const [hintSeen, setHintSeen] = useState({});
+  const [openCase, setOpenCase] = useState(null);
+  const openCaseRef = useRef(null);
+  openCaseRef.current = openCase;
+
+  // the 3D world stops drawing while a case is open — the GPU is the case's
+  useEffect(() => { world.current?.setPaused?.(!!openCase); }, [openCase]);
+
+  // a shareable deep link straight into a case: /#case=cv-cath:1
+  useEffect(() => {
+    const m = /#case=([\w-]+:\d+)/.exec(window.location.hash);
+    if (m && CASES[m[1]]) setOpenCase(m[1]);
+  }, []);
 
   const viewRef = useRef(view);
   const busyRef = useRef(false);
@@ -180,6 +201,7 @@ export default function App() {
     const onKey = e => {
       if (e.target.closest?.('input, textarea')) return;
       const cur = viewRef.current;
+      if (openCaseRef.current) { if (e.key === 'Escape') setOpenCase(null); return; }
       if (e.key === 'Escape') stepBack();
       if (cur.level === 'bed' && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
         const next = (cur.bed + (e.key === 'ArrowRight' ? 1 : BEDS_PER_FLOOR - 1)) % BEDS_PER_FLOOR;
@@ -195,7 +217,12 @@ export default function App() {
   const wing = view.wingId ? WING_BY_ID[view.wingId] : null;
   const floor = view.wingId ? floorOf(view.wingId, view.number) : null;
   const bedHeader = view.level === 'bed' && floor ? floor.beds[view.bed] : null;
-  const hint = !hintSeen[view.level] && ready ? HINTS[view.level] : null;
+  const isLab = floor?.id === 'cv-cath';
+  const slotWord = isLab ? 'Case' : 'Bed';
+  const bedCaseKey = view.level === 'bed' && floor ? caseKey(floor.id, view.bed + 1) : null;
+  const bedHasCase = !!(bedCaseKey && CASES[bedCaseKey]);
+  const CaseComp = openCase ? caseComponent(openCase) : null;
+  const hint = !hintSeen[view.level] && ready ? (view.level === 'floor' && floor?.id === 'cv-cath' ? HINTS.lab : HINTS[view.level]) : null;
 
   const dismissHint = () => setHintSeen(s => (s[view.level] ? s : { ...s, [view.level]: true }));
 
@@ -228,7 +255,7 @@ export default function App() {
           {view.level === 'bed' && (
             <>
               <span className="plate-sep" aria-hidden="true">/</span>
-              <span className="plate-crumb is-current">Bed {pad2(view.bed + 1)}</span>
+              <span className="plate-crumb is-current">{floor?.id === 'cv-cath' ? 'Case' : 'Bed'} {pad2(view.bed + 1)}</span>
             </>
           )}
         </nav>
@@ -258,6 +285,30 @@ export default function App() {
         </div>
       )}
 
+      {/* ---------- the catheter lab's list ---------- */}
+      {isLab && view.level === 'floor' && !busy && (
+        <aside className="cathlist" aria-label="Today's list in Cath Lab 1">
+          <div className="cathlist-h">
+            <span className="cathlist-dot" />
+            <b>Cath Lab 1 · today’s list</b>
+          </div>
+          <ol>
+            {floor.beds.map((h, i) => {
+              const ready = !!CASES[caseKey(floor.id, i + 1)];
+              return (
+                <li key={i}>
+                  <button type="button" onClick={() => goBed(i)} className={ready ? 'is-ready' : ''}>
+                    <span className="cathlist-time">{LIST_TIMES[i]}</span>
+                    <span className="cathlist-text">{h || 'Slot available'}</span>
+                    {ready && <span className="cathlist-tag">Simulation</span>}
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        </aside>
+      )}
+
       {/* ---------- bedside ---------- */}
       {view.level === 'bed' && floor && (
         <div className="bedbar">
@@ -265,9 +316,14 @@ export default function App() {
             <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </button>
           <div className="bedbar-id">
-            <span className="bedbar-num" style={{ '--hue': floor.hue }}>Bed {pad2(view.bed + 1)}</span>
+            <span className="bedbar-num" style={{ '--hue': floor.hue }}>{slotWord} {pad2(view.bed + 1)}</span>
             <span className="bedbar-text">{bedHeader || 'Case to be assigned'}</span>
           </div>
+          {bedHasCase && (
+            <button type="button" className="bedbar-open" disabled={busy} onClick={() => setOpenCase(bedCaseKey)}>
+              Open case
+            </button>
+          )}
           <button type="button" className="bedbar-step" disabled={busy} onClick={() => goBed((view.bed + 1) % BEDS_PER_FLOOR, { push: false })} aria-label="Next bed">
             <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </button>
@@ -282,6 +338,12 @@ export default function App() {
       )}
 
       <ElevatorDoors state={doors.state} from={doors.from} to={doors.to} label={doors.label} />
+
+      {CaseComp && (
+        <Suspense fallback={<div className="case-loading"><div className="splash-bar"><span /></div><p>Preparing the case…</p></div>}>
+          <CaseComp onClose={() => { setOpenCase(null); if (window.location.hash.startsWith('#case=')) window.history.replaceState(window.history.state, '', window.location.pathname); }} />
+        </Suspense>
+      )}
 
       {/* ---------- arrival ---------- */}
       <div className={'splash' + (ready || failed ? ' is-gone' : '')} aria-hidden={ready}>

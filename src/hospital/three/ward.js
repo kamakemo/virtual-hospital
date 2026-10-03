@@ -6,6 +6,7 @@ import {
   locker, overbedTable, armchair, plant, crashCart, apronRack,
 } from './props.js';
 import { KIND, pad2 } from '../data.js';
+import { buildCathLab } from './cathlab.js';
 
 /* ============================================================
    THE WARD
@@ -39,6 +40,8 @@ function hash(str) {
 }
 
 export function buildWard(floor) {
+  // the catheter lab is a procedure suite, not a ward
+  if (floor.id === 'cv-cath') return buildCathLab(floor);
   const fit = FIT[floor.kind] || FIT[KIND.ward];
   const root = new THREE.Group();
   const own = [];           // textures/materials created for this ward only

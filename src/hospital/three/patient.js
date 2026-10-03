@@ -52,7 +52,11 @@ let trimMat = null;
 const gownTrim = () => (trimMat ||= new THREE.MeshStandardMaterial({ map: TX.gownPrint(), roughness: 0.88, side: THREE.DoubleSide }));
 const gown = () => (gownMat ||= new THREE.MeshStandardMaterial({ map: TX.gownPrint(), roughness: 0.88 }));
 const blanketMats = new Map();
+let drapeM = null;
 function blanketMat(kind) {
+  if (kind === 'cathlab') {
+    return (drapeM ||= new THREE.MeshStandardMaterial({ map: TX.sterileDrape(), roughness: 0.95, side: THREE.DoubleSide }));
+  }
   const tone = kind === KIND.comfort ? '#E8DBC4' : kind === KIND.ward ? '#D3E3EF' : '#F0F3F4';
   if (!blanketMats.has(tone)) {
     blanketMats.set(tone, new THREE.MeshStandardMaterial({ map: TX.cellularBlanket(tone), roughness: 0.96, side: THREE.DoubleSide }));
@@ -319,7 +323,7 @@ export function buildPatient(g, head, angle, kind, p) {
     const z = -0.6 + 1.2 * k / 24;
     cuffPts.push([fold + 0.006, T + top.heightAt(fold + 0.01, z) + 0.012, z]);
   }
-  head.add(new THREE.Mesh(tube(cuffPts, 0.02, 48), MAT.linen()));
+  if (!p.table) head.add(new THREE.Mesh(tube(cuffPts, 0.02, 48), MAT.linen()));
 
   /* blanket over the legs, draped over the sides and the foot */
   const legs = drape({ u0: -0.02, u1: 1.42, nu: 64, nz: 40, body: legBody, edgeU: 1.32 });
@@ -330,6 +334,7 @@ export function buildPatient(g, head, angle, kind, p) {
   /* arms: sleeve, upper arm, forearm onto the abdomen, hands at rest */
   const anchors = {};
   for (const s of [-1, 1]) {
+    if (p.table && s === 1) { radialArm(g, head, skin, anchors); continue; }
     const onSheet = (x, z, r) => T + Math.max(top.heightAt(x, z), torsoBody(x, z) * 0.9) + r * 0.9;
     const shoulder = [-0.34, T + 0.1, s * 0.205];
     const elbow = [-0.11, onSheet(-0.11, s * 0.262, 0.036), s * 0.262];
@@ -366,10 +371,16 @@ export function buildPatient(g, head, angle, kind, p) {
     const from = headToUnit(-0.3, T + 0.19, angle, z);
     g.add(new THREE.Mesh(tube([[from.x, from.y, from.z], [from.x + 0.02, from.y + 0.06, (from.z + join.z) / 2], [join.x, join.y, join.z]], 0.0028, 24), MAT.paint(c, 0.5)));
   }
-  g.add(new THREE.Mesh(tube([[join.x, join.y, join.z], [join.x - 0.1, join.y + 0.25, 0.45], [0.42, 1.55, 0.5], [0.34, 1.72, 0.45]], 0.004, 40), MAT.lightGrey()));
-  // the oximeter cable runs up to the same monitor
   const f = anchors.finger;
-  g.add(new THREE.Mesh(tube([[f.x, f.y, f.z], [f.x - 0.1, f.y + 0.08, f.z - 0.12], [0.62, 0.98, -0.47], [0.3, 1.25, -0.2], [0.34, 1.72, 0.4]], 0.0032, 48), MAT.lightGrey()));
+  if (p.table) {
+    // on the table the leads drop over the far edge to the lab's recording system
+    g.add(new THREE.Mesh(tube([[join.x, join.y, join.z], [join.x + 0.1, join.y - 0.05, -0.6], [join.x + 0.15, BED.deckY - 0.3, -0.72]], 0.004, 30), MAT.lightGrey()));
+    if (f) g.add(new THREE.Mesh(tube([[f.x, f.y, f.z], [f.x + 0.05, f.y + 0.02, f.z - 0.2], [f.x + 0.1, BED.deckY - 0.3, -0.72]], 0.0032, 30), MAT.lightGrey()));
+  } else {
+    g.add(new THREE.Mesh(tube([[join.x, join.y, join.z], [join.x - 0.1, join.y + 0.25, 0.45], [0.42, 1.55, 0.5], [0.34, 1.72, 0.45]], 0.004, 40), MAT.lightGrey()));
+    // the oximeter cable runs up to the same monitor
+    g.add(new THREE.Mesh(tube([[f.x, f.y, f.z], [f.x - 0.1, f.y + 0.08, f.z - 0.12], [0.62, 0.98, -0.47], [0.3, 1.25, -0.2], [0.34, 1.72, 0.4]], 0.0032, 48), MAT.lightGrey()));
+  }
 
   /* the airway */
   const mouth = face.mouth.clone();
@@ -396,6 +407,13 @@ export function buildPatient(g, head, angle, kind, p) {
   } else {
     anchors.mouth = headToUnit(mouth.x, mouth.y, angle, mouth.z);
   }
+  if (p.table) {
+    const n0 = face.nose;
+    const tubeM = MAT.paint('#E6F2F3', 0.3);
+    for (const s of [-1, 1]) {
+      head.add(new THREE.Mesh(tube([[n0.x, n0.y - 0.005, n0.z], [n0.x - 0.05, n0.y - 0.04, s * 0.085], [n0.x - 0.16, n0.y - 0.09, s * 0.095], [-0.78, T + 0.05, s * 0.03]], 0.0035, 30), tubeM));
+    }
+  }
   const n = face.nose;
   anchors.nose = headToUnit(n.x, n.y, angle, n.z);
   anchors.hand ||= headToUnit(0.05, T + 0.2, angle, 0.15);
@@ -420,4 +438,35 @@ export function pillowGeometry() {
   g.userData.shared = true;
   pillowGeo = g;
   return g;
+}
+
+/**
+ * The right arm out on its board for transradial access: draped to the
+ * forearm, wrist prepped and extended, palm up, with the 6F radial sheath
+ * sitting in the artery and its side-arm flushed.
+ */
+function radialArm(g, head, skin, anchors) {
+  const drapeMat = blanketMat('cathlab');
+  const shoulder = [-0.34, T + 0.08, 0.205];
+  const elbow = [-0.04, T + 0.03, 0.6];
+  const wrist = [0.24, T + 0.02, 0.7];
+  head.add(limb(shoulder, elbow, 0.05, 0.046, drapeMat));          // arm drape over the upper arm
+  head.add(limb(elbow, wrist, 0.037, 0.029, skin));
+  const dir = new THREE.Vector3(...wrist).sub(new THREE.Vector3(...elbow)).normalize();
+  const h = hand(new THREE.Vector3(...wrist), dir, new THREE.Vector3(0, -1, 0), skin, 1);   // palm up
+  head.add(h.group);
+
+  // padded arm board under the arm
+  g.add(part(rbox(0.95, 0.03, 0.3, 0.01), MAT.charcoal(), BED.hingeX - 0.05, BED.deckY + T - 0.03, 0.68));
+  g.add(part(rbox(0.93, 0.025, 0.28, 0.01), drapeMat, BED.hingeX - 0.05, BED.deckY + T - 0.005, 0.68));
+
+  // 6F radial sheath: hub at the wrist, side-arm and three-way tap
+  const w = new THREE.Vector3(...wrist).addScaledVector(dir, 0.02);
+  const at = headToUnit(w.x, w.y + 0.03, 0, w.z - 0.012);
+  g.add(part(cyl(0.0045, 0.0045, 0.07, 10), MAT.paint('#F2F2F2', 0.3), at.x - 0.03, at.y - 0.004, at.z, 0, 0, Math.PI / 2 - 0.15));
+  g.add(part(rbox(0.03, 0.016, 0.016, 0.005), MAT.paint('#3A7BC8', 0.4), at.x + 0.012, at.y, at.z));
+  g.add(new THREE.Mesh(tube([[at.x + 0.02, at.y, at.z], [at.x + 0.08, at.y + 0.02, at.z + 0.04], [at.x + 0.14, at.y - 0.01, at.z + 0.1]], 0.003, 20), MAT.glassClear()));
+  g.add(part(rbox(0.025, 0.012, 0.025, 0.004), MAT.paint('#2F8F5B', 0.5), at.x + 0.15, at.y - 0.01, at.z + 0.11));
+  anchors.hand = at;
+  anchors.sheath = at;
 }

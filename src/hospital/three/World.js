@@ -252,6 +252,7 @@ export class World {
 
   buildLabels() {
     this.labels.innerHTML = '';
+    if (this.ward.listMode) { this.labelEls = []; return; }
     this.labelEls = this.ward.beds.map(b => {
       const el = document.createElement('button');
       el.type = 'button';
@@ -299,7 +300,7 @@ export class World {
       const { wingId, number } = hits[0].object.userData;
       return { type: 'floor', wingId, number };
     }
-    if (this.mode === 'ward' && this.ward) {
+    if (this.mode === 'ward' && this.ward && !this.ward.listMode) {
       const hits = this.ray.intersectObjects(this.ward.beds.map(b => b.hit), false);
       if (!hits.length) return null;
       return { type: 'bed', index: hits[0].object.userData.bed };
@@ -366,10 +367,17 @@ export class World {
     if (instant) f.glassMat.emissiveIntensity = target * 0.55;
   }
 
+  /** Stop drawing (a case is open over the scene); resume where we left off. */
+  setPaused(v) {
+    this.paused = v;
+    if (!v) this.clock.getDelta();
+  }
+
   /* ---------- frame loop ---------- */
 
   loop() {
     this.raf = requestAnimationFrame(this.loop);
+    if (this.paused) return;
     const dt = Math.min(0.05, this.clock.getDelta());
     const now = performance.now();
     const t = this.clock.elapsedTime;
@@ -403,6 +411,7 @@ export class World {
       this.renderer.render(this.outside, this.camera);
     } else if (this.ward) {
       for (const b of this.ward.beds) {
+        if (!b.glow) continue;
         const hot = this.mode === 'ward' && this.hover?.type === 'bed' && this.hover.index === b.index;
         const goal = hot ? 0.3 : 0;
         b.glow.material.opacity += (goal - b.glow.material.opacity) * Math.min(1, dt * 10);

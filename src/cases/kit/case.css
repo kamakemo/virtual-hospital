@@ -1,0 +1,238 @@
+/* ============================================================
+   CASE SIMULATOR — the cath-lab control-room look.
+   Dark slate panels, monitor-phosphor readouts, amber for
+   attention, and a calm reading column for the teaching.
+   ============================================================ */
+
+.cs-root {
+  --bg: #0A1016; --panel: #101921; --panel2: #15212B; --panel3: #1B2935;
+  --line: #22323F; --line2: #2C3F4E;
+  --ink: #E6EEF5; --ink2: #A9B8C7; --ink3: #6F8396;
+  --amber: #FFB020; --green: #38E07A; --red: #FF5A52; --cyan: #3ED0F5; --violet: #B08CFF;
+  --accent: #4FB8CC; --accent2: #2D8FA3;
+  --good: #2FD08A; --ok: #F2C14B; --bad: #FF6B5E;
+  position: fixed; inset: 0; z-index: 80;
+  display: grid; grid-template-rows: auto 1fr;
+  background: var(--bg); color: var(--ink);
+  font-family: Archivo, system-ui, sans-serif; font-size: 15px; line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+.cs-root *, .cs-root *::before, .cs-root *::after { box-sizing: border-box; }
+.cs-root button { font: inherit; color: inherit; cursor: pointer; }
+.cs-root button:disabled { cursor: default; }
+.cs-root :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.cs-mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+
+/* ---------- patient band ---------- */
+.cs-band {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  padding: 9px 14px; background: #070C11; border-bottom: 1px solid var(--line);
+}
+.cs-close {
+  width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--line2);
+  background: var(--panel2); display: grid; place-items: center; flex: none;
+}
+.cs-close:hover { background: var(--panel3); }
+.cs-pt { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; min-width: 0; }
+.cs-pt-name { font-weight: 700; font-size: 16px; }
+.cs-pt-meta { color: var(--ink2); font-size: 13px; }
+.cs-flags { display: flex; gap: 6px; flex-wrap: wrap; }
+.cs-flag {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  border-radius: 5px; padding: 3px 7px; border: 1px solid;
+}
+.cs-flag.red { color: #FFB1AA; border-color: rgba(255,90,82,0.5); background: rgba(255,90,82,0.12); }
+.cs-flag.amber { color: #FFD38A; border-color: rgba(255,176,32,0.5); background: rgba(255,176,32,0.1); }
+.cs-flag.blue { color: #A6E6F5; border-color: rgba(62,208,245,0.45); background: rgba(62,208,245,0.08); }
+.cs-clock { margin-left: auto; display: flex; gap: 16px; align-items: center; }
+.cs-clock-item { text-align: right; line-height: 1.15; }
+.cs-clock-item span { display: block; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink3); }
+.cs-clock-item b { font: 600 17px 'IBM Plex Mono', monospace; color: var(--amber); }
+.cs-score b { color: var(--green); }
+
+/* ---------- body ---------- */
+.cs-body { display: grid; grid-template-columns: 236px minmax(0, 1fr) 312px; min-height: 0; }
+.cs-rail { border-right: 1px solid var(--line); overflow-y: auto; padding: 12px 10px; background: var(--panel); }
+.cs-rail h2 { font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink3); margin: 4px 8px 10px; font-weight: 600; }
+.cs-step {
+  display: flex; gap: 10px; align-items: flex-start; width: 100%; text-align: left;
+  border: 0; background: none; border-radius: 9px; padding: 8px 9px; margin-bottom: 2px;
+}
+.cs-step:hover { background: var(--panel2); }
+.cs-step.is-on { background: var(--panel3); box-shadow: inset 3px 0 0 var(--accent); }
+.cs-step-n {
+  flex: none; width: 24px; height: 24px; border-radius: 7px; display: grid; place-items: center;
+  font: 600 11px 'IBM Plex Mono', monospace; background: var(--panel2); border: 1px solid var(--line2); color: var(--ink2);
+}
+.cs-step.is-done .cs-step-n { background: rgba(47,208,138,0.15); border-color: rgba(47,208,138,0.5); color: var(--good); }
+.cs-step-t { font-size: 13px; line-height: 1.3; color: var(--ink2); }
+.cs-step.is-on .cs-step-t { color: var(--ink); font-weight: 600; }
+.cs-step-s { display: block; font: 500 10.5px 'IBM Plex Mono', monospace; color: var(--ink3); margin-top: 2px; }
+
+.cs-main { overflow-y: auto; padding: 22px clamp(16px, 3vw, 40px) 80px; scroll-behavior: smooth; }
+.cs-main-inner { max-width: 940px; margin: 0 auto; }
+.cs-kicker { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+.cs-h1 { font-family: Newsreader, Georgia, serif; font-weight: 500; font-size: clamp(26px, 3vw, 34px); line-height: 1.15; margin: 6px 0 6px; text-wrap: balance; }
+.cs-lede { color: var(--ink2); font-size: 15.5px; max-width: 70ch; margin: 0 0 18px; }
+.cs-h2 { font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink2); margin: 28px 0 10px; font-weight: 700; }
+.cs-p { color: #CCD7E1; max-width: 72ch; margin: 0 0 12px; }
+.cs-p b, .cs-li b { color: var(--ink); }
+.cs-ul { margin: 0 0 12px; padding-left: 18px; color: #CCD7E1; max-width: 72ch; }
+.cs-li { margin-bottom: 5px; }
+
+.cs-card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+.cs-card.tight { padding: 12px; }
+.cs-grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.cs-grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.cs-vignette { border-left: 3px solid var(--amber); background: linear-gradient(90deg, rgba(255,176,32,0.07), transparent 60%); }
+.cs-time { font: 600 12px 'IBM Plex Mono', monospace; color: var(--amber); margin-right: 8px; }
+
+.cs-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.cs-table th, .cs-table td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.cs-table th { color: var(--ink3); font-weight: 600; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+.cs-table td.num { font-family: 'IBM Plex Mono', monospace; text-align: right; white-space: nowrap; }
+.cs-hi { color: var(--red); font-weight: 600; }
+.cs-lo { color: var(--cyan); font-weight: 600; }
+.cs-scroll { overflow-x: auto; }
+
+/* ---------- teaching notes ---------- */
+.cs-note { border-radius: 10px; padding: 12px 14px; margin: 12px 0; font-size: 14px; border: 1px solid; }
+.cs-note > b:first-child { display: block; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 4px; }
+.cs-note.pearl { background: rgba(79,184,204,0.08); border-color: rgba(79,184,204,0.35); color: #CDEBF1; }
+.cs-note.pearl > b:first-child { color: var(--accent); }
+.cs-note.warn { background: rgba(255,90,82,0.08); border-color: rgba(255,90,82,0.35); color: #FFD6D2; }
+.cs-note.warn > b:first-child { color: var(--red); }
+.cs-note.evid { background: rgba(176,140,255,0.08); border-color: rgba(176,140,255,0.32); color: #E2D7FF; }
+.cs-note.evid > b:first-child { color: var(--violet); }
+
+/* ---------- decisions ---------- */
+.cs-q { font-weight: 600; font-size: 15.5px; margin: 0 0 10px; }
+.cs-opts { display: grid; gap: 8px; }
+.cs-opt {
+  display: flex; gap: 10px; align-items: flex-start; text-align: left; width: 100%;
+  background: var(--panel2); border: 1px solid var(--line2); border-radius: 10px; padding: 10px 12px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.cs-opt:hover:not(:disabled) { border-color: var(--accent); background: var(--panel3); }
+.cs-opt-k { flex: none; width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; font: 600 11px 'IBM Plex Mono', monospace; background: var(--panel); border: 1px solid var(--line2); color: var(--ink2); }
+.cs-opt.sel { border-color: var(--accent); background: rgba(79,184,204,0.1); }
+.cs-opt.best { border-color: rgba(47,208,138,0.6); background: rgba(47,208,138,0.08); }
+.cs-opt.ok { border-color: rgba(242,193,75,0.55); background: rgba(242,193,75,0.07); }
+.cs-opt.wrong { border-color: rgba(255,107,94,0.55); background: rgba(255,107,94,0.07); }
+.cs-opt.dim { opacity: 0.6; }
+.cs-opt-why { display: block; font-size: 13px; color: var(--ink2); margin-top: 6px; line-height: 1.5; }
+.cs-verdict { display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-left: 6px; }
+.cs-verdict.best { color: var(--good); } .cs-verdict.ok { color: var(--ok); } .cs-verdict.wrong { color: var(--bad); }
+.cs-fb { margin-top: 10px; border-radius: 10px; padding: 12px 14px; font-size: 14px; }
+.cs-fb.best { background: rgba(47,208,138,0.1); border: 1px solid rgba(47,208,138,0.4); }
+.cs-fb.ok { background: rgba(242,193,75,0.09); border: 1px solid rgba(242,193,75,0.4); }
+.cs-fb.wrong { background: rgba(255,107,94,0.09); border: 1px solid rgba(255,107,94,0.4); }
+.cs-pts { font: 600 12px 'IBM Plex Mono', monospace; color: var(--ink3); }
+
+.cs-btn {
+  display: inline-flex; align-items: center; gap: 8px; border-radius: 9px; padding: 8px 14px;
+  border: 1px solid var(--line2); background: var(--panel2); font-weight: 600; font-size: 13.5px;
+}
+.cs-btn:hover:not(:disabled) { background: var(--panel3); border-color: var(--accent); }
+.cs-btn.primary { background: var(--accent2); border-color: var(--accent); color: #fff; }
+.cs-btn.primary:hover:not(:disabled) { background: #3AA2B6; }
+.cs-btn.danger { background: rgba(255,90,82,0.15); border-color: rgba(255,90,82,0.55); color: #FFC9C4; }
+.cs-btn:disabled { opacity: 0.45; }
+/* press-and-hold: no long-press menu or text selection on touch screens */
+.cs-hold { touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.cs-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.cs-chip { display: inline-flex; align-items: center; gap: 5px; border-radius: 999px; padding: 4px 10px; font-size: 12px; border: 1px solid var(--line2); background: var(--panel2); color: var(--ink2); }
+.cs-chip.on { border-color: var(--accent); color: var(--ink); background: rgba(79,184,204,0.14); }
+.cs-chip.done { border-color: rgba(47,208,138,0.5); color: var(--good); }
+
+/* sequence game */
+.cs-seq-pool, .cs-seq-out { display: grid; gap: 6px; }
+.cs-seq-item { text-align: left; background: var(--panel2); border: 1px dashed var(--line2); border-radius: 9px; padding: 8px 11px; font-size: 13.5px; }
+.cs-seq-item.placed { border-style: solid; display: flex; gap: 10px; }
+.cs-seq-item.placed.right { border-color: rgba(47,208,138,0.55); }
+.cs-seq-item.placed.wrongpos { border-color: rgba(255,107,94,0.55); }
+
+/* stepper */
+.cs-steps { display: grid; gap: 12px; }
+.cs-stepcard { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); overflow: hidden; }
+.cs-stepcard-h { display: flex; align-items: center; gap: 10px; padding: 11px 14px; background: var(--panel2); border-bottom: 1px solid var(--line); }
+.cs-stepcard-h b { font-size: 14.5px; }
+.cs-stepcard-h .cs-step-n { width: 26px; height: 26px; }
+.cs-stepcard-b { padding: 14px; }
+.cs-stepcard.locked { opacity: 0.45; }
+.cs-stepcard.locked .cs-stepcard-b { display: none; }
+
+/* ---------- canvases ---------- */
+.cs-canvas { display: block; width: 100%; border-radius: 10px; background: #000; }
+.cs-viewer { position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--line2); background: #000; }
+.cs-viewer-hud { position: absolute; left: 10px; top: 8px; font: 600 12px 'IBM Plex Mono', monospace; color: var(--amber); text-shadow: 0 1px 2px #000; pointer-events: none; }
+.cs-viewer-hud.r { left: auto; right: 10px; text-align: right; color: #CFE3F2; }
+.cs-viewer-hud.b { top: auto; bottom: 8px; color: #9FB4C6; font-weight: 500; }
+.cs-ctrls { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
+.cs-slider { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink2); }
+.cs-slider input { accent-color: var(--accent); width: 140px; }
+.cs-readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 8px; margin-top: 10px; }
+.cs-readout div { background: var(--panel2); border: 1px solid var(--line); border-radius: 9px; padding: 7px 10px; }
+.cs-readout span { display: block; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink3); }
+.cs-readout b { font: 600 18px 'IBM Plex Mono', monospace; }
+
+/* ---------- monitor rail ---------- */
+.cs-mon { border-left: 1px solid var(--line); background: #070C11; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+.cs-mon-screen { background: #03070B; border: 1px solid #1A2632; border-radius: 10px; padding: 8px; }
+.cs-mon-title { display: flex; justify-content: space-between; font: 600 10.5px 'IBM Plex Mono', monospace; letter-spacing: 0.1em; color: var(--ink3); margin-bottom: 6px; }
+.cs-alarm { color: var(--red); animation: csBlink 0.9s steps(2) infinite; }
+@keyframes csBlink { 50% { opacity: 0.25; } }
+.cs-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.cs-metric { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; }
+.cs-metric span { display: block; font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink3); }
+.cs-metric b { font: 600 16px 'IBM Plex Mono', monospace; }
+.cs-metric.warn b { color: var(--amber); } .cs-metric.over b { color: var(--red); }
+.cs-bar { height: 4px; border-radius: 3px; background: var(--line); margin-top: 5px; overflow: hidden; }
+.cs-bar i { display: block; height: 100%; background: var(--accent); }
+.cs-metric.warn .cs-bar i { background: var(--amber); } .cs-metric.over .cs-bar i { background: var(--red); }
+
+/* ---------- media ---------- */
+.cs-fig { margin: 12px 0; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.cs-fig img { display: block; width: 100%; max-height: 380px; object-fit: contain; background: #fff; }
+.cs-fig figcaption { padding: 9px 12px; font-size: 12.5px; color: var(--ink2); }
+.cs-fig figcaption a { color: var(--accent); }
+.cs-fig-fallback { padding: 22px; text-align: center; color: var(--ink3); font-size: 13px; }
+.cs-video { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel); margin: 10px 0; }
+.cs-video-frame { position: relative; aspect-ratio: 16 / 9; background: #000; }
+.cs-video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.cs-video-poster { position: absolute; inset: 0; display: grid; place-items: center; background: radial-gradient(circle at 50% 45%, #1B2935, #05080B); border: 0; width: 100%; }
+.cs-video-play { width: 64px; height: 44px; border-radius: 12px; background: #E62117; display: grid; place-items: center; }
+.cs-video-meta { display: flex; justify-content: space-between; gap: 10px; padding: 9px 12px; font-size: 13px; align-items: center; }
+.cs-video-meta a { color: var(--accent); white-space: nowrap; font-size: 12.5px; }
+.cs-media-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+
+/* ---------- live viewer pinned above procedure steps (tall screens only) ---------- */
+@media (min-height: 940px) and (min-width: 761px) {
+  .cs-sticky { position: sticky; top: -22px; z-index: 2; background: var(--bg); padding-top: 4px; }
+}
+
+/* ---------- navigation footer ---------- */
+.cs-next { display: flex; justify-content: space-between; gap: 10px; margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line); }
+
+/* ---------- score summary ---------- */
+.cs-scorebar { height: 8px; border-radius: 5px; background: var(--line); overflow: hidden; }
+.cs-scorebar i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent2), var(--good)); }
+
+@media (max-width: 1180px) {
+  .cs-body { grid-template-columns: 210px minmax(0, 1fr); }
+  .cs-mon { display: none; }
+  .cs-mon-strip { display: flex !important; }
+}
+.cs-mon-strip { display: none; gap: 8px; padding: 6px 14px; background: #070C11; border-bottom: 1px solid var(--line); overflow-x: auto; }
+.cs-mon-strip .cs-metric { min-width: 96px; }
+@media (max-width: 760px) {
+  .cs-body { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .cs-rail { border-right: 0; border-bottom: 1px solid var(--line); display: flex; overflow-x: auto; padding: 8px; gap: 4px; }
+  .cs-rail h2 { display: none; }
+  .cs-step { flex: none; width: auto; }
+  .cs-step-t, .cs-step-s { display: none; }
+  .cs-grid2, .cs-grid3, .cs-media-row { grid-template-columns: 1fr; }
+  .cs-clock-item.hide-sm { display: none; }
+  .cs-main { padding: 16px 14px 60px; }
+}
+@media (prefers-reduced-motion: reduce) { .cs-alarm { animation: none; } .cs-main { scroll-behavior: auto; } }

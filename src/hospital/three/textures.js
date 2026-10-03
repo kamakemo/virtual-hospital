@@ -207,6 +207,16 @@ export const cellularBlanket = (tone = '#EEF2F4') => cached('blanket' + tone, ()
   for (let i = 0; i <= w; i += s) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i, h); g.stroke(); g.beginPath(); g.moveTo(0, i); g.lineTo(w, i); g.stroke(); }
 }, { repeat: [6, 6] }));
 
+/** Sterile non-woven drape: the blue of every procedure table. */
+export const sterileDrape = () => cached('drape', () => make(256, 256, (g, w, h) => {
+  g.fillStyle = '#356C9E'; g.fillRect(0, 0, w, h);
+  const r = rng(131);
+  for (let i = 0; i < 7000; i++) {
+    g.fillStyle = r() < 0.5 ? 'rgba(255,255,255,0.06)' : 'rgba(10,30,60,0.08)';
+    g.fillRect(r() * w, r() * h, 1 + r() * 2.5, 1);
+  }
+}, { repeat: [4, 4] }));
+
 /** Short hair, as fine strands over a darker root tone. */
 export const hairStrands = (base) => cached('hair' + base, () => make(512, 512, (g, w, h) => {
   const c = new THREE.Color(base);
