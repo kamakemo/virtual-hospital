@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   CaseShell, useCase, Note, Decision, MultiSelect, Sequence, Steps, Step, Figure, Video, Quiz, fmtClock, fmtSec,
+  Why, Contrast, WarStory, ViciousCycle, BedsideMonitor,
 } from '../kit/CaseKit.jsx';
 import ECG12 from '../kit/ECG12.jsx';
 import Angio from '../kit/Angio.jsx';
@@ -104,6 +105,28 @@ function Presentation() {
         Widespread ST depression with ST elevation in aVR during pain is subendocardial ischaemia across a large territory — think left main, proximal LAD or multivessel disease.
         It is not a STEMI equivalent on its own. <b>That the changes come and go with the pain is the point.</b>
       </Note>
+      <Why title="Why the ST segment drops everywhere — and rises in aVR"
+        chain={[
+          { k: 'SUPPLY', t: 'A ruptured LAD plaque with flickering thrombus: flow falls whenever demand rises.' },
+          { k: 'WHERE', t: 'The subendocardium starves first — furthest from the epicardial artery and squeezed hardest in systole.' },
+          { k: 'ELECTRICS', t: 'Injured inner muscle sets up a current of injury pointing away from the surface leads → ST depression.' },
+          { k: 'aVR', t: 'aVR looks from the opposite side, so it records the mirror image: ST elevation.' },
+        ]}>
+        Diffuse ST depression does not localise the artery — it measures <b>how much muscle is starving</b>. That is why aVR elevation with widespread depression means a big territory: left main, proximal LAD, or three vessels.
+      </Why>
+      <Contrast title="what this ECG is — and what it is not"
+        is={{ h: 'NSTE-ACS with dynamic subendocardial ischaemia', points: [
+          'Partial occlusion or a flickering thrombus — flow comes and goes, so the ECG does too.',
+          'ST depression that does not localise; it changes with the pain.',
+          'Urgency comes from risk features: immediate (< 2 h) when pain recurs despite treatment, early (< 24 h) otherwise.',
+          'No fibrinolysis — it does not help a non-occlusive white thrombus and only adds bleeding.',
+        ] }}
+        isnt={{ h: 'STEMI (occlusion MI)', points: [
+          'Total occlusion — the full thickness of the wall is dying.',
+          'ST elevation localises to a territory, with reciprocal depression opposite.',
+          'Reperfusion now: primary PCI, or lysis if PCI cannot happen within 120 minutes.',
+          'Trap: posterior MI hides as ST depression in V1–V3. Look for it before calling an ECG “NSTE”.',
+        ] }} />
 
       <div className="cs-grid2">
         <div className="cs-card">
@@ -200,6 +223,28 @@ function Workup() {
         <p className="cs-p">Apixaban last taken at 21:00 — about 12 hours ago. Oral anticoagulation is a major Academic Research Consortium high-bleeding-risk criterion. Plan: <b>radial access</b>, no bridging, and in the lab <b>give unfractionated heparin irrespective of the timing of the last apixaban dose</b>, at a reduced bolus guided by ACT.</p>
       </Reveal>
 
+      <Contrast title="contrast-reaction risk: real predictors vs folklore"
+        is={{ h: 'What actually predicts a reaction', points: [
+          'A previous reaction to iodinated contrast — his hives in 2019.',
+          'Severe asthma or several severe allergies (a weaker signal).',
+          'Most reactions are direct, non-IgE mast-cell release — which is why steroid and antihistamine premedication blunts them.',
+        ] }}
+        isnt={{ h: 'Folklore that delays care', points: [
+          'Shellfish allergy — the allergen is tropomyosin, a muscle protein. There is no iodine in it that matters.',
+          'Povidone-iodine skin reactions — a contact dermatitis, not a predictor of contrast anaphylaxis.',
+          '“Iodine allergy” — iodine is an essential element in every thyroid hormone. Nobody is allergic to it.',
+        ] }} />
+
+      <Why title="Why contrast hurts a diabetic kidney"
+        chain={[
+          { k: 'VASOCONSTRICTION', t: 'Contrast releases adenosine and endothelin: renal medullary vessels clamp down.' },
+          { k: 'HYPOXIA', t: 'The outer medulla already lives at the edge of hypoxia — thick ascending limbs pump salt all day on little blood flow.' },
+          { k: 'TOXICITY', t: 'Viscous contrast lingers in the tubules: direct tubular-cell injury and free radicals.' },
+          { k: 'NO RESERVE', t: 'Diabetes + CKD = fewer nephrons, each already hyperfiltering. Nothing left to absorb the hit.' },
+        ]}>
+        So the levers are <b>volume and flow</b>: less contrast means less insult; isotonic saline keeps tubular flow moving and dilutes what is there. And metformin is held not because it harms the kidney — but because if the kidney fails, metformin accumulates and causes <b>lactic acidosis</b>.
+      </Why>
+
       <Decision id="s2-premed" question="How do you handle the previous contrast reaction for an urgent procedure?"
         options={[
           { id: 'accel', label: 'Accelerated IV premedication — methylprednisolone 40 mg (or hydrocortisone 200 mg) plus diphenhydramine 50 mg about an hour before — a different contrast agent, and the anaphylaxis kit ready', verdict: 'best', points: 10,
@@ -219,7 +264,7 @@ function Workup() {
           ['Contrast volume / eGFR ratio < 2 (highest-risk target)', `2 × ${EGFR}`, N(`${2 * EGFR} mL`)],
           ['Maximum acceptable contrast dose (Cigarroa)', `5 × ${W} kg ÷ ${CR} mg/dL`, N(`${Math.round(5 * W / CR)} mL`)],
         ]} />
-        <p className="cs-pts" style={{ marginTop: 8 }}>The lab monitor on the right tracks every millilitre against this budget.</p>
+        <p className="cs-pts" style={{ marginTop: 8 }}>The contrast tile in the vitals strip tracks every millilitre against this budget.</p>
       </div>
       <Decision id="s2-budget" question="Which contrast ceiling do you brief the team on?"
         options={[
@@ -296,6 +341,21 @@ function Access() {
             why: 'Valid, and preferred with a LIMA graft or right subclavian tortuosity. Ergonomically harder for the operator.' },
           { id: 'fem', label: 'Right common femoral', verdict: 'wrong', points: 2,
             why: 'More bleeding — and he is on apixaban. Keep femoral for bailout: large-bore devices, failed radial, mechanical support.' },
+        ]} />
+
+      <Why title="Why the wrist bleeds less — and why that saves lives"
+        chain={[
+          { k: 'ANATOMY', t: 'The radial artery is superficial and lies on bone — the radius.' },
+          { k: 'CONTROL', t: 'Any bleed is visible at once and stopped with a band pressing it against that bone.' },
+          { k: 'THE GROIN', t: 'The femoral artery is deep. A puncture above the inguinal ligament bleeds backwards into the retroperitoneum — silently, litres at a time.' },
+          { k: 'OUTCOME', t: 'A major bleed after ACS independently raises death. Fewer bleeds, fewer deaths (RIVAL, MATRIX).' },
+        ]} />
+      <Why title="Why the radial artery spasms"
+        chain={[
+          { k: 'WALL', t: 'A thick muscular media, rich in α₁-adrenergic receptors.' },
+          { k: 'TRIGGER', t: 'Pain, fear and catheter friction release catecholamines.' },
+          { k: 'SPASM', t: 'The artery grips the catheter: pain, resistance, and failed access.' },
+          { k: 'BREAK IT', t: 'Verapamil and nitrate relax the muscle; a hydrophilic sheath cuts friction; local anaesthetic and calm cut the catecholamines.' },
         ]} />
 
       <Sequence id="s3-seq" question="Put the radial access in order."
@@ -383,7 +443,7 @@ function Diagnostic() {
   const enough = left >= 4 && right >= 2;
   return (
     <>
-      <p className="cs-p">Acquire the series. Pick a projection, then <b>Cine / inject</b>. Every run costs contrast and dose — watch the totals on the right. Aim for four or more views of the left system and two of the right, chosen so every segment is seen twice, in roughly orthogonal views.</p>
+      <p className="cs-p">Acquire the series. Pick a projection, then <b>Cine / inject</b>. Every run costs contrast and dose — watch the contrast and fluoro tiles at the top. Aim for four or more views of the left system and two of the right, chosen so every segment is seen twice, in roughly orthogonal views.</p>
       <Angio tree={TREE} presets={VIEWS} onCine={onCine} height={420} startView="rao-cau" />
       <div className="cs-row" style={{ margin: '4px 0 14px' }}>
         {VIEWS.map(v => <span key={v.id} className={'cs-chip' + (runs.includes(v.id) ? ' done' : '')}>{runs.includes(v.id) ? '✓ ' : ''}{v.short}</span>)}
@@ -393,6 +453,26 @@ function Diagnostic() {
       <Note kind="pearl" title="How to choose views">
         Name the projection by where the <b>detector</b> sits: LAO/RAO for left or right anterior oblique, cranial/caudal for its tilt toward head or feet. Caudal views open the left main and circumflex; cranial views open the mid LAD and its branches. A lesion is only as severe as it looks in its <b>least</b> foreshortened, non-overlapped view.
       </Note>
+      <Why title="Foreshortening: why one view lies"
+        chain={[
+          { k: 'SHADOW', t: 'An angiogram is the shadow of a 3D tube thrown onto a flat detector.' },
+          { k: 'ANGLE', t: 'When the vessel runs toward the detector its length collapses — a 20 mm lesion can look like 8 mm.' },
+          { k: 'OVERLAP', t: 'Branches cross in front of the lesion and hide its narrowest point.' },
+          { k: 'RULE', t: 'Every segment in two roughly orthogonal views; judge by the worst unforeshortened one.' },
+        ]}>
+        Try it above: put the LAD in RAO caudal, then LAO cranial. Same artery, different truth.
+      </Why>
+      <Contrast title="culprit vs bystander"
+        is={{ h: 'The culprit', points: [
+          'Hazy, irregular or ulcerated edge; a filling defect (thrombus).',
+          'Sits in the territory of the ECG changes and the wall-motion abnormality.',
+          'Treated for what it is — a ruptured plaque — not for its gradient.',
+        ] }}
+        isnt={{ h: 'The bystander', points: [
+          'Smooth, concentric, often long-standing.',
+          'No territory correlate on ECG or echo.',
+          'Judged by physiology: treated only if it limits flow.',
+        ] }} />
 
       {enough && (
         <div className="cs-card" style={{ borderColor: 'var(--accent2)' }}>
@@ -478,6 +558,26 @@ function Assessment() {
       <Note kind="warn" title="Not on the culprit">
         Do not use FFR to judge the culprit lesion in ACS. Microvascular dysfunction in the infarct territory blunts hyperaemia, so FFR can look falsely reassuring; and a ruptured plaque is treated for what it is, not for its gradient.
       </Note>
+      <Why title="Why FFR needs adenosine"
+        chain={[
+          { k: 'REST', t: 'At rest the arterioles autoregulate — they dilate to keep flow normal despite the narrowing.' },
+          { k: 'HIDDEN', t: 'So the resting gradient is small and misleading: the reserve is being spent invisibly.' },
+          { k: 'HYPERAEMIA', t: 'Adenosine dilates the arterioles fully; resistance becomes minimal and fixed.' },
+          { k: 'RATIO', t: 'With resistance fixed, pressure tracks flow: Pd/Pa is the fraction of normal maximal flow the artery can deliver.' },
+        ]}>
+        The same logic explains the trap on the culprit: stunned, embolised microvessels <b>cannot</b> dilate, so flow cannot rise, the gradient stays small — and a lethal lesion looks innocent.
+      </Why>
+      <Contrast title="FFR is not iFR"
+        is={{ h: 'FFR — hyperaemic', points: [
+          'Needs adenosine to abolish microvascular resistance.',
+          'Ischaemic at ≤ 0.80.',
+          'Side effects: chest tightness, flushing, transient AV block.',
+        ] }}
+        isnt={{ h: 'iFR — resting, wave-free', points: [
+          'No drug: measured in the diastolic window where resistance is naturally low and stable.',
+          'Ischaemic at ≤ 0.89 — a different scale, not a worse FFR.',
+          'Faster, and non-inferior for deferral decisions (DEFINE-FLAIR, iFR-SWEDEHEART).',
+        ] }} />
 
       <div className="cs-h2">B · The LAD (culprit): IVUS before treatment</div>
       <p className="cs-p">A 60 MHz IVUS catheter on a workhorse wire, pulled back at 1 mm/s from the distal LAD to the left main. Drag along the longitudinal view, or jump to the landmarks.</p>
@@ -538,6 +638,28 @@ function Strategy() {
   return (
     <>
       <p className="cs-p">The picture: an ACS culprit in the proximal–mid LAD, 360° superficial calcium (IVUS calcium score 2), a Medina 1,1,0 bifurcation with a 2.5 mm first diagonal whose ostium is healthy, a non-ischaemic RCA, and a contrast budget already {`≈`}25% spent.</p>
+      <Why title="Why calcium kills stents"
+        chain={[
+          { k: 'RING', t: '360° calcium is a rigid ring — a pipe, not a wall.' },
+          { k: 'PHYSICS', t: 'Balloon force goes where resistance is least: the soft ends bulge (dog-bone), the ring holds.' },
+          { k: 'UNDEREXPANSION', t: 'The stent is crimped to whatever the ring allows.' },
+          { k: 'FAILURE', t: 'Small area → high shear, platelet activation, exposed struts → thrombosis and restenosis.' },
+        ]}>
+        Every calcium tool works the same way at heart: <b>break the ring first</b>. Once fractured, the ring becomes a hinge and the balloon can open it.
+      </Why>
+      <Contrast title="lithotripsy is not atherectomy"
+        is={{ h: 'Intravascular lithotripsy (IVL)', points: [
+          'Sonic pressure waves crack calcium — deep and superficial — through a balloon at 4 atm.',
+          'Sized 1:1 to the vessel; both branch wires stay in.',
+          'Little debris, little slow-flow.',
+          'Needs the balloon to cross the lesion.',
+        ] }}
+        isnt={{ h: 'Rotational atherectomy', points: [
+          'A diamond burr grinds superficial calcium into microparticles.',
+          'Needs its own wire; the side-branch wire comes out.',
+          'Cannot reach deep calcium; debris can cause slow-flow and no-reflow.',
+          'Essential when nothing else will cross.',
+        ] }} />
       <Decision id="s6-prep" question="How do you treat the LAD lesion?"
         options={[
           { id: 'ivl', label: 'Intravascular lithotripsy (IVL), then a drug-eluting stent — provisional bifurcation strategy with a wire in D1 and POT', verdict: 'best', points: 10,
@@ -798,6 +920,25 @@ function Intervention() {
         </Step>
       </Steps>
 
+      <Why title="Why the ST rises while the balloon is up"
+        chain={[
+          { k: 'OCCLUSION', t: 'An inflated balloon is a deliberate, total occlusion.' },
+          { k: 'TRANSMURAL', t: 'Within seconds the whole wall downstream is ischaemic, not only the subendocardium.' },
+          { k: 'ECG', t: 'The injury current now points toward the surface leads → ST elevation, and chest pain.' },
+          { k: 'RECOVERY', t: 'Deflate and it settles in seconds. If it does not — think dissection, thrombus, or a lost side branch.' },
+        ]} />
+      <Contrast title="POT vs kissing balloon"
+        is={{ h: 'POT — proximal optimisation', points: [
+          'One short NC balloon in the proximal main vessel, sized to the proximal reference.',
+          'Restores the natural taper, apposes the proximal struts, opens the cell facing the side branch.',
+          'Done in every provisional bifurcation.',
+        ] }}
+        isnt={{ h: 'Final kissing inflation', points: [
+          'Two balloons at once, main vessel and side branch.',
+          'For a compromised side branch only.',
+          'Routine use ovalises the proximal stent and showed no benefit (Nordic Bifurcation III).',
+        ] }} />
+
       <div className="cs-media-row" style={{ marginTop: 16 }}>
         <Video id="wfbZaHBBHto" title="Proximal optimisation technique (POT) in bifurcation stenting" />
         <Figure src={WIKI('Blausen_0034_Angioplasty_Stent_01.png')} href={WIKIPAGE('Blausen_0034_Angioplasty_Stent_01.png')} alt="Diagram of a balloon-expanded coronary stent" caption="Balloon-expandable stent: the balloon drives the struts into the wall, and the stent holds the result." credit="Blausen Medical, CC BY 3.0, Wikimedia Commons" />
@@ -839,6 +980,17 @@ function Result() {
         ]}>
         <p className="cs-pts" style={{ marginBottom: 8 }}>Criteria in the style of ULTIMATE and RENOVATE-COMPLEX-PCI: MSA &gt; 5.5 mm² (or &gt; 90% of distal reference lumen), edge plaque burden &lt; 50%, no edge dissection involving the media &gt; 3 mm.</p>
       </MultiSelect>
+      <Contrast title="an optimal stent vs a good-looking angiogram"
+        is={{ h: 'An optimal stent (IVUS)', points: [
+          'Minimal stent area > 5.5 mm², or > 90% of the distal reference.',
+          'Struts apposed; edges in plaque burden < 50%; no major edge dissection.',
+          'Predicts fewer stent thromboses and repeat procedures.',
+        ] }}
+        isnt={{ h: '“Angiographic success”', points: [
+          '< 20% residual narrowing — judged by eye, on a lumenogram.',
+          'Cannot see expansion, apposition, or a dissection hidden behind struts.',
+          'The contrast fills the lumen beautifully, whatever the metal is doing.',
+        ] }} />
 
       <Decision id="s8-opt" question="How do you optimise?"
         options={[
@@ -904,6 +1056,7 @@ function Complication() {
           {!sealed && <b className="cs-alarm" style={{ marginLeft: 8 }}>{elapsed}s since recognition</b>}
         </p>
       </div>
+      <BedsideMonitor />
       <Angio tree={TREE} presets={VIEWS.filter(v => v.system === 'left')} systems={['left']} devices={devices} height={320} startView="lao-cra" />
 
       <Decision id="s9-what" question="What is happening?"
@@ -964,6 +1117,17 @@ function Complication() {
           ) : (
             <div className="cs-fb best">220 mL of blood drained via a subxiphoid pigtail. Pressure 112/68, heart rate 104. The drain stays on free drainage.</div>
           )}
+          <Contrast title="why 220 mL nearly killed him"
+            is={{ h: 'Acute tamponade', points: [
+              'The pericardium cannot stretch in minutes: its pressure–volume curve goes vertical after 100–200 mL.',
+              'Hypotension, tachycardia, rising venous pressure — shock with a small effusion.',
+              'Removing even 50 mL drops the pressure steeply: you are on the steep part of the curve.',
+            ] }}
+            isnt={{ h: 'A chronic effusion', points: [
+              'Over weeks the pericardium stretches; litres can collect.',
+              'The patient may walk into clinic breathless but standing.',
+              'Same physics, different time. Speed of filling, not volume, kills.',
+            ] }} />
         </>
       )}
 
@@ -1003,6 +1167,155 @@ function Complication() {
         <Video id="fV5UozhaGvY" title="Coronary perforation, part 3: management" />
       </div>
       <Video id="xTNQq8FJ7XY" title="Massive coronary perforation, coils, and pericardiogram" />
+    </>
+  );
+}
+
+/* ============================================================
+   THE VICIOUS CYCLE — the why behind the why
+   Three loops this patient lived through today. Understand the
+   loop and the treatment stops being a list: each drug or act
+   is a pair of scissors placed on one link.
+   ============================================================ */
+
+function Cycles() {
+  return (
+    <>
+      <p className="cs-p">Students forget treatment lists. They do not forget a loop they understand. Each loop below feeds itself — every turn makes the next one worse. Tap each step; the green scissors mark where treatment cuts it.</p>
+
+      <ViciousCycle id="cyc-tamp" title="The tamponade spiral — 10:49 in this lab"
+        nodes={[
+          { short: 'Blood in the sac', t: 'Arterial blood fills the pericardial sac', d: 'An Ellis III jet pumps blood into a sac that cannot stretch in minutes. After the first 100–150 mL, pericardial pressure climbs steeply.' },
+          { short: 'RV cannot fill', t: 'The right heart cannot fill', d: 'When pericardial pressure exceeds RV diastolic pressure, the thin RV free wall collapses in diastole. Venous return cannot get in.' },
+          { short: 'Output falls', t: 'Stroke volume and blood pressure fall', d: 'Less in, less out. On inspiration the RV takes what little room there is and the septum bows left — the LV fills even less: pulsus paradoxus.' },
+          { short: 'Tachycardia', t: 'The body compensates: tachycardia and vasoconstriction', d: 'The baroreflex drives the rate up. But faster means shorter diastole — the only time the ventricles fill, and the only time the left ventricle is perfused.' },
+          { short: 'Coronary flow falls', t: 'Coronary perfusion pressure collapses', d: 'Coronary perfusion ≈ aortic diastolic pressure − ventricular diastolic pressure. One is falling, the other has risen to match the pericardium: the gap closes.' },
+          { short: 'Weaker heart', t: 'An ischaemic heart pumps less — and the jet keeps filling', d: 'Starved muscle contracts less, pressure falls further, perfusion falls further. The end of this loop is PEA arrest.' },
+        ]}
+        breaks={[
+          { at: 0, t: 'Seal the hole: a balloon at low pressure over the perforation. No new blood enters — without this, everything else is bailing water.' },
+          { at: 0, t: 'Covered stent: the definitive seal.' },
+          { at: 1, t: 'Pericardiocentesis: on the steep part of the curve, removing 50–100 mL drops the pressure dramatically.' },
+          { at: 2, t: 'Fluid bolus: raise filling pressure above pericardial pressure — a bridge, not a fix.' },
+          { at: 3, t: 'Protect the compensation: no beta-blocker, and no casual intubation — positive pressure and sedation take away venous return and sympathetic drive, and can tip him into arrest.' },
+          { at: 4, t: 'A vasopressor holds aortic diastolic pressure while the drain goes in.' },
+        ]} />
+      <Decision id="cyc-intub" question="Before the drain is in, he becomes agitated and a colleague proposes rapid-sequence intubation “to control the situation”. Why is that dangerous?"
+        options={[
+          { id: 'ppv', label: 'Positive-pressure ventilation and induction agents cut venous return and sympathetic tone — the only things holding his pressure up', verdict: 'best', points: 10,
+            why: 'In tamponade the heart lives on high venous pressure and catecholamines. Induction removes the catecholamines; positive intrathoracic pressure removes the venous return. Arrest on induction is a classic catastrophe. Drain first, under local anaesthetic.' },
+          { id: 'asp', label: 'Because he might aspirate', verdict: 'wrong', points: 0, why: 'A real but secondary risk — not why patients die on induction in tamponade.' },
+          { id: 'fine', label: 'It is not dangerous: securing the airway always comes first', verdict: 'wrong', points: 0, why: 'ABC dogma, applied without the physiology, kills this patient.' },
+        ]} />
+
+      <ViciousCycle id="cyc-isch" title="The ischaemia spiral — why his pain came back at 08:50"
+        nodes={[
+          { short: 'Plaque ruptures', t: 'Plaque rupture and thrombus narrow the LAD', d: 'Supply falls. The thrombus is dynamic — platelets build it, the body lyses it — so flow flickers, and so does the ECG.' },
+          { short: 'Ischaemia', t: 'The subendocardium becomes ischaemic', d: 'Pain, and a surge of catecholamines.' },
+          { short: 'Demand rises', t: 'Tachycardia and hypertension raise oxygen demand', d: 'Heart rate 102, BP 152/90: more work, less diastole — less time to perfuse.' },
+          { short: 'LVEDP rises', t: 'The ischaemic ventricle stiffens; its filling pressure rises', d: 'Subendocardial perfusion pressure = aortic diastolic − LV end-diastolic pressure. Raise the LVEDP and the inner layer is squeezed from inside.' },
+          { short: 'Thrombus grows', t: 'More ischaemia, more platelet activation', d: 'Catecholamines and shear activate platelets; the thrombus grows; supply falls further.' },
+        ]}
+        breaks={[
+          { at: 0, t: 'PCI restores the lumen — the definitive cut.' },
+          { at: 4, t: 'Aspirin and heparin stop the thrombus growing (the P2Y12 inhibitor once the anatomy is known).' },
+          { at: 1, t: 'Nitrates dilate the epicardial artery and veins; analgesia blunts the catecholamine surge.' },
+          { at: 2, t: 'A beta-blocker slows the heart and lengthens diastole — if there is no heart failure or shock.' },
+          { at: 3, t: 'Nitrate venodilation lowers preload → LVEDP falls → the subendocardium is perfused again.' },
+        ]} />
+      <Decision id="cyc-bb" question="The beta-blocker that breaks the ischaemia spiral would be dangerous in the tamponade spiral an hour later. What single idea explains both?"
+        options={[
+          { id: 'comp', label: 'Tachycardia is the problem in ischaemia (it raises demand) but the compensation in tamponade (it keeps output up when stroke volume is fixed)', verdict: 'best', points: 10,
+            why: 'Same heart rate, opposite meaning. Cardiac output = stroke volume × rate. When stroke volume is capped by the pericardium, the rate is all that is left.' },
+          { id: 'bp', label: 'Beta-blockers always drop blood pressure, so are always dangerous in a cath lab', verdict: 'wrong', points: 0, why: 'They are standard in ACS when the patient is not in failure or shock.' },
+          { id: 'brady', label: 'Beta-blockers cause heart block during PCI', verdict: 'wrong', points: 0, why: 'Not the mechanism here.' },
+        ]} />
+
+      <ViciousCycle id="cyc-aki" title="The contrast–kidney spiral — why the budget matters"
+        nodes={[
+          { short: 'Contrast', t: 'Contrast reaches the kidney', d: 'Adenosine and endothelin release constrict the medullary vessels.' },
+          { short: 'Medullary hypoxia', t: 'The outer medulla becomes hypoxic', d: 'Salt-pumping tubules with a marginal blood supply run out of oxygen first.' },
+          { short: 'Tubular injury', t: 'Tubular cells are injured', d: 'Hypoxia plus direct toxicity: cells swell, slough and block their own tubules.' },
+          { short: 'Slow flow', t: 'Tubular flow slows — contrast lingers', d: 'Concentrated, viscous contrast stays longer in contact with the tubules: more toxicity.' },
+          { short: 'Low BP', t: 'Hypotension cuts renal blood flow further', d: 'His tamponade was a kidney insult too: a falling pressure on a kidney already starved.' },
+        ]}
+        breaks={[
+          { at: 0, t: 'Less contrast: a ceiling set from the eGFR, small puffs, IVUS instead of extra runs.' },
+          { at: 2, t: 'Isotonic hydration keeps tubular flow moving and dilutes the contrast.' },
+          { at: 3, t: 'Avoid nephrotoxins (NSAIDs), hold metformin, avoid repeat contrast within 48–72 hours.' },
+          { at: 4, t: 'Fix hypotension fast — the tamponade drain was also kidney protection.' },
+        ]} />
+    </>
+  );
+}
+
+/* ============================================================
+   M&M — WAR STORIES
+   Composite cases, each built around one real, repeated
+   mistake. Read the story, then answer what should have happened.
+   ============================================================ */
+
+function WarStories() {
+  return (
+    <>
+      <p className="cs-p">Every rule in this case was written by someone who paid for it. These are composite morbidity-and-mortality cases — details changed, mechanisms real. Not to frighten. To make sure you never have to learn them the same way.</p>
+
+      <WarStory title="The wire that came out"
+        mistake="Giving up wire position in a perforation."
+        burn="The wire is the patient’s lifeline. In a perforation, the wire is the last thing to leave the coronary.">
+        <p className="cs-p">A 4.0 mm balloon at high pressure in a calcified mid-LAD. The final run shows a jet. The operator, frightened of making it worse, pulls the balloon <b>and the wire</b> back into the guide “to stop the damage”. Blood pressure falls to 60. Three attempts to re-cross the torn, bleeding segment fail — the wire keeps leaving the vessel. By the time the surgeon is scrubbed, the patient is in PEA.</p>
+      </WarStory>
+      <Decision id="mm-wire" question="Ellis III jet, pressure falling, the balloon is still on the wire. What is the first move?"
+        options={[
+          { id: 'inflate', label: 'Advance the balloon over the wire to the hole and inflate at low pressure — keep the wire exactly where it is', verdict: 'best', points: 10,
+            why: 'The wire is your rail for the balloon, the covered stent, and every rescue that follows. Seal first.' },
+          { id: 'pull', label: 'Withdraw the balloon and wire to stop further injury', verdict: 'wrong', points: 0, why: 'This is the mistake in the story. The injury is done; the wire is now the treatment.' },
+          { id: 'prot', label: 'Give protamine immediately', verdict: 'wrong', points: 0, why: 'Does not stop a jet, and risks thrombus on the equipment in the vessel.' },
+        ]} />
+
+      <WarStory title="The perfect angiogram"
+        mistake="Trusting a lumenogram, skipping calcium preparation and imaging."
+        burn="Angiography shows the lumen, not the stent. Prepare calcium before the stent — underexpansion cannot be fixed afterwards.">
+        <p className="cs-p">A 58-year-old with a heavily calcified proximal LAD. To save time and contrast, a 3.5 mm stent goes straight in at 14 atm. The final angiogram is beautiful. No imaging. Day six: anterior STEMI. OCT shows the stent crimped inside a 360° calcium ring — minimal stent area 3.1 mm², and thrombus filling what is left.</p>
+      </WarStory>
+
+      <WarStory title="Protamine with the gear still in"
+        mistake="Reversing heparin while the balloon and wire were still in the coronary."
+        burn="Seal mechanically first. Reverse only when the hardware is out. Protamine on equipment is a thrombus factory.">
+        <p className="cs-p">A perforation is sealed with a balloon. Relieved, the team gives full-dose protamine — with the balloon, the wire and a freshly stented segment still in the LAD. Within minutes the guide fills with thrombus and the stent occludes. The patient goes into VF in a vessel that had been saved.</p>
+      </WarStory>
+
+      <WarStory title="The groin that bled into the back"
+        mistake="A high femoral puncture in an anticoagulated patient — and tachycardia with back pain put down to anxiety."
+        burn="Unexplained hypotension or back pain after femoral access is a retroperitoneal bleed until a CT says otherwise. Radial first.">
+        <p className="cs-p">A 71-year-old woman on apixaban. The radial “looked small”, so the femoral was used — punctured above the inguinal ligament. Four hours later: heart rate 118, back pain, and a soft, unremarkable groin. “Anxious,” said the night note. The next haemoglobin was 78, down from 132. The CT showed a retroperitoneal haematoma. Transfusion, kidney injury, multi-organ failure.</p>
+      </WarStory>
+      <Decision id="mm-rp" question="Four hours after a femoral PCI: HR 118, BP 96/60, back pain, the groin is soft. What do you do?"
+        options={[
+          { id: 'ct', label: 'Treat it as a retroperitoneal bleed: urgent haemoglobin and crossmatch, fluids, stop anticoagulation, CT abdomen/pelvis, call vascular/interventional radiology', verdict: 'best', points: 10,
+            why: 'The groin looks normal because the blood is going backwards, above the ligament, into a space that holds litres.' },
+          { id: 'reassure', label: 'Reassure: the groin is soft, so it is not a bleed', verdict: 'wrong', points: 0, why: 'This is the mistake in the story. A soft groin does not exclude a retroperitoneal bleed.' },
+          { id: 'ecg', label: 'ECG and troponin first — it is probably ischaemia', verdict: 'ok', points: 2, why: 'Worth doing, but tachycardia + hypotension + back pain after femoral access is bleeding until proven otherwise.' },
+        ]} />
+
+      <WarStory title="Two hundred more millilitres"
+        mistake="No contrast budget, and multivessel PCI in one sitting “while we’re here”."
+        burn="Set the contrast ceiling before the first puff. Stage non-culprit work. The kidney does not care how good the angiogram looked.">
+        <p className="cs-p">A diabetic man with eGFR 38. The culprit is treated well; then, “while we’re here”, two more vessels. 420 mL of contrast — a volume-to-eGFR ratio of 11. Creatinine triples by 72 hours. He leaves hospital on dialysis three times a week.</p>
+      </WarStory>
+
+      <WarStory title="Triple therapy, triple trouble"
+        mistake="Aspirin + ticagrelor + an anticoagulant for twelve months, without a proton-pump inhibitor."
+        burn="With an anticoagulant: clopidogrel only, triple therapy for a week at most, a PPI always. The bleed that stops every drug causes the thrombosis.">
+        <p className="cs-p">AF on an anticoagulant, discharged after PCI on aspirin, ticagrelor and the anticoagulant for a year. Week seven: haematemesis, haemoglobin 62. Every antithrombotic is stopped to control the bleed. Week eight: stent thrombosis.</p>
+      </WarStory>
+      <Decision id="mm-att" question="Which regimen would most likely have prevented both events?"
+        options={[
+          { id: 'right', label: 'Aspirin + clopidogrel + anticoagulant for ≤ 1 week, then clopidogrel + anticoagulant, with a PPI throughout', verdict: 'best', points: 10,
+            why: 'Less potent P2Y12 inhibition, the shortest triple therapy, and gastroprotection — less bleeding, so no reason to stop everything.' },
+          { id: 'noac', label: 'Stop the anticoagulant and use aspirin + ticagrelor', verdict: 'wrong', points: 0, why: 'Leaves the AF stroke risk uncovered.' },
+          { id: 'same', label: 'The same regimen, with a PPI', verdict: 'ok', points: 3, why: 'The PPI helps, but ticagrelor with an anticoagulant and a year of triple therapy still bleeds too much.' },
+        ]} />
     </>
   );
 }
@@ -1115,35 +1428,81 @@ export const CASE_01 = {
   contrastBudget: { aim: 150, limit: 190, basis: 'volume/eGFR ≤ 3.7' },
   clock0: min(8, 52),
   vitals0: { hr: 102, sys: 152, dia: 90, spo2: 96, rr: 20, st: -2 },
+  brand: { icon: '🫀', line: 'Cath Lab · Case 01' },
+  hero: {
+    badges: [
+      { text: 'Postgrad · Cardiology / IM', tone: 'cyan' },
+      { text: 'High-acuity case', tone: 'red' },
+      { text: 'ESC 2023 ACS · EBC-aligned', tone: 'plain' },
+    ],
+    lines: [
+      { text: 'The calcium', style: 'outline' },
+      { text: 'trap', style: 'grad' },
+      { text: '& the bleed', style: 'cyan' },
+    ],
+    hook: (
+      <>
+        A 64-year-old diabetic on <b>apixaban</b> whose pain will not settle. A <b>360° ring of calcium</b> waiting to strangle your stent.
+        An angiogram that looks <span className="g">perfect</span> — and lies. And at <span className="r">10:49</span>, a jet of contrast where no contrast should be.
+        You have <span className="y">two hours</span>, <span className="y">190 mL</span> of contrast, and <span className="y">one wire</span> you must never pull.
+      </>
+    ),
+    sims: 's4',
+    crisis: 's9',
+    cards: [
+      { k: 'The patient', t: 'Mr Youssef Karam, 64 — NSTE-ACS with recurrent pain, CKD 3a, atrial fibrillation on apixaban.' },
+      { k: 'Your role', t: 'Primary operator, from the emergency department to the coronary care unit.' },
+      { k: 'In your hands', t: 'A C-arm you drive, a pressure wire, IVUS, an inflation device, echo and a live monitor.' },
+      { k: 'How it teaches', t: 'Mechanisms, not memory: the why, what it isn’t, the vicious cycle, and who it has hurt.' },
+    ],
+  },
   stages: [
-    { id: 's1', title: 'Clinical presentation & triage', Component: Presentation,
+    { id: 's1', icon: '🚑', nav: 'Presentation & Triage', title: 'Clinical presentation & triage', Component: Presentation,
+      pill: '⏱ Golden hour — the clock starts now',
       lede: 'History, ECG, troponin and risk — and the decision that starts the clock.',
       enter: ({ setVitals, atLeastClock }) => { setVitals({ hr: 102, sys: 152, dia: 90, spo2: 96, st: -2 }); atLeastClock(min(8, 52)); } },
-    { id: 's2', title: 'Pre-procedure workup & planning', Component: Workup,
+    { id: 's2', icon: '📋', nav: 'Pre-Procedure Workup', title: 'Pre-procedure workup & planning', Component: Workup,
+      pill: '🧾 Know the patient before the table',
       lede: 'Consent, allergy, kidneys, anticoagulation, access — and a plan the whole team hears.',
       enter: ({ setVitals, atLeastClock }) => { setVitals({ hr: 88, sys: 140, dia: 84, st: -0.5 }); atLeastClock(min(9, 12)); } },
-    { id: 's3', title: 'Vascular access & setup', Component: Access,
+    { id: 's3', icon: '🩸', nav: 'Vascular Access', title: 'Vascular access & setup', Component: Access,
+      pill: '🎯 The wrist saves lives',
       lede: 'Radial or femoral, the sheath, the anticoagulant and the guide for the job.',
       enter: ({ setVitals, atLeastClock }) => { setVitals({ hr: 84, sys: 138, dia: 78, st: 0 }); atLeastClock(min(9, 41)); } },
-    { id: 's4', title: 'Diagnostic angiography & views', Component: Diagnostic,
-      lede: 'Drive the C-arm. Acquire the series, read the tree, name the culprit.',
+    { id: 's4', icon: '📸', nav: 'Angiography & Views', title: 'Diagnostic angiography & views', Component: Diagnostic,
+      pill: '🎥 You drive the C-arm',
+      lede: 'Acquire the series, read the tree, name the culprit.',
       enter: ({ setVitals, atLeastClock }) => { setVitals({ hr: 82, sys: 134, dia: 76 }); atLeastClock(min(9, 52)); } },
-    { id: 's5', title: 'Lesion assessment — physiology & imaging', Component: Assessment,
+    { id: 's5', icon: '🔬', nav: 'Physiology & Imaging', title: 'Lesion assessment — physiology & imaging', Component: Assessment,
+      pill: '📏 Measure, don’t guess',
       lede: 'A pressure wire for the bystander; IVUS for the culprit.',
       enter: ({ setVitals, atLeastClock }) => { setVitals({ hr: 84, sys: 132, dia: 74 }); atLeastClock(min(10, 3)); } },
-    { id: 's6', title: 'Strategy & decision point', Component: Strategy,
-      lede: 'The branching core: how this lesion will be treated.',
+    { id: 's6', icon: '🎬', nav: 'Choose Your Path', title: 'Strategy & decision point', Component: Strategy,
+      pill: '🧭 The branching point',
+      lede: 'How this lesion will be treated — and what each choice costs.',
       enter: ({ atLeastClock }) => atLeastClock(min(10, 12)) },
-    { id: 's7', title: 'Intervention — step by step', Component: Intervention,
+    { id: 's7', icon: '🛠️', nav: 'Intervention Steps', title: 'Intervention — step by step', Component: Intervention,
+      pill: '🎈 Hands on the balloon',
       lede: 'Wire, prepare, size, deploy, optimise the proximal segment, check the branch.',
       enter: ({ setVitals, atLeastClock }) => { setVitals({ hr: 80, sys: 130, dia: 74 }); atLeastClock(min(10, 15)); } },
-    { id: 's8', title: 'Result assessment & optimisation', Component: Result,
+    { id: 's8', icon: '✅', nav: 'Result Assessment', title: 'Result assessment & optimisation', Component: Result,
+      pill: '🔍 The angiogram can lie',
       lede: 'The angiogram says perfect. Does IVUS agree?',
       enter: ({ setVitals, atLeastClock }) => { setVitals({ hr: 80, sys: 132, dia: 74 }); atLeastClock(min(10, 44)); } },
-    { id: 's9', title: 'Complication recognition & management', Component: Complication,
+    { id: 's9', icon: '🚨', nav: 'Perforation Drill', title: 'Complication recognition & management', Component: Complication,
+      pill: '🩸 10:49 — crisis on the table',
       lede: 'Recognise it from the screen and the monitor, then act — in the right order.',
       enter: ({ setVitals, atLeastClock }) => { setVitals({ hr: 112, sys: 98, dia: 60 }); atLeastClock(min(10, 49)); } },
-    { id: 's10', title: 'Post-procedure care, debrief & assessment', Component: Debrief,
+    { id: 'cyc', icon: '🧠', nav: 'The Vicious Cycle', title: 'The vicious cycle', Component: Cycles,
+      pill: '🔁 The why behind the why',
+      lede: 'Understand the loop and you will never forget the treatment.',
+      enter: ({ setVitals, atLeastClock }) => { setVitals({ hr: 90, sys: 120, dia: 72, st: 0 }); atLeastClock(min(11, 20)); } },
+    { id: 'mm', icon: '💀', nav: 'M&M War Stories', title: 'Morbidity & mortality: war stories', Component: WarStories,
+      pill: '⚰️ Every rule was paid for',
+      lede: 'Six mistakes that hurt patients — so they never have to hurt yours.',
+      enter: ({ atLeastClock }) => atLeastClock(min(12, 0)) },
+    { id: 's10', icon: '🏁', nav: 'Debrief & Assessment', title: 'Post-procedure care, debrief & assessment', Component: Debrief,
+      pill: '🎓 Score & take-home',
       lede: 'Access, monitoring, antithrombotics and prevention — then your score.',
       enter: ({ setVitals, atLeastClock }) => { setVitals({ hr: 76, sys: 122, dia: 70, st: 0 }); atLeastClock(min(12, 30)); } },
   ],
