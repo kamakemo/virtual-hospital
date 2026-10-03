@@ -168,6 +168,56 @@ export function PressureWire({ lesion, onReading }) {
   );
 }
 
+/* ---------- pressure at the catheter tip ---------- */
+
+const CATH_MODES = {
+  aortic: { sys: 128, dia: 72, label: 'Aortic pressure — sharp upstroke, dicrotic notch, diastolic held up by the aortic valve' },
+  damped: { sys: 96, dia: 70, label: 'DAMPED — systolic falls, pulse pressure narrows, the notch blurs: the tip is against a wall or in an ostial stenosis' },
+  ventricular: { sys: 122, dia: 12, label: 'VENTRICULARISED — diastolic falls toward zero and rises through diastole, like an LV trace: the tip is wedged, flow beyond it has stopped' },
+};
+
+/** What the pressure transducer on the guide shows, beat by beat; mode morphs smoothly. */
+export function CatheterPressure({ mode = 'aortic', note }) {
+  const ref = useRef(null);
+  const live = useRef({ ...CATH_MODES.aortic, k: 0 });
+  const target = useRef(mode);
+  target.current = mode;
+  useCanvas(ref, 170, (g, w, h, t) => {
+    const T = CATH_MODES[target.current];
+    const L = live.current;
+    L.sys += (T.sys - L.sys) * 0.09; L.dia += (T.dia - L.dia) * 0.09;
+    L.k += ((target.current === 'ventricular' ? 1 : 0) - L.k) * 0.09;
+    const notch = target.current === 'aortic' ? 1 : target.current === 'damped' ? 0.3 : 0;
+    g.fillStyle = '#03070B'; g.fillRect(0, 0, w, h);
+    const y = mm => h - 14 - mm / 160 * (h - 28);
+    g.strokeStyle = '#13212D'; g.font = '10px "JetBrains Mono", monospace';
+    for (const v of [0, 40, 80, 120, 160]) { g.beginPath(); g.moveTo(30, y(v)); g.lineTo(w, y(v)); g.stroke(); g.fillStyle = '#3B4B5A'; g.fillText(v, 4, y(v) + 3); }
+    const aort = x => x < 0.12 ? Math.sin(x / 0.12 * Math.PI / 2) : x < 0.3 ? 1 - (x - 0.12) * 1.3 : x < 0.33 ? 0.77 - notch * 0.1 + (x - 0.3) * 3 * notch : Math.max(0, 0.82 - (x - 0.33) * 1.2);
+    const vent = x => x < 0.1 ? Math.sin(x / 0.1 * Math.PI / 2) : x < 0.32 ? 1 - (x - 0.1) * 0.6 : x < 0.42 ? Math.max(0, 0.87 - (x - 0.32) * 8.7) : (x - 0.42) * 0.14;
+    g.strokeStyle = '#FF5A52'; g.lineWidth = 2; g.beginPath();
+    for (let x = 30; x < w; x += 1.5) {
+      const ph = ((t - (w - x) / 130) * 1.25) % 1;
+      const p = ph < 0 ? ph + 1 : ph;
+      const shape = aort(p) * (1 - L.k) + vent(p) * L.k;
+      const v = L.dia + (L.sys - L.dia) * shape;
+      x === 30 ? g.moveTo(x, y(v)) : g.lineTo(x, y(v));
+    }
+    g.stroke();
+    g.fillStyle = '#FF5A52'; g.font = '700 16px "JetBrains Mono", monospace';
+    g.fillText(`${Math.round(L.sys)}/${Math.round(L.dia)}`, w - 100, 22);
+  }, []);
+  return (
+    <div className="cs-card tight">
+      <div className="cs-viewer">
+        <canvas ref={ref} className="cs-canvas" style={{ height: 170 }} aria-label="Pressure at the catheter tip" />
+        <div className="cs-viewer-hud">P · CATHETER TIP</div>
+        <div className="cs-viewer-hud b" style={{ color: mode === 'aortic' ? '#9FB4C6' : '#FF8A80' }}>{CATH_MODES[mode].label}</div>
+      </div>
+      {note && <p className="cs-pts" style={{ marginTop: 8 }}>{note}</p>}
+    </div>
+  );
+}
+
 /* ---------- inflation device ---------- */
 
 /**

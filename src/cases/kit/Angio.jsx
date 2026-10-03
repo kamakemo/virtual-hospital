@@ -52,21 +52,28 @@ function sample(pts, n = 80) {
   return { pts: out, length: L };
 }
 
-function narrowing(lesions, t) {
+/**
+ * How narrow the lumen looks at t. An eccentric plaque (ecc, bulging along
+ * dir) is seen in full only in profile: viewed en face, its shadow overlaps
+ * the contrast column and the narrowing all but disappears.
+ */
+function narrowing(lesions, t, viewer) {
   let n = 0;
   for (const l of lesions || []) {
     if (t < l.t0 || t > l.t1) continue;
     const k = (t - l.t0) / (l.t1 - l.t0);
     const shape = l.shape ? l.shape(k) : Math.sin(k * Math.PI) ** 0.7;
-    n = Math.max(n, l.sev * shape);
+    let seen = 1;
+    if (l.ecc && l.dir && viewer) seen = 1 - l.ecc * Math.abs(l.dir[0] * viewer[0] + l.dir[1] * viewer[1] + l.dir[2] * viewer[2]);
+    n = Math.max(n, l.sev * shape * seen);
   }
   return n;
 }
 
-export default function Angio({ tree, presets, system: sys0 = 'left', systems = ['left', 'right'], devices = {}, height = 400, onCine, caption, startView }) {
+export default function Angio({ tree, presets, system: sys0 = 'left', systems = ['left', 'right'], devices = {}, height = 400, onCine, caption, startView, autoCine = false }) {
   const { bump } = useCase() || {};
   const ref = useRef(null);
-  const centre = useRef({ x: null, y: null });
+  const centre = useRef({ x: null, y: null, s: null });
   const [system, setSystem] = useState(sys0);
   const first = presets.find(p => p.system === sys0 && (!startView || p.id === startView)) || presets[0];
   const [view, setView] = useState({ lao: first.lao, cra: first.cra, id: first.id });
@@ -108,8 +115,7 @@ export default function Angio({ tree, presets, system: sys0 = 'left', systems = 
       const B = basis(V.lao, V.cra);
       const t = now / 1000;
       const beat = Math.sin(t * 2 * Math.PI * 1.3);
-      const scale = h / 10;
-      // centre the injected system in the frame, easing as the C-arm moves
+      // centre and fit the injected system in the frame, easing as the C-arm moves
       let minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
       for (const v of vessels) {
         if (v.system !== SY) continue;
@@ -121,6 +127,10 @@ export default function Angio({ tree, presets, system: sys0 = 'left', systems = 
         }
       }
       const C = centre.current;
+      const fit = Math.min(h * 0.8 / Math.max(1, maxY - minY), w * 0.72 / Math.max(1, maxX - minX));
+      const want = Math.max(h / 11, Math.min(h / 5.5, fit));
+      C.s = C.s == null ? want : C.s + (want - C.s) * 0.12;
+      const scale = C.s;
       const tx = w / 2 - (minX + maxX) / 2 * scale, ty = h / 2 + (minY + maxY) / 2 * scale;
       C.x = C.x == null ? tx : C.x + (tx - C.x) * 0.12;
       C.y = C.y == null ? ty : C.y + (ty - C.y) * 0.12;
@@ -183,7 +193,7 @@ export default function Angio({ tree, presets, system: sys0 = 'left', systems = 
             const dist = startLen + v.len * tt;
             if (dist > front) break;
             const a = P(v.s[i]), b = P(v.s[i + 1]);
-            const n = narrowing(lesions, tt);
+            const n = narrowing(lesions, tt, [-B.d[0], -B.d[1], -B.d[2]]);
             const r = (v.r0 + (v.r1 - v.r0) * tt) * (1 - n);
             const edgeFill = Math.min(1, (front - dist) / 1.2);
             g.strokeStyle = `rgba(12,12,12,${0.82 * fade * edgeFill})`;
@@ -198,7 +208,7 @@ export default function Angio({ tree, presets, system: sys0 = 'left', systems = 
         }
         // perforation: contrast jet and a spreading pericardial stain
         const pf = DV.perforation;
-        if (pf && pf.vessel && SY === 'left') {
+        if (pf && pf.vessel && vessels.find(x => x.id === pf.vessel)?.system === SY) {
           const v = vessels.find(x => x.id === pf.vessel);
           const p = P(v.s[Math.round(pf.t * 90)]);
           const grow = Math.min(1, Math.max(0, since - 0.6) / 1.6) * fade;
@@ -213,6 +223,32 @@ export default function Angio({ tree, presets, system: sys0 = 'left', systems = 
             g.fillStyle = `rgba(30,30,30,${0.28 * grow})`;
             g.beginPath(); g.ellipse(p[0] + 60, p[1] + 34, 70 * grow, 34 * grow, 0.5, 0, Math.PI * 2); g.fill();
           }
+        }
+      }
+
+      // dissection: a lucent flap while contrast is in, and a stain that hangs on after washout
+      const ds = DV.dissection;
+      const dv = ds && vessels.find(x => x.id === ds.vessel && x.system === SY);
+      if (dv) {
+        const hang = ds.sealed ? 0.12 : 0.5;
+        for (let i = Math.floor(ds.t0 * 90); i < Math.ceil(ds.t1 * 90); i++) {
+          const a = P(dv.s[i]), b = P(dv.s[i + 1]);
+          g.strokeStyle = `rgba(28,28,28,${hang})`; g.lineCap = 'round';
+          g.lineWidth = dv.r0 * 2 * scale * VW * 1.9;
+          g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke();
+          if (level > 0 && !ds.sealed) {
+            const nx = -(b[1] - a[1]), ny = b[0] - a[0], nn = Math.hypot(nx, ny) || 1;
+            const off = dv.r0 * scale * VW * 0.35 * Math.sin(i * 0.7);
+            g.strokeStyle = `rgba(215,215,215,${0.75 * fade})`; g.lineWidth = 1.3;
+            g.beginPath(); g.moveTo(a[0] + nx / nn * off, a[1] + ny / nn * off); g.lineTo(b[0] + nx / nn * off, b[1] + ny / nn * off); g.stroke();
+          }
+        }
+        if (ds.aortic) {
+          const cpts = catheters[SY];
+          const o = P(cpts[0]);
+          const up = P(cpts[Math.min(cpts.length - 1, 8)]);
+          g.fillStyle = `rgba(30,30,30,${(ds.sealed ? 0.1 : 0.38) * ds.aortic})`;
+          g.beginPath(); g.ellipse((o[0] + up[0]) / 2, (o[1] + up[1]) / 2, scale * 0.9 * ds.aortic + 6, Math.hypot(up[0] - o[0], up[1] - o[1]) / 2 + 6, Math.atan2(up[1] - o[1], up[0] - o[0]) + Math.PI / 2, 0, Math.PI * 2); g.fill();
         }
       }
 
@@ -274,6 +310,9 @@ export default function Angio({ tree, presets, system: sys0 = 'left', systems = 
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
   }, [vessels, catheters, height]);
+
+  // open on a run already on the screen (the one that caused the trouble)
+  useEffect(() => { if (autoCine) setCineAt(performance.now() - 300); }, []);   // eslint-disable-line
 
   const cine = () => {
     setHold(false);

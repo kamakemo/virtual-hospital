@@ -2,6 +2,7 @@
    Each loads on demand, so the hospital itself stays light. */
 export const CASES = {
   'cv-cath:1': () => import('./cath01/index.jsx'),
+  'cv-cath:2': () => import('./cath02/index.jsx'),
 };
 export const caseKey = (floorId, bedNumber) => `${floorId}:${bedNumber}`;
 export const hasCase = (floorId, bedNumber) => !!CASES[caseKey(floorId, bedNumber)];

@@ -17,7 +17,7 @@ function rng(seed) {
   return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
 }
 
-export default function IVUS({ profile, length = 60, marks = [], title, onFrame }) {
+export default function IVUS({ profile, length = 60, marks = [], title, onFrame, proxLabel = 'proximal (LM)' }) {
   const xsRef = useRef(null);
   const lmRef = useRef(null);
   const [pos, setPos] = useState(marks[0]?.at ?? 20);
@@ -83,6 +83,7 @@ export default function IVUS({ profile, length = 60, marks = [], title, onFrame 
       else if (rad < f.eemR + 0.05) b = 0.04;                         // media: thin dark band
       else b = 0.12 + r() * 0.28;                                     // adventitia
       if (inCalc(a) && rad > lumR + 0.2) b *= 0.06;                   // acoustic shadow
+      if (f.flap && angDist(a, f.flap.at) < f.flap.arc / 2 && rad > lumR + 0.06 && rad < lumR + f.flap.depth) b = 0.03 + r() * 0.06;   // false lumen
       g.fillStyle = `rgba(255,255,255,${b})`;
       g.fillRect(cx + Math.cos(a) * rad * s, cy + Math.sin(a) * rad * s, 1.6, 1.6);
     }
@@ -101,6 +102,16 @@ export default function IVUS({ profile, length = 60, marks = [], title, onFrame 
           g.fillRect(cx + Math.cos(a) * (lr + 1.0) * s - 1, cy + Math.sin(a) * (lr + 1.0) * s - 1, 2, 2);
         }
       }
+    }
+    // dissection flap: a bright membrane between the true lumen and the false one
+    if (f.flap) {
+      g.strokeStyle = 'rgba(255,255,255,0.85)'; g.lineWidth = 2.2; g.beginPath();
+      for (let k = 0; k <= 40; k++) {
+        const a = f.flap.at - f.flap.arc / 2 + f.flap.arc * k / 40;
+        const rr = (lumenAt(f, a) + 0.05) * s;
+        k ? g.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr) : g.moveTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr);
+      }
+      g.stroke();
     }
     // stent struts
     if (f.stent) {
@@ -172,7 +183,7 @@ export default function IVUS({ profile, length = 60, marks = [], title, onFrame 
           aria-label="Longitudinal view — drag to move the transducer"
         />
         <div className="cs-row" style={{ justifyContent: 'space-between', fontSize: 11, color: 'var(--ink3)', marginTop: 4 }}>
-          <span>proximal (LM)</span><span>drag along the run to move the transducer</span><span>distal</span>
+          <span>{proxLabel}</span><span>drag along the run to move the transducer</span><span>distal</span>
         </div>
       </div>
       <div className="cs-ctrls">
