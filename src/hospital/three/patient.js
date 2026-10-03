@@ -107,7 +107,7 @@ function torsoBody(x, z) {
  * nearby less a tension term — so it bridges between the legs instead of
  * dipping into the gap, and falls away over the mattress edges.
  */
-function drape({ u0, u1, nu, nz, body, edgeU = Infinity, lift = 0.012 }) {
+function drape({ u0, u1, nu, nz, body, edgeU = Infinity, lift = 0.012, wrinkles = false }) {
   const zHalf = 0.64, mattHalf = BED.width / 2;
   const K = 7, Kfoot = 9;
   const H = [];
@@ -133,6 +133,14 @@ function drape({ u0, u1, nu, nz, body, edgeU = Infinity, lift = 0.012 }) {
   for (let pass = 0; pass < 2; pass++) {
     for (let i = 1; i < nu; i++) for (let j = 0; j <= nz; j++) {
       H[i][j] = (H[i - 1][j] + 2 * H[i][j] + H[i + 1][j]) / 4;
+    }
+  }
+  if (wrinkles) {
+    for (let i = 0; i <= nu; i++) for (let j = 0; j <= nz; j++) {
+      const u = u0 + (u1 - u0) * i / nu, z = -zHalf + 2 * zHalf * j / nz;
+      // Small asymmetric folds, with more slack toward the hanging edges.
+      const slack = .45 + Math.abs(z) / zHalf;
+      H[i][j] += .015 + (Math.sin(u * 23 + z * 9) * .006 + Math.sin(z * 19 - u * 8) * .005) * slack;
     }
   }
   const pos = [], uv = [], idx = [];
@@ -314,7 +322,7 @@ export function buildPatient(g, head, angle, kind, p) {
   /* blanket over the torso, with the white sheet turned down over it */
   const blanket = blanketMat(kind);
   const fold = -0.27;
-  const top = drape({ u0: fold, u1: 0.02, nu: 26, nz: 34, body: torsoBody, lift: 0.014 });
+  const top = drape({ u0: fold, u1: 0.02, nu: 26, nz: 34, body: torsoBody, lift: 0.014, wrinkles: p.table });
   const topMesh = new THREE.Mesh(top.geo, blanket);
   topMesh.position.y = T;
   head.add(topMesh);
@@ -326,7 +334,7 @@ export function buildPatient(g, head, angle, kind, p) {
   if (!p.table) head.add(new THREE.Mesh(tube(cuffPts, 0.02, 48), MAT.linen()));
 
   /* blanket over the legs, draped over the sides and the foot */
-  const legs = drape({ u0: -0.02, u1: 1.42, nu: 64, nz: 40, body: legBody, edgeU: 1.32 });
+  const legs = drape({ u0: -0.02, u1: 1.42, nu: 64, nz: 40, body: legBody, edgeU: 1.32, wrinkles: p.table });
   const legMesh = new THREE.Mesh(legs.geo, blanket);
   legMesh.position.set(BED.hingeX, BED.deckY + T, 0);
   g.add(legMesh);
