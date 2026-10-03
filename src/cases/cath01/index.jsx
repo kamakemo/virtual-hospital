@@ -1447,6 +1447,7 @@ export const CASE_01 = {
         You have <span className="y">two hours</span>, <span className="y">190 mL</span> of contrast, and <span className="y">one wire</span> you must never pull.
       </>
     ),
+    image: '/images/cath-lab.webp',
     sims: 's4',
     crisis: 's9',
     cards: [

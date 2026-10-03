@@ -135,7 +135,10 @@ export function CaseShell({ def, onClose }) {
         {/* ---------- main column ---------- */}
         <main className="cs-main" ref={mainRef}>
           {cover ? (
-            <div className="cs-main-inner"><Cover def={def} onStart={() => jump(def.stages[0].id)} onJump={jump} /></div>
+            <>
+              {def.hero.image && <div className="cs-hero-bg" style={{ backgroundImage: `url(${def.hero.image})` }} aria-hidden="true" />}
+              <div className="cs-main-inner" style={{ position: 'relative' }}><Cover def={def} onStart={() => jump(def.stages[0].id)} onJump={jump} /></div>
+            </>
           ) : (
             <>
               <VitalsStrip vitals={vitals} metrics={metrics} clock={clock} contrastTone={contrastTone} budget={budget} patient={def.patient} />

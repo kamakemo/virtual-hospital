@@ -188,7 +188,7 @@ export class World {
     if (this.coarse) this.ward.shadowLight.shadow.mapSize.set(1024, 1024);
     this.mode = 'ward';
     this.controls.enabled = false;
-    this.renderer.toneMappingExposure = 1.14;   // ACES dulls bright interiors; lift them
+    this.renderer.toneMappingExposure = this.ward.exposure ?? 1.14;   // ACES dulls bright interiors; lift them
     this.camera.near = 0.05;
     this.applyFov();
     this.camera.position.copy(this.ward.entry.pos);
