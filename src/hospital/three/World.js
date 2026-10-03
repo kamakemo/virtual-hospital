@@ -195,7 +195,7 @@ export class World {
     this.look.copy(this.ward.entry.target);
     // Held upright, a phone can't take in both rows at once: start turned
     // toward beds 1–6, and let the visitor drag across to the other side.
-    const yaw0 = this.camera.aspect < 0.9 ? 0.55 : 0;
+    const yaw0 = this.camera.aspect < 0.9 && !this.ward.listMode ? 0.55 : 0;
     Object.assign(this.lookOffset, { yaw: yaw0, pitch: 0, yawT: yaw0, pitchT: 0 });
     this.buildLabels();
     this.exterior.floors.forEach(f => this.setFloorGlow(f, 0, true));
@@ -228,11 +228,18 @@ export class World {
     await this.tweenCamera(b.cam.pos, b.cam.target, 1250, 0.25);
   }
 
+  async focusLabView(name) {
+    const view = this.ward?.views?.[name];
+    if (!view || this.mode !== 'ward') return;
+    Object.assign(this.lookOffset, { yaw: 0, pitch: 0, yawT: 0, pitchT: 0 });
+    await this.tweenCamera(view.pos, view.target, 900);
+  }
+
   async leaveBed() {
     if (!this.ward) return;
     this.mode = 'ward';
     this.applyFov();
-    this.lookOffset.yawT = this.camera.aspect < 0.9 ? 0.55 : 0; this.lookOffset.pitchT = 0;
+    this.lookOffset.yawT = this.camera.aspect < 0.9 && !this.ward.listMode ? 0.55 : 0; this.lookOffset.pitchT = 0;
     await this.tweenCamera(this.ward.entry.pos, this.ward.entry.target, 1150, 0.2);
     this.labels.classList.remove('is-hidden');
   }

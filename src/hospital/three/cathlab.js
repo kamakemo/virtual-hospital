@@ -16,13 +16,13 @@ import { crashCart, apronRack, plant, wallMonitor, ivPole } from './props.js';
    control room watches through lead glass.
 
    World axes: the table runs along z with the head at -z; the
-   operator stands on the patient's right, at -x.
+   operator stands beside the table at +x.
    ============================================================ */
 
 const ROOM = { x0: -5, x1: 5, z0: -6, z1: 6, H: 3.2 };
 const CTRL = { x1: 8.6, z0: -6, z1: 3.1 };
-const TABLE = { y: 0.95, head: -2.45, foot: 0.75, w: 0.52 };
-const ISO = new THREE.Vector3(0, 1.05, -1.8);       // the C-arm's isocentre, over the heart
+const TABLE = { y: 0.95, head: -2.45, foot: 0.75, w: 0.66 };
+const ISO = new THREE.Vector3(0, 1.18, -1.8);       // the C-arm's isocentre, over the heart
 
 /* ---------- the angiography wall: six screens in one frame ---------- */
 
@@ -215,7 +215,7 @@ export function buildCathLab(floor) {
     const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.rotation.set(rx, ry, 0); m.receiveShadow = true; root.add(m); return m;
   };
   const white = MAT.paint('#F4F5F4', 0.4);
-  const band = MAT.paint('#C4D9EB', 0.6);
+  const band = MAT.paint('#A8BED0', 0.6);
   const hoseMat = ribbedHose(own);
 
   /* ---------- shell: white walls with a pale-blue band, glossy grey floor ---------- */
@@ -232,7 +232,7 @@ export function buildCathLab(floor) {
 
   const shell = new THREE.Group();
   // the pale-blue wall band with panel seams, a bumper rail and skirting
-  const BAND = { y0: 1.25, y1: 1.98 };
+  const BAND = { y0: 1.95, y1: 2.35 };
   const bh = BAND.y1 - BAND.y0, by = (BAND.y0 + BAND.y1) / 2;
   shell.add(part(box(0.02, bh, L), band, ROOM.x0 + 0.01, by, 0));
   shell.add(part(box(W, bh, 0.02), band, 0, by, ROOM.z0 + 0.01));
@@ -277,10 +277,15 @@ export function buildCathLab(floor) {
   const ceil = new THREE.Group();
   for (const x of [-3.9, -2.7, 0, 2.7, 3.9]) for (const z of [-4.8, -2.6, -0.4, 1.8, 4.2]) {
     if (Math.abs(x) < 0.1 && z < -2) continue;
-    ceil.add(part(box(0.6, 0.02, 0.6), MAT.lightPanel(), x, H - 0.012, z));
-    ceil.add(part(box(0.66, 0.025, 0.66), white, x, H - 0.006, z));
+    ceil.add(part(box(0.52, 0.02, 1.1), MAT.lightPanel(), x, H - 0.045, z));
+    ceil.add(part(box(0.6, 0.025, 1.18), white, x, H - 0.006, z));
   }
   for (const [x, z] of [[6.8, -4], [6.8, -1]]) ceil.add(part(box(1.2, 0.02, 0.6), MAT.lightPanel(), x, H - 0.012, z));
+  // Ventilation grilles between the light panels.
+  for (const x of [-3, 3]) for (const z of [-3.5, 1]) {
+    ceil.add(part(box(0.72, 0.025, 0.46), MAT.lightGrey(), x, H - 0.028, z));
+    for (let k = 0; k < 10; k++) ceil.add(part(box(0.62, 0.012, 0.018), MAT.paint('#7F8A93', 0.7), x, H - 0.045, z - 0.18 + k * 0.04));
+  }
   const RAIL = { x: [-1.7, 1.7], y: H - 0.12 };
   for (const x of RAIL.x) {
     ceil.add(part(rbox(0.24, 0.16, 9.2, 0.02), white, x, RAIL.y, -0.8));
@@ -313,6 +318,11 @@ export function buildCathLab(floor) {
   for (const [dx, dz, ex, ez, r] of [[-0.2, 0.2, -0.6, 1.5, 0.028], [0.15, 0.25, 0.7, 1.4, 0.024], [-0.1, -0.1, -0.9, -0.6, 0.03]]) {
     tbl.add(new THREE.Mesh(tube([[dx, 0.7, PZ + dz], [dx * 2, 0.25, PZ + dz * 2], [ex * 0.7, 0.04, PZ + (ez - PZ) * 0.6], [ex, 0.03, ez]], r, 40), hoseMat));
   }
+  for (const dx of [-0.19, 0.19]) {
+    tbl.add(part(rbox(0.15, 0.045, 0.28, 0.02), MAT.charcoal(), 0.65 + dx, 0.045, 0.65));
+    tbl.add(part(rbox(0.1, 0.02, 0.16, 0.01), MAT.paint('#718797', 0.65), 0.65 + dx, 0.075, 0.63));
+  }
+  tbl.add(new THREE.Mesh(tube([[0.65, 0.04, 0.5], [0.7, 0.03, 0.2], [0.4, 0.04, 0], [0.3, 0.35, 0.4]], 0.012, 24), MAT.charcoal()));
   root.add(bake(tbl));
 
   /* ---------- the patient, draped, right arm out for radial access ---------- */
@@ -329,27 +339,42 @@ export function buildCathLab(floor) {
   const carm = new THREE.Group();
   carm.position.copy(ISO);
   const C = new THREE.Group();
-  C.rotation.set(THREE.MathUtils.degToRad(-12), Math.PI, THREE.MathUtils.degToRad(15));
+  C.rotation.set(0, 0, 0);
   const R = 1.02;
-  const arc = new THREE.Mesh(new THREE.TorusGeometry(R, 0.1, 16, 80, THREE.MathUtils.degToRad(215)), MAT.plastic());
-  arc.rotation.z = THREE.MathUtils.degToRad(-107);
-  arc.scale.set(1, 1, 1.9);
-  C.add(arc);
+  // A broad, flat gantry housing, with a recessed track along its outer edge.
+  // Both ends meet the detector/tube on the vertical beam axis.
+  const ring = (inner, outer, depth, material) => {
+    const shape = new THREE.Shape();
+    shape.absarc(0, 0, outer, Math.PI / 2, Math.PI * 1.5, false);
+    shape.absarc(0, 0, inner, Math.PI * 1.5, Math.PI / 2, true);
+    shape.closePath();
+    const geometry = new THREE.ExtrudeGeometry(shape, {
+      depth, steps: 1, curveSegments: 48,
+      bevelEnabled: true, bevelSegments: 2, bevelSize: 0.025, bevelThickness: 0.025,
+    });
+    geometry.translate(0, 0, -depth / 2);
+    C.add(new THREE.Mesh(geometry, material));
+    own.push(geometry);
+  };
+  ring(R - 0.13, R + 0.16, 0.42, MAT.plastic());
+  ring(R + 0.025, R + 0.075, 0.475, MAT.lightGrey());
+  C.add(part(rbox(0.34, 0.34, 0.44, 0.04), MAT.plastic(), 0, R - 0.15, 0));
+  C.add(part(rbox(0.34, 0.28, 0.44, 0.04), MAT.plastic(), 0, -R + 0.17, 0));
   C.add(part(rbox(0.66, 0.2, 0.66, 0.05), MAT.plastic(), 0, R - 0.36, 0));               // flat-panel detector
   C.add(part(rbox(0.56, 0.025, 0.56, 0.01), MAT.charcoal(), 0, R - 0.47, 0));
   C.add(part(rbox(0.46, 0.34, 0.5, 0.07), MAT.plastic(), 0, -(R - 0.3), 0));            // tube housing
   C.add(part(rbox(0.36, 0.08, 0.4, 0.03), MAT.lightGrey(), 0, -(R - 0.52), 0));
-  C.add(part(rbox(0.3, 0.42, 0.5, 0.05), MAT.lightGrey(), R + 0.14, 0, 0));               // carriage on the C's back
+  C.add(part(rbox(0.3, 0.42, 0.5, 0.05), MAT.lightGrey(), -R - 0.14, 0, 0));               // carriage on the C's back
   // corrugated cable hoses running round the outside of the C to the tube
   for (const dz of [-0.13, 0.13]) {
     const pts = [];
-    for (let k = 0; k <= 8; k++) { const th = THREE.MathUtils.degToRad(25 - k * 13); pts.push([(R + 0.2) * Math.cos(th), (R + 0.2) * Math.sin(th), dz]); }
-    pts.push([0.35, -(R - 0.22), dz]);
+    for (let k = 0; k <= 8; k++) { const th = THREE.MathUtils.degToRad(95 + k * 20); pts.push([(R + 0.2) * Math.cos(th), (R + 0.2) * Math.sin(th), dz]); }
+    pts.push([0, -(R - 0.22), dz]);
     C.add(new THREE.Mesh(tube(pts, 0.04, 60), hoseMat));
   }
   carm.add(C);
   C.updateMatrix();
-  const back = new THREE.Vector3(R + 0.3, 0, 0).applyMatrix4(C.matrix);              // the carriage, in carm space
+  const back = new THREE.Vector3(-R - 0.3, 0, 0).applyMatrix4(C.matrix);              // the carriage, in carm space
   // L-arm: elbow from the carriage, column up to its carriage on the left ceiling rail
   const colX = back.x - 0.35, colTop = H - ISO.y - 0.2;
   carm.add(part(rbox(0.5, 0.26, 0.42, 0.05), MAT.plastic(), (back.x + colX) / 2, back.y, back.z));
@@ -362,12 +387,15 @@ export function buildCathLab(floor) {
   /* ---------- the angiography wall on its ceiling boom, facing the operator ---------- */
   const live = labDisplay();
   own.push(live.texture);
-  const MW = 2.95, MH = MW / live.aspect;
+  const MW = 2.5, MH = MW / live.aspect;
   const boom = new THREE.Group();
   const screens = new THREE.Group();
-  screens.position.set(1.0, 2.15, -3.45);
-  screens.rotation.y = 0.35;
+  screens.position.set(1.45, 2.12, -2.5);
+  screens.rotation.y = -0.2;
   screens.add(part(rbox(MW + 0.1, MH + 0.1, 0.09, 0.02), MAT.charcoal(), 0, 0, 0));
+  // Thin individual bezels preserve the six-panel layout even at an angle.
+  for (const dx of [-MW / 6, MW / 6]) screens.add(part(box(0.018, MH, 0.012), MAT.charcoal(), dx, 0, 0.06));
+  screens.add(part(box(MW, 0.018, 0.012), MAT.charcoal(), 0, 0, 0.06));
   const big = part(plane(MW, MH), screenMat(live.texture, 1.0), 0, 0, 0.05);
   big.userData.keep = true;
   screens.add(big);
@@ -383,12 +411,12 @@ export function buildCathLab(floor) {
 
   /* ---------- lead acrylic shield, ceiling-suspended between operator and tube ---------- */
   const shieldArm = new THREE.Group();
-  const SH = { x: 0.78, y: 1.66, z: -2.2 };
+  const SH = { x: 0.95, y: 1.65, z: -0.95 };
   shieldArm.add(part(cyl(0.035, 0.035, H - 2.35, 10), MAT.plastic(), RAIL.x[1], (H + 2.35) / 2, SH.z));
   shieldArm.add(part(rbox(RAIL.x[1] - SH.x, 0.06, 0.06, 0.02), MAT.plastic(), (RAIL.x[1] + SH.x) / 2, 2.35, SH.z));
   shieldArm.add(part(cyl(0.025, 0.025, 0.28, 10), MAT.steel(), SH.x, 2.2, SH.z));
   // the frame
-  const fw = 0.7, fh = 0.92;
+  const fw = 1.05, fh = 0.98;
   for (const dz of [-fw / 2, fw / 2]) shieldArm.add(part(cyl(0.012, 0.012, fh, 8), MAT.steel(), SH.x, SH.y, SH.z + dz));
   for (const dy of [-fh / 2, fh / 2]) shieldArm.add(part(cyl(0.012, 0.012, fw, 8), MAT.steel(), SH.x, SH.y + dy, SH.z, Math.PI / 2, 0, 0));
   for (let k = 0; k < 8; k++) shieldArm.add(part(box(0.012, 0.24, 0.08), MAT.paint('#3D4852', 0.85), SH.x, SH.y - fh / 2 - 0.12, SH.z - 0.3 + k * 0.085));
@@ -414,16 +442,16 @@ export function buildCathLab(floor) {
   tsGroup.add(part(plane(0.38, 0.26), screenMat(TX.workstationScreen(), 0.85), 0, 0, 0.032));
   kit.add(tsGroup);
   // IVUS console and IABP on the far side
-  kit.add(cart(-1.75, 0.6, '#E8EAEC', screenMat(TX.workstationScreen(), 0.8)));
+  kit.add(cart(-3.8, 0.6, '#E8EAEC', screenMat(TX.workstationScreen(), 0.8)));
   const iabp = TX.liveMonitor(2);
   own.push(iabp.texture);
   kit.add(cart(-2.2, -3.6, '#E8EAEC', screenMat(iabp.texture, 0.9), true));
 
   // the sterile back table: blue drape, blue trays, steel bowls, gauze, syringes, wire hoops
-  kit.add(sterileTrolley(2.15, 2.25, 1.35, 0.68, true));
+  kit.add(sterileTrolley(own, 2.25, 1.3, 1.65, 0.78, true, -0.15));
   // a second, smaller draped trolley and supply carts along the left wall
-  kit.add(sterileTrolley(-4.25, 3.0, 0.9, 0.6, false, Math.PI / 2));
-  kit.add(sterileTrolley(-4.3, 1.3, 0.9, 0.6, false, Math.PI / 2));
+  kit.add(sterileTrolley(own, -4.25, 3.0, 0.9, 0.6, false, Math.PI / 2));
+  kit.add(sterileTrolley(own, -4.3, 1.3, 0.9, 0.6, false, Math.PI / 2));
 
   // red-drawer emergency trolley with its defibrillator, far right
   kit.add(crashCart({ x: 4.3, z: 3.6, ry: Math.PI }));
@@ -478,9 +506,9 @@ export function buildCathLab(floor) {
   root.add(part(plane(1.37, 0.86), listMat, ROOM.x0 + 0.075, 2.35, 2.2, 0, Math.PI / 2, 0));
 
   /* ---------- light: bright, even, clinical ---------- */
-  root.add(new THREE.HemisphereLight('#F2F6FB', '#B6BEC6', 0.5));
-  const key = new THREE.DirectionalLight('#F8FBFF', 0.85);
-  key.position.set(2.5, 11, 4);
+  root.add(new THREE.HemisphereLight('#F2F6FB', '#A8B2BD', 0.65));
+  const key = new THREE.DirectionalLight('#F8FBFF', 1.25);
+  key.position.set(-3, 7, 3);
   key.target.position.set(0, 0, -1);
   key.castShadow = true;
   key.shadow.mapSize.set(2048, 2048);
@@ -504,9 +532,14 @@ export function buildCathLab(floor) {
     group: root,
     beds,
     listMode: true,
-    exposure: 1.0,
+    exposure: 1.08,
     shadowLight: key,
-    entry: { pos: new THREE.Vector3(1.05, 1.74, 4.75), target: new THREE.Vector3(-0.35, 1.22, -2.2) },
+    entry: { pos: new THREE.Vector3(-2.85, 1.8, 3.65), target: new THREE.Vector3(0.15, 1.15, -1.15) },
+    views: {
+      overview: { pos: new THREE.Vector3(-2.85, 1.8, 3.65), target: new THREE.Vector3(0.15, 1.15, -1.15) },
+      operator: { pos: new THREE.Vector3(2.6, 1.7, 0.45), target: new THREE.Vector3(0, 1.25, -1.8) },
+      monitors: { pos: new THREE.Vector3(1.8, 1.75, 0.4), target: new THREE.Vector3(1.45, 2.12, -2.5) },
+    },
     update(t) { live.draw(t); },
     dispose() {
       root.traverse(o => { if (o.geometry && !o.geometry.userData?.shared) o.geometry.dispose(); });
@@ -533,10 +566,10 @@ function ribbedHose(own) {
 }
 
 /** A two-tier stainless trolley under a blue sterile drape, laid out for the case. */
-function sterileTrolley(x, z, len, dep, laidOut, ry = 0) {
+function sterileTrolley(own, x, z, len, dep, laidOut, ry = 0) {
   const outer = new THREE.Group();
   const g = new THREE.Group();
-  const top = 0.92, blue = MAT.paint('#5A9BD8', 0.9), tray = MAT.paint('#2C6FD6', 0.35);
+  const top = 0.92, blue = MAT.paint('#72ACD6', 0.96), tray = MAT.paint('#2C6FD6', 0.35);
   g.add(part(rbox(len, 0.03, dep, 0.01), MAT.chrome(), 0, top, 0));
   g.add(part(rbox(len, 0.025, dep, 0.01), MAT.chrome(), 0, 0.3, 0));
   for (const [dx, dz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
@@ -544,10 +577,24 @@ function sterileTrolley(x, z, len, dep, laidOut, ry = 0) {
     g.add(part(cyl(0.035, 0.035, 0.03, 12), MAT.castor(), dx * (len / 2 - 0.03), 0.035, dz * (dep / 2 - 0.03), Math.PI / 2, 0, 0));
   }
   g.add(part(rbox(len + 0.06, 0.012, dep + 0.06, 0.004), blue, 0, top + 0.022, 0));
-  g.add(part(box(len + 0.06, 0.34, 0.01), blue, 0, top - 0.15, dep / 2 + 0.035));
-  g.add(part(box(len + 0.06, 0.34, 0.01), blue, 0, top - 0.15, -dep / 2 - 0.035));
-  g.add(part(box(0.01, 0.34, dep + 0.06), blue, len / 2 + 0.035, top - 0.15, 0));
-  g.add(part(box(0.01, 0.34, dep + 0.06), blue, -len / 2 - 0.035, top - 0.15, 0));
+  const skirt = (width, x, z, rotation) => {
+    const geo = new THREE.PlaneGeometry(width, 0.36, 32, 6);
+    own.push(geo);
+    const pos = geo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const u = pos.getX(i), drop = (0.18 - pos.getY(i)) / 0.36;
+      pos.setZ(i, Math.sin(u * 38) * 0.012 * drop);
+      pos.setY(i, pos.getY(i) + Math.sin(u * 17) * 0.008 * drop);
+    }
+    geo.computeVertexNormals();
+    const cloth = new THREE.Mesh(geo, blue);
+    cloth.position.set(x, top - 0.15, z); cloth.rotation.y = rotation;
+    g.add(cloth);
+  };
+  skirt(len + 0.06, 0, dep / 2 + 0.035, 0);
+  skirt(len + 0.06, 0, -dep / 2 - 0.035, Math.PI);
+  skirt(dep + 0.06, len / 2 + 0.035, 0, Math.PI / 2);
+  skirt(dep + 0.06, -len / 2 - 0.035, 0, -Math.PI / 2);
   g.add(part(rbox(len * 0.6, 0.08, dep * 0.6, 0.01), MAT.steel(), 0, 0.36, 0));
   const y = top + 0.03;
   if (laidOut) {

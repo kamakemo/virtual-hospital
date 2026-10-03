@@ -44,6 +44,7 @@ export default function App() {
   const world = useRef(null);
 
   const [ready, setReady] = useState(false);
+  const [labView, setLabView] = useState('overview');
   const [failed, setFailed] = useState('');
   const [view, setView] = useState({ level: 'building' });
   const [doors, setDoors] = useState({ state: 'open' });
@@ -85,6 +86,7 @@ export default function App() {
     if (cur.level === 'bed' && cur.wingId === wingId && cur.number === number) {
       lock(true);
       await W.leaveBed();
+      setLabView('overview');
       const v = { level: 'floor', wingId, number };
       setView(v); record(v, push);
       lock(false);
@@ -97,6 +99,7 @@ export default function App() {
     await sleep(720);
     setDoors(d => ({ ...d, state: 'closed' }));
     await Promise.race([W.assetsReady, sleep(6000)]);   // patients need the head scan
+    setLabView('overview');
     W.enterFloor(floor);               // the ward is built behind closed doors
     const v = { level: 'floor', wingId, number };
     setView(v); record(v, push);
@@ -106,6 +109,14 @@ export default function App() {
     setDoors({ state: 'open' });
     lock(false);
   }, []);
+
+  const chooseLabView = async name => {
+    if (busyRef.current || !world.current) return;
+    lock(true);
+    setLabView(name);
+    try { await world.current.focusLabView(name); }
+    finally { lock(false); }
+  };
 
   const goBuilding = useCallback(async ({ push = true } = {}) => {
     const W = world.current;
@@ -263,6 +274,7 @@ export default function App() {
 
       {/* ---------- floor selector ---------- */}
       <ElevatorPanel
+        compact={isLab}
         current={view.level === 'building' ? null : { wingId: view.wingId, number: view.number }}
         onSelect={(w, n) => goFloor(w, n)}
         onLobby={() => goBuilding()}
@@ -286,27 +298,34 @@ export default function App() {
       )}
 
       {/* ---------- the catheter lab's list ---------- */}
-      {isLab && view.level === 'floor' && !busy && (
-        <aside className="cathlist" aria-label="Today's list in Cath Lab 1">
-          <div className="cathlist-h">
-            <span className="cathlist-dot" />
-            <b>Cath Lab 1 · today’s list</b>
+      {isLab && view.level === 'floor' && (
+        <div className="lab-tools">
+          <div className="lab-viewpoints" role="group" aria-label="Cath lab viewpoints">
+            {[['overview', 'Room overview'], ['operator', 'Operator side'], ['monitors', 'Monitors']].map(([id, label]) => (
+              <button key={id} type="button" disabled={busy} aria-pressed={labView === id} onClick={() => chooseLabView(id)}>{label}</button>
+            ))}
           </div>
-          <ol>
-            {floor.beds.map((h, i) => {
-              const ready = !!CASES[caseKey(floor.id, i + 1)];
-              return (
-                <li key={i}>
-                  <button type="button" onClick={() => goBed(i)} className={ready ? 'is-ready' : ''}>
-                    <span className="cathlist-time">{LIST_TIMES[i]}</span>
-                    <span className="cathlist-text">{h || 'Slot available'}</span>
-                    {ready && <span className="cathlist-tag">Simulation</span>}
-                  </button>
-                </li>
-              );
-            })}
-          </ol>
-        </aside>
+          <details className="cathlist">
+            <summary className="cathlist-h">
+              <span className="cathlist-dot" />
+              <b>Today’s cases</b><span className="cathlist-count">{floor.beds.filter((_, i) => CASES[caseKey(floor.id, i + 1)]).length} simulations</span>
+            </summary>
+            <ol aria-label="Today's list in Cath Lab 1">
+              {floor.beds.map((h, i) => {
+                const ready = !!CASES[caseKey(floor.id, i + 1)];
+                return (
+                  <li key={i}>
+                    <button type="button" disabled={busy} onClick={() => goBed(i)} className={ready ? 'is-ready' : ''}>
+                      <span className="cathlist-time">{LIST_TIMES[i]}</span>
+                      <span className="cathlist-text">{h || 'Slot available'}</span>
+                      {ready && <span className="cathlist-tag">Simulation</span>}
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
+          </details>
+        </div>
       )}
 
       {/* ---------- bedside ---------- */}

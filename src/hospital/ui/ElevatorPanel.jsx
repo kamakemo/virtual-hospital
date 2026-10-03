@@ -26,7 +26,7 @@ function Display({ wingId, number, preview }) {
   );
 }
 
-export default function ElevatorPanel({ current, onSelect, onLobby, onPreview, busy }) {
+export default function ElevatorPanel({ current, onSelect, onLobby, onPreview, busy, compact = false }) {
   const [wingId, setWingId] = useState(current?.wingId || 'cardiology');
   const [open, setOpen] = useState(false);
   const [preview, setPreview] = useState(null);
@@ -52,7 +52,7 @@ export default function ElevatorPanel({ current, onSelect, onLobby, onPreview, b
     <>
       <button
         type="button"
-        className="lift-toggle"
+        className={'lift-toggle' + (compact ? ' lift-toggle-compact' : '')}
         onClick={() => setOpen(o => !o)}
         aria-expanded={open}
         aria-controls="lift-panel"
@@ -61,7 +61,7 @@ export default function ElevatorPanel({ current, onSelect, onLobby, onPreview, b
         <span className="lift-toggle-label">Floors</span>
       </button>
 
-      <aside id="lift-panel" className={'lift' + (open ? ' is-open' : '')} aria-label="Floor selector">
+      <aside id="lift-panel" className={'lift' + (open ? ' is-open' : '') + (compact ? ' lift-compact' : '')} aria-label="Floor selector">
         <div className="lift-face">
           <Display wingId={current?.wingId} number={current?.number} preview={preview} />
 
