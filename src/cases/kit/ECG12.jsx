@@ -18,25 +18,61 @@ const SHAPE = {
   V4: { r: 14, s: 4 }, V5: { r: 13, s: 2 }, V6: { r: 10, s: 1 },
 };
 
-function beatY(x, lead, st = 0, tInv = false) {
-  // x in seconds within the beat; returns mm (positive up)
-  const sh = SHAPE[lead];
+// leads whose QRS points toward the left ventricle: tall and broad in LBBB
+const LEFTWARD = new Set(['I', 'aVL', 'V5', 'V6']);
+const RIGHTWARD = new Set(['V1', 'V2', 'V3', 'aVR', 'III']);
+
+function pWave(x, sh) { return x >= 0 && x < 0.09 ? (sh.inv ? -1 : 1) * Math.sin(x / 0.09 * Math.PI) * 1.2 : 0; }
+
+/** QRS–ST–T, x in seconds from QRS onset; returns mm. */
+function qrst(x, lead, sh, st, tInv, wide) {
   const p = sh.inv ? -1 : 1;
-  if (x < 0.09) return p * Math.sin(x / 0.09 * Math.PI) * 1.2;
-  if (x < 0.15) return 0;
-  if (x < 0.165) return -0.8 * p;
-  if (x < 0.195) return sh.r * Math.sin((x - 0.165) / 0.03 * Math.PI);
-  if (x < 0.23) return -sh.s * Math.sin((x - 0.195) / 0.035 * Math.PI);
-  if (x < 0.34) return st;
-  if (x < 0.5) {
-    const k = (x - 0.34) / 0.16;
+  if (x < 0) return 0;
+  if (wide) {
+    // left bundle branch block (or RV pacing): 150 ms QRS, discordant ST–T
+    const left = LEFTWARD.has(lead), right = RIGHTWARD.has(lead);
+    if (x < 0.15) {
+      const k = x / 0.15;
+      if (left) return sh.r * 1.05 * Math.sin(k * Math.PI) * (1 - 0.22 * Math.exp(-(((k - 0.5) / 0.1) ** 2)));   // broad, notched R
+      if (right) return -Math.max(sh.s, 9) * 1.15 * Math.sin(k * Math.PI);                                 // deep, broad QS
+      return (sh.r * 0.5 * Math.sin(Math.min(1, k * 2) * Math.PI) - sh.s * 0.6 * Math.sin(Math.max(0, k * 2 - 1) * Math.PI));
+    }
+    const disc = left ? -1.6 : right ? 1.8 : 0.3;
+    if (x < 0.24) return disc;
+    if (x < 0.42) { const k = (x - 0.24) / 0.18; return disc * (1 - k) + (left ? -2.6 : right ? 3 : 1) * Math.sin(k * Math.PI); }
+    return 0;
+  }
+  if (x < 0.015) return -0.8 * p;
+  if (x < 0.045) return sh.r * Math.sin((x - 0.015) / 0.03 * Math.PI);
+  if (x < 0.08) return -sh.s * Math.sin((x - 0.045) / 0.035 * Math.PI);
+  if (x < 0.19) return st;
+  if (x < 0.35) {
+    const k = (x - 0.19) / 0.16;
     const tAmp = (tInv ? -2.2 : sh.inv ? -2 : 3) * Math.sin(k * Math.PI);
     return st * (1 - k) + tAmp;
   }
   return 0;
 }
 
-export default function ECG12({ rate = 96, st = {}, tInv = {}, caption, height = 330 }) {
+/**
+ * Voltage at time sec (from the start of the strip), in mm.
+ * rhythm: 'sinus' | 'chb' (P waves march through at atrialRate, dissociated
+ * from a slow wide escape) | 'paced' (pacing spike, then a wide complex).
+ */
+function voltage(sec, lead, o) {
+  const sh = { ...SHAPE[lead], ...(o.shape[lead] || {}) };
+  const rr = 60 / o.rate;
+  if (o.rhythm === 'chb') {
+    const pp = 60 / o.atrialRate;
+    return pWave(sec % pp, sh) + qrst((sec + 0.3) % rr - 0.3 + 0.0, lead, sh, 0, false, true);
+  }
+  const x = sec % rr;
+  let v = (o.rhythm === 'paced' ? 0 : pWave(x, sh)) + qrst(x - 0.15, lead, sh, o.st[lead] || 0, !!o.tInv[lead], o.wide);
+  if (o.rhythm === 'paced' && x > 0.148 && x < 0.152) v += 9;     // the pacing spike
+  return v;
+}
+
+export default function ECG12({ rate = 96, st = {}, tInv = {}, caption, height = 330, lbbb = false, rhythm = 'sinus', atrialRate = 80, shape = {} }) {
   const ref = useRef(null);
   useEffect(() => {
     const c = ref.current;
@@ -52,14 +88,14 @@ export default function ECG12({ rate = 96, st = {}, tInv = {}, caption, height =
       for (let x = 0; x <= w; x += mm) { g.strokeStyle = (Math.round(x / mm) % 5 === 0) ? 'rgba(220,90,90,0.55)' : 'rgba(240,160,160,0.35)'; g.lineWidth = (Math.round(x / mm) % 5 === 0) ? 0.9 : 0.4; g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); }
       for (let y = 0; y <= h; y += mm) { g.strokeStyle = (Math.round(y / mm) % 5 === 0) ? 'rgba(220,90,90,0.55)' : 'rgba(240,160,160,0.35)'; g.lineWidth = (Math.round(y / mm) % 5 === 0) ? 0.9 : 0.4; g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
 
-      const rr = 60 / rate;
+      const opts = { rate, st, tInv, shape, rhythm, atrialRate, wide: lbbb || rhythm === 'paced' };
       const rowH = h / 4;
       g.strokeStyle = '#1B1B1B'; g.lineWidth = 1.25; g.lineJoin = 'round';
       const trace = (lead, x0, x1, yc) => {
         g.beginPath();
         for (let px = x0; px <= x1; px += 0.6) {
           const sec = (px - x0) / mm / 25;
-          const yy = yc - beatY(sec % rr, lead, st[lead] || 0, !!tInv[lead]) * mm;
+          const yy = yc - voltage(sec, lead, opts) * mm;
           px === x0 ? g.moveTo(px, yy) : g.lineTo(px, yy);
         }
         g.stroke();
@@ -73,12 +109,12 @@ export default function ECG12({ rate = 96, st = {}, tInv = {}, caption, height =
       trace('II', 2, w - 2, rowH * 3 + rowH * 0.6);
       g.fillStyle = '#1B1B1B'; g.fillText('II (rhythm)', 6, rowH * 3 + 14);
       g.font = '500 10px "IBM Plex Mono", monospace';
-      g.fillText(`25 mm/s · 10 mm/mV · ${rate} bpm`, w - 190, h - 6);
+      g.fillText(`25 mm/s · 10 mm/mV · ${rhythm === 'chb' ? `A ${atrialRate} / V ${rate}` : `${rate} bpm`}`, w - 200, h - 6);
     };
     draw();
     const ro = new ResizeObserver(draw); ro.observe(c);
     return () => ro.disconnect();
-  }, [rate, JSON.stringify(st), JSON.stringify(tInv), height]);
+  }, [rate, JSON.stringify(st), JSON.stringify(tInv), height, lbbb, rhythm, atrialRate, JSON.stringify(shape)]);
 
   return (
     <figure className="cs-fig" style={{ background: '#FFF6F4' }}>
