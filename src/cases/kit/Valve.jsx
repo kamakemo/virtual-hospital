@@ -414,3 +414,79 @@ export function TaviDeploy({ onResult, done }) {
     </div>
   );
 }
+
+/* ---------- transcutaneous pacing ---------- */
+
+/**
+ * External pacing over a complete heart block with a slow escape. Below the
+ * capture threshold every spike is followed only by a big, decaying artefact
+ * — which can look like a QRS on the monitor. Real capture shows a broad
+ * complex AND a pulse (pleth) after every spike.
+ * onConfirm({ rate, mA, captured, threshold })
+ */
+export function Pacer({ escape = 34, atrial = 84, threshold = 78, onConfirm, done }) {
+  const ref = useRef(null);
+  const [rate, setRate] = useState(70);
+  const [mA, setMA] = useState(0);
+  const [on, setOn] = useState(false);
+  const [pulse, setPulse] = useState(null);
+  const S = useRef({}); S.current = { rate, mA, on };
+  useCanvas(ref, 230, (g, w, h, t) => {
+    const { rate: r, mA: m, on: o } = S.current;
+    const cap = o && m >= threshold;
+    g.fillStyle = '#03070B'; g.fillRect(0, 0, w, h);
+    const span = 6, X = s => 30 + s / span * (w - 40);
+    const ecgY = 80, plY = 190;
+    g.font = '600 10px "JetBrains Mono", monospace'; g.fillStyle = '#6A7F9B';
+    g.fillText('II', 4, ecgY - 40); g.fillText('PLETH', 2, plY - 40);
+    const now = t;
+    const sample = (sec) => {          // sec: time before now (0 = newest)
+      const T = now - sec;
+      let v = 0, pl = 0;
+      const pp = 60 / atrial; const pa = ((T % pp) + pp) % pp;
+      if (pa < 0.09) v += Math.sin(pa / 0.09 * Math.PI) * 0.12;
+      const wide = x => x < 0 || x > 0.55 ? 0 : x < 0.16 ? Math.sin(x / 0.16 * Math.PI) * 0.9 : x < 0.22 ? -0.06 : -Math.sin((x - 0.22) / 0.33 * Math.PI) * 0.32;
+      const pul = x => x < 0.05 || x > 0.75 ? 0 : x < 0.25 ? Math.sin((x - 0.05) / 0.2 * Math.PI / 2) : Math.max(0, 1 - (x - 0.25) * 2);
+      if (o) {
+        const pr = 60 / r; const px = ((T % pr) + pr) % pr;
+        if (px < 0.012) v += 1.6;                                            // the spike
+        if (cap) { v += wide(px - 0.02); pl = pul(px); }
+        else { v += px < 0.25 ? Math.exp(-px / 0.05) * (m / 140) * 1.1 * (px < 0.03 ? 1 : 0.8) : 0;    // artefact, no capture
+          const er = 60 / escape; const ex = ((T % er) + er) % er; v += wide(ex); pl = pul(ex); }
+      } else {
+        const er = 60 / escape; const ex = ((T % er) + er) % er; v += wide(ex); pl = pul(ex);
+      }
+      return { v, pl };
+    };
+    g.lineWidth = 1.6;
+    g.strokeStyle = '#38E07A'; g.beginPath();
+    for (let px = 30; px < w - 10; px += 1) { const sec = span - (px - 30) / (w - 40) * span; const { v } = sample(sec); px === 30 ? g.moveTo(px, ecgY - v * 34) : g.lineTo(px, ecgY - v * 34); }
+    g.stroke();
+    g.strokeStyle = '#3ED0F5'; g.beginPath();
+    for (let px = 30; px < w - 10; px += 1) { const sec = span - (px - 30) / (w - 40) * span; const { pl } = sample(sec); px === 30 ? g.moveTo(px, plY - pl * 30) : g.lineTo(px, plY - pl * 30); }
+    g.stroke();
+    g.fillStyle = o ? '#FF4D6D' : '#9FB4C6'; g.font = '700 12px "JetBrains Mono", monospace';
+    g.fillText(o ? `PACING · ${r} ppm · ${m} mA` : 'PACER OFF', w - 220, 18);
+  }, []);
+  const check = () => setPulse(on && mA >= threshold ? rate : escape);
+  return (
+    <div className="cs-card tight">
+      <div className="cs-viewer"><canvas ref={ref} className="cs-canvas" style={{ height: 230 }} aria-label="Defibrillator monitor during transcutaneous pacing" /></div>
+      <div className="cs-ctrls">
+        <button className={'cs-btn' + (on ? ' danger' : ' primary')} disabled={!!done} onClick={() => setOn(o => !o)}>{on ? '■ Pause pacing' : '⚡ Start pacing'}</button>
+        {[60, 70, 80].map(r => <button key={r} className={'cs-chip' + (rate === r ? ' on' : '')} disabled={!!done} onClick={() => setRate(r)}>{r} ppm</button>)}
+      </div>
+      <div className="cs-ctrls">
+        <label className="cs-slider" style={{ flex: 1 }}>Output
+          <input type="range" min="0" max="140" step="2" value={mA} disabled={!!done} onChange={e => setMA(+e.target.value)} style={{ width: '100%' }} aria-label="Pacing output in milliamps" />
+        {mA} mA</label>
+      </div>
+      <div className="cs-ctrls">
+        <button className="cs-btn" onClick={check}>✋ Feel the femoral pulse</button>
+        <button className="cs-btn primary" disabled={!on || !!done} onClick={() => onConfirm?.({ rate, mA, captured: mA >= threshold, threshold })}>Confirm capture</button>
+        {pulse != null && <span className="cs-mono" style={{ color: pulse === escape ? 'var(--red)' : 'var(--green)' }}>Femoral pulse: {pulse} /min</span>}
+      </div>
+      <p className="cs-pts" style={{ marginTop: 8 }}>Turn the output up in steps. Watch for a broad complex after every spike — then prove it with a pulse. A spike followed by a tall, smooth hump is artefact, not capture.</p>
+    </div>
+  );
+}

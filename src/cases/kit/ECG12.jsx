@@ -67,12 +67,13 @@ function voltage(sec, lead, o) {
     return pWave(sec % pp, sh) + qrst((sec + 0.3) % rr - 0.3 + 0.0, lead, sh, 0, false, true);
   }
   const x = sec % rr;
-  let v = (o.rhythm === 'paced' ? 0 : pWave(x, sh)) + qrst(x - 0.15, lead, sh, o.st[lead] || 0, !!o.tInv[lead], o.wide);
+  const pr = o.rhythm === 'paced' ? 0.15 : o.pr;
+  let v = (o.rhythm === 'paced' ? 0 : pWave(x, sh)) + qrst(x - pr, lead, sh, o.st[lead] || 0, !!o.tInv[lead], o.wide);
   if (o.rhythm === 'paced' && x > 0.148 && x < 0.152) v += 9;     // the pacing spike
   return v;
 }
 
-export default function ECG12({ rate = 96, st = {}, tInv = {}, caption, height = 330, lbbb = false, rhythm = 'sinus', atrialRate = 80, shape = {} }) {
+export default function ECG12({ rate = 96, st = {}, tInv = {}, caption, height = 330, lbbb = false, rhythm = 'sinus', atrialRate = 80, shape = {}, pr = 0.15 }) {
   const ref = useRef(null);
   useEffect(() => {
     const c = ref.current;
@@ -88,7 +89,7 @@ export default function ECG12({ rate = 96, st = {}, tInv = {}, caption, height =
       for (let x = 0; x <= w; x += mm) { g.strokeStyle = (Math.round(x / mm) % 5 === 0) ? 'rgba(220,90,90,0.55)' : 'rgba(240,160,160,0.35)'; g.lineWidth = (Math.round(x / mm) % 5 === 0) ? 0.9 : 0.4; g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); }
       for (let y = 0; y <= h; y += mm) { g.strokeStyle = (Math.round(y / mm) % 5 === 0) ? 'rgba(220,90,90,0.55)' : 'rgba(240,160,160,0.35)'; g.lineWidth = (Math.round(y / mm) % 5 === 0) ? 0.9 : 0.4; g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
 
-      const opts = { rate, st, tInv, shape, rhythm, atrialRate, wide: lbbb || rhythm === 'paced' };
+      const opts = { rate, st, tInv, shape, rhythm, atrialRate, pr, wide: lbbb || rhythm === 'paced' };
       const rowH = h / 4;
       g.strokeStyle = '#1B1B1B'; g.lineWidth = 1.25; g.lineJoin = 'round';
       const trace = (lead, x0, x1, yc) => {
@@ -114,7 +115,7 @@ export default function ECG12({ rate = 96, st = {}, tInv = {}, caption, height =
     draw();
     const ro = new ResizeObserver(draw); ro.observe(c);
     return () => ro.disconnect();
-  }, [rate, JSON.stringify(st), JSON.stringify(tInv), height, lbbb, rhythm, atrialRate, JSON.stringify(shape)]);
+  }, [rate, JSON.stringify(st), JSON.stringify(tInv), height, lbbb, rhythm, atrialRate, JSON.stringify(shape), pr]);
 
   return (
     <figure className="cs-fig" style={{ background: '#FFF6F4' }}>

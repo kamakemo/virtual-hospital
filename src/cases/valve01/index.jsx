@@ -4,17 +4,25 @@ import {
   Why, Contrast, WarStory, ViciousCycle, BedsideMonitor,
 } from '../kit/CaseKit.jsx';
 import ECG12 from '../kit/ECG12.jsx';
-import { Auscultation, Doppler, Hemodynamics, TaviDeploy } from '../kit/Valve.jsx';
+import { Auscultation, Doppler, Hemodynamics, TaviDeploy, Pacer } from '../kit/Valve.jsx';
 
 /* ============================================================
    VALVULAR & STRUCTURAL HEART UNIT · CASE 01
    Severe, symptomatic, high-gradient calcific aortic stenosis in
    a 79-year-old: exertional syncope, angina and breathlessness.
-   Bedside diagnosis, Doppler measurement and the continuity
-   equation; the heart team; CT planning; transfemoral TAVI on
-   rapid pacing — and, two nights later on the unit, complete
-   heart block from the valve frame pressing on the conduction
-   system beneath the membranous septum.
+
+   1  the faint, the murmur, the pulse, the ECG, the bloods
+   2  Doppler you measure, the continuity equation, discordant
+      grading, and a dobutamine stress echo with three patients
+   3  the heart team, the conversation, lifetime management
+   4  CT: annulus sizing, coronary heights, the route, the septum
+   5  the hybrid lab: access, pacing test, crossing, pressures
+   6  strategy: predilation, target depth, embolic protection
+   7  deployment on rapid pacing; aortogram, regurgitation index
+   8  the unit: serial ECGs, a conduction algorithm, day-1 bloods
+   9  night two: complete heart block, transcutaneous pacing,
+      which pacemaker
+   10 vicious cycles  11 M&M  12 discharge, follow-up, debrief
 
    Clinical content follows the 2025 ESC/EACTS valvular heart
    disease guideline and published consensus on conduction
@@ -64,11 +72,96 @@ function Continuity() {
       </div>
       <div className="cs-readout">
         <div><span>LVOT area</span><b>{area.toFixed(2)} cm²</b></div>
+        <div><span>Stroke volume</span><b>{Math.round(area * lvotVti)} mL</b></div>
         <div><span>Aortic valve area</span><b style={{ color: ava <= 1.0 ? 'var(--red)' : 'var(--amber)' }}>{ava.toFixed(2)} cm²</b></div>
         <div><span>Indexed (BSA 1.9)</span><b>{(ava / 1.9).toFixed(2)} cm²/m²</b></div>
         <div><span>Dimensionless index</span><b style={{ color: 'var(--red)' }}>{dvi.toFixed(2)}</b></div>
       </div>
-      <p className="cs-pts" style={{ marginTop: 10 }}>A 1 mm error in the LVOT diameter — the width of a calliper mark — moves the AVA by ~10%, because the diameter is <b>squared</b>. The dimensionless index (LVOT VTI ÷ AV VTI) never touches the diameter: below 0.25 is severe whatever the ruler says.</p>
+      <p className="cs-pts" style={{ marginTop: 10 }}>A 1 mm error in the LVOT diameter — the width of a calliper mark — moves the AVA by ~10%, because the diameter is <b>squared</b>. The LVOT is also oval, not round, so echo tends to underestimate it. The dimensionless index (LVOT VTI ÷ AV VTI) never touches the diameter: below 0.25 is severe whatever the ruler says.</p>
+    </div>
+  );
+}
+
+/** Low-dose dobutamine echo in three patients with low-flow, low-gradient AS and a weak LV. */
+const DSE = {
+  A: { name: 'Patient A', sv: [44, 50, 56, 61, 64], mg: [26, 32, 38, 43, 46], ava: [0.78, 0.8, 0.81, 0.83, 0.84] },
+  B: { name: 'Patient B', sv: [42, 50, 58, 63, 66], mg: [24, 25, 26, 27, 28], ava: [0.8, 0.95, 1.1, 1.22, 1.3] },
+  C: { name: 'Patient C', sv: [40, 41, 42, 42, 43], mg: [22, 22, 23, 23, 23], ava: [0.76, 0.77, 0.77, 0.78, 0.78] },
+};
+const DOSES = [0, 5, 10, 15, 20];
+function DobutamineEcho() {
+  const [pt, setPt] = useState('A');
+  const [k, setK] = useState(0);
+  const P = DSE[pt];
+  const rise = Math.round((P.sv[k] / P.sv[0] - 1) * 100);
+  const W = 360, H = 160, X = i => 40 + i * ((W - 60) / 4), Y = v => H - 24 - (v - 15) / 40 * (H - 40);
+  return (
+    <div className="cs-card">
+      <div className="cs-h2" style={{ marginTop: 0 }}>Low-dose dobutamine stress echo — EF 32%, AVA 0.8 cm², mean gradient ~25 mmHg</div>
+      <div className="cs-row" style={{ marginBottom: 8 }}>
+        {Object.keys(DSE).map(key => <button key={key} className={'cs-chip' + (pt === key ? ' on' : '')} onClick={() => { setPt(key); setK(0); }}>{DSE[key].name}</button>)}
+      </div>
+      <div className="cs-row" style={{ marginBottom: 10 }}>
+        {DOSES.map((d, i) => <button key={d} className={'cs-chip' + (k === i ? ' on' : '')} onClick={() => setK(i)}>{d} µg/kg/min</button>)}
+      </div>
+      <div className="cs-grid2" style={{ alignItems: 'center' }}>
+        <div className="cs-viewer" style={{ background: '#03070B' }}>
+          <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', display: 'block' }} role="img" aria-label="Mean gradient against dobutamine dose">
+            {[20, 30, 40, 50].map(v => <g key={v}><line x1={34} x2={W - 10} y1={Y(v)} y2={Y(v)} stroke={v === 40 ? '#FF4D6D' : '#13212D'} strokeDasharray={v === 40 ? '5 4' : ''} /><text x={4} y={Y(v) + 4} fill="#6A7F9B" fontSize="10" fontFamily="JetBrains Mono, monospace">{v}</text></g>)}
+            <path d={P.mg.slice(0, k + 1).map((v, i) => `${i ? 'L' : 'M'}${X(i)} ${Y(v)}`).join(' ')} fill="none" stroke="#F5C451" strokeWidth="2.5" />
+            {P.mg.slice(0, k + 1).map((v, i) => <circle key={i} cx={X(i)} cy={Y(v)} r="4" fill="#F5C451" />)}
+            <text x={W - 12} y={14} textAnchor="end" fill="#6A7F9B" fontSize="10" fontFamily="JetBrains Mono, monospace">mean gradient, mmHg</text>
+          </svg>
+        </div>
+        <div className="cs-readout" style={{ marginTop: 0 }}>
+          <div><span>Stroke volume</span><b>{P.sv[k]} mL</b></div>
+          <div><span>Rise from baseline</span><b style={{ color: rise >= 20 ? 'var(--green)' : 'var(--amber)' }}>{rise}%</b></div>
+          <div><span>Mean gradient</span><b style={{ color: P.mg[k] >= 40 ? 'var(--red)' : undefined }}>{P.mg[k]} mmHg</b></div>
+          <div><span>AVA</span><b style={{ color: P.ava[k] <= 1.0 ? 'var(--red)' : 'var(--green)' }}>{P.ava[k].toFixed(2)} cm²</b></div>
+        </div>
+      </div>
+      <p className="cs-pts" style={{ marginTop: 10 }}>Step the dose up for each patient. Contractile (flow) reserve is a stroke-volume rise of ≥ 20%. Then ask: did the valve open, or did the gradient climb through a valve that stayed small?</p>
+    </div>
+  );
+}
+
+/** CT annulus: an ellipse, and the valve sizes laid over it. */
+function AnnulusSizer() {
+  const [v, setV] = useState(26);
+  const a = 27.2, b = 22.0;
+  const area = Math.PI * (a / 2) * (b / 2);
+  const perim = Math.PI * (3 * (a / 2 + b / 2) - Math.sqrt((3 * a / 2 + b / 2) * (a / 2 + 3 * b / 2)));
+  const valveArea = Math.PI * (v / 2) ** 2;
+  const over = (valveArea / area - 1) * 100;
+  const S = 6, C = 110;
+  const good = over > 0 && over < 25;
+  return (
+    <div className="cs-card">
+      <div className="cs-h2" style={{ marginTop: 0 }}>The annulus, seen end-on (systolic phase)</div>
+      <div className="cs-grid2" style={{ alignItems: 'center' }}>
+        <div className="cs-viewer" style={{ background: '#05070A', maxWidth: 300 }}>
+          <svg viewBox="0 0 220 220" style={{ width: '100%', display: 'block' }} role="img" aria-label="Aortic annulus with valve overlay">
+            <ellipse cx={C} cy={C} rx={a / 2 * S} ry={b / 2 * S} fill="rgba(200,200,200,0.12)" stroke="#E9F2FC" strokeWidth="2" />
+            <line x1={C - a / 2 * S} x2={C + a / 2 * S} y1={C} y2={C} stroke="#6A7F9B" strokeDasharray="4 3" />
+            <line x1={C} x2={C} y1={C - b / 2 * S} y2={C + b / 2 * S} stroke="#6A7F9B" strokeDasharray="4 3" />
+            <circle cx={C} cy={C} r={v / 2 * S} fill="none" stroke={good ? '#34E39A' : over < 0 ? '#F5C451' : '#FF4D6D'} strokeWidth="3" />
+            {[[-0.6, 0.55], [0.7, 0.3], [-0.2, -0.85]].map(([x, y], i) => <circle key={i} cx={C + x * a / 2 * S} cy={C + y * b / 2 * S} r="5" fill="#FFFFFF" opacity="0.9" />)}
+            <text x={8} y={16} fill="#9FB4C6" fontSize="10" fontFamily="JetBrains Mono, monospace">{a} × {b} mm</text>
+          </svg>
+        </div>
+        <div>
+          <div className="cs-row" style={{ marginBottom: 10 }}>
+            {[23, 26, 29].map(x => <button key={x} className={'cs-chip' + (v === x ? ' on' : '')} onClick={() => setV(x)}>{x} mm valve</button>)}
+          </div>
+          <div className="cs-readout" style={{ marginTop: 0 }}>
+            <div><span>Annulus area</span><b>{Math.round(area)} mm²</b></div>
+            <div><span>Perimeter</span><b>{Math.round(perim)} mm</b></div>
+            <div><span>Valve nominal area</span><b>{Math.round(valveArea)} mm²</b></div>
+            <div><span>Area oversizing</span><b style={{ color: good ? 'var(--green)' : over < 0 ? 'var(--amber)' : 'var(--red)' }}>{over > 0 ? '+' : ''}{over.toFixed(0)}%</b></div>
+          </div>
+          <p className="cs-pts" style={{ marginTop: 8 }}>White blobs: calcium nodules in the annulus and outflow tract. Too little oversizing leaks around the frame; too much, pushed into calcium, tears the annulus.</p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -81,24 +174,25 @@ function Presentation() {
   return (
     <>
       <div className="cs-card cs-vignette">
-        <p className="cs-p"><span className="cs-time">09:40</span>Mr Elias Mansour, 79, a retired civil engineer, was carrying two watering cans up the garden path when the world “went grey from the edges in”. His wife found him on the path, conscious again within a minute, grazed, not confused, not incontinent.</p>
-        <p className="cs-p"><span className="cs-time">history</span>Six months of breathlessness after one flight of stairs, and a tight chest when he hurries — which he put down to age. One similar near-faint in the summer, also on exertion. Hypertension, mild COPD (ex-smoker), eGFR 58. Amlodipine 10 mg, ramipril 5 mg, atorvastatin 20 mg.</p>
+        <p className="cs-p"><span className="cs-time">09:40</span>Mr Elias Mansour, 79, a retired civil engineer, was carrying two watering cans up the garden path when the world “went grey from the edges in”. His wife found him on the path, conscious again within a minute, grazed, not confused, not incontinent, no tongue bite.</p>
+        <p className="cs-p"><span className="cs-time">history</span>Six months of breathlessness after one flight of stairs, and a tight chest when he hurries — which he put down to age. One near-faint in the summer, also on exertion. He has quietly stopped walking to the shops. Hypertension, mild COPD (ex-smoker, 30 pack-years), eGFR 58. Amlodipine 10 mg, ramipril 5 mg, atorvastatin 20 mg.</p>
         <p className="cs-p" style={{ marginBottom: 0 }}><span className="cs-time">10:20</span>Emergency department. Now well. A junior colleague has heard “a murmur, probably sclerosis — he’s 79”.</p>
       </div>
+      <Note kind="pearl" title="The history hides in what he stopped doing">Patients with aortic stenosis slowly shrink their lives to fit their valve. “No symptoms” often means “no exertion”. Ask what he could do a year ago.</Note>
 
       <div className="cs-grid2">
         <div className="cs-card">
           <div className="cs-h2" style={{ marginTop: 0 }}>Observations · 10:20</div>
           <Table head={['', 'Value']} rows={[
-            ['Heart rate', N('72 /min, regular')], ['Blood pressure', N('118/80 mmHg — pulse pressure 38', 'cs-hi')], ['SpO₂', N('95% on air')],
-            ['Resp. rate', N('16 /min')], ['Temperature', N('36.6 °C')], ['Glucose', N('6.4 mmol/L')],
+            ['Heart rate', N('72 /min, regular')], ['Blood pressure', N('118/80 mmHg — pulse pressure 38', 'cs-hi')], ['Lying → standing', N('116/80 → 112/78, no symptoms')],
+            ['SpO₂', N('95% on air')], ['Resp. rate', N('16 /min')], ['Glucose', N('6.4 mmol/L')],
           ]} />
         </div>
         <div className="cs-card">
           <div className="cs-h2" style={{ marginTop: 0 }}>Examination</div>
           <ul className="cs-ul">
-            <li className="cs-li">Carotid pulse: small, slow-rising, a shudder under the finger.</li>
-            <li className="cs-li">Apex: undisplaced but sustained, heaving.</li>
+            <li className="cs-li">Carotid pulse: small, slow-rising, a shudder (thrill) under the finger.</li>
+            <li className="cs-li">Apex: undisplaced but sustained, heaving; a palpable atrial impulse.</li>
             <li className="cs-li">Harsh ejection murmur, right upper sternal edge, to both carotids. Quiet S2.</li>
             <li className="cs-li">Fine basal crackles. No oedema. A graze on the forehead.</li>
           </ul>
@@ -119,6 +213,13 @@ function Presentation() {
           { id: 'rad', label: 'Radiation to the carotids', correct: false, why: 'Any aortic stenosis radiates there, mild or severe.' },
         ]} />
 
+      <Decision id="s1-grade" question="The murmur is harsh and loud, and you can feel a thrill over the carotid. Levine grade?"
+        options={[
+          { id: '4', label: 'Grade 4/6 — loud, with a palpable thrill', verdict: 'best', points: 6, why: 'A thrill makes it at least 4. Grade 5 is heard with the stethoscope barely on the chest; 6 without touching it.' },
+          { id: '3', label: 'Grade 3/6', verdict: 'wrong', points: 0, why: 'Grade 3 is loud but has no thrill.' },
+          { id: '6', label: 'Grade 6/6', verdict: 'wrong', points: 0, why: 'Audible with the stethoscope off the chest — not here.' },
+        ]} />
+
       <Contrast title="aortic stenosis vs hypertrophic obstructive cardiomyopathy"
         is={{ h: 'Aortic stenosis — a FIXED obstruction', points: [
           'Valve level; radiates to the carotids; A2 soft.',
@@ -133,17 +234,51 @@ function Presentation() {
           'Brisk, double-peaked carotid.',
         ] }} />
 
-      <ECG12 rate={72} shape={LVH.shape} st={LVH.st} tInv={LVH.tInv}
-        caption="Sinus rhythm, PR 210 ms (first-degree AV block). Left ventricular hypertrophy by voltage (S V2 + R V5 ≈ 55 mm), with lateral ST depression and T inversion — the “strain” pattern of a pressure-loaded LV." />
+      <ECG12 rate={72} pr={0.21} shape={LVH.shape} st={LVH.st} tInv={LVH.tInv}
+        caption="Sinus rhythm, PR 210 ms (first-degree AV block), QRS 108 ms. LVH by voltage (S V2 + R V5 ≈ 55 mm) with lateral ST depression and T inversion — the “strain” of a pressure-loaded LV. Calcium from the valve can creep into the conduction system: the long PR is a clue for later." />
+
+      <div className="cs-grid2">
+        <div className="cs-card">
+          <div className="cs-h2" style={{ marginTop: 0 }}>Bloods</div>
+          <Table head={['Test', 'Result']} rows={[
+            ['hs-Troponin T', N('28 ng/L (no rise at 3 h)', 'cs-hi')], ['NT-proBNP', N('2,850 ng/L', 'cs-hi')],
+            ['Haemoglobin', N('128 g/L')], ['Creatinine / eGFR', N('112 µmol/L · 58', 'cs-hi')], ['Potassium', N('4.6 mmol/L')],
+          ]} />
+        </div>
+        <div className="cs-card">
+          <div className="cs-h2" style={{ marginTop: 0 }}>Chest X-ray</div>
+          <p className="cs-p">Heart size normal — concentric hypertrophy thickens the wall inward, it does not enlarge the shadow. Valve calcification on the lateral film. Mild upper-lobe diversion. No consolidation.</p>
+        </div>
+      </div>
+      <Why title="Why a flat troponin and a high BNP matter in aortic stenosis"
+        chain={[
+          { k: 'WALL STRESS', t: 'Pressure overload stretches the LV wall; stretched myocytes release BNP.' },
+          { k: 'STARVED MUSCLE', t: 'A thick wall outgrows its capillaries; a little troponin leaks constantly, without a plaque rupture.' },
+          { k: 'PROGNOSIS', t: 'Both track how close the ventricle is to failing — high values predict death and heart failure.' },
+          { k: 'NOT AN MI', t: 'A stable, low troponin with no rise is the valve, not a coronary event. Interpret it in context.' },
+        ]} />
+
+      <MultiSelect id="s1-ddx" question="Exertional syncope. Which of these belong in the differential?"
+        items={[
+          { id: 'as', label: 'Severe aortic stenosis', correct: true, why: 'Fixed output — his murmur says this first.' },
+          { id: 'hcm', label: 'Hypertrophic obstructive cardiomyopathy', correct: true, why: 'Dynamic obstruction worsening with exercise.' },
+          { id: 'vt', label: 'Ventricular tachycardia', correct: true, why: 'A scarred or hypertrophied LV can produce VT on exertion.' },
+          { id: 'block', label: 'Intermittent high-grade AV block', correct: true, why: 'His PR is long; exertion can unmask infranodal block.' },
+          { id: 'pah', label: 'Pulmonary hypertension or massive PE', correct: true, why: 'A fixed right-sided output fails the same way.' },
+          { id: 'vv', label: 'Vasovagal syncope', correct: false, why: 'Classically on standing, in heat, with pain or emotion — and after, not during, exertion.' },
+        ]} />
 
       <Decision id="s1-syncope" question="What do you make of the faint?"
         options={[
-          { id: 'as', label: 'Exertional syncope from severe aortic stenosis until proven otherwise — admit for urgent assessment', verdict: 'best', points: 10,
+          { id: 'as', label: 'Exertional syncope from severe aortic stenosis until proven otherwise — admit for urgent assessment and telemetry', verdict: 'best', points: 10,
             why: 'Syncope on exertion with this murmur is a cardinal symptom of severe AS and marks a patient at risk of sudden death. He does not go home today.' },
           { id: 'vaso', label: 'Probably vasovagal; discharge with outpatient echo', verdict: 'wrong', points: 0, why: 'Vasovagal syncope is not triggered by carrying water uphill. Exertional syncope is cardiac until proven otherwise.' },
-          { id: 'ortho', label: 'Orthostatic hypotension from his amlodipine', verdict: 'ok', points: 2, why: 'Worth checking, and his vasodilator may have contributed — but it does not explain the murmur or the exertional trigger.' },
+          { id: 'ortho', label: 'Orthostatic hypotension from his amlodipine', verdict: 'ok', points: 2, why: 'His lying/standing pressures were flat. His vasodilator may have contributed — it does not explain the murmur or the exertional trigger.' },
           { id: 'tia', label: 'A TIA — CT head and stroke clinic', verdict: 'wrong', points: 0, why: 'Global loss of consciousness with rapid recovery is not a TIA.' },
         ]} />
+      <Contrast title="the syncope of aortic stenosis vs a vasovagal faint"
+        is={{ h: 'Aortic stenosis', points: ['DURING exertion.', 'Little warning; grey-out, then down.', 'Can recur — and can be the last symptom before sudden death.', 'Murmur, slow pulse, LVH.'] }}
+        isnt={{ h: 'Vasovagal', points: ['Standing, heat, pain, emotion — or just AFTER exercise stops.', 'Prodrome: nausea, sweating, yawning, warmth.', 'Benign, recurs in clusters, younger patients.', 'Normal heart.'] }} />
 
       <Why title="Why he fainted carrying water uphill"
         chain={[
@@ -151,7 +286,7 @@ function Presentation() {
           { k: 'EXERCISE', t: 'Working leg muscles dilate their arterioles: total resistance falls.' },
           { k: 'NO RESERVE', t: 'A normal heart raises its output to match. His cannot — the door is fixed.' },
           { k: 'PRESSURE FALLS', t: 'Blood pressure = output × resistance. Output fixed, resistance falling: pressure falls.' },
-          { k: 'GREY-OUT', t: 'The brain is first to notice — and a stretched, ischaemic LV can trigger a reflex vasodilatation that deepens the drop.' },
+          { k: 'GREY-OUT', t: 'The brain is first to notice — and a stretched, ischaemic LV can fire a reflex vasodilatation that deepens the drop.' },
         ]}>
         Every symptom of AS has the same root: a fixed output meeting a body that needs more. Angina, breathlessness, syncope — the classic triad, each a mechanism, not a list.
       </Why>
@@ -162,6 +297,13 @@ function Presentation() {
             why: 'In severe AS cardiac output is fixed; a venodilator drops preload, the LV under-fills, and output falls further. Pressure collapses, and coronary perfusion with it.' },
           { id: 'half', label: 'One small puff, lying down', verdict: 'ok', points: 2, why: 'Lying down helps — but you are still pulling the preload out from a heart that cannot compensate. Avoid.' },
           { id: 'give', label: 'Fine — chest pain gets GTN', verdict: 'wrong', points: 0, why: 'Reflexes kill here. The war-stories stage has this exact case.' },
+        ]} />
+      <Decision id="s1-meds" question="His regular medicines on admission?"
+        options={[
+          { id: 'adjust', label: 'Hold the amlodipine; continue ramipril at the current dose if his pressure allows; continue the statin', verdict: 'best', points: 8,
+            why: 'A potent arterial vasodilator in a fixed-output heart is the first thing to stop. ACE inhibitors are not forbidden in AS — started low and watched, they treat his hypertension and LV — but not escalated today.' },
+          { id: 'stopall', label: 'Stop every blood-pressure drug', verdict: 'ok', points: 4, why: 'Defensible for a day, but untreated hypertension also loads the LV. Be selective.' },
+          { id: 'cont', label: 'Continue everything unchanged', verdict: 'wrong', points: 0, why: 'He fainted on a vasodilator with a fixed obstruction.' },
         ]} />
 
       <div className="cs-media-row">
@@ -179,9 +321,10 @@ function Presentation() {
 function Echo() {
   const { answers, answer } = useCase();
   const m = answers['s2-vmax'];
+  const l = answers['s2-lvot'];
   return (
     <>
-      <p className="cs-p">Transthoracic echo, 13:00. Heavily calcified trileaflet aortic valve with restricted opening. LV wall 14 mm, concentric hypertrophy, EF 58%. Stroke volume index 41 mL/m² — normal flow. Now measure.</p>
+      <p className="cs-p">Transthoracic echo, 13:00. Heavily calcified trileaflet aortic valve with restricted opening. LV wall 14 mm, concentric hypertrophy, EF 58%. Now measure — from the apex, and then again from the right parasternal window, because the highest velocity wins.</p>
       <div className="cs-h2" style={{ marginTop: 10 }}>A · Continuous-wave Doppler across the valve</div>
       <Doppler kind="cw-as" vmax={4.6} title="Apical five-chamber, CW cursor aligned through the valve" onMeasure={r => answer('s2-vmax', r)} />
       {m && (
@@ -192,10 +335,38 @@ function Echo() {
         </div>
       )}
       <ScoreOnce id="s2-vmax" pts={m == null ? null : m.close ? 10 : 4} max={10} />
+      <Decision id="s2-window" question="Why also scan from the right parasternal window and the suprasternal notch?"
+        options={[
+          { id: 'angle', label: 'Doppler under-reads when the beam is not parallel to the jet; the window most in line with it gives the true (highest) velocity', verdict: 'best', points: 6,
+            why: 'Measured velocity = true velocity × cos(angle). At 20° off-axis you lose 6% of the velocity and 12% of the gradient. Search every window; never average them.' },
+          { id: 'avg', label: 'To average the windows for accuracy', verdict: 'wrong', points: 0, why: 'Every off-axis window is an underestimate. Averaging dilutes the truth.' },
+        ]} />
 
       <div className="cs-h2">B · Pulsed-wave Doppler in the outflow tract</div>
-      <Doppler kind="pw-lvot" vmax={1.1} title="PW sample volume 5 mm below the valve" />
+      <Doppler kind="pw-lvot" vmax={1.1} title="PW sample volume 5 mm below the valve" onMeasure={r => answer('s2-lvot', r)} />
+      {l && <div className={'cs-fb ' + (l.close ? 'best' : 'ok')}>LVOT velocity {l.v.toFixed(2)} m/s, VTI ≈ {l.vti.toFixed(0)} cm. {l.close ? 'Good — a laminar envelope, sampled just below the valve.' : 'Re-check: sample too close to the valve and you pick up the accelerating jet; too far and you under-read.'}</div>}
+      <ScoreOnce id="s2-lvot" pts={l == null ? null : l.close ? 6 : 2} max={6} />
       <Continuity />
+
+      <div className="cs-card">
+        <div className="cs-h2" style={{ marginTop: 0 }}>The rest of the echo</div>
+        <Table head={['Measure', 'Value', 'Meaning']} rows={[
+          ['Stroke volume index', N('41 mL/m²'), 'Normal flow (≥ 35)'],
+          ['Global longitudinal strain', N('−14%', 'cs-hi'), 'Normal ≤ −18%: the long-axis fibres are already failing behind a normal EF'],
+          ['E/e′ average', N('16', 'cs-hi'), 'Raised filling pressure — why he is breathless'],
+          ['Left atrium', N('44 mL/m²', 'cs-hi'), 'Chronic pressure load'],
+          ['PA systolic pressure', N('42 mmHg'), ''], ['Aortic regurgitation', N('mild'), ''], ['Mitral', N('mild MR, annular calcium'), ''],
+        ]} />
+      </div>
+      <Why title="Why he is breathless with a normal ejection fraction"
+        chain={[
+          { k: 'THICK WALL', t: 'Concentric hypertrophy, then fibrosis: a stiff ventricle.' },
+          { k: 'STIFF FILLING', t: 'Every millilitre of filling costs more pressure: LV diastolic pressure rises.' },
+          { k: 'BACKWARDS', t: 'The left atrium and pulmonary veins carry that pressure into the lungs.' },
+          { k: 'BREATHLESS', t: 'Wet, stiff lungs on exertion — while the EF still reads 58%.' },
+        ]}>
+        EF measures the radial squeeze; strain catches the long-axis fibres failing first. By the time the EF falls in AS, the heart has been suffering for years.
+      </Why>
 
       <Decision id="s2-grade" question="Vmax 4.6 m/s, mean gradient 51 mmHg, AVA ≈ 0.8 cm², EF 58%, normal flow. Grade it."
         options={[
@@ -215,16 +386,41 @@ function Echo() {
         That is why the gradient is never read alone: you must know the flow that made it.
       </Why>
       <Contrast title="high-gradient AS vs low-flow, low-gradient AS"
-        is={{ h: 'High-gradient (his)', points: [
-          'Mean ≥ 40 mmHg, Vmax ≥ 4 m/s, AVA ≤ 1.0 cm².',
-          'Normal flow; the numbers agree.',
-          'Diagnosis made — move on to the decision.',
-        ] }}
-        isnt={{ h: 'Low-flow, low-gradient', points: [
-          'AVA ≤ 1.0 cm² but mean < 40 mmHg, SVi < 35 mL/m².',
-          'Reduced EF: low-dose dobutamine echo — does the valve open with more flow (pseudo-severe) or does the gradient rise (true severe)?',
-          'Preserved EF (small, thick LV): CT calcium score of the valve settles it.',
-        ] }} />
+        is={{ h: 'High-gradient (his)', points: ['Mean ≥ 40 mmHg, Vmax ≥ 4 m/s, AVA ≤ 1.0 cm².', 'Normal flow; the numbers agree.', 'Diagnosis made — move on to the decision.'] }}
+        isnt={{ h: 'Low-flow, low-gradient', points: ['AVA ≤ 1.0 cm² but mean < 40 mmHg, SVi < 35 mL/m².', 'Reduced EF (classical): low-dose dobutamine echo.', 'Preserved EF (paradoxical — small, thick LV): CT calcium score of the valve.'] }} />
+
+      <div className="cs-h2">C · Not every patient is him — grade these</div>
+      <Decision id="s2-p1" question="Woman, 82. EF 65%, small thick LV, SVi 28 mL/m², AVA 0.75 cm², mean gradient 31 mmHg, Vmax 3.5 m/s. CT valve calcium score 2,100 AU."
+        options={[
+          { id: 'paradox', label: 'Paradoxical low-flow, low-gradient severe AS', verdict: 'best', points: 8, why: 'Normal EF but low flow from a small, stiff cavity. Calcium ≥ 1,200 AU in a woman (≥ 2,000 in a man) makes severe likely.' },
+          { id: 'mod', label: 'Moderate AS', verdict: 'wrong', points: 0, why: 'The gradient is low because the flow is low, not because the valve is open.' },
+        ]} />
+      <Decision id="s2-p2" question="Man, 76. EF 60%, SVi 44 mL/m², mean gradient 34 mmHg, Vmax 3.8 m/s, AVA 0.95 cm² with an LVOT measured at 1.9 cm."
+        options={[
+          { id: 'mod', label: 'Probably moderate: normal flow, and the small LVOT measurement has likely underestimated the AVA', verdict: 'best', points: 8, why: 'With normal flow the gradient is trustworthy. Check the LVOT on CT or use the dimensionless index — it will likely be ≥ 0.25.' },
+          { id: 'sev', label: 'Severe — the AVA is below 1.0', verdict: 'wrong', points: 0, why: 'One number from a squared diameter does not override two flow-dependent measurements made at normal flow.' },
+        ]} />
+      <DobutamineEcho />
+      <div className="cs-grid3">
+        <Decision id="s2-dA" question="Patient A?"
+          options={[
+            { id: 'true', label: 'True severe AS', verdict: 'best', points: 6, why: 'Flow rose 45% and the gradient climbed to 46 while the AVA stayed ≤ 1.0: a fixed valve.' },
+            { id: 'pseudo', label: 'Pseudo-severe', verdict: 'wrong', points: 0, why: 'The valve did not open.' },
+            { id: 'ind', label: 'Indeterminate', verdict: 'wrong', points: 0, why: 'He had contractile reserve.' },
+          ]} />
+        <Decision id="s2-dB" question="Patient B?"
+          options={[
+            { id: 'pseudo', label: 'Pseudo-severe AS — a weak LV could not open a moderate valve', verdict: 'best', points: 6, why: 'With more flow the AVA rose to 1.3 and the gradient stayed low. Treat the cardiomyopathy.' },
+            { id: 'true', label: 'True severe', verdict: 'wrong', points: 0, why: 'The valve opened.' },
+            { id: 'ind', label: 'Indeterminate', verdict: 'wrong', points: 0, why: 'Flow rose 57%.' },
+          ]} />
+        <Decision id="s2-dC" question="Patient C?"
+          options={[
+            { id: 'ind', label: 'No contractile reserve — indeterminate; get a CT calcium score', verdict: 'best', points: 6, why: 'Stroke volume barely rose, so the test cannot judge the valve. Calcium score decides; no reserve carries higher surgical risk but TAVI may still help.' },
+            { id: 'true', label: 'True severe', verdict: 'wrong', points: 0, why: 'No flow change, no conclusion.' },
+            { id: 'pseudo', label: 'Pseudo-severe', verdict: 'wrong', points: 0, why: 'No flow change, no conclusion.' },
+          ]} />
+      </div>
 
       <div className="cs-media-row">
         <Figure src={WIKI('Aortic_valve_stenosis_E00127_(CardioNetworks_ECHOpedia).jpg')} href={WIKIPAGE('Aortic_valve_stenosis_E00127_(CardioNetworks_ECHOpedia).jpg')} alt="Echocardiogram of aortic valve stenosis" caption="A real echocardiogram of aortic valve stenosis." credit="CardioNetworks ECHOpedia, CC BY-SA 3.0, Wikimedia Commons" />
@@ -245,38 +441,60 @@ function HeartTeam() {
         <div className="cs-h2" style={{ marginTop: 0 }}>Heart team meeting · day 3</div>
         <Table head={['', 'Finding']} rows={[
           ['Symptoms', 'Exertional syncope, angina, NYHA III breathlessness'],
-          ['Echo', 'Severe high-gradient AS, EF 58%, no other significant valve disease'],
+          ['Echo', 'Severe high-gradient AS, tricuspid valve, EF 58%, GLS −14%'],
           ['Coronaries (CT)', 'Moderate non-obstructive disease; no proximal stenosis > 70%'],
-          ['STS-PROM', N('3.8%')], ['Frailty', 'Mild: 5-metre walk 6.8 s, independent, lives with wife'],
-          ['Lungs', 'Mild COPD, FEV₁ 68%'], ['Kidneys', 'eGFR 58'], ['His wish', '“I want to be safe to look after my wife — and my garden.”'],
+          ['STS-PROM / EuroSCORE II', N('3.8% / 3.1%')],
+          ['Frailty', 'Clinical Frailty Scale 4; 5-metre walk 6.8 s; independent, lives with his wife'],
+          ['Cognition', N('MoCA 26/30')], ['Lungs', 'Mild COPD, FEV₁ 68%'], ['Kidneys', 'eGFR 58'],
+          ['His wish', '“I want to be safe to look after my wife — and my garden.”'],
         ]} />
       </div>
 
       <Decision id="s3-treat" question="Symptomatic severe aortic stenosis. Treat?"
         options={[
           { id: 'avr', label: 'Yes — aortic valve replacement, without delay', verdict: 'best', points: 10,
-            why: 'Symptomatic severe AS is a class I indication. Untreated, mortality after the onset of syncope or heart failure is measured in a few years — and sudden death is real while he waits.' },
+            why: 'Symptomatic severe AS is a class I indication. Untreated, half of patients with syncope or heart failure are dead within about two to three years — and sudden death is real while he waits.' },
           { id: 'watch', label: 'Medical therapy and surveillance', verdict: 'wrong', points: 0, why: 'No drug opens a calcified valve. Medical therapy only manages blood pressure and fluid.' },
           { id: 'bav', label: 'Balloon valvuloplasty alone', verdict: 'ok', points: 2, why: 'A bridge in the unstable or as a diagnostic test — restenosis within months.' },
         ]} />
       <Decision id="s3-how" question="Which procedure does the heart team recommend?"
         options={[
           { id: 'tavi', label: 'Transfemoral TAVI', verdict: 'best', points: 10,
-            why: 'Older patients (≥ 70 years in the 2025 ESC/EACTS guideline) with suitable transfemoral anatomy and tricuspid valves are generally offered TAVI: faster recovery, no sternotomy, outcomes at least as good at intermediate and low risk.' },
-          { id: 'savr', label: 'Surgical AVR', verdict: 'ok', points: 5, why: 'Excellent durability and the choice for younger patients, bicuspid valves with difficult anatomy, or concomitant surgery — not his profile.' },
+            why: 'Older patients (≥ 70 years in the 2025 ESC/EACTS guideline) with a tricuspid valve and suitable transfemoral anatomy are generally offered TAVI: faster recovery, no sternotomy, outcomes at least as good at intermediate and low surgical risk.' },
+          { id: 'savr', label: 'Surgical AVR', verdict: 'ok', points: 5, why: 'Excellent durability and the choice for younger patients, bicuspid valves with difficult anatomy, or when other cardiac surgery is needed — not his profile.' },
           { id: 'ta', label: 'Transapical TAVI', verdict: 'wrong', points: 1, why: 'For when the femoral route is impossible; more invasive and worse outcomes.' },
         ]} />
       <Contrast title="TAVI vs surgical AVR"
-        is={{ h: 'TAVI', points: [
-          'Through the femoral artery, under sedation, home in 1–3 days.',
-          'Native leaflets pushed aside, not removed.',
-          'More pacemakers and paravalvular leaks; long-term durability still being written.',
-        ] }}
-        isnt={{ h: 'Surgical AVR', points: [
-          'Sternotomy and bypass; the calcified valve cut out and the annulus debrided.',
-          'Fewer pacemakers, less leak, decades of durability data.',
-          'Longer recovery; more bleeding, AF and kidney injury early.',
-        ] }} />
+        is={{ h: 'TAVI', points: ['Through the femoral artery, under sedation, home in 1–3 days.', 'Native leaflets pushed aside, not removed.', 'More pacemakers and paravalvular leaks; long-term durability still being written.'] }}
+        isnt={{ h: 'Surgical AVR', points: ['Sternotomy and bypass; the calcified valve cut out and the annulus debrided.', 'Fewer pacemakers, less leak, decades of durability data.', 'Longer recovery; more bleeding, AF and kidney injury early.'] }} />
+      <Contrast title="tricuspid vs bicuspid aortic stenosis"
+        is={{ h: 'Tricuspid, calcific (his)', points: ['Age-related degeneration, usually 70s–80s.', 'Round, predictable annulus.', 'The standard TAVI anatomy.'] }}
+        isnt={{ h: 'Bicuspid', points: ['Congenital; stenoses a decade or two earlier.', 'Oval annulus, a calcified raphe, often an aortopathy.', 'TAVI possible in selected anatomy; surgery often preferred in the young or with a dilated aorta.'] }} />
+
+      <div className="cs-h2">The conversation</div>
+      <p className="cs-p">You sit down with Mr and Mrs Mansour. He asks: “Doctor, what does this new valve mean for me?”</p>
+      <Decision id="s3-talk" question="How do you open?"
+        options={[
+          { id: 'ask', label: '“Before I explain, tell me what you understand so far — and what matters most to you in the next few years.”', verdict: 'best', points: 8,
+            why: 'Start with his understanding and his goals. Then the facts land on something: he wants to be safe, to care for his wife, to garden. Every option can be explained against that.' },
+          { id: 'facts', label: 'A clear list of the procedure, its risks and the statistics', verdict: 'ok', points: 4, why: 'Accurate — but a list delivered before you know what matters to him is information, not shared decision-making.' },
+          { id: 'tell', label: '“You need a TAVI. It’s the standard of care at your age.”', verdict: 'wrong', points: 0, why: 'A recommendation is right; a verdict without a conversation is not consent.' },
+        ]} />
+      <Decision id="s3-risk" question="He asks: “What could go wrong?” Which risks must he hear?"
+        options={[
+          { id: 'full', label: 'Death (~1–2%), stroke (~2%), pacemaker (~10%, higher for him), major bleeding or vascular injury, kidney injury, valve leak, rare emergency surgery — and what happens if he does nothing', verdict: 'best', points: 8,
+            why: 'Material risks, specific to him (his long PR raises the pacemaker risk), set against the natural history he would otherwise live with.' },
+          { id: 'major', label: 'Only the catastrophic ones: death and stroke', verdict: 'ok', points: 3, why: 'A pacemaker affects his daily life and his driving. He needs to know it is likely enough to plan for.' },
+          { id: 'none', label: 'Reassure him that it is very safe', verdict: 'wrong', points: 0, why: 'Reassurance without numbers is not consent.' },
+        ]} />
+
+      <Why title="Why the first valve must be chosen with the second one in mind"
+        chain={[
+          { k: 'DURABILITY', t: 'Tissue valves wear out — often in 10–15 years. A 79-year-old may outlive his valve.' },
+          { k: 'VALVE-IN-VALVE', t: 'The next valve goes inside this one, so its size and frame height limit the next result.' },
+          { k: 'CORONARIES', t: 'A tall frame and pinned-up leaflets can block access to the coronaries — and the coronary ostia during a second TAVI.' },
+          { k: 'PLAN NOW', t: '“Lifetime management”: valve type, size and commissural alignment are chosen today for the procedure in 2040.' },
+        ]} />
 
       <MultiSelect id="s3-workup" question="What must happen before his TAVI?"
         items={[
@@ -288,6 +506,15 @@ function HeartTeam() {
           { id: 'pciall', label: 'Stent every coronary plaque first', correct: false, why: 'Only significant proximal disease supplying a large territory.' },
           { id: 'mri', label: 'Cardiac MRI in every case', correct: false, why: 'Useful for selected questions; not a routine requirement.' },
         ]} />
+      <Why title="Why right bundle branch block before TAVI predicts complete heart block after it"
+        chain={[
+          { k: 'TWO WIRES', t: 'Below the His bundle, conduction runs down two branches: right and left.' },
+          { k: 'THE FRAME', t: 'TAVI injures the LEFT bundle, which runs right under the membranous septum.' },
+          { k: 'ALREADY CUT', t: 'If the right bundle is already blocked, the left is the only path left.' },
+          { k: 'BOTH GONE', t: 'Injure it and nothing reaches the ventricles: complete heart block.' },
+        ]}>
+        He has no RBBB — but his long PR says his conduction system is not pristine either.
+      </Why>
       <Video id="4JgN8zCkOTY" title="Understanding transcatheter aortic valve replacement (TAVR)" channel="Edwards Lifesciences" />
     </>
   );
@@ -303,36 +530,47 @@ function Planning() {
       <div className="cs-card">
         <div className="cs-h2" style={{ marginTop: 0 }}>ECG-gated CT · systolic phase</div>
         <Table head={['Measure', 'Value', 'Meaning']} rows={[
-          ['Annulus area', N('468 mm²'), 'The number valves are sized to'],
-          ['Annulus perimeter', N('78 mm'), 'Cross-check'],
+          ['Annulus diameters', N('27.2 × 22.0 mm'), 'Oval, as most annuli are'],
+          ['Annulus area / perimeter', N('470 mm² / 78 mm'), 'The numbers valves are sized to'],
           ['Left main height', N('12.5 mm'), '> 10–12 mm: low obstruction risk'],
           ['RCA height', N('16 mm'), 'Low risk'],
           ['Sinus of Valsalva width', N('31 mm'), 'Room for displaced leaflets'],
           ['LVOT calcium', N('moderate, under the non-coronary cusp', 'cs-hi'), 'Annular rupture and leak risk'],
           ['Membranous septum length', N('4 mm — short', 'cs-hi'), 'Conduction system close to the frame'],
-          ['Right common femoral, min. Ø', N('6.6 mm'), 'Accepts a 14F expandable sheath'],
+          ['Right common femoral, min. Ø', N('6.6 mm, little calcium'), 'Accepts a 14F expandable sheath'],
+          ['Predicted coplanar view', N('LAO 6° / CAU 12°'), 'All three cusps in one line on fluoroscopy'],
         ]} />
       </div>
-      <Decision id="s4-size" question="Balloon-expandable valve sizes: 23 mm (338–430 mm²), 26 mm (430–546 mm²), 29 mm (540–683 mm²). Which for an annulus of 468 mm²?"
+      <AnnulusSizer />
+      <Decision id="s4-size" question="Balloon-expandable sizes: 23 mm (338–430 mm²), 26 mm (430–546 mm²), 29 mm (540–683 mm²). Which for an annulus of 470 mm²?"
         options={[
-          { id: '26', label: '26 mm', verdict: 'best', points: 10, why: '468 mm² sits in the 26 mm range, with modest oversizing for a seal.' },
-          { id: '23', label: '23 mm — smaller is safer', verdict: 'wrong', points: 0, why: 'Undersized: paravalvular leak, and the valve can migrate.' },
-          { id: '29', label: '29 mm — bigger seals better', verdict: 'wrong', points: 0, why: 'Oversizing into calcified LVOT is how annular rupture happens.' },
+          { id: '26', label: '26 mm', verdict: 'best', points: 10, why: '470 mm² sits in the 26 mm range, with ~13% area oversizing for a seal.' },
+          { id: '23', label: '23 mm — smaller is safer', verdict: 'wrong', points: 0, why: 'Undersized by 12%: paravalvular leak, and the valve can migrate.' },
+          { id: '29', label: '29 mm — bigger seals better', verdict: 'wrong', points: 0, why: '40% oversizing into calcified LVOT is how annular rupture happens.' },
         ]} />
-      <Decision id="s4-access" question="Access route?"
+      <Decision id="s4-cor" question="A different patient: left main height 8 mm, sinus width 27 mm, bulky leaflet tips. What is the risk, and the plan?"
+        options={[
+          { id: 'obs', label: 'High risk of coronary obstruction: the displaced leaflet can seal the ostium. Plan coronary protection (a wire and stent ready in the left main) or leaflet modification', verdict: 'best', points: 8,
+            why: 'Low ostium + narrow sinus + bulky leaflet = the native leaflet is pushed straight over the coronary. It presents as sudden hypotension and ST change seconds after deployment.' },
+          { id: 'none', label: 'No issue — TAVI does not affect the coronaries', verdict: 'wrong', points: 0, why: 'Coronary obstruction is rare, often fatal, and predictable on CT.' },
+        ]} />
+      <Decision id="s4-access" question="Access route for him?"
         options={[
           { id: 'rcf', label: 'Right common femoral artery, ultrasound-guided, with pre-closure sutures', verdict: 'best', points: 10, why: 'Adequate size, little calcium, no tortuosity. Plan closure before you open.' },
           { id: 'sub', label: 'Subclavian', verdict: 'ok', points: 3, why: 'An alternative when the femoral route fails.' },
           { id: 'ta', label: 'Transapical', verdict: 'wrong', points: 0, why: 'Unnecessary with good femoral access.' },
         ]} />
+      <Contrast title="a safe femoral route vs a dangerous one"
+        is={{ h: 'Safe', points: ['Minimal diameter comfortably above the sheath’s outer diameter.', 'Little circumferential calcium.', 'Gentle curves; puncture over the femoral head.'] }}
+        isnt={{ h: 'Dangerous', points: ['Sheath-to-artery ratio > 1.05.', 'Horseshoe or circumferential calcium — the artery cannot stretch.', 'Severe tortuosity; a high bifurcation; puncture above the ligament.'] }} />
       <Why title="Why a short membranous septum and a deep valve stop the heart"
         chain={[
           { k: 'ANATOMY', t: 'The His bundle emerges beneath the membranous septum, just under the commissure between the non- and right coronary cusps.' },
           { k: 'SHORT SEPTUM', t: 'A short membranous septum puts the His bundle millimetres from the annulus.' },
-          { k: 'THE FRAME', t: 'The valve frame presses outward on the LVOT. The deeper it sits, the more of it pushes on the conducting tissue.' },
+          { k: 'THE FRAME', t: 'The frame presses outward on the LVOT. The deeper it sits, the more of it pushes on the conducting tissue.' },
           { k: 'OEDEMA', t: 'Pressure, bruising and swelling over 24–72 hours: new LBBB, then sometimes complete heart block — late, on the ward.' },
         ]}>
-        His short septum is written in the CT report. Write it into the procedure plan: aim high.
+        A useful rule: implant depth greater than the membranous septum length predicts a pacemaker. His septum is 4 mm. Aim high.
       </Why>
     </>
   );
@@ -345,6 +583,15 @@ function Planning() {
 function Setup() {
   return (
     <>
+      <MultiSelect id="s5-check" question="Pre-procedure checklist in the hybrid lab — what must be done?"
+        items={[
+          { id: 'abx', label: 'Prophylactic antibiotic (e.g. cefazolin) before the sheath goes in', correct: true, why: 'A prosthetic valve and a large sheath.' },
+          { id: 'xm', label: 'Group and save / crossmatch', correct: true, why: 'Vascular injury and annular rupture bleed fast.' },
+          { id: 'surg', label: 'Perfusion and cardiac surgery informed and available', correct: true, why: 'Bailout for rupture, embolisation, coronary obstruction.' },
+          { id: 'pads', label: 'Defibrillator pads on', correct: true, why: 'Rapid pacing can degenerate into VF.' },
+          { id: 'cons', label: 'Consent confirmed, including pacemaker risk', correct: true, why: 'Already discussed — re-confirm.' },
+          { id: 'ga', label: 'Mandatory general anaesthetic', correct: false, why: 'Not mandatory — see below.' },
+        ]} />
       <Decision id="s5-anaes" question="Anaesthesia?"
         options={[
           { id: 'sed', label: 'Local anaesthetic with light conscious sedation, anaesthetist present', verdict: 'best', points: 10, why: 'Minimalist transfemoral TAVI: faster recovery, less delirium, outcomes at least as good.' },
@@ -359,12 +606,25 @@ function Setup() {
           { label: 'Heparin to an ACT > 250 s; insert the 14F expandable sheath', why: 'Anticoagulate before the big sheath.' },
           { label: 'Cross the valve with a straight wire; exchange for a pre-shaped stiff LV wire', why: 'The rail the valve rides on, curled safely in the LV apex.' },
         ]} />
+      <Decision id="s5-pacetest" question="Before the valve goes in, you test rapid pacing at 180. What are you checking?"
+        options={[
+          { id: 'cap', label: '1:1 capture, and that arterial pressure falls below ~50 mmHg with the pulse pressure gone', verdict: 'best', points: 8,
+            why: 'If the pacing does not capture, or the pressure stays up, the heart will still eject during deployment — and push the valve. Find out now, not mid-inflation.' },
+          { id: 'rate', label: 'Only that the box can reach 180', verdict: 'wrong', points: 0, why: 'A number on the pacing box is not a still heart.' },
+        ]} />
+      <Why title="Why the stiff wire has a curl at its tip"
+        chain={[
+          { k: 'THE RAIL', t: 'A 14F valve system is pushed up the aorta and around the arch on this wire.' },
+          { k: 'FORCE', t: 'All that push ends at the wire tip, in the LV apex.' },
+          { k: 'A CURL', t: 'A pre-shaped pigtail curl spreads the force and sits away from the thin apex.' },
+          { k: 'DANGER', t: 'A straight stiff tip in the LV can perforate it — tamponade on the table.' },
+        ]} />
       <div className="cs-h2">Simultaneous pressures before the valve goes in</div>
       <Hemodynamics mode="as" />
       <Decision id="s5-hemo" question="LV 192/16, aorta 118/64, mean gradient 50 mmHg — and the aortic upstroke is slow. What does that confirm?"
         options={[
           { id: 'sev', label: 'Invasive confirmation of severe AS, consistent with the echo', verdict: 'best', points: 10, why: 'The shaded area between the LV and aortic traces in systole is the gradient. The slow aortic rise is the tardus of his carotid.' },
-          { id: 'hcm', label: 'A dynamic subvalvular obstruction', verdict: 'wrong', points: 0, why: 'That would show a late-peaking, dagger-shaped intracavity gradient and a spike-and-dome aorta.' },
+          { id: 'hcm', label: 'A dynamic subvalvular obstruction', verdict: 'wrong', points: 0, why: 'That would show a late-peaking intracavity gradient and a spike-and-dome aorta.' },
         ]} />
       <Contrast title="peak-to-peak vs peak instantaneous gradient"
         is={{ h: 'Peak-to-peak (cath)', points: ['LV peak minus aortic peak — two moments that never coincide.', 'Here 74 mmHg.', 'Not a physiological event.'] }}
@@ -392,6 +652,11 @@ function Strategy() {
           { id: 'mid', label: 'About 70 : 30', verdict: 'ok', points: 4, why: 'Seals well — but presses on the His bundle in a short septum.' },
           { id: 'deep', label: 'Deep: 50 : 50 for stability', verdict: 'wrong', points: 0, why: 'Stability bought with a pacemaker.' },
         ]} />
+      <Decision id="s6-cep" question="Use a cerebral embolic protection filter routinely?"
+        options={[
+          { id: 'no', label: 'Not routinely: in the large randomised trial it did not reduce stroke overall', verdict: 'best', points: 6, why: 'Filters catch debris, but stroke rates were not lower with routine use (BHF PROTECT-TAVI). Selective use is still debated.' },
+          { id: 'yes', label: 'Yes — filters prevent stroke', verdict: 'wrong', points: 0, why: 'Intuitive, and not borne out for routine use.' },
+        ]} />
       <Contrast title="balloon-expandable vs self-expanding valves"
         is={{ h: 'Balloon-expandable', points: ['Expanded by a balloon on rapid pacing, in seconds.', 'Short frame at the annulus; not recapturable.', 'Lower pacemaker rates; slightly higher gradients in small annuli.'] }}
         isnt={{ h: 'Self-expanding', points: ['Nitinol unsheathes and opens itself, slowly; often recapturable.', 'Tall frame, supra-annular leaflets: better gradients in small annuli.', 'More pressure on the LVOT for longer: more pacemakers.'] }} />
@@ -413,13 +678,20 @@ function Strategy() {
 function Deploy() {
   const { answers, answer, setVitals, bump } = useCase();
   const res = answers['s7-deploy'];
+  const aorto = answers['s7-aorto'];
   const verdict = !res ? null : res.migrated ? 'wrong' : res.depth >= 5 && res.depth <= 20 ? 'best' : res.depth > 20 && res.depth <= 30 ? 'ok' : 'wrong';
   return (
     <>
-      <p className="cs-p">The 26 mm valve is crimped on its balloon and across the native valve on the stiff wire. Position it against the pigtail’s annulus line, start rapid pacing, then inflate.</p>
+      <p className="cs-p">The 26 mm valve is crimped on its balloon, across the native valve on the stiff wire. First confirm the coplanar view; then position against the pigtail’s annulus line, rapid pace, and inflate.</p>
+      {!aorto ? (
+        <button className="cs-btn" onClick={() => { answer('s7-aorto', true); bump({ contrast: 15, fluoro: 20, kerma: 30 }); }}>Root aortogram in LAO 6° / CAU 12° (15 mL)</button>
+      ) : (
+        <div className="cs-fb best">All three cusps in a line, the pigtail at the floor of the non-coronary cusp. The CT-predicted view was right — this is the annulus plane you will deploy against.</div>
+      )}
+      <ScoreOnce id="s7-aorto" pts={aorto ? 6 : res ? 0 : null} max={6} />
       <TaviDeploy done={res} onResult={(r) => {
         answer('s7-deploy', r);
-        bump({ contrast: 40, fluoro: 420, kerma: 260 });
+        bump({ contrast: 25, fluoro: 420, kerma: 260 });
         if (r.migrated) setVitals({ sys: 92, dia: 50, hr: 96 }); else setVitals({ sys: 128, dia: 62, hr: 78 });
       }} />
       {res && (
@@ -427,7 +699,7 @@ function Deploy() {
           {res.migrated
             ? 'Inflated without rapid pacing: the ejecting ventricle shoved the expanding valve up toward the aorta. In real life — a leaking, malpositioned or embolised valve, and a second valve or surgery.'
             : res.depth < 5 ? 'Too high: barely in the annulus. Risk of embolisation into the aorta and of a paravalvular leak.'
-            : res.depth <= 20 ? 'On target. Sealed in the annulus, frame kept off the conduction system as far as it can be.'
+            : res.depth <= 20 ? 'On target. Sealed in the annulus, the frame kept off the conduction system as far as it can be.'
             : res.depth <= 30 ? 'Acceptable seal, but deeper than planned for a short septum: expect conduction changes.'
             : 'Deep: the frame is pressing into the LVOT below the membranous septum. Heart block is likely.'}
         </div>
@@ -437,12 +709,33 @@ function Deploy() {
         <>
           <div className="cs-h2">After deployment</div>
           <Hemodynamics mode="post" />
+          <Decision id="s7-ari" question="Ao 128/62, LV end-diastolic pressure 16. Aortic regurgitation index = (aortic diastolic − LVEDP) ÷ aortic systolic × 100. What is it, and what does it mean?"
+            options={[
+              { id: '36', label: '≈ 36 — above 25: no significant regurgitation', verdict: 'best', points: 8,
+                why: '(62 − 16) ÷ 128 × 100 ≈ 36. Significant regurgitation drops the aortic diastolic pressure and raises the LVEDP, pushing the index below 25 — which predicts worse survival.' },
+              { id: '18', label: '≈ 18 — significant leak', verdict: 'wrong', points: 0, why: 'Recalculate: (62 − 16) ÷ 128.' },
+              { id: '48', label: '≈ 48 — the formula uses the systolic pressure as the numerator', verdict: 'wrong', points: 0, why: 'Diastolic minus LVEDP, over systolic.' },
+            ]} />
           <Doppler kind="cw-as" vmax={2.1} title="Transthoracic echo on the table: CW through the new valve" />
+          <MultiSelect id="s7-echo" question="What else must that on-table echo rule out?"
+            items={[
+              { id: 'eff', label: 'A new pericardial effusion', correct: true, why: 'Annular rupture or LV wire perforation.' },
+              { id: 'wma', label: 'A new regional wall-motion abnormality', correct: true, why: 'Coronary obstruction.' },
+              { id: 'pvl', label: 'The grade and site of any paravalvular leak', correct: true, why: 'Moderate or worse needs post-dilation or a second valve.' },
+              { id: 'mv', label: 'Mitral valve damage from the stiff wire', correct: true, why: 'The wire can catch the chordae.' },
+              { id: 'ef', label: 'A full strain analysis', correct: false, why: 'Not on the table.' },
+            ]} />
           <Decision id="s7-pvl" question="Echo shows a trace paravalvular jet at the non-coronary cusp, mean gradient 7 mmHg, no effusion, no new wall-motion abnormality. Next?"
             options={[
               { id: 'accept', label: 'Accept: excellent result. Close the access, check the femoral artery, transfer to the unit', verdict: 'best', points: 10, why: 'Trace or mild paravalvular leak is common and benign. Moderate or worse would need post-dilation.' },
               { id: 'post', label: 'Post-dilate to abolish the trace leak', verdict: 'wrong', points: 2, why: 'Extra expansion in a calcified LVOT for a benign finding: annular rupture risk, and more pressure on the conduction system.' },
               { id: 'second', label: 'A second valve inside the first', verdict: 'wrong', points: 0, why: 'For a malpositioned valve or severe leak only.' },
+            ]} />
+          <Decision id="s7-close" question="Closing up. The temporary pacing wire?"
+            options={[
+              { id: 'keep', label: 'Check the rhythm before removing it: if new LBBB or a longer PR appears, keep the wire in for 24 hours', verdict: 'best', points: 6,
+                why: 'Conduction changes on the table predict heart block later. A wire already in the RV is far easier than a new one at 3 am. His ECG on the table is unchanged — so it comes out.' },
+              { id: 'always', label: 'Always remove it on the table', verdict: 'ok', points: 2, why: 'Often right, but decide on the ECG, not by habit.' },
             ]} />
         </>
       )}
@@ -458,34 +751,59 @@ function Deploy() {
    8 · BACK ON THE UNIT
    ============================================================ */
 
+const SERIAL = [
+  { id: 'base', label: 'Pre-TAVI', pr: 0.21, lbbb: false, note: 'PR 210 ms, QRS 108 ms. LVH with strain.' },
+  { id: 'post', label: '16:30 · 4 h after', pr: 0.23, lbbb: true, note: 'New LBBB: QRS 152 ms. PR 230 ms.' },
+  { id: 'day1', label: 'Day 1 · 08:00', pr: 0.26, lbbb: true, note: 'QRS 158 ms. PR 260 ms — both lengthening.' },
+];
+
 function Recovery() {
   const { answers } = useCase();
+  const [ecg, setEcg] = useState('post');
+  const E = SERIAL.find(x => x.id === ecg);
   const deep = answers['s7-deploy'] && (answers['s7-deploy'].depth > 20 || answers['s7-deploy'].migrated);
   return (
     <>
       <div className="cs-card cs-vignette">
-        <p className="cs-p" style={{ marginBottom: 0 }}><span className="cs-time">16:30</span>Bed 1, Valvular & Structural Heart Unit. Sitting up, eating, the groin dry. “I can breathe already.” The temporary pacing wire was removed at the end of the case. Then the post-procedure ECG arrives{deep ? ' — the deep implant has left its mark' : ''}:</p>
+        <p className="cs-p" style={{ marginBottom: 0 }}><span className="cs-time">16:30</span>Bed 1, Valvular & Structural Heart Unit. Sitting up, eating, the groin dry. “I can breathe already.” The table ECG was unchanged, so the temporary wire came out. Then the four-hour ECG arrives{deep ? ' — and the deep implant has left its mark' : ''}.</p>
       </div>
-      <ECG12 rate={76} lbbb shape={LVH.shape}
-        caption="New left bundle branch block: QRS 152 ms, broad notched R in I, aVL, V5–V6, deep QS in V1–V3, discordant ST–T. PR 230 ms — longer than before." />
-      <Decision id="s8-lbbb" question="New LBBB with a longer PR after TAVI. What now?"
+      <div className="cs-row" style={{ marginBottom: 8 }}>
+        {SERIAL.map(s => <button key={s.id} className={'cs-chip' + (ecg === s.id ? ' on' : '')} onClick={() => setEcg(s.id)}>{s.label}</button>)}
+      </div>
+      <ECG12 rate={E.id === 'base' ? 72 : 76} pr={E.pr} lbbb={E.lbbb} shape={LVH.shape} st={E.lbbb ? {} : LVH.st} tInv={E.lbbb ? {} : LVH.tInv} caption={E.note} />
+      <Decision id="s8-lbbb" question="Compare the three ECGs. New LBBB after TAVI, and by the next morning the QRS is 158 ms and the PR 260 ms. What now?"
         options={[
-          { id: 'tele', label: 'Continuous telemetry for at least 48 hours, daily ECGs, no rate-slowing drugs; plan a pacemaker or EP study if the PR or QRS lengthens further or block appears', verdict: 'best', points: 10,
-            why: 'New LBBB is the warning shot: conduction injury from the frame. Most high-degree block declares within 48–72 hours — so the monitoring must outlast it.' },
-          { id: 'home', label: 'Discharge tomorrow morning as planned — LBBB is common after TAVI', verdict: 'wrong', points: 0, why: 'Common is not the same as safe. See the war stories.' },
-          { id: 'ppm', label: 'Implant a pacemaker now', verdict: 'ok', points: 3, why: 'Not for LBBB alone — many recover. Monitor and act on progression.' },
+          { id: 'progress', label: 'Progressive conduction disease: keep him on telemetry, no rate-slowing drugs, and plan an EP study or pacemaker before discharge — or at least ambulatory monitoring', verdict: 'best', points: 10,
+            why: 'Expert consensus: new LBBB with QRS > 150 ms or PR > 240 ms, or any further lengthening, is high risk for delayed high-degree block. Do not send him home blind.' },
+          { id: 'home', label: 'Discharge today as planned — LBBB is common after TAVI', verdict: 'wrong', points: 0, why: 'Common is not the same as safe. See the war stories.' },
+          { id: 'ppmnow', label: 'Implant a pacemaker immediately, today', verdict: 'ok', points: 4, why: 'Not unreasonable with progression this clear — but an EP study (HV interval) can separate who needs one. Many centres would monitor another 24 hours first.' },
         ]} />
       <Contrast title="what the new LBBB is — and what it isn’t"
         is={{ h: 'Mechanical conduction injury', points: ['The frame pressing on the left bundle under the membranous septum.', 'Can progress as oedema peaks over 24–72 hours.', 'A reason to monitor, not panic.'] }}
         isnt={{ h: 'An acute MI', points: ['Not an ischaemic STEMI equivalent here: no symptoms, no wall-motion change, a known cause.', 'Do not reflexly activate the cath lab.', 'But know Sgarbossa: concordant ST elevation would still mean ischaemia.'] }} />
+
+      <div className="cs-card">
+        <div className="cs-h2" style={{ marginTop: 0 }}>Day 1 bloods</div>
+        <Table head={['Test', 'Pre', 'Day 1']} rows={[
+          ['Haemoglobin', N('128 g/L'), N('116 g/L')], ['Creatinine', N('112 µmol/L'), N('131 µmol/L', 'cs-hi')],
+          ['Potassium', N('4.6'), N('4.9')], ['hs-Troponin T', N('28'), N('210 ng/L', 'cs-hi')],
+        ]} />
+      </div>
+      <Decision id="s8-bloods" question="Interpret the day-1 bloods."
+        options={[
+          { id: 'expected', label: 'Expected changes: a modest haemoglobin fall, a small creatinine rise to watch, and a procedural troponin rise — fluids, a repeat in 24 h, no nephrotoxins', verdict: 'best', points: 8,
+            why: 'Rapid pacing and valve expansion release troponin without an MI. A 12 g/L haemoglobin drop is typical; a bigger fall means hunting for a bleed (groin, retroperitoneum). Creatinine +19 is below the AKI threshold (≥ 26.5).' },
+          { id: 'mi', label: 'A procedural MI — urgent angiography', verdict: 'wrong', points: 0, why: 'No symptoms, no ECG ischaemia beyond the expected LBBB, no new wall-motion abnormality.' },
+          { id: 'bleed', label: 'A major bleed — transfuse', verdict: 'wrong', points: 0, why: 'Not at 116 with a dry groin and stable observations.' },
+        ]} />
       <MultiSelect id="s8-checks" question="What else do you check on his first evening?"
         items={[
           { id: 'groin', label: 'Groin and distal pulses', correct: true, why: 'Vascular complications are the commonest major complication of transfemoral TAVI.' },
           { id: 'neuro', label: 'A neurological check', correct: true, why: 'Stroke risk peaks in the first days.' },
-          { id: 'hb', label: 'Haemoglobin and creatinine', correct: true, why: 'Bleeding and contrast kidney injury.' },
           { id: 'mob', label: 'Mobilise early', correct: true, why: 'Less delirium, less deconditioning.' },
+          { id: 'delir', label: 'Screen for delirium', correct: true, why: 'Common in the elderly after any procedure; worsens outcomes.' },
           { id: 'bed', label: 'Strict bed rest for 48 hours', correct: false, why: 'Not needed after a closed femoral access.' },
-          { id: 'amlo', label: 'Restart full-dose amlodipine and ramipril tonight', correct: false, why: 'His afterload just fell; restart cautiously against his blood pressure.' },
+          { id: 'amlo', label: 'Restart full-dose amlodipine tonight', correct: false, why: 'His afterload just fell; restart blood-pressure drugs cautiously against his readings.' },
         ]} />
     </>
   );
@@ -497,13 +815,14 @@ function Recovery() {
 
 function HeartBlock() {
   const { answers, answer, setVitals, advanceClock } = useCase();
-  const paced = answers['s9-pace'];
+  const pace = answers['s9-pace'];
+  const paced = !!pace && pace.captured;
   const ppm = answers['s9-ppm'];
   return (
     <>
       <div className="cs-card cs-vignette" style={{ borderLeftColor: 'var(--red)' }}>
         <p className="cs-p" style={{ marginBottom: 0 }}><span className="cs-time" style={{ color: 'var(--red)' }}>03:10</span>
-          Night two. The telemetry alarms. The nurse finds him grey, “dizzy… far away”. He answers slowly.
+          Night two. The telemetry alarms. The nurse finds him grey, “dizzy… far away”. He answers slowly. His wife went home at ten.
         </p>
       </div>
       <BedsideMonitor />
@@ -537,23 +856,48 @@ function HeartBlock() {
           { id: 'wait', label: 'Atropine and observe — it often settles', correct: false, why: 'The level of the block says otherwise.' },
           { id: 'fluid', label: 'Fluids and repeat obs in an hour', correct: false, why: 'The problem is rate, not volume.' },
         ]} />
-      {!paced ? (
-        <button className="cs-btn danger" onClick={() => { answer('s9-pace', true); setVitals({ hr: 70, sys: 112, dia: 64, rhythm: 'paced' }); advanceClock(8); }}>Transcutaneous pacing: rate 70, output up to capture (78 mA)</button>
-      ) : (
-        <div className="cs-fb best">Electrical and mechanical capture: a pulse with every spike. Pressure 112/64. Analgesia and sedation for the pacing — it hurts. A temporary transvenous wire follows within the hour.</div>
+
+      <div className="cs-h2">Transcutaneous pacing — find capture</div>
+      <p className="cs-p">Pads are on: anterior–posterior. Fentanyl 25 µg and midazolam 1 mg for the pain. Choose a rate, start pacing, and raise the output until you see capture — then prove it.</p>
+      <Pacer done={pace} onConfirm={(r) => {
+        answer('s9-pace', r);
+        if (r.captured) { setVitals({ hr: r.rate, sys: 112, dia: 64, rhythm: 'paced' }); advanceClock(8); }
+      }} />
+      {pace && (
+        <div className={'cs-fb ' + (!pace.captured ? 'wrong' : pace.mA <= pace.threshold + 20 ? 'best' : 'ok')}>
+          {!pace.captured
+            ? `At ${pace.mA} mA there is a spike and a big artefact, but no broad complex and no pulse at the pacing rate — this is not capture. Electrical capture starts at ${pace.threshold} mA in him. In a real emergency, this mistake leaves the patient barely perfused while the monitor looks “paced”.`
+            : pace.mA <= pace.threshold + 20 ? `Capture at ${pace.mA} mA — just above threshold (${pace.threshold} mA), with a femoral pulse at ${pace.rate}. Set the output ~10% above threshold.`
+            : `Captured — but at ${pace.mA} mA, far above the ${pace.threshold} mA threshold. It works and it hurts: find the threshold, then add a 10% margin.`}
+        </div>
       )}
+      <ScoreOnce id="s9-pacing" pts={pace == null ? null : !pace.captured ? 0 : pace.mA <= pace.threshold + 20 ? 15 : 8} max={15} />
+      {pace && !pace.captured && (
+        <button className="cs-btn danger" onClick={() => { answer('s9-pace', { ...pace, mA: pace.threshold + 6, captured: true, rescued: true }); setVitals({ hr: pace.rate, sys: 112, dia: 64, rhythm: 'paced' }); advanceClock(8); }}>Your registrar turns it up to {pace.threshold + 6} mA</button>
+      )}
+      <Contrast title="electrical capture vs mechanical capture"
+        is={{ h: 'Electrical capture', points: ['A broad QRS and T after every spike.', 'Confirms the current depolarises the ventricle.', 'Necessary — not sufficient.'] }}
+        isnt={{ h: 'Mechanical capture', points: ['A pulse (femoral — not carotid, where muscle twitch fools you) or a pleth wave after every spike.', 'Confirms the depolarisation produces a beat.', 'The only proof the patient is perfused.'] }} />
+
       {paced && (
         <>
-          <Decision id="s9-next" question="By morning he is still in complete heart block on the temporary wire. Next?"
+          <Decision id="s9-next" question="By morning he is still in complete heart block on a temporary transvenous wire. Next?"
             options={[
               { id: 'ppm', label: 'Permanent pacemaker before discharge', verdict: 'best', points: 10, why: 'Persistent high-degree AV block after TAVI is a clear indication. Waiting days for recovery keeps him in bed with a wire in his heart.' },
               { id: 'wait', label: 'Wait two weeks to see if it recovers', verdict: 'wrong', points: 1, why: 'Prolonged temporary pacing carries infection, displacement and immobility.' },
               { id: 'remove', label: 'Remove the wire and monitor', verdict: 'wrong', points: 0, why: 'A broad escape at 34 is not a safety net.' },
             ]} />
+          <Decision id="s9-type" question="Which pacing system?"
+            options={[
+              { id: 'csp', label: 'Dual-chamber, ideally with conduction-system (left bundle branch area) pacing for the ventricular lead', verdict: 'best', points: 8,
+                why: 'He will be paced most of the time. Pacing the RV apex for years can weaken the LV (pacing-induced cardiomyopathy); pacing the conduction system keeps the ventricles activating normally. The atrial lead keeps AV synchrony — his stiff LV needs the atrial kick.' },
+              { id: 'rv', label: 'Dual-chamber with a standard RV apical lead', verdict: 'ok', points: 5, why: 'Reliable and widely used; watch the LV function over time.' },
+              { id: 'vvi', label: 'A single-chamber ventricular pacemaker', verdict: 'wrong', points: 1, why: 'Loses AV synchrony: a hypertrophied LV depends on the atrial contribution.' },
+            ]} />
           {!ppm ? (
             <button className="cs-btn primary" onClick={() => { answer('s9-ppm', true); setVitals({ hr: 70, sys: 124, dia: 68, rhythm: 'paced' }); advanceClock(min(9, 0)); }}>Implant the permanent pacemaker</button>
           ) : (
-            <div className="cs-fb best">Dual-chamber pacemaker implanted via the left cephalic vein. Pacing check normal. Walking the corridor by the evening.</div>
+            <div className="cs-fb best">Dual-chamber pacemaker implanted via the left cephalic vein, ventricular lead in the left bundle branch area. Paced QRS 118 ms. Walking the corridor by the evening.</div>
           )}
         </>
       )}
@@ -564,7 +908,7 @@ function HeartBlock() {
           { k: 'WHERE IT ISN’T', t: 'Sparsely in the His bundle and bundle branches.' },
           { k: 'HIS BLOCK', t: 'Is mechanical injury of the His–Purkinje system by the frame. Removing vagal tone changes nothing there.' },
         ]}>
-        Worse: atropine can speed the atria and, in infranodal block, sometimes worsens the ratio of conducted beats. Know the level of the block before reaching for the drug.
+        Worse: atropine speeds the atria, and in infranodal block more atrial impulses can mean fewer conducted beats. Know the level of the block before reaching for the drug.
       </Why>
     </>
   );
@@ -589,7 +933,7 @@ function Cycles() {
         ]}
         breaks={[
           { at: 0, t: 'Replace the valve — the definitive cut.' },
-          { at: 3, t: 'Avoid vasodilators: nitrates, high-dose ACE inhibitors titrated carelessly, spinal anaesthesia.' },
+          { at: 3, t: 'Avoid vasodilators: nitrates, carelessly titrated vasodilators, spinal anaesthesia.' },
           { at: 3, t: 'Treat hypotension with an alpha-agonist (phenylephrine/metaraminol): it raises aortic diastolic pressure without speeding the heart.' },
           { at: 2, t: 'Keep the rate slow-normal: diastole is when the thick wall is perfused.' },
           { at: 5, t: 'Restore sinus rhythm in new AF: the stiff LV depends on the atrial kick for up to 40% of its filling.' },
@@ -599,6 +943,21 @@ function Cycles() {
           { id: 'alpha', label: 'Pure vasoconstriction raises diastolic and coronary perfusion pressure without tachycardia', verdict: 'best', points: 10, why: 'Tachycardia shortens diastole and raises demand in a starving, thick LV. You want pressure, not rate.' },
           { id: 'ino', label: 'Inotropes are dangerous in all valve disease', verdict: 'wrong', points: 0, why: 'Not true — they have a role when the LV has failed. The reasoning here is about rate and perfusion pressure.' },
           { id: 'none', label: 'It makes no difference', verdict: 'wrong', points: 0, why: 'It makes all the difference.' },
+        ]} />
+
+      <ViciousCycle id="cyc-af" title="The AF spiral — when the atrial kick is lost"
+        nodes={[
+          { short: 'AF starts', t: 'New atrial fibrillation', d: 'The atria quiver instead of contracting.' },
+          { short: 'Kick lost', t: 'The stiff LV loses its last-second top-up', d: 'A thick ventricle gets up to 40% of its filling from atrial contraction.' },
+          { short: 'Fast & short', t: 'A fast ventricular rate shortens diastole', d: 'Less filling time, less coronary perfusion time.' },
+          { short: 'Output falls', t: 'Stroke volume and pressure fall', d: 'Through a fixed valve, nothing compensates.' },
+          { short: 'Ischaemia', t: 'The starving LV stiffens further; LA pressure climbs', d: 'Pulmonary oedema — and a stretched atrium that keeps the AF going.' },
+        ]}
+        breaks={[
+          { at: 0, t: 'Unstable: synchronised cardioversion — restore the kick.' },
+          { at: 2, t: 'Rate control carefully (avoid big doses of vasodilating calcium blockers).' },
+          { at: 3, t: 'Treat hypotension with an alpha-agonist, not a vasodilator.' },
+          { at: 1, t: 'Long term: replace the valve, anticoagulate the AF.' },
         ]} />
 
       <ViciousCycle id="cyc-block" title="The heart-block spiral — 03:10"
@@ -653,7 +1012,7 @@ function WarStories() {
       <WarStory title="The gradient that lied"
         mistake="Labelling low-flow, low-gradient aortic stenosis as “moderate” from the mean gradient alone."
         burn="Low gradient + small valve + low flow = ask why. Dobutamine echo or CT calcium score before you call it moderate.">
-        <p className="cs-p">A 74-year-old with breathlessness, EF 35%, AVA 0.8 cm², mean gradient 28 mmHg. “Moderate AS, heart failure from his old MI.” Diuretics, clinic in a year. He died at home in seven months. The dobutamine study, done for research after a similar case in the same unit, would have shown the gradient climbing to 46 with a fixed valve.</p>
+        <p className="cs-p">A 74-year-old with breathlessness, EF 35%, AVA 0.8 cm², mean gradient 28 mmHg. “Moderate AS, heart failure from his old MI.” Diuretics, clinic in a year. He died at home in seven months. A dobutamine study would have shown the gradient climbing to 46 through a valve that stayed shut.</p>
       </WarStory>
       <Decision id="mm-lflg" question="EF 35%, AVA 0.8 cm², mean gradient 28 mmHg. Next test?"
         options={[
@@ -662,10 +1021,22 @@ function WarStories() {
           { id: 'cath', label: 'Coronary angiography only', verdict: 'ok', points: 2, why: 'May be needed — but it does not answer the valve question.' },
         ]} />
 
+      <WarStory title="The leaflet over the ostium"
+        mistake="Not measuring the coronary heights on the planning CT."
+        burn="Low coronary + narrow sinus + bulky leaflet = obstruction. Read the CT; protect the coronary before you deploy.">
+        <p className="cs-p">A smooth deployment in an 81-year-old woman with a small aortic root. Twenty seconds later: pressure 60, ST elevation in I and aVL, a new akinetic anterior wall. The native leaflet had swung up and sealed the left main, 7 mm above the annulus. No wire was in the coronary; re-wiring past a stent frame took twenty minutes. She survived with a large infarct.</p>
+      </WarStory>
+
       <WarStory title="Home with a new LBBB"
         mistake="Next-day discharge after TAVI with a new LBBB and a lengthening PR, without monitoring."
         burn="New conduction disease after TAVI is the warning shot. Monitor long enough to catch the next one.">
         <p className="cs-p">A smooth TAVI, home the next morning — “LBBB is common”. Day four: a fall in the kitchen, a fractured wrist and a head injury. In the emergency department: complete heart block at 28.</p>
+      </WarStory>
+
+      <WarStory title="The paced rhythm with no pulse"
+        mistake="Accepting pacing spikes on the monitor as capture without feeling for a pulse."
+        burn="Electrical capture is not a heartbeat. Feel a femoral pulse with every spike.">
+        <p className="cs-p">Transcutaneous pacing for complete heart block. The monitor showed a spike and a broad hump after each one: “paced at 70”. Fifteen minutes later he was unresponsive. The humps were artefact; there had been no capture and no pulse at the pacing rate. The output was below threshold all along.</p>
       </WarStory>
 
       <WarStory title="Bigger seals better"
@@ -678,7 +1049,7 @@ function WarStories() {
 }
 
 /* ============================================================
-   DEBRIEF
+   DISCHARGE, FOLLOW-UP & DEBRIEF
    ============================================================ */
 
 function Debrief() {
@@ -691,16 +1062,28 @@ function Debrief() {
         options={[
           { id: 'sapt', label: 'A single antiplatelet (aspirin or clopidogrel), lifelong', verdict: 'best', points: 10, why: 'Single antiplatelet therapy bleeds less than dual, with no more thrombosis (POPular TAVI).' },
           { id: 'dapt', label: 'Aspirin + clopidogrel for 6 months', verdict: 'ok', points: 3, why: 'The old routine — more bleeding, no benefit, unless he has had recent PCI.' },
-          { id: 'oac', label: 'A direct oral anticoagulant', verdict: 'wrong', points: 0, why: 'Without AF or another indication, anticoagulation after TAVI did worse (GALILEO).' },
+          { id: 'oac', label: 'A direct oral anticoagulant', verdict: 'wrong', points: 0, why: 'Without AF or another indication, routine anticoagulation after TAVI did worse (GALILEO).' },
         ]} />
       <MultiSelect id="s12-home" question="What goes in his discharge plan?"
         items={[
           { id: 'echo', label: 'Echo at about 30 days as his new baseline', correct: true, why: 'Gradients and leak to compare against for life.' },
           { id: 'endo', label: 'Endocarditis prevention: dental hygiene, antibiotic prophylaxis for dental procedures, a valve card', correct: true, why: 'He now has a prosthetic valve.' },
-          { id: 'pace', label: 'Pacemaker check in 4–6 weeks', correct: true, why: 'And ask whether he still needs it pacing — some recover conduction.' },
-          { id: 'bp', label: 'Re-titrate blood pressure drugs', correct: true, why: 'His afterload has changed; his BP may rise now the valve is open.' },
-          { id: 'drive', label: 'Driving advice after a pacemaker', correct: true, why: 'Usually a short period off driving after a pacemaker implanted for block (check local rules).' },
+          { id: 'pace', label: 'Pacemaker check in 4–6 weeks', correct: true, why: 'And see how often he is really paced — some recover conduction.' },
+          { id: 'bp', label: 'Re-titrate blood pressure drugs', correct: true, why: 'His afterload has changed; his BP often rises now the valve is open.' },
+          { id: 'drive', label: 'Driving advice after a pacemaker', correct: true, why: 'Usually a short period off driving after a pacemaker for block (check local rules).' },
           { id: 'warf', label: 'Lifelong warfarin for the valve', correct: false, why: 'Not for a tissue valve without another indication.' },
+        ]} />
+
+      <div className="cs-card">
+        <div className="cs-h2" style={{ marginTop: 0 }}>Fourteen months later</div>
+        <p className="cs-p">He is gardening. Routine echo: mean gradient 21 mmHg (it was 7 at 30 days). CT: a thin layer of thrombus on two leaflets with reduced leaflet motion.</p>
+      </div>
+      <Decision id="s12-halt" question="What is it, and what do you do?"
+        options={[
+          { id: 'thromb', label: 'Subclinical leaflet thrombosis (HALT) causing a rising gradient — anticoagulate for about 3 months and re-image', verdict: 'best', points: 8,
+            why: 'Thrombus on the leaflets thickens them and raises the gradient; anticoagulation usually dissolves it and the gradient falls back. A rising gradient is never just “wear”.' },
+          { id: 'svd', label: 'Structural valve degeneration — plan a valve-in-valve now', verdict: 'wrong', points: 0, why: 'Far too early for wear, and the CT shows thrombus. Treat the reversible first.' },
+          { id: 'ignore', label: 'Leave it — he is well', verdict: 'ok', points: 2, why: 'Many centres would not treat HALT without a gradient rise. His gradient has tripled: treat.' },
         ]} />
 
       <div className="cs-h2">Case quiz</div>
@@ -708,9 +1091,13 @@ function Debrief() {
         { q: 'Which sign suggests severe rather than mild aortic stenosis?', options: ['A loud murmur', 'An early-peaking murmur with an ejection click', 'A late-peaking murmur with a soft A2', 'Radiation to the carotids'], answer: 2, why: 'Late peak and soft A2: rigid leaflets, slow ejection.' },
         { q: 'Squatting makes the murmur of HOCM…', options: ['Louder', 'Softer', 'Unchanged', 'Diastolic'], answer: 1, why: 'A fuller LV holds the walls apart.' },
         { q: 'Vmax 4.6 m/s gives a peak gradient of about…', options: ['18 mmHg', '46 mmHg', '85 mmHg', '120 mmHg'], answer: 2, why: '4 × 4.6² ≈ 85 mmHg.' },
-        { q: 'Low-flow, low-gradient AS with reduced EF is clarified by…', options: ['Exercise ECG', 'Low-dose dobutamine echo', 'Cardiac MRI only', 'Repeat echo in a year'], answer: 1, why: 'Raise the flow and see whether the valve opens.' },
+        { q: 'Dobutamine raises stroke volume 40%; AVA rises from 0.8 to 1.3 cm²; gradient stays 26. This is…', options: ['True severe AS', 'Pseudo-severe AS', 'No contractile reserve', 'Paradoxical low-flow AS'], answer: 1, why: 'The valve opened with more flow.' },
+        { q: 'A rule of thumb that predicts a pacemaker after TAVI:', options: ['Implant depth greater than the membranous septum length', 'Annulus area above 500 mm²', 'A female patient', 'Mean gradient above 50 mmHg'], answer: 0, why: 'The frame reaches the conduction system.' },
+        { q: 'Aortic regurgitation index after TAVI: Ao 120/50, LVEDP 25. The index is…', options: ['≈ 21 — significant regurgitation', '≈ 36 — no significant regurgitation', '≈ 62', 'Cannot be calculated'], answer: 0, why: '(50 − 25) ÷ 120 × 100 ≈ 21: below 25.' },
         { q: 'Hypotension under anaesthesia in severe AS is best treated with…', options: ['Nitrate', 'Phenylephrine', 'Isoprenaline', 'Ephedrine boluses'], answer: 1, why: 'Pressure without tachycardia.' },
         { q: 'Complete heart block after TAVI with a broad escape: atropine…', options: ['Is curative', 'Is usually ineffective — the block is infranodal', 'Is contraindicated in all bradycardia', 'Should be given every 5 minutes until it works'], answer: 1, why: 'Pace.' },
+        { q: 'Transcutaneous pacing is confirmed by…', options: ['A spike on the monitor', 'A broad complex after each spike', 'A femoral pulse matching the pacing rate', 'The patient’s chest muscle twitching'], answer: 2, why: 'Mechanical capture is the only proof of perfusion.' },
+        { q: 'A gradient rising from 7 to 21 mmHg one year after TAVI, with leaflet thickening on CT:', options: ['Valve-in-valve now', 'Anticoagulate and re-image', 'Ignore', 'Endocarditis — start antibiotics'], answer: 1, why: 'Leaflet thrombosis is reversible.' },
       ]} />
 
       <div className="cs-card" style={{ borderColor: 'var(--accent2)' }}>
@@ -725,11 +1112,13 @@ function Debrief() {
         <ol className="cs-ul">
           <li className="cs-li">Exertional syncope with an ejection murmur is severe aortic stenosis until proven otherwise. Admit.</li>
           <li className="cs-li">Severity is in the timing, the A2 and the pulse — not the loudness.</li>
-          <li className="cs-li">The gradient depends on flow. Low gradient + small valve: ask about the flow.</li>
+          <li className="cs-li">Measure the highest velocity from every window; the LVOT diameter is squared, so trust the dimensionless index.</li>
+          <li className="cs-li">The gradient depends on flow. Low gradient + small valve: ask about the flow — dobutamine for a weak LV, calcium score for a small one.</li>
           <li className="cs-li">Fixed output means vasodilators, spinals and tachycardia are dangerous. Treat hypotension with an alpha-agonist.</li>
-          <li className="cs-li">Symptomatic severe AS needs a new valve; older patients with good femoral access usually get TAVI.</li>
-          <li className="cs-li">Read the CT for the membranous septum. Aim high; rapid pace to deploy.</li>
-          <li className="cs-li">New LBBB after TAVI: monitor beyond 48 hours. Infranodal block: atropine fails — pace.</li>
+          <li className="cs-li">Symptomatic severe AS needs a new valve; choose it with the next one in mind.</li>
+          <li className="cs-li">Read the CT: annulus, coronary heights, the route — and the membranous septum. Aim high; rapid pace to deploy.</li>
+          <li className="cs-li">New LBBB after TAVI that lengthens is the warning shot. Infranodal block: atropine fails — pace, and prove capture with a pulse.</li>
+          <li className="cs-li">A rising gradient after TAVI is thrombus until proven otherwise.</li>
         </ol>
       </div>
       <Video id="GGiQIoZMQ_k" title="Aortic stenosis — murmur sound and animation" />
@@ -781,47 +1170,47 @@ export const VALVE_01 = {
     crisis: 's9',
     cards: [
       { k: 'The patient', t: 'Mr Elias Mansour, 79 — exertional syncope, angina and breathlessness; a harsh murmur “probably sclerosis”.' },
-      { k: 'Your role', t: 'From the emergency department to the heart team, the hybrid lab and the night shift on the unit.' },
-      { k: 'In your hands', t: 'Synthesised heart sounds with manoeuvres, CW and PW Doppler, LV/Ao pressures, a TAVI deployment on rapid pacing, ECGs.' },
+      { k: 'Your role', t: 'From the emergency department to the heart team, the hybrid lab and the night shift on the unit — and a year later.' },
+      { k: 'In your hands', t: 'Heart sounds and manoeuvres, Doppler, dobutamine echo, CT sizing, LV/Ao pressures, TAVI on rapid pacing, serial ECGs, transcutaneous pacing.' },
       { k: 'How it teaches', t: 'Every symptom is one mechanism — a fixed output. Every treatment is a cut in a loop.' },
     ],
   },
   stages: [
     { id: 's1', icon: '🚑', nav: 'Presentation & Triage', title: 'Clinical presentation & triage', Component: Presentation,
       pill: '🫥 The faint on the garden path',
-      lede: 'Listen, feel the pulse, read the ECG — and decide whether he goes home.',
+      lede: 'Listen, feel the pulse, read the ECG and the bloods — and decide whether he goes home.',
       enter: ({ setVitals, atLeastClock }) => { setVitals({ hr: 72, sys: 118, dia: 80, spo2: 95, st: -1, rhythm: 'sinus' }); atLeastClock(min(10, 20)); } },
     { id: 's2', icon: '📏', nav: 'Echo & Doppler', title: 'Measuring it — echo & Doppler', Component: Echo,
       pill: '🔊 Measure the velocity yourself',
-      lede: 'CW Doppler, the outflow tract, the continuity equation — and the flow behind the gradient.',
+      lede: 'CW and PW Doppler, the continuity equation, discordant grading and a dobutamine stress echo.',
       enter: ({ setVitals, atLeastClock }) => { setVitals({ hr: 70, sys: 122, dia: 80 }); atLeastClock(min(13, 0)); } },
     { id: 's3', icon: '👥', nav: 'Heart Team', title: 'The heart team decision', Component: HeartTeam,
       pill: '🧭 Day 3 — whether, and how',
-      lede: 'Treat or watch, TAVI or surgery, and what must come first.',
+      lede: 'Treat or watch, TAVI or surgery, the conversation — and the valve after this one.',
       enter: ({ atLeastClock }) => atLeastClock(min(62, 0)) },
     { id: 's4', icon: '🧮', nav: 'CT Planning', title: 'CT planning', Component: Planning,
       pill: '📐 Size it, route it, read the septum',
-      lede: 'Annulus, coronary heights, the femoral route — and the membranous septum.',
+      lede: 'Annulus sizing, coronary heights, the femoral route — and the membranous septum.',
       enter: ({ atLeastClock }) => atLeastClock(min(63, 0)) },
     { id: 's5', icon: '🩸', nav: 'Access & Setup', title: 'Access & set-up in the hybrid lab', Component: Setup,
       pill: '🧷 Day 5 — pre-close before you open',
-      lede: 'Sedation, access, pacing, the stiff wire — and the gradient measured directly.',
+      lede: 'Checklist, sedation, access, a pacing test, the stiff wire — and the gradient measured directly.',
       enter: ({ setVitals, atLeastClock }) => { setVitals({ hr: 74, sys: 124, dia: 78 }); atLeastClock(min(104, 30)); } },
     { id: 's6', icon: '🎬', nav: 'Choose Your Path', title: 'Strategy & decision point', Component: Strategy,
       pill: '🎯 Where the frame will sit',
-      lede: 'Predilate or not; the implant target; why the heart must stop beating for a moment.',
+      lede: 'Predilate or not; the implant target; embolic protection; why the heart must stop for a moment.',
       enter: ({ atLeastClock }) => atLeastClock(min(105, 0)) },
     { id: 's7', icon: '⚡', nav: 'Valve Deployment', title: 'Valve deployment on rapid pacing', Component: Deploy,
       pill: '⏱ Ten seconds at 180 bpm',
-      lede: 'Position, pace, inflate — then judge the result.',
+      lede: 'Aortogram, position, pace, inflate — then judge the result by pressure and echo.',
       enter: ({ setVitals, atLeastClock }) => { setVitals({ hr: 74, sys: 122, dia: 70 }); atLeastClock(min(105, 20)); } },
     { id: 's8', icon: '🛏️', nav: 'Back on the Unit', title: 'Back on the unit', Component: Recovery,
       pill: '📟 A warning shot on the ECG',
-      lede: 'Bed 1: breathing easier — and a new bundle branch block.',
+      lede: 'Bed 1: breathing easier — serial ECGs, day-1 bloods, and a bundle branch block that keeps growing.',
       enter: ({ setVitals, atLeastClock }) => { setVitals({ hr: 76, sys: 132, dia: 70, rhythm: 'sinus' }); atLeastClock(min(112, 30)); } },
     { id: 's9', icon: '🚨', nav: 'Night Crisis', title: 'Night two: complete heart block', Component: HeartBlock,
       pill: '🌙 03:10 — the beat falls away',
-      lede: 'Name the rhythm, find the level, pace.',
+      lede: 'Name the rhythm, find the level, pace — and prove it with a pulse.',
       enter: ({ setVitals, atLeastClock }) => { setVitals({ hr: 34, sys: 78, dia: 46, rhythm: 'chb' }); atLeastClock(min(147, 10)); } },
     { id: 'cyc', icon: '🧠', nav: 'The Vicious Cycle', title: 'The vicious cycle', Component: Cycles,
       pill: '🔁 The why behind the why',
@@ -829,10 +1218,10 @@ export const VALVE_01 = {
       enter: ({ setVitals }) => setVitals({ hr: 70, sys: 124, dia: 68, rhythm: 'paced' }) },
     { id: 'mm', icon: '💀', nav: 'M&M War Stories', title: 'Morbidity & mortality: war stories', Component: WarStories,
       pill: '⚰️ Every rule was paid for',
-      lede: 'Five patients who taught these rules the hard way.' },
-    { id: 's10', icon: '🏁', nav: 'Debrief & Assessment', title: 'Discharge, debrief & assessment', Component: Debrief,
-      pill: '🎓 Score & take-home',
-      lede: 'Antithrombotics, follow-up and prevention — then your score.',
+      lede: 'Seven patients who taught these rules the hard way.' },
+    { id: 's10', icon: '🏁', nav: 'Debrief & Assessment', title: 'Discharge, follow-up & assessment', Component: Debrief,
+      pill: '🎓 A year later — score & take-home',
+      lede: 'Antithrombotics, follow-up, a rising gradient — then your score.',
       enter: ({ setVitals }) => setVitals({ hr: 70, sys: 128, dia: 70, rhythm: 'paced' }) },
   ],
 };
