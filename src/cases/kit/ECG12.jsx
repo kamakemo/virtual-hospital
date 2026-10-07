@@ -62,6 +62,12 @@ function qrst(x, lead, sh, st, tInv, wide) {
 function voltage(sec, lead, o) {
   const sh = { ...SHAPE[lead], ...(o.shape[lead] || {}) };
   const rr = 60 / o.rate;
+  if (o.rhythm === 'af') {
+    // irregularly irregular: the last QRS onset before this moment, on a fibrillating baseline
+    let k = 0; while (k + 1 < o.onsets.length && o.onsets[k + 1] <= sec) k++;
+    const f = 0.35 * Math.sin(sec * 2 * Math.PI * 5.7) + 0.25 * Math.sin(sec * 2 * Math.PI * 8.3 + 1) * (lead === 'V1' || lead === 'II' || lead === 'III' || lead === 'aVF' ? 1.4 : 0.6);
+    return f + qrst(sec - o.onsets[k], lead, sh, o.st[lead] || 0, !!o.tInv[lead], o.wide);
+  }
   if (o.rhythm === 'chb') {
     const pp = 60 / o.atrialRate;
     return pWave(sec % pp, sh) + qrst((sec + 0.3) % rr - 0.3 + 0.0, lead, sh, 0, false, true);
@@ -90,6 +96,11 @@ export default function ECG12({ rate = 96, st = {}, tInv = {}, caption, height =
       for (let y = 0; y <= h; y += mm) { g.strokeStyle = (Math.round(y / mm) % 5 === 0) ? 'rgba(220,90,90,0.55)' : 'rgba(240,160,160,0.35)'; g.lineWidth = (Math.round(y / mm) % 5 === 0) ? 0.9 : 0.4; g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
 
       const opts = { rate, st, tInv, shape, rhythm, atrialRate, pr, wide: lbbb || rhythm === 'paced' };
+      if (rhythm === 'af') {        // a fixed, seeded sequence of irregular R–R intervals averaging the given rate
+        let seed = 7, t0 = 0.05; opts.onsets = [];
+        const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+        while (t0 < 11) { opts.onsets.push(t0); t0 += (60 / rate) * (0.55 + rnd() * 0.9); }
+      }
       const rowH = h / 4;
       g.strokeStyle = '#1B1B1B'; g.lineWidth = 1.25; g.lineJoin = 'round';
       const trace = (lead, x0, x1, yc) => {

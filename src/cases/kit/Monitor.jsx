@@ -77,6 +77,7 @@ export default function Monitor({ vitals }) {
     const ecg = rhythm === 'chb'
       ? (ph, t0) => { const pa = (t0 * 1.35) % 1; return (pa < 0.11 ? Math.sin(pa / 0.11 * Math.PI) * 0.12 : 0) + wideBeat(ph % 1); }
       : rhythm === 'paced' ? ph => { const x = ph % 1; return (x > 0.06 && x < 0.07 ? 1.3 : 0) + wideBeat(x); }
+      : rhythm === 'af' ? (ph, t0) => { const x = ph % 1; return (x < 0.12 ? 0 : ecgBeat(x, L.st)) + 0.05 * Math.sin(t0 * 37) + 0.035 * Math.sin(t0 * 53 + 1); }
       : ph => ecgBeat(ph % 1, L.st);
     g.fillStyle = '#03070B'; g.fillRect(0, 0, w, h);
     const traceW = w - 86;
@@ -95,7 +96,9 @@ export default function Monitor({ vitals }) {
         if (Math.abs(x - sweep) < 7) { pen = false; continue; }
         const age = x <= sweep ? sweep - x : sweep + traceW - x;
         if (t - age / 60 < 0) { pen = false; continue; }     // nothing recorded before the monitor was connected
-        const ph = (t - age / 60) * r.rate;
+        const T0 = t - age / 60;
+        // AF: the beats arrive irregularly — warp time for every trace so pulse and ECG stay together
+        const ph = T0 * r.rate + (rhythm === 'af' ? 0.45 * Math.sin(T0 * 1.7) + 0.3 * Math.sin(T0 * 2.9 + 1) : 0);
         let v = r.ecg ? r.fn(ph, t - age / 60) : r.fn(ph);
         if (r.label === 'ART') v = v * (L.sys - L.dia) / 80;          // pulse pressure scales the wave
         const y = r.y - v * r.amp;
