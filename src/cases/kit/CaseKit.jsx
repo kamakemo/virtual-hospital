@@ -626,15 +626,17 @@ export function Figure({ src, alt, caption, credit, href }) {
 }
 
 /** YouTube, loaded only when asked for, always with a direct link. */
-export function Video({ id, title, channel }) {
+export function Video({ id, title, channel, list }) {
   const [on, setOn] = useState(false);
-  const url = `https://www.youtube.com/watch?v=${id}`;
+  // a single video, a video inside a playlist, or a whole playlist
+  const url = id ? `https://www.youtube.com/watch?v=${id}${list ? `&list=${list}` : ''}` : `https://www.youtube.com/playlist?list=${list}`;
+  const src = id ? `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0${list ? `&list=${list}` : ''}` : `https://www.youtube-nocookie.com/embed/videoseries?list=${list}&autoplay=1&rel=0`;
   return (
     <div className="cs-video">
       <div className="cs-video-frame">
         {on ? (
           <iframe
-            src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`}
+            src={src}
             title={title}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
@@ -650,9 +652,28 @@ export function Video({ id, title, channel }) {
       </div>
       <div className="cs-video-meta">
         <span>{channel || 'YouTube'}</span>
-        <a href={url} target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a>
+        <a href={url} target="_blank" rel="noopener noreferrer">{list && !id ? 'Open the playlist ↗' : 'Watch on YouTube ↗'}</a>
       </div>
     </div>
+  );
+}
+
+/**
+ * A shelf of recommended case channels: a playable playlist plus links out.
+ * channels: [{ name, url, note }]
+ */
+export function CaseLibrary({ title = 'Structural & valvular case library', playlist, start, channels = [], children }) {
+  return (
+    <section className="cs-card">
+      <div className="cs-h2" style={{ marginTop: 0 }}>📚 {title}</div>
+      {children && <p className="cs-p">{children}</p>}
+      {playlist && <Video id={start} list={playlist} title="Structural & valvular heart cases — playlist" channel="Recommended playlist" />}
+      <div className="cs-row" style={{ marginTop: 10 }}>
+        {channels.map(c => (
+          <a key={c.url} className="cs-btn" href={c.url} target="_blank" rel="noopener noreferrer" title={c.note || c.name}>▶ {c.name} ↗</a>
+        ))}
+      </div>
+    </section>
   );
 }
 

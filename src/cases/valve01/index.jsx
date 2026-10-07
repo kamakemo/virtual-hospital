@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import {
   CaseShell, useCase, Note, Decision, MultiSelect, Sequence, Figure, Video, Quiz,
-  Why, Contrast, WarStory, ViciousCycle, BedsideMonitor,
+  Why, Contrast, WarStory, ViciousCycle, BedsideMonitor, CaseLibrary,
 } from '../kit/CaseKit.jsx';
+import { VALVE_PLAYLIST, VALVE_PLAYLIST_START, VALVE_CHANNELS } from '../valveMedia.js';
 import ECG12 from '../kit/ECG12.jsx';
 import { Auscultation, Doppler, Hemodynamics, TaviDeploy, Pacer } from '../kit/Valve.jsx';
 
@@ -554,6 +555,8 @@ function Planning() {
             why: 'Low ostium + narrow sinus + bulky leaflet = the native leaflet is pushed straight over the coronary. It presents as sudden hypotension and ST change seconds after deployment.' },
           { id: 'none', label: 'No issue — TAVI does not affect the coronaries', verdict: 'wrong', points: 0, why: 'Coronary obstruction is rare, often fatal, and predictable on CT.' },
         ]} />
+      <Video id="ezVzR3Bj63A" title="TAVI case with emergency bailout left-main intervention (SCAI 2025)" channel="Gulf Intervention Society" />
+      <p className="cs-pts">Watch for the moment the pressure falls after deployment — and how the left main is rescued. Then ask: what on the planning CT predicted it?</p>
       <Decision id="s4-access" question="Access route for him?"
         options={[
           { id: 'rcf', label: 'Right common femoral artery, ultrasound-guided, with pre-closure sutures', verdict: 'best', points: 10, why: 'Adequate size, little calcium, no tortuosity. Plan closure before you open.' },
@@ -731,6 +734,25 @@ function Deploy() {
               { id: 'post', label: 'Post-dilate to abolish the trace leak', verdict: 'wrong', points: 2, why: 'Extra expansion in a calcified LVOT for a benign finding: annular rupture risk, and more pressure on the conduction system.' },
               { id: 'second', label: 'A second valve inside the first', verdict: 'wrong', points: 0, why: 'For a malpositioned valve or severe leak only.' },
             ]} />
+          <Contrast title="hypotension in the minutes after deployment — three causes, three opposite treatments"
+            is={{ h: 'Suicide LV — dynamic LVOT obstruction', points: [
+              'A small, thick, hyperdynamic LV suddenly freed of its afterload.',
+              'The septum and mitral leaflet meet in systole: a NEW gradient below the valve, often with systolic anterior motion.',
+              'Treat like HOCM: stop inotropes, give fluid, phenylephrine, a short-acting beta-blocker (esmolol).',
+            ] }}
+            isnt={{ h: 'Coronary obstruction or annular rupture', points: [
+              'Obstruction: new wall-motion abnormality and ST change — wire and stent the coronary.',
+              'Rupture: a new pericardial effusion — drain, reverse, call the surgeon.',
+              'Inotropes may help these — and kill the suicide LV. The echo decides.',
+            ] }} />
+          <Decision id="s7-suicide" question="A different patient: small LV, septum 17 mm. Two minutes after a TAVI the pressure falls to 70/40. Echo: no effusion, normal wall motion, a hyperdynamic cavity and a new 80 mmHg gradient below the valve. The anaesthetist starts dobutamine. You…"
+            options={[
+              { id: 'stop', label: 'Stop the dobutamine; fluid bolus, phenylephrine and esmolol — this is suicide LV', verdict: 'best', points: 10,
+                why: 'Inotropes make the LV squeeze harder and emptier, closing the outflow tract further. Fill it, raise the afterload a little, slow it down: the walls move apart and the gradient falls.' },
+              { id: 'more', label: 'Increase the dobutamine — the heart is failing', verdict: 'wrong', points: 0, why: 'The heart is not failing; it is obstructing itself. More inotrope, more obstruction.' },
+              { id: 'pci', label: 'Coronary angiography for obstruction', verdict: 'wrong', points: 2, why: 'Normal wall motion and a subvalvular gradient point elsewhere.' },
+            ]} />
+          <Video id="StIv-KTbt2M" title="Suicidal LV post-TAVI — case presentation (Dr Abdulrahman Alqahtani)" channel="Gulf Intervention Society" />
           <Decision id="s7-close" question="Closing up. The temporary pacing wire?"
             options={[
               { id: 'keep', label: 'Check the rhythm before removing it: if new LBBB or a longer PR appears, keep the wire in for 24 hours', verdict: 'best', points: 6,
@@ -1122,6 +1144,9 @@ function Debrief() {
         </ol>
       </div>
       <Video id="GGiQIoZMQ_k" title="Aortic stenosis — murmur sound and animation" />
+      <CaseLibrary playlist={VALVE_PLAYLIST} start={VALVE_PLAYLIST_START} channels={VALVE_CHANNELS}>
+        Real structural and valvular cases from interventional teams — TAVI, its complications and their bailouts. Watch them after this case and spot the mechanisms you have just learned.
+      </CaseLibrary>
     </>
   );
 }

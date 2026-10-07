@@ -1,8 +1,9 @@
 import React from 'react';
 import {
   CaseShell, useCase, Note, Decision, MultiSelect, Sequence, Figure, Video, Quiz,
-  Why, Contrast, WarStory, ViciousCycle, BedsideMonitor,
+  Why, Contrast, WarStory, ViciousCycle, BedsideMonitor, CaseLibrary,
 } from '../kit/CaseKit.jsx';
+import { VALVE_PLAYLIST, VALVE_PLAYLIST_START, VALVE_CHANNELS } from '../valveMedia.js';
 import ECG12 from '../kit/ECG12.jsx';
 import { Auscultation, ColorMR, PulmonaryVein, LAPressure, TransseptalPuncture, ClipGrasp } from '../kit/Valve.jsx';
 
@@ -461,6 +462,9 @@ function Deploy() {
         <Video id="ihEM97ApCqE" title="MitraClip transcatheter mitral valve repair — procedure animation" />
         <Video id="XiBNAEpbL8U" title="MitraClip G4 TEER teaching case: step by step" />
       </div>
+      <CaseLibrary title="Watch real cases" playlist={VALVE_PLAYLIST} start={VALVE_PLAYLIST_START} channels={VALVE_CHANNELS}>
+        Structural and valvular cases from interventional teams. As you watch, look for the moments you just practised: the septal tent, the clip coming down, the grasp, the gradient check.
+      </CaseLibrary>
     </>
   );
 }
@@ -744,6 +748,9 @@ function Debrief() {
         </ol>
       </div>
       <Video id="AJLrK8PUtzI" title="Mitral regurgitation murmur — causes, pathophysiology and signs" />
+      <CaseLibrary playlist={VALVE_PLAYLIST} start={VALVE_PLAYLIST_START} channels={VALVE_CHANNELS}>
+        Keep going: more structural and valvular cases from the same teams.
+      </CaseLibrary>
     </>
   );
 }
