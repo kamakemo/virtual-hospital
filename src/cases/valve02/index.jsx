@@ -3,7 +3,7 @@ import {
   CaseShell, useCase, Note, Decision, MultiSelect, Sequence, Figure, Video, Quiz,
   Why, Contrast, WarStory, ViciousCycle, BedsideMonitor, CaseLibrary,
 } from '../kit/CaseKit.jsx';
-import { VALVE_PLAYLIST, VALVE_PLAYLIST_START, VALVE_CHANNELS } from '../valveMedia.js';
+import { VALVE_PLAYLIST, VALVE_PLAYLIST_START, VALVE_CHANNELS, MITRACLIP_SEARCHES, TRANSSEPTAL_SEARCHES } from '../valveMedia.js';
 import ECG12 from '../kit/ECG12.jsx';
 import { Auscultation, ColorMR, PulmonaryVein, LAPressure, TransseptalPuncture, ClipGrasp } from '../kit/Valve.jsx';
 
@@ -350,7 +350,14 @@ function Planning() {
           { id: 'nt', label: 'The standard short-arm clip (NT size)', verdict: 'ok', points: 4, why: 'Fine for prolapse with short leaflets; a flail gap favours longer arms.' },
           { id: 'two', label: 'Plan two clips from the start', verdict: 'wrong', points: 1, why: 'Decide after the first — every clip raises the gradient.' },
         ]} />
-      <Video id="OOarHfU8JiA" title="How to guide a transseptal puncture with echocardiography" />
+      <div className="cs-media-row">
+        <Video id="OOarHfU8JiA" title="How to guide a transseptal puncture with echocardiography" />
+        <Video id="qsz3M3bPbcI" title="Advanced course on transseptal puncture (Maisano & Denti)" />
+      </div>
+      <Video id="vtdHSsKptW8" title="Complex transseptal puncture — Gagan Singh, MD" />
+      <CaseLibrary title="Transseptal punctures in real cases" channels={TRANSSEPTAL_SEARCHES}>
+        Watch the tent in the bicaval and short-axis views, and the height in the four-chamber view, before every puncture.
+      </CaseLibrary>
     </>
   );
 }
@@ -462,6 +469,13 @@ function Deploy() {
         <Video id="ihEM97ApCqE" title="MitraClip transcatheter mitral valve repair — procedure animation" />
         <Video id="XiBNAEpbL8U" title="MitraClip G4 TEER teaching case: step by step" />
       </div>
+      <div className="cs-media-row">
+        <Video id="-uec3exRV7M" title="MitraClip G4 live case" />
+        <Video id="bCLPUiXnJFs" title="MitraClip live case in a box" />
+      </div>
+      <CaseLibrary title="MitraClip in real cases" channels={MITRACLIP_SEARCHES}>
+        Watch for the alignment in the 3D view, the arms opening below the leaflets, the grasp, and the gradient check before release.
+      </CaseLibrary>
       <CaseLibrary title="Watch real cases" playlist={VALVE_PLAYLIST} start={VALVE_PLAYLIST_START} channels={VALVE_CHANNELS}>
         Structural and valvular cases from interventional teams. As you watch, look for the moments you just practised: the septal tent, the clip coming down, the grasp, the gradient check.
       </CaseLibrary>
@@ -564,6 +578,8 @@ function Detachment() {
       <Contrast title="single-leaflet detachment vs iatrogenic mitral stenosis"
         is={{ h: 'SLDA', points: ['A sudden return of severe MR, often in the first days.', 'A new loud murmur, pulmonary oedema, giant v-waves.', 'Fix: recapture with a second clip, or replace.'] }}
         isnt={{ h: 'Iatrogenic stenosis', points: ['Gradually rising breathlessness after one clip too many.', 'Mean gradient > 5 mmHg, high mean LA pressure without big v-waves.', 'Prevented, not fixed: stop at a good result.'] }} />
+      <Video id="4jwSyhf4UFI" title="Percutaneous removal of an embolised MitraClip" />
+      <p className="cs-pts">The rarer, worse cousin of single-leaflet detachment: a clip that lets go of both leaflets and embolises.</p>
       <Why title="Why a pure vasoconstrictor makes her worse"
         chain={[
           { k: 'TWO EXITS', t: 'With the clip off, the LV again has a wide-open back door.' },
