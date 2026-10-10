@@ -1,3 +1,4 @@
+import { CASE_HEADERS } from '../cases/registry.js';
 /* ============================================================
    THE HOSPITAL
    One building, two wings, fourteen floors each. Every floor is
@@ -95,6 +96,15 @@ function assignBeds(list = []) {
   return beds;
 }
 
+/** A written case may name its bed's header in its own meta.js; that wins. */
+function withCaseHeaders(unitId, beds) {
+  for (const [key, header] of Object.entries(CASE_HEADERS)) {
+    const [unit, n] = key.split(':');
+    if (unit === unitId && +n >= 1 && +n <= BEDS_PER_FLOOR) beds[+n - 1] = header;
+  }
+  return beds;
+}
+
 function wing(id, name, short, tab, side, rows) {
   return {
     id, name, short, tab, side,
@@ -105,7 +115,7 @@ function wing(id, name, short, tab, side, rows) {
       kind,
       hue,
       wingId: id,
-      beds: assignBeds(HEADERS[unitId]),
+      beds: withCaseHeaders(unitId, assignBeds(HEADERS[unitId])),
     })),
   };
 }
