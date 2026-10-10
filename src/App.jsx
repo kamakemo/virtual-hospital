@@ -44,6 +44,7 @@ export default function App() {
   const world = useRef(null);
 
   const [ready, setReady] = useState(false);
+  const [intro, setIntro] = useState(false);
   const [labView, setLabView] = useState('overview');
   const [failed, setFailed] = useState('');
   const [view, setView] = useState({ level: 'building' });
@@ -193,6 +194,7 @@ export default function App() {
         wings: WINGS,
         on: {
           ready: () => setTimeout(() => setReady(true), 250),
+          intro: v => setIntro(v),
           hover: h => setHover(h),
           selectFloor: (a, b) => handlers.current.selectFloor(a, b),
           selectBed: i => handlers.current.selectBed(i),
@@ -349,7 +351,8 @@ export default function App() {
         </div>
       )}
 
-      {hint && <p className="hint">{hint}</p>}
+      {intro && ready && <button type="button" className="skip-intro" onClick={() => world.current?.skipIntro?.()}>Skip intro ⏭</button>}
+      {hint && !intro && <p className="hint">{hint}</p>}
       {view.level === 'bed' && !hint && (
         <p className="credit">
           Head scan: Lee Perry-Smith, <a href="https://ir-ltd.net/" target="_blank" rel="noopener noreferrer">Infinite-Realities</a>, <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">CC BY 3.0</a>

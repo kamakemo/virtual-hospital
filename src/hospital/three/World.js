@@ -53,7 +53,7 @@ export class World {
     this.exterior = buildExterior(wings);
     this.outside = new THREE.Scene();
     this.outside.add(this.exterior.group, this.exterior.sky);
-    this.outside.fog = new THREE.Fog('#DCE7EE', 320, 1100);
+    this.outside.fog = new THREE.Fog('#E8DCC8', 220, 950);   // warm afternoon haze; the city fades into it
     if (this.coarse) this.exterior.shadowLight.shadow.mapSize.set(1024, 1024);
 
     const pmrem = new THREE.PMREMGenerator(r);
@@ -104,16 +104,9 @@ export class World {
     this.resizeObserver.observe(canvas.parentElement);
     this.resize();
 
-    // arrive: a slow dolly in from further out
-    const home = this.exterior.home;
-    this.camera.position.copy(home.pos).sub(home.target).multiplyScalar(1.45).add(home.target).add(new THREE.Vector3(0, 30, 0));
-    this.look.copy(home.target);
-    this.camera.lookAt(this.look);
+    // arrive: a drone shot — in high over the city, round the far side, down to the forecourt
     this.controls.enabled = false;
-    this.tweenCamera(home.pos, home.target, 2600, 0).then(() => {
-      this.controls.enabled = this.mode === 'building';
-      this.controls.target.copy(home.target);
-    });
+    this.playIntro();
 
     this.loop = this.loop.bind(this);
     this.raf = requestAnimationFrame(this.loop);
@@ -165,6 +158,44 @@ export class World {
         if (t >= 1) { resolve(); return true; }
         return false;
       });
+    });
+  }
+
+  /** The opening fly-in. Any click, key or wheel skips it. */
+  playIntro() {
+    const home = this.exterior.home;
+    const path = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-230, 150, 260), new THREE.Vector3(-170, 95, 120), new THREE.Vector3(-60, 70, 165),
+      new THREE.Vector3(30, 48, 175), home.pos.clone(),
+    ]);
+    const look = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, 60, 0), new THREE.Vector3(0, 45, 0), new THREE.Vector3(0, 36, 0), home.target.clone(),
+    ]);
+    const ms = this.coarse ? 6000 : 7500;
+    let start = null, frames = 0;     // the clock starts once frames are flowing, not while shaders compile
+    this.intro = true;
+    this.on.intro?.(true);
+    const finish = () => {
+      if (!this.intro) return;
+      this.intro = false;
+      this.tweens.length = 0;
+      this.camera.position.copy(home.pos);
+      this.look.copy(home.target);
+      this.controls.target.copy(home.target);
+      this.controls.enabled = this.mode === 'building';
+      ['pointerdown', 'keydown', 'wheel'].forEach(ev => window.removeEventListener(ev, this.skipIntro));
+      this.on.intro?.(false);
+    };
+    this.skipIntro = finish;
+    ['pointerdown', 'keydown', 'wheel'].forEach(ev => window.addEventListener(ev, finish, { once: true }));
+    this.camera.position.copy(path.getPoint(0)); this.look.copy(look.getPoint(0)); this.camera.lookAt(this.look);
+    this.tweens.push(now => {
+      if (start === null) { if (++frames < 4) return false; start = now; }
+      const t = clamp((now - start) / ms, 0, 1), e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      this.camera.position.copy(path.getPoint(e));
+      this.look.copy(look.getPoint(e));
+      if (t >= 1) { finish(); return true; }
+      return false;
     });
   }
 

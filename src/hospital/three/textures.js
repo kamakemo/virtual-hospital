@@ -561,3 +561,61 @@ export function lettering(text, color = '#1D4FA8', w = 2048, h = 256) {
     g.fillText(text, w / 2, h / 2 + 8);
   }, { mips: true });
 }
+
+/** Spandrel cladding: large-format panels with shadowed joints and faint weathering. */
+export const facadePanel = () => cached('fpanel', () => make(512, 128, (g, w, h) => {
+  const r = rng(131);
+  g.fillStyle = '#ECE5D4'; g.fillRect(0, 0, w, h);
+  const cols = 4;
+  for (let i = 0; i < cols; i++) {
+    const v = 232 + Math.floor(r() * 12);
+    g.fillStyle = `rgb(${v},${v - 6},${v - 20})`;
+    g.fillRect(i * w / cols + 2, 2, w / cols - 4, h - 4);
+    const st = g.createLinearGradient(0, h * 0.55, 0, h);       // rain streaks under the sill
+    st.addColorStop(0, 'rgba(120,110,95,0)'); st.addColorStop(1, `rgba(120,110,95,${0.08 + r() * 0.08})`);
+    g.fillStyle = st; g.fillRect(i * w / cols + 2, h * 0.55, w / cols - 4, h * 0.45 - 2);
+  }
+  g.fillStyle = 'rgba(90,82,70,0.55)';
+  for (let i = 0; i <= cols; i++) g.fillRect(i * w / cols - 1.5, 0, 3, h);
+  g.fillRect(0, 0, w, 2); g.fillRect(0, h - 2, w, 2);
+}));
+
+/** The lobby behind the ground-floor glass: warm light, ceiling panels, a desk, people. */
+export const lobbyGlass = () => cached('lobby', () => make(1024, 256, (g, w, h) => {
+  const r = rng(141);
+  const bg = g.createLinearGradient(0, 0, 0, h);
+  bg.addColorStop(0, '#E9D9BA'); bg.addColorStop(0.55, '#CDB892'); bg.addColorStop(1, '#8E7E66');
+  g.fillStyle = bg; g.fillRect(0, 0, w, h);
+  g.fillStyle = 'rgba(255,250,235,0.95)';
+  for (let x = 30; x < w; x += 70) g.fillRect(x, 18, 40, 7);                     // ceiling lights
+  g.fillStyle = '#F4F1EA'; g.fillRect(w * 0.38, h * 0.55, w * 0.24, h * 0.2);   // reception desk
+  g.fillStyle = '#2F6C9E'; g.fillRect(w * 0.42, h * 0.36, w * 0.16, h * 0.08);
+  g.fillStyle = '#FFFFFF'; g.font = '700 18px Archivo, Arial, sans-serif'; g.textAlign = 'center';
+  g.fillText('RECEPTION', w * 0.5, h * 0.42);
+  for (let i = 0; i < 22; i++) {                                                  // people
+    const x = r() * w, s = 0.8 + r() * 0.35, y = h * 0.62 + r() * h * 0.12;
+    g.fillStyle = ['#34495E', '#7A8C9A', '#2E7D6A', '#5B6E8C', '#8C5A4A', '#3C6E9E'][i % 6];
+    g.fillRect(x - 5 * s, y - 34 * s, 10 * s, 30 * s);
+    g.beginPath(); g.arc(x, y - 40 * s, 5 * s, 0, Math.PI * 2); g.fillStyle = '#C9A487'; g.fill();
+  }
+  for (let x = 0; x < w; x += 140) {                                             // reflections and mullions
+    const ref = g.createLinearGradient(x, 0, x + 140, h);
+    ref.addColorStop(0, 'rgba(200,225,245,0.35)'); ref.addColorStop(0.45, 'rgba(200,225,245,0)');
+    g.fillStyle = ref; g.fillRect(x, 0, 140, h);
+    g.fillStyle = '#BFC5C9'; g.fillRect(x - 3, 0, 6, h);
+  }
+  g.fillStyle = '#BFC5C9'; g.fillRect(0, h * 0.3, w, 4);
+}));
+
+/** Distant office and housing blocks: a window grid, some lit. */
+export const cityBlock = (seed = 1) => cached('city' + seed, () => make(256, 512, (g, w, h) => {
+  const r = rng(150 + seed);
+  const tones = ['#B9B6AE', '#A9B3BB', '#C7BFAE', '#9DA7AF', '#D2CBBD'];
+  g.fillStyle = tones[seed % tones.length]; g.fillRect(0, 0, w, h);
+  const cols = 8, rows = 24;
+  for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) {
+    const lit = r() < 0.12;
+    g.fillStyle = lit ? 'rgba(255,236,190,0.85)' : `rgba(${60 + r() * 30},${80 + r() * 30},${100 + r() * 30},0.85)`;
+    g.fillRect(i * w / cols + 5, j * h / rows + 5, w / cols - 10, h / rows - 9);
+  }
+}));
