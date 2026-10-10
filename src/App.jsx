@@ -45,6 +45,16 @@ export default function App() {
 
   const [ready, setReady] = useState(false);
   const [intro, setIntro] = useState(false);
+  // day or night outside: the visitor's choice, else their own clock
+  const [night, setNight] = useState(() => {
+    try { const v = localStorage.getItem('vh-night'); if (v != null) return v === '1'; } catch { /* storage blocked */ }
+    const h = new Date().getHours();
+    return h >= 19 || h < 6;
+  });
+  useEffect(() => {
+    if (ready) world.current?.setNight(night);
+    try { localStorage.setItem('vh-night', night ? '1' : '0'); } catch { /* storage blocked */ }
+  }, [night, ready]);
   const [labView, setLabView] = useState('overview');
   const [failed, setFailed] = useState('');
   const [view, setView] = useState({ level: 'building' });
@@ -351,6 +361,12 @@ export default function App() {
         </div>
       )}
 
+      {view.level === 'building' && ready && (
+        <button type="button" className={'daynight' + (night ? ' is-night' : '')} onClick={() => setNight(n => !n)}
+          aria-pressed={night} aria-label={night ? 'Switch to day' : 'Switch to night'} title={night ? 'Switch to day' : 'Switch to night'}>
+          <span aria-hidden="true">{night ? '☀' : '☾'}</span>{night ? 'Day' : 'Night'}
+        </button>
+      )}
       {intro && ready && <button type="button" className="skip-intro" onClick={() => world.current?.skipIntro?.()}>Skip intro ⏭</button>}
       {hint && !intro && <p className="hint">{hint}</p>}
       {view.level === 'bed' && !hint && (

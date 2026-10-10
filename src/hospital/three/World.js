@@ -58,8 +58,12 @@ export class World {
 
     const pmrem = new THREE.PMREMGenerator(r);
     const skyScene = new THREE.Scene();
-    skyScene.add(this.exterior.sky.clone());
-    this.outside.environment = pmrem.fromScene(skyScene, 0.02).texture;
+    skyScene.add(this.exterior.sky.clone());          // shares the sky's material, so it follows day/night
+    this.dayEnv = pmrem.fromScene(skyScene, 0.02).texture;
+    this.exterior.setNight(true);
+    this.nightEnv = pmrem.fromScene(skyScene, 0.02).texture;
+    this.exterior.setNight(false);
+    this.outside.environment = this.dayEnv;
     this.indoorEnv = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
     pmrem.dispose();
 
@@ -161,6 +165,14 @@ export class World {
     });
   }
 
+  /** Day or night outside the hospital. */
+  setNight(on) {
+    this.exterior.setNight(on);
+    this.outside.environment = on ? this.nightEnv : this.dayEnv;
+    this.outside.fog.color.set(on ? '#1C1E2C' : '#E8DCC8');
+    if (this.mode === 'building') this.renderer.toneMappingExposure = on ? 1.15 : 1.0;
+  }
+
   /** The opening fly-in. Any click, key or wheel skips it. */
   playIntro() {
     const home = this.exterior.home;
@@ -235,7 +247,7 @@ export class World {
   showBuilding() {
     this.clearWard();
     this.mode = 'building';
-    this.renderer.toneMappingExposure = 1.0;
+    this.renderer.toneMappingExposure = this.exterior.night ? 1.15 : 1.0;
     this.camera.near = 0.5;
     this.applyFov();
     const home = this.exterior.home;
@@ -443,7 +455,10 @@ export class World {
     if (this.mode === 'building') {
       for (const f of this.exterior.floors) {
         const hot = this.hover?.type === 'floor' && this.hover.wingId === f.wingId && this.hover.number === f.number;
-        const goal = Math.max(f.glowTarget || 0, hot ? 1 : 0) * 0.55;
+        const lit = Math.max(f.glowTarget || 0, hot ? 1 : 0);
+        // after dark every floor shows its lit rooms; the hovered one glows in its department colour
+        const goal = this.exterior.night ? 1.0 + lit * 0.6 : lit * 0.55;
+        if (this.exterior.night) f.glassMat.emissive.set(lit > 0.5 ? f.hue : '#FFFFFF'); else f.glassMat.emissive.set(f.hue);
         f.glassMat.emissiveIntensity += (goal - f.glassMat.emissiveIntensity) * Math.min(1, dt * 10);
       }
       this.exterior.update(t, dt);

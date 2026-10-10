@@ -64,11 +64,28 @@ function wheelchair() {
 
 /* ---------- vehicles ---------- */
 
+// shared lamp materials: dim by day, blazing by night
+const HEAD = new THREE.MeshStandardMaterial({ color: '#F4F4EE', emissive: '#FFF6DE', emissiveIntensity: 0.15 });
+const TAIL = new THREE.MeshStandardMaterial({ color: '#7A1010', emissive: '#FF2020', emissiveIntensity: 0.1 });
+const BEAM = new THREE.MeshBasicMaterial({ color: '#FFE9B8', transparent: true, opacity: 0.35, depthWrite: false, blending: THREE.AdditiveBlending });
+const BEAM_GEO = (() => { const g = new THREE.PlaneGeometry(9, 4.2); g.rotateX(-Math.PI / 2); g.translate(4.5, 0, 0); return g; })();
+const beams = [];
+function lamps(g, front, back, y, half) {
+  for (const s of [-1, 1]) {
+    g.add(part(box(0.06, 0.18, 0.34), HEAD, front, y, s * half));
+    g.add(part(box(0.06, 0.16, 0.3), TAIL, back, y, s * half));
+  }
+  const beam = new THREE.Mesh(BEAM_GEO, BEAM);
+  beam.position.set(front + 0.2, 0.06, 0); beam.visible = false;
+  g.add(beam); beams.push(beam);
+}
+
 function carModel(color) {
   const c = new THREE.Group();
   c.add(part(rbox(4.4, 0.75, 1.8, 0.25), MAT.paint(color, 0.35), 0, 0.72, 0));
   c.add(part(rbox(2.4, 0.6, 1.62, 0.22), MAT.paint('#2A3640', 0.15), -0.2, 1.32, 0));
   for (const dx of [-1.4, 1.4]) for (const dz of [-0.82, 0.82]) c.add(part(cyl(0.34, 0.34, 0.24, 14), MAT.castor(), dx, 0.34, dz, Math.PI / 2, 0, 0));
+  lamps(c, 2.21, -2.21, 0.82, 0.62);
   c.traverse(o => { if (o.isMesh) o.castShadow = true; });
   return c;
 }
@@ -91,6 +108,7 @@ function ambulanceModel() {
   a.add(part(rbox(0.3, 0.14, 0.4, 0.05), blue, -3.4, 3.08, -0.7));
   a.add(part(rbox(0.3, 0.14, 0.4, 0.05), red, -3.4, 3.08, 0.7));
   for (const dx of [-2.4, 2.6]) for (const dz of [-1.0, 1.0]) a.add(part(cyl(0.4, 0.4, 0.3, 14), MAT.castor(), dx, 0.4, dz, Math.PI / 2, 0, 0));
+  lamps(a, 4.01, -3.61, 0.95, 0.8);
   a.traverse(o => { if (o.isMesh) o.castShadow = true; });
   // a light that washes the ground and the canopy blue while it runs
   const glow = new THREE.PointLight('#5C86FF', 0, 26, 2);
@@ -244,6 +262,11 @@ export function buildLife() {
   return {
     group: root,
     update,
+    setNight(on) {
+      HEAD.emissiveIntensity = on ? 3.2 : 0.15;
+      TAIL.emissiveIntensity = on ? 2.2 : 0.1;
+      for (const b of beams) b.visible = on;
+    },
     dispose() { amb.blue.dispose(); amb.red.dispose(); },
   };
 }

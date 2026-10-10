@@ -619,3 +619,40 @@ export const cityBlock = (seed = 1) => cached('city' + seed, () => make(256, 512
     g.fillRect(i * w / cols + 5, j * h / rows + 5, w / cols - 10, h / rows - 9);
   }
 }));
+
+/** Night: a storey of windows seen from outside — most rooms lit warm, a few dark, the odd screen-blue. */
+export const litWindows = (seed = 1) => cached('lit' + seed, () => make(1024, 128, (g, w, h) => {
+  const r = rng(170 + seed);
+  g.fillStyle = '#000'; g.fillRect(0, 0, w, h);
+  const bays = 16, bw = w / bays;
+  for (let i = 0; i < bays; i++) {
+    const v = r();
+    if (v < 0.18) continue;                                         // dark room
+    const warm = v < 0.9;
+    const k = 0.55 + r() * 0.45;
+    g.fillStyle = warm ? `rgba(255,${200 + r() * 40},${130 + r() * 60},${k})` : `rgba(150,200,255,${k * 0.7})`;
+    g.fillRect(i * bw + 4, h * 0.26, bw - 8, h * 0.7);
+    g.fillStyle = `rgba(255,250,235,${0.5 * k})`;                   // ceiling light line
+    g.fillRect(i * bw + bw * 0.2, h * 0.28, bw * 0.6, 3);
+    if (r() < 0.5) { g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(i * bw + 4, h * 0.26, bw - 8, h * 0.7 * r() * 0.6); }   // a blind half down
+  }
+}));
+
+/** Night: lit windows only, for the distant city blocks. */
+export const cityNight = (seed = 1) => cached('cityN' + seed, () => make(256, 512, (g, w, h) => {
+  const r = rng(190 + seed);
+  g.fillStyle = '#000'; g.fillRect(0, 0, w, h);
+  const cols = 8, rows = 24;
+  for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) {
+    if (r() > 0.42) continue;
+    g.fillStyle = r() < 0.85 ? `rgba(255,${205 + r() * 35},${140 + r() * 50},${0.6 + r() * 0.4})` : 'rgba(160,205,255,0.7)';
+    g.fillRect(i * w / cols + 5, j * h / rows + 5, w / cols - 10, h / rows - 9);
+  }
+}));
+
+/** A soft round pool of light, for lamps and headlights on the ground. */
+export const lightPool = () => cached('pool', () => make(256, 256, (g, w, h) => {
+  const gr = g.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2);
+  gr.addColorStop(0, 'rgba(255,214,150,0.9)'); gr.addColorStop(0.4, 'rgba(255,200,130,0.35)'); gr.addColorStop(1, 'rgba(255,190,120,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, w, h);
+}));

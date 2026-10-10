@@ -128,6 +128,7 @@ export function buildExterior(wings) {
 
   /* ---------- wings ---------- */
   const floorTargets = [];
+  const glowMats = [];      // signs and lettering that burn brighter after dark
   const panelMat = surf(TX.facadePanel(), 8, 1, { roughness: 0.72 });
   const fin = MAT.paint('#4F708C', 0.45);
   for (const wing of wings) {
@@ -160,7 +161,9 @@ export function buildExterior(wings) {
       root.add(hit);
       own.push(hit.material);
 
+      const nightTex = TX.litWindows((fl.number * 5 + (wing.side === 'east' ? 3 : 7)) % 11);
       floorTargets.push({
+        nightTex,
         wingId: wing.id,
         number: fl.number,
         name: fl.name,
@@ -190,6 +193,7 @@ export function buildExterior(wings) {
     const letters = TX.lettering(wing.short.toUpperCase(), '#1D4FA8');
     const lm = new THREE.MeshStandardMaterial({ map: letters, transparent: true, roughness: 0.4, emissive: '#2B5FC7', emissiveMap: letters, emissiveIntensity: 0.35 });
     own.push(letters, lm);
+    glowMats.push([lm, 0.35, 1.6, '#8FB4FF']);
     const l = new THREE.Mesh(new THREE.PlaneGeometry(w * 0.84, w * 0.84 / 8), lm);
     l.position.set(cx, roofY + 0.72, d / 2 + 0.27);
     root.add(l);
@@ -216,6 +220,7 @@ export function buildExterior(wings) {
   const atriumH = PODIUM_H + 0.5 + 14 * STOREY + 3;
   const atriumGlass = new THREE.MeshPhysicalMaterial({ map: TX.curtainWall(), roughness: 0.05, metalness: 0.3, envMapIntensity: 1.5 });
   own.push(atriumGlass);
+  atriumGlass.emissive = new THREE.Color('#FFD9A8'); atriumGlass.emissiveMap = TX.curtainWall(); atriumGlass.emissiveIntensity = 0;
   const atrium = new THREE.Mesh(box(TOWER.gap * 2 - 0.6, atriumH, TOWER.d - 4), atriumGlass);
   atrium.position.set(0, atriumH / 2, -1);
   atrium.castShadow = true; atrium.receiveShadow = true;
@@ -229,6 +234,7 @@ export function buildExterior(wings) {
   const nameTex = TX.lettering(HOSPITAL_NAME.toUpperCase(), '#1D4FA8');
   const nameMat = new THREE.MeshStandardMaterial({ map: nameTex, transparent: true, roughness: 0.4, emissive: '#2B5FC7', emissiveMap: nameTex, emissiveIntensity: 0.45 });
   own.push(nameTex, nameMat);
+  glowMats.push([nameMat, 0.45, 1.8, '#8FB4FF']);
   // sits on the upper podium band, clear of the canopy below it
   const nm = new THREE.Mesh(new THREE.PlaneGeometry(22.4, 2.8), nameMat);
   nm.position.set(0, 7.55, PD / 2 + 0.36);
@@ -286,6 +292,7 @@ export function buildExterior(wings) {
   const erTex = TX.lettering('EMERGENCY', '#D62828', 1536, 256);
   const erMat = new THREE.MeshStandardMaterial({ map: erTex, transparent: true, emissive: '#FF2A2A', emissiveMap: erTex, emissiveIntensity: 1.1, roughness: 0.4 });
   own.push(erTex, erMat);
+  glowMats.push([erMat, 1.1, 2.6]);
   const er = new THREE.Mesh(new THREE.PlaneGeometry(9.4, 1.4), erMat);
   er.position.set(47, 4.9, 1.2);
   root.add(er);
@@ -294,6 +301,7 @@ export function buildExterior(wings) {
     const t = TX.smallSign(text, bg, '#FFFFFF', 512, 160);
     const m = new THREE.MeshStandardMaterial({ map: t, emissive: '#FFFFFF', emissiveMap: t, emissiveIntensity: 0.5, roughness: 0.5 });
     own.push(t, m);
+    glowMats.push([m, 0.5, 1.5]);
     const g = new THREE.Group();
     g.add(part(rbox(3.4, 1.25, 0.3, 0.06), MAT.charcoal(), 0, 2.6, 0));
     g.add(part(plane(3.2, 1.0), m, 0, 2.6, 0.16));
@@ -310,7 +318,12 @@ export function buildExterior(wings) {
 
   /* ---------- the city beyond the grounds, fading into haze ---------- */
   const city = new THREE.Group();
-  const cityMats = [0, 1, 2, 3, 4].map(k => surf(TX.cityBlock(k), 2, 3, { roughness: 0.85 }));
+  const cityMats = [0, 1, 2, 3, 4].map(k => {
+    const m = surf(TX.cityBlock(k), 2, 3, { roughness: 0.85 });
+    const n = TX.cityNight(k).clone(); n.wrapS = n.wrapT = THREE.RepeatWrapping; n.repeat.set(2, 3); n.needsUpdate = true;
+    m.userData.nightMap = n; m.emissive = new THREE.Color('#FFFFFF'); own.push(n);
+    return m;
+  });
   let cs = 11;
   const rnd = () => ((cs = (cs * 16807) % 2147483647) / 2147483647);
   for (let i = 0; i < 70; i++) {
@@ -323,6 +336,28 @@ export function buildExterior(wings) {
   }
   root.add(bake(city, { castShadow: false, receiveShadow: false }));
 
+  /* ---------- after dark: lamp heads, light pools, a few real lights ---------- */
+  const nightGroup = new THREE.Group();
+  nightGroup.visible = false;
+  const lampHead = new THREE.MeshStandardMaterial({ color: '#FFF4DC', emissive: '#FFD9A0', emissiveIntensity: 2.4 });
+  const poolTex = TX.lightPool();
+  const poolMat = new THREE.MeshBasicMaterial({ map: poolTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.85 });
+  own.push(lampHead, poolMat);
+  const pool = (x, z, r, y = 0.08) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(r * 2, r * 2), poolMat); m.rotation.x = -Math.PI / 2; m.position.set(x, y, z); nightGroup.add(m); own.push(m.geometry); };
+  for (const sx of [-1, 1]) for (const z of [26, 38, 50]) {
+    const h = new THREE.Mesh(box(0.9, 0.08, 0.3), lampHead); h.position.set(sx * 12.6, 5.9, z); nightGroup.add(h);
+    pool(sx * 12.2, z, 7);
+  }
+  // under both canopies, and along the road
+  const canopyGlow = new THREE.Mesh(new THREE.PlaneGeometry(24, 8.5), new THREE.MeshBasicMaterial({ color: '#FFE9C4', transparent: true, opacity: 0.85 }));
+  canopyGlow.rotation.x = Math.PI / 2; canopyGlow.position.set(0, 4.54, PD / 2 + 4.6); nightGroup.add(canopyGlow); own.push(canopyGlow.material, canopyGlow.geometry);
+  pool(0, PD / 2 + 5, 13, 0.07); pool(47, -1, 8, 0.09);
+  for (let x = -130; x <= 130; x += 26) pool(x, 70, 9, 0.06);
+  const lamps = [[0, 6, PD / 2 + 5, '#FFE2B8', 70], [-12, 6.2, 38, '#FFD9A0', 45], [12, 6.2, 38, '#FFD9A0', 45], [47, 4.2, -1, '#F2F6FF', 50]].map(([x, y, z, c, i]) => {
+    const l = new THREE.PointLight(c, 0, 34, 2); l.position.set(x, y, z); l.userData.on = i; nightGroup.add(l); return l;
+  });
+  root.add(nightGroup);
+
   /* ---------- people and traffic ---------- */
   const life = buildLife();
   root.add(life.group);
@@ -333,10 +368,11 @@ export function buildExterior(wings) {
     uniforms: {
       top: { value: new THREE.Color('#5C9BD8') }, horizon: { value: new THREE.Color('#F0DFC2') }, ground: { value: new THREE.Color('#B9B49E') },
       sunDir: { value: new THREE.Vector3(150, 105, 140).normalize() }, sunCol: { value: new THREE.Color('#FFD39A') },
+      night: { value: 0 },
     },
     vertexShader: 'varying vec3 vP; void main(){ vP = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
     // a late-afternoon sky: warm haze at the horizon, a sun with its glow, and soft drifting cumulus
-    fragmentShader: `uniform vec3 top; uniform vec3 horizon; uniform vec3 ground; uniform vec3 sunDir; uniform vec3 sunCol; varying vec3 vP;
+    fragmentShader: `uniform vec3 top; uniform vec3 horizon; uniform vec3 ground; uniform vec3 sunDir; uniform vec3 sunCol; uniform float night; varying vec3 vP;
       float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
       float noise(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
         return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y); }
@@ -345,12 +381,18 @@ export function buildExterior(wings) {
         float h = vP.y;
         vec3 c = h > 0.0 ? mix(horizon, top, pow(h, 0.5)) : mix(horizon, ground, pow(-h, 0.4));
         float s = max(dot(vP, sunDir), 0.0);
-        c += sunCol * (pow(s, 6.0) * 0.32 + pow(s, 900.0) * 6.0);
+        c += sunCol * (pow(s, 6.0) * mix(0.32, 0.08, night) + pow(s, mix(900.0, 2500.0, night)) * 6.0);
+        if (night > 0.0 && h > 0.0) {                       // stars, fading toward the city glow at the horizon
+          vec3 q = floor(vP * 420.0);
+          float st = step(0.9975, hash(q.xy + q.z * 1.37));
+          c += vec3(st) * night * smoothstep(0.05, 0.35, h) * (0.5 + hash(q.yz) * 0.8);
+        }
         if (h > 0.0) {
           vec2 uv = vP.xz / (h + 0.15) * 1.4;
           float cl = smoothstep(0.56, 0.86, fbm(uv + vec2(3.0, 1.0)));
           vec3 cloud = mix(vec3(1.0, 0.97, 0.93), vec3(0.86, 0.86, 0.9), smoothstep(0.65, 0.95, fbm(uv * 2.0))) + sunCol * pow(s, 3.0) * 0.3;
-          c = mix(c, cloud, cl * 0.7 * smoothstep(0.0, 0.2, h));
+          cloud *= mix(1.0, 0.16, night);
+          c = mix(c, cloud, cl * mix(0.7, 0.55, night) * smoothstep(0.0, 0.2, h));
         }
         gl_FragColor = vec4(c, 1.0);
       }`,
@@ -377,6 +419,32 @@ export function buildExterior(wings) {
     // a three-quarter view from the forecourt, the whole building in frame
     home: { pos: new THREE.Vector3(58, 22, 150), target: new THREE.Vector3(0, 30, 0) },
     update: life.update,
+    night: false,
+    /** Day ↔ night: the sky, the sun becomes a moon, every lit thing switches on. */
+    setNight(on) {
+      this.night = on;
+      const U = sky.material.uniforms;
+      U.night.value = on ? 1 : 0;
+      U.top.value.set(on ? '#071226' : '#5C9BD8');
+      U.horizon.value.set(on ? '#2C2A44' : '#F0DFC2');
+      U.ground.value.set(on ? '#14171C' : '#B9B49E');
+      U.sunCol.value.set(on ? '#C9D6FF' : '#FFD39A');
+      U.sunDir.value.set(on ? -120 : 150, on ? 160 : 105, on ? -90 : 140).normalize();
+      hemi.color.set(on ? '#3B4D78' : '#CFE0F2'); hemi.groundColor.set(on ? '#1A1C22' : '#7E8B66'); hemi.intensity = on ? 0.55 : 0.78;
+      sun.color.set(on ? '#A9BCFF' : '#FFD9A8'); sun.intensity = on ? 0.75 : 3.1;
+      sun.position.set(on ? -120 : 150, on ? 160 : 105, on ? -90 : 140);
+      for (const f of floorTargets) { f.glassMat.emissiveMap = on ? f.nightTex : null; f.glassMat.needsUpdate = true; }
+      lobbyMat.emissiveIntensity = on ? 1.25 : 0.35;
+      for (const [m, day, nite, col] of glowMats) {
+        m.emissiveIntensity = on ? nite : day;
+        if (col) { m.userData.dayColor ??= m.emissive.getHex(); m.emissive.set(on ? col : m.userData.dayColor); }
+      }
+      atriumGlass.emissiveIntensity = on ? 0.55 : 0;
+      for (const m of cityMats) { m.emissiveMap = on ? m.userData.nightMap : null; m.emissiveIntensity = on ? 1.1 : 0; m.needsUpdate = true; }
+      nightGroup.visible = on;
+      for (const l of lamps) l.intensity = on ? l.userData.on : 0;
+      life.setNight(on);
+    },
     dispose() {
       life.dispose();
       root.traverse(o => { if (o.geometry && !o.geometry.userData?.shared) o.geometry.dispose(); });
