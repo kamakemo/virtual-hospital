@@ -446,6 +446,7 @@ export class World {
         const goal = Math.max(f.glowTarget || 0, hot ? 1 : 0) * 0.55;
         f.glassMat.emissiveIntensity += (goal - f.glassMat.emissiveIntensity) * Math.min(1, dt * 10);
       }
+      this.exterior.update(t, dt);
       this.renderer.render(this.outside, this.camera);
     } else if (this.ward) {
       for (const b of this.ward.beds) {

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { MAT, box, rbox, cyl, sphere, plane, part, bake } from './kit.js';
 import * as TX from './textures.js';
 import { HOSPITAL_NAME } from '../data.js';
+import { buildLife } from './life.js';
 
 /* ============================================================
    THE BUILDING
@@ -45,23 +46,6 @@ function car(g, x, z, ry, color) {
   c.position.set(x, 0, z);
   c.rotation.y = ry;
   g.add(c);
-}
-
-function ambulance(g, x, z, ry) {
-  const a = new THREE.Group();
-  a.add(part(rbox(6.4, 2.5, 2.3, 0.2), MAT.paint('#F5F5F2', 0.4), -0.4, 1.75, 0));
-  a.add(part(rbox(1.8, 1.5, 2.2, 0.3), MAT.paint('#F5F5F2', 0.4), 3.1, 1.25, 0));
-  a.add(part(rbox(1.0, 0.8, 2.1, 0.15), MAT.paint('#2A3640', 0.15), 3.5, 1.55, 0));
-  for (const s of [-1, 1]) {
-    a.add(part(box(6.4, 0.3, 0.02), MAT.red(), -0.4, 1.5, s * 1.16));
-    a.add(part(box(6.4, 0.18, 0.02), MAT.paint('#1F5FB4', 0.4), -0.4, 1.12, s * 1.16));
-  }
-  const beacon = new THREE.MeshStandardMaterial({ color: '#2244AA', emissive: '#3B6BFF', emissiveIntensity: 1.6 });
-  a.add(part(rbox(1.2, 0.16, 1.6, 0.06), beacon, 2.0, 3.08, 0));
-  for (const dx of [-2.4, 2.6]) for (const dz of [-1.0, 1.0]) a.add(part(cyl(0.4, 0.4, 0.3, 14), MAT.castor(), dx, 0.4, dz, Math.PI / 2, 0, 0));
-  a.position.set(x, 0, z);
-  a.rotation.y = ry;
-  g.add(a);
 }
 
 export function buildExterior(wings) {
@@ -288,7 +272,6 @@ export function buildExterior(wings) {
     if (k % 3 !== 1) car(land, 58 + k * 5.5 + 0.1, 12 + 2.7, Math.PI / 2, colors[ci++ % colors.length]);
     if (k % 4 !== 2) car(land, 58 + k * 5.5 + 0.1, 32 - 2.7, -Math.PI / 2, colors[ci++ % colors.length]);
   }
-  ambulance(land, 47, -2, Math.PI);
   land.add(part(rbox(10, 0.3, 6, 0.1), MAT.plastic(), 47, 4.4, -2));
   land.add(part(box(10.2, 0.95, 0.25), MAT.plastic(), 47, 4.9, 1.05));            // canopy fascia
   for (const x of [42.6, 51.4]) land.add(part(cyl(0.2, 0.2, 4.4, 12), MAT.plastic(), x, 2.2, 0.8));
@@ -340,6 +323,10 @@ export function buildExterior(wings) {
   }
   root.add(bake(city, { castShadow: false, receiveShadow: false }));
 
+  /* ---------- people and traffic ---------- */
+  const life = buildLife();
+  root.add(life.group);
+
   /* ---------- sky + sun ---------- */
   const sky = new THREE.Mesh(new THREE.SphereGeometry(1200, 32, 16), new THREE.ShaderMaterial({
     side: THREE.BackSide, depthWrite: false,
@@ -389,7 +376,9 @@ export function buildExterior(wings) {
     shadowLight: sun,
     // a three-quarter view from the forecourt, the whole building in frame
     home: { pos: new THREE.Vector3(58, 22, 150), target: new THREE.Vector3(0, 30, 0) },
+    update: life.update,
     dispose() {
+      life.dispose();
       root.traverse(o => { if (o.geometry && !o.geometry.userData?.shared) o.geometry.dispose(); });
       own.forEach(x => x.dispose && x.dispose());
     },
