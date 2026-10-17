@@ -147,6 +147,13 @@ export function headwall({ bedNumber, unitName, header, hue, kind, own = [] }) {
   own.push(boardTex, boardMat);
   g.add(part(plane(0.64, 0.427), boardMat, 0.021, 1.68, -0.62, 0, Math.PI / 2, 0));
 
+  // the case title, large and lit, across the wall above the reading light
+  const titleTex = TX.bedTitle({ bed: bedNumber, header, hue });
+  const titleMat = new THREE.MeshStandardMaterial({ map: titleTex, roughness: 0.4, emissive: '#FFFFFF', emissiveMap: titleTex, emissiveIntensity: header ? 0.55 : 0.15 });
+  own.push(titleTex, titleMat);
+  g.add(part(rbox(0.04, 0.47, 2.5, 0.015), MAT.lightGrey(), 0.02, 2.585, 0));
+  g.add(part(plane(2.46, 0.46), titleMat, 0.041, 2.585, 0, 0, Math.PI / 2, 0));
+
   return g;
 }
 

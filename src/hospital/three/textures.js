@@ -339,6 +339,62 @@ export function idBoard({ bed, unit, header, hue }) {
   });
 }
 
+/**
+ * Backlit case-title sign over the bed: a hue block with the bed number, then
+ * the case title in large type (the part before " — " bold, the rest beneath).
+ */
+export function bedTitle({ bed, header, hue }) {
+  return make(2048, 384, (g, w, h) => {
+    g.fillStyle = '#2B3138'; roundRect(g, 0, 0, w, h, 26); g.fill();
+    g.fillStyle = header ? '#FCFDFD' : '#DADFE3'; roundRect(g, 12, 12, w - 24, h - 24, 18); g.fill();
+    // bed number block
+    const bw = 300;
+    g.fillStyle = header ? hue : '#8C969E'; roundRect(g, 12, 12, bw, h - 24, 18); g.fill();
+    g.fillRect(bw - 20, 12, 32, h - 24);
+    g.fillStyle = '#FFFFFF'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = '700 54px Archivo, Arial, sans-serif';
+    g.fillText('BED', 12 + bw / 2, 104);
+    g.font = '800 170px Archivo, Arial, sans-serif';
+    g.fillText(String(bed).padStart(2, '0'), 12 + bw / 2, 238);
+
+    const x = bw + 60, maxW = w - x - 50;
+    g.textAlign = 'left';
+    if (!header) {
+      g.fillStyle = '#7C8790';
+      fitText(g, 'Case to be assigned', maxW, 110, 600);
+      g.fillText('Case to be assigned', x, h / 2);
+      return;
+    }
+    const cut = header.indexOf(' — ');
+    let main = cut > 0 ? header.slice(0, cut) : header;
+    let sub = cut > 0 ? header.slice(cut + 3) : '';
+    // a short tag such as "Case AR-58" reads better as part of the title
+    if (sub && main.length < 14) { const c2 = sub.search(/[:—]/); main = `${main} — ${c2 > 0 ? sub.slice(0, c2) : sub}`; sub = c2 > 0 ? sub.slice(c2 + 1).trim() : ''; }
+
+    // main title: as large as fits on at most two lines
+    g.fillStyle = '#121B23';
+    let size = 150, lines;
+    const room = sub ? 230 : 320;
+    do {
+      g.font = `800 ${size}px Archivo, Arial, sans-serif`;
+      lines = wrap(g, main, maxW);
+      size -= 4;
+    } while ((lines.length > 2 || lines.length * size * 1.08 > room) && size > 40);
+    size += 4;
+    const lh = size * 1.06;
+    const subSize = sub ? Math.min(66, fitText(g, sub, maxW, 66, 600)) : 0;
+    const total = lines.length * lh + (sub ? subSize * 1.35 : 0);
+    let y = h / 2 - total / 2 + lh / 2;
+    g.font = `800 ${size}px Archivo, Arial, sans-serif`;
+    lines.slice(0, 2).forEach((l, i) => g.fillText(l, x, y + i * lh));
+    if (sub) {
+      g.fillStyle = '#4A5866';
+      g.font = `600 ${subSize}px Archivo, Arial, sans-serif`;
+      g.fillText(sub, x, y + lines.length * lh - lh / 2 + subSize * 0.85);
+    }
+  });
+}
+
 /** Wayfinding sign (green exit, hand hygiene, etc). */
 export function smallSign(text, bg = '#1E7A3E', fg = '#FFFFFF', w = 512, h = 160) {
   return make(w, h, (g) => {

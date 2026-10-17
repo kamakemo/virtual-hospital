@@ -283,8 +283,9 @@ export function buildWard(floor) {
       hit,
       glow,
       label: w([BED.footX + 0.15, 1.3, 0]),
-      // standing at the foot of the bed, just outside the bay, slightly to the IV side
-      cam: { pos: w([3.3, 1.6, 0.48]), target: w([0.84, 1.12, -0.1]) },
+      // standing at the foot of the bed, just outside the bay, slightly to the IV side,
+      // looking up enough to read the case title over the bed
+      cam: { pos: w([3.75, 1.8, 0.48]), target: w([0.84, 1.66, -0.1]) },
     });
   });
 
