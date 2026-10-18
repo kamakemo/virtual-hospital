@@ -545,6 +545,226 @@ function Planning() {
 }
 
 /* ============================================================
+   5 · PART ONE DONE — SET-UP FOR THE PERICARDIECTOMY
+   ============================================================ */
+
+function Setup() {
+  return (
+    <>
+      <div className="cs-card cs-vignette">
+        <p className="cs-p"><span className="cs-time">📅 day 6</span>IVUS-guided ostial left main stent (4.0 mm, proximal optimisation, ostium covered — MSA 11.2 mm²), then transfemoral TAVI under light sedation, implanted high. Mean gradient 30 → 9 mmHg. PR 220 → 250 ms; no high-grade block on 72 hours of telemetry; a 14-day patch monitor on discharge stayed clean.</p>
+        <p className="cs-p"><span className="cs-time">📅 weeks 1–6</span>Clopidogrel stopped at 1 month; aspirin continued. Furosemide 40 mg, spironolactone 25 mg. She is a little better — and her stroke volume a little bigger now the valve is open — but the ascites is back within ten days of each tap.</p>
+        <p className="cs-p" style={{ marginBottom: 0 }}><span className="cs-time">🌅 day 44 · 07:30</span>Theatre 2. Today the shell comes off.</p>
+      </div>
+      <Decision id="s5-after-tavi" question="After the TAVI her gradient fell, yet the constriction signs are now MORE obvious on echo: E variation 42%, a bigger septal bounce. Why?"
+        options={[
+          { id: 'unmask', label: 'With the fixed obstruction gone, the LV fills and ejects more freely — ventricular interdependence, which a high LV afterload had damped, is unmasked', verdict: 'best', points: 8,
+            why: 'Severe AS stiffens the left ventricle’s side of the see-saw; remove it and the respiratory swings grow. Case reports describe constriction “appearing” after TAVI for exactly this reason. Nothing new has happened in the pericardium.' },
+          { id: 'tavi', label: 'The TAVI caused pericarditis', verdict: 'wrong', points: 0, why: 'No pain, no rub, no effusion, no CRP rise.' },
+          { id: 'worse', label: 'Her constriction is rapidly progressing', verdict: 'ok', points: 2, why: 'Possible in principle, but six weeks is too short — and there is a better mechanical explanation.' },
+        ]} />
+      <MultiSelect id="s5-check" question="🧾 Pre-incision checklist in a radiated chest — what must be in place?"
+        items={[
+          { id: 'cpb', label: 'Perfusionist scrubbed, bypass circuit primed; femoral vessels prepped (or wired) for rapid peripheral cannulation', correct: true, why: 'If the RV tears during the dissection, the fastest way onto bypass is through the groin — the porcelain aorta cannot take a cannula.' },
+          { id: 'blood', label: 'Cross-matched blood, cell salvage, and factor concentrates available', correct: true, why: 'Radiated mediastinal dissection oozes for hours.' },
+          { id: 'pads', label: 'External defibrillator pads on before the drapes', correct: true, why: 'Manipulating the heart provokes VF; the chest is not open yet when the saw goes in.' },
+          { id: 'toe', label: 'TOE probe and an arterial line before induction; a PA catheter', correct: true, why: 'You will need to see the RV, the septum and the pressures all day — and all night.' },
+          { id: 'asp', label: 'Aspirin continued (left main stent six weeks old)', correct: true, why: 'Stopping it risks stent thrombosis of the whole left system.' },
+          { id: 'pace', label: 'Epicardial pacing wires to place before closing', correct: true, why: 'She has a long PR; post-op junctional rhythm and block are common; rate is her output.' },
+          { id: 'ivpush', label: 'A large fluid preload to “fill her up” before induction', correct: false, why: 'She is already at the top of what the shell allows; extra volume raises venous pressure and wet lungs without filling the ventricles more. Maintain, do not flood.' },
+        ]} />
+      <Decision id="s5-induction" question="Anaesthetic induction in severe constriction. What are your goals?"
+        options={[
+          { id: 'fft', label: 'Keep her “fast, full and tight”: preserve heart rate (avoid bradycardia), preload and systemic resistance; gentle induction with a vasopressor running; minimal PEEP and modest tidal volumes', verdict: 'best', points: 10,
+            why: 'Stroke volume is small and fixed: output depends on rate. Venodilating induction agents drop the high filling pressure she needs; positive-pressure ventilation squeezes venous return further. Induction is when these patients arrest.' },
+          { id: 'slow', label: 'Esmolol to slow her to 70 so she fills better', verdict: 'wrong', points: 0, why: 'A longer diastole adds nothing after the plateau — filling stopped in the first third of diastole. A slower rate is simply less output.' },
+          { id: 'std', label: 'A standard propofol induction and PEEP 10 for her effusions', verdict: 'wrong', points: 0, why: 'Vasodilatation plus high PEEP: the textbook way to watch the pressure fall to 50.' },
+        ]} />
+      <Why title="⚡ Why heart rate is her lifeline"
+        chain={[
+          { k: 'EARLY STOP', t: 'Filling ends early in diastole when the ventricle meets the shell (the plateau).' },
+          { k: 'NO RESERVE', t: 'More time in diastole does not fill the ventricle further.' },
+          { k: 'FIXED SV', t: 'Stroke volume cannot rise to meet demand.' },
+          { k: 'RATE = OUTPUT', t: 'Output = SV × HR; the only variable left is rate.' },
+          { k: 'THE DANGER', t: 'Beta-blockers, bradycardia, junctional rhythm or heart block cut her output directly.' },
+        ]} />
+      <Sequence id="s5-seq" question="🔪 Put the start of the operation in order."
+        steps={[
+          { label: 'Arterial line, pads, induction with a vasopressor running; TOE baseline', why: 'Monitoring before the most dangerous minute.' },
+          { label: 'Groins prepped and a femoral wire placed for emergency bypass', why: 'The plan B is laid before plan A starts.' },
+          { label: 'Careful median sternotomy (oscillating saw), the RV 3 mm behind the sternum', why: 'Adherent RV: go slow, lift the sternal edges.' },
+          { label: 'Find a plane on the LV, free the LV anterolateral and diaphragmatic surfaces first', why: 'The traditional order (see the next stage).' },
+          { label: 'Then the RV, RVOT and the cavo-atrial/IVC bands; check the epicardium', why: 'Radical, phrenic to phrenic.' },
+          { label: 'Haemostasis, pacing wires, drains; measure pressures and TOE before closing', why: 'Prove the release before you leave.' },
+        ]} />
+      <Contrast title="anaesthesia for constriction vs anaesthesia for tamponade"
+        is={{ h: 'Constriction', points: ['Rate and preload dependent; avoid bradycardia.', 'The heart is caged, not compressed by fluid.', 'Relief comes slowly, plate by plate, over hours.'] }}
+        isnt={{ h: 'Tamponade', points: ['Rate and preload dependent; avoid positive pressure.', 'Drain under local before induction if at all possible.', 'Relief is instant when the fluid is out — and so is the rebound hypertension.'] }} />
+    </>
+  );
+}
+
+/* ============================================================
+   6 · STRATEGY
+   ============================================================ */
+
+function Strategy() {
+  return (
+    <>
+      <Decision id="s6-approach" question="Median sternotomy or left anterolateral thoracotomy?"
+        options={[
+          { id: 'stern', label: 'Median sternotomy: access to both ventricles, the cavae and the diaphragmatic surfaces — and to the right atrium and groins for bypass', verdict: 'best', points: 10,
+            why: 'A radical pericardiectomy needs the right side and the IVC band; a left thoracotomy reaches the LV well but the right heart poorly. Thoracotomy is used for selected redo cases. In a radiated sternum, plan the wound carefully (consider plastic surgical closure).' },
+          { id: 'thor', label: 'Left anterolateral thoracotomy — it avoids the radiated sternum', verdict: 'ok', points: 4, why: 'A real argument for the wound, but it buys an incomplete release of the right heart and the cavae.' },
+          { id: 'vats', label: 'Thoracoscopic (keyhole) pericardial window', verdict: 'wrong', points: 0, why: 'A window drains an effusion. It does not release a calcified shell.' },
+        ]} />
+      <Decision id="s6-cpb" question="Cardiopulmonary bypass?"
+        options={[
+          { id: 'standby', label: 'Start off-pump with bypass primed on standby (peripheral cannulation ready); go on bypass if bleeding, a tear or haemodynamic instability makes dissection unsafe', verdict: 'best', points: 8,
+            why: 'Off-pump means less heparin and less coagulopathic bleeding from a raw surface. Bypass makes the posterior and diaphragmatic dissection easier and safer when needed. Centres differ: some use bypass routinely to make the operation more complete. Both are defensible; what matters is a complete release and a plan for trouble.' },
+          { id: 'on', label: 'Routine full bypass with aortic cannulation', verdict: 'wrong', points: 1, why: 'Bypass itself is defensible — but not through a porcelain ascending aorta.' },
+          { id: 'never', label: 'Never bypass: the bleeding risk is too high', verdict: 'ok', points: 3, why: 'Rigidity costs completeness; a torn RV with no bypass plan is how patients die on the table.' },
+        ]} />
+      <Decision id="s6-order" question="Which ventricle do you free first?"
+        options={[
+          { id: 'lv', label: 'The LV first, then the RV', verdict: 'best', points: 10,
+            why: 'Traditional teaching: if the RV is freed first it suddenly fills and pumps more blood into a pulmonary circulation draining into a still-caged LV — the left atrial and pulmonary pressures rise, and acute pulmonary oedema can follow. Free the outlet before the inlet. The evidence is surgical experience, not trials, and some surgeons start at the RV outflow; but the physiology is sound.' },
+          { id: 'rv', label: 'The RV first — it is the thinnest and most constrained', verdict: 'wrong', points: 2, why: 'The thinnest wall also tears the most. And see the physiology: a freed RV pumping into a caged LV.' },
+          { id: 'any', label: 'It makes no difference', verdict: 'wrong', points: 0, why: 'It can make a lot of difference to the lungs.' },
+        ]} />
+      <Decision id="s6-extent" question="How much pericardium comes off?"
+        options={[
+          { id: 'radical', label: 'Radical: anteriorly from left phrenic nerve to right phrenic nerve, the diaphragmatic surfaces of both ventricles, and the cavo-atrial bands — preserving both phrenic nerves', verdict: 'best', points: 10,
+            why: 'Partial (anterior) pericardiectomy leaves residual constriction and has worse long-term survival and more re-operation. The ESC pericardial guideline recommends as complete a removal as possible, including the visceral layer when it is involved.' },
+          { id: 'ant', label: 'Anterior only, between the phrenic nerves — the diaphragmatic surface is too risky', verdict: 'wrong', points: 2, why: 'The diaphragmatic surface is a big part of what is caging the ventricles.' },
+          { id: 'all', label: 'Everything including behind the phrenic nerves and the posterior LA, sacrificing the nerves if needed', verdict: 'wrong', points: 1, why: 'Bilateral phrenic palsy in a woman with fibrotic lungs is a ventilator for life.' },
+        ]} />
+      <Decision id="s6-island" question="A calcium spur is welded into the LAD in the AV groove. What do you do?"
+        options={[
+          { id: 'island', label: 'Leave an island of calcium on the vessel and free all around it', verdict: 'best', points: 8,
+            why: 'An isolated island cannot constrict anything once its edges are free. Chiselling it off a radiated coronary risks tearing the artery.' },
+          { id: 'chisel', label: 'Remove it completely — residual calcium means residual constriction', verdict: 'wrong', points: 0, why: 'The coronary pays for that completeness.' },
+        ]} />
+      <Contrast title="radical vs partial pericardiectomy"
+        is={{ h: 'Radical (phrenic to phrenic + diaphragmatic)', points: ['Both ventricles and the IVC freed.', 'Lower residual constriction; better long-term survival.', 'Longer, bloodier operation.'] }}
+        isnt={{ h: 'Partial (anterior)', points: ['Quicker, less bleeding.', 'Diaphragmatic surfaces still caged.', 'Persistent symptoms; redo in a scarred, radiated chest.'] }} />
+      <Why title="🫁 Why freeing the RV first can flood the lungs"
+        chain={[
+          { k: 'RV FREED', t: 'The released right ventricle fills and ejects much more.' },
+          { k: 'MORE IN', t: 'More blood is pumped into the pulmonary circulation.' },
+          { k: 'LV STILL CAGED', t: 'The left ventricle cannot accept the extra volume.' },
+          { k: 'LA PRESSURE', t: 'Left atrial and pulmonary venous pressure climb.' },
+          { k: 'OEDEMA', t: 'Acute pulmonary oedema on the table — in lungs already fibrosed by radiation.' },
+        ]} />
+    </>
+  );
+}
+
+/* ============================================================
+   7 · THE PERICARDIECTOMY
+   ============================================================ */
+
+function Operation() {
+  const { answers, answer, setVitals, advanceClock } = useCase();
+  const res = answers['s7-peri'];
+  return (
+    <>
+      <p className="cs-p">The sternum is open. Under it, a grey-yellow shell up to 7 mm thick, calcified plates over the RV and the diaphragmatic surface. Every plate you free should drop the CVP. Pick the surfaces in the order you would free them, and choose how to deal with each one.</p>
+      <Pericardiectomy done={res} onResult={r => {
+        answer('s7-peri', r);
+        advanceClock(150);
+        setVitals(r.tear ? { hr: 118, sys: 82, dia: 50 } : { hr: 96, sys: 108, dia: 62 });
+      }} />
+      {res && (
+        <div className={'cs-fb ' + (res.score >= 18 ? 'best' : res.score >= 10 ? 'ok' : 'wrong')}>
+          Operation score {res.score}/20 — LV before RV: {res.lvBefore ? '✓' : '✗'} · radical and complete: {res.complete ? '✓' : '✗'} · phrenic nerves intact: {res.phrenic ? '✓' : '✗'} · LAD protected: {res.lad ? '✓' : '✗'} · no RV tear: {res.tear ? '✗' : '✓'}.
+        </div>
+      )}
+      <ScoreOnce id="s7-peri" pts={res ? res.score : null} max={20} />
+      {res && (
+        <>
+          <div className="cs-card">
+            <div className="cs-h2" style={{ marginTop: 0 }}>📈 Pressures after the release</div>
+            <Table head={['', 'Before', 'After']} rows={[
+              ['CVP', N('23 mmHg'), N(res.complete ? '12 mmHg' : '17 mmHg', res.complete ? undefined : 'cs-hi')],
+              ['LVEDP / RVEDP', N('24 / 22'), N(res.complete ? '16 / 11' : '20 / 17', res.complete ? undefined : 'cs-hi')],
+              ['RV peak with inspiration', N('↑ (discordant)'), N(res.complete ? 'concordant' : 'still discordant', res.complete ? undefined : 'cs-hi')],
+              ['Cardiac index', N('1.9 L/min/m²'), N('2.3 L/min/m²')],
+            ]} />
+          </div>
+          <Decision id="s7-epi" question="The parietal shell is off, but the epicardium itself looks thick and white, and the ventricles still do not move freely. TOE shows persistent septal bounce."
+            options={[
+              { id: 'waffle', label: 'Visceral (epicardial) constriction: score the epicardium in a criss-cross pattern (the “waffle” technique) or peel it where it lifts safely', verdict: 'best', points: 10,
+              why: 'Radiation often thickens the visceral layer too. If it is left, the heart stays bound. Cross-hatched incisions let the muscle expand without stripping it off the coronaries.' },
+              { id: 'close', label: 'Close — the parietal pericardium is out', verdict: 'wrong', points: 0, why: 'And the constriction is still there.' },
+              { id: 'strip', label: 'Strip the whole epicardium off both ventricles', verdict: 'ok', points: 3, why: 'Thorough, but it bleeds and risks coronary injury; scoring achieves most of the release.' },
+            ]} />
+          <Decision id="s7-lvedp" question="Even after a complete release, the LVEDP is 16 and the dip-and-plateau has softened but not vanished. Why?"
+            options={[
+              { id: 'myo', label: 'The radiated, anthracycline-exposed myocardium is itself stiff — the restrictive component that will remain', verdict: 'best', points: 8,
+                why: 'This is the mixed physiology the catheter predicted. It is why radiation patients improve less, recover more slowly and are prone to low output on the first night.' },
+              { id: 'missed', label: 'There must still be a piece of pericardium left — go back in', verdict: 'ok', points: 2, why: 'Worth checking with TOE and the surgeon’s eyes, but with concordant pressures and a free heart, this is the muscle.' },
+              { id: 'fluid', label: 'She is overloaded — give furosemide on the table', verdict: 'wrong', points: 0, why: 'It is stiffness, not volume.' },
+            ]} />
+        </>
+      )}
+      <Note kind="pearl" title="Why the CVP tells you how complete the operation was">The venous pressure is the shell’s fingerprint. A big fall (23 → 12) says the right heart is free; a CVP still in the high teens after closing says something is still caged — the IVC band, the diaphragmatic surface, or the epicardium.</Note>
+      <SearchLinks title="🎬 Constriction cases on the recommended channels" links={CONSTRICTION_SEARCHES} />
+    </>
+  );
+}
+
+/* ============================================================
+   8 · THE FIRST EVENING IN INTENSIVE CARE
+   ============================================================ */
+
+function ICU() {
+  return (
+    <>
+      <div className="cs-card cs-vignette">
+        <p className="cs-p" style={{ marginBottom: 0 }}><span className="cs-time">🛏️ 16:00</span>Cardiac intensive care, bed 4. Ventilated, warm, drains 90 mL in the first hour. Noradrenaline 0.06 µg/kg/min, dobutamine 3 µg/kg/min. Sinus 96, BP 108/62, CVP 12, cardiac index 2.3. Lactate 2.1. Epicardial wires: atrial and ventricular, sensing well.</p>
+      </div>
+      <BedsideMonitor />
+      <MultiSelect id="s8-checks" question="What do you check and set tonight?"
+        items={[
+          { id: 'drain', label: 'Drain output hourly, with a threshold to call the surgeon (e.g. > 200 mL/h or rising)', correct: true, why: 'A raw pericardial bed oozes; tamponade can still happen after a pericardiectomy if the bed is closed off.' },
+          { id: 'echo', label: 'A TTE/TOE baseline of RV size and function', correct: true, why: 'So that at 2 a.m. you can tell what has changed.' },
+          { id: 'pace', label: 'Pacing box connected, AAI or DDD backup at 80–90 if the rhythm slows', correct: true, why: 'Her stroke volume is still small; rate keeps her out.' },
+          { id: 'bal', label: 'A neutral-to-slightly-negative fluid balance target — not chasing the CVP back down with boluses', correct: true, why: 'The heart now accepts volume, and an atrophic RV can over-distend.' },
+          { id: 'lyte', label: 'Potassium > 4.0 and magnesium > 1.0 mmol/L', correct: true, why: 'AF and ventricular ectopy are common after pericardiectomy.' },
+          { id: 'phren', label: 'A chest X-ray: hemidiaphragm position before extubation', correct: true, why: 'Phrenic injury shows as a raised hemidiaphragm and a failed wean.' },
+          { id: 'bb', label: 'Start bisoprolol tonight to prevent AF', correct: false, why: 'Not on the first night in a rate-dependent, freshly released heart with low output risk.' },
+        ]} />
+      <Decision id="s8-fluid" question="At 20:00 the nurse asks: “Her CVP has fallen to 9 and urine is 30 mL/h — should I give 500 mL?”"
+        options={[
+          { id: 'small', label: 'Check perfusion first: if lactate is falling, she is warm and the MAP is fine, accept a lower CVP. If you do give volume, a small 250 mL bolus with an echo look at the RV', verdict: 'best', points: 10,
+            why: 'Before surgery she needed a CVP of 20 to fill; now the shell is off, a CVP of 9 may be plenty. The released, atrophic RV can dilate with generous volume. Treat the patient, not the number.' },
+          { id: 'big', label: 'Yes — 1 litre: the pressure she lived on was 20', verdict: 'wrong', points: 0, why: 'The old number belonged to the shell. Filling to it now is how the crisis starts.' },
+          { id: 'diur', label: 'Furosemide 80 mg IV — she is still oedematous', verdict: 'ok', points: 2, why: 'She will need diuresis — gently, from tomorrow, once the haemodynamics have settled.' },
+        ]} />
+      <Decision id="s8-drugs" question="Her support drugs — which doses are right for tonight?"
+        options={[
+          { id: 'right', label: 'Noradrenaline 0.02–0.2 µg/kg/min to MAP ≥ 65; dobutamine 2.5–5 µg/kg/min (milrinone 0.25–0.5 µg/kg/min if needed, without a bolus); paracetamol and opioid analgesia; amiodarone if AF develops (300 mg IV over 1 h, then 900 mg over 24 h)', verdict: 'best', points: 8,
+            why: 'Low doses, titrated. A milrinone bolus in a vasodilated post-op patient drops the pressure. Amiodarone controls AF without the negative chronotropy of a beta-blocker that would cut her output.' },
+          { id: 'high', label: 'Adrenaline 0.5 µg/kg/min prophylactically', verdict: 'wrong', points: 0, why: 'A large prophylactic dose: tachyarrhythmia, lactate, myocardial oxygen cost.' },
+          { id: 'none', label: 'Wean everything off now', verdict: 'ok', points: 2, why: 'The aim tonight — but slowly; the first night is when low output declares itself.' },
+        ]} />
+      <Why title="🫀 Why the first night is dangerous even when the operation went well"
+        chain={[
+          { k: 'ATROPHY', t: 'Years in a shell: the ventricles have been small, under-worked and partly fibrosed.' },
+          { k: 'RELEASE', t: 'Suddenly they can accept much more volume.' },
+          { k: 'OVERSTRETCH', t: 'Fluid, transfusion or a high PEEP can dilate the thin RV beyond its ability to empty.' },
+          { k: 'SEPTUM', t: 'The dilated RV pushes the septum into the LV: the LV underfills.' },
+          { k: 'LOW OUTPUT', t: 'Post-pericardiectomy low output syndrome — seen in roughly 1 in 10 to 1 in 4 patients, and more after radiation.' },
+        ]} />
+      <Contrast title="hypotension after a pericardiectomy — RV failure vs bleeding/tamponade"
+        is={{ h: 'RV failure (low output syndrome)', points: ['CVP rising, drains quiet.', 'Echo: dilated hypokinetic RV, D-shaped septum, small LV, no collection.', 'Inotrope, vasopressor, iNO, pace; stop fluids.'] }}
+        isnt={{ h: 'Bleeding / tamponade', points: ['Drains high — or suddenly stopping (clotted).', 'Echo: a collection or clot compressing a chamber.', 'Blood products, correct coagulopathy, back to theatre.'] }} />
+    </>
+  );
+}
+
+/* ============================================================
    placeholder stages (written next)
    ============================================================ */
 
@@ -617,10 +837,22 @@ export const VALVE_03 = {
       pill: '🏺 Plan around the porcelain',
       lede: 'The planning CT, a sternotomy-risk planner, TAVI at 53, antiplatelets before a major operation.',
       enter: ({ atLeastClock }) => atLeastClock(min(96 + 9, 0)) },
-    { id: 's5', icon: '🩸', nav: 'Set-up', title: 'Part one done — set-up for the pericardiectomy', Component: Todo },
-    { id: 's6', icon: '🎬', nav: 'Choose Your Path', title: 'Strategy & decision points', Component: Todo },
-    { id: 's7', icon: '🛠️', nav: 'Pericardiectomy', title: 'The radical pericardiectomy', Component: Todo },
-    { id: 's8', icon: '🛏️', nav: 'Intensive Care', title: 'The first evening in intensive care', Component: Todo },
+    { id: 's5', icon: '🩸', nav: 'Set-up', title: 'Part one done — set-up for the pericardiectomy', Component: Setup,
+      pill: '🧷 Plan B before plan A',
+      lede: 'PCI and TAVI are behind her. Checklist, induction in constriction, and the order of the operation.',
+      enter: ({ setVitals, atLeastClock }) => { setVitals({ hr: 98, sys: 106, dia: 74 }); atLeastClock(min(24 * 43 + 7, 30)); } },
+    { id: 's6', icon: '🎬', nav: 'Choose Your Path', title: 'Strategy & decision points', Component: Strategy,
+      pill: '🧭 Which incision, which ventricle, how much',
+      lede: 'Sternotomy or thoracotomy, bypass or not, LV first, radical or partial — and the calcium on the LAD.',
+      enter: ({ atLeastClock }) => atLeastClock(min(24 * 43 + 8, 15)) },
+    { id: 's7', icon: '🛠️', nav: 'Pericardiectomy', title: 'The radical pericardiectomy', Component: Operation,
+      pill: '✂️ Plate by plate',
+      lede: 'Free the shell in the right order, spare the nerves and the coronaries — then prove the release.',
+      enter: ({ setVitals, atLeastClock }) => { setVitals({ hr: 100, sys: 96, dia: 64 }); atLeastClock(min(24 * 43 + 9, 0)); } },
+    { id: 's8', icon: '🛏️', nav: 'Intensive Care', title: 'The first evening in intensive care', Component: ICU,
+      pill: '📟 The old numbers belonged to the shell',
+      lede: 'Drains, pacing, fluids and drug doses — and why the first night is the dangerous one.',
+      enter: ({ setVitals, atLeastClock }) => { setVitals({ hr: 96, sys: 108, dia: 62, rhythm: 'sinus' }); atLeastClock(min(24 * 43 + 16, 0)); } },
     { id: 's9', icon: '🚨', nav: 'Night Crisis', title: '02:40 — low output with a dilated RV', Component: Todo },
     { id: 'cyc', icon: '🧠', nav: 'The Vicious Cycle', title: 'The vicious cycle', Component: Todo },
     { id: 'mm', icon: '💀', nav: 'M&M War Stories', title: 'Morbidity & mortality: war stories', Component: Todo },
