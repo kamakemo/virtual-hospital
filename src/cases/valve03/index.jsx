@@ -708,6 +708,14 @@ function Operation() {
             ]} />
         </>
       )}
+      <Why title="🧱 Why the thin RV tears and the LV does not"
+        chain={[
+          { k: 'THIN WALL', t: 'The RV free wall is 3–5 mm of muscle; the LV is 10.' },
+          { k: 'NO PLANE', t: 'Radiation fuses pericardium to epicardium: in places there is no plane at all.' },
+          { k: 'TRACTION', t: 'Pulling a rigid plate puts all the force on the weakest point beneath it.' },
+          { k: 'TEAR', t: 'Over the RV, that point is the ventricle itself — torrential bleeding in a heart you cannot easily put on bypass.' },
+          { k: 'ISLANDS', t: 'So: sharp dissection, and leave small islands where the plane disappears.' },
+        ]} />
       <Note kind="pearl" title="Why the CVP tells you how complete the operation was">The venous pressure is the shell’s fingerprint. A big fall (23 → 12) says the right heart is free; a CVP still in the high teens after closing says something is still caged — the IVC band, the diaphragmatic surface, or the epicardium.</Note>
       <SearchLinks title="🎬 Constriction cases on the recommended channels" links={CONSTRICTION_SEARCHES} />
     </>
@@ -765,10 +773,291 @@ function ICU() {
 }
 
 /* ============================================================
-   placeholder stages (written next)
+   9 · 02:40 — LOW OUTPUT WITH A DILATED RV
    ============================================================ */
 
-function Todo() { return <p className="cs-p">Coming next.</p>; }
+function Crisis() {
+  const { answers, answer, setVitals, advanceClock } = useCase();
+  const res = answers['s9-rescue'];
+  return (
+    <>
+      <div className="cs-card cs-vignette" style={{ borderLeftColor: 'var(--red)' }}>
+        <p className="cs-p" style={{ marginBottom: 0 }}><span className="cs-time" style={{ color: 'var(--red)' }}>🚨 02:40</span>
+          Night one. Since midnight the night team has given two 500 mL boluses and a unit of red cells for “low CVP and low urine”. Now: BP 78/46 (MAP 58), CVP 19 and rising, junctional rhythm at 76, cool peripheries, urine 8 mL/h, lactate 4.8. Drains: 30 mL in the last hour. PEEP 10, PaCO₂ 7.1 kPa, pH 7.27.
+        </p>
+      </div>
+      <BedsideMonitor />
+      <MultiSelect id="s9-ddx" question="Hypotension with a rising CVP on night one after pericardiectomy. What is on your list?"
+        items={[
+          { id: 'rv', label: 'Acute RV failure — post-pericardiectomy low output', correct: true, why: 'The commonest serious cause: an atrophic RV over-distended by volume.' },
+          { id: 'tamp', label: 'Tamponade from a clotted, contained bleed', correct: true, why: 'Quiet drains do not exclude a clot behind the heart. Echo.' },
+          { id: 'rhythm', label: 'Loss of AV synchrony (junctional rhythm)', correct: true, why: 'Losing the atrial kick and rate in a heart with a small stroke volume.' },
+          { id: 'vaso', label: 'Vasoplegia', correct: true, why: 'Possible after a long operation — but vasoplegia gives a LOW CVP, warm peripheries.' },
+          { id: 'lm', label: 'Left main stent thrombosis', correct: true, why: 'Always on the list in a six-week-old stent: ECG and echo for regional wall motion.' },
+          { id: 'hypo', label: 'Hypovolaemia — she needs more fluid', correct: false, why: 'A CVP of 19 after two litres says the opposite.' },
+        ]} />
+      <Decision id="s9-first" question="First action?"
+        options={[
+          { id: 'echo', label: 'Stop the fluid and get an echo now — while calling the consultant and the surgeon', verdict: 'best', points: 10,
+            why: 'Every next step depends on what the RV, the septum and the pericardial space look like. The echo takes three minutes; guessing takes lives.' },
+          { id: 'more', label: 'Another 500 mL — the pressure is low', verdict: 'wrong', points: 0, why: 'Two litres have already made her worse.' },
+          { id: 'theatre', label: 'Straight back to theatre for tamponade', verdict: 'ok', points: 3, why: 'If the echo shows a collection, yes. Not before.' },
+        ]} />
+      <div className="cs-grid2">
+        <div className="cs-card">
+          <div className="cs-h2" style={{ marginTop: 0 }}>🫀 Bedside echo · 02:46</div>
+          <p className="cs-p">Subcostal and apical views: no pericardial collection or clot. RV dilated (RV:LV ratio 1.35), hypokinetic, TAPSE 9 mm. The septum is flat — a D-shaped LV, small and hyperdynamic. Moderate TR. No new regional wall-motion abnormality.</p>
+        </div>
+        <SubcostalEcho effusion={0} label="Subcostal view: no collection around the heart." />
+      </div>
+      <p className="cs-p">Now pull the levers — once each, in the order you choose. Watch what every one does to the numbers (and to the monitor).</p>
+      <RVRescue done={res} onVitals={v => setVitals(v)} onResult={r => {
+        answer('s9-rescue', r);
+        advanceClock(90);
+        setVitals(r.ok ? { hr: 100, sys: 102, dia: 60, rhythm: 'paced' } : { hr: 98, sys: 86, dia: 52 });
+      }} />
+      {res && <div className={'cs-fb ' + (res.score >= 17 ? 'best' : res.score >= 10 ? 'ok' : 'wrong')}>Rescue score {res.score}/20. {res.ok ? 'By 04:10: MAP 70s, CVP 13, cardiac index 2.4, lactate falling. The septum is moving back towards the midline.' : 'Not there yet — the levers that help an RV are pressure, contractility, a lower PVR, rate and synchrony, and taking volume away once the pressure can stand it.'}</div>}
+      <ScoreOnce id="s9-rescue" pts={res ? res.score : null} max={20} />
+      {res && (
+        <>
+          <Decision id="s9-ecmo" question="If, despite all of this, she had stayed at MAP 55 with a lactate of 8, what next?"
+            options={[
+              { id: 'ecmo', label: 'Mechanical support: VA-ECMO via the femoral vessels (or a percutaneous RV assist device) as a bridge to recovery', verdict: 'best', points: 8,
+                why: 'Refractory RV failure needs circulatory support before the organs fail. Peripheral VA-ECMO also spares her porcelain aorta. An IABP mainly unloads the LV and does little for the RV.' },
+              { id: 'iabp', label: 'An intra-aortic balloon pump', verdict: 'wrong', points: 1, why: 'Wrong ventricle.' },
+              { id: 'more', label: 'Keep adding vasopressors', verdict: 'wrong', points: 0, why: 'Escalating vasopressors in a failing RV ends in ischaemic gut and kidneys.' },
+            ]} />
+          <Decision id="s9-why" question="Looking back: what started this crisis?"
+            options={[
+              { id: 'fluid', label: 'Two litres given to chase a CVP that belonged to the shell, plus loss of atrial rhythm and high PEEP with hypercapnia', verdict: 'best', points: 8,
+                why: 'A released, atrophic RV over-distended by volume, losing its atrial kick and pushing against a raised PVR. Each was avoidable, and each was reversible once it was recognised.' },
+              { id: 'surg', label: 'A surgical complication', verdict: 'wrong', points: 0, why: 'The echo excluded bleeding and the coronaries look fine.' },
+              { id: 'bad', label: 'Bad luck — it happens', verdict: 'ok', points: 2, why: 'It does happen more after radiation. But the night team made it more likely.' },
+            ]} />
+        </>
+      )}
+      <Why title="🔁 Why a dilated RV starves the left ventricle"
+        chain={[
+          { k: 'STRETCH', t: 'Volume and a raised PVR dilate the thin RV.' },
+          { k: 'SEPTUM', t: 'The septum bulges into the LV — the same interdependence, now without a shell.' },
+          { k: 'LV UNDERFILLS', t: 'A small LV ejects less: systemic pressure falls.' },
+          { k: 'RV ISCHAEMIA', t: 'Low aortic pressure plus high RV wall tension: the RV is starved of coronary flow.' },
+          { k: 'SPIRAL', t: 'A weaker RV dilates further. Break it with pressure, contractility, lower PVR, rate — and less volume.' },
+        ]} />
+      <Contrast title="post-pericardiectomy RV failure vs a constricted heart"
+        is={{ h: 'Tonight', points: ['Big RV, flat septum, low LV preload.', 'Volume makes it WORSE.', 'Wants inotropy, a lower PVR and diuresis.'] }}
+        isnt={{ h: 'Before surgery', points: ['Normal-sized ventricles in a shell.', 'Volume sustained output (high CVP needed).', 'Wanted preload kept, rate kept.'] }} />
+    </>
+  );
+}
+
+/* ============================================================
+   THE VICIOUS CYCLES
+   ============================================================ */
+
+function Cycles() {
+  return (
+    <>
+      <p className="cs-p">Tap each step. The green scissors mark where treatment cuts in.</p>
+      <ViciousCycle id="cyc-diur" title="🌀 The diuretic trap in constriction"
+        nodes={[
+          { short: 'The shell', t: 'A rigid pericardium caps filling', d: 'Venous pressure rises; oedema and ascites accumulate.' },
+          { short: 'More diuretic', t: 'Congestion is treated with more furosemide', d: 'Filling pressure falls — but filling pressure was what drove blood into a caged heart.' },
+          { short: 'Less output', t: 'Stroke volume falls further', d: 'Hypotension, dizziness, a narrow pulse pressure.' },
+          { short: 'Kidneys', t: 'Renal perfusion falls; venous congestion persists', d: 'Creatinine rises; RAAS and ADH switch on: hyponatraemia, salt and water retained.' },
+          { short: 'Retention', t: 'More fluid is retained', d: 'The oedema returns — and the dose goes up again.' },
+        ]}
+        breaks={[
+          { at: 0, t: 'Recognise constriction and remove the shell: radical pericardiectomy.' },
+          { at: 1, t: 'Use diuretics only to the lowest dose that keeps her out of trouble; tap large ascites rather than chasing it with the loop.' },
+          { at: 2, t: 'Never slow her heart: rate is her output.' },
+          { at: 3, t: 'Watch kidneys and sodium; treat a rising creatinine as a sign of underfilling, not a reason for more diuretic.' },
+        ]} />
+      <Decision id="cyc-d1" question="Her creatinine rose each time the furosemide went up. What should that have told her doctors?"
+        options={[
+          { id: 'under', label: 'Her output depends on a high filling pressure — the heart, not the liver or kidneys, is the cause', verdict: 'best', points: 10, why: 'A falling eGFR with diuresis in a congested patient says the heart needs that pressure. Look for constriction, restriction, severe AS — fixed-output states.' },
+          { id: 'ckd', label: 'She has developed chronic kidney disease', verdict: 'wrong', points: 0, why: 'It doubled in months, in step with the diuretic.' },
+          { id: 'more', label: 'The dose is not yet enough', verdict: 'wrong', points: 0, why: 'The trap itself.' },
+        ]} />
+      <ViciousCycle id="cyc-rv" title="🫀 The RV spiral after the shell comes off"
+        nodes={[
+          { short: 'Volume', t: 'Fluid given for a “low” CVP', d: 'The released, atrophic RV accepts more than it can pump.' },
+          { short: 'RV dilates', t: 'The RV stretches; TR grows', d: 'Contraction becomes less efficient on the far side of its Starling curve.' },
+          { short: 'Septum', t: 'The septum shifts left', d: 'A D-shaped LV, underfilled.' },
+          { short: 'Hypotension', t: 'Systemic pressure falls', d: 'Less LV output.' },
+          { short: 'RV ischaemia', t: 'The RV coronary perfusion falls', d: 'Low aortic pressure, high RV wall tension.' },
+          { short: 'Weaker RV', t: 'RV contractility falls', d: 'More dilation — the loop closes.' },
+        ]}
+        breaks={[
+          { at: 0, t: 'Stop fluid; diurese once the pressure holds.' },
+          { at: 3, t: 'Noradrenaline: restore aortic pressure and RV perfusion.' },
+          { at: 5, t: 'Dobutamine or milrinone for contractility; iNO and lung-protective ventilation for PVR.' },
+          { at: 2, t: 'Atrial pacing: restore synchrony and rate.' },
+        ]} />
+      <ViciousCycle id="cyc-rad" title="☢️ The radiation cascade — why it never stops"
+        nodes={[
+          { short: 'Endothelium', t: 'Radiation injures the small-vessel endothelium', d: 'Capillaries are lost.' },
+          { short: 'Ischaemia', t: 'Chronic micro-ischaemia', d: 'Low oxygen in pericardium, valves, myocardium.' },
+          { short: 'Fibrosis', t: 'Fibroblasts lay down collagen (TGF-β)', d: 'Stiffer tissue, fewer vessels.' },
+          { short: 'Calcium', t: 'Fibrosed tissue calcifies', d: 'Valves, curtain, aorta, pericardium.' },
+          { short: 'More ischaemia', t: 'Thicker, stiffer tissue is perfused worse still', d: 'The process feeds itself for decades.' },
+        ]}
+        breaks={[
+          { at: 0, t: 'Prevention today: modern involved-site radiotherapy, heart-sparing planning and breath-hold — a fraction of her heart dose.' },
+          { at: 2, t: 'Surveillance of survivors: screening echo ~5 years after radiotherapy then every 5 years (ESC cardio-oncology), aggressive risk-factor control.' },
+          { at: 3, t: 'Treat the end-organ lesions as they declare themselves — with the hostile chest in mind.' },
+        ]} />
+      <Decision id="cyc-d2" question="She is junctional at 76 after the operation. Why might atrial pacing at 100 help more than in most patients?"
+        options={[
+          { id: 'sv', label: 'Her stroke volume is still small and fixed by stiff, atrophic muscle — output follows rate and AV synchrony', verdict: 'best', points: 10, why: 'The same logic that made beta-blockers dangerous before the operation.' },
+          { id: 'no', label: 'It won’t — pacing at 100 raises oxygen demand', verdict: 'wrong', points: 0, why: 'A modest rate rise is worth it in a stroke-volume-limited heart.' },
+        ]} />
+    </>
+  );
+}
+
+/* ============================================================
+   M&M — WAR STORIES
+   ============================================================ */
+
+function WarStories() {
+  return (
+    <>
+      <p className="cs-p">Composite morbidity-and-mortality cases. Details changed; the mechanism, and the outcome, are the kind that happen.</p>
+
+      <WarStory title="💊 The HFpEF that was a shell"
+        mistake="Escalating loop diuretics for “HFpEF” in a lymphoma survivor whose JVP rose on inspiration, while the creatinine climbed."
+        burn="A rising creatinine with each diuretic step, a high JVP and ascites: think constriction. Look at the neck while the patient breathes.">
+        <p className="cs-p">A 58-year-old man, mantle radiotherapy at 30. Ascites and oedema, “HFpEF with cardiorenal syndrome”. Furosemide by infusion, then metolazone. Creatinine 110 → 390, potassium 6.9, a broad-complex bradycardia and arrest on the ward. Resuscitated; dialysis; he died of line sepsis on day 19. The post-mortem pericardium was 9 mm thick and calcified.</p>
+      </WarStory>
+      <Decision id="mm-hfpef" question="What one bedside finding should have stopped the metolazone?"
+        options={[
+          { id: 'kuss', label: 'A JVP that rises on inspiration, with ascites out of proportion to the oedema', verdict: 'best', points: 10, why: 'Kussmaul and ascites point at the right heart’s container. One look; then an echo with respirometry.' },
+          { id: 'crack', label: 'Basal crackles', verdict: 'wrong', points: 0, why: 'Non-specific.' },
+          { id: 'bnp', label: 'A very high BNP', verdict: 'wrong', points: 0, why: 'His was modest — the clue nobody used.' },
+        ]} />
+
+      <WarStory title="🫃 The cirrhosis that was a heart"
+        mistake="Labelling cardiac ascites as cirrhosis and placing a TIPS without looking at the neck veins."
+        burn="Ascites with a high SAAG AND a high protein: post-sinusoidal — the heart or the hepatic veins. Never TIPS a raised JVP.">
+        <p className="cs-p">A 49-year-old woman, “cryptogenic cirrhosis” on a stiff FibroScan. Refractory ascites, so a TIPS shunt. Within an hour her portal blood poured into a right heart that could not take it: pulmonary oedema, hypoxic arrest in the radiology suite. She survived with a hypoxic brain injury. Her pericardium was thick and calcified on the CT nobody had re-read.</p>
+      </WarStory>
+      <Decision id="mm-tips" question="Which test result, already in her notes, should have changed the diagnosis?"
+        options={[
+          { id: 'prot', label: 'Ascitic protein 32 g/L with a SAAG of 16', verdict: 'best', points: 10, why: 'High gradient, high protein: congestion from above, not a scarred liver.' },
+          { id: 'plt', label: 'Platelets 190', verdict: 'ok', points: 3, why: 'Normal platelets argue against portal hypertension from cirrhosis, but the fluid is more specific.' },
+          { id: 'alt', label: 'A normal ALT', verdict: 'wrong', points: 0, why: 'Non-specific.' },
+        ]} />
+
+      <WarStory title="🪟 The window that was not enough"
+        mistake="An anterior-only pericardiectomy through a left thoracotomy for calcific constriction."
+        burn="Radical — phrenic to phrenic, the diaphragmatic surfaces, the IVC band. A partial operation is often a first operation.">
+        <p className="cs-p">A 61-year-old with radiation constriction. A quick anterior pericardiectomy: “the diaphragmatic surface looked too dangerous”. Better for three months, then the ascites returned. Redo sternotomy two years later into a scarred, radiated chest: an RV tear on entry, massive transfusion, and death on day 4 from multi-organ failure.</p>
+      </WarStory>
+
+      <WarStory title="🏺 The clamp on the eggshell"
+        mistake="Cross-clamping a porcelain aorta for a surgical aortic valve replacement in a radiated chest."
+        burn="Porcelain aorta: never clamp. Plan treatments that do not touch it — TAVI, PCI, an operation that needs no clamp.">
+        <p className="cs-p">A 56-year-old Hodgkin survivor with severe AS and constriction, booked for “one operation for everything”. The calcium was noted on the chest X-ray, not on a CT. The clamp cracked the aorta’s wall; debris showered the brain. She woke with a dense left hemiplegia and aphasia — and a new valve. She aspirated on day 12 and died three weeks after the operation.</p>
+      </WarStory>
+      <Decision id="mm-clamp" question="Which pre-operative test would have changed the plan?"
+        options={[
+          { id: 'ct', label: 'A non-contrast or gated CT of the whole thoracic aorta — and epiaortic ultrasound in theatre before any clamp', verdict: 'best', points: 10, why: 'Every radiated chest needs a CT before cardiac surgery: aorta, pericardium, sternum-to-RV distance, mammary arteries.' },
+          { id: 'echo', label: 'Another TTE', verdict: 'wrong', points: 0, why: 'Echo cannot map the ascending aorta’s calcium.' },
+          { id: 'angio', label: 'Coronary angiography', verdict: 'ok', points: 2, why: 'Needed, but it would not have shown the full extent of the porcelain.' },
+        ]} />
+
+      <WarStory title="🛑 The beta-blocker for a ‘sinus tachycardia’"
+        mistake="Giving IV metoprolol to slow a sinus tachycardia of 112 in a patient with undiagnosed constriction."
+        burn="In a fixed-stroke-volume heart, tachycardia IS the output. Find out why the heart is fast before you slow it.">
+        <p className="cs-p">A 47-year-old in the ED with breathlessness and a heart rate of 112: “anxious, palpitations”. Metoprolol 5 mg IV, then another 5. Rate 74; BP 70/40; then 52/30, unresponsive, PEA. Twenty minutes of CPR and adrenaline brought her back. The echo the next day: septal bounce, a thick pericardium, E variation 40%.</p>
+      </WarStory>
+
+      <WarStory title="🎗️ The beam’s other legacy"
+        mistake="Discharging a mantle-radiotherapy survivor from follow-up without a survivorship plan: no breast screening, no thyroid checks, no cardiac surveillance."
+        burn="Treat the survivor, not just the heart: breast MRI, thyroid function, lipids, carotids, and an echo every five years.">
+        <p className="cs-p">A 44-year-old, mantle field at 19, “cured” and discharged at 29. Nobody told her that her breast cancer risk was several times the population’s. A lump found at 44 was already metastatic; she died at 47. Her cardiology admission a year earlier had fixed her valve and never mentioned her breasts.</p>
+      </WarStory>
+      <Note kind="warn" title="Why these six stories">Every one of them is the same mistake in a different coat: treating the organ in front of you without asking what the beam crossed. The pericardium, the valves, the aorta, the heart rate and the breasts all belong to one history.</Note>
+    </>
+  );
+}
+
+/* ============================================================
+   DISCHARGE, SURVIVORSHIP & DEBRIEF
+   ============================================================ */
+
+function Debrief() {
+  const { totals, def } = useCase();
+  const pct = totals.max ? Math.round(totals.got / totals.max * 100) : 0;
+  const band = pct >= 85 ? 'Distinction' : pct >= 70 ? 'Pass with merit' : pct >= 55 ? 'Pass' : 'Needs another run';
+  return (
+    <>
+      <div className="cs-card cs-vignette">
+        <p className="cs-p" style={{ marginBottom: 0 }}><span className="cs-time">🏡 day 58</span>Extubated on day 3, both hemidiaphragms moving. Off inotropes on day 4. Weight down 9 kg on low-dose diuretic; no ascites since. Walking two flights. Echo: CVP estimate 5–10, no septal bounce, E variation 8%, TAVI gradient 11 mmHg, moderate MR unchanged.</p>
+      </div>
+      <Decision id="s10-diur" question="Diuretics at discharge?"
+        options={[
+          { id: 'low', label: 'Low-dose loop diuretic for a few weeks, reviewed against weight and kidneys — many patients need less or none as the liver and kidneys recover', verdict: 'best', points: 8,
+            why: 'The shell is off, so filling no longer needs a high pressure. Some patients keep residual restriction (as she may) and need a small regular dose.' },
+          { id: 'high', label: 'Her old 120 mg a day', verdict: 'wrong', points: 0, why: 'That dose was the spiral.' },
+          { id: 'none', label: 'Stop all diuretics — she is cured', verdict: 'ok', points: 3, why: 'Possible later; her myocardium is not normal.' },
+        ]} />
+      <MultiSelect id="s10-plan" question="🎗️ What goes in her survivorship and cardiac follow-up plan?"
+        items={[
+          { id: 'echo', label: 'Echo at 1–3 months, then at least yearly: TAVI gradients, MR, RV, any return of constriction or restriction', correct: true, why: 'Radiation valve disease progresses; the mitral valve is next in line.' },
+          { id: 'breast', label: 'Breast cancer screening (annual MRI ± mammography) — she should have started years ago', correct: true, why: 'Mantle radiotherapy at a young age greatly raises breast cancer risk; screening is recommended from about 8 years after treatment (not before 25).' },
+          { id: 'thy', label: 'Thyroid function yearly; neck examination', correct: true, why: 'Hypothyroidism and thyroid nodules are common after neck radiation.' },
+          { id: 'car', label: 'Carotid duplex and cardiovascular risk-factor control (lipids, BP, glucose)', correct: true, why: 'Radiation accelerates carotid and coronary disease.' },
+          { id: 'lung', label: 'Lung function follow-up; smoking avoidance', correct: true, why: 'Radiation lung fibrosis and lung cancer risk.' },
+          { id: 'endo', label: 'Endocarditis prevention for her TAVI: dental hygiene, prophylaxis for dental procedures, a valve card', correct: true, why: 'A prosthetic valve.' },
+          { id: 'conduct', label: 'ECG at each visit — conduction disease may progress', correct: true, why: 'Her PR is 250 ms with fascicular block.' },
+          { id: 'onco', label: 'No further follow-up needed — the lymphoma was cured 25 years ago', correct: false, why: 'The lymphoma was. The radiation’s effects are lifelong.' },
+        ]} />
+
+      <div className="cs-h2">🧪 Case quiz</div>
+      <Quiz id="s10-quiz" items={[
+        { q: 'Kussmaul’s sign is…', options: ['Specific for constrictive pericarditis', 'A rise in JVP with inspiration, seen in constriction, restriction, RV infarction and severe TR', 'A fall in BP of > 10 mmHg with inspiration', 'Typical of tamponade'], answer: 1, why: 'A right heart that cannot accept inspiratory venous return — not one disease.' },
+        { q: 'A pericardial knock occurs…', options: ['~70 ms after A2, with a rumble', '~100–120 ms after A2, sharp and high-pitched', '~160 ms after A2, low-pitched', 'Before S1'], answer: 1, why: 'Earlier than an S3, later than an opening snap.' },
+        { q: 'Ascites with SAAG 17 g/L and protein 34 g/L suggests…', options: ['Cirrhosis', 'Peritoneal malignancy', 'Post-sinusoidal (cardiac) portal hypertension', 'Nephrotic syndrome'], answer: 2, why: 'High gradient, high protein: healthy, congested sinusoids.' },
+        { q: 'Mitral E velocity falling 35% on inspiration, medial e′ 13 cm/s:', options: ['Restrictive cardiomyopathy', 'Constriction', 'Normal', 'Severe MR'], answer: 1, why: 'Respiratory variation ≥ 25% with a brisk e′.' },
+        { q: 'Annulus reversus means…', options: ['Lateral e′ > medial e′', 'Medial e′ > lateral e′', 'Mitral annular calcification', 'Reversed hepatic vein flow'], answer: 1, why: 'The lateral wall is tethered to the pericardium.' },
+        { q: 'The most accurate catheter criterion for constriction is…', options: ['Dip-and-plateau', 'LVEDP − RVEDP ≤ 5 mmHg', 'Systolic area index > 1.1 (discordance)', 'RV systolic pressure > 55 mmHg'], answer: 2, why: 'Ventricular interdependence, measured.' },
+        { q: 'Hepatic vein diastolic flow reversal in EXPIRATION suggests…', options: ['Constriction', 'Restriction', 'Tamponade', 'Normal'], answer: 0, why: 'Restriction reverses in inspiration.' },
+        { q: 'Why is her aortic gradient only 30 mmHg despite an AVA of 0.8 cm²?', options: ['The valve is moderate', 'Low flow: the caged LV cannot fill enough', 'Measurement error', 'Aortic regurgitation'], answer: 1, why: 'Gradient depends on flow²; calcium score confirms severity.' },
+        { q: 'In a radiated chest with a porcelain aorta, the strategy should…', options: ['Combine everything into one sternotomy with a cross-clamp', 'Avoid touching the aorta: PCI, TAVI, then an off-pump pericardiectomy', 'Use vein grafts to the aorta', 'Avoid any intervention'], answer: 1, why: 'Never clamp the eggshell.' },
+        { q: 'Post-pericardiectomy hypotension, CVP 19, dilated RV, no collection. First move:', options: ['A fluid bolus', 'Metoprolol', 'Stop fluid; noradrenaline, inotrope, iNO, pacing, then diuresis', 'Back to theatre'], answer: 2, why: 'RV failure: pressure, contractility, PVR, rate — less volume.' },
+      ]} />
+
+      <div className="cs-card" style={{ borderColor: 'var(--accent2)' }}>
+        <div className="cs-h2" style={{ marginTop: 0 }}>🏆 Your score</div>
+        <p className="cs-p" style={{ fontSize: 20 }}><b className="cs-mono">{totals.got} / {totals.max}</b> · {pct}% · <b style={{ color: pct >= 70 ? 'var(--good)' : 'var(--amber)' }}>{band}</b></p>
+        <div className="cs-scorebar" style={{ marginBottom: 14 }}><i style={{ width: `${pct}%` }} /></div>
+        <Table head={['Stage', 'Points']} rows={def.stages.map(st => [st.title, N(`${totals.by[st.id]?.got || 0} / ${totals.by[st.id]?.max || 0}`)])} />
+      </div>
+
+      <div className="cs-card">
+        <div className="cs-h2" style={{ marginTop: 0 }}>📌 Take-home points</div>
+        <ol className="cs-ul">
+          <li className="cs-li">☢️ Ask every breathless patient about chest radiation — the disease arrives 10–30 years later, in every structure the beam crossed.</li>
+          <li className="cs-li">🫗 Look at the neck while they breathe: a JVP that rises on inspiration with a steep y says the right heart is in a box.</li>
+          <li className="cs-li">💧 Ascites with a high SAAG and a high protein is the heart until proven otherwise — never TIPS a raised JVP.</li>
+          <li className="cs-li">🧪 A modest BNP in a very congested patient is a clue for constriction, not a reason to look elsewhere.</li>
+          <li className="cs-li">⚖️ Constriction is a see-saw: E variation ≥ 25%, brisk medial e′ (annulus reversus), expiratory hepatic vein reversal, septal bounce — and discordant LV/RV peaks.</li>
+          <li className="cs-li">📉 Dip-and-plateau and Kussmaul occur in restriction too; discordance and equalisation separate them.</li>
+          <li className="cs-li">🫀 Constriction hides aortic stenosis: low flow, low gradient — use the calcium score.</li>
+          <li className="cs-li">🏺 A porcelain aorta decides the plan: never clamp it; PCI, TAVI and an off-pump radical pericardiectomy.</li>
+          <li className="cs-li">⚡ In constriction, rate is output: no beta-blockers, no bradycardia, and keep filling pressures up until the shell is off.</li>
+          <li className="cs-li">🌙 After the shell comes off the old numbers are wrong: do not chase the CVP with fluid — a released RV dilates and fails.</li>
+          <li className="cs-li">🎗️ Treat the survivor: breast screening, thyroid, carotids, lungs, and lifelong cardiac surveillance.</li>
+        </ol>
+      </div>
+      <CaseLibrary playlist={VALVE_PLAYLIST} start={VALVE_PLAYLIST_START} channels={[...VALVE_CHANNELS, ...CONSTRICTION_SEARCHES.slice(0, 2)]}>
+        Real structural and valvular cases from interventional teams. Watch them after this case and spot the hostile-chest decisions you have just made — the porcelain aorta, the left main ostium, the valve that can only go in from the groin.
+      </CaseLibrary>
+    </>
+  );
+}
 
 /* ============================================================
    THE CASE
@@ -853,10 +1142,21 @@ export const VALVE_03 = {
       pill: '📟 The old numbers belonged to the shell',
       lede: 'Drains, pacing, fluids and drug doses — and why the first night is the dangerous one.',
       enter: ({ setVitals, atLeastClock }) => { setVitals({ hr: 96, sys: 108, dia: 62, rhythm: 'sinus' }); atLeastClock(min(24 * 43 + 16, 0)); } },
-    { id: 's9', icon: '🚨', nav: 'Night Crisis', title: '02:40 — low output with a dilated RV', Component: Todo },
-    { id: 'cyc', icon: '🧠', nav: 'The Vicious Cycle', title: 'The vicious cycle', Component: Todo },
-    { id: 'mm', icon: '💀', nav: 'M&M War Stories', title: 'Morbidity & mortality: war stories', Component: Todo },
-    { id: 's10', icon: '🏁', nav: 'Debrief & Assessment', title: 'Survivorship, debrief & assessment', Component: Todo },
+    { id: 's9', icon: '🚨', nav: 'Night Crisis', title: '02:40 — low output with a dilated RV', Component: Crisis,
+      pill: '🌙 The RV gives way',
+      lede: 'Hypotension with a rising CVP: tamponade or RV failure? Echo, then pull the right levers.',
+      enter: ({ setVitals, atLeastClock }) => { setVitals({ hr: 76, sys: 78, dia: 46, spo2: 93, rhythm: 'sinus' }); atLeastClock(min(24 * 44 + 2, 40)); } },
+    { id: 'cyc', icon: '🧠', nav: 'The Vicious Cycle', title: 'The vicious cycle', Component: Cycles,
+      pill: '🔁 The why behind the why',
+      lede: 'The diuretic trap, the RV spiral, and the radiation cascade that never stops.',
+      enter: ({ setVitals }) => setVitals({ hr: 100, sys: 104, dia: 62, spo2: 96, rhythm: 'paced' }) },
+    { id: 'mm', icon: '💀', nav: 'M&M War Stories', title: 'Morbidity & mortality: war stories', Component: WarStories,
+      pill: '⚰️ Every rule was paid for',
+      lede: 'Six patients who taught these rules the hard way.' },
+    { id: 's10', icon: '🏁', nav: 'Debrief & Assessment', title: 'Survivorship, debrief & assessment', Component: Debrief,
+      pill: '🎓 Treat the survivor — score & take-home',
+      lede: 'Diuretics at discharge, a survivorship plan, the quiz — and your score.',
+      enter: ({ setVitals, atLeastClock }) => { setVitals({ hr: 84, sys: 118, dia: 70, spo2: 97, rhythm: 'sinus' }); atLeastClock(min(24 * 57 + 11, 0)); } },
   ],
 };
 
