@@ -348,7 +348,7 @@ function Measure() {
       <ScoreOnce id="s2-av" pts={av == null ? null : av.close ? 6 : 2} max={6} />
       <div className="cs-card">
         <Table head={['Measure', 'Value', 'Meaning']} rows={[
-          ['Vmax / mean gradient', N('3.5 m/s / 30 mmHg'), '“Moderate” by gradient'],
+          ['Vmax / mean gradient', N('3.5 m/s / 27 mmHg'), '“Moderate” by gradient'],
           ['AVA (continuity)', N('0.8 cm² (0.45 cm²/m²)', 'cs-hi'), 'Severe by area'],
           ['Stroke volume index', N('28 mL/m²', 'cs-hi'), 'LOW flow (< 35) — with an EF of 60%'],
           ['Dimensionless index', N('0.23', 'cs-hi'), 'Severe'],
@@ -356,11 +356,11 @@ function Measure() {
           ['Mitral', N('moderate MR, mean gradient 4 mmHg'), 'Calcified curtain; leaflets restricted'],
         ]} />
       </div>
-      <Decision id="s2-lflg" question="EF 60%, SVi 28, AVA 0.8 cm², mean gradient 30, calcium score 2,350 AU. Grade the aortic stenosis — and why does the gradient lie?"
+      <Decision id="s2-lflg" question="EF 60%, SVi 28, AVA 0.8 cm², mean gradient 27, calcium score 2,350 AU. Grade the aortic stenosis — and why does the gradient lie?"
         options={[
           { id: 'sev', label: 'Severe, low-flow, low-gradient AS with preserved EF: the constriction underfills the LV, so too little flow crosses the valve to build a severe gradient', verdict: 'best', points: 10,
             why: 'Gradient ∝ flow². A small, underfilled LV pushing 28 mL/m² cannot generate 40 mmHg through even a tight valve. The calcium score confirms it anatomically. Once the shell comes off and the LV fills, the gradient will climb — the valve has to be dealt with.' },
-          { id: 'mod', label: 'Moderate AS — the gradient is 30', verdict: 'wrong', points: 0, why: 'A gradient is a measure of flow as much as of the valve. Treat the gradient alone and the valve will declare itself on the night after the pericardiectomy.' },
+          { id: 'mod', label: 'Moderate AS — the gradient is 27', verdict: 'wrong', points: 0, why: 'A gradient is a measure of flow as much as of the valve. Treat the gradient alone and the valve will declare itself on the night after the pericardiectomy.' },
           { id: 'dse', label: 'Indeterminate — dobutamine stress echo first', verdict: 'ok', points: 3, why: 'Dobutamine is the test for low flow from a WEAK ventricle (low EF). Her LV is strong but caged — it cannot fill more however hard it is driven. Calcium scoring is the right tool here.' },
         ]} />
 
@@ -552,7 +552,7 @@ function Setup() {
   return (
     <>
       <div className="cs-card cs-vignette">
-        <p className="cs-p"><span className="cs-time">📅 day 6</span>IVUS-guided ostial left main stent (4.0 mm, proximal optimisation, ostium covered — MSA 11.2 mm²), then transfemoral TAVI under light sedation, implanted high. Mean gradient 30 → 9 mmHg. PR 220 → 250 ms; no high-grade block on 72 hours of telemetry; a 14-day patch monitor on discharge stayed clean.</p>
+        <p className="cs-p"><span className="cs-time">📅 day 6</span>IVUS-guided ostial left main stent (4.0 mm, proximal optimisation, ostium covered — MSA 11.2 mm²), then transfemoral TAVI under light sedation, implanted high. Mean gradient 27 → 9 mmHg. PR 220 → 250 ms; no high-grade block on 72 hours of telemetry; a 14-day patch monitor on discharge stayed clean.</p>
         <p className="cs-p"><span className="cs-time">📅 weeks 1–6</span>Clopidogrel stopped at 1 month; aspirin continued. Furosemide 40 mg, spironolactone 25 mg. She is a little better — and her stroke volume a little bigger now the valve is open — but the ascites is back within ten days of each tap.</p>
         <p className="cs-p" style={{ marginBottom: 0 }}><span className="cs-time">🌅 day 44 · 07:30</span>Theatre 2. Today the shell comes off.</p>
       </div>
@@ -1024,7 +1024,7 @@ function Debrief() {
         { q: 'Annulus reversus means…', options: ['Lateral e′ > medial e′', 'Medial e′ > lateral e′', 'Mitral annular calcification', 'Reversed hepatic vein flow'], answer: 1, why: 'The lateral wall is tethered to the pericardium.' },
         { q: 'The most accurate catheter criterion for constriction is…', options: ['Dip-and-plateau', 'LVEDP − RVEDP ≤ 5 mmHg', 'Systolic area index > 1.1 (discordance)', 'RV systolic pressure > 55 mmHg'], answer: 2, why: 'Ventricular interdependence, measured.' },
         { q: 'Hepatic vein diastolic flow reversal in EXPIRATION suggests…', options: ['Constriction', 'Restriction', 'Tamponade', 'Normal'], answer: 0, why: 'Restriction reverses in inspiration.' },
-        { q: 'Why is her aortic gradient only 30 mmHg despite an AVA of 0.8 cm²?', options: ['The valve is moderate', 'Low flow: the caged LV cannot fill enough', 'Measurement error', 'Aortic regurgitation'], answer: 1, why: 'Gradient depends on flow²; calcium score confirms severity.' },
+        { q: 'Why is her aortic gradient only 27 mmHg despite an AVA of 0.8 cm²?', options: ['The valve is moderate', 'Low flow: the caged LV cannot fill enough', 'Measurement error', 'Aortic regurgitation'], answer: 1, why: 'Gradient depends on flow²; calcium score confirms severity.' },
         { q: 'In a radiated chest with a porcelain aorta, the strategy should…', options: ['Combine everything into one sternotomy with a cross-clamp', 'Avoid touching the aorta: PCI, TAVI, then an off-pump pericardiectomy', 'Use vein grafts to the aorta', 'Avoid any intervention'], answer: 1, why: 'Never clamp the eggshell.' },
         { q: 'Post-pericardiectomy hypotension, CVP 19, dilated RV, no collection. First move:', options: ['A fluid bolus', 'Metoprolol', 'Stop fluid; noradrenaline, inotrope, iNO, pacing, then diuresis', 'Back to theatre'], answer: 2, why: 'RV failure: pressure, contractility, PVR, rate — less volume.' },
       ]} />

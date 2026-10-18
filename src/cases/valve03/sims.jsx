@@ -37,6 +37,15 @@ function lungVol(sec) {
   return ph < INSP ? 0.5 - 0.5 * Math.cos(ph / INSP * Math.PI) : 0.5 + 0.5 * Math.cos((ph - INSP) / (1 - INSP) * Math.PI);
 }
 const gauss = (x, m, s) => Math.exp(-(((x - m) / s) ** 2));
+/** Two breaths on a wide screen, a little over one on a phone. */
+const spanFor = w => (w < 520 ? 1.3 : 2) * BREATH;
+/** A canvas title, right-aligned and shrunk to fit beside the RESP label. */
+function canvasTitle(g, w, text, x1 = w - 8, room = w - 110) {
+  let f = 11;
+  g.font = `600 ${f}px ${MONO}`;
+  while (g.measureText(text).width > room && f > 8) { f -= 0.5; g.font = `600 ${f}px ${MONO}`; }
+  g.fillStyle = '#9FB4C6'; g.textAlign = 'right'; g.fillText(text, x1, 14); g.textAlign = 'left';
+}
 
 function drawResp(g, x0, w, y, amp, span, t, label = true) {
   g.strokeStyle = '#7DD3FC'; g.lineWidth = 1.4; g.beginPath();
@@ -83,7 +92,7 @@ export function JVPViewer({ modes = ['constriction', 'normal', 'restriction', 't
   useCanvas(ref, 250, (g, w, h, t) => {
     const { P } = S.current;
     g.fillStyle = '#03070B'; g.fillRect(0, 0, w, h);
-    const span = 2 * BREATH, x0 = 34, gw = w - 120;
+    const span = spanFor(w), x0 = 34, gw = w - 120;
     shadeInsp(g, x0, x0 + gw + 6, 20, h - 10, span, t * 0);
     drawResp(g, x0, x0 + gw + 6, 44, 24, span, 0);
     // venous column height (cm above the sternal angle) on the cardiac waveform
@@ -114,7 +123,7 @@ export function JVPViewer({ modes = ['constriction', 'normal', 'restriction', 't
     g.strokeStyle = '#2B4366'; g.strokeRect(gx - 14, Yc(20), 28, Yc(0) - Yc(20));
     g.fillStyle = '#9FB4C6'; g.font = `600 10px ${MONO}`; g.fillText('neck', gx - 12, Yc(20) - 6);
     g.fillStyle = inspWeight(now) > 0.05 ? '#7DD3FC' : '#6A7F9B'; g.fillText(inspWeight(now) > 0.05 ? 'IN' : 'OUT', gx - 9, h - 8);
-    g.fillStyle = '#9FB4C6'; g.font = `600 11px ${MONO}`; g.fillText(`${P.name.toUpperCase()} · JVP AT 45°`, x0 + 120, 14);
+    canvasTitle(g, w, `${P.name.toUpperCase()} · JVP AT 45°`, x0 + gw, gw - 90);
   }, []);
   const P = JVP[key];
   const kuss = P.insp > P.exp;
@@ -187,7 +196,7 @@ export function KnockPhono({ sounds = ['knock', 's3', 'os'], onMeasure, done }) 
     g.strokeStyle = '#22D3EE'; g.setLineDash([4, 3]); g.lineWidth = 1.2;
     g.beginPath(); g.moveTo(X(a2), 20); g.lineTo(X(a2), h - 20); g.moveTo(X(a2 + c / 1000), 20); g.lineTo(X(a2 + c / 1000), h - 20); g.stroke(); g.setLineDash([]);
     g.fillStyle = '#22D3EE'; g.font = `700 11px ${MONO}`; g.fillText(`A2 → ${c} ms`, X(a2) + 6, 30);
-    g.fillStyle = '#6A7F9B'; g.font = `600 10px ${MONO}`; g.fillText(`PHONOCARDIOGRAM · ${K.hr} bpm · 100 ms = ${Math.round(X(0.1) - X(0))} px`, x0, 14);
+    g.fillStyle = '#6A7F9B'; g.font = `600 10px ${MONO}`; g.fillText(w < 520 ? `PCG · ${K.hr} bpm` : `PHONOCARDIOGRAM · ${K.hr} bpm · 100 ms = ${Math.round(X(0.1) - X(0))} px`, x0, 14);
   }, []);
 
   const start = () => {
@@ -292,9 +301,9 @@ export function LVRVPressure({ mode = 'constriction', onMeasure, done }) {
   const [rv, setRv] = useState(10);
   const [call, setCall] = useState(null);
   const S = useRef({}); S.current = { lv, rv };
-  const span = 2 * BREATH;
   useCanvas(ref, 290, (g, w, h, t) => {
     const { lv: cl, rv: cr } = S.current;
+    const span = spanFor(w);
     g.fillStyle = '#03070B'; g.fillRect(0, 0, w, h);
     const x0 = 34, Y = p => h - 22 - p / 140 * (h - 76);
     shadeInsp(g, x0, w, 50, h - 20, span, 0);
@@ -315,7 +324,7 @@ export function LVRVPressure({ mode = 'constriction', onMeasure, done }) {
     g.strokeStyle = 'rgba(233,242,252,0.25)'; g.beginPath(); g.moveTo(cx, 52); g.lineTo(cx, h - 20); g.stroke();
     g.fillStyle = '#F2D24B'; g.font = `700 12px ${MONO}`; g.fillText('LV', w - 70, 64);
     g.fillStyle = '#22D3EE'; g.fillText('RV', w - 40, 64);
-    g.fillStyle = '#9FB4C6'; g.font = `600 11px ${MONO}`; g.fillText(H.name.toUpperCase(), x0 + 110, 14);
+    canvasTitle(g, w, H.name.toUpperCase());
   }, [mode]);
   const sai = systolicAreaIndex(mode);
   const close = Math.abs(lv - H.lv.edp) <= 3 && Math.abs(rv - H.rv.edp) <= 3;
@@ -371,9 +380,9 @@ export function MitralInflow({ mode = 'constriction', onMeasure, done }) {
   const [ex, setEx] = useState(0.8);
   const [ins, setIns] = useState(0.8);
   const S = useRef({}); S.current = { ex, ins };
-  const span = 2 * BREATH;
   useCanvas(ref, 260, (g, w, h) => {
     const { ex: ce, ins: ci } = S.current;
+    const span = spanFor(w);
     g.fillStyle = '#000'; g.fillRect(0, 0, w, h);
     const x0 = 40, base = 78, Y = v => base + v * 150;
     shadeInsp(g, x0, w, 54, h - 8, span, 0);
@@ -392,9 +401,9 @@ export function MitralInflow({ mode = 'constriction', onMeasure, done }) {
     }
     for (const [v, col, lab] of [[ce, '#F5C451', 'E exp'], [ci, '#22D3EE', 'E insp']]) {
       g.strokeStyle = col; g.setLineDash([5, 4]); g.lineWidth = 1.2; g.beginPath(); g.moveTo(x0, Y(v)); g.lineTo(w, Y(v)); g.stroke(); g.setLineDash([]);
-      g.fillStyle = col; g.font = `700 11px ${MONO}`; g.fillText(`${lab} ${v.toFixed(2)} m/s`, lab === 'E exp' ? w - 150 : w - 300, Y(v) + 13);
+      g.fillStyle = col; g.font = `700 11px ${MONO}`; g.fillText(`${lab} ${v.toFixed(2)} m/s`, lab === 'E exp' ? w - 150 : Math.max(x0 + 4, w - 300), Y(v) + 13);
     }
-    g.fillStyle = '#9FB4C6'; g.font = `600 11px ${MONO}`; g.fillText(M.name.toUpperCase(), x0 + 100, 14);
+    canvasTitle(g, w, M.name.toUpperCase());
   }, [mode]);
   const variation = ex > 0 ? (ex - ins) / ex * 100 : 0;
   const trueVar = (M.eExp - M.eInsp) / M.eExp * 100;
@@ -434,9 +443,9 @@ export function AnnulusDoppler({ mode = 'constriction', onMeasure, done }) {
   const [l, setL] = useState(8);
   const ref = useRef(null);
   const S = useRef({}); S.current = { tab, site, m, l };
-  const span = 2 * BREATH;
   useCanvas(ref, 240, (g, w, h, t) => {
     const { tab: tb, site: st, m: cm, l: cl } = S.current;
+    const span = spanFor(w);
     g.fillStyle = '#000'; g.fillRect(0, 0, w, h);
     const x0 = 40;
     g.font = `10px ${MONO}`;
@@ -458,7 +467,7 @@ export function AnnulusDoppler({ mode = 'constriction', onMeasure, done }) {
       const cal = st === 'med' ? cm : cl;
       g.strokeStyle = st === 'med' ? '#F5C451' : '#22D3EE'; g.setLineDash([5, 4]); g.beginPath(); g.moveTo(x0, Y(cal)); g.lineTo(w, Y(cal)); g.stroke(); g.setLineDash([]);
       g.fillStyle = g.strokeStyle; g.font = `700 11px ${MONO}`; g.fillText(`e′ caliper ${cal} cm/s`, w - 170, Y(cal) + 14);
-      g.fillStyle = '#9FB4C6'; g.font = `600 11px ${MONO}`; g.fillText(`TISSUE DOPPLER · ${st === 'med' ? 'MEDIAL (SEPTAL)' : 'LATERAL'} MITRAL ANNULUS`, x0, 16);
+      g.fillStyle = '#9FB4C6'; g.font = `600 11px ${MONO}`; g.font = `600 ${w < 520 ? 9 : 11}px ${MONO}`; g.fillText(`TISSUE DOPPLER · ${st === 'med' ? 'MEDIAL (SEPTAL)' : 'LATERAL'} MITRAL ANNULUS`, x0, 16);
       g.fillStyle = '#6A7F9B'; g.font = `600 10px ${MONO}`; g.fillText("s′ above · e′ and a′ below", x0, 32);
     } else if (tb === 'hv') {
       shadeInsp(g, x0, w, 50, h - 8, span, 0);
@@ -478,11 +487,11 @@ export function AnnulusDoppler({ mode = 'constriction', onMeasure, done }) {
         g.fillStyle = v > 0 ? 'rgba(255,90,82,0.85)' : 'rgba(100,170,255,0.85)';
         g.fillRect(px, Math.min(base, base - v), 1, Math.abs(v));
       }
-      g.fillStyle = '#9FB4C6'; g.font = `600 11px ${MONO}`; g.fillText('HEPATIC VEIN · PW, SUBCOSTAL', x0 + 120, 14);
+      canvasTitle(g, w, 'HEPATIC VEIN · PW, SUBCOSTAL');
     } else {
       // M-mode through the septum: the bounce
       const per = 60 / 96;
-      g.fillStyle = '#9FB4C6'; g.font = `600 11px ${MONO}`; g.fillText('M-MODE · PARASTERNAL, THROUGH THE SEPTUM', x0, 16);
+      canvasTitle(g, w, 'M-MODE · PARASTERNAL, THROUGH THE SEPTUM', w - 8, w - 20);
       for (let px = x0; px < w - 6; px++) {
         const sec = (px - x0) / (w - 6 - x0) * span, b = Math.floor(sec / per) * per, x = (sec - b) / per;
         const iw = inspWeight(b + per * 0.5);
@@ -499,7 +508,7 @@ export function AnnulusDoppler({ mode = 'constriction', onMeasure, done }) {
         if (Math.random() < 0.06) { g.fillStyle = 'rgba(200,200,200,0.12)'; g.fillRect(px, 60 + Math.random() * 130, 1, 2); }
       }
       g.fillStyle = '#6A7F9B'; g.font = `600 10px ${MONO}`; g.fillText('RV', 8, 80); g.fillText('septum', 2, 110); g.fillText('LV', 8, 160);
-      if (A.sb) { g.fillStyle = '#F5C451'; g.fillText('early-diastolic notch — bigger in inspiration', w - 300, h - 10); }
+      if (A.sb) { g.fillStyle = '#F5C451'; g.textAlign = 'right'; g.fillText(w < 520 ? 'notch: bigger in inspiration' : 'early-diastolic notch — bigger in inspiration', w - 8, h - 10); g.textAlign = 'left'; }
     }
   }, [mode]);
   const reversus = m > l;

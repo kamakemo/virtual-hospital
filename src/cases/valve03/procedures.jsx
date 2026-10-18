@@ -183,7 +183,7 @@ export function Pericardiectomy({ onResult, done }) {
     <div className="cs-card tight">
       <div className="cs-grid2" style={{ alignItems: 'start' }}>
         <div className="cs-viewer" style={{ background: '#080406' }}>
-          <svg viewBox="40 70 320 260" style={{ width: '100%', display: 'block' }} role="group" aria-label="The pericardium seen through a sternotomy">
+          <svg viewBox="36 70 350 260" style={{ width: '100%', display: 'block' }} role="group" aria-label="The pericardium seen through a sternotomy">
             <defs>
               <pattern id="pc-calc" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#B9A98A" /><circle cx="2" cy="2" r="1.4" fill="#E9E1CC" /><circle cx="6" cy="6" r="1" fill="#8F826A" /></pattern>
             </defs>
@@ -252,7 +252,7 @@ export const RESCUE_LEVERS = [
   { id: 'norad', label: '🩸 Noradrenaline to MAP ≥ 65 (start 0.05–0.1 µg/kg/min)', d: { map: 12, ci: 0.1 }, pts: 3, msg: 'MAP 70s. The RV is perfused through the whole cardiac cycle; when aortic pressure falls below RV pressure the RV starves. Pressure first.' },
   { id: 'ino', label: '💪 Dobutamine 5 µg/kg/min (or milrinone 0.25–0.375 µg/kg/min, no bolus)', d: { ci: 0.35, map: -3 }, pts: 3, msg: 'Cardiac index up. An inodilator strengthens the atrophic RV and lowers its afterload — paired with the noradrenaline so the pressure holds.' },
   { id: 'ino_no', label: '🌬️ Inhaled nitric oxide 20 ppm', d: { rvlv: -0.2, ci: 0.2, cvp: -2 }, pts: 2, msg: 'PVR down, the RV empties better, the septum swings back. Inhaled, so it dilates only the lung vessels that ventilate — no systemic hypotension.' },
-  { id: 'pace', label: '⚡ Atrial pacing at 100 via the epicardial wires (she is junctional at 76)', d: { ci: 0.35, map: 4, hr: 100 }, pts: 3, msg: 'Atrial kick restored and the rate up. After years in a shell her stroke volume is small and fixed: output now comes from rate and synchrony.' },
+  { id: 'pace', label: '⚡ Atrial pacing at 100 via the epicardial wires (she is junctional at 76)', d: { ci: 0.35, map: 4, hr: 24 }, pts: 3, msg: 'Atrial kick restored and the rate up. After years in a shell her stroke volume is small and fixed: output now comes from rate and synchrony.' },
   { id: 'vent', label: '🫁 PEEP 10 → 5, tidal volume 6 mL/kg, correct the CO₂ and pH', d: { rvlv: -0.1, ci: 0.1, cvp: -1 }, pts: 2, msg: 'High PEEP and hypercapnic acidosis both raise pulmonary vascular resistance — the RV’s afterload.' },
   { id: 'diur', label: '🚰 Once MAP ≥ 65: furosemide infusion (or CRRT) for a slow negative balance', d: { cvp: -4, rvlv: -0.15, ci: 0.15 }, pts: 2, needMap: 65, msg: 'Off-loading the distended RV lets the septum return and the LV fill. Done with a pressure that can stand it.' },
   { id: 'ecmo', label: '📞 Tell the ECMO team now, in case she does not turn', d: {}, pts: 2, msg: 'Early warning, not yet cannulation. If the levers fail, VA-ECMO (or an RV assist device) is the bridge — called early, it is a plan; called late, it is a salvage.' },
