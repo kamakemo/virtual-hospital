@@ -116,7 +116,8 @@ export default function CArmLab({ start = { lao: 0, cra: 0, system: 'left' }, sy
   const [big, setBig] = useState(false);
   const [cineAt, setCineAt] = useState(-1e9);
   const [tab, setTab] = useState('both');
-  const S = useRef({}); S.current = { lao, cra, system, labels, cineAt };
+  const near0 = nearestView(lao, cra, system);
+  const S = useRef({}); S.current = { lao, cra, system, labels, cineAt, title: near0 ? `${near0.short.replace(/ \(.*\)/, '')} View` : `${viewName(lao, cra)} View` };
 
   // one offscreen canvas feeds the monitor in the 3D room
   const screen = useMemo(() => { const c = document.createElement('canvas'); c.width = 640; c.height = 420; return c; }, []);
@@ -285,9 +286,12 @@ export default function CArmLab({ start = { lao: 0, cra: 0, system: 'left' }, sy
 /** Contrast front and washout for a cine run started at c0 (s). Without a run, the tree stays filled. */
 function cineState(t, c0) {
   const since = t - c0;
-  if (since < 0 || since > 4.5) return { fill: 1, fade: 1 };
-  if (since < 0.3) return { fill: 0, fade: 1 };
-  return { fill: Math.min(1, (since - 0.3) / 1.4), fade: since < 3.2 ? 1 : Math.max(0.15, 1 - (since - 3.2) / 1.3) };
+  if (since < 0 || since > 6.2) return { fill: 1, fade: 1, blush: 0 };
+  if (since < 0.3) return { fill: 0, fade: 1, blush: 0 };
+  // contrast front runs out, holds, washes out leaving a myocardial blush, then the road map returns
+  const blush = since > 2.6 && since < 5.6 ? Math.sin((since - 2.6) / 3 * Math.PI) : 0;
+  const fade = since < 3.2 ? 1 : since < 4.5 ? Math.max(0.1, 1 - (since - 3.2) / 1.3) : since < 5.4 ? 0.1 : Math.min(1, 0.1 + (since - 5.4) / 0.8);
+  return { fill: Math.min(1, (since - 0.3) / 1.4), fade, blush };
 }
 
 function hud(g, w, h, st, k) {
