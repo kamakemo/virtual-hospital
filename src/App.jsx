@@ -1,401 +1,150 @@
-import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react';
-import { World } from './hospital/three/World.js';
-import ElevatorPanel from './hospital/ui/ElevatorPanel.jsx';
-import ElevatorDoors from './hospital/ui/ElevatorDoors.jsx';
-import { WINGS, WING_BY_ID, HOSPITAL_NAME, BEDS_PER_FLOOR, floorOf, pad2 } from './hospital/data.js';
-import { CASES, caseKey } from './cases/registry.js';
-
-// each written case is its own chunk, fetched the first time it is opened
-const lazyCases = {};
-const caseComponent = key => (lazyCases[key] ||= React.lazy(CASES[key]));
-
-/* the catheter lab's day list: start times for its twelve slots */
-const LIST_TIMES = ['08:00', '08:45', '09:30', '10:15', '11:00', '11:45', '12:30', '13:15', '14:00', '14:45', '15:30', '16:15'];
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { HOSPITALS, CENTRES, SECTION_BY_ID, UNIT_BY_ID, ITEM_BY_ID } from './data/catalog.js';
+import { getSession, onAuthChange, isUserAdmin, fetchContent, isSupabaseConfigured } from './supabaseClient.js';
+import Home from './pages/Home.jsx';
+import SectionPage from './pages/SectionPage.jsx';
+import UnitPage from './pages/UnitPage.jsx';
+import ItemPage from './pages/ItemPage.jsx';
+import AccountPage from './pages/AccountPage.jsx';
+import NotFound from './pages/NotFound.jsx';
 
 /* ============================================================
-   VIRTUAL HOSPITAL
-   building → floor → department → patient bed.
-   The 3D world does the drawing; this component owns where the
-   visitor is, the history stack, and the few controls laid over
-   the scene.
+   VIRTUAL TEACHING HOSPITAL
+   Hash routes:
+     #/                         home
+     #/s/<section>              a hospital or a centre
+     #/s/<section>/<unit>       a unit and its 12 items
+     #/item/<id>                one case / session / test
+     #/account                  sign in, profile, admin panel
    ============================================================ */
 
-const sleep = ms => new Promise(r => setTimeout(r, ms));
+const Ctx = createContext(null);
+export const useApp = () => useContext(Ctx);
 
-const HINTS = {
-  building: 'Drag to walk around the building · choose a floor',
-  floor: 'Drag to look around · choose a bed',
-  lab: 'Drag to look around · choose a case from today’s list',
-  bed: 'Drag to look · Esc to step back',
-};
+function parse() {
+  const h = window.location.hash.replace(/^#\/?/, '');
+  const [a, b, c] = h.split('/').filter(Boolean).map(decodeURIComponent);
+  return { a: a || '', b, c };
+}
+export const go = path => { window.location.hash = path; };
 
-function Mark() {
+export default function App() {
+  const [route, setRoute] = useState(parse);
+  const [session, setSession] = useState(null);
+  const [admin, setAdmin] = useState(false);
+  const [content, setContent] = useState({});
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const on = () => { setRoute(parse()); window.scrollTo(0, 0); };
+    window.addEventListener('hashchange', on);
+    return () => window.removeEventListener('hashchange', on);
+  }, []);
+
+  const refresh = useCallback(async () => { setContent(await fetchContent()); setLoaded(true); }, []);
+
+  useEffect(() => {
+    getSession().then(setSession);
+    return onAuthChange(setSession);
+  }, []);
+  useEffect(() => {
+    isUserAdmin(session?.user?.email).then(setAdmin);
+    refresh();
+  }, [session, refresh]);
+
+  const ctx = useMemo(() => ({ session, admin, content, loaded, refresh, setContent, demo: !isSupabaseConfigured() }), [session, admin, content, loaded, refresh]);
+
+  let page;
+  const { a, b, c } = route;
+  if (!a) page = <Home />;
+  else if (a === 's' && SECTION_BY_ID[b] && !c) page = <SectionPage section={SECTION_BY_ID[b]} />;
+  else if (a === 's' && SECTION_BY_ID[b] && UNIT_BY_ID[c]?.section === b) page = <UnitPage section={SECTION_BY_ID[b]} unit={UNIT_BY_ID[c]} />;
+  else if (a === 'item' && ITEM_BY_ID[b]) page = <ItemPage item={ITEM_BY_ID[b]} />;
+  else if (a === 'account') page = <AccountPage />;
+  else page = <NotFound />;
+
   return (
-    <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true">
-      <rect x="1.25" y="1.25" width="29.5" height="29.5" rx="7" fill="none" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M16 8.5v15M8.5 16h15" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" />
-    </svg>
+    <Ctx.Provider value={ctx}>
+      <Header route={route} />
+      <main id="main">{page}</main>
+      <Footer />
+    </Ctx.Provider>
   );
 }
 
-export default function App() {
-  const canvasRef = useRef(null);
-  const labelsRef = useRef(null);
-  const world = useRef(null);
+/* ---------- header with mega menu ---------- */
 
-  const [ready, setReady] = useState(false);
-  const [intro, setIntro] = useState(false);
-  // day or night outside: the visitor's choice, else their own clock
-  const [night, setNight] = useState(() => {
-    try { const v = localStorage.getItem('vh-night'); if (v != null) return v === '1'; } catch { /* storage blocked */ }
-    const h = new Date().getHours();
-    return h >= 19 || h < 6;
-  });
-  useEffect(() => {
-    if (ready) world.current?.setNight(night);
-    try { localStorage.setItem('vh-night', night ? '1' : '0'); } catch { /* storage blocked */ }
-  }, [night, ready]);
-  const [labView, setLabView] = useState('overview');
-  const [failed, setFailed] = useState('');
-  const [view, setView] = useState({ level: 'building' });
-  const [doors, setDoors] = useState({ state: 'open' });
-  const [busy, setBusy] = useState(false);
-  const [hover, setHover] = useState(null);
-  const [hintSeen, setHintSeen] = useState({});
-  const [openCase, setOpenCase] = useState(null);
-  const openCaseRef = useRef(null);
-  openCaseRef.current = openCase;
-
-  // the 3D world stops drawing while a case is open — the GPU is the case's
-  useEffect(() => { world.current?.setPaused?.(!!openCase); }, [openCase]);
-
-  // a shareable deep link straight into a case: /#case=cv-cath:1
-  useEffect(() => {
-    const m = /#case=([\w-]+:\d+)/.exec(window.location.hash);
-    if (m && CASES[m[1]]) setOpenCase(m[1]);
-  }, []);
-
-  const viewRef = useRef(view);
-  const busyRef = useRef(false);
-  viewRef.current = view;
-
-  const lock = v => { busyRef.current = v; setBusy(v); };
-
-  /* ---------- navigation ---------- */
-
-  const record = (v, push) => {
-    if (push) window.history.pushState({ v }, '');
-    else window.history.replaceState({ v }, '');
-  };
-
-  const goFloor = useCallback(async (wingId, number, { push = true } = {}) => {
-    const floor = floorOf(wingId, number);
-    const W = world.current;
-    if (!floor || !W || busyRef.current) return;
-    const cur = viewRef.current;
-    if (cur.level === 'floor' && cur.wingId === wingId && cur.number === number) return;
-    if (cur.level === 'bed' && cur.wingId === wingId && cur.number === number) {
-      lock(true);
-      await W.leaveBed();
-      setLabView('overview');
-      const v = { level: 'floor', wingId, number };
-      setView(v); record(v, push);
-      lock(false);
-      return;
-    }
-    lock(true);
-    setHover(null);
-    if (cur.level === 'building') await W.flyToFloor(wingId, number);
-    setDoors({ state: 'closing', from: cur.number || 0, to: number, label: floor.name });
-    await sleep(720);
-    setDoors(d => ({ ...d, state: 'closed' }));
-    await Promise.race([W.assetsReady, sleep(6000)]);   // patients need the head scan
-    setLabView('overview');
-    W.enterFloor(floor);               // the ward is built behind closed doors
-    const v = { level: 'floor', wingId, number };
-    setView(v); record(v, push);
-    await sleep(420);
-    setDoors(d => ({ ...d, state: 'opening' }));
-    await sleep(760);
-    setDoors({ state: 'open' });
-    lock(false);
-  }, []);
-
-  const chooseLabView = async name => {
-    if (busyRef.current || !world.current) return;
-    lock(true);
-    setLabView(name);
-    try { await world.current.focusLabView(name); }
-    finally { lock(false); }
-  };
-
-  const goBuilding = useCallback(async ({ push = true } = {}) => {
-    const W = world.current;
-    const cur = viewRef.current;
-    if (!W || busyRef.current || cur.level === 'building') return;
-    lock(true);
-    setHover(null);
-    setDoors({ state: 'closing', from: cur.number || 0, to: 0, label: 'Ground · Main entrance' });
-    await sleep(720);
-    setDoors(d => ({ ...d, state: 'closed' }));
-    await sleep(40);
-    W.showBuilding();
-    const v = { level: 'building' };
-    setView(v); record(v, push);
-    await sleep(380);
-    setDoors(d => ({ ...d, state: 'opening' }));
-    await sleep(760);
-    setDoors({ state: 'open' });
-    lock(false);
-  }, []);
-
-  const goBed = useCallback(async (index, { push = true } = {}) => {
-    const W = world.current;
-    const cur = viewRef.current;
-    if (!W || busyRef.current || cur.level === 'building') return;
-    if (index < 0 || index >= BEDS_PER_FLOOR) return;
-    lock(true);
-    setHover(null);
-    const v = { level: 'bed', wingId: cur.wingId, number: cur.number, bed: index };
-    setView(v); record(v, push);
-    await W.focusBed(index);
-    lock(false);
-  }, []);
-
-  const stepBack = useCallback(() => {
-    const cur = viewRef.current;
-    if (cur.level === 'bed') goFloor(cur.wingId, cur.number);
-    else if (cur.level === 'floor') goBuilding();
-  }, [goFloor, goBuilding]);
-
-  // Browser back/forward walks the same path.
-  useEffect(() => {
-    record(viewRef.current, false);
-    const onPop = async e => {
-      const t = e.state?.v || { level: 'building' };
-      const cur = viewRef.current;
-      if (t.level === 'building') return goBuilding({ push: false });
-      if (t.level === 'floor') return goFloor(t.wingId, t.number, { push: false });
-      if (t.level === 'bed') {
-        if (cur.wingId !== t.wingId || cur.number !== t.number || cur.level === 'building') {
-          await goFloor(t.wingId, t.number, { push: false });
-        }
-        return goBed(t.bed, { push: false });
-      }
-    };
-    window.addEventListener('popstate', onPop);
-    return () => window.removeEventListener('popstate', onPop);
-  }, [goFloor, goBuilding, goBed]);
-
-  /* ---------- the 3D world ---------- */
-
-  const handlers = useRef({});
-  handlers.current = {
-    selectFloor: (w, n) => goFloor(w, n),
-    selectBed: i => goBed(i),
-  };
-
-  useEffect(() => {
-    let w;
-    try {
-      w = new World({
-        canvas: canvasRef.current,
-        labels: labelsRef.current,
-        wings: WINGS,
-        on: {
-          ready: () => setTimeout(() => setReady(true), 250),
-          intro: v => setIntro(v),
-          hover: h => setHover(h),
-          selectFloor: (a, b) => handlers.current.selectFloor(a, b),
-          selectBed: i => handlers.current.selectBed(i),
-        },
-      });
-      world.current = w;
-    } catch (e) {
-      console.error(e);
-      setFailed('This device could not start the 3D view. Try a recent version of Chrome, Edge, Safari or Firefox with hardware acceleration turned on.');
-    }
-    return () => { w?.dispose(); world.current = null; };
-  }, []);
-
-  /* ---------- keyboard ---------- */
-
-  useEffect(() => {
-    const onKey = e => {
-      if (e.target.closest?.('input, textarea')) return;
-      const cur = viewRef.current;
-      if (openCaseRef.current) { if (e.key === 'Escape') setOpenCase(null); return; }
-      if (e.key === 'Escape') stepBack();
-      if (cur.level === 'bed' && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
-        const next = (cur.bed + (e.key === 'ArrowRight' ? 1 : BEDS_PER_FLOOR - 1)) % BEDS_PER_FLOOR;
-        goBed(next, { push: false });
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [stepBack, goBed]);
-
-  /* ---------- derived ---------- */
-
-  const wing = view.wingId ? WING_BY_ID[view.wingId] : null;
-  const floor = view.wingId ? floorOf(view.wingId, view.number) : null;
-  const bedHeader = view.level === 'bed' && floor ? floor.beds[view.bed] : null;
-  const isLab = floor?.id === 'cv-cath';
-  const isEcho = floor?.id === 'cv-imaging';
-  const slotWord = isLab ? 'Case' : isEcho ? 'Echo bay' : 'Bed';
-  const bedCaseKey = view.level === 'bed' && floor ? caseKey(floor.id, view.bed + 1) : null;
-  const bedHasCase = !!(bedCaseKey && CASES[bedCaseKey]);
-  const CaseComp = openCase ? caseComponent(openCase) : null;
-  const hint = !hintSeen[view.level] && ready ? (view.level === 'floor' && floor?.id === 'cv-cath' ? HINTS.lab : HINTS[view.level]) : null;
-
-  const dismissHint = () => setHintSeen(s => (s[view.level] ? s : { ...s, [view.level]: true }));
-
+function Header({ route }) {
+  const { session, admin } = useApp();
+  const [open, setOpen] = useState(null);
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => { setOpen(null); setMobile(false); }, [route]);
+  const active = id => route.a === 's' && route.b === id;
   return (
-    <div className="stage" onPointerDown={dismissHint}>
-      <canvas ref={canvasRef} className="scene" />
-      <div ref={labelsRef} className="bed-tags" />
-
-      {/* ---------- where you are ---------- */}
-      <header className="plate">
-        {view.level !== 'building' && (
-          <button type="button" className="plate-back" onClick={stepBack} aria-label="Step back" disabled={busy}>
-            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
-          </button>
-        )}
-        <nav className="plate-trail" aria-label="Location">
-          <button type="button" className="plate-home" onClick={() => goBuilding()} disabled={busy || view.level === 'building'}>
-            <Mark /> <span>{HOSPITAL_NAME}</span>
-          </button>
-          {wing && floor && (
-            <>
-              <span className="plate-sep" aria-hidden="true">/</span>
-              <button type="button" className="plate-crumb" onClick={() => goFloor(wing.id, floor.number)} disabled={busy || view.level === 'floor'}>
-                <span className="plate-floor" style={{ '--hue': floor.hue }}>{pad2(floor.number)}</span>
-                <span className="plate-name">{floor.name}</span>
-                <span className="plate-wing">{wing.name}</span>
-              </button>
-            </>
-          )}
-          {view.level === 'bed' && (
-            <>
-              <span className="plate-sep" aria-hidden="true">/</span>
-              <span className="plate-crumb is-current">{slotWord} {pad2(view.bed + 1)}</span>
-            </>
-          )}
-        </nav>
-      </header>
-
-      {/* ---------- floor selector ---------- */}
-      <ElevatorPanel
-        compact={isLab}
-        current={view.level === 'building' ? null : { wingId: view.wingId, number: view.number }}
-        onSelect={(w, n) => goFloor(w, n)}
-        onLobby={() => goBuilding()}
-        onPreview={p => world.current?.previewFloor(p?.wingId, p?.number)}
-        busy={busy}
-      />
-
-      {/* ---------- hover readouts ---------- */}
-      {hover?.type === 'floor' && view.level === 'building' && !busy && (
-        <div className="tip" style={{ left: hover.x, top: hover.y }}>
-          <span className="tip-floor" style={{ '--hue': hover.hue }}>Floor {pad2(hover.number)}</span>
-          <span className="tip-name">{hover.name}</span>
-          <span className="tip-wing">{WING_BY_ID[hover.wingId]?.name}</span>
+    <header className="hdr">
+      <div className="hdr-util">
+        <div className="wrap hdr-util-in">
+          <span>Virtual Teaching Hospital · Cardiology & Internal Medicine</span>
+          <nav>
+            <a href="#/s/conference">Conference Centre</a>
+            <a href="#/s/tests">Test Centre</a>
+            <a href="#/account" className="hdr-acc">{session ? (admin ? '⚙️ My account · Admin' : '👤 My account') : '🔐 Sign in'}</a>
+          </nav>
         </div>
-      )}
-      {hover?.type === 'bed' && view.level === 'floor' && !busy && (
-        <div className="caption">
-          <span className="caption-bed">{slotWord} {pad2(hover.number)}</span>
-          <span className="caption-text">{hover.header || 'Case to be assigned'}</span>
-        </div>
-      )}
-
-      {/* ---------- the catheter lab's list ---------- */}
-      {isLab && view.level === 'floor' && (
-        <div className="lab-tools">
-          <div className="lab-viewpoints" role="group" aria-label="Cath lab viewpoints">
-            {[['overview', 'Room overview'], ['operator', 'Operator side'], ['monitors', 'Monitors']].map(([id, label]) => (
-              <button key={id} type="button" disabled={busy} aria-pressed={labView === id} onClick={() => chooseLabView(id)}>{label}</button>
-            ))}
-          </div>
-          <details className="cathlist">
-            <summary className="cathlist-h">
-              <span className="cathlist-dot" />
-              <b>Today’s cases</b><span className="cathlist-count">{floor.beds.filter((_, i) => CASES[caseKey(floor.id, i + 1)]).length} simulations</span>
-            </summary>
-            <ol aria-label="Today's list in Cath Lab 1">
-              {floor.beds.map((h, i) => {
-                const ready = !!CASES[caseKey(floor.id, i + 1)];
-                return (
-                  <li key={i}>
-                    <button type="button" disabled={busy} onClick={() => goBed(i)} className={ready ? 'is-ready' : ''}>
-                      <span className="cathlist-time">{LIST_TIMES[i]}</span>
-                      <span className="cathlist-text">{h || 'Slot available'}</span>
-                      {ready && <span className="cathlist-tag">Simulation</span>}
-                    </button>
-                  </li>
-                );
-              })}
-            </ol>
-          </details>
-        </div>
-      )}
-
-      {/* ---------- bedside ---------- */}
-      {view.level === 'bed' && floor && (
-        <div className="bedbar">
-          <button type="button" className="bedbar-step" disabled={busy} onClick={() => goBed((view.bed + BEDS_PER_FLOOR - 1) % BEDS_PER_FLOOR, { push: false })} aria-label="Previous bed">
-            <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
-          </button>
-          <div className="bedbar-id">
-            <span className="bedbar-num" style={{ '--hue': floor.hue }}>{slotWord} {pad2(view.bed + 1)}</span>
-            <span className="bedbar-text">{bedHeader || 'Case to be assigned'}</span>
-          </div>
-          {bedHasCase && (
-            <button type="button" className="bedbar-open" disabled={busy} onClick={() => setOpenCase(bedCaseKey)}>
-              Open case
-            </button>
-          )}
-          <button type="button" className="bedbar-step" disabled={busy} onClick={() => goBed((view.bed + 1) % BEDS_PER_FLOOR, { push: false })} aria-label="Next bed">
-            <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
-          </button>
-        </div>
-      )}
-
-      {view.level === 'building' && ready && (
-        <button type="button" className={'daynight' + (night ? ' is-night' : '')} onClick={() => setNight(n => !n)}
-          aria-pressed={night} aria-label={night ? 'Switch to day' : 'Switch to night'} title={night ? 'Switch to day' : 'Switch to night'}>
-          <span aria-hidden="true">{night ? '☀' : '☾'}</span>{night ? 'Day' : 'Night'}
-        </button>
-      )}
-      {intro && ready && <button type="button" className="skip-intro" onClick={() => world.current?.skipIntro?.()}>Skip intro ⏭</button>}
-      {hint && !intro && <p className="hint">{hint}</p>}
-      {view.level === 'bed' && !hint && (
-        <p className="credit">
-          Head scan: Lee Perry-Smith, <a href="https://ir-ltd.net/" target="_blank" rel="noopener noreferrer">Infinite-Realities</a>, <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">CC BY 3.0</a>
-        </p>
-      )}
-
-      <ElevatorDoors state={doors.state} from={doors.from} to={doors.to} label={doors.label} />
-
-      {CaseComp && (
-        <Suspense fallback={<div className="case-loading"><div className="splash-bar"><span /></div><p>Preparing the case…</p></div>}>
-          <CaseComp onClose={() => { setOpenCase(null); if (window.location.hash.startsWith('#case=')) window.history.replaceState(window.history.state, '', window.location.pathname); }} />
-        </Suspense>
-      )}
-
-      {/* ---------- arrival ---------- */}
-      <div className={'splash' + (ready || failed ? ' is-gone' : '')} aria-hidden={ready}>
-        <div className="splash-mark"><Mark /></div>
-        <div className="splash-name">{HOSPITAL_NAME}</div>
-        <div className="splash-bar"><span /></div>
       </div>
-      {failed && (
-        <div className="failed" role="alert">
-          <h1>{HOSPITAL_NAME}</h1>
-          <p>{failed}</p>
+      <div className="hdr-main">
+        <div className="wrap hdr-main-in">
+          <a href="#/" className="logo" aria-label="Home">
+            <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="#0A2A5E" /><path d="M8 26h8l3-8 5 16 4-12 3 4h9" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            <span><b>Virtual Teaching</b><i>Hospital</i></span>
+          </a>
+          <button className="hdr-burger" aria-label="Menu" aria-expanded={mobile} onClick={() => setMobile(m => !m)}>☰</button>
+          <nav className={'hdr-nav' + (mobile ? ' open' : '')} onMouseLeave={() => setOpen(null)}>
+            {[...HOSPITALS, ...CENTRES].map(s => (
+              <div key={s.id} className={'hdr-item' + (active(s.id) ? ' on' : '')} onMouseEnter={() => setOpen(s.id)}>
+                <a href={`#/s/${s.id}`} onFocus={() => setOpen(s.id)}>{s.name}</a>
+                {open === s.id && (
+                  <div className="mega" style={{ '--c': s.color }}>
+                    <div className="wrap mega-in">
+                      <div className="mega-lead">
+                        <span className="mega-ic">{s.icon}</span>
+                        <h3>{s.name}</h3>
+                        <p>{s.tagline}</p>
+                        <a className="btn" href={`#/s/${s.id}`}>Enter the {s.short === 'Tests' ? 'Test Centre' : s.short === 'Conferences' ? 'Conference Centre' : 'hospital'} →</a>
+                      </div>
+                      <ul className="mega-list">
+                        {s.units.map(u => <li key={u.id}><a href={`#/s/${s.id}/${u.id}`}><span>{u.icon}</span>{u.name}</a></li>)}
+                      </ul>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+            <div className="hdr-item hdr-item-acc"><a href="#/account">{session ? 'My account' : 'Sign in'}</a></div>
+          </nav>
         </div>
-      )}
-    </div>
+      </div>
+    </header>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="ftr">
+      <div className="wrap ftr-cols">
+        {[...HOSPITALS, ...CENTRES].map(s => (
+          <div key={s.id}>
+            <h4>{s.icon} {s.name}</h4>
+            <ul>{s.units.slice(0, 6).map(u => <li key={u.id}><a href={`#/s/${s.id}/${u.id}`}>{u.name}</a></li>)}
+              {s.units.length > 6 && <li><a href={`#/s/${s.id}`}>All {s.units.length} {s.id === 'tests' ? 'tracks' : s.id === 'conference' ? 'halls' : 'units'} →</a></li>}
+            </ul>
+          </div>
+        ))}
+      </div>
+      <div className="wrap ftr-base">
+        <span>© {new Date().getFullYear()} Virtual Teaching Hospital — for medical education only. Composite teaching cases; not medical advice.</span>
+        <a href="#/account">My account</a>
+      </div>
+    </footer>
   );
 }
