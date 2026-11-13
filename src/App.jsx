@@ -241,7 +241,8 @@ export default function App() {
   const floor = view.wingId ? floorOf(view.wingId, view.number) : null;
   const bedHeader = view.level === 'bed' && floor ? floor.beds[view.bed] : null;
   const isLab = floor?.id === 'cv-cath';
-  const slotWord = isLab ? 'Case' : 'Bed';
+  const isEcho = floor?.id === 'cv-imaging';
+  const slotWord = isLab ? 'Case' : isEcho ? 'Echo bay' : 'Bed';
   const bedCaseKey = view.level === 'bed' && floor ? caseKey(floor.id, view.bed + 1) : null;
   const bedHasCase = !!(bedCaseKey && CASES[bedCaseKey]);
   const CaseComp = openCase ? caseComponent(openCase) : null;
@@ -278,7 +279,7 @@ export default function App() {
           {view.level === 'bed' && (
             <>
               <span className="plate-sep" aria-hidden="true">/</span>
-              <span className="plate-crumb is-current">{floor?.id === 'cv-cath' ? 'Case' : 'Bed'} {pad2(view.bed + 1)}</span>
+              <span className="plate-crumb is-current">{slotWord} {pad2(view.bed + 1)}</span>
             </>
           )}
         </nav>
@@ -304,7 +305,7 @@ export default function App() {
       )}
       {hover?.type === 'bed' && view.level === 'floor' && !busy && (
         <div className="caption">
-          <span className="caption-bed">Bed {pad2(hover.number)}</span>
+          <span className="caption-bed">{slotWord} {pad2(hover.number)}</span>
           <span className="caption-text">{hover.header || 'Case to be assigned'}</span>
         </div>
       )}

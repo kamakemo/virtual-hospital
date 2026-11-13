@@ -286,14 +286,86 @@ export function deptSign(name, hue, sub) {
 }
 
 /** The red "Bed-03" wall plaque straight out of the reference ward. */
-export function bedPlaque(n) {
+export function bedPlaque(n, word = 'Bed') {
   return cached('plaque' + n, () => make(256, 96, (g, w, h) => {
     g.fillStyle = '#FFFFFF'; roundRect(g, 0, 0, w, h, 8); g.fill();
     g.fillStyle = '#C8302A'; roundRect(g, 5, 5, w - 10, h - 10, 6); g.fill();
     g.fillStyle = '#FFFFFF'; g.font = '700 50px Archivo, Arial, sans-serif';
     g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.fillText(`Bed-${String(n).padStart(2, '0')}`, w / 2, h / 2 + 2);
+    g.fillText(`${word}-${String(n).padStart(2, '0')}`, w / 2, h / 2 + 2);
   }));
+}
+
+/**
+ * Echo machine screen, redrawn each frame: a beating 2D sector (four-chamber,
+ * long-axis or short-axis by variant), depth scale, ECG strip and a Doppler
+ * strip on the side — what an echo lab's monitors look like from the door.
+ */
+export function echoScreen(variant = 0) {
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 384;
+  const g = c.getContext('2d');
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = ANISO;
+  const r = rng(77 + variant);
+  const dots = Array.from({ length: 900 }, () => [r(), r(), r()]);
+  function draw(t) {
+    const ph = (t * 1.15) % 1;
+    const s = ph < 0.35 ? Math.sin(ph / 0.35 * Math.PI) : 0;       // systole
+    g.fillStyle = '#03070B'; g.fillRect(0, 0, 512, 384);
+    const cx = 200, cy = 26, R = 300, a0 = Math.PI / 2 - 0.72, a1 = Math.PI / 2 + 0.72;
+    g.save();
+    g.beginPath(); g.moveTo(cx, cy); g.arc(cx, cy, R, a0, a1); g.closePath(); g.clip();
+    g.fillStyle = '#10151A'; g.fillRect(0, 0, 512, 384);
+    // speckled myocardium
+    for (const [u, v, w] of dots) {
+      const a = a0 + u * (a1 - a0), rr = 30 + v * (R - 30);
+      g.fillStyle = `rgba(210,220,225,${0.10 + w * 0.22})`;
+      g.fillRect(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr, 2.2, 2.2);
+    }
+    const cav = (x, y, rx, ry, rot = 0) => { g.beginPath(); g.ellipse(x, y, rx, ry, rot, 0, Math.PI * 2); g.fillStyle = '#020406'; g.fill(); g.strokeStyle = 'rgba(235,240,245,0.75)'; g.lineWidth = 3; g.stroke(); };
+    if (variant % 3 === 0) {            // apical four-chamber
+      cav(cx + 38, 130, 34 - 7 * s, 78 - 8 * s);
+      cav(cx - 40, 138, 26 - 4 * s, 66 - 5 * s);
+      cav(cx + 42, 250, 36 + 4 * s, 30 + 3 * s);
+      cav(cx - 40, 248, 32 + 3 * s, 28 + 3 * s);
+    } else if (variant % 3 === 1) {     // parasternal long axis
+      cav(cx - 30, 150, 80 - 8 * s, 34 - 8 * s, 0.25);
+      cav(cx + 78, 205, 40 + 4 * s, 34 + 3 * s);
+      cav(cx + 70, 128, 30, 17, -0.2);
+      cav(cx - 10, 78, 70, 12, 0.2);
+    } else {                            // short axis
+      cav(cx, 165, 52 - 12 * s, 52 - 12 * s);
+      g.beginPath(); g.arc(cx - 16, 150, 92, Math.PI * 0.75, Math.PI * 1.45); g.strokeStyle = 'rgba(235,240,245,0.5)'; g.lineWidth = 3; g.stroke();
+    }
+    g.restore();
+    g.strokeStyle = 'rgba(120,160,190,0.5)'; g.lineWidth = 1.5;
+    g.beginPath(); g.moveTo(cx, cy); g.arc(cx, cy, R, a0, a1); g.closePath(); g.stroke();
+    // Doppler strip
+    g.fillStyle = '#080D12'; g.fillRect(396, 40, 104, 250);
+    g.strokeStyle = 'rgba(160,190,210,0.5)'; g.beginPath(); g.moveTo(396, 170); g.lineTo(500, 170); g.stroke();
+    g.fillStyle = 'rgba(225,232,238,0.8)';
+    for (let x = 0; x < 104; x += 2) {
+      const p = ((t * 1.15) + x / 52) % 1;
+      const e = p > 0.4 && p < 0.62 ? Math.sin((p - 0.4) / 0.22 * Math.PI) * 78 : p > 0.8 ? Math.sin((p - 0.8) / 0.2 * Math.PI) * 48 : 0;
+      if (e > 0) g.fillRect(396 + x, 170 - e, 2, e);
+    }
+    // ECG
+    g.strokeStyle = '#34E39A'; g.lineWidth = 2; g.beginPath();
+    for (let x = 0; x < 500; x += 2) {
+      const p = ((t * 1.15) + x / 230) % 1;
+      const y = p < 0.03 ? -p * 300 : p < 0.06 ? -9 + (p - 0.03) * 900 : p < 0.09 ? 18 - (p - 0.06) * 600 : p > 0.3 && p < 0.45 ? -7 * Math.sin((p - 0.3) / 0.15 * Math.PI) : 0;
+      x ? g.lineTo(6 + x, 350 + y) : g.moveTo(6 + x, 350 + y);
+    }
+    g.stroke();
+    g.fillStyle = '#F5C451'; g.font = '700 15px monospace';
+    g.fillText(['A4C', 'PLAX', 'PSAX'][variant % 3] + '  2.5 MHz', 10, 18);
+    g.fillStyle = '#CFE3F2'; g.fillText('HR ' + [72, 84, 66][variant % 3], 420, 18);
+    tex.needsUpdate = true;
+  }
+  draw(0);
+  return { texture: tex, draw };
 }
 
 /**
@@ -343,7 +415,7 @@ export function idBoard({ bed, unit, header, hue }) {
  * Backlit case-title sign over the bed: a hue block with the bed number, then
  * the case title in large type (the part before " — " bold, the rest beneath).
  */
-export function bedTitle({ bed, header, hue }) {
+export function bedTitle({ bed, header, hue, word = 'BED' }) {
   return make(2048, 384, (g, w, h) => {
     g.fillStyle = '#2B3138'; roundRect(g, 0, 0, w, h, 26); g.fill();
     g.fillStyle = header ? '#FCFDFD' : '#DADFE3'; roundRect(g, 12, 12, w - 24, h - 24, 18); g.fill();
@@ -353,7 +425,7 @@ export function bedTitle({ bed, header, hue }) {
     g.fillRect(bw - 20, 12, 32, h - 24);
     g.fillStyle = '#FFFFFF'; g.textAlign = 'center'; g.textBaseline = 'middle';
     g.font = '700 54px Archivo, Arial, sans-serif';
-    g.fillText('BED', 12 + bw / 2, 104);
+    g.fillText(word, 12 + bw / 2, 104);
     g.font = '800 170px Archivo, Arial, sans-serif';
     g.fillText(String(bed).padStart(2, '0'), 12 + bw / 2, 238);
 

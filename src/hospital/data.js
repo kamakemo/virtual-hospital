@@ -31,7 +31,7 @@ const CARDIOLOGY = [
   ['cv-cath',     'Cardiac Catheterisation Laboratory',   KIND.procedure, '#B4643A'],
   ['cv-valve',    'Valvular & Structural Heart Unit',     KIND.ward,      '#3F5A99'],
   ['cv-ep',       'Electrophysiology & Arrhythmia Unit',  KIND.procedure, '#A57A22'],
-  ['cv-imaging',  'Cardiac Imaging & Diagnostics',        KIND.procedure, '#1F7A72'],
+  ['cv-imaging',  'Echocardiography Lab & Cardiac Imaging', KIND.procedure, '#1F7A72'],
   ['cv-prevent',  'Preventive Cardiology Day Unit',       KIND.comfort,   '#4C7A42'],
   ['cv-htn-vasc', 'Hypertension & Vascular Unit',         KIND.ward,      '#4B5F70'],
   ['cv-myo',      'Cardiomyopathy & Pericardial Unit',    KIND.ward,      '#7D4466'],

@@ -3,7 +3,7 @@ import { MAT, box, rbox, cyl, sphere, plane, part, bake, screenMat } from './kit
 import * as TX from './textures.js';
 import {
   BED, hospitalBed, headwall, wallMonitor, ivPole, ventilator, cannula,
-  locker, overbedTable, armchair, plant, crashCart, apronRack,
+  locker, overbedTable, armchair, plant, crashCart, apronRack, echoMachine, scanStool,
 } from './props.js';
 import { KIND, pad2 } from '../data.js';
 import { buildCathLab } from './cathlab.js';
@@ -42,7 +42,11 @@ function hash(str) {
 export function buildWard(floor) {
   // the catheter lab is a procedure suite, not a ward
   if (floor.id === 'cv-cath') return buildCathLab(floor);
-  const fit = FIT[floor.kind] || FIT[KIND.ward];
+  // the echo lab: scanning bays in a dimmed room, an echo machine at every couch
+  const echo = floor.id === 'cv-imaging';
+  const fit = echo
+    ? { curtain: '#2C4868', floor: 'vinyl', floorTone: '#9AA3AC', bay: 'vinyl', bayTone: '#7F8C99', head: 'tiles', pumps: 0, monitorBig: false, table: false, chair: false, plants: 2, warmth: 0.1, light: '#DCE6FF', chairColor: '#2C4868', echo: true }
+    : FIT[floor.kind] || FIT[KIND.ward];
   const root = new THREE.Group();
   const own = [];           // textures/materials created for this ward only
   const W = ROOM.W, H = ROOM.H, L = ROOM.near - ROOM.far, zMid = (ROOM.near + ROOM.far) / 2;
@@ -125,7 +129,7 @@ export function buildWard(floor) {
   const fixtures = new THREE.Group();
   // recessed panels over every bay
   for (const s of [-1, 1]) for (const z of BAY_Z) {
-    fixtures.add(part(box(1.2, 0.02, 0.6), MAT.lightPanel(), s * (W / 2 - 1.75), H - 0.012, z));
+    fixtures.add(part(box(1.2, 0.02, 0.6), echo ? MAT.grey() : MAT.lightPanel(), s * (W / 2 - 1.75), H - 0.012, z));
     fixtures.add(part(box(1.26, 0.015, 0.66), MAT.lightGrey(), s * (W / 2 - 1.75), H - 0.006, z));
   }
   // continuous linear LEDs down both sides of the corridor
@@ -204,11 +208,15 @@ export function buildWard(floor) {
     root.add(m);
   }
   // bay range signs at the head of each side
-  sign(root, own, 'BEDS 01 – 06', '#2B3138', -4.4, 2.62, 9.6, 0, 1.0, 0.22);
-  sign(root, own, 'BEDS 07 – 12', '#2B3138', 4.4, 2.62, 9.6, 0, 1.0, 0.22);
+  sign(root, own, echo ? 'ECHO BAYS 01 – 06' : 'BEDS 01 – 06', '#2B3138', -4.4, 2.62, 9.6, 0, echo ? 1.5 : 1.0, 0.22);
+  sign(root, own, echo ? 'ECHO BAYS 07 – 12' : 'BEDS 07 – 12', '#2B3138', 4.4, 2.62, 9.6, 0, echo ? 1.5 : 1.0, 0.22);
+  if (echo) {
+    sign(root, own, 'TRANSTHORACIC · STRESS · 3D · TOE', floor.hue, 0, 2.74, ROOM.far + 0.03, 0, 3.4, 0.26);
+    sign(root, own, 'SCANNING IN PROGRESS — LIGHTS DIMMED', '#2B3138', 4.4, 2.72, ROOM.far + 0.03, 0, 2.6, 0.2);
+  }
 
   /* ---------- the twelve bays ---------- */
-  const live = [TX.liveMonitor(0), TX.liveMonitor(1), TX.liveMonitor(2)];
+  const live = echo ? [TX.echoScreen(0), TX.echoScreen(1), TX.echoScreen(2)] : [TX.liveMonitor(0), TX.liveMonitor(1), TX.liveMonitor(2)];
   own.push(...live.map(l => l.texture));
   const hitMat = new THREE.MeshBasicMaterial();
   own.push(hitMat);
@@ -231,24 +239,31 @@ export function buildWard(floor) {
     // airway support, decided per bed: intubated in critical care, then masks
     // and nasal cannulae scattered through the acute units
     const ventilated = occupied && floor.kind === KIND.critical && i % 2 === 0;
-    const support = !occupied ? 'none'
+    const support = !occupied || echo ? 'none'
       : ventilated ? 'vent'
       : floor.kind !== KIND.comfort && seed % 4 === 1 ? 'mask'
       : floor.kind !== KIND.comfort && seed % 3 === 0 ? 'cannula'
       : 'none';
     const bed = hospitalBed({ kind: floor.kind, occupied, patient: { seed, cap: seed % 5 === 0, support } });
     unit.add(bed.group);
-    unit.add(headwall({ bedNumber: number, unitName: floor.name, header, hue: floor.hue, kind: floor.kind, own }));
-    unit.add(wallMonitor(live[seed % 3].texture, fit.monitorBig));
+    unit.add(headwall({ bedNumber: number, unitName: floor.name, header, hue: floor.hue, kind: floor.kind, own, word: echo ? 'BAY' : 'BED' }));
+    if (echo) {
+      // the sonographer's side: machine angled toward the couch, stool beside it
+      unit.add(echoMachine({ x: 1.05, z: 1.02, ry: Math.PI * 0.82, tex: live[i % 3].texture }));
+      unit.add(scanStool({ x: 1.75, z: 0.86 }));
+      unit.add(locker({ kind: floor.kind }));
+    } else {
+      unit.add(wallMonitor(live[seed % 3].texture, fit.monitorBig));
 
-    unit.add(ivPole({ pumps: occupied ? Math.max(1, fit.pumps) : 0, bag: occupied, lineTo: occupied ? bed.anchors.hand : null }));
-    if (ventilated) unit.add(ventilator({ to: bed.anchors.mouth }));
-    else if (support === 'cannula') unit.add(cannula(bed.anchors.nose));
+      unit.add(ivPole({ pumps: occupied ? Math.max(1, fit.pumps) : 0, bag: occupied, lineTo: occupied ? bed.anchors.hand : null }));
+      if (ventilated) unit.add(ventilator({ to: bed.anchors.mouth }));
+      else if (support === 'cannula') unit.add(cannula(bed.anchors.nose));
 
-    unit.add(locker({ kind: floor.kind }));
-    if (fit.table) unit.add(overbedTable({}));
-    if (fit.chair) unit.add(armchair({ color: fit.chairColor }));
-    if (floor.kind === KIND.comfort) unit.add(plant({ x: 2.45, z: -1.18, h: 0.9 + (seed % 4) * 0.1 }));
+      unit.add(locker({ kind: floor.kind }));
+      if (fit.table) unit.add(overbedTable({}));
+      if (fit.chair) unit.add(armchair({ color: fit.chairColor }));
+      if (floor.kind === KIND.comfort) unit.add(plant({ x: 2.45, z: -1.18, h: 0.9 + (seed % 4) * 0.1 }));
+    }
 
     // hand-hygiene dispenser on the wall between bays
     unit.add(part(rbox(0.08, 0.24, 0.12, 0.02), MAT.plastic(), 0.04, 1.25, 1.12));
@@ -307,10 +322,10 @@ export function buildWard(floor) {
 
   /* ---------- light ---------- */
   const warm = new THREE.Color(fit.light);
-  const hemi = new THREE.HemisphereLight(warm, new THREE.Color('#C8BBA8'), 0.55);
+  const hemi = new THREE.HemisphereLight(warm, new THREE.Color(echo ? '#6E7F96' : '#C8BBA8'), echo ? 0.34 : 0.55);
   root.add(hemi);
 
-  const key = new THREE.DirectionalLight(warm, 1.55);
+  const key = new THREE.DirectionalLight(warm, echo ? 0.7 : 1.55);
   key.position.set(3.5, 13, 5.5);
   key.target.position.set(0, 0, 0);
   key.castShadow = true;
@@ -321,7 +336,7 @@ export function buildWard(floor) {
   key.shadow.radius = 4;
   root.add(key, key.target);
 
-  const daylight = new THREE.DirectionalLight('#DDEBFF', 0.45);
+  const daylight = new THREE.DirectionalLight('#DDEBFF', echo ? 0.2 : 0.45);
   daylight.position.set(0, 4, -24);
   daylight.target.position.set(0, 0.5, 4);
   root.add(daylight, daylight.target);

@@ -106,7 +106,7 @@ export function hospitalBed({ kind, occupied, patient }) {
  * gas outlets, a flowmeter, a suction jar, sockets, a reading light, the red
  * bed plaque and the identification board.
  */
-export function headwall({ bedNumber, unitName, header, hue, kind, own = [] }) {
+export function headwall({ bedNumber, unitName, header, hue, kind, own = [], word = 'BED' }) {
   const g = new THREE.Group();
   const y = 1.32;
   g.add(part(rbox(0.07, 0.17, 2.0, 0.02), MAT.plastic(), 0.035, y, 0));
@@ -138,7 +138,7 @@ export function headwall({ bedNumber, unitName, header, hue, kind, own = [] }) {
   g.add(part(box(0.002, 0.03, 0.82), MAT.ledWarm(), 0.101, 2.29, 0));
 
   // red bed plaque and identification board
-  const plaque = part(plane(0.3, 0.112), texMat(TX.bedPlaque(bedNumber), { roughness: 0.4 }), 0.012, 2.03, -0.62, 0, Math.PI / 2, 0);
+  const plaque = part(plane(0.3, 0.112), texMat(TX.bedPlaque(bedNumber, word === 'BAY' ? 'Bay' : 'Bed'), { roughness: 0.4 }), 0.012, 2.03, -0.62, 0, Math.PI / 2, 0);
   g.add(plaque);
   g.add(part(rbox(0.02, 0.45, 0.67, 0.01), MAT.lightGrey(), 0.01, 1.68, -0.62));
   // unique per bed, so owned (and later disposed) by the ward, not the shared cache
@@ -148,7 +148,7 @@ export function headwall({ bedNumber, unitName, header, hue, kind, own = [] }) {
   g.add(part(plane(0.64, 0.427), boardMat, 0.021, 1.68, -0.62, 0, Math.PI / 2, 0));
 
   // the case title, large and lit, across the wall above the reading light
-  const titleTex = TX.bedTitle({ bed: bedNumber, header, hue });
+  const titleTex = TX.bedTitle({ bed: bedNumber, header, hue, word });
   const titleMat = new THREE.MeshStandardMaterial({ map: titleTex, roughness: 0.4, emissive: '#FFFFFF', emissiveMap: titleTex, emissiveIntensity: header ? 0.55 : 0.15 });
   own.push(titleTex, titleMat);
   g.add(part(rbox(0.04, 0.47, 2.5, 0.015), MAT.lightGrey(), 0.02, 2.585, 0));
@@ -326,5 +326,56 @@ export function apronRack({ x, z, ry = 0 }) {
   inner.position.set(x, 0, z);
   inner.rotation.y = ry;
   g.add(inner);
+  return g;
+}
+
+
+/* ---------- the echo lab ---------- */
+
+/** A cart-based cardiac ultrasound system: base, column, console with trackball and TGC sliders, probes in holders, screen on an arm. */
+export function echoMachine({ x = 1.1, z = 1.0, ry = 0, tex }) {
+  const g = new THREE.Group();
+  const m = new THREE.Group();
+  const body = MAT.plastic(), dark = MAT.charcoal();
+  m.add(part(rbox(0.5, 0.1, 0.62, 0.04), body, 0, 0.13, 0));
+  for (const dx of [-0.2, 0.2]) for (const dz of [-0.26, 0.26]) castor(m, dx, dz, 0.05);
+  m.add(part(rbox(0.36, 0.6, 0.4, 0.05), body, 0, 0.48, -0.06));
+  m.add(part(rbox(0.3, 0.3, 0.02, 0.01), dark, 0, 0.46, 0.145));                         // vents / CPU door
+  m.add(part(cyl(0.05, 0.06, 0.26, 16), MAT.lightGrey(), 0, 0.9, -0.1));                  // lift column
+  // console: tilted keyboard deck
+  const deck = part(rbox(0.56, 0.05, 0.4, 0.02), body, 0, 1.0, 0.1, 0.22, 0, 0);
+  m.add(deck);
+  m.add(part(rbox(0.5, 0.012, 0.3, 0.006), dark, 0, 1.03, 0.11, 0.22, 0, 0));
+  m.add(part(sphere(0.03, 14, 10), MAT.paint('#D9DDE0', 0.3), 0, 1.035, 0.19));           // trackball
+  for (let k = 0; k < 8; k++) m.add(part(box(0.012, 0.012, 0.05), MAT.lightGrey(), 0.12 + k * 0.014, 1.05, 0.03, 0.22, 0, 0));   // TGC sliders
+  for (let k = 0; k < 5; k++) m.add(part(cyl(0.014, 0.014, 0.014, 10), MAT.paint(['#22D3EE', '#F5C451', '#34E39A', '#FB7185', '#A78BFA'][k], 0.4), -0.2 + k * 0.045, 1.045, 0.02, 0.22, 0, 0));
+  m.add(part(rbox(0.6, 0.03, 0.03, 0.012), MAT.chrome(), 0, 0.97, 0.32));                 // front handle
+  // probes in their holders, cables drooping
+  for (const s of [-1, 1]) {
+    m.add(part(rbox(0.05, 0.07, 0.07, 0.015), MAT.lightGrey(), s * 0.3, 0.98, 0.12));
+    m.add(part(rbox(0.032, 0.11, 0.026, 0.01), MAT.paint('#E5E7EB', 0.35), s * 0.3, 1.06, 0.12));
+    m.add(part(rbox(0.04, 0.03, 0.03, 0.01), dark, s * 0.3, 1.125, 0.12));
+    m.add(tube([[s * 0.3, 1.0, 0.12], [s * 0.36, 0.7, 0.16], [s * 0.3, 0.45, 0.1], [s * 0.18, 0.5, -0.02]].map(p => new THREE.Vector3(...p)), 0.006, 18));
+  }
+  m.add(part(cyl(0.022, 0.022, 0.1, 10), MAT.paint('#38BDF8', 0.4), 0.23, 1.07, -0.02));  // gel bottle
+  // monitor on an articulated arm
+  m.add(part(cyl(0.02, 0.02, 0.34, 10), MAT.lightGrey(), 0, 1.2, -0.12));
+  m.add(part(rbox(0.05, 0.04, 0.2, 0.012), MAT.lightGrey(), 0, 1.37, -0.06));
+  const head = new THREE.Group();
+  head.position.set(0, 1.5, 0.04); head.rotation.x = -0.1;
+  head.add(part(rbox(0.56, 0.42, 0.035, 0.015), dark, 0, 0, 0));
+  if (tex) head.add(part(plane(0.52, 0.38), screenMat(tex, 1.25), 0, 0, 0.019));
+  m.add(head);
+  m.position.set(x, 0, z); m.rotation.y = ry;
+  g.add(m);
+  return g;
+}
+
+/** Sonographer's saddle stool. */
+export function scanStool({ x, z }) {
+  const g = new THREE.Group();
+  starBase(g, x, z, 0.24);
+  g.add(part(cyl(0.022, 0.022, 0.4, 10), MAT.chrome(), x, 0.32, z));
+  g.add(part(cyl(0.19, 0.17, 0.08, 20), MAT.upholstery('#27364A'), x, 0.56, z));
   return g;
 }
