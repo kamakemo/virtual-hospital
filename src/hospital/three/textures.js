@@ -287,7 +287,7 @@ export function deptSign(name, hue, sub) {
 
 /** The red "Bed-03" wall plaque straight out of the reference ward. */
 export function bedPlaque(n, word = 'Bed') {
-  return cached('plaque' + n, () => make(256, 96, (g, w, h) => {
+  return cached('plaque' + word + n, () => make(256, 96, (g, w, h) => {
     g.fillStyle = '#FFFFFF'; roundRect(g, 0, 0, w, h, 8); g.fill();
     g.fillStyle = '#C8302A'; roundRect(g, 5, 5, w - 10, h - 10, 6); g.fill();
     g.fillStyle = '#FFFFFF'; g.font = '700 50px Archivo, Arial, sans-serif';
