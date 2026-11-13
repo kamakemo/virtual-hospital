@@ -1,45 +1,46 @@
 import React from 'react';
-import { useApp } from '../App.jsx';
-
-export function Crumbs({ items }) {
-  return (
-    <nav className="crumbs" aria-label="Breadcrumb">
-      <a href="#/">Home</a>
-      {items.map(([label, href], i) => <React.Fragment key={i}><span>›</span>{href ? <a href={href}>{label}</a> : <b>{label}</b>}</React.Fragment>)}
-    </nav>
-  );
-}
+import { useApp, Hero } from '../App.jsx';
+import Art from '../components/Art.jsx';
 
 export default function SectionPage({ section }) {
   const { content } = useApp();
   const word = section.id === 'conference' ? 'halls' : section.id === 'tests' ? 'tracks' : 'units';
   const per = section.id === 'conference' ? 'sessions' : section.id === 'tests' ? 'tests' : 'cases';
+  const [first, ...rest] = section.units;
+  const done = section.units.reduce((n, u) => n + u.items.filter(it => content[it.id]).length, 0);
+  const firstDone = first.items.filter(it => content[it.id]).length;
   return (
     <>
-      <section className="page-hero" style={{ '--c': section.color }}>
-        <div className="wrap">
-          <Crumbs items={[[section.name]]} />
-          <div className="page-hero-in">
-            <span className="page-ic">{section.icon}</span>
-            <div>
-              <h1>{section.name}</h1>
-              <p>{section.tagline}</p>
-              <span className="page-meta">{section.units.length} {word} · {section.units.length * 12} {per}</span>
+      <Hero id={section.id + '-hero'} color={section.color} icon={section.icon} current={section.id}
+        crumbs={[[section.name]]} title={section.name} light={section.tagline}
+        sub={`${section.units.length} ${word} · ${section.units.length * 12} ${per} · ${done} published`} />
+
+      <section className="wrap panel">
+        <div className="feature-row">
+          <a href={`#/s/${section.id}/${first.id}`} className="card card-dark">
+            <Art id={first.id} color={section.color} icon={first.icon} dark />
+            <div className="card-dark-copy">
+              <span className="tag">{first.icon} {word.slice(0, -1)} 1 · {firstDone}/12 ready</span>
+              <h2>{first.name}</h2>
+              <p>{first.blurb}</p>
+              <span className="more">Open the {word.slice(0, -1)} →</span>
             </div>
+          </a>
+          <div className="card card-list">
+            <h3>{first.icon} Inside {first.name}</h3>
+            <ol>{first.items.map(it => <li key={it.id}><a href={`#/item/${it.id}`}>{content[it.id]?.title || it.title}</a>{content[it.id] && <span className="dot-ok" title="Published" />}</li>)}</ol>
           </div>
         </div>
-      </section>
-      <section className="wrap sec">
-        <div className="unit-grid">
-          {section.units.map(u => {
-            const done = u.items.filter(it => content[it.id]).length;
+        <div className="card-row">
+          {rest.map(u => {
+            const n = u.items.filter(it => content[it.id]).length;
             return (
-              <a key={u.id} href={`#/s/${section.id}/${u.id}`} className="unit-card" style={{ '--c': section.color }}>
-                <div className="unit-card-h"><span className="unit-ic">{u.icon}</span><span className={'pill' + (done ? ' pill-on' : '')}>{done}/12 ready</span></div>
+              <a key={u.id} href={`#/s/${section.id}/${u.id}`} className="card card-img">
+                <div className="thumb"><Art id={u.id} color={section.color} icon={u.icon} /></div>
+                <span className="tag">{n}/12 ready</span>
                 <h3>{u.name}</h3>
                 <p>{u.blurb}</p>
-                <ol>{u.items.slice(0, 4).map(it => <li key={it.id}>{it.title}</li>)}</ol>
-                <span className="unit-go">Open the {word.slice(0, -1)} — 12 {per} →</span>
+                <span className="more">Explore 12 {per} →</span>
               </a>
             );
           })}

@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useApp } from '../App.jsx';
+import { useApp, Hero } from '../App.jsx';
 import { SECTION_BY_ID, UNIT_BY_ID, itemWord } from '../data/catalog.js';
 import { loadHtml } from '../supabaseClient.js';
 import HtmlFrame from '../components/HtmlFrame.jsx';
-import { Crumbs } from './SectionPage.jsx';
 
 export default function ItemPage({ item }) {
   const { content, loaded, session, admin, demo } = useApp();
@@ -23,16 +22,10 @@ export default function ItemPage({ item }) {
 
   return (
     <>
-      <section className="page-hero small" style={{ '--c': section.color }}>
-        <div className="wrap">
-          <Crumbs items={[[section.name, `#/s/${section.id}`], [unit.name, `#/s/${section.id}/${unit.id}`], [`${itemWord(section.id)} ${item.n}`]]} />
-          <div className="page-hero-in">
-            <span className="page-ic">{unit.icon}</span>
-            <div><h1>{title}</h1><p>{unit.name} · {itemWord(section.id)} {item.n} of 12</p></div>
-          </div>
-        </div>
-      </section>
-      <section className="wrap sec">
+      <Hero id={item.id + '-hero'} color={section.color} icon={unit.icon} current={section.id} small
+        crumbs={[[section.name, `#/s/${section.id}`], [unit.name, `#/s/${section.id}/${unit.id}`], [`${itemWord(section.id)} ${item.n}`]]}
+        title={title} sub={`${unit.name} · ${itemWord(section.id)} ${item.n} of 12`} />
+      <section className="wrap panel">
         {!loaded && <p className="muted">Loading…</p>}
         {loaded && !entry && (
           <div className="empty">
@@ -47,8 +40,8 @@ export default function ItemPage({ item }) {
         {entry && !err && html == null && <p className="muted">Opening…</p>}
         {entry && html != null && <HtmlFrame html={html} title={title} />}
         <div className="pager">
-          {prev ? <a href={`#/item/${prev.id}`}>← {prev.title}</a> : <a href={`#/s/${section.id}/${unit.id}`}>← {unit.name}</a>}
-          {next ? <a href={`#/item/${next.id}`}>{next.title} →</a> : <a href={`#/s/${section.id}/${unit.id}`}>{unit.name} →</a>}
+          {prev ? <a className="pill-btn" href={`#/item/${prev.id}`}>← {prev.title}</a> : <a className="pill-btn" href={`#/s/${section.id}/${unit.id}`}>← {unit.name}</a>}
+          {next ? <a className="pill-btn" href={`#/item/${next.id}`}>{next.title} →</a> : <a className="pill-btn" href={`#/s/${section.id}/${unit.id}`}>{unit.name} →</a>}
         </div>
       </section>
     </>

@@ -1,98 +1,82 @@
-import React, { useState } from 'react';
-import { HOSPITALS, CENTRES, COUNTS } from '../data/catalog.js';
-import { useApp } from '../App.jsx';
-import { Search } from '../components/Search.jsx';
-
-const HERO = [
-  { k: 'Cardiology Hospital', h: 'Sixteen units. The whole cardiology curriculum.', p: 'From the chest-pain door and the coronary care unit to the cath lab, the echo lab and the device clinic — every topic of the ESC core curriculum as a case.', to: '#/s/cardiology', c: '#C8102E' },
-  { k: 'Internal Medicine Hospital', h: 'Every specialty of internal medicine, case by case.', p: 'The acute take, intensive care and fifteen specialty units, each with twelve cases built around the problems physicians meet every day.', to: '#/s/internal', c: '#0067B1' },
-  { k: 'Conference & Test Centres', h: 'Learn together. Then prove it.', p: 'Grand rounds, guideline updates and masterclasses in the Conference Centre; board simulators and question banks in the Test Centre.', to: '#/s/conference', c: '#7A3E9D' },
-];
+import React from 'react';
+import { HOSPITALS, CENTRES, COUNTS, SECTION_BY_ID } from '../data/catalog.js';
+import { useApp, Hero } from '../App.jsx';
+import Art from '../components/Art.jsx';
 
 export default function Home() {
   const { content } = useApp();
-  const [slide, setSlide] = useState(0);
-  const s = HERO[slide];
+  const [cardio, im] = HOSPITALS;
+  const [conf, tests] = CENTRES;
   const ready = Object.keys(content).length;
   return (
     <>
-      <section className="hero" style={{ '--c': s.c }}>
-        <div className="hero-art" aria-hidden="true">
-          <svg viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice">
-            <defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#0A2A5E" /><stop offset="1" stopColor="#061A3A" /></linearGradient></defs>
-            <rect width="800" height="400" fill="url(#hg)" />
-            {[...Array(9)].map((_, i) => <circle key={i} cx={560 + (i % 3) * 70} cy={90 + Math.floor(i / 3) * 90} r={26 + (i % 2) * 8} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="2" />)}
-            <path className="hero-ecg" d="M0 250 H220 l18 -60 20 120 18 -150 22 170 16 -80 H430 l14 -30 14 30 H560 l18 -60 20 120 18 -150 22 170 16 -80 H800" fill="none" stroke="var(--c)" strokeWidth="4" strokeLinejoin="round" />
-          </svg>
+      <Hero id="home-hero" color="#C4122F" icon="🫀" title="Our mission" light="to train the doctors who keep hearts — and patients — alive"
+        sub={`${COUNTS.units} clinical units · ${COUNTS.cases} cases · a Conference Centre and a Test Centre`}>
+        <div className="hero-cta">
+          <a className="btn" href="#/s/cardiology">Enter the Cardiology Hospital →</a>
+          <a className="btn btn-white" href="#/s/internal">Enter the Internal Medicine Hospital →</a>
         </div>
-        <div className="wrap hero-in">
-          <span className="kicker">{s.k}</span>
-          <h1>{s.h}</h1>
-          <p>{s.p}</p>
-          <div className="hero-cta">
-            <a className="btn btn-red" href={s.to}>Explore →</a>
-            <a className="btn btn-ghost" href="#/account">My account</a>
-          </div>
-          <div className="hero-dots" role="tablist">
-            {HERO.map((x, i) => <button key={i} role="tab" aria-selected={i === slide} aria-label={x.k} className={i === slide ? 'on' : ''} onClick={() => setSlide(i)} />)}
-          </div>
+      </Hero>
+
+      <section className="wrap panel">
+        <div className="feature-row">
+          <a href={`#/s/${cardio.id}`} className="card card-dark">
+            <Art id={cardio.id} color={cardio.color} icon={cardio.icon} dark />
+            <div className="card-dark-copy">
+              <span className="tag">🏥 Hospital</span>
+              <h2>{cardio.name}: the whole ESC core curriculum, one case at a time</h2>
+              <p>{cardio.units.length} units from the emergency department and coronary care to the cath lab, the echo lab and the device clinic — {cardio.units.length * 12} cases.</p>
+              <span className="more">Read more →</span>
+            </div>
+          </a>
+          <a href={`#/s/${im.id}`} className="card card-side">
+            <div className="thumb"><Art id={im.id} color={im.color} icon={im.icon} /></div>
+            <div>
+              <h2>{im.name} opens all {im.units.length} specialties</h2>
+              <p>From the acute medical take and intensive care to nephrology, endocrinology, neurology and palliative care — twelve cases in every unit.</p>
+            </div>
+            <span className="more">Read more →</span>
+          </a>
         </div>
-      </section>
-
-      <section className="band-search">
-        <div className="wrap"><Search /></div>
-      </section>
-
-      <section className="wrap sec">
-        <div className="sec-h"><h2>Our hospitals</h2><p>Choose a hospital, walk into a unit and pick one of its twelve cases.</p></div>
-        <div className="hosp-grid">
-          {HOSPITALS.map(h => (
-            <a key={h.id} href={`#/s/${h.id}`} className="hosp" style={{ '--c': h.color }}>
-              <div className="hosp-top"><span className="hosp-ic">{h.icon}</span><span className="hosp-n">{h.units.length} units · {h.units.length * 12} cases</span></div>
-              <h3>{h.name}</h3>
-              <p>{h.tagline}</p>
-              <ul>{h.units.slice(0, 8).map(u => <li key={u.id}>{u.icon} {u.name}</li>)}<li className="more">+ {h.units.length - 8} more units</li></ul>
-              <span className="hosp-go">Enter the {h.short.toLowerCase()} hospital →</span>
-            </a>
-          ))}
-        </div>
-      </section>
-
-      <section className="stats">
-        <div className="wrap stats-in">
-          {[[COUNTS.units, 'clinical units'], [COUNTS.cases, 'case titles'], [COUNTS.sessions, 'conference sessions'], [COUNTS.tests, 'tests & simulators'], [ready, 'items published']].map(([n, l]) => (
-            <div key={l}><b>{n}</b><span>{l}</span></div>
-          ))}
-        </div>
-      </section>
-
-      <section className="wrap sec">
-        <div className="sec-h"><h2>Centres</h2><p>Beyond the wards.</p></div>
-        <div className="centre-grid">
-          {CENTRES.map(c => (
-            <a key={c.id} href={`#/s/${c.id}`} className="centre" style={{ '--c': c.color }}>
-              <span className="centre-ic">{c.icon}</span>
-              <div>
-                <h3>{c.name}</h3>
-                <p>{c.tagline}</p>
-                <div className="chips">{c.units.map(u => <span key={u.id} className="chip">{u.icon} {u.name}</span>)}</div>
-              </div>
+        <div className="card-row">
+          {[
+            { to: `#/s/${conf.id}`, id: conf.id, color: conf.color, icon: conf.icon, tag: 'Conference Centre', h: 'Grand rounds, guideline updates & masterclasses', p: `${conf.units.length} halls and ${COUNTS.sessions} sessions — from the latest ESC guidelines to landmark-trial journal clubs.` },
+            { to: `#/s/${tests.id}`, id: tests.id, color: tests.color, icon: tests.icon, tag: 'Test Centre', h: 'Board simulators & question banks', p: `EEGC, MRCP, Arab Board and Fellowship mock exams, topic banks and skills tests — ${COUNTS.tests} in all.` },
+            { to: '#/s/cardiology/c-img', id: 'c-img', color: '#0A6E8A', icon: '🖥️', tag: 'Cardiology · Imaging', h: 'The echo lab: from the systematic study to 3D', p: 'Twelve imaging cases: TTE, strain, diastology, the right heart, TOE, CMR, CT and nuclear.' },
+            { to: '#/account', id: 'account', color: '#2B2B33', icon: '⚙️', tag: 'My account', h: `${ready} items published`, p: 'Sign in to open published cases. Administrators upload one HTML file per case, session or test.' },
+          ].map(c => (
+            <a key={c.tag} href={c.to} className="card card-img">
+              <div className="thumb"><Art id={c.id} color={c.color} icon={c.icon} /></div>
+              <span className="tag">{c.tag}</span>
+              <h3>{c.h}</h3>
+              <p>{c.p}</p>
+              <span className="more">Read more →</span>
             </a>
           ))}
         </div>
       </section>
 
       <section className="wrap sec">
-        <div className="sec-h"><h2>Explore by unit</h2><p>Every unit of both hospitals.</p></div>
+        <div className="sec-h"><h2><b>Our</b> hospitals</h2><p>Choose a unit — each one holds twelve cases.</p></div>
         {HOSPITALS.map(h => (
           <div key={h.id} className="unit-strip">
-            <h3 style={{ color: h.color }}>{h.icon} {h.name}</h3>
+            <div className="unit-strip-h"><h3>{h.icon} {h.name}</h3><a className="pill-btn" href={`#/s/${h.id}`}>All {h.units.length} units →</a></div>
             <div className="unit-tiles">
-              {h.units.map(u => <a key={u.id} href={`#/s/${h.id}/${u.id}`} className="unit-tile" style={{ '--c': h.color }}><span>{u.icon}</span>{u.name}</a>)}
+              {h.units.map(u => <a key={u.id} href={`#/s/${h.id}/${u.id}`} className="unit-tile"><span>{u.icon}</span>{u.name}</a>)}
             </div>
           </div>
         ))}
       </section>
+
+      <section className="stats">
+        <div className="wrap stats-in">
+          {[[COUNTS.units, 'clinical units'], [COUNTS.cases, 'cases'], [COUNTS.sessions, 'conference sessions'], [COUNTS.tests, 'tests & simulators'], [ready, 'published']].map(([n, l]) => (
+            <div key={l}><b>{n}</b><span>{l}</span></div>
+          ))}
+        </div>
+      </section>
     </>
   );
 }
+
+export { SECTION_BY_ID };

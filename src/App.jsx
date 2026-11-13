@@ -7,6 +7,8 @@ import UnitPage from './pages/UnitPage.jsx';
 import ItemPage from './pages/ItemPage.jsx';
 import AccountPage from './pages/AccountPage.jsx';
 import NotFound from './pages/NotFound.jsx';
+import Art from './components/Art.jsx';
+import { Search } from './components/Search.jsx';
 
 /* ============================================================
    VIRTUAL TEACHING HOSPITAL
@@ -72,59 +74,82 @@ export default function App() {
   );
 }
 
-/* ---------- header with mega menu ---------- */
+/* ---------- header: logo, tabs, search, pill buttons ---------- */
 
 function Header({ route }) {
   const { session, admin } = useApp();
-  const [open, setOpen] = useState(null);
-  const [mobile, setMobile] = useState(false);
-  useEffect(() => { setOpen(null); setMobile(false); }, [route]);
-  const active = id => route.a === 's' && route.b === id;
+  const tab = route.a === 's' ? route.b : route.a === 'item' ? ITEM_BY_ID[route.b]?.section : route.a || 'home';
   return (
     <header className="hdr">
-      <div className="hdr-util">
-        <div className="wrap hdr-util-in">
-          <span>Virtual Teaching Hospital · Cardiology & Internal Medicine</span>
-          <nav>
-            <a href="#/s/conference">Conference Centre</a>
-            <a href="#/s/tests">Test Centre</a>
-            <a href="#/account" className="hdr-acc">{session ? (admin ? '⚙️ My account · Admin' : '👤 My account') : '🔐 Sign in'}</a>
-          </nav>
-        </div>
-      </div>
-      <div className="hdr-main">
-        <div className="wrap hdr-main-in">
-          <a href="#/" className="logo" aria-label="Home">
-            <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="#0A2A5E" /><path d="M8 26h8l3-8 5 16 4-12 3 4h9" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            <span><b>Virtual Teaching</b><i>Hospital</i></span>
-          </a>
-          <button className="hdr-burger" aria-label="Menu" aria-expanded={mobile} onClick={() => setMobile(m => !m)}>☰</button>
-          <nav className={'hdr-nav' + (mobile ? ' open' : '')} onMouseLeave={() => setOpen(null)}>
-            {[...HOSPITALS, ...CENTRES].map(s => (
-              <div key={s.id} className={'hdr-item' + (active(s.id) ? ' on' : '')} onMouseEnter={() => setOpen(s.id)}>
-                <a href={`#/s/${s.id}`} onFocus={() => setOpen(s.id)}>{s.name}</a>
-                {open === s.id && (
-                  <div className="mega" style={{ '--c': s.color }}>
-                    <div className="wrap mega-in">
-                      <div className="mega-lead">
-                        <span className="mega-ic">{s.icon}</span>
-                        <h3>{s.name}</h3>
-                        <p>{s.tagline}</p>
-                        <a className="btn" href={`#/s/${s.id}`}>Enter the {s.short === 'Tests' ? 'Test Centre' : s.short === 'Conferences' ? 'Conference Centre' : 'hospital'} →</a>
-                      </div>
-                      <ul className="mega-list">
-                        {s.units.map(u => <li key={u.id}><a href={`#/s/${s.id}/${u.id}`}><span>{u.icon}</span>{u.name}</a></li>)}
-                      </ul>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-            <div className="hdr-item hdr-item-acc"><a href="#/account">{session ? 'My account' : 'Sign in'}</a></div>
-          </nav>
+      <div className="wrap hdr-in">
+        <a href="#/" className="logo" aria-label="Virtual Teaching Hospital — home">
+          <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 35C8 26 3 19 3 12.5 3 7.5 7 4 11.5 4c3.4 0 6.4 2 8.5 5 2.1-3 5.1-5 8.5-5C33 4 37 7.5 37 12.5 37 19 32 26 20 35z" fill="#C4122F" /><path d="M8 19h6l2.4-5 4 9 3-6 1.6 2H32" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          <span><b>VTH</b><i>Virtual Teaching<br />Hospital</i></span>
+        </a>
+        <nav className="hdr-tabs" aria-label="Main">
+          <a href="#/" className={tab === 'home' ? 'on' : ''}>Home</a>
+          <a href="#/s/cardiology" className={tab === 'cardiology' ? 'on' : ''}>Cardiology</a>
+          <a href="#/s/internal" className={tab === 'internal' ? 'on' : ''}>Internal Medicine</a>
+        </nav>
+        <div className="hdr-search"><Search compact /></div>
+        <div className="hdr-pills">
+          <a href="#/s/conference" className={'pill-btn' + (tab === 'conference' ? ' on' : '')}>Conferences</a>
+          <a href="#/s/tests" className={'pill-btn' + (tab === 'tests' ? ' on' : '')}>Tests</a>
+          <a href="#/account" className={'pill-btn' + (tab === 'account' ? ' on' : '')}>{session ? (admin ? 'Admin' : 'My account') : 'Sign in'}</a>
         </div>
       </div>
     </header>
+  );
+}
+
+/** The floating white pill menu that sits on every hero and sticks on scroll. */
+export function PillNav({ current }) {
+  const [open, setOpen] = useState(null);
+  const items = [...HOSPITALS, ...CENTRES];
+  return (
+    <nav className="pillnav" aria-label="Sections" onMouseLeave={() => setOpen(null)}>
+      <a href="#/" className="pillnav-home" aria-label="Home"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /></svg></a>
+      {items.map(s => (
+        <div key={s.id} className="pillnav-item" onMouseEnter={() => setOpen(s.id)}>
+          <a href={`#/s/${s.id}`} className={current === s.id ? 'on' : ''}>{s.name.replace(' Hospital', '')}</a>
+          {open === s.id && (
+            <div className="pillnav-drop">
+              <a className="pillnav-all" href={`#/s/${s.id}`}>{s.icon} All of the {s.name} →</a>
+              <div className="pillnav-grid">{s.units.map(u => <a key={u.id} href={`#/s/${s.id}/${u.id}`}><span>{u.icon}</span>{u.name}</a>)}</div>
+            </div>
+          )}
+        </div>
+      ))}
+      <a href="#/account" className="pillnav-acc">My account</a>
+    </nav>
+  );
+}
+
+/** Big rounded hero card with drawn cover art, the pill menu and a slab headline. */
+export function Hero({ id, color, icon, current, crumbs, kicker, title, light, sub, small, children }) {
+  return (
+    <section className={'wrap hero-card' + (small ? ' small' : '')}>
+      <Art id={id} color={color} icon={icon} dark />
+      <div className="hero-shade" />
+      <PillNav current={current} />
+      <div className="hero-copy">
+        {crumbs && <Crumbs items={crumbs} />}
+        {kicker && <span className="kicker">{kicker}</span>}
+        <h1><b>{title}</b>{light && <span>{light}</span>}</h1>
+        {sub && <p>{sub}</p>}
+        {children}
+      </div>
+      <i className="dot d1" /><i className="dot d2" /><i className="dot d3" />
+    </section>
+  );
+}
+
+export function Crumbs({ items }) {
+  return (
+    <nav className="crumbs" aria-label="Breadcrumb">
+      <a href="#/">Home</a>
+      {items.map(([label, href], i) => <React.Fragment key={i}><span>›</span>{href ? <a href={href}>{label}</a> : <b>{label}</b>}</React.Fragment>)}
+    </nav>
   );
 }
 
@@ -136,7 +161,7 @@ function Footer() {
           <div key={s.id}>
             <h4>{s.icon} {s.name}</h4>
             <ul>{s.units.slice(0, 6).map(u => <li key={u.id}><a href={`#/s/${s.id}/${u.id}`}>{u.name}</a></li>)}
-              {s.units.length > 6 && <li><a href={`#/s/${s.id}`}>All {s.units.length} {s.id === 'tests' ? 'tracks' : s.id === 'conference' ? 'halls' : 'units'} →</a></li>}
+              {s.units.length > 6 && <li><a href={`#/s/${s.id}`}>All {s.units.length} units →</a></li>}
             </ul>
           </div>
         ))}

@@ -1,24 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useApp } from '../App.jsx';
+import { useApp, Hero } from '../App.jsx';
 import { SECTIONS, UNIT_BY_ID, ITEM_BY_ID, itemWord } from '../data/catalog.js';
 import { signIn, signUp, resetPassword, signInWithGoogle, signOut, saveContent, removeContent, loadHtml } from '../supabaseClient.js';
 import HtmlFrame from '../components/HtmlFrame.jsx';
-import { Crumbs } from './SectionPage.jsx';
 
 export default function AccountPage() {
   const { session, admin, demo } = useApp();
   return (
     <>
-      <section className="page-hero small" style={{ '--c': '#0A2A5E' }}>
-        <div className="wrap">
-          <Crumbs items={[['My account']]} />
-          <div className="page-hero-in">
-            <span className="page-ic">{admin ? '⚙️' : '👤'}</span>
-            <div><h1>My account</h1><p>{session ? session.user.email : demo ? 'Demo mode — no sign-in needed on this preview' : 'Sign in to open published cases'}</p></div>
-          </div>
-        </div>
-      </section>
-      <section className="wrap sec">
+      <Hero id="account-hero" color="#2B2B33" icon={admin ? '⚙️' : '👤'} small crumbs={[['My account']]} title="My account"
+        sub={session ? session.user.email : demo ? 'Demo mode — no sign-in needed on this preview' : 'Sign in to open published cases'} />
+      <section className="wrap panel panel-light">
         {demo && <div className="note">🧪 <b>Demo mode.</b> This copy of the site is not connected to the database, so the admin panel saves uploads in this browser only. On the live site, uploads are stored in Supabase and visible to everyone.</div>}
         {!session && !demo && <SignIn />}
         {session && <Profile />}
