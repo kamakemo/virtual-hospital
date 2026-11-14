@@ -9,6 +9,7 @@ import AccountPage from './pages/AccountPage.jsx';
 import NotFound from './pages/NotFound.jsx';
 import Glyph from './components/Art.jsx';
 import Palette from './components/Palette.jsx';
+import { BUILTIN } from './data/builtin.js';
 
 /* ============================================================
    VIRTUAL TEACHING HOSPITAL
@@ -43,7 +44,7 @@ export default function App() {
     return () => window.removeEventListener('hashchange', on);
   }, []);
 
-  const refresh = useCallback(async () => { setContent(await fetchContent()); setLoaded(true); }, []);
+  const refresh = useCallback(async () => { setContent({ ...BUILTIN, ...(await fetchContent()) }); setLoaded(true); }, []);
 
   useEffect(() => {
     getSession().then(setSession);

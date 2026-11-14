@@ -3,6 +3,7 @@ import { useApp, Hero } from '../App.jsx';
 import { SECTIONS, UNIT_BY_ID, ITEM_BY_ID, itemWord } from '../data/catalog.js';
 import { signIn, signUp, resetPassword, signInWithGoogle, signOut, saveContent, removeContent, loadHtml } from '../supabaseClient.js';
 import HtmlFrame from '../components/HtmlFrame.jsx';
+import { BUILTIN } from '../data/builtin.js';
 
 export default function AccountPage() {
   const { session, admin, demo } = useApp();
@@ -157,7 +158,7 @@ function AdminRow({ item, open, onToggle, showUnit }) {
     const r = await removeContent(item, entry);
     setBusy(false);
     if (r.error) { setMsg({ bad: true, t: r.error.message }); return; }
-    setContent(c => { const n = { ...c }; delete n[item.id]; return n; });
+    setContent(c => { const n = { ...c }; delete n[item.id]; if (BUILTIN[item.id]) n[item.id] = BUILTIN[item.id]; return n; });
     setPreview(null); setMsg({ t: 'Removed.' });
   };
   const showCurrent = async () => {
@@ -169,7 +170,7 @@ function AdminRow({ item, open, onToggle, showUnit }) {
       <button className="arow-h" onClick={onToggle} aria-expanded={open}>
         <span className="case-n">{String(item.n).padStart(2, '0')}</span>
         <span className="arow-t">{entry?.title || item.title}{showUnit && <small>{UNIT_BY_ID[item.unit].name}</small>}</span>
-        <span className={'pill' + (entry ? ' pill-on' : '')}>{entry ? '● Published' : 'Empty'}</span>
+        <span className={'pill' + (entry ? ' pill-on' : '')}>{entry ? (entry.builtin ? '● Built-in' : '● Published') : 'Empty'}</span>
       </button>
       {open && (
         <div className="arow-b">
@@ -186,7 +187,7 @@ function AdminRow({ item, open, onToggle, showUnit }) {
             <button className="btn" disabled={!file || busy} onClick={publish}>{busy ? 'Working…' : entry ? '⬆️ Replace & publish' : '⬆️ Publish'}</button>
             {entry && !file && <button className="btn btn-line" onClick={showCurrent}>👁️ Preview current</button>}
             {entry && <a className="btn btn-line" href={`#/item/${item.id}`}>Open the page →</a>}
-            {entry && <button className="btn btn-danger" disabled={busy} onClick={remove}>🗑️ Remove</button>}
+            {entry && !entry.builtin && <button className="btn btn-danger" disabled={busy} onClick={remove}>🗑️ Remove</button>}
             {msg && <span className={msg.bad ? 'err' : 'ok'}>{msg.t}</span>}
           </div>
           {preview != null && <HtmlFrame html={preview} title={`Preview — ${title}`} tall={false} />}
