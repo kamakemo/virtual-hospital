@@ -7,8 +7,8 @@ import UnitPage from './pages/UnitPage.jsx';
 import ItemPage from './pages/ItemPage.jsx';
 import AccountPage from './pages/AccountPage.jsx';
 import NotFound from './pages/NotFound.jsx';
-import Art from './components/Art.jsx';
-import { Search } from './components/Search.jsx';
+import Glyph from './components/Art.jsx';
+import Palette from './components/Palette.jsx';
 
 /* ============================================================
    VIRTUAL TEACHING HOSPITAL
@@ -65,90 +65,91 @@ export default function App() {
   else if (a === 'account') page = <AccountPage />;
   else page = <NotFound />;
 
+  const [palette, setPalette] = useState(false);
+  const [theme, setTheme] = useState(() => { try { return localStorage.getItem('vth-theme') || 'dark'; } catch { return 'dark'; } });
+  useEffect(() => { document.documentElement.dataset.theme = theme; try { localStorage.setItem('vth-theme', theme); } catch { /* private mode */ } }, [theme]);
+  useEffect(() => {
+    const key = e => {
+      if ((e.key === 'k' && (e.metaKey || e.ctrlKey)) || (e.key === '/' && !/INPUT|TEXTAREA/.test(document.activeElement?.tagName))) { e.preventDefault(); setPalette(true); }
+    };
+    // cards with .spot follow the pointer with a soft light
+    const move = e => { const el = e.target.closest?.('.spot'); if (!el) return; const r = el.getBoundingClientRect(); el.style.setProperty('--mx', `${e.clientX - r.left}px`); el.style.setProperty('--my', `${e.clientY - r.top}px`); };
+    window.addEventListener('keydown', key); window.addEventListener('pointermove', move, { passive: true });
+    return () => { window.removeEventListener('keydown', key); window.removeEventListener('pointermove', move); };
+  }, []);
+  useEffect(() => setPalette(false), [route]);
+
   return (
     <Ctx.Provider value={ctx}>
-      <Header route={route} />
-      <main id="main">{page}</main>
+      <Header route={route} onSearch={() => setPalette(true)} theme={theme} onTheme={() => setTheme(t => (t === 'dark' ? 'light' : 'dark'))} />
+      <main id="main" key={route.a + route.b + route.c}>{page}</main>
       <Footer />
+      {palette && <Palette onClose={() => setPalette(false)} />}
     </Ctx.Provider>
   );
 }
 
-/* ---------- header: logo, tabs, search, pill buttons ---------- */
+/* ---------- brand ---------- */
 
-function Header({ route }) {
+/** The mark: a V whose stroke runs on into a heartbeat. */
+export function Mark({ size = 34 }) {
+  return (
+    <svg className="mark" width={size} height={size} viewBox="0 0 40 40" aria-hidden="true">
+      <rect width="40" height="40" rx="11" fill="var(--lime)" />
+      <path d="M7 11l7 18 5-13 3 7 2.5-5 2 4H34" fill="none" stroke="#07090F" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function Header({ route, onSearch, theme, onTheme }) {
   const { session, admin } = useApp();
+  const [open, setOpen] = useState(false);
+  useEffect(() => setOpen(false), [route]);
   const tab = route.a === 's' ? route.b : route.a === 'item' ? ITEM_BY_ID[route.b]?.section : route.a || 'home';
   return (
     <header className="hdr">
-      <div className="wrap hdr-in">
+      <div className="hdr-bar">
         <a href="#/" className="logo" aria-label="Virtual Teaching Hospital — home">
-          <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 35C8 26 3 19 3 12.5 3 7.5 7 4 11.5 4c3.4 0 6.4 2 8.5 5 2.1-3 5.1-5 8.5-5C33 4 37 7.5 37 12.5 37 19 32 26 20 35z" fill="#C4122F" /><path d="M8 19h6l2.4-5 4 9 3-6 1.6 2H32" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
-          <span><b>VTH</b><i>Virtual Teaching<br />Hospital</i></span>
+          <Mark />
+          <span><b>VTH</b><i>virtual teaching hospital</i></span>
         </a>
-        <nav className="hdr-tabs" aria-label="Main">
-          <a href="#/" className={tab === 'home' ? 'on' : ''}>Home</a>
-          <a href="#/s/cardiology" className={tab === 'cardiology' ? 'on' : ''}>Cardiology</a>
-          <a href="#/s/internal" className={tab === 'internal' ? 'on' : ''}>Internal Medicine</a>
+        <nav className={'hdr-nav' + (open ? ' open' : '')} aria-label="Main">
+          {[...HOSPITALS, ...CENTRES].map(s => <a key={s.id} href={`#/s/${s.id}`} className={tab === s.id ? 'on' : ''} style={{ '--c': s.color }}><i />{s.short}</a>)}
         </nav>
-        <div className="hdr-search"><Search compact /></div>
-        <div className="hdr-pills">
-          <a href="#/s/conference" className={'pill-btn' + (tab === 'conference' ? ' on' : '')}>Conferences</a>
-          <a href="#/s/tests" className={'pill-btn' + (tab === 'tests' ? ' on' : '')}>Tests</a>
-          <a href="#/account" className={'pill-btn' + (tab === 'account' ? ' on' : '')}>{session ? (admin ? 'Admin' : 'My account') : 'Sign in'}</a>
-        </div>
+        <button className="hdr-search" onClick={onSearch} aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" strokeWidth="2" /><path d="M16.5 16.5L21 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg><span>Search</span><kbd>⌘K</kbd></button>
+        <button className="hdr-ic" onClick={onTheme} aria-label="Switch theme">{theme === 'dark' ? '☀' : '☾'}</button>
+        <a href="#/account" className="btn btn-sm">{session ? (admin ? 'Admin' : 'Account') : 'Sign in'}</a>
+        <button className="hdr-ic hdr-burger" onClick={() => setOpen(o => !o)} aria-label="Menu" aria-expanded={open}>≡</button>
       </div>
     </header>
   );
 }
 
-/** The floating white pill menu that sits on every hero and sticks on scroll. */
-export function PillNav({ current }) {
-  const [open, setOpen] = useState(null);
-  const items = [...HOSPITALS, ...CENTRES];
+/** Page head for every inner page: breadcrumb, oversized title, the section's aura. */
+export function Hero({ id, color = 'var(--lime)', icon, crumbs, title, light, sub, children }) {
   return (
-    <nav className="pillnav" aria-label="Sections" onMouseLeave={() => setOpen(null)}>
-      <a href="#/" className="pillnav-home" aria-label="Home"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /></svg></a>
-      {items.map(s => (
-        <div key={s.id} className="pillnav-item" onMouseEnter={() => setOpen(s.id)}>
-          <a href={`#/s/${s.id}`} className={current === s.id ? 'on' : ''}>{s.name.replace(' Hospital', '')}</a>
-          {open === s.id && (
-            <div className="pillnav-drop">
-              <a className="pillnav-all" href={`#/s/${s.id}`}>{s.icon} All of the {s.name} →</a>
-              <div className="pillnav-grid">{s.units.map(u => <a key={u.id} href={`#/s/${s.id}/${u.id}`}><span>{u.icon}</span>{u.name}</a>)}</div>
-            </div>
-          )}
-        </div>
-      ))}
-      <a href="#/account" className="pillnav-acc">My account</a>
-    </nav>
-  );
-}
-
-/** Big rounded hero card with drawn cover art, the pill menu and a slab headline. */
-export function Hero({ id, color, icon, current, crumbs, kicker, title, light, sub, small, children }) {
-  return (
-    <section className={'wrap hero-card' + (small ? ' small' : '')}>
-      <Art id={id} color={color} icon={icon} dark />
-      <div className="hero-shade" />
-      <PillNav current={current} />
-      <div className="hero-copy">
+    <section className="phead" style={{ '--c': color }}>
+      <div className="aura" />
+      <div className="wrap phead-in">
         {crumbs && <Crumbs items={crumbs} />}
-        {kicker && <span className="kicker">{kicker}</span>}
-        <h1><b>{title}</b>{light && <span>{light}</span>}</h1>
-        {sub && <p>{sub}</p>}
+        <div className="phead-row">
+          <h1 className="rise">{title}</h1>
+          {icon && <span className="phead-ic rise" style={{ '--i': 1 }}>{icon}</span>}
+        </div>
+        {light && <p className="phead-lede rise" style={{ '--i': 1 }}>{light}</p>}
+        {sub && <p className="mono rise" style={{ '--i': 2 }}>{sub}</p>}
         {children}
       </div>
-      <i className="dot d1" /><i className="dot d2" /><i className="dot d3" />
+      <Glyph id={id} color={color} className="phead-glyph" />
     </section>
   );
 }
 
 export function Crumbs({ items }) {
   return (
-    <nav className="crumbs" aria-label="Breadcrumb">
+    <nav className="crumbs mono" aria-label="Breadcrumb">
       <a href="#/">Home</a>
-      {items.map(([label, href], i) => <React.Fragment key={i}><span>›</span>{href ? <a href={href}>{label}</a> : <b>{label}</b>}</React.Fragment>)}
+      {items.map(([label, href], i) => <React.Fragment key={i}><span>/</span>{href ? <a href={href}>{label}</a> : <b>{label}</b>}</React.Fragment>)}
     </nav>
   );
 }
@@ -156,19 +157,22 @@ export function Crumbs({ items }) {
 function Footer() {
   return (
     <footer className="ftr">
-      <div className="wrap ftr-cols">
-        {[...HOSPITALS, ...CENTRES].map(s => (
-          <div key={s.id}>
-            <h4>{s.icon} {s.name}</h4>
-            <ul>{s.units.slice(0, 6).map(u => <li key={u.id}><a href={`#/s/${s.id}/${u.id}`}>{u.name}</a></li>)}
-              {s.units.length > 6 && <li><a href={`#/s/${s.id}`}>All {s.units.length} units →</a></li>}
-            </ul>
-          </div>
-        ))}
-      </div>
-      <div className="wrap ftr-base">
-        <span>© {new Date().getFullYear()} Virtual Teaching Hospital — for medical education only. Composite teaching cases; not medical advice.</span>
-        <a href="#/account">My account</a>
+      <div className="wrap">
+        <div className="ftr-big"><Mark size={56} /><span>Learn medicine<br />where it <em>happens</em>.</span></div>
+        <div className="ftr-cols">
+          {[...HOSPITALS, ...CENTRES].map(s => (
+            <div key={s.id} style={{ '--c': s.color }}>
+              <h4><i />{s.name}</h4>
+              <ul>{s.units.slice(0, 6).map(u => <li key={u.id}><a href={`#/s/${s.id}/${u.id}`}>{u.name}</a></li>)}
+                {s.units.length > 6 && <li><a href={`#/s/${s.id}`}>All {s.units.length} units →</a></li>}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div className="ftr-base mono">
+          <span>© {new Date().getFullYear()} Virtual Teaching Hospital · for medical education only · composite teaching cases, not medical advice</span>
+          <a href="#/account">My account</a>
+        </div>
       </div>
     </footer>
   );

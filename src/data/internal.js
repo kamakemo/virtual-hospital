@@ -6,7 +6,7 @@ export default {
   name: 'Internal Medicine Hospital',
   short: 'Internal Medicine',
   tagline: 'Every specialty of general internal medicine, from the acute take to palliative care.',
-  color: '#0067B1',
+  color: '#3D8BFF',
   icon: '🏥',
   units: [
     { id: 'm-amu', name: 'Acute Medical Unit', icon: '🚨', blurb: 'The acute take: undifferentiated, unwell and undiagnosed.', cases: [

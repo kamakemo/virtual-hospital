@@ -25,7 +25,7 @@ export default function ItemPage({ item }) {
       <Hero id={item.id + '-hero'} color={section.color} icon={unit.icon} current={section.id} small
         crumbs={[[section.name, `#/s/${section.id}`], [unit.name, `#/s/${section.id}/${unit.id}`], [`${itemWord(section.id)} ${item.n}`]]}
         title={title} sub={`${unit.name} · ${itemWord(section.id)} ${item.n} of 12`} />
-      <section className="wrap panel">
+      <section className="wrap sec">
         {!loaded && <p className="muted">Loading…</p>}
         {loaded && !entry && (
           <div className="empty">
@@ -40,8 +40,8 @@ export default function ItemPage({ item }) {
         {entry && !err && html == null && <p className="muted">Opening…</p>}
         {entry && html != null && <HtmlFrame html={html} title={title} />}
         <div className="pager">
-          {prev ? <a className="pill-btn" href={`#/item/${prev.id}`}>← {prev.title}</a> : <a className="pill-btn" href={`#/s/${section.id}/${unit.id}`}>← {unit.name}</a>}
-          {next ? <a className="pill-btn" href={`#/item/${next.id}`}>{next.title} →</a> : <a className="pill-btn" href={`#/s/${section.id}/${unit.id}`}>{unit.name} →</a>}
+          {prev ? <a className="btn btn-line" href={`#/item/${prev.id}`}>← {prev.title}</a> : <a className="btn btn-line" href={`#/s/${section.id}/${unit.id}`}>← {unit.name}</a>}
+          {next ? <a className="btn btn-line" href={`#/item/${next.id}`}>{next.title} →</a> : <a className="btn btn-line" href={`#/s/${section.id}/${unit.id}`}>{unit.name} →</a>}
         </div>
       </section>
     </>

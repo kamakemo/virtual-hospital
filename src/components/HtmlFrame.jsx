@@ -27,7 +27,7 @@ export default function HtmlFrame({ html, title, tall = true }) {
     <div className={'frame' + (full ? ' full' : '')}>
       <div className="frame-bar">
         <span>{title}</span>
-        <button className="btn btn-sm" onClick={() => setFull(f => !f)}>{full ? '✕ Exit full screen' : '⤢ Full screen'}</button>
+        <button className="btn btn-line btn-sm" onClick={() => setFull(f => !f)}>{full ? '✕ Exit full screen' : '⤢ Full screen'}</button>
       </div>
       <iframe ref={ref} title={title} srcDoc={doc} className={tall ? 'tall' : ''}
         sandbox="allow-scripts allow-forms allow-popups allow-modals allow-downloads allow-popups-to-escape-sandbox" />

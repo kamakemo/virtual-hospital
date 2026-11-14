@@ -6,7 +6,7 @@ export default {
   name: 'Cardiology Hospital',
   short: 'Cardiology',
   tagline: 'The full ESC core curriculum — from the chest-pain door to the cath lab.',
-  color: '#C8102E',
+  color: '#FF5A4E',
   icon: '🫀',
   units: [
     { id: 'c-ed', name: 'Cardiac Emergency Department', icon: '🚑', blurb: 'The first hour: triage, resuscitation and the diagnoses that cannot wait.', cases: [

@@ -6,7 +6,7 @@ export const CONFERENCE = {
   name: 'Conference Centre',
   short: 'Conferences',
   tagline: 'Grand rounds, guideline updates, journal clubs and masterclasses.',
-  color: '#7A3E9D',
+  color: '#A678FF',
   icon: '🎤',
   units: [
     { id: 'conf-grand', name: 'Grand Rounds Hall', icon: '🏛️', blurb: 'Multidisciplinary case-based grand rounds.', cases: [
@@ -73,7 +73,7 @@ export const TESTS = {
   name: 'Test Centre',
   short: 'Tests',
   tagline: 'Board-exam simulators, topic question banks and skills assessments.',
-  color: '#00857C',
+  color: '#2EE6A6',
   icon: '📝',
   units: [
     { id: 'test-cardio', name: 'Cardiology Board Simulators', icon: '🫀', blurb: 'Mock exams for the cardiology boards.', cases: [

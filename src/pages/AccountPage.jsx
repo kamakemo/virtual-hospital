@@ -8,9 +8,9 @@ export default function AccountPage() {
   const { session, admin, demo } = useApp();
   return (
     <>
-      <Hero id="account-hero" color="#2B2B33" icon={admin ? '⚙️' : '👤'} small crumbs={[['My account']]} title="My account"
+      <Hero id="account-hero" color="var(--lime)" icon={admin ? '⚙️' : '👤'} small crumbs={[['My account']]} title="My account"
         sub={session ? session.user.email : demo ? 'Demo mode — no sign-in needed on this preview' : 'Sign in to open published cases'} />
-      <section className="wrap panel panel-light">
+      <section className="wrap sec">
         {demo && <div className="note">🧪 <b>Demo mode.</b> This copy of the site is not connected to the database, so the admin panel saves uploads in this browser only. On the live site, uploads are stored in Supabase and visible to everyone.</div>}
         {!session && !demo && <SignIn />}
         {session && <Profile />}
@@ -44,8 +44,8 @@ function SignIn() {
       </div>
       <label>Email<input type="email" required value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" /></label>
       {mode !== 'reset' && <label>Password<input type="password" required minLength={6} value={pw} onChange={e => setPw(e.target.value)} autoComplete={mode === 'up' ? 'new-password' : 'current-password'} /></label>}
-      <button className="btn btn-red" disabled={busy}>{busy ? '…' : mode === 'in' ? 'Sign in' : mode === 'up' ? 'Create account' : 'Send reset email'}</button>
-      <button type="button" className="btn btn-ghost-dark" onClick={() => signInWithGoogle()}>Continue with Google</button>
+      <button className="btn" disabled={busy}>{busy ? '…' : mode === 'in' ? 'Sign in' : mode === 'up' ? 'Create account' : 'Send reset email'}</button>
+      <button type="button" className="btn btn-line" onClick={() => signInWithGoogle()}>Continue with Google</button>
       {msg && <p className={msg.bad ? 'err' : 'ok'}>{msg.t}</p>}
     </form>
   );
@@ -56,7 +56,7 @@ function Profile() {
   return (
     <div className="card profile">
       <div><b>{session.user.email}</b><span>{admin ? 'Administrator' : 'Learner'}</span></div>
-      <button className="btn btn-ghost-dark" onClick={() => signOut()}>Sign out</button>
+      <button className="btn btn-line" onClick={() => signOut()}>Sign out</button>
     </div>
   );
 }
@@ -183,9 +183,9 @@ function AdminRow({ item, open, onToggle, showUnit }) {
           </div>
           <label className="arow-title">Title shown on the site<input value={title} onChange={e => setTitle(e.target.value)} /></label>
           <div className="arow-actions">
-            <button className="btn btn-red" disabled={!file || busy} onClick={publish}>{busy ? 'Working…' : entry ? '⬆️ Replace & publish' : '⬆️ Publish'}</button>
-            {entry && !file && <button className="btn btn-ghost-dark" onClick={showCurrent}>👁️ Preview current</button>}
-            {entry && <a className="btn btn-ghost-dark" href={`#/item/${item.id}`}>Open the page →</a>}
+            <button className="btn" disabled={!file || busy} onClick={publish}>{busy ? 'Working…' : entry ? '⬆️ Replace & publish' : '⬆️ Publish'}</button>
+            {entry && !file && <button className="btn btn-line" onClick={showCurrent}>👁️ Preview current</button>}
+            {entry && <a className="btn btn-line" href={`#/item/${item.id}`}>Open the page →</a>}
             {entry && <button className="btn btn-danger" disabled={busy} onClick={remove}>🗑️ Remove</button>}
             {msg && <span className={msg.bad ? 'err' : 'ok'}>{msg.t}</span>}
           </div>
