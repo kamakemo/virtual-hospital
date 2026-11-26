@@ -148,14 +148,14 @@ function AdminRow({ item, open, onToggle, showUnit }) {
     const r = await saveContent(item, { html: file.html, fileName: file.name, title: title.trim() || item.title });
     setBusy(false);
     if (r.error) { setMsg({ bad: true, t: r.error.message || 'Upload failed.' }); return; }
-    setContent(c => ({ ...c, [item.id]: r.data }));
+    setContent(c => ({ ...c, [item.id]: BUILTIN[item.id]?.sim ? { ...BUILTIN[item.id], upload: r.data } : r.data }));
     setFile(null);
     setMsg({ t: '✅ Published.' });
   };
   const remove = async () => {
     if (!window.confirm(`Remove the HTML for “${item.title}”? The case goes back to “Coming soon”.`)) return;
     setBusy(true);
-    const r = await removeContent(item, entry);
+    const r = await removeContent(item, entry.upload || entry);
     setBusy(false);
     if (r.error) { setMsg({ bad: true, t: r.error.message }); return; }
     setContent(c => { const n = { ...c }; delete n[item.id]; if (BUILTIN[item.id]) n[item.id] = BUILTIN[item.id]; return n; });
@@ -187,7 +187,7 @@ function AdminRow({ item, open, onToggle, showUnit }) {
             <button className="btn" disabled={!file || busy} onClick={publish}>{busy ? 'Working…' : entry ? '⬆️ Replace & publish' : '⬆️ Publish'}</button>
             {entry && !file && (entry.sim ? <a className="btn btn-line" href={`#/item/${item.id}`}>👁️ Open simulator case</a> : <button className="btn btn-line" onClick={showCurrent}>👁️ Preview current</button>)}
             {entry && <a className="btn btn-line" href={`#/item/${item.id}`}>Open the page →</a>}
-            {entry && !entry.builtin && <button className="btn btn-danger" disabled={busy} onClick={remove}>🗑️ Remove</button>}
+            {entry && (!entry.builtin || entry.upload) && <button className="btn btn-danger" disabled={busy} onClick={remove}>🗑️ Remove</button>}
             {msg && <span className={msg.bad ? 'err' : 'ok'}>{msg.t}</span>}
           </div>
           {preview != null && <HtmlFrame html={preview} title={`Preview — ${title}`} tall={false} />}

@@ -44,7 +44,13 @@ export default function App() {
     return () => window.removeEventListener('hashchange', on);
   }, []);
 
-  const refresh = useCallback(async () => { setContent({ ...BUILTIN, ...(await fetchContent()) }); setLoaded(true); }, []);
+  const refresh = useCallback(async () => {
+    const remote = await fetchContent();
+    // simulator cases always win; an uploaded file for the same id is kept as `upload`
+    const merged = { ...BUILTIN, ...remote };
+    for (const [id, b] of Object.entries(BUILTIN)) if (b.sim) merged[id] = remote[id] ? { ...b, upload: remote[id] } : b;
+    setContent(merged); setLoaded(true);
+  }, []);
 
   useEffect(() => {
     getSession().then(setSession);
