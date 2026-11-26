@@ -3,6 +3,8 @@ import { useApp, Hero } from '../App.jsx';
 import { SECTION_BY_ID, UNIT_BY_ID, itemWord } from '../data/catalog.js';
 import { loadHtml } from '../supabaseClient.js';
 import HtmlFrame from '../components/HtmlFrame.jsx';
+import { SIM_CASES } from '../sim/index.js';
+const SimCase = React.lazy(() => import('../sim/SimCase.jsx'));
 
 export default function ItemPage({ item }) {
   const { content, loaded, session, admin, demo } = useApp();
@@ -14,7 +16,7 @@ export default function ItemPage({ item }) {
 
   useEffect(() => {
     setHtml(null); setErr(null);
-    if (entry) loadHtml(entry).then(setHtml).catch(e => setErr(e.message));
+    if (entry && !entry.sim) loadHtml(entry).then(setHtml).catch(e => setErr(e.message));
   }, [entry]);
 
   const i = unit.items.indexOf(item);
@@ -36,9 +38,10 @@ export default function ItemPage({ item }) {
             {admin && <a className="btn" href="#/account" onClick={() => sessionStorage.setItem('vh-admin-item', item.id)}>⬆️ Upload the HTML for this {itemWord(section.id).toLowerCase()}</a>}
           </div>
         )}
-        {entry && err && <div className="empty"><span>⚠️</span><h2>Could not open this file</h2><p>{err}</p></div>}
-        {entry && !err && html == null && <p className="muted">Opening…</p>}
-        {entry && html != null && <HtmlFrame html={html} title={title} />}
+        {entry?.sim && SIM_CASES[item.id] && <React.Suspense fallback={<p className="muted">Opening the simulator…</p>}><SimCase def={SIM_CASES[item.id]} /></React.Suspense>}
+        {entry && !entry.sim && err && <div className="empty"><span>⚠️</span><h2>Could not open this file</h2><p>{err}</p></div>}
+        {entry && !entry.sim && !err && html == null && <p className="muted">Opening…</p>}
+        {entry && !entry.sim && html != null && <HtmlFrame html={html} title={title} />}
         <div className="pager">
           {prev ? <a className="btn btn-line" href={`#/item/${prev.id}`}>← {prev.title}</a> : <a className="btn btn-line" href={`#/s/${section.id}/${unit.id}`}>← {unit.name}</a>}
           {next ? <a className="btn btn-line" href={`#/item/${next.id}`}>{next.title} →</a> : <a className="btn btn-line" href={`#/s/${section.id}/${unit.id}`}>{unit.name} →</a>}

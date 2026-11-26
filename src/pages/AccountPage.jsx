@@ -185,7 +185,7 @@ function AdminRow({ item, open, onToggle, showUnit }) {
           <label className="arow-title">Title shown on the site<input value={title} onChange={e => setTitle(e.target.value)} /></label>
           <div className="arow-actions">
             <button className="btn" disabled={!file || busy} onClick={publish}>{busy ? 'Working…' : entry ? '⬆️ Replace & publish' : '⬆️ Publish'}</button>
-            {entry && !file && <button className="btn btn-line" onClick={showCurrent}>👁️ Preview current</button>}
+            {entry && !file && (entry.sim ? <a className="btn btn-line" href={`#/item/${item.id}`}>👁️ Open simulator case</a> : <button className="btn btn-line" onClick={showCurrent}>👁️ Preview current</button>)}
             {entry && <a className="btn btn-line" href={`#/item/${item.id}`}>Open the page →</a>}
             {entry && !entry.builtin && <button className="btn btn-danger" disabled={busy} onClick={remove}>🗑️ Remove</button>}
             {msg && <span className={msg.bad ? 'err' : 'ok'}>{msg.t}</span>}
